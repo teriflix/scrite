@@ -27,7 +27,8 @@ public:
     QImageItem(QQuickItem *parentItem = nullptr);
     ~QImageItem();
 
-    Q_PROPERTY(bool useSoftwareRenderer READ useSoftwareRenderer WRITE setUseSoftwareRenderer NOTIFY useSoftwareRendererChanged)
+    Q_PROPERTY(bool useSoftwareRenderer READ useSoftwareRenderer WRITE setUseSoftwareRenderer NOTIFY
+                       useSoftwareRendererChanged)
     void setUseSoftwareRenderer(bool val);
     bool useSoftwareRenderer() const { return m_useSoftwareRenderer; }
     Q_SIGNAL void useSoftwareRendererChanged();

@@ -67,7 +67,8 @@
 
 bool QtApplicationEventNotificationCallback(void **cbdata);
 
-void ApplicationQtMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message)
+void ApplicationQtMessageHandler(QtMsgType type, const QMessageLogContext &context,
+                                 const QString &message)
 {
 #if QT_NO_DEBUG_OUTPUT
     Q_UNUSED(type)
@@ -125,16 +126,19 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     connect(this, &QGuiApplication::fontChanged, this, &Application::applicationFontChanged);
 
     this->setWindowIcon(QIcon(":/images/appicon.png"));
-    this->setBaseWindowTitle(Application::applicationName() + " " + Application::applicationVersion());
+    this->setBaseWindowTitle(Application::applicationName() + " "
+                             + Application::applicationVersion());
 
     const QString settingsFile =
-            QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).absoluteFilePath("settings.ini");
+            QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
+                    .absoluteFilePath("settings.ini");
     m_settings = new QSettings(settingsFile, QSettings::IniFormat, this);
     this->installationId();
     this->installationTimestamp();
     m_settings->setValue(QStringLiteral("Installation/launchCount"), this->launchCounter() + 1);
 
-    if (m_settings->value(QStringLiteral("Installation/fileTypeRegistered"), false).toBool() == false) {
+    if (m_settings->value(QStringLiteral("Installation/fileTypeRegistered"), false).toBool()
+        == false) {
         const bool rft = this->registerFileTypes();
         m_settings->setValue(QStringLiteral("Installation/fileTypeRegistered"), rft);
         if (rft)
@@ -148,11 +152,12 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     }
 
 #ifndef QT_NO_DEBUG_OUTPUT
-    QInternal::registerCallback(QInternal::EventNotifyCallback, QtApplicationEventNotificationCallback);
+    QInternal::registerCallback(QInternal::EventNotifyCallback,
+                                QtApplicationEventNotificationCallback);
 #endif
 
-    const QVersionNumber sversion =
-            QVersionNumber::fromString(m_settings->value(QStringLiteral("Installation/version")).toString());
+    const QVersionNumber sversion = QVersionNumber::fromString(
+            m_settings->value(QStringLiteral("Installation/version")).toString());
     if (sversion.isNull() || sversion == QVersionNumber(0, 4, 7)) {
         // until we can fix https://github.com/teriflix/scrite/issues/138
         m_settings->setValue("Screenplay Editor/enableSpellCheck", false);
@@ -161,9 +166,11 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 
     if (sversion.isNull() || sversion <= QVersionNumber(0, 5, 3)) {
         const QString customResKey = QStringLiteral("ScreenplayPageLayout/customResolution");
-        const QString forceCustomResKey = QStringLiteral("ScreenplayPageLayout/forceCustomResolution");
+        const QString forceCustomResKey =
+                QStringLiteral("ScreenplayPageLayout/forceCustomResolution");
         const bool customResAlreadySet = m_settings->value(customResKey, 0).toDouble() > 0;
-        const bool forceCustomRes = !customResAlreadySet && m_settings->value(forceCustomResKey, true).toBool();
+        const bool forceCustomRes =
+                !customResAlreadySet && m_settings->value(forceCustomResKey, true).toBool();
         if (forceCustomRes) {
 #ifdef Q_OS_MAC
             m_settings->setValue(customResKey, 72);
@@ -191,7 +198,8 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     this->computeIdealFontPointSize();
 
     QSurfaceFormat surfaceFormat = QSurfaceFormat::defaultFormat();
-    const QByteArray envOpenGLMultisampling = qgetenv("SCRITE_OPENGL_MULTISAMPLING").toUpper().trimmed();
+    const QByteArray envOpenGLMultisampling =
+            qgetenv("SCRITE_OPENGL_MULTISAMPLING").toUpper().trimmed();
     if (envOpenGLMultisampling == QByteArrayLiteral("FULL"))
         surfaceFormat.setSamples(4);
     else if (envOpenGLMultisampling == QByteArrayLiteral("EXTREME"))
@@ -234,12 +242,14 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 
     QQuickStyle::setStyle(style);
 
-    connect(this, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SIGNAL(appStateChanged()));
+    connect(this, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this,
+            SIGNAL(appStateChanged()));
 }
 
 static void copyFilesRecursively(const QDir &from, const QDir &to)
 {
-    const QFileInfoList fromList = from.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+    const QFileInfoList fromList =
+            from.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     for (const QFileInfo &fromFile : fromList) {
         if (fromFile.isFile())
             QFile::copy(fromFile.absoluteFilePath(), to.absoluteFilePath(fromFile.fileName()));
@@ -257,7 +267,8 @@ static void copyFilesRecursively(const QDir &from, const QDir &to)
 
 QVersionNumber Application::prepare()
 {
-    const QVersionNumber applicationVersion = QVersionNumber::fromString(QStringLiteral(SCRITE_VERSION));
+    const QVersionNumber applicationVersion =
+            QVersionNumber::fromString(QStringLiteral(SCRITE_VERSION));
     const QString applicationVersionString = [applicationVersion]() -> QString {
         QStringList ret = { QString::number(applicationVersion.majorVersion()),
                             QString::number(applicationVersion.minorVersion()) };
@@ -288,13 +299,15 @@ QVersionNumber Application::prepare()
     Application::setOrganizationName(QStringLiteral("TERIFLIX"));
     Application::setOrganizationDomain(QStringLiteral("teriflix.com"));
 
-    const QDir oldAppDataFolder = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    const QDir oldAppDataFolder =
+            QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
 
     Application::setOrganizationName(QStringLiteral("Scrite"));
     Application::setOrganizationDomain(QStringLiteral("scrite.io"));
 
     if (oldAppDataFolder.exists()) {
-        const QString newAppDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        const QString newAppDataPath =
+                QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         QDir().mkpath(newAppDataPath);
         copyFilesRecursively(oldAppDataFolder, QDir(newAppDataPath));
         QDir(oldAppDataFolder).removeRecursively();
@@ -324,8 +337,11 @@ QVersionNumber Application::prepare()
     const QByteArray dpiMode = qgetenv("SCRITE_DPI_MODE").trimmed();
     if (dpiMode.isEmpty()) {
         const qreal uiScaleFactor =
-                Utils::SystemEnvironment::get(QLatin1String("SCRITE_UI_SCALE_FACTOR"), QLatin1String("1.0")).toDouble();
-        const QByteArray qtScaleFactor = QByteArray::number(qRound(qBound(0.1, uiScaleFactor, 10.0) * 100) / 100.0);
+                Utils::SystemEnvironment::get(QLatin1String("SCRITE_UI_SCALE_FACTOR"),
+                                              QLatin1String("1.0"))
+                        .toDouble();
+        const QByteArray qtScaleFactor =
+                QByteArray::number(qRound(qBound(0.1, uiScaleFactor, 10.0) * 100) / 100.0);
         Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
         Application::setAttribute(Qt::AA_Use96Dpi);
         Application::setAttribute(Qt::AA_DisableHighDpiScaling);
@@ -353,7 +369,8 @@ QVersionNumber Application::prepare()
 Application::~Application()
 {
 #ifndef QT_NO_DEBUG_OUTPUT
-    QInternal::unregisterCallback(QInternal::EventNotifyCallback, QtApplicationEventNotificationCallback);
+    QInternal::unregisterCallback(QInternal::EventNotifyCallback,
+                                  QtApplicationEventNotificationCallback);
 #endif
 }
 
@@ -390,7 +407,8 @@ QString Application::installationId() const
 
 QDateTime Application::installationTimestamp() const
 {
-    QString installTimestampStr = m_settings->value(QLatin1String("Installation/timestamp")).toString();
+    QString installTimestampStr =
+            m_settings->value(QLatin1String("Installation/timestamp")).toString();
     QDateTime installTimestamp = QDateTime::fromString(installTimestampStr);
     if (installTimestampStr.isEmpty() || !installTimestamp.isValid()) {
         installTimestamp = QDateTime::currentDateTime();
@@ -427,8 +445,9 @@ void Application::setCustomFontPointSize(int val)
 QStringList Application::availableThemes()
 {
     // return QQuickStyle::availableStyles();
-    static QStringList themes({ QStringLiteral("Basic"), QStringLiteral("Fusion"), QStringLiteral("Imagine"),
-                                QStringLiteral("Material"), QStringLiteral("Universal") });
+    static QStringList themes({ QStringLiteral("Basic"), QStringLiteral("Fusion"),
+                                QStringLiteral("Imagine"), QStringLiteral("Material"),
+                                QStringLiteral("Universal") });
     return themes;
 }
 
@@ -509,7 +528,8 @@ void Application::revealFileOnDesktop(const QString &pathIn)
     if (Utils::Platform::isWindowsDesktop()) {
         const QString explorer = QStandardPaths::findExecutable("explorer.exe");
         if (explorer.isEmpty()) {
-            m_errorReport->setErrorMessage("Could not find explorer.exe in path to launch Windows Explorer.");
+            m_errorReport->setErrorMessage(
+                    "Could not find explorer.exe in path to launch Windows Explorer.");
             return;
         }
 
@@ -525,7 +545,8 @@ void Application::revealFileOnDesktop(const QString &pathIn)
                               .arg(fileInfo.canonicalFilePath());
         QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
         scriptArgs.clear();
-        scriptArgs << QLatin1String("-e") << QLatin1String("tell application \"Finder\" to activate");
+        scriptArgs << QLatin1String("-e")
+                   << QLatin1String("tell application \"Finder\" to activate");
         QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
     } else {
 #if 0 // TODO
@@ -550,18 +571,20 @@ void Application::revealFileOnDesktop(const QString &pathIn)
         notification->setTitle(QStringLiteral("File available"));
 
 #ifdef Q_OS_MAC
-        notification->setText(
-                QStringLiteral("Revealing <b>%1</b> in '<i>%2</i>'...").arg(fi.fileName(), fi.absolutePath()));
+        notification->setText(QStringLiteral("Revealing <b>%1</b> in '<i>%2</i>'...")
+                                      .arg(fi.fileName(), fi.absolutePath()));
 #else
 #ifdef Q_OS_WIN
-        notification->setText(QStringLiteral("<b>%1</b> is available at '<i>%2</i>'. You can take a look at the "
-                                             "file by switching to the Explorer window which has been "
-                                             "opened in the background with this file selected.")
-                                      .arg(fi.fileName(), fi.absolutePath()));
+        notification->setText(
+                QStringLiteral("<b>%1</b> is available at '<i>%2</i>'. You can take a look at the "
+                               "file by switching to the Explorer window which has been "
+                               "opened in the background with this file selected.")
+                        .arg(fi.fileName(), fi.absolutePath()));
 #else
-        notification->setText(QStringLiteral("<b>%1</b> is available. Please launch your file manager app "
-                                             "and navigate to '<i>%2</i>' to open the file.")
-                                      .arg(fi.fileName(), fi.absolutePath()));
+        notification->setText(
+                QStringLiteral("<b>%1</b> is available. Please launch your file manager app "
+                               "and navigate to '<i>%2</i>' to open the file.")
+                        .arg(fi.fileName(), fi.absolutePath()));
 #endif
 #endif
 
@@ -616,7 +639,8 @@ bool Application::notify(QObject *object, QEvent *event)
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(event);
 
-        if (ke->modifiers() & Qt::ControlModifier | Qt::ShiftModifier | Qt::AltModifier && ke->key() == Qt::Key_R) {
+        if (ke->modifiers() & Qt::ControlModifier | Qt::ShiftModifier | Qt::AltModifier
+            && ke->key() == Qt::Key_R) {
             CrashpadModule::crash();
             return true;
         }
@@ -663,10 +687,11 @@ bool Application::notifyInternal(QObject *object, QEvent *event)
             QObject *parent = item && item->parentItem() ? item->parentItem() : object->parent();
             QString parentName = parent ? from.value(parent) : "No Parent";
             if (parentName.isEmpty()) {
-                parentName = QString("%1 [%2] (%3)")
-                                     .arg(parent ? parent->metaObject()->className() : "Unknown Parent")
-                                     .arg((unsigned long)((void *)parent), 0, 16)
-                                     .arg(parent->objectName());
+                parentName =
+                        QString("%1 [%2] (%3)")
+                                .arg(parent ? parent->metaObject()->className() : "Unknown Parent")
+                                .arg((unsigned long)((void *)parent), 0, 16)
+                                .arg(parent->objectName());
             }
             objectName = QString("%1 [%2] (%3) under %4")
                                  .arg(object->metaObject()->className())
@@ -713,7 +738,8 @@ void Application::computeIdealFontPointSize()
         fontPointSize = 12;
 #else
         const qreal minInch = 0.12; // Font should occupy atleast 0.12 inches on the screen
-        const qreal nrPointsPerInch = qt_defaultDpi(); // These many dots make up one inch on the screen
+        const qreal nrPointsPerInch =
+                qt_defaultDpi(); // These many dots make up one inch on the screen
         const qreal scale = this->primaryScreen()->physicalDotsPerInch() / nrPointsPerInch;
         const qreal dpr = this->primaryScreen()->devicePixelRatio();
         fontPointSize = qCeil(minInch * nrPointsPerInch * qMax(dpr, scale));
@@ -761,11 +787,15 @@ void Application::saveWindowGeometry(QWindow *window, const QString &group)
 
     const QRect geometry = window->geometry();
     if (window->visibility() == QWindow::Windowed) {
-        const QString geometryString =
-                QString("%1 %2 %3 %4").arg(geometry.x()).arg(geometry.y()).arg(geometry.width()).arg(geometry.height());
+        const QString geometryString = QString("%1 %2 %3 %4")
+                                               .arg(geometry.x())
+                                               .arg(geometry.y())
+                                               .arg(geometry.width())
+                                               .arg(geometry.height());
         m_settings->setValue(group + QStringLiteral("/windowGeometry"), geometryString);
     } else
-        m_settings->setValue(group + QStringLiteral("/windowGeometry"), QStringLiteral("Maximized"));
+        m_settings->setValue(group + QStringLiteral("/windowGeometry"),
+                             QStringLiteral("Maximized"));
 }
 
 bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
@@ -787,7 +817,8 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
     const QScreen *screen = window->screen();
     const QRect screenGeo = screen->availableGeometry();
 
-    const QString geometryString = m_settings->value(group + QStringLiteral("/windowGeometry")).toString();
+    const QString geometryString =
+            m_settings->value(group + QStringLiteral("/windowGeometry")).toString();
     if (geometryString == QStringLiteral("Maximized")) {
 #ifdef Q_OS_WIN
         QTimer::singleShot(100, window, &QWindow::showMaximized);
@@ -805,11 +836,12 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
 
     const QString geoDeltaArg = QStringLiteral("--geodelta");
     const int geoDeltaArgPos = this->arguments().indexOf(geoDeltaArg);
-    const int geoDelta = qBound(0,
-                                geoDeltaArgPos >= 0 && this->arguments().size() >= geoDeltaArgPos + 2
-                                        ? this->arguments().at(geoDeltaArgPos + 1).toInt()
-                                        : 0,
-                                100);
+    const int geoDelta =
+            qBound(0,
+                   geoDeltaArgPos >= 0 && this->arguments().size() >= geoDeltaArgPos + 2
+                           ? this->arguments().at(geoDeltaArgPos + 1).toInt()
+                           : 0,
+                   100);
 
     const int x = geometry.at(0).toInt() + geoDelta;
     const int y = geometry.at(1).toInt() + geoDelta;

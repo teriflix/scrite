@@ -93,19 +93,24 @@ public:
 
 inline static QString timeToString(const QTime &time, bool inclSecs = false)
 {
-    const QTime time2 = inclSecs ? time : QTime(time.hour(), time.minute() + (time.second() > 30 ? 1 : 0), 0);
+    const QTime time2 =
+            inclSecs ? time : QTime(time.hour(), time.minute() + (time.second() > 30 ? 1 : 0), 0);
     return Utils::TMath::timeLengthString(time2);
 }
 
-StatisticsReportPage::StatisticsReportPage(StatisticsReport *report) : PdfExportableGraphicsScene(report)
+StatisticsReportPage::StatisticsReportPage(StatisticsReport *report)
+    : PdfExportableGraphicsScene(report)
 {
-    auto ir = [](const QGraphicsItem *item) { return item->mapToScene(item->boundingRect()).boundingRect(); };
+    auto ir = [](const QGraphicsItem *item) {
+        return item->mapToScene(item->boundingRect()).boundingRect();
+    };
 
     StatisticsReportKeyNumbers *keyNumbers = new StatisticsReportKeyNumbers(report);
     keyNumbers->setPos(0, 0);
     this->addItem(keyNumbers);
 
-    StatisticsReportDialogueActionRatio *dialogueActionPieChart = new StatisticsReportDialogueActionRatio(report);
+    StatisticsReportDialogueActionRatio *dialogueActionPieChart =
+            new StatisticsReportDialogueActionRatio(report);
     dialogueActionPieChart->setPos(ir(keyNumbers).bottomLeft() + QPointF(0, 20));
     this->addItem(dialogueActionPieChart);
 
@@ -140,7 +145,8 @@ StatisticsReportPage::~StatisticsReportPage() { }
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-StatisticsReportKeyNumbers::StatisticsReportKeyNumbers(const StatisticsReport *report, QGraphicsItem *parent)
+StatisticsReportKeyNumbers::StatisticsReportKeyNumbers(const StatisticsReport *report,
+                                                       QGraphicsItem *parent)
     : QGraphicsRectItem(parent)
 {
     const Screenplay *screenplay = report->document()->screenplay();
@@ -154,14 +160,15 @@ StatisticsReportKeyNumbers::StatisticsReportKeyNumbers(const StatisticsReport *r
     const qreal avgScenePxLength = report->totalPixelLength() / sceneElements.size();
     const QTime avgSceneTime = report->pixelLengthToTime(avgScenePxLength);
 
-    const QStringList statLabels = { QStringLiteral("Est. Runtime: ") + ::timeToString(report->estimatedTime()),
-                                     QString::number(sceneElements.size()) + QStringLiteral(" Scenes"),
-                                     QString::number(structure->characterNames().size())
-                                             + QStringLiteral(" Characters"),
-                                     QString::number(report->pageCount()) + QStringLiteral(" Pages"),
-                                     QString::number(nrDialogues) + QStringLiteral(" Dialogues"),
-                                     QString::number(structure->allLocations().size()) + QStringLiteral(" Locations"),
-                                     QStringLiteral("Avg. Scene Time: ") + ::timeToString(avgSceneTime, true) };
+    const QStringList statLabels = {
+        QStringLiteral("Est. Runtime: ") + ::timeToString(report->estimatedTime()),
+        QString::number(sceneElements.size()) + QStringLiteral(" Scenes"),
+        QString::number(structure->characterNames().size()) + QStringLiteral(" Characters"),
+        QString::number(report->pageCount()) + QStringLiteral(" Pages"),
+        QString::number(nrDialogues) + QStringLiteral(" Dialogues"),
+        QString::number(structure->allLocations().size()) + QStringLiteral(" Locations"),
+        QStringLiteral("Avg. Scene Time: ") + ::timeToString(avgSceneTime, true)
+    };
 
     const QColor bgColor = StatisticsReport::pickColor(0);
     const QColor textColor = Utils::Color::textColorFor(bgColor);
@@ -199,7 +206,8 @@ StatisticsReportKeyNumbers::~StatisticsReportKeyNumbers() { }
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-StatisticsReportTimeline::StatisticsReportTimeline(qreal suggestedWidth, const StatisticsReport *report,
+StatisticsReportTimeline::StatisticsReportTimeline(qreal suggestedWidth,
+                                                   const StatisticsReport *report,
                                                    QGraphicsItem *parent)
     : QGraphicsRectItem(parent)
 {
@@ -232,24 +240,28 @@ StatisticsReportTimeline::StatisticsReportTimeline(qreal suggestedWidth, const S
         if (dist.isEmpty())
             continue;
 
-        QGraphicsRectItem *distsRect = this->createDistributionItems(container, dist, distsItem.second,
-                                                                     totalPixelLength, i == dists.size() - 1);
+        QGraphicsRectItem *distsRect = this->createDistributionItems(
+                container, dist, distsItem.second, totalPixelLength, i == dists.size() - 1);
         if (distsRect) {
-            distsRect->setPos(prevItem->pos() + prevItem->boundingRect().bottomLeft() + QPointF(0, 10));
+            distsRect->setPos(prevItem->pos() + prevItem->boundingRect().bottomLeft()
+                              + QPointF(0, 10));
             prevItem = distsRect;
         }
     }
 
     QGraphicsRectItem *sceneItemsContainer = prevItem;
-    QGraphicsRectItem *tracksItem = this->createScreenplayTracks(report, container, 40, totalPixelLength);
+    QGraphicsRectItem *tracksItem =
+            this->createScreenplayTracks(report, container, 40, totalPixelLength);
     if (tracksItem != nullptr) {
         tracksItem->setPos(sceneItemsContainer->pos());
-        sceneItemsContainer->setPos(tracksItem->pos() + tracksItem->boundingRect().bottomLeft() + QPointF(0, 10));
+        sceneItemsContainer->setPos(tracksItem->pos() + tracksItem->boundingRect().bottomLeft()
+                                    + QPointF(0, 10));
     }
 
     this->createScenePullouts(report, container, sceneItemsContainer);
     if (report->isIncludeCharacterPresenceGraphs()) {
-        this->createSeparator(container, QStringLiteral("Character Presence"), StatisticsReport::pickColor(0));
+        this->createSeparator(container, QStringLiteral("Character Presence"),
+                              StatisticsReport::pickColor(0));
         this->createCharacterPresenceGraph(report, container, sceneItemsContainer);
     }
 
@@ -331,10 +343,9 @@ QGraphicsRectItem *StatisticsReportTimeline::createTimelineItem(const Statistics
     return timeline;
 }
 
-QGraphicsRectItem *StatisticsReportTimeline::createDistributionItems(QGraphicsRectItem *container,
-                                                                     const QList<StatisticsReport::Distribution> &dist,
-                                                                     qreal heightHint, qreal totalPixelLength,
-                                                                     bool lightenFillColors) const
+QGraphicsRectItem *StatisticsReportTimeline::createDistributionItems(
+        QGraphicsRectItem *container, const QList<StatisticsReport::Distribution> &dist,
+        qreal heightHint, qreal totalPixelLength, bool lightenFillColors) const
 {
     const qreal containerWidth = container->boundingRect().width();
     const qreal pixelScaleFactor = containerWidth / totalPixelLength;
@@ -354,7 +365,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createDistributionItems(QGraphicsRe
         rect.moveTopLeft(rect.topRight());
         rect.setWidth(distItem.pixelLength * pixelScaleFactor);
 
-        const QColor color = distItem.color == Qt::transparent ? StatisticsReport::pickColor(i) : distItem.color;
+        const QColor color =
+                distItem.color == Qt::transparent ? StatisticsReport::pickColor(i) : distItem.color;
         QPen pen;
         pen.setColor(Utils::Color::isLight(color) ? Qt::gray : color);
         pen.setCosmetic(true);
@@ -387,8 +399,9 @@ QGraphicsRectItem *StatisticsReportTimeline::createDistributionItems(QGraphicsRe
         }
 
         const QString timeString = ::timeToString(distItem.timeLength);
-        const QString labelHtml = QStringLiteral("<center><b>%1</b><br/><font size=\"-2\">%2 - %3</font></center>")
-                                          .arg(distItem.key, timeString, distItem.percent);
+        const QString labelHtml =
+                QStringLiteral("<center><b>%1</b><br/><font size=\"-2\">%2 - %3</font></center>")
+                        .arg(distItem.key, timeString, distItem.percent);
 
         QGraphicsTextItem *label = new QGraphicsTextItem(item);
         label->setHtml(labelHtml);
@@ -397,14 +410,16 @@ QGraphicsRectItem *StatisticsReportTimeline::createDistributionItems(QGraphicsRe
 
         QRectF labelRect = label->boundingRect();
         if (labelRect.width() > item->rect().width()) {
-            const QString labelHtml2 = QStringLiteral("<center><b>%1</b><br/><font size=\"-2\">%2</font></center>")
-                                               .arg(distItem.key, timeString);
+            const QString labelHtml2 =
+                    QStringLiteral("<center><b>%1</b><br/><font size=\"-2\">%2</font></center>")
+                            .arg(distItem.key, timeString);
             label->setHtml(labelHtml2);
             labelRect = label->boundingRect();
         }
         if (labelRect.width() > item->rect().width()) {
-            const QString labelHtml3 = QStringLiteral("<center><b>%1</b><br/><font size=\"-2\">%2</font></center>")
-                                               .arg(distItem.key, distItem.percent);
+            const QString labelHtml3 =
+                    QStringLiteral("<center><b>%1</b><br/><font size=\"-2\">%2</font></center>")
+                            .arg(distItem.key, distItem.percent);
             label->setHtml(labelHtml3);
             labelRect = label->boundingRect();
         }
@@ -424,7 +439,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createDistributionItems(QGraphicsRe
 }
 
 QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const StatisticsReport *report,
-                                                                    QGraphicsRectItem *container, qreal heightHint,
+                                                                    QGraphicsRectItem *container,
+                                                                    qreal heightHint,
                                                                     qreal totalPixelLength)
 {
     // We are not using ScreenplayTracks here, because
@@ -471,7 +487,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const Statis
         return overlappingTracks.last();
     };
 
-    const QString activeGroupPrefix = report->document()->structure()->preferredGroupCategory() + QLatin1String("/");
+    const QString activeGroupPrefix =
+            report->document()->structure()->preferredGroupCategory() + QLatin1String("/");
     for (auto sceneElement : sceneElements) {
         ++currentSceneIndex;
         const Scene *scene = sceneElement->scene();
@@ -540,7 +557,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const Statis
         bool firstTrack = true;
         for (const auto &track : tracks) {
             QGraphicsRectItem *trackItem = new QGraphicsRectItem(tracksContainer);
-            trackItem->setBrush(StatisticsReport::pickColor(trackNr++, false, StatisticsReport::Beat));
+            trackItem->setBrush(
+                    StatisticsReport::pickColor(trackNr++, false, StatisticsReport::Beat));
             trackItem->setPen(Qt::NoPen);
             trackItem->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
 
@@ -561,17 +579,19 @@ QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const Statis
             QGraphicsPathItem *trackBorderItem = new QGraphicsPathItem(trackItem);
             trackBorderItem->setPath(trackBorderPath);
             trackBorderItem->setBrush(Qt::NoBrush);
-            trackBorderItem->setPen(
-                    QPen(trackItem->brush().color().darker(), 1, Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin));
+            trackBorderItem->setPen(QPen(trackItem->brush().color().darker(), 1, Qt::SolidLine,
+                                         Qt::RoundCap, Qt::MiterJoin));
 
             const QString text = Utils::SMath::titleCased(
                     track.tag.section(QStringLiteral("/"), 1).section(QStringLiteral("("), 0, 0));
             const QString timeString = ::timeToString(track.timeLength);
-            const QString percent =
-                    QString::number(qRound(100 * (track.pixel.to - track.pixel.from) / totalPixelLength))
+            const QString percent = QString::number(qRound(100 * (track.pixel.to - track.pixel.from)
+                                                           / totalPixelLength))
                     + QStringLiteral("%");
-            const QString labelHtml = QStringLiteral("<center><b>%1</b><br/><font size=\"-2\">%2 - %3</font></center>")
-                                              .arg(text, timeString, percent);
+            const QString labelHtml =
+                    QStringLiteral(
+                            "<center><b>%1</b><br/><font size=\"-2\">%2 - %3</font></center>")
+                            .arg(text, timeString, percent);
 
             QGraphicsTextItem *label = new QGraphicsTextItem(trackItem);
             label->setHtml(labelHtml);
@@ -579,14 +599,16 @@ QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const Statis
 
             QRectF labelRect = label->boundingRect();
             if (labelRect.width() > trackItem->rect().width()) {
-                const QString labelHtml2 = QStringLiteral("<center><b>%1</b><br/><font size=\"-2\">%2</font></center>")
-                                                   .arg(text, timeString);
+                const QString labelHtml2 =
+                        QStringLiteral("<center><b>%1</b><br/><font size=\"-2\">%2</font></center>")
+                                .arg(text, timeString);
                 label->setHtml(labelHtml2);
                 labelRect = label->boundingRect();
             }
             if (labelRect.width() > trackItem->rect().width()) {
                 const QString labelHtml3 =
-                        QStringLiteral("<center><b>%1</b><br/><font size=\"-2\">%2</font></center>").arg(text, percent);
+                        QStringLiteral("<center><b>%1</b><br/><font size=\"-2\">%2</font></center>")
+                                .arg(text, percent);
                 label->setHtml(labelHtml3);
                 labelRect = label->boundingRect();
             }
@@ -600,8 +622,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const Statis
                 label->setPlainText(QString::number(trackNr));
                 labelRect = label->boundingRect();
 
-                numberedBeats << QStringList(
-                        { QString::number(trackNr) + QStringLiteral(": "), text, timeString, percent });
+                numberedBeats << QStringList({ QString::number(trackNr) + QStringLiteral(": "),
+                                               text, timeString, percent });
             }
 
             if (labelRect.width() > trackItem->rect().width())
@@ -625,7 +647,9 @@ QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const Statis
     QVector<qreal> colWidths({ 0, 0, 0, 0 });
     for (const auto &row : qAsConst(numberedBeats)) {
         for (int i = 0; i < row.size(); i++)
-            colWidths[i] = qMax(colWidths[i], fontMetrics.horizontalAdvance(row[i]) + fontMetrics.averageCharWidth());
+            colWidths[i] =
+                    qMax(colWidths[i],
+                         fontMetrics.horizontalAdvance(row[i]) + fontMetrics.averageCharWidth());
     }
 
     qreal tableWidth = std::accumulate(colWidths.begin(), colWidths.end(), 0.0);
@@ -639,7 +663,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const Statis
         qreal tableRowX = tableIndex * tableXStep + (tableXStep - tableWidth) / 2;
         for (int i = 0; i < row.size(); i++) {
             const QString text = row.at(i);
-            const QRectF tableCellRect(tableRowX, tableRowY, colWidths[i], fontMetrics.lineSpacing());
+            const QRectF tableCellRect(tableRowX, tableRowY, colWidths[i],
+                                       fontMetrics.lineSpacing());
 
             QGraphicsSimpleTextItem *cellText = new QGraphicsSimpleTextItem(tracksContainer);
             cellText->setFont(Application::font());
@@ -684,7 +709,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const Statis
     return tracksContainer;
 }
 
-qreal StatisticsReportTimeline::evalPixelLength(const QList<StatisticsReport::Distribution> &dist) const
+qreal StatisticsReportTimeline::evalPixelLength(
+        const QList<StatisticsReport::Distribution> &dist) const
 {
     qreal ret = 0;
     for (const auto &distItem : dist)
@@ -693,9 +719,10 @@ qreal StatisticsReportTimeline::evalPixelLength(const QList<StatisticsReport::Di
     return ret;
 }
 
-QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const StatisticsReport *report,
-                                                                 QGraphicsRectItem *container,
-                                                                 QGraphicsRectItem *sceneItemsContainer) const
+QGraphicsRectItem *
+StatisticsReportTimeline::createScenePullouts(const StatisticsReport *report,
+                                              QGraphicsRectItem *container,
+                                              QGraphicsRectItem *sceneItemsContainer) const
 {
     const Screenplay *screenplay = report->document()->screenplay();
     const QList<ScreenplayElement *> sceneElements = screenplay->getFilteredElements(
@@ -714,9 +741,10 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
 
         QString makeLabel(const QString &prefix) const
         {
-            return prefix + QStringLiteral(": ") + sceneNumber + QStringLiteral(", ") + QString::number(nrCharacters)
-                    + QStringLiteral(" Characters, ") + QString::number(this->pageLength, 'g', 1)
-                    + QStringLiteral(" Pages, ") + ::timeToString(timeLength);
+            return prefix + QStringLiteral(": ") + sceneNumber + QStringLiteral(", ")
+                    + QString::number(nrCharacters) + QStringLiteral(" Characters, ")
+                    + QString::number(this->pageLength, 'g', 1) + QStringLiteral(" Pages, ")
+                    + ::timeToString(timeLength);
         }
     };
 
@@ -767,7 +795,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
     mostCrowdedScene.label = mostCrowdedScene.makeLabel(QStringLiteral("Most Crowded Scene"));
 
     // Now prepare to render these labels from left-to-right
-    sceneInfos = QVector<SceneInfo>({ shortestScene, longestScene, mostCrowdedScene, leastCrowdedScene });
+    sceneInfos = QVector<SceneInfo>(
+            { shortestScene, longestScene, mostCrowdedScene, leastCrowdedScene });
     for (int i = sceneInfos.size() - 1; i >= 0; i--) {
         const SceneInfo &sceneInfo = sceneInfos[i];
         if (sceneInfo.index < 0)
@@ -787,7 +816,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
     QGraphicsRectItem *labelsItem = new QGraphicsRectItem(container);
     labelsItem->setPen(Qt::NoPen);
     labelsItem->setBrush(Qt::NoBrush);
-    labelsItem->setPos(sceneItemsContainer->boundingRect().bottomLeft() + sceneItemsContainer->pos());
+    labelsItem->setPos(sceneItemsContainer->boundingRect().bottomLeft()
+                       + sceneItemsContainer->pos());
     labelsItem->setRect(QRectF(0, 0, sceneItemsContainer->boundingRect().width(), 10));
 
     // Create the labels themselves.
@@ -801,13 +831,15 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
             continue;
 
         const QGraphicsItem *sceneItem = sceneItemsContainer->childItems().at(sceneInfo.index);
-        const QRectF sceneItemRect = labelsItem->mapFromItem(sceneItem, sceneItem->boundingRect()).boundingRect();
+        const QRectF sceneItemRect =
+                labelsItem->mapFromItem(sceneItem, sceneItem->boundingRect()).boundingRect();
         const QPointF p1(sceneItemRect.center().x(), sceneItemRect.bottom());
         const QPointF p2 = p1 + QPointF(0, 30);
 
         QGraphicsLineItem *lineItem = new QGraphicsLineItem(labelsItem);
         lineItem->setLine(QLineF(p1, p2));
-        lineItem->setPen(QPen(Utils::Color::isLight(sceneInfo.color) ? sceneInfo.color.darker() : sceneInfo.color));
+        lineItem->setPen(QPen(Utils::Color::isLight(sceneInfo.color) ? sceneInfo.color.darker()
+                                                                     : sceneInfo.color));
 
         QGraphicsSimpleTextItem *labelItem = new QGraphicsSimpleTextItem(lineItem);
         labelItem->setText(labelText.join(QStringLiteral(", ")));
@@ -820,7 +852,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
 
         QGraphicsPathItem *pathItem = new QGraphicsPathItem(labelItem);
 
-        const qreal size = 8 + qMax(labelItem->boundingRect().width(), labelItem->boundingRect().height());
+        const qreal size =
+                8 + qMax(labelItem->boundingRect().width(), labelItem->boundingRect().height());
         QRectF pathRect(0, 0, size, size);
         pathRect.moveCenter(labelItem->boundingRect().center());
 
@@ -846,8 +879,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
         QGraphicsTextItem *textItem = new QGraphicsTextItem(labelsItem);
         textItem->setTextWidth(cellWidth - 10);
         textItem->setFont(font);
-        textItem->setHtml(QStringLiteral("<center>") + QString::number(i + 1) + QStringLiteral(": ") + sceneInfo.label
-                          + QStringLiteral("</center>"));
+        textItem->setHtml(QStringLiteral("<center>") + QString::number(i + 1) + QStringLiteral(": ")
+                          + sceneInfo.label + QStringLiteral("</center>"));
 
         QRectF textItemRect = textItem->boundingRect();
         textItemRect.moveCenter(cellRect.center());
@@ -872,16 +905,20 @@ QGraphicsRectItem *StatisticsReportTimeline::createScenePullouts(const Statistic
     return labelsItem;
 }
 
-QList<QPair<QString, QList<int>>> StatisticsReportTimeline::evalCharacterPresence(const StatisticsReport *report) const
+QList<QPair<QString, QList<int>>>
+StatisticsReportTimeline::evalCharacterPresence(const StatisticsReport *report) const
 {
     const Structure *structure = report->document()->structure();
     const QStringList allCharacterNames = structure->characterNames();
     const QStringList specificCharacterNames = report->characterNames();
-    const QStringList characterNames = specificCharacterNames.isEmpty() ? allCharacterNames : specificCharacterNames;
+    const QStringList characterNames =
+            specificCharacterNames.isEmpty() ? allCharacterNames : specificCharacterNames;
 
-    QList<QPair<QString, QList<int>>> ret =
-            this->evalPresence(report, characterNames, [](const Scene *scene, const QString &characterName) -> int {
-                return scene->hasCharacter(characterName) ? scene->characterPresence(characterName) + 2 : 0;
+    QList<QPair<QString, QList<int>>> ret = this->evalPresence(
+            report, characterNames, [](const Scene *scene, const QString &characterName) -> int {
+                return scene->hasCharacter(characterName)
+                        ? scene->characterPresence(characterName) + 2
+                        : 0;
             });
     if (!specificCharacterNames.isEmpty())
         ret = ret.mid(0, specificCharacterNames.size());
@@ -891,7 +928,8 @@ QList<QPair<QString, QList<int>>> StatisticsReportTimeline::evalCharacterPresenc
     return ret;
 }
 
-QList<QPair<QString, QList<int>>> StatisticsReportTimeline::evalLocationPresence(const StatisticsReport *report) const
+QList<QPair<QString, QList<int>>>
+StatisticsReportTimeline::evalLocationPresence(const StatisticsReport *report) const
 {
     const Structure *structure = report->document()->structure();
     const QStringList allLocations = structure->allLocations();
@@ -899,8 +937,8 @@ QList<QPair<QString, QList<int>>> StatisticsReportTimeline::evalLocationPresence
     const QStringList locations = specificLocations.isEmpty() ? allLocations : specificLocations;
 
     QString lastLocation;
-    QList<QPair<QString, QList<int>>> ret =
-            this->evalPresence(report, locations, [&lastLocation](const Scene *scene, const QString &location) -> int {
+    QList<QPair<QString, QList<int>>> ret = this->evalPresence(
+            report, locations, [&lastLocation](const Scene *scene, const QString &location) -> int {
                 const QString sceneLocation =
                         scene->heading()->isEnabled() ? scene->heading()->location() : lastLocation;
                 const int ret = sceneLocation == location ? 10 : 0;
@@ -916,9 +954,9 @@ QList<QPair<QString, QList<int>>> StatisticsReportTimeline::evalLocationPresence
     return ret;
 }
 
-QList<QPair<QString, QList<int>>>
-StatisticsReportTimeline::evalPresence(const StatisticsReport *report, const QStringList &allNames,
-                                       std::function<int(const Scene *, const QString &)> determinePresenceFunc) const
+QList<QPair<QString, QList<int>>> StatisticsReportTimeline::evalPresence(
+        const StatisticsReport *report, const QStringList &allNames,
+        std::function<int(const Scene *, const QString &)> determinePresenceFunc) const
 {
     QList<QPair<QString, QList<int>>> ret;
 
@@ -935,17 +973,18 @@ StatisticsReportTimeline::evalPresence(const StatisticsReport *report, const QSt
             pair.second.append(determinePresenceFunc(scene, pair.first));
     }
 
-    std::sort(ret.begin(), ret.end(), [](const QPair<QString, QList<int>> &a, const QPair<QString, QList<int>> &b) {
-        return std::accumulate(a.second.begin(), a.second.end(), 0)
-                > std::accumulate(b.second.begin(), b.second.end(), 0);
-    });
+    std::sort(ret.begin(), ret.end(),
+              [](const QPair<QString, QList<int>> &a, const QPair<QString, QList<int>> &b) {
+                  return std::accumulate(a.second.begin(), a.second.end(), 0)
+                          > std::accumulate(b.second.begin(), b.second.end(), 0);
+              });
 
     return ret;
 }
 
-QGraphicsRectItem *
-StatisticsReportTimeline::createCharacterPresenceGraph(const StatisticsReport *report, QGraphicsItem *container,
-                                                       const QGraphicsRectItem *sceneItemsContainer) const
+QGraphicsRectItem *StatisticsReportTimeline::createCharacterPresenceGraph(
+        const StatisticsReport *report, QGraphicsItem *container,
+        const QGraphicsRectItem *sceneItemsContainer) const
 {
     const Structure *structure = report->document()->structure();
     const QList<QPair<QString, QList<int>>> characterPresence = this->evalCharacterPresence(report);
@@ -959,11 +998,13 @@ StatisticsReportTimeline::createCharacterPresenceGraph(const StatisticsReport *r
             [](ScreenplayElement *e) { return e->scene() != nullptr && !e->isOmitted(); });
 
     const QList<StatisticsReport::Distribution> dialogueDist = report->dialogueDistribution();
-    auto evalCharacterLabel = [=](const QString &characterName, const QList<int> presence) -> QString {
+    auto evalCharacterLabel = [=](const QString &characterName,
+                                  const QList<int> presence) -> QString {
         // dialogue count & time can be found from dialogue distribution
-        auto it = std::find_if(
-                dialogueDist.begin(), dialogueDist.end(),
-                [characterName](const StatisticsReport::Distribution &dist) { return dist.key == characterName; });
+        auto it = std::find_if(dialogueDist.begin(), dialogueDist.end(),
+                               [characterName](const StatisticsReport::Distribution &dist) {
+                                   return dist.key == characterName;
+                               });
 
         // screen time can be found by summing up scene times across all scenes
         // in which the character exists.
@@ -981,8 +1022,8 @@ StatisticsReportTimeline::createCharacterPresenceGraph(const StatisticsReport *r
         const QTime screenTime = report->pixelLengthToTime(screenPresenceLength);
 
         // Prepare to format with what we have now.
-        QString ret = characterName + QStringLiteral(" - Sc: ") + QString::number(nrScenes) + QStringLiteral(", ")
-                + timeToString(screenTime);
+        QString ret = characterName + QStringLiteral(" - Sc: ") + QString::number(nrScenes)
+                + QStringLiteral(", ") + timeToString(screenTime);
         if (it == dialogueDist.end())
             return ret;
 
@@ -991,13 +1032,13 @@ StatisticsReportTimeline::createCharacterPresenceGraph(const StatisticsReport *r
         return ret;
     };
 
-    return this->createPresenceGraph(characterPresence, evalCharacterColor, evalCharacterLabel, report, container,
-                                     sceneItemsContainer);
+    return this->createPresenceGraph(characterPresence, evalCharacterColor, evalCharacterLabel,
+                                     report, container, sceneItemsContainer);
 }
 
-QGraphicsRectItem *
-StatisticsReportTimeline::createLocationPresenceGraph(const StatisticsReport *report, QGraphicsItem *container,
-                                                      const QGraphicsRectItem *sceneItemsContainer) const
+QGraphicsRectItem *StatisticsReportTimeline::createLocationPresenceGraph(
+        const StatisticsReport *report, QGraphicsItem *container,
+        const QGraphicsRectItem *sceneItemsContainer) const
 {
     const QList<QPair<QString, QList<int>>> locationPresence = this->evalLocationPresence(report);
 
@@ -1005,7 +1046,8 @@ StatisticsReportTimeline::createLocationPresenceGraph(const StatisticsReport *re
     const QList<ScreenplayElement *> sceneElements = screenplay->getFilteredElements(
             [](ScreenplayElement *e) { return e->scene() != nullptr && !e->isOmitted(); });
 
-    auto evalLocationLabel = [=](const QString &locationName, const QList<int> presence) -> QString {
+    auto evalLocationLabel = [=](const QString &locationName,
+                                 const QList<int> presence) -> QString {
         int nrScenes = 0;
         qreal scenePixelLength = 0;
         for (int scIdx = 0; scIdx < presence.size(); scIdx++) {
@@ -1016,8 +1058,8 @@ StatisticsReportTimeline::createLocationPresenceGraph(const StatisticsReport *re
         }
 
         const QTime timeLength = report->pixelLengthToTime(scenePixelLength);
-        return locationName + QStringLiteral(" - Sc: ") + QString::number(nrScenes) + QStringLiteral(", ")
-                + timeToString(timeLength);
+        return locationName + QStringLiteral(" - Sc: ") + QString::number(nrScenes)
+                + QStringLiteral(", ") + timeToString(timeLength);
     };
 
     int locationIndex = 0;
@@ -1025,14 +1067,16 @@ StatisticsReportTimeline::createLocationPresenceGraph(const StatisticsReport *re
         return StatisticsReport::pickColor(locationIndex++ % 2, true, StatisticsReport::Location);
     };
 
-    return this->createPresenceGraph(locationPresence, evalColorFunc, evalLocationLabel, report, container,
-                                     sceneItemsContainer, false);
+    return this->createPresenceGraph(locationPresence, evalColorFunc, evalLocationLabel, report,
+                                     container, sceneItemsContainer, false);
 }
 
 QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(
-        const QList<QPair<QString, QList<int>>> &presence, std::function<QColor(const QString &)> evalColorFunc,
-        std::function<QString(const QString &, const QList<int> &)> evalLabelFunc, const StatisticsReport *report,
-        QGraphicsItem *container, const QGraphicsRectItem *sceneItemsContainer, bool useCurvedPath) const
+        const QList<QPair<QString, QList<int>>> &presence,
+        std::function<QColor(const QString &)> evalColorFunc,
+        std::function<QString(const QString &, const QList<int> &)> evalLabelFunc,
+        const StatisticsReport *report, QGraphicsItem *container,
+        const QGraphicsRectItem *sceneItemsContainer, bool useCurvedPath) const
 {
     const Structure *structure = report->document()->structure();
     if (presence.isEmpty())
@@ -1041,8 +1085,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(
     const qreal containerWidth = container->boundingRect().width();
     const qreal heightPerGraph = 40;
     const int nrGraphs = presence.size();
-    const QPointF sceneItemsBottomLeft =
-            container->mapFromItem(sceneItemsContainer, sceneItemsContainer->boundingRect().bottomLeft());
+    const QPointF sceneItemsBottomLeft = container->mapFromItem(
+            sceneItemsContainer, sceneItemsContainer->boundingRect().bottomLeft());
     const QPointF containerBottomLeft = container->childrenBoundingRect().bottomLeft();
     const QPointF graphContainerPos(sceneItemsBottomLeft.x(), containerBottomLeft.y() + 20);
 
@@ -1074,19 +1118,23 @@ QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(
         QPainterPath path;
         path.moveTo(0, heightPerGraph);
         for (int i = 0; i < presenceItem.second.size(); i++) {
-            const QGraphicsItem *sceneItem = i >= 0 && i < sceneItems.size() ? sceneItems.at(i) : nullptr;
+            const QGraphicsItem *sceneItem =
+                    i >= 0 && i < sceneItems.size() ? sceneItems.at(i) : nullptr;
             if (sceneItem == nullptr)
                 break;
 
             hasPresence = true;
             const int presence = presenceItem.second.at(i);
             const QRectF sceneItemRect =
-                    graphContainer->mapFromItem(sceneItem, sceneItem->boundingRect()).boundingRect();
+                    graphContainer->mapFromItem(sceneItem, sceneItem->boundingRect())
+                            .boundingRect();
             const qreal y = heightPerGraph - presence * heightPerPresence;
             const QPointF prevPos = path.currentPosition();
 
             if (useCurvedPath) {
-                const qreal x = graphContainer->mapFromItem(sceneItem, sceneItem->boundingRect().center()).x();
+                const qreal x =
+                        graphContainer->mapFromItem(sceneItem, sceneItem->boundingRect().center())
+                                .x();
 
                 const QPointF newPos = QPointF(x, y);
                 if (qAbs(newPos.y() - prevPos.y()) > cubicCurveThreshold) {
@@ -1167,7 +1215,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(
     return graphContainer;
 }
 
-QGraphicsRectItem *StatisticsReportTimeline::createSeparator(QGraphicsItem *container, const QString &label,
+QGraphicsRectItem *StatisticsReportTimeline::createSeparator(QGraphicsItem *container,
+                                                             const QString &label,
                                                              const QColor &color) const
 {
     QGraphicsRectItem *separatorItem = new QGraphicsRectItem(container);
@@ -1202,7 +1251,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createSeparator(QGraphicsItem *cont
     leftLine->setZValue(-1);
 
     QGraphicsLineItem *rightLine = new QGraphicsLineItem(separatorItem);
-    rightLine->setLine(labelBgRect.right(), labelBgRect.center().y(), containerBRect.width(), labelBgRect.center().y());
+    rightLine->setLine(labelBgRect.right(), labelBgRect.center().y(), containerBRect.width(),
+                       labelBgRect.center().y());
     rightLine->setPen(QPen(color, 5));
     rightLine->setZValue(-1);
 
@@ -1211,8 +1261,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createSeparator(QGraphicsItem *cont
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-StatisticsReportDialogueActionRatio::StatisticsReportDialogueActionRatio(const StatisticsReport *report,
-                                                                         QGraphicsItem *parent)
+StatisticsReportDialogueActionRatio::StatisticsReportDialogueActionRatio(
+        const StatisticsReport *report, QGraphicsItem *parent)
     : QGraphicsRectItem(parent)
 {
     const qreal chartSize = 200;
@@ -1267,12 +1317,15 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
     this->setPen(Qt::NoPen);
     this->setBrush(Qt::NoBrush);
 
-    auto ir = [](const QGraphicsItem *item) { return item->mapToScene(item->boundingRect()).boundingRect(); };
+    auto ir = [](const QGraphicsItem *item) {
+        return item->mapToScene(item->boundingRect()).boundingRect();
+    };
 
     const qreal chartSize = 200;
     const Screenplay *screenplay = report->document()->screenplay();
-    const auto sceneElements = screenplay->getFilteredElements(
-            [](ScreenplayElement *e) { return e->scene() && e->scene()->heading()->isEnabled() && !e->isOmitted(); });
+    const auto sceneElements = screenplay->getFilteredElements([](ScreenplayElement *e) {
+        return e->scene() && e->scene()->heading()->isEnabled() && !e->isOmitted();
+    });
 
     const QString othersKey = QStringLiteral("OTHERS");
 
@@ -1315,14 +1368,15 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
 
         otherMoments = exclMoments.first().first;
         if (exclMoments.size() > 1)
-            otherMoments +=
-                    QStringLiteral(" and ") + QString::number(exclMoments.size() - 1) + QStringLiteral(" more.");
+            otherMoments += QStringLiteral(" and ") + QString::number(exclMoments.size() - 1)
+                    + QStringLiteral(" more.");
     }
 
     const int maxLocations = 6;
     if (locationMap.size() > maxLocations) {
         typedef QPair<QString, int> LocationItem;
-        locationMap.sort([](const LocationItem &a, const LocationItem &b) { return a.second > b.second; });
+        locationMap.sort(
+                [](const LocationItem &a, const LocationItem &b) { return a.second > b.second; });
 
         const QVector<LocationItem> exclLocs = locationMap.vector.mid(maxLocations - 1);
         locationMap.vector = locationMap.vector.mid(0, maxLocations - 1);
@@ -1332,7 +1386,8 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
 
         otherLocations = exclLocs.first().first;
         if (exclLocs.size() > 1)
-            otherLocations += QStringLiteral(" and ") + QString::number(exclLocs.size() - 1) + QStringLiteral(" more.");
+            otherLocations += QStringLiteral(" and ") + QString::number(exclLocs.size() - 1)
+                    + QStringLiteral(" more.");
     }
 
     QFont smallFont = Application::font();
@@ -1356,8 +1411,8 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
     while (it1 != end1) {
         const int percent = qRound(100.0 * qreal(it1->second) / qreal(sceneElements.size()));
         const QColor color = StatisticsReport::pickColor(typeSeries->slices().size(), false);
-        const QString label = QString::number(it1->second) + QStringLiteral(" Scenes: ") + QString::number(percent)
-                + QStringLiteral("%");
+        const QString label = QString::number(it1->second) + QStringLiteral(" Scenes: ")
+                + QString::number(percent) + QStringLiteral("%");
         QtCharts::QPieSlice *slice = typeSeries->append(label, it1->second);
         slice->setBrush(color);
         slice->setLabel(label);
@@ -1408,7 +1463,8 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
         int maxValue = 0;
         const QStringList types = typeColorMap.keys();
         for (const QString &type : types) {
-            QtCharts::QBarSet *barSet = momentSeries->findChild<QtCharts::QBarSet *>(type, Qt::FindDirectChildrenOnly);
+            QtCharts::QBarSet *barSet =
+                    momentSeries->findChild<QtCharts::QBarSet *>(type, Qt::FindDirectChildrenOnly);
             if (barSet == nullptr) {
                 barSet = new QtCharts::QBarSet(type, momentSeries);
                 barSet->setObjectName(type);
@@ -1466,7 +1522,9 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
     while (it3 != end3) {
         const bool othersLoc = it3->first == othersKey;
         if (!othersLoc) {
-            const QString locName = othersLoc ? it3->first : QStringLiteral("L%1").arg(locationNameAxis->count() + 1);
+            const QString locName = othersLoc
+                    ? it3->first
+                    : QStringLiteral("L%1").arg(locationNameAxis->count() + 1);
             locationBarSet->append(it3->second);
             locationNameAxis->append(locName);
             locationLegend->add(Qt::transparent,
@@ -1474,8 +1532,9 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
                                         + QString::number(it3->second) + QStringLiteral(")"));
         } else
             locationLegend->add(Qt::transparent,
-                                othersKey + QStringLiteral(": ") + otherLocations + QStringLiteral(" (")
-                                        + QString::number(it3->second) + QStringLiteral(")"));
+                                othersKey + QStringLiteral(": ") + otherLocations
+                                        + QStringLiteral(" (") + QString::number(it3->second)
+                                        + QStringLiteral(")"));
         ++it3;
     }
 
@@ -1501,7 +1560,8 @@ StatisticsReportSceneHeadingStats::~StatisticsReportSceneHeadingStats() { }
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-StatisticsReportGraphVLegend::StatisticsReportGraphVLegend(QGraphicsItem *parent) : QGraphicsRectItem(parent)
+StatisticsReportGraphVLegend::StatisticsReportGraphVLegend(QGraphicsItem *parent)
+    : QGraphicsRectItem(parent)
 {
     this->setPen(Qt::NoPen);
     this->setBrush(Qt::NoBrush);
@@ -1535,8 +1595,9 @@ void StatisticsReportGraphVLegend::place(const QRectF &rect, Qt::Alignment align
 
 void StatisticsReportGraphVLegend::add(const QColor &color, const QString &label)
 {
-    const QPointF legendItemPos =
-            this->childItems().isEmpty() ? QPointF(0, 0) : this->boundingRect().bottomLeft() + QPointF(0, 5);
+    const QPointF legendItemPos = this->childItems().isEmpty()
+            ? QPointF(0, 0)
+            : this->boundingRect().bottomLeft() + QPointF(0, 5);
 
     if (color == Qt::transparent) {
         QGraphicsSimpleTextItem *legendText = new QGraphicsSimpleTextItem(this);
@@ -1558,7 +1619,8 @@ void StatisticsReportGraphVLegend::add(const QColor &color, const QString &label
         legendText->setText(label);
         legendText->setFont(m_font);
         legendText->setPos(legendRect->rect().width() + 5, 0);
-        legendRect->setPos(0, (legendText->boundingRect().height() - legendRect->boundingRect().height()) / 2);
+        legendRect->setPos(
+                0, (legendText->boundingRect().height() - legendRect->boundingRect().height()) / 2);
 
         legendItem->setRect(legendItem->childrenBoundingRect());
     }

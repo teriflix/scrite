@@ -23,7 +23,8 @@ class CharacterRelationshipsGraphExporter : public AbstractExporter
     Q_OBJECT
     Q_CLASSINFO("Format", "Notebook/Character Relationship Graph")
     Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
-    Q_CLASSINFO("Description", "Exports to PDF the current character relationship graph in the Notebook.")
+    Q_CLASSINFO("Description",
+                "Exports to PDF the current character relationship graph in the Notebook.")
     Q_CLASSINFO("Icon", ":/icons/exporter/character_relationship_graph.png")
 
 public:
@@ -37,7 +38,8 @@ public:
 
     Q_CLASSINFO("enableHeaderFooter_FieldLabel", "Include header & footer in the generated PDF.")
     Q_CLASSINFO("enableHeaderFooter_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool enableHeaderFooter READ isEnableHeaderFooter WRITE setEnableHeaderFooter NOTIFY enableHeaderFooterChanged)
+    Q_PROPERTY(bool enableHeaderFooter READ isEnableHeaderFooter WRITE setEnableHeaderFooter NOTIFY
+                       enableHeaderFooterChanged)
     void setEnableHeaderFooter(bool val);
     bool isEnableHeaderFooter() const { return m_enableHeaderFooter; }
     Q_SIGNAL void enableHeaderFooterChanged();

@@ -40,7 +40,8 @@ public:
     Q_PROPERTY(bool arrayHasObjects READ arrayHasObjects NOTIFY arrayChanged)
     bool arrayHasObjects() const;
 
-    Q_PROPERTY(QStringList objectMembers READ objectMembers WRITE setObjectMembers NOTIFY objectMembersChanged)
+    Q_PROPERTY(QStringList objectMembers READ objectMembers WRITE setObjectMembers NOTIFY
+                       objectMembersChanged)
     void setObjectMembers(const QStringList &val);
     QStringList objectMembers() const { return m_objectMembers; }
     Q_SIGNAL void objectMembersChanged();
@@ -101,7 +102,8 @@ public:
     explicit GenericArraySortFilterProxyModel(QObject *parent = nullptr);
     ~GenericArraySortFilterProxyModel();
 
-    Q_PROPERTY(GenericArrayModel* arrayModel READ arrayModel WRITE setArrayModel NOTIFY arrayModelChanged RESET resetArrayModel)
+    Q_PROPERTY(GenericArrayModel *arrayModel READ arrayModel WRITE setArrayModel NOTIFY
+                       arrayModelChanged RESET resetArrayModel)
     void setArrayModel(GenericArrayModel *val);
     GenericArrayModel *arrayModel() const { return m_arrayModel; }
     Q_SIGNAL void arrayModelChanged();

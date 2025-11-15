@@ -89,7 +89,10 @@ public:
     QString sceneID() const;
 
     Q_PROPERTY(int sceneNumber READ sceneNumber NOTIFY sceneNumberChanged)
-    int sceneNumber() const { return m_customSceneNumber < 0 ? m_sceneNumber : m_customSceneNumber; }
+    int sceneNumber() const
+    {
+        return m_customSceneNumber < 0 ? m_sceneNumber : m_customSceneNumber;
+    }
     Q_SIGNAL void sceneNumberChanged();
 
     Q_PROPERTY(QString userSceneNumber READ userSceneNumber WRITE setUserSceneNumber NOTIFY
@@ -143,12 +146,14 @@ public:
     QString breakSummary() const { return m_breakSummary; }
     Q_SIGNAL void breakSummaryChanged();
 
-    Q_PROPERTY(bool pageBreakAfter READ isPageBreakAfter WRITE setPageBreakAfter NOTIFY pageBreakAfterChanged)
+    Q_PROPERTY(bool pageBreakAfter READ isPageBreakAfter WRITE setPageBreakAfter NOTIFY
+                       pageBreakAfterChanged)
     void setPageBreakAfter(bool val);
     bool isPageBreakAfter() const { return m_pageBreakAfter; }
     Q_SIGNAL void pageBreakAfterChanged();
 
-    Q_PROPERTY(bool pageBreakBefore READ isPageBreakBefore WRITE setPageBreakBefore NOTIFY pageBreakBeforeChanged)
+    Q_PROPERTY(bool pageBreakBefore READ isPageBreakBefore WRITE setPageBreakBefore NOTIFY
+                       pageBreakBeforeChanged)
     void setPageBreakBefore(bool val);
     bool isPageBreakBefore() const { return m_pageBreakBefore; }
     Q_SIGNAL void pageBreakBeforeChanged();
@@ -385,21 +390,25 @@ public:
 
     enum CoverPagePhotoSize { SmallCoverPhoto, MediumCoverPhoto, LargeCoverPhoto };
     Q_ENUM(CoverPagePhotoSize)
-    Q_PROPERTY(CoverPagePhotoSize coverPagePhotoSize READ coverPagePhotoSize WRITE setCoverPagePhotoSize NOTIFY coverPagePhotoSizeChanged)
+    Q_PROPERTY(CoverPagePhotoSize coverPagePhotoSize READ coverPagePhotoSize WRITE
+                       setCoverPagePhotoSize NOTIFY coverPagePhotoSizeChanged)
     void setCoverPagePhotoSize(CoverPagePhotoSize val);
     CoverPagePhotoSize coverPagePhotoSize() const { return m_coverPagePhotoSize; }
     Q_SIGNAL void coverPagePhotoSizeChanged();
 
-    Q_PROPERTY(bool titlePageIsCentered READ isTitlePageIsCentered WRITE setTitlePageIsCentered NOTIFY titlePageIsCenteredChanged)
+    Q_PROPERTY(bool titlePageIsCentered READ isTitlePageIsCentered WRITE setTitlePageIsCentered
+                       NOTIFY titlePageIsCenteredChanged)
     void setTitlePageIsCentered(bool val);
     bool isTitlePageIsCentered() const { return m_titlePageIsCentered; }
     Q_SIGNAL void titlePageIsCenteredChanged();
 
-    Q_PROPERTY(bool hasTitlePageAttributes READ hasTitlePageAttributes NOTIFY hasTitlePageAttributesChanged)
+    Q_PROPERTY(bool hasTitlePageAttributes READ hasTitlePageAttributes NOTIFY
+                       hasTitlePageAttributesChanged)
     bool hasTitlePageAttributes() const { return m_hasTitlePageAttributes; }
     Q_SIGNAL void hasTitlePageAttributesChanged();
 
-    Q_PROPERTY( bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
+    Q_PROPERTY(
+            bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
     bool hasNonStandardScenes() const { return m_hasNonStandardScenes; }
     Q_SIGNAL void hasNonStandardScenesChanged();
 
@@ -407,14 +416,16 @@ public:
     bool hasSelectedElements() const;
     Q_SIGNAL void hasSelectedElementsChanged();
 
-    Q_PROPERTY(int selectedElementsCount READ selectedElementsCount NOTIFY selectedElementsCountChanged)
+    Q_PROPERTY(int selectedElementsCount READ selectedElementsCount NOTIFY
+                       selectedElementsCountChanged)
     int selectedElementsCount() const;
     Q_SIGNAL void selectedElementsCountChanged();
 
     enum OmitStatus { Omitted, NotOmitted, PartiallyOmitted };
     Q_ENUM(OmitStatus)
 
-    Q_PROPERTY(OmitStatus selectedElementsOmitStatus READ selectedElementsOmitStatus WRITE setSelectedElementsOmitStatus NOTIFY selectedElementsOmitStatusChanged)
+    Q_PROPERTY(OmitStatus selectedElementsOmitStatus READ selectedElementsOmitStatus WRITE
+                       setSelectedElementsOmitStatus NOTIFY selectedElementsOmitStatusChanged)
     void setSelectedElementsOmitStatus(OmitStatus val);
     OmitStatus selectedElementsOmitStatus() const;
     Q_SIGNAL void selectedElementsOmitStatusChanged();
@@ -448,15 +459,18 @@ public:
     Q_SIGNAL void elementOmitted(ScreenplayElement *element, int index);
     Q_SIGNAL void elementIncluded(ScreenplayElement *element, int index);
     Q_SIGNAL void elementSceneContentChanged(ScreenplayElement *element, Scene *scene);
-    Q_SIGNAL void elementSceneHeadingChanged(ScreenplayElement *element, SceneHeading *sceneHeading);
-    Q_SIGNAL void elementSceneElementChanged(ScreenplayElement *element, SceneElement *sceneElement);
+    Q_SIGNAL void elementSceneHeadingChanged(ScreenplayElement *element,
+                                             SceneHeading *sceneHeading);
+    Q_SIGNAL void elementSceneElementChanged(ScreenplayElement *element,
+                                             SceneElement *sceneElement);
     Q_SIGNAL void aboutToMoveElements(int at);
 
     Q_SIGNAL void elementSceneGroupsChanged(ScreenplayElement *ptr);
 
     Q_INVOKABLE void gatherSelectedScenes(SceneGroup *into);
 
-    Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element, int textPosition);
+    Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element,
+                                                int textPosition);
     Q_INVOKABLE ScreenplayElement *mergeElementWithPrevious(ScreenplayElement *ptr);
 
     Q_INVOKABLE void removeSceneElements(Scene *scene);
@@ -470,7 +484,8 @@ public:
 
     int dialogueCount() const;
     QList<ScreenplayElement *> getElements() const { return m_elements; }
-    QList<ScreenplayElement *> getFilteredElements(std::function<bool(ScreenplayElement *item)> filterFunc) const;
+    QList<ScreenplayElement *>
+    getFilteredElements(std::function<bool(ScreenplayElement *item)> filterFunc) const;
     bool setElements(const QList<ScreenplayElement *> &list);
 
     enum BreakType { Act, Episode, Chapter = Episode, Interval };
@@ -478,7 +493,10 @@ public:
     Q_INVOKABLE void addBreakElement(Screenplay::BreakType type);
     Q_INVOKABLE void addBreakElementI(int type) { this->addBreakElement(BreakType(type)); }
     Q_INVOKABLE void insertBreakElement(Screenplay::BreakType type, int index);
-    Q_INVOKABLE void insertBreakElementI(int type, int index) { this->insertBreakElement(BreakType(type), index); }
+    Q_INVOKABLE void insertBreakElementI(int type, int index)
+    {
+        this->insertBreakElement(BreakType(type), index);
+    }
     Q_INVOKABLE void updateBreakTitles();
     Q_SIGNAL void breakTitleChanged();
     void updateBreakTitlesLater();
@@ -495,7 +513,8 @@ public:
     int episodeCount() const { return m_episodeCount; }
     Q_SIGNAL void episodeCountChanged();
 
-    Q_PROPERTY(QList<ScreenplayBreakInfo> episodeInfoList READ episodeInfoList NOTIFY episodeCountChanged)
+    Q_PROPERTY(QList<ScreenplayBreakInfo> episodeInfoList READ episodeInfoList NOTIFY
+                       episodeCountChanged)
     QList<ScreenplayBreakInfo> episodeInfoList() const;
 
     Q_SIGNAL void screenplayChanged();
@@ -640,12 +659,14 @@ private:
     friend class ScreenplayTextDocument;
     friend class ScreenplayElement;
 
-    static void staticAppendElement(QQmlListProperty<ScreenplayElement> *list, ScreenplayElement *ptr);
+    static void staticAppendElement(QQmlListProperty<ScreenplayElement> *list,
+                                    ScreenplayElement *ptr);
     static void staticClearElements(QQmlListProperty<ScreenplayElement> *list);
     static ScreenplayElement *staticElementAt(QQmlListProperty<ScreenplayElement> *list, int index);
     static int staticElementCount(QQmlListProperty<ScreenplayElement> *list);
-    QList<ScreenplayElement *> m_elements; // We dont use ObjectListPropertyModel<ScreenplayElement*> for this because
-                                           // the Screenplay class is already a list model of screenplay elements.
+    QList<ScreenplayElement *>
+            m_elements; // We dont use ObjectListPropertyModel<ScreenplayElement*> for this because
+                        // the Screenplay class is already a list model of screenplay elements.
     int m_currentElementIndex = -1;
     QObjectProperty<Scene> m_activeScene;
     bool m_hasNonStandardScenes = false;

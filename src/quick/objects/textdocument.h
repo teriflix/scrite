@@ -33,15 +33,17 @@ public:
 
     static TextDocument *qmlAttachedProperties(QObject *object);
 
-    Q_PROPERTY(QQuickTextDocument* quickTextDocument READ quickTextDocument WRITE setQuickTextDocument NOTIFY quickTextDocumentChanged)
+    Q_PROPERTY(QQuickTextDocument *quickTextDocument READ quickTextDocument WRITE
+                       setQuickTextDocument NOTIFY quickTextDocumentChanged)
     QQuickTextDocument *quickTextDocument() const { return m_quickTextDocument; }
     Q_SIGNAL void quickTextDocumentChanged();
 
-    Q_PROPERTY(QTextDocument* document READ document NOTIFY documentChanged)
+    Q_PROPERTY(QTextDocument *document READ document NOTIFY documentChanged)
     QTextDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY cursorPositionChanged)
+    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
+                       cursorPositionChanged)
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();

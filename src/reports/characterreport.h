@@ -20,7 +20,8 @@ class CharacterReport : public AbstractReportGenerator
 {
     Q_OBJECT
     Q_CLASSINFO("Title", "Character Report")
-    Q_CLASSINFO("Description", "Generate a report with dialogues and notes for one or more selected characters.")
+    Q_CLASSINFO("Description",
+                "Generate a report with dialogues and notes for one or more selected characters.")
     Q_CLASSINFO("Icon", ":/icons/reports/character_report.png")
 
 public:
@@ -33,7 +34,8 @@ public:
     Q_CLASSINFO("characterNames_FieldLabel", "Characters to include in the report")
     Q_CLASSINFO("characterNames_FieldEditor", "MultipleCharacterNameSelector")
     Q_CLASSINFO("characterNames_IsPersistent", "false")
-    Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY characterNamesChanged)
+    Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY
+                       characterNamesChanged)
     void setCharacterNames(const QStringList &val);
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
@@ -41,7 +43,8 @@ public:
     Q_CLASSINFO("includeSceneHeadings_FieldGroup", "Characters")
     Q_CLASSINFO("includeSceneHeadings_FieldLabel", "Include scene headings")
     Q_CLASSINFO("includeSceneHeadings_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeSceneHeadings READ isIncludeSceneHeadings WRITE setIncludeSceneHeadings NOTIFY includeSceneHeadingsChanged)
+    Q_PROPERTY(bool includeSceneHeadings READ isIncludeSceneHeadings WRITE setIncludeSceneHeadings
+                       NOTIFY includeSceneHeadingsChanged)
     void setIncludeSceneHeadings(bool val);
     bool isIncludeSceneHeadings() const { return m_includeSceneHeadings; }
     Q_SIGNAL void includeSceneHeadingsChanged();
@@ -49,7 +52,8 @@ public:
     Q_CLASSINFO("includeDialogues_FieldGroup", "Characters")
     Q_CLASSINFO("includeDialogues_FieldLabel", "Include dialogues")
     Q_CLASSINFO("includeDialogues_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeDialogues READ isIncludeDialogues WRITE setIncludeDialogues NOTIFY includeDialoguesChanged)
+    Q_PROPERTY(bool includeDialogues READ isIncludeDialogues WRITE setIncludeDialogues NOTIFY
+                       includeDialoguesChanged)
     void setIncludeDialogues(bool val);
     bool isIncludeDialogues() const { return m_includeDialogues; }
     Q_SIGNAL void includeDialoguesChanged();

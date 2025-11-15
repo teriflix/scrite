@@ -20,7 +20,8 @@ class LocationScreenplayReport : public AbstractScreenplaySubsetReport
 {
     Q_OBJECT
     Q_CLASSINFO("Title", "Location Screenplay")
-    Q_CLASSINFO("Description", "Generate screenplay with only those scenes at one or more locations.")
+    Q_CLASSINFO("Description",
+                "Generate screenplay with only those scenes at one or more locations.")
 
 public:
     Q_INVOKABLE explicit LocationScreenplayReport(QObject *parent = nullptr);
@@ -37,7 +38,8 @@ public:
     Q_CLASSINFO("generateSummary_FieldGroup", "PDF Options")
     Q_CLASSINFO("generateSummary_FieldLabel", "Generate summary")
     Q_CLASSINFO("generateSummary_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool generateSummary READ generateSummary WRITE setGenerateSummary NOTIFY generateSummaryChanged)
+    Q_PROPERTY(bool generateSummary READ generateSummary WRITE setGenerateSummary NOTIFY
+                       generateSummaryChanged)
     void setGenerateSummary(bool val);
     bool generateSummary() const { return m_generateSummary; }
     Q_SIGNAL void generateSummaryChanged();

@@ -57,10 +57,13 @@ public:
 
     Q_CLASSINFO("characterNames_FieldGroup", "Characters")
     Q_CLASSINFO("characterNames_FieldLabel", "Characters to include in the report")
-    Q_CLASSINFO("characterNames_FieldNote", "If no characters are selected, then the report is generted for all characters in the screenplay.")
+    Q_CLASSINFO("characterNames_FieldNote",
+                "If no characters are selected, then the report is generted for all characters in "
+                "the screenplay.")
     Q_CLASSINFO("characterNames_FieldEditor", "MultipleCharacterNameSelector")
     Q_CLASSINFO("characterNames_IsPersistent", "false")
-    Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY characterNamesChanged)
+    Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY
+                       characterNamesChanged)
     void setCharacterNames(const QStringList &val);
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
@@ -68,9 +71,12 @@ public:
     Q_CLASSINFO("episodeNumbers_FieldGroup", "Episodes")
     Q_CLASSINFO("episodeNumbers_FieldLabel", "Episodes to include in the report")
     Q_CLASSINFO("episodeNumbers_FieldEditor", "MultipleEpisodeSelector")
-    Q_CLASSINFO("episodeNumbers_FieldNote", "If no episodes are selected, then the report is generted for all episodes in the screenplay.")
+    Q_CLASSINFO("episodeNumbers_FieldNote",
+                "If no episodes are selected, then the report is generted for all episodes in the "
+                "screenplay.")
     Q_CLASSINFO("episodeNumbers_IsPersistent", "false")
-    Q_PROPERTY(QList<int> episodeNumbers READ episodeNumbers WRITE setEpisodeNumbers NOTIFY episodeNumbersChanged)
+    Q_PROPERTY(QList<int> episodeNumbers READ episodeNumbers WRITE setEpisodeNumbers NOTIFY
+                       episodeNumbersChanged)
     void setEpisodeNumbers(const QList<int> &val);
     QList<int> episodeNumbers() const { return m_episodeNumbers; }
     Q_SIGNAL void episodeNumbersChanged();
@@ -78,7 +84,9 @@ public:
     Q_CLASSINFO("tags_FieldGroup", "Tags")
     Q_CLASSINFO("tags_FieldLabel", "Groups/Tags to include in the report")
     Q_CLASSINFO("tags_FieldEditor", "MultipleTagGroupSelector")
-    Q_CLASSINFO("tags_FieldNote", "If no tags are selected, then the report is generated for all tags in the screenplay.")
+    Q_CLASSINFO(
+            "tags_FieldNote",
+            "If no tags are selected, then the report is generated for all tags in the screenplay.")
     Q_CLASSINFO("tags_IsPersistent", "false")
     Q_PROPERTY(QStringList tags READ tags WRITE setTags NOTIFY tagsChanged)
     void setTags(const QStringList &val);

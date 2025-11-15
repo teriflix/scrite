@@ -71,12 +71,14 @@ public:
     bool autoClose() const { return m_autoClose; }
     Q_SIGNAL void autoCloseChanged();
 
-    Q_PROPERTY(int autoCloseDelay READ autoCloseDelay WRITE setAutoCloseDelay NOTIFY autoCloseDelayChanged)
+    Q_PROPERTY(int autoCloseDelay READ autoCloseDelay WRITE setAutoCloseDelay NOTIFY
+                       autoCloseDelayChanged)
     void setAutoCloseDelay(int val);
     int autoCloseDelay() const { return m_autoCloseDelay; }
     Q_SIGNAL void autoCloseDelayChanged();
 
-    Q_PROPERTY(bool closeOnButtonClick READ isCloseOnButtonClick WRITE setCloseOnButtonClick NOTIFY closeOnButtonClickChanged)
+    Q_PROPERTY(bool closeOnButtonClick READ isCloseOnButtonClick WRITE setCloseOnButtonClick NOTIFY
+                       closeOnButtonClickChanged)
     void setCloseOnButtonClick(bool val);
     bool isCloseOnButtonClick() const { return m_closeOnButtonClick; }
     Q_SIGNAL void closeOnButtonClickChanged();

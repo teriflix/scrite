@@ -45,11 +45,13 @@ void Utils::registerTypes()
     if (!typesRegistered) {
         qRegisterMetaType<Utils::FileInfo>("Utils::FileInfo");
         qRegisterMetaType<Utils::ObjectConfigFieldChoice>("Utils::ObjectConfigFieldChoice");
-        qRegisterMetaType<QList<Utils::ObjectConfigFieldChoice>>("QList<Utils::ObjectConfigFieldChoice>");
+        qRegisterMetaType<QList<Utils::ObjectConfigFieldChoice>>(
+                "QList<Utils::ObjectConfigFieldChoice>");
         qRegisterMetaType<Utils::ObjectConfigField>("Utils::ObjectConfigField");
         qRegisterMetaType<QList<Utils::ObjectConfigField>>("QList<Utils::ObjectConfigField>");
         qRegisterMetaType<Utils::ObjectConfigFieldGroup>("Utils::ObjectConfigFieldGroup");
-        qRegisterMetaType<QList<Utils::ObjectConfigFieldGroup>>("QList<Utils::ObjectConfigFieldGroup>");
+        qRegisterMetaType<QList<Utils::ObjectConfigFieldGroup>>(
+                "QList<Utils::ObjectConfigFieldGroup>");
         qRegisterMetaType<Utils::ObjectConfig>("Utils::ObjectConfig");
 
         typesRegistered = true;
@@ -458,8 +460,9 @@ bool Utils::Object::save(QObject *object)
         }
     }
 
-    const QString configFilePath = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
-                                           .absoluteFilePath("objectconfig.json");
+    const QString configFilePath =
+            QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
+                    .absoluteFilePath("objectconfig.json");
 
     QJsonObject configObject;
 
@@ -495,8 +498,9 @@ bool Utils::Object::load(QObject *object)
     if (object == nullptr)
         return false;
 
-    const QString configFilePath = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
-                                           .absoluteFilePath("objectconfig.json");
+    const QString configFilePath =
+            QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
+                    .absoluteFilePath("objectconfig.json");
 
     QJsonObject configObject;
 
@@ -617,7 +621,8 @@ Utils::ObjectConfig Utils::Object::configuration(const QObject *object, const QM
                 choice.key = QString::fromLatin1(enumerator.key(j));
                 choice.value = enumerator.value(j);
 
-                const QByteArray ciKey = QByteArray(enumerator.name()) + "_" + QByteArray(enumerator.key(j));
+                const QByteArray ciKey =
+                        QByteArray(enumerator.name()) + "_" + QByteArray(enumerator.key(j));
                 const QString text = queryClassInfo(ciKey);
                 if (!text.isEmpty())
                     choice.key = text;
@@ -643,7 +648,8 @@ int Utils::Object::treeSize(QObject *object)
     return object->findChildren<QObject *>(QString(), Qt::FindChildrenRecursively).size() + 1;
 }
 
-static QObject *recursivelyFindChild(QObject *object, const QString &className, const QString &objectName)
+static QObject *recursivelyFindChild(QObject *object, const QString &className,
+                                     const QString &objectName)
 {
     if (object == nullptr || (className.isEmpty() && objectName.isEmpty()))
         return nullptr;
@@ -753,7 +759,8 @@ QObject *Utils::Object::firstParentByName(QObject *of, const QString &objectName
 
 static QObject *findSibling(QObject *object, const QString &className, const QString &objectName)
 {
-    if (object == nullptr || object->parent() == nullptr || (className.isEmpty() && objectName.isEmpty()))
+    if (object == nullptr || object->parent() == nullptr
+        || (className.isEmpty() && objectName.isEmpty()))
         return nullptr;
 
     QObject *parent = object->parent();
@@ -851,7 +858,8 @@ QString Utils::Object::enumKey(QObject *object, const QString &enumName, int val
 QString Utils::Object::typeEnumKey(const QString &typeName, const QString &enumName, int value)
 {
     const int typeId = QMetaType::type(qPrintable(typeName + "*"));
-    const QMetaObject *mo = typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
+    const QMetaObject *mo =
+            typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
     if (mo)
         return ::enumerationKey(mo, enumName, value);
 
@@ -869,10 +877,12 @@ QAbstractListModel *Utils::Object::enumModel(QObject *object, const QString &enu
     return ret;
 }
 
-QAbstractListModel *Utils::Object::typeEnumModel(const QString &typeName, const QString &enumName, QObject *parent)
+QAbstractListModel *Utils::Object::typeEnumModel(const QString &typeName, const QString &enumName,
+                                                 QObject *parent)
 {
     const int typeId = QMetaType::type(qPrintable(typeName + "*"));
-    const QMetaObject *mo = typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
+    const QMetaObject *mo =
+            typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
     if (mo)
         return new EnumerationModel(mo, enumName, parent);
 
@@ -990,7 +1000,8 @@ void Utils::ObjectRegister::setName(const QString &val)
  */
 QColor Utils::Color::pick(const QColor &initial)
 {
-    QColorDialog::ColorDialogOptions options = QColorDialog::ShowAlphaChannel | QColorDialog::DontUseNativeDialog;
+    QColorDialog::ColorDialogOptions options =
+            QColorDialog::ShowAlphaChannel | QColorDialog::DontUseNativeDialog;
     const QColor ret = QColorDialog::getColor(initial, nullptr, "Select Color", options);
     return ret.isValid() ? ret : initial;
 }
@@ -1134,15 +1145,15 @@ QString Utils::File::copyToFolder(const QString &fromFilePath, const QString &to
         return QString();
 
     const QFileInfo toInfo(toFolder);
-    QString toFilePath =
-            toInfo.isDir() ? toInfo.dir().absoluteFilePath(fromFileInfo.fileName()) : toInfo.absoluteFilePath();
+    QString toFilePath = toInfo.isDir() ? toInfo.dir().absoluteFilePath(fromFileInfo.fileName())
+                                        : toInfo.absoluteFilePath();
     int counter = 1;
     while (1) {
         if (QFile::exists(toFilePath)) {
             const QFileInfo toFileInfo(toFilePath);
-            toFilePath = toFileInfo.absoluteDir().absoluteFilePath(toFileInfo.completeBaseName() + QStringLiteral(" ")
-                                                                   + QString::number(counter++) + QStringLiteral(".")
-                                                                   + toFileInfo.suffix());
+            toFilePath = toFileInfo.absoluteDir().absoluteFilePath(
+                    toFileInfo.completeBaseName() + QStringLiteral(" ") + QString::number(counter++)
+                    + QStringLiteral(".") + toFileInfo.suffix());
         } else
             break;
     }
@@ -1239,9 +1250,10 @@ QString Utils::File::sanitiseName(const QString &fileName, QSet<QChar> *removedC
     }
 
     // Check for Windows reserved names (case-insensitive, even with extensions)
-    static const QSet<QString> reservedNames = { "CON",  "PRN",  "AUX",  "NUL",  "COM1", "COM2", "COM3", "COM4",
-                                                 "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3",
-                                                 "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9" };
+    static const QSet<QString> reservedNames = { "CON",  "PRN",  "AUX",  "NUL",  "COM1", "COM2",
+                                                 "COM3", "COM4", "COM5", "COM6", "COM7", "COM8",
+                                                 "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5",
+                                                 "LPT6", "LPT7", "LPT8", "LPT9" };
     QString baseUpper = completeBaseName.toUpper();
     if (reservedNames.contains(baseUpper)) {
         completeBaseName += "_";
@@ -1358,14 +1370,15 @@ QList<QColor> Utils::SceneColors::paletteForVersion(const QVersionNumber &versio
     if (!version.isNull() && version <= QVersionNumber(0, 2, 17))
         return QList<QColor>() << QColor(Qt::blue) << QColor(Qt::magenta) << QColor(Qt::darkGreen)
                                << QColor(128, 0, 128 /* purple */) << QColor(Qt::yellow)
-                               << QColor(255, 165, 0 /* orange */) << QColor(Qt::red) << QColor(165, 42, 42 /* brown */)
-                               << QColor(Qt::gray) << QColor(Qt::white);
+                               << QColor(255, 165, 0 /* orange */) << QColor(Qt::red)
+                               << QColor(165, 42, 42 /* brown */) << QColor(Qt::gray)
+                               << QColor(Qt::white);
 
     // New set of colors
-    return QList<QColor>() << QColor(33, 150, 243) << QColor(233, 30, 99) << QColor(0, 150, 136) << QColor(156, 39, 176)
-                           << QColor(255, 235, 59) << QColor(255, 152, 0) << QColor(244, 67, 54) << QColor(121, 85, 72)
-                           << QColor(158, 158, 158) << QColor(250, 250, 250) << QColor(63, 81, 181)
-                           << QColor(205, 220, 57);
+    return QList<QColor>() << QColor(33, 150, 243) << QColor(233, 30, 99) << QColor(0, 150, 136)
+                           << QColor(156, 39, 176) << QColor(255, 235, 59) << QColor(255, 152, 0)
+                           << QColor(244, 67, 54) << QColor(121, 85, 72) << QColor(158, 158, 158)
+                           << QColor(250, 250, 250) << QColor(63, 81, 181) << QColor(205, 220, 57);
 }
 
 /**
@@ -1449,7 +1462,8 @@ qreal Utils::GMath::distanceBetweenPoints(const QPointF &p1, const QPointF &p2)
  * \param bottom Bottom adjustment.
  * \return The adjusted rectangle.
  */
-QRectF Utils::GMath::adjustRectangle(const QRectF &rect, qreal left, qreal top, qreal right, qreal bottom)
+QRectF Utils::GMath::adjustRectangle(const QRectF &rect, qreal left, qreal top, qreal right,
+                                     qreal bottom)
 {
     return rect.adjusted(left, top, right, bottom);
 }
@@ -1519,7 +1533,8 @@ QRectF Utils::GMath::querySubRectangle(const QRectF &in, const QRectF &around, c
 
     QRectF around2;
     if (atBest.width() > in.width() || atBest.height() > in.height())
-        around2 = QRectF(0, 0, qMin(atBest.width(), in.width()), qMin(atBest.height(), in.height()));
+        around2 =
+                QRectF(0, 0, qMin(atBest.width(), in.width()), qMin(atBest.height(), in.height()));
     else
         around2 = QRectF(0, 0, atBest.width(), atBest.height());
     around2.moveCenter(around.center());
@@ -1527,7 +1542,8 @@ QRectF Utils::GMath::querySubRectangle(const QRectF &in, const QRectF &around, c
     const QSizeF aroundSize = around2.size();
 
     around2 = in.intersected(around2);
-    if (qFuzzyCompare(around2.width(), aroundSize.width()) && qFuzzyCompare(around2.height(), aroundSize.height()))
+    if (qFuzzyCompare(around2.width(), aroundSize.width())
+        && qFuzzyCompare(around2.height(), aroundSize.height()))
         return around2;
 
     around2.setSize(aroundSize);
@@ -1583,7 +1599,8 @@ QPointF Utils::GMath::centerOf(const QRectF &rect)
  * \param smallRect The rectangle to move.
  * \return The translation point.
  */
-QPointF Utils::GMath::translationRequiredToBringRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect)
+QPointF Utils::GMath::translationRequiredToBringRectangleInRectangle(const QRectF &bigRect,
+                                                                     const QRectF &smallRect)
 {
     QPointF ret(0, 0);
 
@@ -1668,7 +1685,8 @@ QString Utils::TMath::relativeTime(const QDateTime &dt)
         if (hours == 0)
             return QString::number(totalMins) + QStringLiteral("m ago");
 
-        return QString::number(hours) + QStringLiteral("h ") + QString::number(mins) + QStringLiteral("m ago");
+        return QString::number(hours) + QStringLiteral("h ") + QString::number(mins)
+                + QStringLiteral("m ago");
     }
 
     const int nrDays = dt.date().daysTo(now.date());
@@ -1688,7 +1706,8 @@ QString Utils::TMath::relativeTime(const QDateTime &dt)
     }
 
     if (nrDays >= 7 && nrDays < 14)
-        return QStringLiteral("Last week ") + QLocale::system().standaloneDayName(dt.date().dayOfWeek()) + " @ " + time;
+        return QStringLiteral("Last week ")
+                + QLocale::system().standaloneDayName(dt.date().dayOfWeek()) + " @ " + time;
 
     if (nrDays >= 14 && nrDays < 21)
         return QStringLiteral("Two weeks ago");
@@ -1908,8 +1927,8 @@ QPainterPath Utils::SMath::stringToPainterPath(const QString &val)
  * \param nrReplacements Optional pointer to count replacements.
  * \return The modified JSON delta.
  */
-QJsonObject Utils::SMath::replaceCharacterName(const QString &from, const QString &to, const QJsonObject &delta,
-                                               int *nrReplacements)
+QJsonObject Utils::SMath::replaceCharacterName(const QString &from, const QString &to,
+                                               const QJsonObject &delta, int *nrReplacements)
 {
     const QString opsAttr = QStringLiteral("ops");
     const QString insertAttr = QStringLiteral("insert");
@@ -1954,8 +1973,8 @@ QJsonObject Utils::SMath::replaceCharacterName(const QString &from, const QStrin
  * \param nrReplacements Optional pointer to count replacements.
  * \return The modified string.
  */
-QString Utils::SMath::replaceCharacterName(const QString &from, const QString &to, const QString &in,
-                                           int *nrReplacements)
+QString Utils::SMath::replaceCharacterName(const QString &from, const QString &to,
+                                           const QString &in, int *nrReplacements)
 {
     QString text = in.trimmed();
     QList<int> replacePositions;
@@ -1993,7 +2012,9 @@ QString Utils::SMath::replaceCharacterName(const QString &from, const QString &t
 
         for (int i = replacePositions.size() - 1; i >= 0; i--) {
             const int pos = replacePositions.at(i);
-            const bool allCaps = [](const QString &val) { return val == val.toUpper(); }(text.mid(pos, from.length()));
+            const bool allCaps = [](const QString &val) {
+                return val == val.toUpper();
+            }(text.mid(pos, from.length()));
             text = text.replace(pos, from.length(), allCaps ? to.toUpper() : to);
         }
 

@@ -47,27 +47,32 @@ public:
     int backtabKey() const { return m_backtabKey; }
     Q_SIGNAL void backtabKeyChanged();
 
-    Q_PROPERTY(int tabKeyModifiers READ tabKeyModifiers WRITE setTabKeyModifiers NOTIFY tabKeyModifiersChanged)
+    Q_PROPERTY(int tabKeyModifiers READ tabKeyModifiers WRITE setTabKeyModifiers NOTIFY
+                       tabKeyModifiersChanged)
     void setTabKeyModifiers(int val);
     int tabKeyModifiers() const { return m_tabKeyModifiers; }
     Q_SIGNAL void tabKeyModifiersChanged();
 
-    Q_PROPERTY(int backtabKeyModifiers READ backtabKeyModifiers WRITE setBacktabKeyModifiers NOTIFY backtabKeyModifiersChanged)
+    Q_PROPERTY(int backtabKeyModifiers READ backtabKeyModifiers WRITE setBacktabKeyModifiers NOTIFY
+                       backtabKeyModifiersChanged)
     void setBacktabKeyModifiers(int val);
     int backtabKeyModifiers() const { return m_backtabKeyModifiers; }
     Q_SIGNAL void backtabKeyModifiersChanged();
 
-    Q_PROPERTY(int disabledKeyModifier READ disabledKeyModifier WRITE setDisabledKeyModifier NOTIFY disabledKeyModifierChanged)
+    Q_PROPERTY(int disabledKeyModifier READ disabledKeyModifier WRITE setDisabledKeyModifier NOTIFY
+                       disabledKeyModifierChanged)
     void setDisabledKeyModifier(int val);
     int disabledKeyModifier() const { return m_disabledKeyModifier; }
     Q_SIGNAL void disabledKeyModifierChanged();
 
-    Q_PROPERTY(int releaseFocusKey READ releaseFocusKey WRITE setReleaseFocusKey NOTIFY releaseFocusKeyChanged)
+    Q_PROPERTY(int releaseFocusKey READ releaseFocusKey WRITE setReleaseFocusKey NOTIFY
+                       releaseFocusKeyChanged)
     void setReleaseFocusKey(int val);
     int releaseFocusKey() const { return m_releaseFocusKey; }
     Q_SIGNAL void releaseFocusKeyChanged();
 
-    Q_PROPERTY(bool releaseFocusEnabled READ isReleaseFocusEnabled WRITE setReleaseFocusEnabled NOTIFY releaseFocusEnabledChanged)
+    Q_PROPERTY(bool releaseFocusEnabled READ isReleaseFocusEnabled WRITE setReleaseFocusEnabled
+                       NOTIFY releaseFocusEnabledChanged)
     void setReleaseFocusEnabled(bool val);
     bool isReleaseFocusEnabled() const { return m_releaseFocusEnabled; }
     Q_SIGNAL void releaseFocusEnabledChanged();
@@ -77,7 +82,7 @@ public:
     bool isWrapAround() const { return m_wrapAround; }
     Q_SIGNAL void wrapAroundChanged();
 
-    Q_PROPERTY(QObject* currentItem READ currentItemObject NOTIFY currentItemChanged)
+    Q_PROPERTY(QObject *currentItem READ currentItemObject NOTIFY currentItemChanged)
     TabSequenceItem *currentItem() const { return m_currentItem; }
     QObject *currentItemObject() const;
     Q_SIGNAL void currentItemChanged();
@@ -146,7 +151,8 @@ public:
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    Q_PROPERTY(TabSequenceManager *manager READ manager WRITE setManager NOTIFY managerChanged RESET resetManager)
+    Q_PROPERTY(TabSequenceManager *manager READ manager WRITE setManager NOTIFY managerChanged RESET
+                       resetManager)
     void setManager(TabSequenceManager *val);
     TabSequenceManager *manager() const { return m_manager; }
     Q_SIGNAL void managerChanged();

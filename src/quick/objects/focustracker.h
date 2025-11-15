@@ -31,7 +31,7 @@ class FocusTrackerIndicator : public QObject
 public:
     ~FocusTrackerIndicator();
 
-    Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
+    Q_PROPERTY(QObject *target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
     void setTarget(QObject *val);
     QObject *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
@@ -79,10 +79,11 @@ public:
 
     static FocusTracker *qmlAttachedProperties(QObject *object);
 
-    Q_PROPERTY(QQuickItem* item READ item CONSTANT)
+    Q_PROPERTY(QQuickItem *item READ item CONSTANT)
     QQuickItem *item() const { return m_item; }
 
-    Q_PROPERTY(QQuickWindow* window READ window WRITE setWindow NOTIFY windowChanged RESET resetWindow)
+    Q_PROPERTY(
+            QQuickWindow *window READ window WRITE setWindow NOTIFY windowChanged RESET resetWindow)
     void setWindow(QQuickWindow *val);
     QQuickWindow *window() const { return m_window; }
     Q_SIGNAL void windowChanged();
@@ -90,7 +91,8 @@ public:
     enum FocusEvaluationMethod { StandardFocusEvaluation, ExclusiveFocusEvaluation };
     Q_ENUM(FocusEvaluationMethod)
 
-    Q_PROPERTY(FocusEvaluationMethod evaluationMethod READ evaluationMethod WRITE setEvaluationMethod NOTIFY evaluationMethodChanged)
+    Q_PROPERTY(FocusEvaluationMethod evaluationMethod READ evaluationMethod WRITE
+                       setEvaluationMethod NOTIFY evaluationMethodChanged)
     void setEvaluationMethod(FocusEvaluationMethod val);
     FocusEvaluationMethod evaluationMethod() const { return m_evaluationMethod; }
     Q_SIGNAL void evaluationMethodChanged();
@@ -99,7 +101,7 @@ public:
     bool hasFocus() const { return m_hasFocus; }
     Q_SIGNAL void hasFocusChanged();
 
-    Q_PROPERTY(FocusTrackerIndicator* indicator READ indicator CONSTANT)
+    Q_PROPERTY(FocusTrackerIndicator *indicator READ indicator CONSTANT)
     FocusTrackerIndicator *indicator() const { return m_indicator; }
 
 private:

@@ -68,7 +68,8 @@ public:
     Q_PROPERTY(Scene *currentScene READ currentScene NOTIFY currentIndexChanged)
     Scene *currentScene() const;
 
-    Q_PROPERTY(bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
+    Q_PROPERTY(
+            bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
     bool hasNonStandardScenes() const;
     Q_SIGNAL void hasNonStandardScenesChanged();
 
@@ -76,7 +77,8 @@ public:
     int wordCount() const;
     Q_SIGNAL void wordCountChanged();
 
-    Q_PROPERTY(bool heightHintsAvailable READ isHeightHintsAvailable NOTIFY heightHintsAvailableChanged)
+    Q_PROPERTY(bool heightHintsAvailable READ isHeightHintsAvailable NOTIFY
+                       heightHintsAvailableChanged)
     bool isHeightHintsAvailable() const;
     Q_SIGNAL void heightHintsAvailableChanged();
 

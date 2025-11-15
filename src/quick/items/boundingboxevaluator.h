@@ -93,7 +93,8 @@ public:
     QRectF initialRect() const { return m_initialRect; }
     Q_SIGNAL void initialRectChanged();
 
-    Q_PROPERTY(qreal previewScale READ previewScale WRITE setPreviewScale NOTIFY previewScaleChanged)
+    Q_PROPERTY(
+            qreal previewScale READ previewScale WRITE setPreviewScale NOTIFY previewScaleChanged)
     void setPreviewScale(qreal val);
     qreal previewScale() const { return m_previewScale; }
     Q_SIGNAL void previewScaleChanged();
@@ -160,7 +161,8 @@ public:
 
     QRectF boundingRect() const;
 
-    Q_PROPERTY(BoundingBoxEvaluator* evaluator READ evaluator WRITE setEvaluator NOTIFY evaluatorChanged RESET resetEvaluator STORED false)
+    Q_PROPERTY(BoundingBoxEvaluator *evaluator READ evaluator WRITE setEvaluator NOTIFY
+                       evaluatorChanged RESET resetEvaluator STORED false)
     void setEvaluator(BoundingBoxEvaluator *val);
     BoundingBoxEvaluator *evaluator() const { return m_evaluator; }
     Q_SIGNAL void evaluatorChanged();
@@ -175,27 +177,32 @@ public:
     qreal stackOrder() const { return m_stackOrder; }
     Q_SIGNAL void stackOrderChanged();
 
-    Q_PROPERTY(bool previewEnabled READ isPreviewEnabled WRITE setPreviewEnabled NOTIFY previewEnabledChanged)
+    Q_PROPERTY(bool previewEnabled READ isPreviewEnabled WRITE setPreviewEnabled NOTIFY
+                       previewEnabledChanged)
     void setPreviewEnabled(bool val);
     bool isPreviewEnabled() const { return m_previewEnabled; }
     Q_SIGNAL void previewEnabledChanged();
 
-    Q_PROPERTY(QColor previewFillColor READ previewFillColor WRITE setPreviewFillColor NOTIFY previewFillColorChanged)
+    Q_PROPERTY(QColor previewFillColor READ previewFillColor WRITE setPreviewFillColor NOTIFY
+                       previewFillColorChanged)
     void setPreviewFillColor(const QColor &val);
     QColor previewFillColor() const { return m_previewFillColor; }
     Q_SIGNAL void previewFillColorChanged();
 
-    Q_PROPERTY(QString previewImageSource READ previewImageSource WRITE setPreviewImageSource NOTIFY previewImageSourceChanged)
+    Q_PROPERTY(QString previewImageSource READ previewImageSource WRITE setPreviewImageSource NOTIFY
+                       previewImageSourceChanged)
     void setPreviewImageSource(const QString &val);
     QString previewImageSource() const { return m_previewImageSource; }
     Q_SIGNAL void previewImageSourceChanged();
 
-    Q_PROPERTY(QColor previewBorderColor READ previewBorderColor WRITE setPreviewBorderColor NOTIFY previewBorderColorChanged)
+    Q_PROPERTY(QColor previewBorderColor READ previewBorderColor WRITE setPreviewBorderColor NOTIFY
+                       previewBorderColorChanged)
     void setPreviewBorderColor(const QColor &val);
     QColor previewBorderColor() const { return m_previewBorderColor; }
     Q_SIGNAL void previewBorderColorChanged();
 
-    Q_PROPERTY(qreal previewBorderWidth READ previewBorderWidth WRITE setPreviewBorderWidth NOTIFY previewBorderWidthChanged)
+    Q_PROPERTY(qreal previewBorderWidth READ previewBorderWidth WRITE setPreviewBorderWidth NOTIFY
+                       previewBorderWidthChanged)
     void setPreviewBorderWidth(qreal val);
     qreal previewBorderWidth() const { return m_previewBorderWidth; }
     Q_SIGNAL void previewBorderWidthChanged();
@@ -213,22 +220,26 @@ public:
         VisibleUponViewportContains
     };
     Q_ENUM(VisibilityMode)
-    Q_PROPERTY(VisibilityMode visibilityMode READ visibilityMode WRITE setVisibilityMode NOTIFY visibilityModeChanged)
+    Q_PROPERTY(VisibilityMode visibilityMode READ visibilityMode WRITE setVisibilityMode NOTIFY
+                       visibilityModeChanged)
     void setVisibilityMode(VisibilityMode val);
     VisibilityMode visibilityMode() const { return m_visibilityMode; }
     Q_SIGNAL void visibilityModeChanged();
 
-    Q_PROPERTY(QQuickItem* viewportItem READ viewportItem WRITE setViewportItem NOTIFY viewportItemChanged RESET resetViewportItem STORED false)
+    Q_PROPERTY(QQuickItem *viewportItem READ viewportItem WRITE setViewportItem NOTIFY
+                       viewportItemChanged RESET resetViewportItem STORED false)
     void setViewportItem(QQuickItem *val);
     QQuickItem *viewportItem() const { return m_viewportItem; }
     Q_SIGNAL void viewportItemChanged();
 
-    Q_PROPERTY(QRectF viewportRect READ viewportRect WRITE setViewportRect NOTIFY viewportRectChanged)
+    Q_PROPERTY(
+            QRectF viewportRect READ viewportRect WRITE setViewportRect NOTIFY viewportRectChanged)
     void setViewportRect(const QRectF &val);
     QRectF viewportRect() const { return m_viewportRect; }
     Q_SIGNAL void viewportRectChanged();
 
-    Q_PROPERTY(QByteArray visibilityProperty READ visibilityProperty WRITE setVisibilityProperty NOTIFY visibilityPropertyChanged)
+    Q_PROPERTY(QByteArray visibilityProperty READ visibilityProperty WRITE setVisibilityProperty
+                       NOTIFY visibilityPropertyChanged)
     void setVisibilityProperty(const QByteArray &val);
     QByteArray visibilityProperty() const { return m_visibilityProperty; }
     Q_SIGNAL void visibilityPropertyChanged();
@@ -288,17 +299,20 @@ public:
     explicit BoundingBoxPreview(QQuickItem *parent = nullptr);
     ~BoundingBoxPreview();
 
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
+    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY
+                       backgroundColorChanged)
     void setBackgroundColor(const QColor &val);
     QColor backgroundColor() const { return m_backgroundColor; }
     Q_SIGNAL void backgroundColorChanged();
 
-    Q_PROPERTY(qreal backgroundOpacity READ backgroundOpacity WRITE setBackgroundOpacity NOTIFY backgroundOpacityChanged)
+    Q_PROPERTY(qreal backgroundOpacity READ backgroundOpacity WRITE setBackgroundOpacity NOTIFY
+                       backgroundOpacityChanged)
     void setBackgroundOpacity(qreal val);
     qreal backgroundOpacity() const { return m_backgroundOpacity; }
     Q_SIGNAL void backgroundOpacityChanged();
 
-    Q_PROPERTY(BoundingBoxEvaluator* evaluator READ evaluator WRITE setEvaluator NOTIFY evaluatorChanged RESET resetEvaluator)
+    Q_PROPERTY(BoundingBoxEvaluator *evaluator READ evaluator WRITE setEvaluator NOTIFY
+                       evaluatorChanged RESET resetEvaluator)
     void setEvaluator(BoundingBoxEvaluator *val);
     BoundingBoxEvaluator *evaluator() const { return m_evaluator; }
     Q_SIGNAL void evaluatorChanged();

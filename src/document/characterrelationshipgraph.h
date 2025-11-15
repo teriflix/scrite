@@ -95,7 +95,8 @@ class CharacterRelationshipGraphEdge : public QObject, public GraphLayout::Abstr
 public:
     ~CharacterRelationshipGraphEdge();
 
-    Q_PROPERTY(Relationship *relationship READ relationship NOTIFY relationshipChanged RESET resetRelationship)
+    Q_PROPERTY(Relationship *relationship READ relationship NOTIFY relationshipChanged RESET
+                       resetRelationship)
     Relationship *relationship() const { return m_relationship; }
     Q_SIGNAL void relationshipChanged();
 
@@ -185,7 +186,8 @@ public:
     QSizeF nodeSize() const { return m_nodeSize; }
     Q_SIGNAL void nodeSizeChanged();
 
-    Q_PROPERTY(Structure *structure READ structure WRITE setStructure NOTIFY structureChanged RESET resetStructure)
+    Q_PROPERTY(Structure *structure READ structure WRITE setStructure NOTIFY structureChanged RESET
+                       resetStructure)
     void setStructure(Structure *val);
     Structure *structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
@@ -195,7 +197,8 @@ public:
     Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
-    Q_PROPERTY(Character *character READ character WRITE setCharacter NOTIFY characterChanged RESET resetCharacter)
+    Q_PROPERTY(Character *character READ character WRITE setCharacter NOTIFY characterChanged RESET
+                       resetCharacter)
     void setCharacter(Character *val);
     Character *character() const { return m_character; }
     Q_SIGNAL void characterChanged();

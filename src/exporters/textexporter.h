@@ -37,28 +37,32 @@ public:
     Q_CLASSINFO("maxLettersPerLine_FieldMinValue", "30")
     Q_CLASSINFO("maxLettersPerLine_FieldMaxValue", "150")
     Q_CLASSINFO("maxLettersPerLine_FieldDefaultValue", "60")
-    Q_PROPERTY(int maxLettersPerLine READ maxLettersPerLine WRITE setMaxLettersPerLine NOTIFY maxLettersPerLineChanged)
+    Q_PROPERTY(int maxLettersPerLine READ maxLettersPerLine WRITE setMaxLettersPerLine NOTIFY
+                       maxLettersPerLineChanged)
     void setMaxLettersPerLine(int val);
     int maxLettersPerLine() const { return m_maxLettersPerLine; }
     Q_SIGNAL void maxLettersPerLineChanged();
 
     Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers.")
     Q_CLASSINFO("includeSceneNumbers_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers NOTIFY includeSceneNumbersChanged)
+    Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers
+                       NOTIFY includeSceneNumbersChanged)
     void setIncludeSceneNumbers(bool val);
     bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
     Q_SIGNAL void includeSceneNumbersChanged();
 
     Q_CLASSINFO("includeEpisodeAndActBreaks_FieldLabel", "Include episode and act breaks.")
     Q_CLASSINFO("includeEpisodeAndActBreaks_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeEpisodeAndActBreaks READ isIncludeEpisodeAndActBreaks WRITE setIncludeEpisodeAndActBreaks NOTIFY includeEpisodeAndActBreaksChanged)
+    Q_PROPERTY(bool includeEpisodeAndActBreaks READ isIncludeEpisodeAndActBreaks WRITE
+                       setIncludeEpisodeAndActBreaks NOTIFY includeEpisodeAndActBreaksChanged)
     void setIncludeEpisodeAndActBreaks(bool val);
     bool isIncludeEpisodeAndActBreaks() const { return m_includeEpisodeAndActBreaks; }
     Q_SIGNAL void includeEpisodeAndActBreaksChanged();
 
     Q_CLASSINFO("includeSceneSynopsis_FieldLabel", "Include scene synopsis.")
     Q_CLASSINFO("includeSceneSynopsis_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis NOTIFY includeSceneSynopsisChanged)
+    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis
+                       NOTIFY includeSceneSynopsisChanged)
     void setIncludeSceneSynopsis(bool val);
     bool isIncludeSceneSynopsis() const { return m_includeSceneSynopsis; }
     Q_SIGNAL void includeSceneSynopsisChanged();

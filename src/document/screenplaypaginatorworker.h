@@ -112,7 +112,8 @@ class ScreenplayPaginatorWorker : public QObject
 public:
     virtual ~ScreenplayPaginatorWorker();
 
-    Q_PROPERTY(bool synchronousSync READ isSynchronousSync WRITE setSynchronousSync NOTIFY synchronousSyncChanged)
+    Q_PROPERTY(bool synchronousSync READ isSynchronousSync WRITE setSynchronousSync NOTIFY
+                       synchronousSyncChanged)
     void setSynchronousSync(bool val);
     bool isSynchronousSync() const { return m_synchronousSync; }
     Q_SIGNAL void synchronousSyncChanged();
@@ -129,12 +130,14 @@ public slots:
     void query(int cursorPosition, int currentSerialNumber);
 
 signals:
-    void cursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber, const QTime &time);
-    void paginationComplete(const QList<ScreenplayPaginatorRecord> &items, qreal pixelLength, int pageCount,
-                            const QTime &totalTime);
+    void cursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber,
+                             const QTime &time);
+    void paginationComplete(const QList<ScreenplayPaginatorRecord> &items, qreal pixelLength,
+                            int pageCount, const QTime &totalTime);
 
 private:
-    explicit ScreenplayPaginatorWorker(QTextDocument *document = nullptr, ScreenplayFormat *format = nullptr,
+    explicit ScreenplayPaginatorWorker(QTextDocument *document = nullptr,
+                                       ScreenplayFormat *format = nullptr,
                                        QObject *parent = nullptr);
 
     void syncDocument();
@@ -142,8 +145,9 @@ private:
 
     qreal cursorPixelOffset(int cursorPosition, int currentSerialNumber) const;
     qreal cursorPixelOffset(const QTextCursor &cursor) const;
-    QList<ScenePageBreak> evaluateScenePageBreaks(const PaginatorDocumentInsights::BlockRange &blockRange,
-                                                  int &lastPageNumber) const;
+    QList<ScenePageBreak>
+    evaluateScenePageBreaks(const PaginatorDocumentInsights::BlockRange &blockRange,
+                            int &lastPageNumber) const;
 
 private:
     friend class ScreenplayPaginator;

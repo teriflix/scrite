@@ -86,7 +86,8 @@ public:
     Q_CLASSINFO("useSceneColors_FieldGroup", "Options")
     Q_CLASSINFO("useSceneColors_FieldLabel", "Use scene colors as background of scene headings.")
     Q_CLASSINFO("useSceneColors_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool useSceneColors READ isUseSceneColors WRITE setUseSceneColors NOTIFY useSceneColorsChanged)
+    Q_PROPERTY(bool useSceneColors READ isUseSceneColors WRITE setUseSceneColors NOTIFY
+                       useSceneColorsChanged)
     void setUseSceneColors(bool val);
     bool isUseSceneColors() const { return m_useSceneColors; }
     Q_SIGNAL void useSceneColorsChanged();
@@ -103,7 +104,8 @@ public:
     Q_CLASSINFO("includeLogline_FieldGroup", "Options")
     Q_CLASSINFO("includeLogline_FieldLabel", "Include logline in title page. (PDF Only)")
     Q_CLASSINFO("includeLogline_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeLogline READ isIncludeLogline WRITE setIncludeLogline NOTIFY includeLoglineChanged)
+    Q_PROPERTY(bool includeLogline READ isIncludeLogline WRITE setIncludeLogline NOTIFY
+                       includeLoglineChanged)
     void setIncludeLogline(bool val);
     bool isIncludeLogline() const { return m_includeLogline; }
     Q_SIGNAL void includeLoglineChanged();
@@ -139,21 +141,24 @@ public:
     Q_CLASSINFO("ignorePageBreaks_FieldGroup", "Options")
     Q_CLASSINFO("ignorePageBreaks_FieldLabel", "Ignore page breaks.")
     Q_CLASSINFO("ignorePageBreaks_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool ignorePageBreaks READ isIgnorePageBreaks WRITE setIgnorePageBreaks NOTIFY ignorePageBreaksChanged)
+    Q_PROPERTY(bool ignorePageBreaks READ isIgnorePageBreaks WRITE setIgnorePageBreaks NOTIFY
+                       ignorePageBreaksChanged)
     void setIgnorePageBreaks(bool val);
     bool isIgnorePageBreaks() const { return m_ignorePageBreaks; }
     Q_SIGNAL void ignorePageBreaksChanged();
 
     // This property is not presented to the user, because it will be consistent with
     // options configured in Settings.
-    Q_PROPERTY(bool capitalizeSentences READ isCapitalizeSentences WRITE setCapitalizeSentences NOTIFY capitalizeSentencesChanged DESIGNABLE false)
+    Q_PROPERTY(bool capitalizeSentences READ isCapitalizeSentences WRITE setCapitalizeSentences
+                       NOTIFY capitalizeSentencesChanged DESIGNABLE false)
     void setCapitalizeSentences(bool val);
     bool isCapitalizeSentences() const { return m_capitalizeSentences; }
     Q_SIGNAL void capitalizeSentencesChanged();
 
     // This property is not presented to the user, because it will be consistent with
     // options configured in Settings.
-    Q_PROPERTY(bool polishParagraphs READ isPolishParagraphs WRITE setPolishParagraphs NOTIFY polishParagraphsChanged DESIGNABLE false)
+    Q_PROPERTY(bool polishParagraphs READ isPolishParagraphs WRITE setPolishParagraphs NOTIFY
+                       polishParagraphsChanged DESIGNABLE false)
     void setPolishParagraphs(bool val);
     bool isPolishParagraphs() const { return m_polishParagraphs; }
     Q_SIGNAL void polishParagraphsChanged();

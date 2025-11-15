@@ -45,8 +45,8 @@ public:
     static bool restoreActionShortcut(QObject *action);
     static QObject *findActionForShortcut(const QString &shortcut);
 
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged) void setTitle(
-            const QString &val);
+    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    void setTitle(const QString &val);
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
@@ -224,10 +224,10 @@ public:
     bool canHandle() const;
     Q_SIGNAL void canHandleChanged();
 
-    Q_PROPERTY(ActionHandler* active READ active NOTIFY canHandleChanged)
+    Q_PROPERTY(ActionHandler *active READ active NOTIFY canHandleChanged)
     ActionHandler *active() const;
 
-    Q_PROPERTY(QList<ActionHandler*> all READ all NOTIFY canHandleChanged)
+    Q_PROPERTY(QList<ActionHandler *> all READ all NOTIFY canHandleChanged)
     QList<ActionHandler *> all() const;
 
     Q_INVOKABLE bool trigger();
@@ -359,7 +359,8 @@ public:
     Q_DECLARE_FLAGS(Filters, Filter)
     Q_FLAG(Filters)
 
-    Q_PROPERTY(QString actionTextStartsWith READ actionTextStartsWith WRITE setActionTextStartsWith NOTIFY actionTextStartsWithChanged)
+    Q_PROPERTY(QString actionTextStartsWith READ actionTextStartsWith WRITE setActionTextStartsWith
+                       NOTIFY actionTextStartsWithChanged)
     void setActionTextStartsWith(const QString &val);
     QString actionTextStartsWith() const { return m_actionTextStartsWith; }
     Q_SIGNAL void actionTextStartsWithChanged();

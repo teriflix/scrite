@@ -111,12 +111,14 @@ public:
     static SyntaxHighlighter *qmlAttachedProperties(QObject *object);
     static SyntaxHighlighter *get(QObject *object) { return qmlAttachedProperties(object); }
 
-    Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged)
+    Q_PROPERTY(QQuickTextDocument *textDocument READ textDocument WRITE setTextDocument NOTIFY
+                       textDocumentChanged)
     void setTextDocument(QQuickTextDocument *val);
     QQuickTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
-    Q_PROPERTY(bool textDocumentUndoRedoEnabled READ isTextDocumentUndoRedoEnabled WRITE setTextDocumentUndoRedoEnabled NOTIFY textDocumentUndoRedoEnabledChanged)
+    Q_PROPERTY(bool textDocumentUndoRedoEnabled READ isTextDocumentUndoRedoEnabled WRITE
+                       setTextDocumentUndoRedoEnabled NOTIFY textDocumentUndoRedoEnabledChanged)
     void setTextDocumentUndoRedoEnabled(bool val);
     bool isTextDocumentUndoRedoEnabled() const { return m_textDocumentUndoRedoEnabled; }
     Q_SIGNAL void textDocumentUndoRedoEnabledChanged();
@@ -126,7 +128,8 @@ protected:
     void highlightBlock(const QString &text);
 
 public:
-    Q_PROPERTY(QQmlListProperty<AbstractSyntaxHighlighterDelegate> delegates READ delegates NOTIFY delegateCountChanged)
+    Q_PROPERTY(QQmlListProperty<AbstractSyntaxHighlighterDelegate> delegates READ delegates NOTIFY
+                       delegateCountChanged)
     QQmlListProperty<AbstractSyntaxHighlighterDelegate> delegates();
     Q_INVOKABLE void addDelegate(AbstractSyntaxHighlighterDelegate *ptr);
     Q_INVOKABLE void removeDelegate(AbstractSyntaxHighlighterDelegate *ptr);
@@ -218,7 +221,8 @@ public:
     Q_SIGNAL void defaultFontChanged();
 
     // Keep this true if you want default font to be applied always.
-    Q_PROPERTY(bool enforceDefaultFont READ isEnforceDefaultFont WRITE setEnforceDefaultFont NOTIFY enforceDefaultFontChanged)
+    Q_PROPERTY(bool enforceDefaultFont READ isEnforceDefaultFont WRITE setEnforceDefaultFont NOTIFY
+                       enforceDefaultFontChanged)
     void setEnforceDefaultFont(bool val);
     bool isEnforceDefaultFont() const { return m_enforceDefaultFont; }
     Q_SIGNAL void enforceDefaultFontChanged();
@@ -305,21 +309,26 @@ public:
     QColor textColor() const { return m_textColor; }
     Q_SIGNAL void textColorChanged();
 
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
+    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY
+                       backgroundColorChanged)
     void setBackgroundColor(const QColor &val);
     QColor backgroundColor() const { return m_backgroundColor; }
     Q_SIGNAL void backgroundColorChanged();
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY cursorPositionChanged)
+    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
+                       cursorPositionChanged)
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
 
-    Q_PROPERTY(bool wordUnderCursorIsMisspelled READ isWordUnderCursorIsMisspelled NOTIFY wordUnderCursorIsMisspelledChanged)
+    Q_PROPERTY(bool wordUnderCursorIsMisspelled READ isWordUnderCursorIsMisspelled NOTIFY
+                       wordUnderCursorIsMisspelledChanged)
     bool isWordUnderCursorIsMisspelled() const { return m_wordUnderCursorIsMisspelled; }
     Q_SIGNAL void wordUnderCursorIsMisspelledChanged();
 
-    Q_PROPERTY(QStringList spellingSuggestionsForWordUnderCursor READ spellingSuggestionsForWordUnderCursor NOTIFY spellingSuggestionsForWordUnderCursorChanged)
+    Q_PROPERTY(QStringList spellingSuggestionsForWordUnderCursor READ
+                       spellingSuggestionsForWordUnderCursor NOTIFY
+                               spellingSuggestionsForWordUnderCursorChanged)
     QStringList spellingSuggestionsForWordUnderCursor() const
     {
         return m_spellingSuggestionsForWordUnderCursor;
@@ -382,12 +391,14 @@ public:
     explicit TextLimiterSyntaxHighlighterDelegate(QObject *parent = nullptr);
     ~TextLimiterSyntaxHighlighterDelegate();
 
-    Q_PROPERTY(TextLimiter* textLimiter READ textLimiter WRITE setTextLimiter NOTIFY textLimiterChanged)
+    Q_PROPERTY(TextLimiter *textLimiter READ textLimiter WRITE setTextLimiter NOTIFY
+                       textLimiterChanged)
     void setTextLimiter(TextLimiter *val);
     TextLimiter *textLimiter() const { return m_textLimiter; }
     Q_SIGNAL void textLimiterChanged();
 
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
+    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY
+                       backgroundColorChanged)
     void setBackgroundColor(const QColor &val);
     QColor backgroundColor() const { return m_backgroundColor; }
     Q_SIGNAL void backgroundColorChanged();

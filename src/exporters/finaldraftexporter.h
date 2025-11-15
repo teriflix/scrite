@@ -28,16 +28,19 @@ public:
     Q_INVOKABLE explicit FinalDraftExporter(QObject *parent = nullptr);
     ~FinalDraftExporter();
 
-    Q_CLASSINFO("markLanguagesExplicitly_FieldLabel", "Explicity mark text-fragments of different languages.")
+    Q_CLASSINFO("markLanguagesExplicitly_FieldLabel",
+                "Explicity mark text-fragments of different languages.")
     Q_CLASSINFO("markLanguagesExplicitly_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool markLanguagesExplicitly READ isMarkLanguagesExplicitly WRITE setMarkLanguagesExplicitly NOTIFY markLanguagesExplicitlyChanged)
+    Q_PROPERTY(bool markLanguagesExplicitly READ isMarkLanguagesExplicitly WRITE
+                       setMarkLanguagesExplicitly NOTIFY markLanguagesExplicitlyChanged)
     void setMarkLanguagesExplicitly(bool val);
     bool isMarkLanguagesExplicitly() const { return m_markLanguagesExplicitly; }
     Q_SIGNAL void markLanguagesExplicitlyChanged();
 
     Q_CLASSINFO("includeSceneSynopsis_FieldLabel", "Include scene synopsis.")
     Q_CLASSINFO("includeSceneSynopsis_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis NOTIFY includeSceneSynopsisChanged)
+    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis
+                       NOTIFY includeSceneSynopsisChanged)
     void setIncludeSceneSynopsis(bool val);
     bool isIncludeSceneSynopsis() const { return m_includeSceneSynopsis; }
     Q_SIGNAL void includeSceneSynopsisChanged();

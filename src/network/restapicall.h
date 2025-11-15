@@ -88,7 +88,8 @@ public:
     virtual Type type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
-    Q_PROPERTY(bool useSessionToken READ useSessionToken WRITE setUseSessionToken NOTIFY useSessionTokenChanged)
+    Q_PROPERTY(bool useSessionToken READ useSessionToken WRITE setUseSessionToken NOTIFY
+                       useSessionTokenChanged)
     void setUseSessionToken(bool val);
     virtual bool useSessionToken() const { return m_useSessionToken; }
     Q_SIGNAL void useSessionTokenChanged();
@@ -142,7 +143,8 @@ public:
     bool isBusy() const { return m_reply != nullptr; }
     Q_SIGNAL void busyChanged();
 
-    Q_PROPERTY(bool reportNetworkErrors READ isReportNetworkErrors WRITE setReportNetworkErrors NOTIFY reportNetworkErrorsChanged)
+    Q_PROPERTY(bool reportNetworkErrors READ isReportNetworkErrors WRITE setReportNetworkErrors
+                       NOTIFY reportNetworkErrorsChanged)
     void setReportNetworkErrors(bool val);
     bool isReportNetworkErrors() const { return m_reportNetworkErrors; }
     Q_SIGNAL void reportNetworkErrorsChanged();
@@ -206,7 +208,7 @@ public:
 
     static RestApiCallQueue *find(RestApiCall *call);
 
-    Q_PROPERTY(RestApiCall* current READ current NOTIFY currentChanged FINAL)
+    Q_PROPERTY(RestApiCall *current READ current NOTIFY currentChanged FINAL)
     RestApiCall *current() const { return m_current; }
     Q_SIGNAL void currentChanged();
 
@@ -416,7 +418,8 @@ public:
     AppActivateDeviceRestApiCall(QObject *parent = nullptr);
     ~AppActivateDeviceRestApiCall();
 
-    Q_PROPERTY(QString activationCode READ activationCode WRITE setActivationCode NOTIFY activationCodeChanged)
+    Q_PROPERTY(QString activationCode READ activationCode WRITE setActivationCode NOTIFY
+                       activationCodeChanged)
     void setActivationCode(const QString &val);
     QString activationCode() const { return m_activationCode; }
     Q_SIGNAL void activationCodeChanged();
@@ -467,7 +470,8 @@ public:
     Q_PROPERTY(QJsonObject userInfo READ userInfo NOTIFY responseChanged)
     QJsonObject userInfo() const { return this->responseData(); }
 
-    Q_PROPERTY(QJsonObject updatedFields READ updatedFields WRITE setUpdatedFields NOTIFY updatedFieldsChanged)
+    Q_PROPERTY(QJsonObject updatedFields READ updatedFields WRITE setUpdatedFields NOTIFY
+                       updatedFieldsChanged)
     void setUpdatedFields(const QJsonObject &val);
     QJsonObject updatedFields() const { return m_updatedFields; }
     Q_SIGNAL void updatedFieldsChanged();
@@ -563,7 +567,8 @@ public:
     QString activity() const { return m_activity; }
     Q_SIGNAL void activityChanged();
 
-    Q_PROPERTY(QJsonValue activityData READ activityData WRITE setActivityData NOTIFY activityDataChanged)
+    Q_PROPERTY(QJsonValue activityData READ activityData WRITE setActivityData NOTIFY
+                       activityDataChanged)
     void setActivityData(const QJsonValue &val);
     QJsonValue activityData() const { return m_activityData; }
     Q_SIGNAL void activityDataChanged();
@@ -672,7 +677,8 @@ public:
     InstallationDeactivateOtherRestApiCall(QObject *parent = nullptr);
     ~InstallationDeactivateOtherRestApiCall();
 
-    Q_PROPERTY(QString installationId READ installationId WRITE setInstallationId NOTIFY installationIdChanged)
+    Q_PROPERTY(QString installationId READ installationId WRITE setInstallationId NOTIFY
+                       installationIdChanged)
     void setInstallationId(const QString &val);
     QString installationId() const { return m_installationId; }
     Q_SIGNAL void installationIdChanged();

@@ -26,12 +26,14 @@ public:
     explicit PropertyAlias(QObject *parent = nullptr);
     ~PropertyAlias();
 
-    Q_PROPERTY(QObject* sourceObject READ sourceObject WRITE setSourceObject NOTIFY sourceObjectChanged)
+    Q_PROPERTY(QObject *sourceObject READ sourceObject WRITE setSourceObject NOTIFY
+                       sourceObjectChanged)
     void setSourceObject(QObject *val);
     QObject *sourceObject() const { return m_sourceObject; }
     Q_SIGNAL void sourceObjectChanged();
 
-    Q_PROPERTY(QByteArray sourceProperty READ sourceProperty WRITE setSourceProperty NOTIFY sourcePropertyChanged)
+    Q_PROPERTY(QByteArray sourceProperty READ sourceProperty WRITE setSourceProperty NOTIFY
+                       sourcePropertyChanged)
     void setSourceProperty(const QByteArray &val);
     QByteArray sourceProperty() const { return m_sourceProperty; }
     Q_SIGNAL void sourcePropertyChanged();

@@ -31,12 +31,14 @@ public:
     QStringList strings() const { return m_strings; }
     Q_SIGNAL void stringsChanged();
 
-    Q_PROPERTY(QStringList priorityStrings READ priorityStrings WRITE setPriorityStrings NOTIFY priorityStringsChanged)
+    Q_PROPERTY(QStringList priorityStrings READ priorityStrings WRITE setPriorityStrings NOTIFY
+                       priorityStringsChanged)
     void setPriorityStrings(QStringList val);
     QStringList priorityStrings() const { return m_priorityStrings; }
     Q_SIGNAL void priorityStringsChanged();
 
-    Q_PROPERTY(bool acceptEnglishStringsOnly READ isAcceptEnglishStringsOnly WRITE setAcceptEnglishStringsOnly NOTIFY acceptEnglishStringsOnlyChanged)
+    Q_PROPERTY(bool acceptEnglishStringsOnly READ isAcceptEnglishStringsOnly WRITE
+                       setAcceptEnglishStringsOnly NOTIFY acceptEnglishStringsOnlyChanged)
     void setAcceptEnglishStringsOnly(bool val);
     bool isAcceptEnglishStringsOnly() const { return m_acceptEnglishStringsOnly; }
     Q_SIGNAL void acceptEnglishStringsOnlyChanged();
@@ -54,17 +56,20 @@ public:
     SortMode sortMode() const { return m_sortMode; }
     Q_SIGNAL void sortModeChanged();
 
-    Q_PROPERTY(int maxVisibleItems READ maxVisibleItems WRITE setMaxVisibleItems NOTIFY maxVisibleItemsChanged)
+    Q_PROPERTY(int maxVisibleItems READ maxVisibleItems WRITE setMaxVisibleItems NOTIFY
+                       maxVisibleItemsChanged)
     void setMaxVisibleItems(int val);
     int maxVisibleItems() const { return m_maxVisibleItems; }
     Q_SIGNAL void maxVisibleItemsChanged();
 
-    Q_PROPERTY(int minimumCompletionPrefixLength READ minimumCompletionPrefixLength WRITE setMinimumCompletionPrefixLength NOTIFY minimumCompletionPrefixLengthChanged)
+    Q_PROPERTY(int minimumCompletionPrefixLength READ minimumCompletionPrefixLength WRITE
+                       setMinimumCompletionPrefixLength NOTIFY minimumCompletionPrefixLengthChanged)
     void setMinimumCompletionPrefixLength(int val);
     int minimumCompletionPrefixLength() const { return m_minimumCompletionPrefixLength; }
     Q_SIGNAL void minimumCompletionPrefixLengthChanged();
 
-    Q_PROPERTY(QString completionPrefix READ completionPrefix WRITE setCompletionPrefix NOTIFY completionPrefixChanged)
+    Q_PROPERTY(QString completionPrefix READ completionPrefix WRITE setCompletionPrefix NOTIFY
+                       completionPrefixChanged)
     void setCompletionPrefix(const QString &val);
     QString completionPrefix() const { return m_completionPrefix; }
     Q_SIGNAL void completionPrefixChanged();
@@ -87,7 +92,8 @@ public:
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    Q_PROPERTY(bool filterKeyStrokes READ isFilterKeyStrokes WRITE setFilterKeyStrokes NOTIFY filterKeyStrokesChanged)
+    Q_PROPERTY(bool filterKeyStrokes READ isFilterKeyStrokes WRITE setFilterKeyStrokes NOTIFY
+                       filterKeyStrokesChanged)
     void setFilterKeyStrokes(bool val);
     bool isFilterKeyStrokes() const { return m_filterKeyStrokes; }
     Q_SIGNAL void filterKeyStrokesChanged();

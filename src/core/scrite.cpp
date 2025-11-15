@@ -77,21 +77,25 @@ void Scrite::setFileNameToOpen(const QString &val)
 
 QStringList Scrite::defaultTransitions()
 {
-    return QStringList({ QStringLiteral("CUT TO"), QStringLiteral("DISSOLVE TO"), QStringLiteral("FADE IN"),
-                         QStringLiteral("FADE OUT"), QStringLiteral("FADE TO"), QStringLiteral("FLASHBACK"),
-                         QStringLiteral("FLASH CUT TO"), QStringLiteral("FREEZE FRAME"), QStringLiteral("IRIS IN"),
-                         QStringLiteral("IRIS OUT"), QStringLiteral("JUMP CUT TO"), QStringLiteral("MATCH CUT TO"),
-                         QStringLiteral("MATCH DISSOLVE TO"), QStringLiteral("SMASH CUT TO"),
-                         QStringLiteral("STOCK SHOT"), QStringLiteral("TIME CUT"), QStringLiteral("WIPE TO") });
+    return QStringList(
+            { QStringLiteral("CUT TO"), QStringLiteral("DISSOLVE TO"), QStringLiteral("FADE IN"),
+              QStringLiteral("FADE OUT"), QStringLiteral("FADE TO"), QStringLiteral("FLASHBACK"),
+              QStringLiteral("FLASH CUT TO"), QStringLiteral("FREEZE FRAME"),
+              QStringLiteral("IRIS IN"), QStringLiteral("IRIS OUT"), QStringLiteral("JUMP CUT TO"),
+              QStringLiteral("MATCH CUT TO"), QStringLiteral("MATCH DISSOLVE TO"),
+              QStringLiteral("SMASH CUT TO"), QStringLiteral("STOCK SHOT"),
+              QStringLiteral("TIME CUT"), QStringLiteral("WIPE TO") });
 }
 
 QStringList Scrite::defaultShots()
 {
-    return QStringList({ QStringLiteral("AIR"), QStringLiteral("CLOSE ON"), QStringLiteral("CLOSER ON"),
-                         QStringLiteral("CLOSEUP"), QStringLiteral("ESTABLISHING"), QStringLiteral("EXTREME CLOSEUP"),
+    return QStringList({ QStringLiteral("AIR"), QStringLiteral("CLOSE ON"),
+                         QStringLiteral("CLOSER ON"), QStringLiteral("CLOSEUP"),
+                         QStringLiteral("ESTABLISHING"), QStringLiteral("EXTREME CLOSEUP"),
                          QStringLiteral("INSERT"), QStringLiteral("POV"), QStringLiteral("SURFACE"),
-                         QStringLiteral("THREE SHOT"), QStringLiteral("TWO SHOT"), QStringLiteral("UNDERWATER"),
-                         QStringLiteral("WIDE"), QStringLiteral("WIDE ON"), QStringLiteral("WIDER ANGLE") });
+                         QStringLiteral("THREE SHOT"), QStringLiteral("TWO SHOT"),
+                         QStringLiteral("UNDERWATER"), QStringLiteral("WIDE"),
+                         QStringLiteral("WIDE ON"), QStringLiteral("WIDER ANGLE") });
 }
 
 Locale Scrite::locale()
@@ -127,12 +131,18 @@ QString Scrite::currencySymbol(const QString &code)
 bool Scrite::isFeatureEnabled(AppFeature feature, const QStringList &features)
 {
     static const QMap<AppFeature, QString> featureNameMap = {
-        { Scrite::ScreenplayFeature, "screenplay" }, { Scrite::StructureFeature, "structure" },
-        { Scrite::NotebookFeature, "notebook" },     { Scrite::RelationshipGraphFeature, "relationshipgraph" },
-        { Scrite::ScriptalayFeature, "scriptalay" }, { Scrite::TemplateFeature, "template" },
-        { Scrite::ReportFeature, "report" },         { Scrite::ImportFeature, "import" },
-        { Scrite::ExportFeature, "export" },         { Scrite::ScritedFeature, "scrited" },
-        { Scrite::WatermarkFeature, "watermark" },   { Scrite::RecentFilesFeature, "recentfiles" },
+        { Scrite::ScreenplayFeature, "screenplay" },
+        { Scrite::StructureFeature, "structure" },
+        { Scrite::NotebookFeature, "notebook" },
+        { Scrite::RelationshipGraphFeature, "relationshipgraph" },
+        { Scrite::ScriptalayFeature, "scriptalay" },
+        { Scrite::TemplateFeature, "template" },
+        { Scrite::ReportFeature, "report" },
+        { Scrite::ImportFeature, "import" },
+        { Scrite::ExportFeature, "export" },
+        { Scrite::ScritedFeature, "scrited" },
+        { Scrite::WatermarkFeature, "watermark" },
+        { Scrite::RecentFilesFeature, "recentfiles" },
         { Scrite::VaultFilesFeature, "vaultfiles" }
     };
 
@@ -155,18 +165,21 @@ bool Scrite::isFeatureNameEnabled(const QString &featureName, const QStringList 
     };
 
     const bool featureEnabled =
-            std::find_if(features.constBegin(), features.constEnd(), featurePredicate) != features.constEnd();
+            std::find_if(features.constBegin(), features.constEnd(), featurePredicate)
+            != features.constEnd();
     const bool allFeaturesEnabled =
-            std::find_if(features.constBegin(), features.constEnd(), wildCardPredicate) != features.constEnd();
+            std::find_if(features.constBegin(), features.constEnd(), wildCardPredicate)
+            != features.constEnd();
     const bool featureDisabled =
-            std::find_if(features.constBegin(), features.constEnd(), notFeaturePredicate) != features.constEnd();
+            std::find_if(features.constBegin(), features.constEnd(), notFeaturePredicate)
+            != features.constEnd();
     return (allFeaturesEnabled || featureEnabled) && !featureDisabled;
 }
 
 void doZipRecursively(const QDir &dir, const QDir &rootDir, QuaZip &qzip)
 {
-    const QFileInfoList entries =
-            dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs, QDir::Name | QDir::DirsLast);
+    const QFileInfoList entries = dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs,
+                                                    QDir::Name | QDir::DirsLast);
     for (const QFileInfo &entry : entries) {
         if (entry.isDir()) {
             doZipRecursively(entry.absoluteFilePath(), rootDir, qzip);
@@ -202,7 +215,8 @@ void doZipRecursively(const QDir &dir, const QDir &rootDir, QuaZip &qzip)
     }
 }
 
-bool Scrite::doZip(const QFileInfo &zipFileInfo, const QDir &sourceDir, const QList<QPair<QString, int>> &files)
+bool Scrite::doZip(const QFileInfo &zipFileInfo, const QDir &sourceDir,
+                   const QList<QPair<QString, int>> &files)
 {
     const QString zipFileName = zipFileInfo.absoluteFilePath();
 

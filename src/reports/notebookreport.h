@@ -32,7 +32,8 @@ public:
     Q_CLASSINFO("actsOnNewPage_FieldGroup", "Basic")
     Q_CLASSINFO("actsOnNewPage_FieldLabel", "Start each Act on a new page.")
     Q_CLASSINFO("actsOnNewPage_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool actsOnNewPage READ isActsOnNewPage WRITE setActsOnNewPage NOTIFY actsOnNewPageChanged)
+    Q_PROPERTY(bool actsOnNewPage READ isActsOnNewPage WRITE setActsOnNewPage NOTIFY
+                       actsOnNewPageChanged)
     void setActsOnNewPage(bool val);
     bool isActsOnNewPage() const { return m_actsOnNewPage; }
     Q_SIGNAL void actsOnNewPageChanged();
@@ -40,7 +41,8 @@ public:
     Q_CLASSINFO("episodesOnNewPage_FieldGroup", "Basic")
     Q_CLASSINFO("episodesOnNewPage_FieldLabel", "Start each Episode on a new page.")
     Q_CLASSINFO("episodesOnNewPage_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool episodesOnNewPage READ isEpisodesOnNewPage WRITE setEpisodesOnNewPage NOTIFY episodesOnNewPageChanged)
+    Q_PROPERTY(bool episodesOnNewPage READ isEpisodesOnNewPage WRITE setEpisodesOnNewPage NOTIFY
+                       episodesOnNewPageChanged)
     void setEpisodesOnNewPage(bool val);
     bool isEpisodesOnNewPage() const { return m_episodesOnNewPage; }
     Q_SIGNAL void episodesOnNewPageChanged();

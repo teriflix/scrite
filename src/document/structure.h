@@ -996,12 +996,14 @@ public:
     Q_INVOKABLE QString presentableGroupNames(const QStringList &groups) const;
 
     // Local to the current Scrite document
-    Q_PROPERTY(QJsonArray indexCardFields READ indexCardFields WRITE setIndexCardFields NOTIFY indexCardFieldsChanged)
+    Q_PROPERTY(QJsonArray indexCardFields READ indexCardFields WRITE setIndexCardFields NOTIFY
+                       indexCardFieldsChanged)
     void setIndexCardFields(const QJsonArray &val);
     QJsonArray indexCardFields() const { return m_indexCardFields; }
     Q_SIGNAL void indexCardFieldsChanged();
 
-    Q_PROPERTY(QJsonArray defaultIndexCardFields READ defaultIndexCardFields WRITE setDefaultIndexCardFields NOTIFY defaultIndexCardFieldsChanged STORED false)
+    Q_PROPERTY(QJsonArray defaultIndexCardFields READ defaultIndexCardFields WRITE
+                       setDefaultIndexCardFields NOTIFY defaultIndexCardFieldsChanged STORED false)
     void setDefaultIndexCardFields(const QJsonArray &val);
     QJsonArray defaultIndexCardFields() const { return m_defaultIndexCardFields; }
     Q_SIGNAL void defaultIndexCardFieldsChanged();

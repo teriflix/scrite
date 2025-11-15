@@ -30,14 +30,16 @@ public:
 
     Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated HTML.")
     Q_CLASSINFO("includeSceneNumbers_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers NOTIFY includeSceneNumbersChanged)
+    Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers
+                       NOTIFY includeSceneNumbersChanged)
     void setIncludeSceneNumbers(bool val);
     bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
     Q_SIGNAL void includeSceneNumbersChanged();
 
     Q_CLASSINFO("exportWithSceneColors_FieldLabel", "Export with scene colors")
     Q_CLASSINFO("exportWithSceneColors_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool exportWithSceneColors READ isExportWithSceneColors WRITE setExportWithSceneColors NOTIFY exportWithSceneColorsChanged)
+    Q_PROPERTY(bool exportWithSceneColors READ isExportWithSceneColors WRITE
+                       setExportWithSceneColors NOTIFY exportWithSceneColorsChanged)
     void setExportWithSceneColors(bool val);
     bool isExportWithSceneColors() const { return m_exportWithSceneColors; }
     Q_SIGNAL void exportWithSceneColorsChanged();

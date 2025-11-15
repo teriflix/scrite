@@ -40,7 +40,8 @@ public:
     int maxWordCount() const { return m_maxWordCount; }
     Q_SIGNAL void maxWordCountChanged();
 
-    Q_PROPERTY(int maxLetterCount READ maxLetterCount WRITE setMaxLetterCount NOTIFY maxLetterCountChanged)
+    Q_PROPERTY(int maxLetterCount READ maxLetterCount WRITE setMaxLetterCount NOTIFY
+                       maxLetterCountChanged)
     void setMaxLetterCount(int val);
     int maxLetterCount() const { return m_maxLetterCount; }
     Q_SIGNAL void maxLetterCountChanged();

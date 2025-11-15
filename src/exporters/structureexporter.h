@@ -21,7 +21,8 @@ class StructureExporter : public AbstractExporter
     Q_OBJECT
     Q_CLASSINFO("Format", "Structure/Screenplay Structure")
     Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
-    Q_CLASSINFO("Description", "Exports the contents of the entire structure canvas as a single page PDF file.")
+    Q_CLASSINFO("Description",
+                "Exports the contents of the entire structure canvas as a single page PDF file.")
     Q_CLASSINFO("Icon", ":/icons/exporter/structure_pdf.png")
 
 public:
@@ -33,21 +34,24 @@ public:
 
     Q_CLASSINFO("insertTitleCard_FieldLabel", "Include title card in the generated PDF.")
     Q_CLASSINFO("insertTitleCard_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool insertTitleCard READ isInsertTitleCard WRITE setInsertTitleCard NOTIFY insertTitleCardChanged)
+    Q_PROPERTY(bool insertTitleCard READ isInsertTitleCard WRITE setInsertTitleCard NOTIFY
+                       insertTitleCardChanged)
     void setInsertTitleCard(bool val);
     bool isInsertTitleCard() const { return m_insertTitleCard; }
     Q_SIGNAL void insertTitleCardChanged();
 
     Q_CLASSINFO("enableHeaderFooter_FieldLabel", "Include header & footer in the generated PDF.")
     Q_CLASSINFO("enableHeaderFooter_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool enableHeaderFooter READ isEnableHeaderFooter WRITE setEnableHeaderFooter NOTIFY enableHeaderFooterChanged)
+    Q_PROPERTY(bool enableHeaderFooter READ isEnableHeaderFooter WRITE setEnableHeaderFooter NOTIFY
+                       enableHeaderFooterChanged)
     void setEnableHeaderFooter(bool val);
     bool isEnableHeaderFooter() const { return m_enableHeaderFooter; }
     Q_SIGNAL void enableHeaderFooterChanged();
 
     Q_CLASSINFO("preferFeaturedImage_FieldLabel", "Include featured image for scene, if available.")
     Q_CLASSINFO("preferFeaturedImage_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool preferFeaturedImage READ isPreferFeaturedImage WRITE setPreferFeaturedImage NOTIFY preferFeaturedImageChanged)
+    Q_PROPERTY(bool preferFeaturedImage READ isPreferFeaturedImage WRITE setPreferFeaturedImage
+                       NOTIFY preferFeaturedImageChanged)
     void setPreferFeaturedImage(bool val);
     bool isPreferFeaturedImage() const { return m_preferFeaturedImage; }
     Q_SIGNAL void preferFeaturedImageChanged();

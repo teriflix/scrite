@@ -35,7 +35,8 @@ public:
     QString fileName() const { return m_fileName; }
     Q_SIGNAL void fileNameChanged();
 
-    Q_PROPERTY(ScriteDocument* document READ document WRITE setDocument NOTIFY documentChanged RESET resetDocument STORED false)
+    Q_PROPERTY(ScriteDocument *document READ document WRITE setDocument NOTIFY documentChanged RESET
+                       resetDocument STORED false)
     void setDocument(ScriteDocument *val);
     ScriteDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();

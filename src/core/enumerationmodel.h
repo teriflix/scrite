@@ -47,7 +47,7 @@ public:
     QString className() const;
     Q_SIGNAL void classNameChanged();
 
-    Q_PROPERTY(QObject* object READ object WRITE setObject NOTIFY objectChanged)
+    Q_PROPERTY(QObject *object READ object WRITE setObject NOTIFY objectChanged)
     void setObject(QObject *val);
     QObject *object() const { return m_object; }
     Q_SIGNAL void objectChanged();

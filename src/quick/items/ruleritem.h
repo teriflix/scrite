@@ -52,27 +52,32 @@ public:
     qreal rightMargin() const { return m_rightMargin; }
     Q_SIGNAL void rightMarginChanged();
 
-    Q_PROPERTY(qreal paragraphLeftMargin READ paragraphLeftMargin WRITE setParagraphLeftMargin NOTIFY paragraphLeftMarginChanged)
+    Q_PROPERTY(qreal paragraphLeftMargin READ paragraphLeftMargin WRITE setParagraphLeftMargin
+                       NOTIFY paragraphLeftMarginChanged)
     void setParagraphLeftMargin(qreal val);
     qreal paragraphLeftMargin() const { return m_paragraphLeftMargin; }
     Q_SIGNAL void paragraphLeftMarginChanged();
 
-    Q_PROPERTY(qreal paragraphRightMargin READ paragraphRightMargin WRITE setParagraphRightMargin NOTIFY paragraphRightMarginChanged)
+    Q_PROPERTY(qreal paragraphRightMargin READ paragraphRightMargin WRITE setParagraphRightMargin
+                       NOTIFY paragraphRightMarginChanged)
     void setParagraphRightMargin(qreal val);
     qreal paragraphRightMargin() const { return m_paragraphRightMargin; }
     Q_SIGNAL void paragraphRightMarginChanged();
 
-    Q_PROPERTY(QColor pageMarginColor READ pageMarginColor WRITE setPageMarginColor NOTIFY pageMarginColorChanged)
+    Q_PROPERTY(QColor pageMarginColor READ pageMarginColor WRITE setPageMarginColor NOTIFY
+                       pageMarginColorChanged)
     void setPageMarginColor(const QColor &val);
     QColor pageMarginColor() const { return m_pageMarginColor; }
     Q_SIGNAL void pageMarginColorChanged();
 
-    Q_PROPERTY(QColor paragraphColor READ paragraphColor WRITE setParagraphColor NOTIFY paragraphColorChanged)
+    Q_PROPERTY(QColor paragraphColor READ paragraphColor WRITE setParagraphColor NOTIFY
+                       paragraphColorChanged)
     void setParagraphColor(const QColor &val);
     QColor paragraphColor() const { return m_paragraphColor; }
     Q_SIGNAL void paragraphColorChanged();
 
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
+    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY
+                       backgroundColorChanged)
     void setBackgroundColor(const QColor &val);
     QColor backgroundColor() const { return m_backgroundColor; }
     Q_SIGNAL void backgroundColorChanged();
@@ -82,12 +87,14 @@ public:
     QColor borderColor() const { return m_borderColor; }
     Q_SIGNAL void borderColorChanged();
 
-    Q_PROPERTY(QColor majorTickColor READ majorTickColor WRITE setMajorTickColor NOTIFY majorTickColorChanged)
+    Q_PROPERTY(QColor majorTickColor READ majorTickColor WRITE setMajorTickColor NOTIFY
+                       majorTickColorChanged)
     void setMajorTickColor(const QColor &val);
     QColor majorTickColor() const { return m_majorTickColor; }
     Q_SIGNAL void majorTickColorChanged();
 
-    Q_PROPERTY(QColor minorTickColor READ minorTickColor WRITE setMinorTickColor NOTIFY minorTickColorChanged)
+    Q_PROPERTY(QColor minorTickColor READ minorTickColor WRITE setMinorTickColor NOTIFY
+                       minorTickColorChanged)
     void setMinorTickColor(const QColor &val);
     QColor minorTickColor() const { return m_minorTickColor; }
     Q_SIGNAL void minorTickColorChanged();

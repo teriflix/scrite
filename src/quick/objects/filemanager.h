@@ -27,7 +27,8 @@ public:
 
     Q_INVOKABLE static QString generateUniqueTemporaryFileName(const QString &ext);
 
-    Q_PROPERTY(QStringList autoDeleteList READ autoDeleteList WRITE setAutoDeleteList NOTIFY autoDeleteListChanged)
+    Q_PROPERTY(QStringList autoDeleteList READ autoDeleteList WRITE setAutoDeleteList NOTIFY
+                       autoDeleteListChanged)
     void setAutoDeleteList(const QStringList &val);
     QStringList autoDeleteList() const { return m_autoDeleteList; }
     Q_SIGNAL void autoDeleteListChanged();

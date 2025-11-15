@@ -42,10 +42,10 @@ public:
     bool busy() const;
     Q_SIGNAL void busyChanged();
 
-    Q_PROPERTY(Library* screenplays READ screenplays CONSTANT)
+    Q_PROPERTY(Library *screenplays READ screenplays CONSTANT)
     static Library *screenplays();
 
-    Q_PROPERTY(Library* templates READ templates CONSTANT)
+    Q_PROPERTY(Library *templates READ templates CONSTANT)
     static Library *templates();
 
     Q_INVOKABLE void reload();

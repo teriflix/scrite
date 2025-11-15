@@ -34,12 +34,12 @@ public:
     QPointF position() const { return m_position; }
     Q_SIGNAL void positionChanged();
 
-    Q_PROPERTY(QQuickItem* from READ from WRITE setFrom NOTIFY fromChanged)
+    Q_PROPERTY(QQuickItem *from READ from WRITE setFrom NOTIFY fromChanged)
     void setFrom(QQuickItem *val);
     QQuickItem *from() const { return m_from; }
     Q_SIGNAL void fromChanged();
 
-    Q_PROPERTY(QQuickItem* to READ to WRITE setTo NOTIFY toChanged)
+    Q_PROPERTY(QQuickItem *to READ to WRITE setTo NOTIFY toChanged)
     void setTo(QQuickItem *val);
     QQuickItem *to() const { return m_to; }
     Q_SIGNAL void toChanged();

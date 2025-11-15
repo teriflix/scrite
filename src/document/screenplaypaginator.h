@@ -79,7 +79,7 @@ public:
     Q_PROPERTY(QList<ScenePageBreak> pageBreaks MEMBER pageBreaks)
     QList<ScenePageBreak> pageBreaks;
 
-    Q_PROPERTY(ScreenplayElement* screenplayElement MEMBER screenplayElement)
+    Q_PROPERTY(ScreenplayElement *screenplayElement MEMBER screenplayElement)
     QPointer<ScreenplayElement> screenplayElement;
 
     ScreenplayPaginatorRecord();
@@ -105,12 +105,12 @@ public:
 
     Q_INVOKABLE void useDefaultFormatAndScreenplay();
 
-    Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)
+    Q_PROPERTY(Screenplay *screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)
     void setScreenplay(Screenplay *val);
     Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
-    Q_PROPERTY(ScreenplayFormat* format READ format WRITE setFormat NOTIFY formatChanged)
+    Q_PROPERTY(ScreenplayFormat *format READ format WRITE setFormat NOTIFY formatChanged)
     void setFormat(ScreenplayFormat *val);
     ScreenplayFormat *format() const { return m_format; }
     Q_SIGNAL void formatChanged();
@@ -128,17 +128,21 @@ public:
     // QTextDocument pointer passed to it belong to the same thread as the current one.
     static bool paginateIntoDocument(const Screenplay *screenplay, const ScreenplayFormat *format,
                                      QTextDocument *document);
-    static QTextDocument *paginatedDocument(const Screenplay *screenplay, const ScreenplayFormat *format,
+    static QTextDocument *paginatedDocument(const Screenplay *screenplay,
+                                            const ScreenplayFormat *format,
                                             QObject *documentParent = nullptr);
     static qreal pixelLength(const ScreenplayElement *element, const QTextDocument *document);
     static qreal pixelLength(const Scene *scene, const QTextDocument *document);
     static qreal pixelLength(const SceneHeading *sceneHeading, const QTextDocument *document);
     static qreal pixelLength(const SceneElement *paragraph, const QTextDocument *document);
     static qreal pixelLength(const QTextDocument *document);
-    static qreal pixelLength(const QTextBlock &from, const QTextBlock &until, const QTextDocument *document);
+    static qreal pixelLength(const QTextBlock &from, const QTextBlock &until,
+                             const QTextDocument *document);
     static qreal pixelToPageLength(qreal pixelLength, const QTextDocument *document);
-    static QTime pixelToTimeLength(qreal pixelLength, ScreenplayFormat *format, const QTextDocument *document);
-    static QTime pageToTimeLength(qreal pixelLength, ScreenplayFormat *format, const QTextDocument *document);
+    static QTime pixelToTimeLength(qreal pixelLength, ScreenplayFormat *format,
+                                   const QTextDocument *document);
+    static QTime pageToTimeLength(qreal pixelLength, ScreenplayFormat *format,
+                                  const QTextDocument *document);
 
     Q_PROPERTY(int pageCount READ pageCount NOTIFY paginationUpdated)
     int pageCount() const { return m_pageCount; }
@@ -149,7 +153,8 @@ public:
     Q_PROPERTY(qreal totalPixelLength READ totalPixelLength NOTIFY paginationUpdated)
     qreal totalPixelLength() const { return m_totalPixelLength; }
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY cursorPositionChanged)
+    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
+                       cursorPositionChanged)
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
@@ -166,7 +171,8 @@ public:
     Q_INVOKABLE int indexOf(ScreenplayElement *element) const;
     Q_INVOKABLE ScreenplayPaginatorRecord recordAt(int row) const;
 
-    Q_INVOKABLE qreal pixelLength(ScreenplayElement *from, ScreenplayElement *until = nullptr) const;
+    Q_INVOKABLE qreal pixelLength(ScreenplayElement *from,
+                                  ScreenplayElement *until = nullptr) const;
     Q_INVOKABLE qreal pageLength(ScreenplayElement *from, ScreenplayElement *until = nullptr) const;
     Q_INVOKABLE QTime timeLength(ScreenplayElement *from, ScreenplayElement *until = nullptr) const;
 
@@ -192,17 +198,20 @@ private:
     void onScreenplayElementOmitted(ScreenplayElement *element, int index);
     void onScreenplayElementIncluded(ScreenplayElement *element, int index);
     void onScreenplayElementSceneReset(ScreenplayElement *element, Scene *scene);
-    void onScreenplayElementSceneHeadingChanged(ScreenplayElement *element, SceneHeading *sceneHeading);
-    void onScreenplayElementSceneElementChanged(ScreenplayElement *element, SceneElement *sceneElement);
+    void onScreenplayElementSceneHeadingChanged(ScreenplayElement *element,
+                                                SceneHeading *sceneHeading);
+    void onScreenplayElementSceneElementChanged(ScreenplayElement *element,
+                                                SceneElement *sceneElement);
 
     void onCursorPositionChanged();
 
-    void onCursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber, const QTime &time);
-    void onPaginationComplete(const QList<ScreenplayPaginatorRecord> &items, qreal pixelLength, int pageCount,
-                              const QTime &totalTime);
+    void onCursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber,
+                               const QTime &time);
+    void onPaginationComplete(const QList<ScreenplayPaginatorRecord> &items, qreal pixelLength,
+                              int pageCount, const QTime &totalTime);
 
-    bool aggregate(ScreenplayElement *from, ScreenplayElement *until, qreal *pixelLength, qreal *pageLength,
-                   QTime *timeLength) const;
+    bool aggregate(ScreenplayElement *from, ScreenplayElement *until, qreal *pixelLength,
+                   qreal *pageLength, QTime *timeLength) const;
 
 private:
     bool m_componentComplete = true;
@@ -235,12 +244,13 @@ public:
     explicit ScreenplayPaginatorWatcher(QObject *parent = nullptr);
     virtual ~ScreenplayPaginatorWatcher();
 
-    Q_PROPERTY(ScreenplayPaginator* paginator READ paginator WRITE setPaginator NOTIFY paginatorChanged)
+    Q_PROPERTY(ScreenplayPaginator *paginator READ paginator WRITE setPaginator NOTIFY
+                       paginatorChanged)
     void setPaginator(ScreenplayPaginator *val);
     ScreenplayPaginator *paginator() const { return m_paginator; }
     Q_SIGNAL void paginatorChanged();
 
-    Q_PROPERTY(ScreenplayElement* element READ element WRITE setElement NOTIFY elementChanged)
+    Q_PROPERTY(ScreenplayElement *element READ element WRITE setElement NOTIFY elementChanged)
     void setElement(ScreenplayElement *val);
     ScreenplayElement *element() const { return m_element; }
     Q_SIGNAL void elementChanged();

@@ -42,7 +42,8 @@ public:
     Source source() const { return m_source; }
     Q_SIGNAL void sourceChanged();
 
-    Q_PROPERTY(bool notifyMissingFiles READ isNotifyMissingFiles WRITE setNotifyMissingFiles NOTIFY notifyMissingFilesChanged)
+    Q_PROPERTY(bool notifyMissingFiles READ isNotifyMissingFiles WRITE setNotifyMissingFiles NOTIFY
+                       notifyMissingFilesChanged)
     void setNotifyMissingFiles(bool val);
     bool isNotifyMissingFiles() const { return m_notifyMissingFiles; }
     Q_SIGNAL void notifyMissingFilesChanged();

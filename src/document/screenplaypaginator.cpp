@@ -52,9 +52,11 @@ ScreenplayPaginatorRecord::ScreenplayPaginatorRecord(const ScreenplayPaginatorRe
 
 bool ScreenplayPaginatorRecord::operator==(const ScreenplayPaginatorRecord &other) const
 {
-    return this->serialNumber == other.serialNumber && qFuzzyCompare(this->pixelLength, other.pixelLength)
+    return this->serialNumber == other.serialNumber
+            && qFuzzyCompare(this->pixelLength, other.pixelLength)
             && this->pageLength == other.pageLength && this->timeLength == other.timeLength
-            && this->pageBreaks == other.pageBreaks && this->screenplayElement == other.screenplayElement;
+            && this->pageBreaks == other.pageBreaks
+            && this->screenplayElement == other.screenplayElement;
 }
 
 bool ScreenplayPaginatorRecord::operator!=(const ScreenplayPaginatorRecord &other) const
@@ -62,7 +64,8 @@ bool ScreenplayPaginatorRecord::operator!=(const ScreenplayPaginatorRecord &othe
     return !(*this == other);
 }
 
-ScreenplayPaginatorRecord &ScreenplayPaginatorRecord::operator=(const ScreenplayPaginatorRecord &other)
+ScreenplayPaginatorRecord &
+ScreenplayPaginatorRecord::operator=(const ScreenplayPaginatorRecord &other)
 {
     this->serialNumber = other.serialNumber;
     this->pixelLength = other.pixelLength;
@@ -82,7 +85,8 @@ ScreenplayPaginator::ScreenplayPaginator(QObject *parent) : QObject(parent)
     m_worker = new ScreenplayPaginatorWorker;
     m_worker->moveToThread(m_workerThread);
     connect(m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater);
-    connect(m_worker, &ScreenplayPaginatorWorker::paginationComplete, this, &ScreenplayPaginator::onPaginationComplete);
+    connect(m_worker, &ScreenplayPaginatorWorker::paginationComplete, this,
+            &ScreenplayPaginator::onPaginationComplete);
     connect(m_worker, &ScreenplayPaginatorWorker::cursorQueryResponse, this,
             &ScreenplayPaginator::onCursorQueryResponse);
 
@@ -92,8 +96,10 @@ ScreenplayPaginator::ScreenplayPaginator(QObject *parent) : QObject(parent)
 
     connect(this, &ScreenplayPaginator::enabledChanged, this, &ScreenplayPaginator::reset);
     connect(this, &ScreenplayPaginator::formatChanged, this, &ScreenplayPaginator::onFormatChanged);
-    connect(this, &ScreenplayPaginator::screenplayChanged, this, &ScreenplayPaginator::onScreenplayChanged);
-    connect(this, &ScreenplayPaginator::cursorPositionChanged, this, &ScreenplayPaginator::onCursorPositionChanged);
+    connect(this, &ScreenplayPaginator::screenplayChanged, this,
+            &ScreenplayPaginator::onScreenplayChanged);
+    connect(this, &ScreenplayPaginator::cursorPositionChanged, this,
+            &ScreenplayPaginator::onCursorPositionChanged);
 }
 
 ScreenplayPaginator::~ScreenplayPaginator()
@@ -124,19 +130,25 @@ void ScreenplayPaginator::setScreenplay(Screenplay *val)
 
     m_screenplay = val;
 
-    connect(m_screenplay, &Screenplay::aboutToDelete, this, &ScreenplayPaginator::onScreenplayDestroyed);
+    connect(m_screenplay, &Screenplay::aboutToDelete, this,
+            &ScreenplayPaginator::onScreenplayDestroyed);
     connect(m_screenplay, &Screenplay::modelReset, this, &ScreenplayPaginator::onScreenplayChanged);
-    connect(m_screenplay, &Screenplay::elementInserted, this, &ScreenplayPaginator::onScreenplayElementInserted);
-    connect(m_screenplay, &Screenplay::elementRemoved, this, &ScreenplayPaginator::onScreenplayElementRemoved);
-    connect(m_screenplay, &Screenplay::elementOmitted, this, &ScreenplayPaginator::onScreenplayElementOmitted);
-    connect(m_screenplay, &Screenplay::elementIncluded, this, &ScreenplayPaginator::onScreenplayElementIncluded);
+    connect(m_screenplay, &Screenplay::elementInserted, this,
+            &ScreenplayPaginator::onScreenplayElementInserted);
+    connect(m_screenplay, &Screenplay::elementRemoved, this,
+            &ScreenplayPaginator::onScreenplayElementRemoved);
+    connect(m_screenplay, &Screenplay::elementOmitted, this,
+            &ScreenplayPaginator::onScreenplayElementOmitted);
+    connect(m_screenplay, &Screenplay::elementIncluded, this,
+            &ScreenplayPaginator::onScreenplayElementIncluded);
     connect(m_screenplay, &Screenplay::elementSceneContentChanged, this,
             &ScreenplayPaginator::onScreenplayElementSceneReset);
     connect(m_screenplay, &Screenplay::elementSceneHeadingChanged, this,
             &ScreenplayPaginator::onScreenplayElementSceneHeadingChanged);
     connect(m_screenplay, &Screenplay::elementSceneElementChanged, this,
             &ScreenplayPaginator::onScreenplayElementSceneElementChanged);
-    connect(m_screenplay, &Screenplay::currentElementIndexChanged, this, &ScreenplayPaginator::onCursorPositionChanged);
+    connect(m_screenplay, &Screenplay::currentElementIndexChanged, this,
+            &ScreenplayPaginator::onCursorPositionChanged);
 
     this->clear();
 
@@ -154,7 +166,8 @@ void ScreenplayPaginator::setFormat(ScreenplayFormat *val)
     m_format = val;
 
     if (m_format != nullptr)
-        connect(m_format, &ScreenplayFormat::formatChanged, this, &ScreenplayPaginator::onFormatChanged);
+        connect(m_format, &ScreenplayFormat::formatChanged, this,
+                &ScreenplayPaginator::onFormatChanged);
 
     this->clear();
 
@@ -180,7 +193,8 @@ void ScreenplayPaginator::reset()
     this->onCursorPositionChanged();
 }
 
-bool ScreenplayPaginator::paginateIntoDocument(const Screenplay *screenplay, const ScreenplayFormat *format,
+bool ScreenplayPaginator::paginateIntoDocument(const Screenplay *screenplay,
+                                               const ScreenplayFormat *format,
                                                QTextDocument *document)
 {
     ScreenplayPaginatorWorker worker(document, const_cast<ScreenplayFormat *>(format));
@@ -192,13 +206,15 @@ bool ScreenplayPaginator::paginateIntoDocument(const Screenplay *screenplay, con
     return document;
 }
 
-QTextDocument *ScreenplayPaginator::paginatedDocument(const Screenplay *screenplay, const ScreenplayFormat *format,
+QTextDocument *ScreenplayPaginator::paginatedDocument(const Screenplay *screenplay,
+                                                      const ScreenplayFormat *format,
                                                       QObject *documentParent)
 {
     if (screenplay == nullptr || format == nullptr)
         return nullptr;
 
-    if (screenplay->thread() != QThread::currentThread() || format->thread() != QThread::currentThread())
+    if (screenplay->thread() != QThread::currentThread()
+        || format->thread() != QThread::currentThread())
         return nullptr;
 
     if (documentParent && documentParent->thread() != QThread::currentThread())
@@ -213,16 +229,19 @@ QTextDocument *ScreenplayPaginator::paginatedDocument(const Screenplay *screenpl
     return nullptr;
 }
 
-qreal ScreenplayPaginator::pixelLength(const ScreenplayElement *element, const QTextDocument *document)
+qreal ScreenplayPaginator::pixelLength(const ScreenplayElement *element,
+                                       const QTextDocument *document)
 {
     if (document == nullptr || element == nullptr || element->isOmitted())
         return 0;
 
-    if (document->thread() != QThread::currentThread() || element->thread() != QThread::currentThread())
+    if (document->thread() != QThread::currentThread()
+        || element->thread() != QThread::currentThread())
         return 0;
 
     const PaginatorDocumentInsights insights =
-            document->property(PaginatorDocumentInsights::property).value<PaginatorDocumentInsights>();
+            document->property(PaginatorDocumentInsights::property)
+                    .value<PaginatorDocumentInsights>();
     if (insights.isEmpty())
         return 0;
 
@@ -240,7 +259,8 @@ qreal ScreenplayPaginator::pixelLength(const ScreenplayElement *element, const Q
         return breakLength;
     }
 
-    const PaginatorDocumentInsights::BlockRange range = insights.findBlockRangeBySerialNumber(element->serialNumber());
+    const PaginatorDocumentInsights::BlockRange range =
+            insights.findBlockRangeBySerialNumber(element->serialNumber());
     if (!range.isValid())
         return 0;
 
@@ -252,35 +272,42 @@ qreal ScreenplayPaginator::pixelLength(const Scene *scene, const QTextDocument *
     if (document == nullptr || scene == nullptr)
         return 0;
 
-    if (document->thread() != QThread::currentThread() || scene->thread() != QThread::currentThread())
+    if (document->thread() != QThread::currentThread()
+        || scene->thread() != QThread::currentThread())
         return 0;
 
     const PaginatorDocumentInsights insights =
-            document->property(PaginatorDocumentInsights::property).value<PaginatorDocumentInsights>();
+            document->property(PaginatorDocumentInsights::property)
+                    .value<PaginatorDocumentInsights>();
     if (insights.isEmpty())
         return 0;
 
-    const PaginatorDocumentInsights::BlockRange range = insights.findBlockRangeBySceneId(scene->id());
+    const PaginatorDocumentInsights::BlockRange range =
+            insights.findBlockRangeBySceneId(scene->id());
     if (!range.isValid())
         return 0;
 
     return pixelLength(range.from, range.until, document);
 }
 
-qreal ScreenplayPaginator::pixelLength(const SceneHeading *sceneHeading, const QTextDocument *document)
+qreal ScreenplayPaginator::pixelLength(const SceneHeading *sceneHeading,
+                                       const QTextDocument *document)
 {
     if (document == nullptr || sceneHeading == nullptr || sceneHeading->scene() == nullptr)
         return 0;
 
-    if (document->thread() != QThread::currentThread() || sceneHeading->thread() != QThread::currentThread())
+    if (document->thread() != QThread::currentThread()
+        || sceneHeading->thread() != QThread::currentThread())
         return 0;
 
     const PaginatorDocumentInsights insights =
-            document->property(PaginatorDocumentInsights::property).value<PaginatorDocumentInsights>();
+            document->property(PaginatorDocumentInsights::property)
+                    .value<PaginatorDocumentInsights>();
     if (insights.isEmpty())
         return 0;
 
-    const PaginatorDocumentInsights::BlockRange range = insights.findBlockRangeBySceneId(sceneHeading->scene()->id());
+    const PaginatorDocumentInsights::BlockRange range =
+            insights.findBlockRangeBySceneId(sceneHeading->scene()->id());
     if (!range.isValid())
         return 0;
 
@@ -307,15 +334,18 @@ qreal ScreenplayPaginator::pixelLength(const SceneElement *paragraph, const QTex
     if (document == nullptr || paragraph == nullptr || paragraph->scene() == nullptr)
         return 0;
 
-    if (document->thread() != QThread::currentThread() || paragraph->thread() != QThread::currentThread())
+    if (document->thread() != QThread::currentThread()
+        || paragraph->thread() != QThread::currentThread())
         return 0;
 
     const PaginatorDocumentInsights insights =
-            document->property(PaginatorDocumentInsights::property).value<PaginatorDocumentInsights>();
+            document->property(PaginatorDocumentInsights::property)
+                    .value<PaginatorDocumentInsights>();
     if (insights.isEmpty())
         return 0;
 
-    const PaginatorDocumentInsights::BlockRange range = insights.findBlockRangeBySceneId(paragraph->scene()->id());
+    const PaginatorDocumentInsights::BlockRange range =
+            insights.findBlockRangeBySceneId(paragraph->scene()->id());
     if (!range.isValid())
         return 0;
 
@@ -323,7 +353,8 @@ qreal ScreenplayPaginator::pixelLength(const SceneElement *paragraph, const QTex
     QTextBlock block = range.from;
     while (block.isValid()) {
         ScreenplayPaginatorBlockData *data = ScreenplayPaginatorBlockData::get(block);
-        if (data && data->sceneId == paragraph->scene()->id() && data->paragraphId == paragraph->id())
+        if (data && data->sceneId == paragraph->scene()->id()
+            && data->paragraphId == paragraph->id())
             break;
 
         if (block == range.until) {
@@ -349,7 +380,8 @@ qreal ScreenplayPaginator::pixelLength(const QTextDocument *document)
     return layout->documentSize().height();
 }
 
-qreal ScreenplayPaginator::pixelLength(const QTextBlock &from, const QTextBlock &until, const QTextDocument *document)
+qreal ScreenplayPaginator::pixelLength(const QTextBlock &from, const QTextBlock &until,
+                                       const QTextDocument *document)
 {
     if (!from.isValid() || !until.isValid() || document == nullptr)
         return 0;
@@ -380,24 +412,28 @@ qreal ScreenplayPaginator::pixelToPageLength(qreal pixelLength, const QTextDocum
     return pixelLength / pageLength;
 }
 
-QTime ScreenplayPaginator::pixelToTimeLength(qreal pixelLength, ScreenplayFormat *format, const QTextDocument *document)
+QTime ScreenplayPaginator::pixelToTimeLength(qreal pixelLength, ScreenplayFormat *format,
+                                             const QTextDocument *document)
 {
     if (qFuzzyIsNull(pixelLength) || pixelLength < 0 || format == nullptr || document == nullptr)
         return QTime();
 
-    if (document->thread() != QThread::currentThread() || format->thread() != QThread::currentThread())
+    if (document->thread() != QThread::currentThread()
+        || format->thread() != QThread::currentThread())
         return QTime();
 
     return Utils::TMath::secondsToTime(
             qCeil(qreal(format->secondsPerPage()) * pixelToPageLength(pixelLength, document)));
 }
 
-QTime ScreenplayPaginator::pageToTimeLength(qreal pageLength, ScreenplayFormat *format, const QTextDocument *document)
+QTime ScreenplayPaginator::pageToTimeLength(qreal pageLength, ScreenplayFormat *format,
+                                            const QTextDocument *document)
 {
     if (qFuzzyIsNull(pageLength) || pageLength < 0 || format == nullptr || document == nullptr)
         return QTime();
 
-    if (document->thread() != QThread::currentThread() || format->thread() != QThread::currentThread())
+    if (document->thread() != QThread::currentThread()
+        || format->thread() != QThread::currentThread())
         return QTime();
 
     return Utils::TMath::secondsToTime(qCeil(qreal(format->secondsPerPage()) * pageLength));
@@ -417,9 +453,10 @@ int ScreenplayPaginator::indexOf(ScreenplayElement *element) const
     if (element == nullptr || element->screenplay() != m_screenplay || m_screenplay == nullptr)
         return -1;
 
-    auto it = std::find_if(m_records.begin(), m_records.end(), [element](const ScreenplayPaginatorRecord &record) {
-        return record.serialNumber == element->serialNumber();
-    });
+    auto it = std::find_if(m_records.begin(), m_records.end(),
+                           [element](const ScreenplayPaginatorRecord &record) {
+                               return record.serialNumber == element->serialNumber();
+                           });
     if (it != m_records.end())
         return std::distance(m_records.begin(), it);
 
@@ -478,7 +515,8 @@ void ScreenplayPaginator::clear()
 
 void ScreenplayPaginator::clearRecords()
 {
-    if (!m_records.isEmpty() || m_pageCount >= 0 || m_totalTime.isValid() || m_totalPixelLength > 0) {
+    if (!m_records.isEmpty() || m_pageCount >= 0 || m_totalTime.isValid()
+        || m_totalPixelLength > 0) {
         m_records.clear();
         m_pageCount = 0;
         m_totalTime = QTime(0, 0, 0);
@@ -502,10 +540,12 @@ void ScreenplayPaginator::onFormatChanged()
     if (!m_enabled)
         return;
 
-    ScreenplayFormat *format = m_format == nullptr ? ScriteDocument::instance()->printFormat() : m_format;
+    ScreenplayFormat *format =
+            m_format == nullptr ? ScriteDocument::instance()->printFormat() : m_format;
 
     const QJsonObject formatJson = QObjectSerializer::toJson(format);
-    QMetaObject::invokeMethod(m_worker, "useFormat", Qt::QueuedConnection, Q_ARG(QJsonObject, formatJson));
+    QMetaObject::invokeMethod(m_worker, "useFormat", Qt::QueuedConnection,
+                              Q_ARG(QJsonObject, formatJson));
 }
 
 void ScreenplayPaginator::onScreenplayChanged()
@@ -514,7 +554,8 @@ void ScreenplayPaginator::onScreenplayChanged()
         return;
 
     QList<SceneContent> screenplayContent = SceneContent::fromScreenplay(m_screenplay);
-    QMetaObject::invokeMethod(m_worker, "reset", Qt::QueuedConnection, Q_ARG(QList<SceneContent>, screenplayContent));
+    QMetaObject::invokeMethod(m_worker, "reset", Qt::QueuedConnection,
+                              Q_ARG(QList<SceneContent>, screenplayContent));
 }
 
 void ScreenplayPaginator::onScreenplayDestroyed()
@@ -569,27 +610,32 @@ void ScreenplayPaginator::onScreenplayElementSceneReset(ScreenplayElement *eleme
 
     Q_UNUSED(scene)
     SceneContent sceneContent = SceneContent::fromScreenplayElement(element);
-    QMetaObject::invokeMethod(m_worker, "updateScene", Qt::QueuedConnection, Q_ARG(SceneContent, sceneContent));
+    QMetaObject::invokeMethod(m_worker, "updateScene", Qt::QueuedConnection,
+                              Q_ARG(SceneContent, sceneContent));
 }
 
-void ScreenplayPaginator::onScreenplayElementSceneHeadingChanged(ScreenplayElement *element, SceneHeading *sceneHeading)
+void ScreenplayPaginator::onScreenplayElementSceneHeadingChanged(ScreenplayElement *element,
+                                                                 SceneHeading *sceneHeading)
 {
     if (!m_enabled)
         return;
 
     Q_UNUSED(element)
     SceneParagraph paragraph = SceneParagraph::fromSceneHeading(sceneHeading);
-    QMetaObject::invokeMethod(m_worker, "updateParagraph", Qt::QueuedConnection, Q_ARG(SceneParagraph, paragraph));
+    QMetaObject::invokeMethod(m_worker, "updateParagraph", Qt::QueuedConnection,
+                              Q_ARG(SceneParagraph, paragraph));
 }
 
-void ScreenplayPaginator::onScreenplayElementSceneElementChanged(ScreenplayElement *element, SceneElement *sceneElement)
+void ScreenplayPaginator::onScreenplayElementSceneElementChanged(ScreenplayElement *element,
+                                                                 SceneElement *sceneElement)
 {
     if (!m_enabled)
         return;
 
     Q_UNUSED(element)
     SceneParagraph paragraph = SceneParagraph::fromSceneElement(sceneElement);
-    QMetaObject::invokeMethod(m_worker, "updateParagraph", Qt::QueuedConnection, Q_ARG(SceneParagraph, paragraph));
+    QMetaObject::invokeMethod(m_worker, "updateParagraph", Qt::QueuedConnection,
+                              Q_ARG(SceneParagraph, paragraph));
 }
 
 void ScreenplayPaginator::onCursorPositionChanged()
@@ -616,8 +662,8 @@ void ScreenplayPaginator::onCursorPositionChanged()
                               Q_ARG(int, currentSerialNumber));
 }
 
-void ScreenplayPaginator::onCursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber,
-                                                const QTime &time)
+void ScreenplayPaginator::onCursorQueryResponse(int cursorPosition, qreal pixelOffset,
+                                                int pageNumber, const QTime &time)
 {
     if (m_cursorPosition == cursorPosition) {
         m_cursorPage = pageNumber;
@@ -627,8 +673,9 @@ void ScreenplayPaginator::onCursorQueryResponse(int cursorPosition, qreal pixelO
     }
 }
 
-void ScreenplayPaginator::onPaginationComplete(const QList<ScreenplayPaginatorRecord> &records, qreal pixelLength,
-                                               int pageCount, const QTime &totalTime)
+void ScreenplayPaginator::onPaginationComplete(const QList<ScreenplayPaginatorRecord> &records,
+                                               qreal pixelLength, int pageCount,
+                                               const QTime &totalTime)
 {
     m_records = records;
     m_pageCount = pageCount;
@@ -652,10 +699,11 @@ void ScreenplayPaginator::onPaginationComplete(const QList<ScreenplayPaginatorRe
     emit paginationUpdated();
 }
 
-bool ScreenplayPaginator::aggregate(ScreenplayElement *from, ScreenplayElement *until, qreal *pixelLength,
-                                    qreal *pageLength, QTime *timeLength) const
+bool ScreenplayPaginator::aggregate(ScreenplayElement *from, ScreenplayElement *until,
+                                    qreal *pixelLength, qreal *pageLength, QTime *timeLength) const
 {
-    if (from == nullptr || (pixelLength == nullptr && pageLength == nullptr && timeLength == nullptr))
+    if (from == nullptr
+        || (pixelLength == nullptr && pageLength == nullptr && timeLength == nullptr))
         return false;
 
     int start = this->indexOf(from);
@@ -690,8 +738,10 @@ bool ScreenplayPaginator::aggregate(ScreenplayElement *from, ScreenplayElement *
 
 ScreenplayPaginatorWatcher::ScreenplayPaginatorWatcher(QObject *parent) : QObject(parent)
 {
-    connect(this, &ScreenplayPaginatorWatcher::paginatorChanged, this, &ScreenplayPaginatorWatcher::lookupRecord);
-    connect(this, &ScreenplayPaginatorWatcher::elementChanged, this, &ScreenplayPaginatorWatcher::lookupRecord);
+    connect(this, &ScreenplayPaginatorWatcher::paginatorChanged, this,
+            &ScreenplayPaginatorWatcher::lookupRecord);
+    connect(this, &ScreenplayPaginatorWatcher::elementChanged, this,
+            &ScreenplayPaginatorWatcher::lookupRecord);
 }
 
 ScreenplayPaginatorWatcher::~ScreenplayPaginatorWatcher() { }

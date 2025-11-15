@@ -20,7 +20,9 @@ class CharacterScreenplayReport : public AbstractScreenplaySubsetReport
 {
     Q_OBJECT
     Q_CLASSINFO("Title", "Character Screenplay")
-    Q_CLASSINFO("Description", "Generate screenplay with only those scenes where one or more characters are present.")
+    Q_CLASSINFO(
+            "Description",
+            "Generate screenplay with only those scenes where one or more characters are present.")
     Q_CLASSINFO("Icon", ":/icons/reports/character_screenplay.png")
 
 public:
@@ -30,7 +32,8 @@ public:
     Q_CLASSINFO("highlightDialogues_FieldGroup", "Characters")
     Q_CLASSINFO("highlightDialogues_FieldLabel", "Highlight dialogues in yellow background")
     Q_CLASSINFO("highlightDialogues_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool highlightDialogues READ isHighlightDialogues WRITE setHighlightDialogues NOTIFY highlightDialoguesChanged)
+    Q_PROPERTY(bool highlightDialogues READ isHighlightDialogues WRITE setHighlightDialogues NOTIFY
+                       highlightDialoguesChanged)
     void setHighlightDialogues(bool val);
     bool isHighlightDialogues() const { return m_highlightDialogues; }
     Q_SIGNAL void highlightDialoguesChanged();
@@ -39,7 +42,8 @@ public:
     Q_CLASSINFO("characterNames_FieldLabel", "Characters to include in the report")
     Q_CLASSINFO("characterNames_FieldEditor", "MultipleCharacterNameSelector")
     Q_CLASSINFO("characterNames_IsPersistent", "false")
-    Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY characterNamesChanged)
+    Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY
+                       characterNamesChanged)
     void setCharacterNames(const QStringList &val);
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();

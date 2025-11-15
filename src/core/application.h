@@ -79,7 +79,8 @@ public:
     int idealFontPointSize() const { return m_idealFontPointSize; }
     Q_SIGNAL void idealFontPointSizeChanged();
 
-    Q_PROPERTY(int customFontPointSize READ customFontPointSize WRITE setCustomFontPointSize NOTIFY customFontPointSizeChanged)
+    Q_PROPERTY(int customFontPointSize READ customFontPointSize WRITE setCustomFontPointSize NOTIFY
+                       customFontPointSizeChanged)
     void setCustomFontPointSize(int val);
     int customFontPointSize() const { return m_customFontPointSize; }
     Q_SIGNAL void customFontPointSizeChanged();
@@ -98,7 +99,8 @@ public:
     Q_PROPERTY(bool usingMaterialTheme READ usingMaterialTheme CONSTANT)
     static bool usingMaterialTheme();
 
-    Q_PROPERTY(QString baseWindowTitle READ baseWindowTitle WRITE setBaseWindowTitle NOTIFY baseWindowTitleChanged)
+    Q_PROPERTY(QString baseWindowTitle READ baseWindowTitle WRITE setBaseWindowTitle NOTIFY
+                       baseWindowTitleChanged)
     void setBaseWindowTitle(const QString &val);
     QString baseWindowTitle() const { return m_baseWindowTitle; }
     Q_SIGNAL void baseWindowTitleChanged();

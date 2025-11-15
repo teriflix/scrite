@@ -29,12 +29,14 @@ public:
     ~ProgressReport();
     Q_SIGNAL void aboutToDelete(ProgressReport *val);
 
-    Q_PROPERTY(ProgressReport* proxyFor READ proxyFor WRITE setProxyFor NOTIFY proxyForChanged RESET resetProxyFor)
+    Q_PROPERTY(ProgressReport *proxyFor READ proxyFor WRITE setProxyFor NOTIFY proxyForChanged RESET
+                       resetProxyFor)
     void setProxyFor(ProgressReport *val);
     ProgressReport *proxyFor() const { return m_proxyFor; }
     Q_SIGNAL void proxyForChanged();
 
-    Q_PROPERTY(QString progressText READ progressText WRITE setProgressText NOTIFY progressTextChanged)
+    Q_PROPERTY(
+            QString progressText READ progressText WRITE setProgressText NOTIFY progressTextChanged)
     void setProgressText(const QString &val);
     QString progressText() const { return m_progressText; }
     Q_SIGNAL void progressTextChanged();

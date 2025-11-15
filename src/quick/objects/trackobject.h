@@ -32,7 +32,7 @@ class AbstractObjectTracker : public QObject, public QQmlParserStatus
 public:
     ~AbstractObjectTracker();
 
-    Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
+    Q_PROPERTY(QObject *target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
     void setTarget(QObject *val);
     QObject *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
@@ -179,7 +179,8 @@ public:
     Q_SIGNAL void enabledChanged();
 
     Q_CLASSINFO("DefaultProperty", "trackers")
-    Q_PROPERTY(QQmlListProperty<AbstractObjectTracker> trackers READ trackers NOTIFY trackerCountChanged)
+    Q_PROPERTY(QQmlListProperty<AbstractObjectTracker> trackers READ trackers NOTIFY
+                       trackerCountChanged)
     QQmlListProperty<AbstractObjectTracker> trackers();
     Q_INVOKABLE void addTracker(AbstractObjectTracker *ptr);
     Q_INVOKABLE void removeTracker(AbstractObjectTracker *ptr);

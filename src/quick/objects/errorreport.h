@@ -31,7 +31,8 @@ public:
     ~ErrorReport();
     Q_SIGNAL void aboutToDelete(ErrorReport *val);
 
-    Q_PROPERTY(ErrorReport* proxyFor READ proxyFor WRITE setProxyFor NOTIFY proxyForChanged RESET resetProxyFor)
+    Q_PROPERTY(ErrorReport *proxyFor READ proxyFor WRITE setProxyFor NOTIFY proxyForChanged RESET
+                       resetProxyFor)
     void setProxyFor(ErrorReport *val);
     ErrorReport *proxyFor() const { return m_proxyFor; }
     Q_SIGNAL void proxyForChanged();

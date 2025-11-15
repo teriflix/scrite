@@ -145,7 +145,8 @@ public:
     QStringList nameFilters() const { return m_nameFilters; }
     Q_SIGNAL void nameFiltersChanged();
 
-    Q_PROPERTY(Attachment *featuredAttachment READ featuredAttachment NOTIFY featuredAttachmentChanged STORED false)
+    Q_PROPERTY(Attachment *featuredAttachment READ featuredAttachment NOTIFY
+                       featuredAttachmentChanged STORED false)
     Attachment *featuredAttachment() const { return m_featuredAttachment; }
     Q_SIGNAL void featuredAttachmentChanged();
 
@@ -211,12 +212,14 @@ public:
     int allowedType() const { return m_allowedType; }
     Q_SIGNAL void allowedTypeChanged();
 
-    Q_PROPERTY(QStringList allowedExtensions READ allowedExtensions WRITE setAllowedExtensions NOTIFY allowedExtensionsChanged)
+    Q_PROPERTY(QStringList allowedExtensions READ allowedExtensions WRITE setAllowedExtensions
+                       NOTIFY allowedExtensionsChanged)
     void setAllowedExtensions(const QStringList &val);
     QStringList allowedExtensions() const { return m_allowedExtensions; }
     Q_SIGNAL void allowedExtensionsChanged();
 
-    Q_PROPERTY(bool allowMultiple READ isAllowMultiple WRITE setAllowMultiple NOTIFY allowMultipleChanged)
+    Q_PROPERTY(bool allowMultiple READ isAllowMultiple WRITE setAllowMultiple NOTIFY
+                       allowMultipleChanged)
     void setAllowMultiple(bool val);
     bool isAllowMultiple() const { return m_allowMultiple; }
     Q_SIGNAL void allowMultipleChanged();

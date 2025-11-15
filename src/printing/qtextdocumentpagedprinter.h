@@ -93,7 +93,8 @@ public:
     qreal opacity() const { return m_opacity; }
     Q_SIGNAL void opacityChanged();
 
-    Q_PROPERTY(bool visibleFromPageOne READ isVisibleFromPageOne WRITE setVisibleFromPageOne NOTIFY visibleFromPageOneChanged)
+    Q_PROPERTY(bool visibleFromPageOne READ isVisibleFromPageOne WRITE setVisibleFromPageOne NOTIFY
+                       visibleFromPageOneChanged)
     void setVisibleFromPageOne(bool val);
     bool isVisibleFromPageOne() const { return m_visibleFromPageOne; }
     Q_SIGNAL void visibleFromPageOneChanged();
@@ -172,7 +173,8 @@ public:
     Qt::Alignment alignment() const { return m_alignment; }
     Q_SIGNAL void alignmentChanged();
 
-    Q_PROPERTY(bool visibleFromPageOne READ isVisibleFromPageOne WRITE setVisibleFromPageOne NOTIFY visibleFromPageOneChanged)
+    Q_PROPERTY(bool visibleFromPageOne READ isVisibleFromPageOne WRITE setVisibleFromPageOne NOTIFY
+                       visibleFromPageOneChanged)
     void setVisibleFromPageOne(bool val);
     bool isVisibleFromPageOne() const { return m_visibleFromPageOne; }
     Q_SIGNAL void visibleFromPageOneChanged();
@@ -213,13 +215,13 @@ public:
     explicit QTextDocumentPagedPrinter(QObject *parent = nullptr);
     ~QTextDocumentPagedPrinter();
 
-    Q_PROPERTY(HeaderFooter* header READ header CONSTANT)
+    Q_PROPERTY(HeaderFooter *header READ header CONSTANT)
     HeaderFooter *header() const { return m_header; }
 
-    Q_PROPERTY(HeaderFooter* footer READ footer CONSTANT)
+    Q_PROPERTY(HeaderFooter *footer READ footer CONSTANT)
     HeaderFooter *footer() const { return m_footer; }
 
-    Q_PROPERTY(Watermark* watermark READ watermark CONSTANT)
+    Q_PROPERTY(Watermark *watermark READ watermark CONSTANT)
     Watermark *watermark() const { return m_watermark; }
 
     void setSideBar(QTextDocumentPageSideBarInterface *val) { m_sideBar = val; }

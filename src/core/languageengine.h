@@ -34,7 +34,7 @@ struct TransliterationOption
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_PROPERTY(QObject* transliterator MEMBER transliteratorObject)
+    Q_PROPERTY(QObject *transliterator MEMBER transliteratorObject)
     QPointer<QObject> transliteratorObject; // must be of type AbstractTransliterationEngine
 
     Q_PROPERTY(int languageCode MEMBER languageCode)
@@ -197,12 +197,14 @@ class SupportedLanguages : public AbstractLanguagesModel
 public:
     ~SupportedLanguages();
 
-    Q_PROPERTY(int activeLanguageCode READ activeLanguageCode WRITE setActiveLanguageCode NOTIFY activeLanguageCodeChanged)
+    Q_PROPERTY(int activeLanguageCode READ activeLanguageCode WRITE setActiveLanguageCode NOTIFY
+                       activeLanguageCodeChanged)
     void setActiveLanguageCode(int val);
     int activeLanguageCode() const { return m_activeLanguageCode; }
     Q_SIGNAL void activeLanguageCodeChanged();
 
-    Q_PROPERTY(int defaultLanguageCode READ defaultLanguageCode WRITE setDefaultLanguageCode NOTIFY defaultLanguageCodeChanged)
+    Q_PROPERTY(int defaultLanguageCode READ defaultLanguageCode WRITE setDefaultLanguageCode NOTIFY
+                       defaultLanguageCodeChanged)
     void setDefaultLanguageCode(int val);
     int defaultLanguageCode() const { return m_defaultLanguageCode; }
     Q_SIGNAL void defaultLanguageCodeChanged();
@@ -487,7 +489,7 @@ public:
     TransliterationOption option() const { return m_option; }
     Q_SIGNAL void optionChanged();
 
-    Q_PROPERTY(QObject* popup READ popup WRITE setPopup NOTIFY popupChanged)
+    Q_PROPERTY(QObject *popup READ popup WRITE setPopup NOTIFY popupChanged)
     void setPopup(QObject *val);
     QObject *popup() const { return m_popup; }
     Q_SIGNAL void popupChanged();
@@ -504,7 +506,7 @@ public:
     QRect textRect() const { return m_currentWord.textRect; }
     Q_SIGNAL void textRectChanged() const;
 
-    Q_PROPERTY(QObject* editor READ editor CONSTANT)
+    Q_PROPERTY(QObject *editor READ editor CONSTANT)
     QObject *editor() const { return m_editor; }
 
 protected:
@@ -589,10 +591,10 @@ public:
     static LanguageEngine *instance();
     ~LanguageEngine();
 
-    Q_PROPERTY(AvailableLanguages* availableLanguages READ availableLanguages CONSTANT)
+    Q_PROPERTY(AvailableLanguages *availableLanguages READ availableLanguages CONSTANT)
     AvailableLanguages *availableLanguages() const { return m_availableLanguages; }
 
-    Q_PROPERTY(SupportedLanguages* supportedLanguages READ supportedLanguages CONSTANT)
+    Q_PROPERTY(SupportedLanguages *supportedLanguages READ supportedLanguages CONSTANT)
     SupportedLanguages *supportedLanguages() const { return m_supportedLanguages; }
 
     Q_INVOKABLE bool setScriptFontFamily(QChar::Script script, const QString &fontFamily);

@@ -32,7 +32,8 @@ public:
     explicit PainterPathItem(QQuickItem *parent = nullptr);
     ~PainterPathItem();
 
-    Q_PROPERTY(PainterPath* painterPath READ painterPath WRITE setPainterPath NOTIFY painterPathChanged RESET resetPainterPath)
+    Q_PROPERTY(PainterPath *painterPath READ painterPath WRITE setPainterPath NOTIFY
+                       painterPathChanged RESET resetPainterPath)
     void setPainterPath(PainterPath *val);
     PainterPath *painterPath() const { return m_painterPath; }
     Q_SIGNAL void painterPathChanged();
@@ -88,7 +89,8 @@ public:
     ~PainterPath();
 
     Q_CLASSINFO("DefaultProperty", "elements")
-    Q_PROPERTY(QQmlListProperty<AbstractPathElement> elements READ elements NOTIFY elementsChanged STORED false)
+    Q_PROPERTY(QQmlListProperty<AbstractPathElement> elements READ elements NOTIFY elementsChanged
+                       STORED false)
     QQmlListProperty<AbstractPathElement> elements();
     Q_SIGNAL void elementsChanged();
 
@@ -191,12 +193,14 @@ public:
     explicit CubicToElement(QObject *parent = nullptr);
     ~CubicToElement();
 
-    Q_PROPERTY(QPointF controlPoint1 READ controlPoint1 WRITE setControlPoint1 NOTIFY controlPoint1Changed)
+    Q_PROPERTY(QPointF controlPoint1 READ controlPoint1 WRITE setControlPoint1 NOTIFY
+                       controlPoint1Changed)
     void setControlPoint1(const QPointF &val);
     QPointF controlPoint1() const { return m_controlPoint1; }
     Q_SIGNAL void controlPoint1Changed();
 
-    Q_PROPERTY(QPointF controlPoint2 READ controlPoint2 WRITE setControlPoint2 NOTIFY controlPoint2Changed)
+    Q_PROPERTY(QPointF controlPoint2 READ controlPoint2 WRITE setControlPoint2 NOTIFY
+                       controlPoint2Changed)
     void setControlPoint2(const QPointF &val);
     QPointF controlPoint2() const { return m_controlPoint2; }
     Q_SIGNAL void controlPoint2Changed();
@@ -224,7 +228,8 @@ public:
     explicit QuadToElement(QObject *parent = nullptr);
     ~QuadToElement();
 
-    Q_PROPERTY(QPointF controlPoint READ controlPoint WRITE setControlPoint NOTIFY controlPointChanged)
+    Q_PROPERTY(
+            QPointF controlPoint READ controlPoint WRITE setControlPoint NOTIFY controlPointChanged)
     void setControlPoint(const QPointF &val);
     QPointF controlPoint() const { return m_controlPoint; }
     Q_SIGNAL void controlPointChanged();

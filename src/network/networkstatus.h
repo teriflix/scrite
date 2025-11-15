@@ -47,7 +47,8 @@ public:
     QUrl url() const { return m_url; }
     Q_SIGNAL void urlChanged();
 
-    Q_PROPERTY(QNetworkAccessManager* networkAccessManager READ networkAccessManager WRITE setNetworkAccessManager NOTIFY networkAccessManagerChanged)
+    Q_PROPERTY(QNetworkAccessManager *networkAccessManager READ networkAccessManager WRITE
+                       setNetworkAccessManager NOTIFY networkAccessManagerChanged)
     void setNetworkAccessManager(QNetworkAccessManager *val);
     QNetworkAccessManager *networkAccessManager() const { return m_networkAccessManager; }
     Q_SIGNAL void networkAccessManagerChanged();

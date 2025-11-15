@@ -31,17 +31,17 @@ public:
     explicit ScreenplayTextDocumentOffsets(QObject *parent = nullptr);
     ~ScreenplayTextDocumentOffsets();
 
-    Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)
+    Q_PROPERTY(Screenplay *screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)
     void setScreenplay(Screenplay *val);
     Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
-    Q_PROPERTY(QTextDocument* document READ document WRITE setDocument NOTIFY documentChanged)
+    Q_PROPERTY(QTextDocument *document READ document WRITE setDocument NOTIFY documentChanged)
     void setDocument(QTextDocument *val);
     QTextDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
 
-    Q_PROPERTY(ScreenplayFormat* format READ format WRITE setFormat NOTIFY formatChanged)
+    Q_PROPERTY(ScreenplayFormat *format READ format WRITE setFormat NOTIFY formatChanged)
     void setFormat(ScreenplayFormat *val);
     ScreenplayFormat *format() const { return m_format; }
     Q_SIGNAL void formatChanged();

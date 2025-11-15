@@ -36,7 +36,8 @@ public:
     FinalizeFunction finalizeFunction() const { return m_finalizeFunction; }
     Q_SIGNAL void finalizeFunctionChanged();
 
-    Q_PROPERTY(QAbstractItemModel* model READ model WRITE setModel RESET resetModel NOTIFY modelChanged)
+    Q_PROPERTY(QAbstractItemModel *model READ model WRITE setModel RESET resetModel NOTIFY
+                       modelChanged)
     void setModel(QAbstractItemModel *val);
     QAbstractItemModel *model() const { return m_model; }
     Q_SIGNAL void modelChanged();
@@ -55,7 +56,8 @@ public:
     QVariant aggregateValue() const { return m_aggregateValue; }
     Q_SIGNAL void aggregateValueChanged();
 
-    Q_PROPERTY(QVariant initialValue READ initialValue WRITE setInitialValue NOTIFY initialValueChanged)
+    Q_PROPERTY(QVariant initialValue READ initialValue WRITE setInitialValue NOTIFY
+                       initialValueChanged)
     void setInitialValue(const QVariant &val);
     QVariant initialValue() const { return m_initialValue; }
     Q_SIGNAL void initialValueChanged();

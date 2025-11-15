@@ -148,7 +148,7 @@ public:
     explicit ScriteDocumentCollaborators(QObject *parent = nullptr);
     ~ScriteDocumentCollaborators();
 
-    Q_PROPERTY(ScriteDocument* document READ document WRITE setDocument NOTIFY documentChanged)
+    Q_PROPERTY(ScriteDocument *document READ document WRITE setDocument NOTIFY documentChanged)
     void setDocument(ScriteDocument *val);
     ScriteDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
@@ -183,7 +183,8 @@ class PageSetup : public QObject
 public:
     ~PageSetup();
 
-    Q_PROPERTY(bool usingFactoryDefaults READ usingFactoryDefaults NOTIFY usingFactoryDefaultsChanged)
+    Q_PROPERTY(
+            bool usingFactoryDefaults READ usingFactoryDefaults NOTIFY usingFactoryDefaultsChanged)
     bool usingFactoryDefaults() const { return m_isFactoryDefaults; }
     Q_SIGNAL void usingFactoryDefaultsChanged();
 
@@ -213,7 +214,8 @@ public:
     int headerRight() const { return m_headerRight; }
     Q_SIGNAL void headerRightChanged();
 
-    Q_PROPERTY(qreal headerOpacity READ headerOpacity WRITE setHeaderOpacity NOTIFY headerOpacityChanged STORED false)
+    Q_PROPERTY(qreal headerOpacity READ headerOpacity WRITE setHeaderOpacity NOTIFY
+                       headerOpacityChanged STORED false)
     void setHeaderOpacity(qreal val);
     qreal headerOpacity() const { return m_headerOpacity; }
     Q_SIGNAL void headerOpacityChanged();
@@ -233,47 +235,56 @@ public:
     int footerRight() const { return m_footerRight; }
     Q_SIGNAL void footerRightChanged();
 
-    Q_PROPERTY(qreal footerOpacity READ footerOpacity WRITE setFooterOpacity NOTIFY footerOpacityChanged STORED false)
+    Q_PROPERTY(qreal footerOpacity READ footerOpacity WRITE setFooterOpacity NOTIFY
+                       footerOpacityChanged STORED false)
     void setFooterOpacity(qreal val);
     qreal footerOpacity() const { return m_footerOpacity; }
     Q_SIGNAL void footerOpacityChanged();
 
-    Q_PROPERTY(bool watermarkEnabled READ isWatermarkEnabled WRITE setWatermarkEnabled NOTIFY watermarkEnabledChanged)
+    Q_PROPERTY(bool watermarkEnabled READ isWatermarkEnabled WRITE setWatermarkEnabled NOTIFY
+                       watermarkEnabledChanged)
     void setWatermarkEnabled(bool val);
     bool isWatermarkEnabled() const { return m_watermarkEnabled; }
     Q_SIGNAL void watermarkEnabledChanged();
 
-    Q_PROPERTY(QString watermarkText READ watermarkText WRITE setWatermarkText NOTIFY watermarkTextChanged)
+    Q_PROPERTY(QString watermarkText READ watermarkText WRITE setWatermarkText NOTIFY
+                       watermarkTextChanged)
     void setWatermarkText(const QString &val);
     QString watermarkText() const { return m_watermarkText; }
     Q_SIGNAL void watermarkTextChanged();
 
-    Q_PROPERTY(QString watermarkFont READ watermarkFont WRITE setWatermarkFont NOTIFY watermarkFontChanged)
+    Q_PROPERTY(QString watermarkFont READ watermarkFont WRITE setWatermarkFont NOTIFY
+                       watermarkFontChanged)
     void setWatermarkFont(const QString &val);
     QString watermarkFont() const { return m_watermarkFont; }
     Q_SIGNAL void watermarkFontChanged();
 
-    Q_PROPERTY(int watermarkFontSize READ watermarkFontSize WRITE setWatermarkFontSize NOTIFY watermarkFontSizeChanged)
+    Q_PROPERTY(int watermarkFontSize READ watermarkFontSize WRITE setWatermarkFontSize NOTIFY
+                       watermarkFontSizeChanged)
     void setWatermarkFontSize(int val);
     int watermarkFontSize() const { return m_watermarkFontSize; }
     Q_SIGNAL void watermarkFontSizeChanged();
 
-    Q_PROPERTY(QColor watermarkColor READ watermarkColor WRITE setWatermarkColor NOTIFY watermarkColorChanged)
+    Q_PROPERTY(QColor watermarkColor READ watermarkColor WRITE setWatermarkColor NOTIFY
+                       watermarkColorChanged)
     void setWatermarkColor(const QColor &val);
     QColor watermarkColor() const { return m_watermarkColor; }
     Q_SIGNAL void watermarkColorChanged();
 
-    Q_PROPERTY(qreal watermarkOpacity READ watermarkOpacity WRITE setWatermarkOpacity NOTIFY watermarkOpacityChanged STORED false)
+    Q_PROPERTY(qreal watermarkOpacity READ watermarkOpacity WRITE setWatermarkOpacity NOTIFY
+                       watermarkOpacityChanged STORED false)
     void setWatermarkOpacity(qreal val);
     qreal watermarkOpacity() const { return m_watermarkOpacity; }
     Q_SIGNAL void watermarkOpacityChanged();
 
-    Q_PROPERTY(int watermarkRotation READ watermarkRotation WRITE setWatermarkRotation NOTIFY watermarkRotationChanged)
+    Q_PROPERTY(int watermarkRotation READ watermarkRotation WRITE setWatermarkRotation NOTIFY
+                       watermarkRotationChanged)
     void setWatermarkRotation(int val);
     int watermarkRotation() const { return m_watermarkRotation; }
     Q_SIGNAL void watermarkRotationChanged();
 
-    Q_PROPERTY(int watermarkAlignment READ watermarkAlignment WRITE setWatermarkAlignment NOTIFY watermarkAlignmentChanged)
+    Q_PROPERTY(int watermarkAlignment READ watermarkAlignment WRITE setWatermarkAlignment NOTIFY
+                       watermarkAlignmentChanged)
     void setWatermarkAlignment(int val);
     int watermarkAlignment() const { return m_watermarkAlignment; }
     Q_SIGNAL void watermarkAlignmentChanged();
@@ -363,7 +374,8 @@ public:
     // When this list is empty, anybody can alter the list.
     // When not empty, it can be altered only by the first collaborator in
     // the list. This attribute cannot be altered unless there is a User login.
-    Q_PROPERTY(QStringList collaborators READ collaborators WRITE setCollaborators NOTIFY collaboratorsChanged STORED false)
+    Q_PROPERTY(QStringList collaborators READ collaborators WRITE setCollaborators NOTIFY
+                       collaboratorsChanged STORED false)
     void setCollaborators(const QStringList &val);
     QStringList collaborators() const { return m_collaborators; }
     Q_SIGNAL void collaboratorsChanged();
@@ -380,7 +392,8 @@ public:
     Q_PROPERTY(QStringList otherCollaborators READ otherCollaborators NOTIFY collaboratorsChanged)
     QStringList otherCollaborators() const { return m_collaborators.mid(1); }
 
-    Q_PROPERTY(bool canModifyCollaborators READ canModifyCollaborators NOTIFY canModifyCollaboratorsChanged)
+    Q_PROPERTY(bool canModifyCollaborators READ canModifyCollaborators NOTIFY
+                       canModifyCollaboratorsChanged)
     bool canModifyCollaborators() const;
     Q_SIGNAL void canModifyCollaboratorsChanged();
 
@@ -389,7 +402,9 @@ public:
     Q_INVOKABLE void enableCollaboration();
     Q_INVOKABLE void disableCollaboration();
 
-    Q_PROPERTY(int autoSaveDurationInSeconds READ autoSaveDurationInSeconds WRITE setAutoSaveDurationInSeconds NOTIFY autoSaveDurationInSecondsChanged STORED false)
+    Q_PROPERTY(int autoSaveDurationInSeconds READ autoSaveDurationInSeconds WRITE
+                       setAutoSaveDurationInSeconds NOTIFY autoSaveDurationInSecondsChanged
+                               STORED false)
     void setAutoSaveDurationInSeconds(int val);
     int autoSaveDurationInSeconds() const { return m_autoSaveDurationInSeconds; }
     Q_SIGNAL void autoSaveDurationInSecondsChanged();
@@ -411,32 +426,35 @@ public:
 
     Q_INVOKABLE void clearBusyMessage() { this->setBusyMessage(QString()); }
 
-    Q_PROPERTY(QString documentWindowTitle READ documentWindowTitle NOTIFY documentWindowTitleChanged)
+    Q_PROPERTY(
+            QString documentWindowTitle READ documentWindowTitle NOTIFY documentWindowTitleChanged)
     QString documentWindowTitle() const { return m_documentWindowTitle; }
     Q_SIGNAL void documentWindowTitleChanged(const QString &val);
 
-    Q_PROPERTY(Forms* forms READ forms NOTIFY formsChanged)
+    Q_PROPERTY(Forms *forms READ forms NOTIFY formsChanged)
     Forms *forms() const { return m_forms; }
     Q_SIGNAL void formsChanged();
 
-    Q_PROPERTY(Structure* structure READ structure NOTIFY structureChanged)
+    Q_PROPERTY(Structure *structure READ structure NOTIFY structureChanged)
     Structure *structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
 
-    Q_PROPERTY(Screenplay* screenplay READ screenplay NOTIFY screenplayChanged)
+    Q_PROPERTY(Screenplay *screenplay READ screenplay NOTIFY screenplayChanged)
     Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
-    Q_PROPERTY(ScreenplayFormat* displayFormat READ formatting NOTIFY formattingChanged STORED false)
-    Q_PROPERTY(ScreenplayFormat* formatting READ formatting NOTIFY formattingChanged)
+    Q_PROPERTY(
+            ScreenplayFormat *displayFormat READ formatting NOTIFY formattingChanged STORED false)
+    Q_PROPERTY(ScreenplayFormat *formatting READ formatting NOTIFY formattingChanged)
     ScreenplayFormat *formatting() const { return m_formatting; }
     Q_SIGNAL void formattingChanged();
 
-    Q_PROPERTY(ScreenplayFormat* printFormat READ printFormat NOTIFY printFormatChanged)
+    Q_PROPERTY(ScreenplayFormat *printFormat READ printFormat NOTIFY printFormatChanged)
     ScreenplayFormat *printFormat() const { return m_printFormat; }
     Q_SIGNAL void printFormatChanged();
 
-    Q_PROPERTY(QStringList spellCheckIgnoreList READ spellCheckIgnoreList WRITE setSpellCheckIgnoreList NOTIFY spellCheckIgnoreListChanged)
+    Q_PROPERTY(QStringList spellCheckIgnoreList READ spellCheckIgnoreList WRITE
+                       setSpellCheckIgnoreList NOTIFY spellCheckIgnoreListChanged)
     void setSpellCheckIgnoreList(const QStringList &val);
     QStringList spellCheckIgnoreList() const { return m_spellCheckIgnoreList; }
     Q_SIGNAL void spellCheckIgnoreListChanged();
@@ -449,7 +467,7 @@ public:
     Form *requestForm(const QString &id);
     void releaseForm(Form *form);
 
-    Q_PROPERTY(PageSetup* pageSetup READ pageSetup NOTIFY pageSetupChanged)
+    Q_PROPERTY(PageSetup *pageSetup READ pageSetup NOTIFY pageSetupChanged)
     PageSetup *pageSetup() const { return m_pageSetup; }
     Q_SIGNAL void pageSetupChanged();
 
@@ -476,21 +494,25 @@ public:
     QJsonObject userData() const { return m_userData; }
     Q_SIGNAL void userDataChanged();
 
-    Q_PROPERTY(QJsonArray bookmarkedNotes READ bookmarkedNotes WRITE setBookmarkedNotes NOTIFY bookmarkedNotesChanged)
+    Q_PROPERTY(QJsonArray bookmarkedNotes READ bookmarkedNotes WRITE setBookmarkedNotes NOTIFY
+                       bookmarkedNotesChanged)
     void setBookmarkedNotes(const QJsonArray &val);
     QJsonArray bookmarkedNotes() const { return m_bookmarkedNotes; }
     Q_SIGNAL void bookmarkedNotesChanged();
 
-    Q_PROPERTY(bool isCreatedOnThisComputer READ isCreatedOnThisComputer NOTIFY createdOnThisComputerChanged)
+    Q_PROPERTY(bool isCreatedOnThisComputer READ isCreatedOnThisComputer NOTIFY
+                       createdOnThisComputerChanged)
     bool isCreatedOnThisComputer() const { return m_createdOnThisComputer; }
     Q_SIGNAL void createdOnThisComputerChanged();
 
-    Q_PROPERTY(int maxBackupCount READ maxBackupCount WRITE setMaxBackupCount NOTIFY maxBackupCountChanged)
+    Q_PROPERTY(int maxBackupCount READ maxBackupCount WRITE setMaxBackupCount NOTIFY
+                       maxBackupCountChanged)
     void setMaxBackupCount(int val);
     int maxBackupCount() const { return m_maxBackupCount; }
     Q_SIGNAL void maxBackupCountChanged();
 
-    Q_PROPERTY(bool canImportFromClipboard READ canImportFromClipboard NOTIFY canImportFromClipboardChanged)
+    Q_PROPERTY(bool canImportFromClipboard READ canImportFromClipboard NOTIFY
+                       canImportFromClipboardChanged)
     bool canImportFromClipboard() const;
     Q_SIGNAL void canImportFromClipboardChanged();
 
@@ -515,7 +537,7 @@ public:
     Q_SIGNAL void openedAnonymously(const QString &fileName);
     Q_SIGNAL void requiresReload();
 
-    Q_PROPERTY(QAbstractListModel* backupFilesModel READ backupFilesModel CONSTANT STORED false)
+    Q_PROPERTY(QAbstractListModel *backupFilesModel READ backupFilesModel CONSTANT STORED false)
     ScriteDocumentBackups *backupFilesModel() const
     {
         return &((const_cast<ScriteDocument *>(this))->m_documentBackupsModel);
@@ -551,7 +573,8 @@ public:
     void setupExporter(AbstractExporter *exporter);
     void setupReportGenerator(AbstractReportGenerator *reportGenerator);
 
-    Q_PROPERTY(QAbstractListModel* structureElementConnectors READ structureElementConnectors CONSTANT STORED false)
+    Q_PROPERTY(QAbstractListModel *structureElementConnectors READ structureElementConnectors
+                       CONSTANT STORED false)
     QAbstractListModel *structureElementConnectors() const;
 
     void clearModified();

@@ -69,7 +69,7 @@ public:
     bool isActive() const { return m_active; }
     Q_SIGNAL void activeChanged();
 
-    Q_PROPERTY(QObject* target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
+    Q_PROPERTY(QObject *target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
     void setTarget(QObject *val);
     QObject *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
@@ -79,7 +79,8 @@ public:
     QList<int> events() const { return m_events; }
     Q_SIGNAL void eventsChanged();
 
-    Q_PROPERTY(bool acceptHoverEvents READ isAcceptHoverEvents WRITE setAcceptHoverEvents NOTIFY acceptHoverEventsChanged)
+    Q_PROPERTY(bool acceptHoverEvents READ isAcceptHoverEvents WRITE setAcceptHoverEvents NOTIFY
+                       acceptHoverEventsChanged)
     void setAcceptHoverEvents(bool val);
     bool isAcceptHoverEvents() const;
     Q_SIGNAL void acceptHoverEventsChanged();

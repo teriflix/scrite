@@ -41,7 +41,13 @@ class ScreenplayTextDocument;
 class AbstractScreenplayTextDocumentInjectionInterface
 {
 public:
-    enum InjectLocation { AfterTitlePage, AfterSceneHeading, AfterLastScene, BeforeSceneElement, AfterSceneElement };
+    enum InjectLocation {
+        AfterTitlePage,
+        AfterSceneHeading,
+        AfterLastScene,
+        BeforeSceneElement,
+        AfterSceneElement
+    };
     virtual void inject(QTextCursor &, InjectLocation) { }
     virtual bool filterSceneElement() const { return false; }
 
@@ -58,7 +64,7 @@ private:
     const SceneElement *m_sceneElement = nullptr;
 };
 
-#define AbstractScreenplayTextDocumentInjectionInterface_iid                                                           \
+#define AbstractScreenplayTextDocumentInjectionInterface_iid                                       \
     "io.scrite.AbstractScreenplayTextDocumentInjectionInterface"
 Q_DECLARE_INTERFACE(AbstractScreenplayTextDocumentInjectionInterface,
                     AbstractScreenplayTextDocumentInjectionInterface_iid)
@@ -103,12 +109,14 @@ public:
     bool hasTitlePage() const { return m_titlePage; }
     Q_SIGNAL void titlePageChanged();
 
-    Q_PROPERTY(bool includeLoglineInTitlePage READ isIncludeLoglineInTitlePage WRITE setIncludeLoglineInTitlePage NOTIFY includeLoglineInTitlePageChanged)
+    Q_PROPERTY(bool includeLoglineInTitlePage READ isIncludeLoglineInTitlePage WRITE
+                       setIncludeLoglineInTitlePage NOTIFY includeLoglineInTitlePageChanged)
     void setIncludeLoglineInTitlePage(bool val);
     bool isIncludeLoglineInTitlePage() const { return m_includeLoglineInTitlePage; }
     Q_SIGNAL void includeLoglineInTitlePageChanged();
 
-    Q_PROPERTY(bool sceneNumbers READ hasSceneNumbers WRITE setSceneNumbers NOTIFY sceneNumbersChanged)
+    Q_PROPERTY(
+            bool sceneNumbers READ hasSceneNumbers WRITE setSceneNumbers NOTIFY sceneNumbersChanged)
     void setSceneNumbers(bool val);
     bool hasSceneNumbers() const { return m_sceneNumbers; }
     Q_SIGNAL void sceneNumbersChanged();
@@ -190,7 +198,8 @@ public:
     Q_SIGNAL void titlePageIsCenteredChanged();
 
     // NOTE: this property is referred only if this->purpose() == ForPrinting
-    Q_PROPERTY(bool includeMoreAndContdMarkers READ isIncludeMoreAndContdMarkers WRITE setIncludeMoreAndContdMarkers NOTIFY includeMoreAndContdMarkersChanged)
+    Q_PROPERTY(bool includeMoreAndContdMarkers READ isIncludeMoreAndContdMarkers WRITE
+                       setIncludeMoreAndContdMarkers NOTIFY includeMoreAndContdMarkersChanged)
     void setIncludeMoreAndContdMarkers(bool val);
     bool isIncludeMoreAndContdMarkers() const { return m_includeMoreAndContdMarkers; }
     Q_SIGNAL void includeMoreAndContdMarkersChanged();
@@ -437,10 +446,10 @@ public:
                     const QTextFormat &format);
 
 private:
-    void drawSceneNumber(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument,
-                         const QTextFormat &format);
-    void drawMoreMarker(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument,
-                        const QTextFormat &format);
+    void drawSceneNumber(QPainter *painter, const QRectF &rect, QTextDocument *doc,
+                         int posInDocument, const QTextFormat &format);
+    void drawMoreMarker(QPainter *painter, const QRectF &rect, QTextDocument *doc,
+                        int posInDocument, const QTextFormat &format);
     void drawSceneIcon(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument,
                        const QTextFormat &format);
     void drawText(QPainter *painter, const QRectF &rect, const QString &text);

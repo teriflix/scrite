@@ -26,7 +26,8 @@ public:
     explicit BatchChange(QObject *parent = nullptr);
     ~BatchChange();
 
-    Q_PROPERTY(QVariant trackChangesOn READ trackChangesOn WRITE setTrackChangesOn NOTIFY trackChangesOnChanged)
+    Q_PROPERTY(QVariant trackChangesOn READ trackChangesOn WRITE setTrackChangesOn NOTIFY
+                       trackChangesOnChanged)
     void setTrackChangesOn(const QVariant &val);
     QVariant trackChangesOn() const { return m_trackChangesOn; }
     Q_SIGNAL void trackChangesOnChanged();

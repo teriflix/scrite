@@ -88,8 +88,8 @@ public:
     Q_PROPERTY(QString displayText READ displayText NOTIFY textChanged)
     QString displayText() const { return this->toString(DisplayMode); }
 
-    static bool parse(const QString &text, QString &locationType, QString &location, QString &moment,
-                      bool strict = false);
+    static bool parse(const QString &text, QString &locationType, QString &location,
+                      QString &moment, bool strict = false);
 
     Q_INVOKABLE void parseFrom(const QString &text);
 
@@ -275,7 +275,10 @@ public:
     QStringList characterNames() const { return this->distinctValues(); }
     bool containsCharacter(const QString &name) const { return this->containsValue(name); }
     QList<SceneElement *> characterElements() const { return this->elements(); }
-    QList<SceneElement *> characterElements(const QString &name) const { return this->elements(name); }
+    QList<SceneElement *> characterElements(const QString &name) const
+    {
+        return this->elements(name);
+    }
 };
 
 class TransitionElementMap : public DistinctElementValuesMap
@@ -287,7 +290,10 @@ public:
     QStringList transitions() const { return this->distinctValues(); }
     bool containsTransition(const QString &name) const { return this->containsValue(name); }
     QList<SceneElement *> transitionElements() const { return this->elements(); }
-    QList<SceneElement *> transitionElements(const QString &name) const { return this->elements(name); }
+    QList<SceneElement *> transitionElements(const QString &name) const
+    {
+        return this->elements(name);
+    }
 };
 
 class ShotElementMap : public DistinctElementValuesMap
@@ -352,7 +358,8 @@ public:
 
     Q_INVOKABLE void trimSynopsis();
 
-    Q_PROPERTY(QStringList indexCardFieldValues READ indexCardFieldValues WRITE setIndexCardFieldValues NOTIFY indexCardFieldValuesChanged)
+    Q_PROPERTY(QStringList indexCardFieldValues READ indexCardFieldValues WRITE
+                       setIndexCardFieldValues NOTIFY indexCardFieldValuesChanged)
     void setIndexCardFieldValues(const QStringList &val);
     QStringList indexCardFieldValues() const { return m_indexCardFieldValues; }
     Q_SIGNAL void indexCardFieldValuesChanged();
@@ -392,12 +399,14 @@ public:
     bool isBeingReset() const { return m_isBeingReset; }
     Q_SIGNAL void resetStateChanged();
 
-    Q_PROPERTY(bool undoRedoEnabled READ isUndoRedoEnabled WRITE setUndoRedoEnabled NOTIFY undoRedoEnabledChanged STORED false)
+    Q_PROPERTY(bool undoRedoEnabled READ isUndoRedoEnabled WRITE setUndoRedoEnabled NOTIFY
+                       undoRedoEnabledChanged STORED false)
     void setUndoRedoEnabled(bool val);
     bool isUndoRedoEnabled() const { return m_undoRedoEnabled; }
     Q_SIGNAL void undoRedoEnabledChanged();
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY cursorPositionChanged STORED false)
+    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
+                       cursorPositionChanged STORED false)
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
@@ -672,7 +681,8 @@ public:
     qreal contentHeight() const { return m_contentHeight; }
     Q_SIGNAL void contentHeightChanged();
 
-    Q_PROPERTY(bool asynchronous READ isAsynchronous WRITE setAsynchronous NOTIFY asynchronousChanged)
+    Q_PROPERTY(
+            bool asynchronous READ isAsynchronous WRITE setAsynchronous NOTIFY asynchronousChanged)
     void setAsynchronous(bool val);
     bool isAsynchronous() const { return m_asynchronous; }
     Q_SIGNAL void asynchronousChanged();

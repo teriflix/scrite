@@ -56,51 +56,60 @@ public:
     explicit GridBackgroundItem(QQuickItem *parent = nullptr);
     ~GridBackgroundItem();
 
-    Q_PROPERTY(qreal tickDistance READ tickDistance WRITE setTickDistance NOTIFY tickDistanceChanged)
+    Q_PROPERTY(
+            qreal tickDistance READ tickDistance WRITE setTickDistance NOTIFY tickDistanceChanged)
     void setTickDistance(qreal val);
     qreal tickDistance() const { return m_tickDistance; }
     Q_SIGNAL void tickDistanceChanged();
 
-    Q_PROPERTY(int majorTickStride READ majorTickStride WRITE setMajorTickStride NOTIFY majorTickStrideChanged)
+    Q_PROPERTY(int majorTickStride READ majorTickStride WRITE setMajorTickStride NOTIFY
+                       majorTickStrideChanged)
     void setMajorTickStride(int val);
     int majorTickStride() const { return m_majorTickStride; }
     Q_SIGNAL void majorTickStrideChanged();
 
-    Q_PROPERTY(qreal minorTickLineWidth READ minorTickLineWidth WRITE setMinorTickLineWidth NOTIFY minorTickLineWidthChanged)
+    Q_PROPERTY(qreal minorTickLineWidth READ minorTickLineWidth WRITE setMinorTickLineWidth NOTIFY
+                       minorTickLineWidthChanged)
     void setMinorTickLineWidth(qreal val);
     qreal minorTickLineWidth() const { return m_minorTickLineWidth; }
     Q_SIGNAL void minorTickLineWidthChanged();
 
-    Q_PROPERTY(qreal majorTickLineWidth READ majorTickLineWidth WRITE setMajorTickLineWidth NOTIFY majorTickLineWidthChanged)
+    Q_PROPERTY(qreal majorTickLineWidth READ majorTickLineWidth WRITE setMajorTickLineWidth NOTIFY
+                       majorTickLineWidthChanged)
     void setMajorTickLineWidth(qreal val);
     qreal majorTickLineWidth() const { return m_majorTickLineWidth; }
     Q_SIGNAL void majorTickLineWidthChanged();
 
-    Q_PROPERTY(QColor minorTickColor READ minorTickColor WRITE setMinorTickColor NOTIFY minorTickColorChanged)
+    Q_PROPERTY(QColor minorTickColor READ minorTickColor WRITE setMinorTickColor NOTIFY
+                       minorTickColorChanged)
     void setMinorTickColor(const QColor &val);
     QColor minorTickColor() const { return m_minorTickColor; }
     Q_SIGNAL void minorTickColorChanged();
 
-    Q_PROPERTY(QColor majorTickColor READ majorTickColor WRITE setMajorTickColor NOTIFY majorTickColorChanged)
+    Q_PROPERTY(QColor majorTickColor READ majorTickColor WRITE setMajorTickColor NOTIFY
+                       majorTickColorChanged)
     void setMajorTickColor(const QColor &val);
     QColor majorTickColor() const { return m_majorTickColor; }
     Q_SIGNAL void majorTickColorChanged();
 
-    Q_PROPERTY(qreal tickColorOpacity READ tickColorOpacity WRITE setTickColorOpacity NOTIFY tickColorOpacityChanged)
+    Q_PROPERTY(qreal tickColorOpacity READ tickColorOpacity WRITE setTickColorOpacity NOTIFY
+                       tickColorOpacityChanged)
     void setTickColorOpacity(qreal val);
     qreal tickColorOpacity() const { return m_tickColorOpacity; }
     Q_SIGNAL void tickColorOpacityChanged();
 
-    Q_PROPERTY(bool gridIsVisible READ gridIsVisible WRITE setGridIsVisible NOTIFY gridIsVisibleChanged)
+    Q_PROPERTY(bool gridIsVisible READ gridIsVisible WRITE setGridIsVisible NOTIFY
+                       gridIsVisibleChanged)
     void setGridIsVisible(bool val);
     bool gridIsVisible() const { return m_gridIsVisible; }
     Q_SIGNAL void gridIsVisibleChanged();
 
-    Q_PROPERTY(GridBackgroundItemBorder* border READ border CONSTANT)
+    Q_PROPERTY(GridBackgroundItemBorder *border READ border CONSTANT)
     GridBackgroundItemBorder *border() const { return m_border; }
     Q_SIGNAL void borderChanged();
 
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
+    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY
+                       backgroundColorChanged)
     void setBackgroundColor(const QColor &val);
     QColor backgroundColor() const { return m_backgroundColor; }
     Q_SIGNAL void backgroundColorChanged();

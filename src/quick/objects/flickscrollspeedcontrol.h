@@ -33,27 +33,31 @@ public:
 
     static FlickScrollSpeedControl *qmlAttachedProperties(QObject *object);
 
-    Q_PROPERTY(QQuickItem* flickable READ flickable WRITE setFlickable NOTIFY flickableChanged)
+    Q_PROPERTY(QQuickItem *flickable READ flickable WRITE setFlickable NOTIFY flickableChanged)
     void setFlickable(QQuickItem *val);
     QQuickItem *flickable() const { return m_flickable; }
     Q_SIGNAL void flickableChanged();
 
-    Q_PROPERTY(qreal defaultFlickDeceleration READ defaultFlickDeceleration WRITE setDefaultFlickDeceleration NOTIFY defaultFlickDecelerationChanged)
+    Q_PROPERTY(qreal defaultFlickDeceleration READ defaultFlickDeceleration WRITE
+                       setDefaultFlickDeceleration NOTIFY defaultFlickDecelerationChanged)
     void setDefaultFlickDeceleration(qreal val);
     qreal defaultFlickDeceleration() const { return m_defaultFlickDeceleration; }
     Q_SIGNAL void defaultFlickDecelerationChanged();
 
-    Q_PROPERTY(qreal defaultMaximumVelocity READ defaultMaximumVelocity WRITE setDefaultMaximumVelocity NOTIFY defaultMaximumVelocityChanged)
+    Q_PROPERTY(qreal defaultMaximumVelocity READ defaultMaximumVelocity WRITE
+                       setDefaultMaximumVelocity NOTIFY defaultMaximumVelocityChanged)
     void setDefaultMaximumVelocity(qreal val);
     qreal defaultMaximumVelocity() const { return m_defaultMaximumVelocity; }
     Q_SIGNAL void defaultMaximumVelocityChanged();
 
-    Q_PROPERTY(qreal flickDecelerationFactor READ flickDecelerationFactor WRITE setFlickDecelerationFactor NOTIFY flickDecelerationFactorChanged)
+    Q_PROPERTY(qreal flickDecelerationFactor READ flickDecelerationFactor WRITE
+                       setFlickDecelerationFactor NOTIFY flickDecelerationFactorChanged)
     void setFlickDecelerationFactor(qreal val);
     qreal flickDecelerationFactor() const { return m_flickDecelerationFactor; }
     Q_SIGNAL void flickDecelerationFactorChanged();
 
-    Q_PROPERTY(qreal maximumVelocityFactor READ maximumVelocityFactor WRITE setMaximumVelocityFactor NOTIFY maximumVelocityFactorChanged)
+    Q_PROPERTY(qreal maximumVelocityFactor READ maximumVelocityFactor WRITE setMaximumVelocityFactor
+                       NOTIFY maximumVelocityFactorChanged)
     void setMaximumVelocityFactor(qreal val);
     qreal maximumVelocityFactor() const { return m_maximumVelocityFactor; }
     Q_SIGNAL void maximumVelocityFactorChanged();

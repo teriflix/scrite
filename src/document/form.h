@@ -144,7 +144,7 @@ public:
     QUrl moreInfoUrl() const;
     Q_SIGNAL void moreInfoUrlChanged();
 
-    Q_PROPERTY(QAbstractListModel* questionsModel READ questionsModel CONSTANT STORED false)
+    Q_PROPERTY(QAbstractListModel *questionsModel READ questionsModel CONSTANT STORED false)
     QObjectListModel<FormQuestion *> *questionsModel() const;
 
     Q_INVOKABLE FormQuestion *questionAt(int index) const;

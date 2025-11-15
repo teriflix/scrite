@@ -27,27 +27,30 @@ public:
     explicit TextDocumentItem(QQuickItem *parent = nullptr);
     ~TextDocumentItem();
 
-    Q_PROPERTY(QTextDocument* document READ document WRITE setDocument NOTIFY documentChanged)
+    Q_PROPERTY(QTextDocument *document READ document WRITE setDocument NOTIFY documentChanged)
     void setDocument(QTextDocument *val);
     QTextDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
 
-    Q_PROPERTY(qreal documentScale READ documentScale WRITE setDocumentScale NOTIFY documentScaleChanged)
+    Q_PROPERTY(qreal documentScale READ documentScale WRITE setDocumentScale NOTIFY
+                       documentScaleChanged)
     void setDocumentScale(qreal val);
     qreal documentScale() const { return m_documentScale; }
     Q_SIGNAL void documentScaleChanged();
 
-    Q_PROPERTY(QQuickItem* flickable READ flickable WRITE setFlickable NOTIFY flickableChanged)
+    Q_PROPERTY(QQuickItem *flickable READ flickable WRITE setFlickable NOTIFY flickableChanged)
     void setFlickable(QQuickItem *val);
     QQuickItem *flickable() const { return m_flickable; }
     Q_SIGNAL void flickableChanged();
 
-    Q_PROPERTY(qreal verticalPadding READ verticalPadding WRITE setVerticalPadding NOTIFY verticalPaddingChanged)
+    Q_PROPERTY(qreal verticalPadding READ verticalPadding WRITE setVerticalPadding NOTIFY
+                       verticalPaddingChanged)
     void setVerticalPadding(qreal val);
     qreal verticalPadding() const { return m_verticalPadding; }
     Q_SIGNAL void verticalPaddingChanged();
 
-    Q_PROPERTY(bool invertColors READ isInvertColors WRITE setInvertColors NOTIFY invertColorsChanged)
+    Q_PROPERTY(
+            bool invertColors READ isInvertColors WRITE setInvertColors NOTIFY invertColorsChanged)
     void setInvertColors(bool val);
     bool isInvertColors() const { return m_invertColors; }
     Q_SIGNAL void invertColorsChanged();
