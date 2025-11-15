@@ -14,7 +14,12 @@ public:
     BooleanResult(QObject *parent = nullptr) : QObject(parent) { }
     ~BooleanResult() { }
 
-    Q_PROPERTY(bool value READ value WRITE setValue NOTIFY valueChanged)
+    // clang-format off
+    Q_PROPERTY(bool value
+               READ value
+               WRITE setValue
+               NOTIFY valueChanged)
+    // clang-format on
     void setValue(bool val)
     {
         if (m_value == val)

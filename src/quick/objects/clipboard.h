@@ -26,12 +26,21 @@ public:
     Clipboard(QObject *parent = nullptr);
     ~Clipboard();
 
-    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    // clang-format off
+    Q_PROPERTY(QString text
+               READ text
+               WRITE setText
+               NOTIFY textChanged)
+    // clang-format on
     void setText(const QString &val);
     QString text() const;
     Q_SIGNAL void textChanged();
 
-    Q_PROPERTY(bool hasText READ hasHasText NOTIFY textChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasText
+               READ hasHasText
+               NOTIFY textChanged)
+    // clang-format on
     bool hasHasText() const { return !this->text().isEmpty(); }
 };
 

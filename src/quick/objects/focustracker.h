@@ -31,22 +31,43 @@ class FocusTrackerIndicator : public QObject
 public:
     ~FocusTrackerIndicator();
 
-    Q_PROPERTY(QObject *target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
+    // clang-format off
+    Q_PROPERTY(QObject *target
+               READ target
+               WRITE setTarget
+               NOTIFY targetChanged
+               RESET resetTarget)
+    // clang-format on
     void setTarget(QObject *val);
     QObject *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
 
-    Q_PROPERTY(QString property READ property WRITE setProperty NOTIFY propertyChanged)
+    // clang-format off
+    Q_PROPERTY(QString property
+               READ property
+               WRITE setProperty
+               NOTIFY propertyChanged)
+    // clang-format on
     void setProperty(const QString &val);
     QString property() const { return m_property; }
     Q_SIGNAL void propertyChanged();
 
-    Q_PROPERTY(QVariant onValue READ onValue WRITE setOnValue NOTIFY onValueChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant onValue
+               READ onValue
+               WRITE setOnValue
+               NOTIFY onValueChanged)
+    // clang-format on
     void setOnValue(const QVariant &val);
     QVariant onValue() const { return m_onValue; }
     Q_SIGNAL void onValueChanged();
 
-    Q_PROPERTY(QVariant offValue READ offValue WRITE setOffValue NOTIFY offValueChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant offValue
+               READ offValue
+               WRITE setOffValue
+               NOTIFY offValueChanged)
+    // clang-format on
     void setOffValue(const QVariant &val);
     QVariant offValue() const { return m_offValue; }
     Q_SIGNAL void offValueChanged();
@@ -79,11 +100,20 @@ public:
 
     static FocusTracker *qmlAttachedProperties(QObject *object);
 
-    Q_PROPERTY(QQuickItem *item READ item CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QQuickItem *item
+               READ item
+               CONSTANT )
+    // clang-format on
     QQuickItem *item() const { return m_item; }
 
-    Q_PROPERTY(
-            QQuickWindow *window READ window WRITE setWindow NOTIFY windowChanged RESET resetWindow)
+    // clang-format off
+    Q_PROPERTY(QQuickWindow *window
+               READ window
+               WRITE setWindow
+               NOTIFY windowChanged
+               RESET resetWindow)
+    // clang-format on
     void setWindow(QQuickWindow *val);
     QQuickWindow *window() const { return m_window; }
     Q_SIGNAL void windowChanged();
@@ -91,17 +121,29 @@ public:
     enum FocusEvaluationMethod { StandardFocusEvaluation, ExclusiveFocusEvaluation };
     Q_ENUM(FocusEvaluationMethod)
 
-    Q_PROPERTY(FocusEvaluationMethod evaluationMethod READ evaluationMethod WRITE
-                       setEvaluationMethod NOTIFY evaluationMethodChanged)
+    // clang-format off
+    Q_PROPERTY(FocusEvaluationMethod evaluationMethod
+               READ evaluationMethod
+               WRITE setEvaluationMethod
+               NOTIFY evaluationMethodChanged)
+    // clang-format on
     void setEvaluationMethod(FocusEvaluationMethod val);
     FocusEvaluationMethod evaluationMethod() const { return m_evaluationMethod; }
     Q_SIGNAL void evaluationMethodChanged();
 
-    Q_PROPERTY(bool hasFocus READ hasFocus NOTIFY hasFocusChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasFocus
+               READ hasFocus
+               NOTIFY hasFocusChanged)
+    // clang-format on
     bool hasFocus() const { return m_hasFocus; }
     Q_SIGNAL void hasFocusChanged();
 
-    Q_PROPERTY(FocusTrackerIndicator *indicator READ indicator CONSTANT)
+    // clang-format off
+    Q_PROPERTY(FocusTrackerIndicator *indicator
+               READ indicator
+               CONSTANT )
+    // clang-format on
     FocusTrackerIndicator *indicator() const { return m_indicator; }
 
 private:

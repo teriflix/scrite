@@ -29,19 +29,32 @@ public:
     ~ProgressReport();
     Q_SIGNAL void aboutToDelete(ProgressReport *val);
 
-    Q_PROPERTY(ProgressReport *proxyFor READ proxyFor WRITE setProxyFor NOTIFY proxyForChanged RESET
-                       resetProxyFor)
+    // clang-format off
+    Q_PROPERTY(ProgressReport *proxyFor
+               READ proxyFor
+               WRITE setProxyFor
+               NOTIFY proxyForChanged
+               RESET resetProxyFor)
+    // clang-format on
     void setProxyFor(ProgressReport *val);
     ProgressReport *proxyFor() const { return m_proxyFor; }
     Q_SIGNAL void proxyForChanged();
 
-    Q_PROPERTY(
-            QString progressText READ progressText WRITE setProgressText NOTIFY progressTextChanged)
+    // clang-format off
+    Q_PROPERTY(QString progressText
+               READ progressText
+               WRITE setProgressText
+               NOTIFY progressTextChanged)
+    // clang-format on
     void setProgressText(const QString &val);
     QString progressText() const { return m_progressText; }
     Q_SIGNAL void progressTextChanged();
 
-    Q_PROPERTY(qreal progress READ progress NOTIFY progressChanged)
+    // clang-format off
+    Q_PROPERTY(qreal progress
+               READ progress
+               NOTIFY progressChanged)
+    // clang-format on
     qreal progress() const { return m_progress; }
     Q_SIGNAL void progressChanged();
 
@@ -52,7 +65,11 @@ public:
         Finished,
     };
     Q_ENUM(Status)
-    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
+    // clang-format off
+    Q_PROPERTY(Status status
+               READ status
+               NOTIFY statusChanged)
+    // clang-format on
     Status status() const { return m_status; }
     Q_SIGNAL void statusChanged();
 

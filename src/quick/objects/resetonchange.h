@@ -26,27 +26,50 @@ public:
     explicit ResetOnChange(QQuickItem *parent = nullptr);
     ~ResetOnChange();
 
-    Q_PROPERTY(QVariant trackChangesOn READ trackChangesOn WRITE setTrackChangesOn NOTIFY
-                       trackChangesOnChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant trackChangesOn
+               READ trackChangesOn
+               WRITE setTrackChangesOn
+               NOTIFY trackChangesOnChanged)
+    // clang-format on
     void setTrackChangesOn(const QVariant &val);
     QVariant trackChangesOn() const { return m_trackChangesOn; }
     Q_SIGNAL void trackChangesOnChanged();
 
-    Q_PROPERTY(QVariant from READ from WRITE setFrom NOTIFY fromChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant from
+               READ from
+               WRITE setFrom
+               NOTIFY fromChanged)
+    // clang-format on
     void setFrom(const QVariant &val);
     QVariant from() const { return m_from; }
     Q_SIGNAL void fromChanged();
 
-    Q_PROPERTY(QVariant to READ to WRITE setTo NOTIFY toChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant to
+               READ to
+               WRITE setTo
+               NOTIFY toChanged)
+    // clang-format on
     void setTo(const QVariant &val);
     QVariant to() const { return m_to; }
     Q_SIGNAL void toChanged();
 
-    Q_PROPERTY(QVariant value READ value NOTIFY valueChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant value
+               READ value
+               NOTIFY valueChanged)
+    // clang-format on
     QVariant value() const { return m_value; }
     Q_SIGNAL void valueChanged();
 
-    Q_PROPERTY(int delay READ delay WRITE setDelay NOTIFY delayChanged)
+    // clang-format off
+    Q_PROPERTY(int delay
+               READ delay
+               WRITE setDelay
+               NOTIFY delayChanged)
+    // clang-format on
     void setDelay(int val);
     int delay() const { return m_delay; }
     Q_SIGNAL void delayChanged();

@@ -47,48 +47,97 @@ public:
     ~Note();
     Q_SIGNAL void aboutToDelete(Note *ptr);
 
-    Q_PROPERTY(Notes *notes READ notes CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(Notes *notes
+               READ notes
+               CONSTANT STORED
+               false )
+    // clang-format on
     Notes *notes() const;
 
-    Q_PROPERTY(QString id READ id NOTIFY idChanged)
+    // clang-format off
+    Q_PROPERTY(QString id
+               READ id
+               NOTIFY idChanged)
+    // clang-format on
     QString id() const;
     Q_SIGNAL void idChanged();
 
     enum Type { TextNoteType, FormNoteType, CheckListNoteType };
     Q_ENUM(Type)
-    Q_PROPERTY(Type type READ type NOTIFY typeChanged)
+    // clang-format off
+    Q_PROPERTY(Type type
+               READ type
+               NOTIFY typeChanged)
+    // clang-format on
     Type type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    // clang-format off
+    Q_PROPERTY(QString title
+               READ title
+               WRITE setTitle
+               NOTIFY titleChanged)
+    // clang-format on
     void setTitle(const QString &val);
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
-    Q_PROPERTY(QString summary READ summary WRITE setSummary NOTIFY summaryChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QString summary
+               READ summary
+               WRITE setSummary
+               NOTIFY summaryChanged
+               STORED false)
+    // clang-format on
     void setSummary(const QString &val);
     QString summary() const { return m_summary; }
     Q_SIGNAL void summaryChanged();
 
-    Q_PROPERTY(QJsonValue content READ content WRITE setContent NOTIFY contentChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonValue content
+               READ content
+               WRITE setContent
+               NOTIFY contentChanged)
+    // clang-format on
     void setContent(const QJsonValue &val);
     QJsonValue content() const { return m_content; }
     Q_SIGNAL void contentChanged();
 
-    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor color
+               READ color
+               WRITE setColor
+               NOTIFY colorChanged)
+    // clang-format on
     void setColor(const QColor &val);
     QColor color() const { return m_color; }
     Q_SIGNAL void colorChanged();
 
-    Q_PROPERTY(QString formId READ formId NOTIFY formIdChanged)
+    // clang-format off
+    Q_PROPERTY(QString formId
+               READ formId
+               NOTIFY formIdChanged)
+    // clang-format on
     QString formId() const { return m_formId; }
     Q_SIGNAL void formIdChanged();
 
-    Q_PROPERTY(Form *form READ form RESET resetForm NOTIFY formChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(Form *form
+               READ form
+               RESET resetForm
+               NOTIFY formChanged
+               STORED false)
+    // clang-format on
     Form *form() const { return m_form; }
     Q_SIGNAL void formChanged();
 
-    Q_PROPERTY(QJsonObject formData READ formData WRITE setFormData NOTIFY formDataChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject formData
+               READ formData
+               WRITE setFormData
+               NOTIFY formDataChanged)
+    // clang-format on
     void setFormData(const QJsonObject &val);
     QJsonObject formData() const { return m_formData; }
     Q_SIGNAL void formDataChanged();
@@ -96,7 +145,11 @@ public:
     Q_INVOKABLE void setFormData(const QString &key, const QJsonValue &value);
     Q_INVOKABLE QJsonValue getFormData(const QString &key) const;
 
-    Q_PROPERTY(Attachments *attachments READ attachments CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Attachments *attachments
+               READ attachments
+               CONSTANT )
+    // clang-format on
     Attachments *attachments() const { return m_attachments; }
 
     Q_SIGNAL void noteModified();
@@ -168,36 +221,84 @@ public:
         OtherOwner
     };
     Q_ENUM(OwnerType)
-    Q_PROPERTY(OwnerType ownerType READ ownerType CONSTANT)
+    // clang-format off
+    Q_PROPERTY(OwnerType ownerType
+               READ ownerType
+               CONSTANT )
+    // clang-format on
     OwnerType ownerType() const;
 
-    Q_PROPERTY(QObject *owner READ owner STORED false CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QObject *owner
+               READ owner
+               STORED false
+               CONSTANT )
+    // clang-format on
     QObject *owner() const { return this->QObject::parent(); }
 
-    Q_PROPERTY(Structure *structure READ structure STORED false CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Structure *structure
+               READ structure
+               STORED false
+               CONSTANT )
+    // clang-format on
     Structure *structure() const;
 
-    Q_PROPERTY(ScreenplayElement *breakElement READ breakElement STORED false CONSTANT)
+    // clang-format off
+    Q_PROPERTY(ScreenplayElement *breakElement
+               READ breakElement
+               STORED false
+               CONSTANT )
+    // clang-format on
     ScreenplayElement *breakElement() const;
 
-    Q_PROPERTY(Scene *scene READ scene STORED false CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Scene *scene
+               READ scene
+               STORED false
+               CONSTANT )
+    // clang-format on
     Scene *scene() const;
 
-    Q_PROPERTY(Character *character READ character STORED false CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Character *character
+               READ character
+               STORED false
+               CONSTANT )
+    // clang-format on
     Character *character() const;
 
-    Q_PROPERTY(Relationship *relationship READ relationship STORED false CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Relationship *relationship
+               READ relationship
+               STORED false
+               CONSTANT )
+    // clang-format on
     Relationship *relationship() const;
 
     /*
-    Q_PROPERTY(Location* location READ location STORED false CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Location* location
+               READ location
+               STORED false
+               CONSTANT )
+    // clang-format on
     Location *location() const { return nullptr; }
 
-    Q_PROPERTY(Prop* prop READ prop STORED false CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Prop* prop
+               READ prop
+               STORED false
+               CONSTANT )
+    // clang-format on
     Prop *prop() const { return nullptr; }
     */
 
-    Q_PROPERTY(QString id READ id NOTIFY idChanged)
+    // clang-format off
+    Q_PROPERTY(QString id
+               READ id
+               NOTIFY idChanged)
+    // clang-format on
     QString id() const;
     Q_SIGNAL void idChanged();
 
@@ -205,7 +306,12 @@ public:
     QString title() const;
     QString summary() const;
 
-    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor color
+               READ color
+               WRITE setColor
+               NOTIFY colorChanged)
+    // clang-format on
     void setColor(const QColor &val);
     QColor color() const { return m_color; }
     Q_SIGNAL void colorChanged();
@@ -219,11 +325,19 @@ public:
     Q_INVOKABLE Note *lastNote() const { return this->noteAt(this->noteCount() - 1); }
     Q_INVOKABLE void clearNotes();
 
-    Q_PROPERTY(int noteCount READ noteCount NOTIFY noteCountChanged)
+    // clang-format off
+    Q_PROPERTY(int noteCount
+               READ noteCount
+               NOTIFY noteCountChanged)
+    // clang-format on
     int noteCount() const { return this->objectCount(); }
     Q_SIGNAL void noteCountChanged();
 
-    Q_PROPERTY(int compatibleFormType READ compatibleFormType CONSTANT)
+    // clang-format off
+    Q_PROPERTY(int compatibleFormType
+               READ compatibleFormType
+               CONSTANT )
+    // clang-format on
     int compatibleFormType() const { return m_compatibleFormType; }
 
     Q_SIGNAL void notesModified();

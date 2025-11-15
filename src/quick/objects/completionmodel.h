@@ -26,24 +26,42 @@ public:
     explicit CompletionModel(QObject *parent = nullptr);
     ~CompletionModel();
 
-    Q_PROPERTY(QStringList strings READ strings WRITE setStrings NOTIFY stringsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList strings
+               READ strings
+               WRITE setStrings
+               NOTIFY stringsChanged)
+    // clang-format on
     void setStrings(const QStringList &val);
     QStringList strings() const { return m_strings; }
     Q_SIGNAL void stringsChanged();
 
-    Q_PROPERTY(QStringList priorityStrings READ priorityStrings WRITE setPriorityStrings NOTIFY
-                       priorityStringsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList priorityStrings
+               READ priorityStrings
+               WRITE setPriorityStrings
+               NOTIFY priorityStringsChanged)
+    // clang-format on
     void setPriorityStrings(QStringList val);
     QStringList priorityStrings() const { return m_priorityStrings; }
     Q_SIGNAL void priorityStringsChanged();
 
-    Q_PROPERTY(bool acceptEnglishStringsOnly READ isAcceptEnglishStringsOnly WRITE
-                       setAcceptEnglishStringsOnly NOTIFY acceptEnglishStringsOnlyChanged)
+    // clang-format off
+    Q_PROPERTY(bool acceptEnglishStringsOnly
+               READ isAcceptEnglishStringsOnly
+               WRITE setAcceptEnglishStringsOnly
+               NOTIFY acceptEnglishStringsOnlyChanged)
+    // clang-format on
     void setAcceptEnglishStringsOnly(bool val);
     bool isAcceptEnglishStringsOnly() const { return m_acceptEnglishStringsOnly; }
     Q_SIGNAL void acceptEnglishStringsOnlyChanged();
 
-    Q_PROPERTY(bool sortStrings READ sortStrings WRITE setSortStrings NOTIFY sortStringsChanged)
+    // clang-format off
+    Q_PROPERTY(bool sortStrings
+               READ sortStrings
+               WRITE setSortStrings
+               NOTIFY sortStringsChanged)
+    // clang-format on
     void setSortStrings(bool val);
     bool sortStrings() const { return m_sortStrings; }
     Q_SIGNAL void sortStringsChanged();
@@ -51,49 +69,88 @@ public:
     enum SortMode { CaseSensitiveSort, CaseInsensitiveSort };
     Q_ENUM(SortMode)
 
-    Q_PROPERTY(SortMode sortMode READ sortMode WRITE setSortMode NOTIFY sortModeChanged)
+    // clang-format off
+    Q_PROPERTY(SortMode sortMode
+               READ sortMode
+               WRITE setSortMode
+               NOTIFY sortModeChanged)
+    // clang-format on
     void setSortMode(SortMode val);
     SortMode sortMode() const { return m_sortMode; }
     Q_SIGNAL void sortModeChanged();
 
-    Q_PROPERTY(int maxVisibleItems READ maxVisibleItems WRITE setMaxVisibleItems NOTIFY
-                       maxVisibleItemsChanged)
+    // clang-format off
+    Q_PROPERTY(int maxVisibleItems
+               READ maxVisibleItems
+               WRITE setMaxVisibleItems
+               NOTIFY maxVisibleItemsChanged)
+    // clang-format on
     void setMaxVisibleItems(int val);
     int maxVisibleItems() const { return m_maxVisibleItems; }
     Q_SIGNAL void maxVisibleItemsChanged();
 
-    Q_PROPERTY(int minimumCompletionPrefixLength READ minimumCompletionPrefixLength WRITE
-                       setMinimumCompletionPrefixLength NOTIFY minimumCompletionPrefixLengthChanged)
+    // clang-format off
+    Q_PROPERTY(int minimumCompletionPrefixLength
+               READ minimumCompletionPrefixLength
+               WRITE setMinimumCompletionPrefixLength
+               NOTIFY minimumCompletionPrefixLengthChanged)
+    // clang-format on
     void setMinimumCompletionPrefixLength(int val);
     int minimumCompletionPrefixLength() const { return m_minimumCompletionPrefixLength; }
     Q_SIGNAL void minimumCompletionPrefixLengthChanged();
 
-    Q_PROPERTY(QString completionPrefix READ completionPrefix WRITE setCompletionPrefix NOTIFY
-                       completionPrefixChanged)
+    // clang-format off
+    Q_PROPERTY(QString completionPrefix
+               READ completionPrefix
+               WRITE setCompletionPrefix
+               NOTIFY completionPrefixChanged)
+    // clang-format on
     void setCompletionPrefix(const QString &val);
     QString completionPrefix() const { return m_completionPrefix; }
     Q_SIGNAL void completionPrefixChanged();
 
-    Q_PROPERTY(int currentRow READ currentRow WRITE setCurrentRow NOTIFY currentRowChanged)
+    // clang-format off
+    Q_PROPERTY(int currentRow
+               READ currentRow
+               WRITE setCurrentRow
+               NOTIFY currentRowChanged)
+    // clang-format on
     void setCurrentRow(int val);
     int currentRow() const { return m_currentRow; }
     Q_SIGNAL void currentRowChanged();
 
-    Q_PROPERTY(QString currentCompletion READ currentCompletion NOTIFY currentCompletionChanged)
+    // clang-format off
+    Q_PROPERTY(QString currentCompletion
+               READ currentCompletion
+               NOTIFY currentCompletionChanged)
+    // clang-format on
     QString currentCompletion() const;
     Q_SIGNAL void currentCompletionChanged();
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    // clang-format off
+    Q_PROPERTY(int count
+               READ count
+               NOTIFY countChanged)
+    // clang-format on
     int count() const { return m_filteredStrings.size(); }
     Q_SIGNAL void countChanged();
 
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool enabled
+               READ isEnabled
+               WRITE setEnabled
+               NOTIFY enabledChanged)
+    // clang-format on
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    Q_PROPERTY(bool filterKeyStrokes READ isFilterKeyStrokes WRITE setFilterKeyStrokes NOTIFY
-                       filterKeyStrokesChanged)
+    // clang-format off
+    Q_PROPERTY(bool filterKeyStrokes
+               READ isFilterKeyStrokes
+               WRITE setFilterKeyStrokes
+               NOTIFY filterKeyStrokesChanged)
+    // clang-format on
     void setFilterKeyStrokes(bool val);
     bool isFilterKeyStrokes() const { return m_filterKeyStrokes; }
     Q_SIGNAL void filterKeyStrokesChanged();

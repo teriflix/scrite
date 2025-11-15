@@ -33,8 +33,12 @@ public:
     // When set to false, it becomes invisible or disabled. Please ensure
     // that the flag is turned back to true as soon as the utility of this
     // flag is over.
-    Q_PROPERTY(bool closeButtonVisible READ isCloseButtonVisible WRITE setCloseButtonVisible NOTIFY
-                       closeButtonVisibleChanged)
+    // clang-format off
+    Q_PROPERTY(bool closeButtonVisible
+               READ isCloseButtonVisible
+               WRITE setCloseButtonVisible
+               NOTIFY closeButtonVisibleChanged)
+    // clang-format on
     void setCloseButtonVisible(bool val);
     bool isCloseButtonVisible() const { return m_closeButtonVisible; }
     Q_SIGNAL void closeButtonVisibleChanged();

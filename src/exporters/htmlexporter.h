@@ -19,27 +19,37 @@
 class HtmlExporter : public AbstractExporter
 {
     Q_OBJECT
+    // clang-format off
     Q_CLASSINFO("Format", "Screenplay/HTML")
     Q_CLASSINFO("NameFilters", "HTML (*.html)")
     Q_CLASSINFO("Description", "Exports the current screenplay to HTML file format.")
     Q_CLASSINFO("Icon", ":/icons/exporter/html.png")
+    // clang-format on
 
 public:
     Q_INVOKABLE explicit HtmlExporter(QObject *parent = nullptr);
     ~HtmlExporter();
 
+    // clang-format off
     Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated HTML.")
     Q_CLASSINFO("includeSceneNumbers_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers
-                       NOTIFY includeSceneNumbersChanged)
+    Q_PROPERTY(bool includeSceneNumbers
+               READ isIncludeSceneNumbers
+               WRITE setIncludeSceneNumbers
+               NOTIFY includeSceneNumbersChanged)
+    // clang-format on
     void setIncludeSceneNumbers(bool val);
     bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
     Q_SIGNAL void includeSceneNumbersChanged();
 
+    // clang-format off
     Q_CLASSINFO("exportWithSceneColors_FieldLabel", "Export with scene colors")
     Q_CLASSINFO("exportWithSceneColors_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool exportWithSceneColors READ isExportWithSceneColors WRITE
-                       setExportWithSceneColors NOTIFY exportWithSceneColorsChanged)
+    Q_PROPERTY(bool exportWithSceneColors
+               READ isExportWithSceneColors
+               WRITE setExportWithSceneColors
+               NOTIFY exportWithSceneColorsChanged)
+    // clang-format on
     void setExportWithSceneColors(bool val);
     bool isExportWithSceneColors() const { return m_exportWithSceneColors; }
     Q_SIGNAL void exportWithSceneColorsChanged();

@@ -29,17 +29,32 @@ public:
     explicit PdfExportableGraphicsScene(QObject *parent = nullptr);
     ~PdfExportableGraphicsScene();
 
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    // clang-format off
+    Q_PROPERTY(QString title
+               READ title
+               WRITE setTitle
+               NOTIFY titleChanged)
+    // clang-format on
     void setTitle(QString val);
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
-    Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)
+    // clang-format off
+    Q_PROPERTY(QString comment
+               READ comment
+               WRITE setComment
+               NOTIFY commentChanged)
+    // clang-format on
     void setComment(const QString &val);
     QString comment() const { return m_comment; }
     Q_SIGNAL void commentChanged();
 
-    Q_PROPERTY(QString watermark READ watermark WRITE setWatermark NOTIFY watermarkChanged)
+    // clang-format off
+    Q_PROPERTY(QString watermark
+               READ watermark
+               WRITE setWatermark
+               NOTIFY watermarkChanged)
+    // clang-format on
     void setWatermark(const QString &val);
     QString watermark() const { return m_watermark; }
     Q_SIGNAL void watermarkChanged();

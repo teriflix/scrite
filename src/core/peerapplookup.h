@@ -36,14 +36,26 @@ public:
     static PeerAppLookup *instance();
     ~PeerAppLookup();
 
-    Q_PROPERTY(QString instanceId READ isInstanceId CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString instanceId
+               READ isInstanceId
+               CONSTANT )
+    // clang-format on
     QString isInstanceId() const { return m_instanceId; }
 
-    Q_PROPERTY(int peerCount READ peerCount NOTIFY peerCountChanged)
+    // clang-format off
+    Q_PROPERTY(int peerCount
+               READ peerCount
+               NOTIFY peerCountChanged)
+    // clang-format on
     int peerCount() const { return m_peerCount; }
     Q_SIGNAL void peerCountChanged();
 
-    Q_PROPERTY(int lookupCount READ lookupCount NOTIFY lookupCountChanged)
+    // clang-format off
+    Q_PROPERTY(int lookupCount
+               READ lookupCount
+               NOTIFY lookupCountChanged)
+    // clang-format on
     int lookupCount() const { return m_lookupCount; }
     Q_SIGNAL void lookupCountChanged();
 

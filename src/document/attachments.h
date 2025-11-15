@@ -38,37 +38,72 @@ public:
 
     enum Type { Photo, Video, Audio, Document };
     Q_ENUM(Type)
-    Q_PROPERTY(Type type READ type NOTIFY typeChanged)
+    // clang-format off
+    Q_PROPERTY(Type type
+               READ type
+               NOTIFY typeChanged)
+    // clang-format on
     Type type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
-    Q_PROPERTY(bool featured READ isFeatured WRITE setFeatured NOTIFY featuredChanged)
+    // clang-format off
+    Q_PROPERTY(bool featured
+               READ isFeatured
+               WRITE setFeatured
+               NOTIFY featuredChanged)
+    // clang-format on
     void setFeatured(bool val);
     bool isFeatured() const { return m_featured; }
     Q_SIGNAL void featuredChanged();
 
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    // clang-format off
+    Q_PROPERTY(QString title
+               READ title
+               WRITE setTitle
+               NOTIFY titleChanged)
+    // clang-format on
     void setTitle(const QString &val);
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
-    Q_PROPERTY(QString originalFileName READ originalFileName NOTIFY originalFileNameChanged)
+    // clang-format off
+    Q_PROPERTY(QString originalFileName
+               READ originalFileName
+               NOTIFY originalFileNameChanged)
+    // clang-format on
     QString originalFileName() const { return m_originalFileName; }
     Q_SIGNAL void originalFileNameChanged();
 
-    Q_PROPERTY(QString filePath READ filePath NOTIFY filePathChanged)
+    // clang-format off
+    Q_PROPERTY(QString filePath
+               READ filePath
+               NOTIFY filePathChanged)
+    // clang-format on
     QString filePath() const { return m_filePath; }
     Q_SIGNAL void filePathChanged();
 
     // For use with Image {}, PdfViewer etc..
-    Q_PROPERTY(QUrl fileSource READ fileSource NOTIFY filePathChanged)
+    // clang-format off
+    Q_PROPERTY(QUrl fileSource
+               READ fileSource
+               NOTIFY filePathChanged)
+    // clang-format on
     QUrl fileSource() const { return m_fileSource; }
 
-    Q_PROPERTY(QString mimeType READ mimeType NOTIFY mimeTypeChanged)
+    // clang-format off
+    Q_PROPERTY(QString mimeType
+               READ mimeType
+               NOTIFY mimeTypeChanged)
+    // clang-format on
     QString mimeType() const { return m_mimeType; }
     Q_SIGNAL void mimeTypeChanged();
 
-    Q_PROPERTY(QJsonObject userData READ userData WRITE setUserData NOTIFY userDataChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject userData
+               READ userData
+               WRITE setUserData
+               NOTIFY userDataChanged)
+    // clang-format on
     void setUserData(const QJsonObject &val);
     QJsonObject userData() const { return m_userData; }
     Q_SIGNAL void userDataChanged();
@@ -133,7 +168,12 @@ public:
         DocumentsOfAnyType = 15
     };
     Q_ENUM(AllowedType)
-    Q_PROPERTY(AllowedType allowedType READ allowedType NOTIFY allowedTypeChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(AllowedType allowedType
+               READ allowedType
+               NOTIFY allowedTypeChanged
+               STORED false)
+    // clang-format on
     void setAllowedType(AllowedType val); // Can only be called from C++ classes.
     AllowedType allowedType() const { return m_allowedType; }
     Q_SIGNAL void allowedTypeChanged();
@@ -141,12 +181,21 @@ public:
     static bool canAllow(const QFileInfo &fi, AllowedType allowed);
     static QMimeType mimeTypeFor(const QFileInfo &fi);
 
-    Q_PROPERTY(QStringList nameFilters READ nameFilters NOTIFY allowedTypeChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QStringList nameFilters
+               READ nameFilters
+               NOTIFY allowedTypeChanged
+               STORED false)
+    // clang-format on
     QStringList nameFilters() const { return m_nameFilters; }
     Q_SIGNAL void nameFiltersChanged();
 
-    Q_PROPERTY(Attachment *featuredAttachment READ featuredAttachment NOTIFY
-                       featuredAttachmentChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(Attachment *featuredAttachment
+               READ featuredAttachment
+               NOTIFY featuredAttachmentChanged
+               STORED false)
+    // clang-format on
     Attachment *featuredAttachment() const { return m_featuredAttachment; }
     Q_SIGNAL void featuredAttachmentChanged();
 
@@ -166,7 +215,11 @@ public:
     }
     Q_INVOKABLE void removeAllAttachments();
 
-    Q_PROPERTY(int attachmentCount READ attachmentCount NOTIFY attachmentCountChanged)
+    // clang-format off
+    Q_PROPERTY(int attachmentCount
+               READ attachmentCount
+               NOTIFY attachmentCountChanged)
+    // clang-format on
     int attachmentCount() const { return this->size(); }
     Q_SIGNAL void attachmentCountChanged();
 
@@ -202,40 +255,74 @@ public:
     explicit AttachmentsDropArea(QQuickItem *parent = nullptr);
     ~AttachmentsDropArea();
 
-    Q_PROPERTY(Attachments *target READ target WRITE setTarget NOTIFY targetChanged)
+    // clang-format off
+    Q_PROPERTY(Attachments *target
+               READ target
+               WRITE setTarget
+               NOTIFY targetChanged)
+    // clang-format on
     void setTarget(Attachments *val);
     Attachments *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
 
-    Q_PROPERTY(int allowedType READ allowedType WRITE setAllowedType NOTIFY allowedTypeChanged)
+    // clang-format off
+    Q_PROPERTY(int allowedType
+               READ allowedType
+               WRITE setAllowedType
+               NOTIFY allowedTypeChanged)
+    // clang-format on
     void setAllowedType(int val);
     int allowedType() const { return m_allowedType; }
     Q_SIGNAL void allowedTypeChanged();
 
-    Q_PROPERTY(QStringList allowedExtensions READ allowedExtensions WRITE setAllowedExtensions
-                       NOTIFY allowedExtensionsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList allowedExtensions
+               READ allowedExtensions
+               WRITE setAllowedExtensions
+               NOTIFY allowedExtensionsChanged)
+    // clang-format on
     void setAllowedExtensions(const QStringList &val);
     QStringList allowedExtensions() const { return m_allowedExtensions; }
     Q_SIGNAL void allowedExtensionsChanged();
 
-    Q_PROPERTY(bool allowMultiple READ isAllowMultiple WRITE setAllowMultiple NOTIFY
-                       allowMultipleChanged)
+    // clang-format off
+    Q_PROPERTY(bool allowMultiple
+               READ isAllowMultiple
+               WRITE setAllowMultiple
+               NOTIFY allowMultipleChanged)
+    // clang-format on
     void setAllowMultiple(bool val);
     bool isAllowMultiple() const { return m_allowMultiple; }
     Q_SIGNAL void allowMultipleChanged();
 
-    Q_PROPERTY(bool active READ isActive NOTIFY attachmentChanged)
+    // clang-format off
+    Q_PROPERTY(bool active
+               READ isActive
+               NOTIFY attachmentChanged)
+    // clang-format on
     bool isActive() const { return m_attachment != nullptr; }
 
-    Q_PROPERTY(Attachment *attachment READ attachment NOTIFY attachmentChanged)
+    // clang-format off
+    Q_PROPERTY(Attachment *attachment
+               READ attachment
+               NOTIFY attachmentChanged)
+    // clang-format on
     Attachment *attachment() const { return m_attachment; }
     Q_SIGNAL void attachmentChanged();
 
-    Q_PROPERTY(QPointF mouse READ mouse NOTIFY mouseChanged)
+    // clang-format off
+    Q_PROPERTY(QPointF mouse
+               READ mouse
+               NOTIFY mouseChanged)
+    // clang-format on
     QPointF mouse() const { return m_mouse; }
     Q_SIGNAL void mouseChanged();
 
-    Q_PROPERTY(QList<QUrl> dropUrls READ dropUrls NOTIFY dropUrlsChanged)
+    // clang-format off
+    Q_PROPERTY(QList<QUrl> dropUrls
+               READ dropUrls
+               NOTIFY dropUrlsChanged)
+    // clang-format on
     QList<QUrl> dropUrls() const { return m_dropUrls; }
     Q_SIGNAL void dropUrlsChanged();
 

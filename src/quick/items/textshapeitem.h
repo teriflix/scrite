@@ -25,12 +25,22 @@ public:
     explicit TextShapeItem(QQuickItem *parent = nullptr);
     ~TextShapeItem();
 
-    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    // clang-format off
+    Q_PROPERTY(QString text
+               READ text
+               WRITE setText
+               NOTIFY textChanged)
+    // clang-format on
     void setText(const QString &val);
     QString text() const { return m_text; }
     Q_SIGNAL void textChanged();
 
-    Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
+    // clang-format off
+    Q_PROPERTY(QFont font
+               READ font
+               WRITE setFont
+               NOTIFY fontChanged)
+    // clang-format on
     void setFont(const QFont &val);
     QFont font() const { return m_font; }
     Q_SIGNAL void fontChanged();

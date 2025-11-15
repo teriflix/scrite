@@ -33,9 +33,18 @@ class UndoHub : public QUndoGroup
     QML_ELEMENT
     QML_SINGLETON
 
-    Q_PROPERTY(bool canUndo READ canUndo NOTIFY _canUndoChanged)
-    Q_PROPERTY(bool canRedo READ canRedo NOTIFY _canRedoChanged)
-    Q_PROPERTY(QUndoStack *active READ activeStack WRITE setActiveStack NOTIFY _activeStackChanged)
+    // clang-format off
+    Q_PROPERTY(bool canUndo
+               READ canUndo
+               NOTIFY _canUndoChanged)
+    Q_PROPERTY(bool canRedo
+               READ canRedo
+               NOTIFY _canRedoChanged)
+    Q_PROPERTY(QUndoStack *active
+               READ activeStack
+               WRITE setActiveStack
+               NOTIFY _activeStackChanged)
+    // clang-format on
 
 public:
     static void init(const char *uri, QQmlEngine *qmlEngine);
@@ -64,7 +73,12 @@ class UndoStack : public QUndoStack
 {
     Q_OBJECT
     QML_ELEMENT
-    Q_PROPERTY(bool isActive READ isActive WRITE setActive NOTIFY activeChanged)
+    // clang-format off
+    Q_PROPERTY(bool isActive
+               READ isActive
+               WRITE setActive
+               NOTIFY activeChanged)
+    // clang-format on
 
 public:
     explicit UndoStack(QObject *parent = nullptr);

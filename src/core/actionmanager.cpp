@@ -611,10 +611,8 @@ void ActionHandler::setAction(QObject *val)
     if (m_action != nullptr) {
         connect(m_action, &QObject::destroyed, this, &ActionHandler::onObjectDestroyed);
 
-        // clang-format off
-        connect(m_action, SIGNAL(toggled(QObject*)), this, SLOT(onToggled(QObject*)));
-        connect(m_action, SIGNAL(triggered(QObject*)), this, SLOT(onTriggered(QObject*)));
-        // clang-format on
+        connect(m_action, SIGNAL(toggled(QObject *)), this, SLOT(onToggled(QObject *)));
+        connect(m_action, SIGNAL(triggered(QObject *)), this, SLOT(onTriggered(QObject *)));
 
         const QMetaObject *mo = m_action->metaObject();
         const QMetaProperty triggerCountProp =
@@ -881,11 +879,8 @@ void ActionHandlers::onHanlderActionAboutToChange()
     if (handler && handler->action()) {
         QObject *oldAction = handler->action();
 
-        // clang-format off
-        QMetaObject::invokeMethod(this, "handlerAvailabilityChanged",
-                                  Qt::QueuedConnection,
-                                  Q_ARG(QObject*, oldAction), Q_ARG(ActionHandler*, nullptr));
-        // clang-format on
+        QMetaObject::invokeMethod(this, "handlerAvailabilityChanged", Qt::QueuedConnection,
+                                  Q_ARG(QObject *, oldAction), Q_ARG(ActionHandler *, nullptr));
     }
 }
 

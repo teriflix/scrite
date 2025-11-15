@@ -19,29 +19,37 @@
 class FountainExporter : public AbstractExporter
 {
     Q_OBJECT
+    // clang-format off
     Q_CLASSINFO("Format", "Screenplay/Fountain")
     Q_CLASSINFO("NameFilters", "Fountain (*.fountain)")
     Q_CLASSINFO("Description", "Exports the current screenplay to Fountain file format.")
     Q_CLASSINFO("Icon", ":/icons/exporter/fountain.png")
+    // clang-format on
 
 public:
     Q_INVOKABLE explicit FountainExporter(QObject *parent = nullptr);
     ~FountainExporter();
 
-    Q_CLASSINFO(
-            "followStrictSyntax_FieldLabel",
-            "Use ., @, !, > to explicitly mark scene heading, character, action and transisitions.")
+    // clang-format off
+    Q_CLASSINFO( "followStrictSyntax_FieldLabel", "Use ., @, !, > to explicitly mark scene heading, character, action and transisitions.")
     Q_CLASSINFO("followStrictSyntax_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool followStrictSyntax READ isFollowStrictSyntax WRITE setFollowStrictSyntax NOTIFY
-                       followStrictSyntaxChanged)
+    Q_PROPERTY(bool followStrictSyntax
+               READ isFollowStrictSyntax
+               WRITE setFollowStrictSyntax
+               NOTIFY followStrictSyntaxChanged)
+    // clang-format on
     void setFollowStrictSyntax(bool val);
     bool isFollowStrictSyntax() const { return m_followStrictSyntax; }
     Q_SIGNAL void followStrictSyntaxChanged();
 
-    Q_CLASSINFO("useEmphasis_FieldLabel",
-                "Use *, ** and _ to highlight italics, bold and underlined text.")
+    // clang-format off
+    Q_CLASSINFO("useEmphasis_FieldLabel", "Use *, ** and _ to highlight italics, bold and underlined text.")
     Q_CLASSINFO("useEmphasis_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool useEmphasis READ isUseEmphasis WRITE setUseEmphasis NOTIFY useEmphasisChanged)
+    Q_PROPERTY(bool useEmphasis
+               READ isUseEmphasis
+               WRITE setUseEmphasis
+               NOTIFY useEmphasisChanged)
+    // clang-format on
     void setUseEmphasis(bool val);
     bool isUseEmphasis() const { return m_useEmphasis; }
     Q_SIGNAL void useEmphasisChanged();

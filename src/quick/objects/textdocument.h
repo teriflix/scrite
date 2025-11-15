@@ -33,17 +33,29 @@ public:
 
     static TextDocument *qmlAttachedProperties(QObject *object);
 
-    Q_PROPERTY(QQuickTextDocument *quickTextDocument READ quickTextDocument WRITE
-                       setQuickTextDocument NOTIFY quickTextDocumentChanged)
+    // clang-format off
+    Q_PROPERTY(QQuickTextDocument *quickTextDocument
+               READ quickTextDocument
+               WRITE setQuickTextDocument
+               NOTIFY quickTextDocumentChanged)
+    // clang-format on
     QQuickTextDocument *quickTextDocument() const { return m_quickTextDocument; }
     Q_SIGNAL void quickTextDocumentChanged();
 
-    Q_PROPERTY(QTextDocument *document READ document NOTIFY documentChanged)
+    // clang-format off
+    Q_PROPERTY(QTextDocument *document
+               READ document
+               NOTIFY documentChanged)
+    // clang-format on
     QTextDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
-                       cursorPositionChanged)
+    // clang-format off
+    Q_PROPERTY(int cursorPosition
+               READ cursorPosition
+               WRITE setCursorPosition
+               NOTIFY cursorPositionChanged)
+    // clang-format on
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();

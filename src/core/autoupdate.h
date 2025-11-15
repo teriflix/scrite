@@ -31,13 +31,26 @@ public:
     static AutoUpdate *instance();
     ~AutoUpdate();
 
-    Q_PROPERTY(bool updateAvailable READ isUpdateAvailable NOTIFY updateInfoChanged)
+    // clang-format off
+    Q_PROPERTY(bool updateAvailable
+               READ isUpdateAvailable
+               NOTIFY updateInfoChanged)
+    // clang-format on
     bool isUpdateAvailable() const { return !m_updateInfo.isEmpty(); }
 
-    Q_PROPERTY(QUrl updateDownloadUrl READ updateDownloadUrl NOTIFY updateInfoChanged)
+    // clang-format off
+    Q_PROPERTY(QUrl updateDownloadUrl
+               READ updateDownloadUrl
+               NOTIFY updateInfoChanged)
+    // clang-format on
     QUrl updateDownloadUrl() const;
 
-    Q_PROPERTY(QJsonObject updateInfo READ updateInfo WRITE setUpdateInfo NOTIFY updateInfoChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject updateInfo
+               READ updateInfo
+               WRITE setUpdateInfo
+               NOTIFY updateInfoChanged)
+    // clang-format on
     QJsonObject updateInfo() const { return m_updateInfo; }
     Q_SIGNAL void updateInfoChanged();
 

@@ -30,7 +30,11 @@ public:
     explicit AbstractQObjectListModel(QObject *parent = nullptr);
     ~AbstractQObjectListModel() { }
 
-    Q_PROPERTY(int objectCount READ objectCount NOTIFY objectCountChanged)
+    // clang-format off
+    Q_PROPERTY(int objectCount
+               READ objectCount
+               NOTIFY objectCountChanged)
+    // clang-format on
     virtual int objectCount() const = 0;
     Q_SIGNAL void objectCountChanged();
 
@@ -289,43 +293,72 @@ public:
     explicit SortFilterObjectListModel(QObject *parent = nullptr);
     ~SortFilterObjectListModel() { }
 
-    Q_PROPERTY(int objectCount READ objectCount NOTIFY objectCountChanged)
+    // clang-format off
+    Q_PROPERTY(int objectCount
+               READ objectCount
+               NOTIFY objectCountChanged)
+    // clang-format on
     int objectCount() const { return this->rowCount(QModelIndex()); }
     Q_SIGNAL void objectCountChanged();
 
-    Q_PROPERTY(QByteArray sortByProperty READ sortByProperty WRITE setSortByProperty NOTIFY
-                       sortByPropertyChanged)
+    // clang-format off
+    Q_PROPERTY(QByteArray sortByProperty
+               READ sortByProperty
+               WRITE setSortByProperty
+               NOTIFY sortByPropertyChanged)
+    // clang-format on
     void setSortByProperty(const QByteArray &val);
     QByteArray sortByProperty() const { return m_sortByProperty; }
     Q_SIGNAL void sortByPropertyChanged();
 
-    Q_PROPERTY(QByteArray filterByProperty READ filterByProperty WRITE setFilterByProperty NOTIFY
-                       filterByPropertyChanged)
+    // clang-format off
+    Q_PROPERTY(QByteArray filterByProperty
+               READ filterByProperty
+               WRITE setFilterByProperty
+               NOTIFY filterByPropertyChanged)
+    // clang-format on
     void setFilterByProperty(const QByteArray &val);
     QByteArray filterByProperty() const { return m_filterByProperty; }
     Q_SIGNAL void filterByPropertyChanged();
 
-    Q_PROPERTY(QVariantList filterValues READ filterValues WRITE setFilterValues NOTIFY
-                       filterValuesChanged)
+    // clang-format off
+    Q_PROPERTY(QVariantList filterValues
+               READ filterValues
+               WRITE setFilterValues
+               NOTIFY filterValuesChanged)
+    // clang-format on
     void setFilterValues(const QVariantList &val);
     QVariantList filterValues() const { return m_filterValues; }
     Q_SIGNAL void filterValuesChanged();
 
     enum FilterMode { IncludeFilterValues, ExcludeFilterValues };
     Q_ENUM(FilterMode)
-    Q_PROPERTY(FilterMode filterMode READ filterMode WRITE setFilterMode NOTIFY filterModeChanged)
+    // clang-format off
+    Q_PROPERTY(FilterMode filterMode
+               READ filterMode
+               WRITE setFilterMode
+               NOTIFY filterModeChanged)
+    // clang-format on
     void setFilterMode(FilterMode val);
     FilterMode filterMode() const { return m_filterMode; }
     Q_SIGNAL void filterModeChanged();
 
-    Q_PROPERTY(QJSValue sortFunction READ sortFunction WRITE setSortFunction NOTIFY
-                       sortFunctionChanged)
+    // clang-format off
+    Q_PROPERTY(QJSValue sortFunction
+               READ sortFunction
+               WRITE setSortFunction
+               NOTIFY sortFunctionChanged)
+    // clang-format on
     void setSortFunction(const QJSValue &val);
     QJSValue sortFunction() const { return m_sortFunction; }
     Q_SIGNAL void sortFunctionChanged();
 
-    Q_PROPERTY(QJSValue filterFunction READ filterFunction WRITE setFilterFunction NOTIFY
-                       filterFunctionChanged)
+    // clang-format off
+    Q_PROPERTY(QJSValue filterFunction
+               READ filterFunction
+               WRITE setFilterFunction
+               NOTIFY filterFunctionChanged)
+    // clang-format on
     void setFilterFunction(const QJSValue &val);
     QJSValue filterFunction() const { return m_filterFunction; }
     Q_SIGNAL void filterFunctionChanged();

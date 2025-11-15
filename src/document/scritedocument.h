@@ -42,7 +42,11 @@ class StructureElementConnectors : public QAbstractListModel
 public:
     ~StructureElementConnectors();
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    // clang-format off
+    Q_PROPERTY(int count
+               READ count
+               NOTIFY countChanged)
+    // clang-format on
     int count() const { return m_items.size(); }
     Q_SIGNAL void countChanged();
 
@@ -85,11 +89,19 @@ class ScriteDocumentBackups : public QAbstractListModel
 public:
     ~ScriteDocumentBackups();
 
-    Q_PROPERTY(QString documentFilePath READ documentFilePath NOTIFY documentFilePathChanged)
+    // clang-format off
+    Q_PROPERTY(QString documentFilePath
+               READ documentFilePath
+               NOTIFY documentFilePathChanged)
+    // clang-format on
     QString documentFilePath() const { return m_documentFilePath; }
     Q_SIGNAL void documentFilePathChanged();
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    // clang-format off
+    Q_PROPERTY(int count
+               READ count
+               NOTIFY countChanged)
+    // clang-format on
     int count() const { return m_backupFiles.size(); }
     Q_SIGNAL void countChanged();
 
@@ -148,7 +160,12 @@ public:
     explicit ScriteDocumentCollaborators(QObject *parent = nullptr);
     ~ScriteDocumentCollaborators();
 
-    Q_PROPERTY(ScriteDocument *document READ document WRITE setDocument NOTIFY documentChanged)
+    // clang-format off
+    Q_PROPERTY(ScriteDocument *document
+               READ document
+               WRITE setDocument
+               NOTIFY documentChanged)
+    // clang-format on
     void setDocument(ScriteDocument *val);
     ScriteDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
@@ -183,108 +200,193 @@ class PageSetup : public QObject
 public:
     ~PageSetup();
 
-    Q_PROPERTY(
-            bool usingFactoryDefaults READ usingFactoryDefaults NOTIFY usingFactoryDefaultsChanged)
+    // clang-format off
+    Q_PROPERTY(bool usingFactoryDefaults
+               READ usingFactoryDefaults
+               NOTIFY usingFactoryDefaultsChanged)
+    // clang-format on
     bool usingFactoryDefaults() const { return m_isFactoryDefaults; }
     Q_SIGNAL void usingFactoryDefaultsChanged();
 
-    Q_PROPERTY(bool usingSavedDefaults READ usingSavedDefaults NOTIFY usingSavedDefaultsChanged)
+    // clang-format off
+    Q_PROPERTY(bool usingSavedDefaults
+               READ usingSavedDefaults
+               NOTIFY usingSavedDefaultsChanged)
+    // clang-format on
     bool usingSavedDefaults() const { return m_isSavedDefaults; }
     Q_SIGNAL void usingSavedDefaultsChanged();
 
     // must be in one of ScreenplayPageLayout::PageSize
-    Q_PROPERTY(int paperSize READ paperSize WRITE setPaperSize NOTIFY paperSizeChanged)
+    // clang-format off
+    Q_PROPERTY(int paperSize
+               READ paperSize
+               WRITE setPaperSize
+               NOTIFY paperSizeChanged)
+    // clang-format on
     void setPaperSize(int val);
     int paperSize() const { return m_paperSize; }
     Q_SIGNAL void paperSizeChanged();
 
     // Must be one of HeaderFooter::Field
-    Q_PROPERTY(int headerLeft READ headerLeft WRITE setHeaderLeft NOTIFY headerLeftChanged)
+    // clang-format off
+    Q_PROPERTY(int headerLeft
+               READ headerLeft
+               WRITE setHeaderLeft
+               NOTIFY headerLeftChanged)
+    // clang-format on
     void setHeaderLeft(int val);
     int headerLeft() const { return m_headerLeft; }
     Q_SIGNAL void headerLeftChanged();
 
-    Q_PROPERTY(int headerCenter READ headerCenter WRITE setHeaderCenter NOTIFY headerCenterChanged)
+    // clang-format off
+    Q_PROPERTY(int headerCenter
+               READ headerCenter
+               WRITE setHeaderCenter
+               NOTIFY headerCenterChanged)
+    // clang-format on
     void setHeaderCenter(int val);
     int headerCenter() const { return m_headerCenter; }
     Q_SIGNAL void headerCenterChanged();
 
-    Q_PROPERTY(int headerRight READ headerRight WRITE setHeaderRight NOTIFY headerRightChanged)
+    // clang-format off
+    Q_PROPERTY(int headerRight
+               READ headerRight
+               WRITE setHeaderRight
+               NOTIFY headerRightChanged)
+    // clang-format on
     void setHeaderRight(int val);
     int headerRight() const { return m_headerRight; }
     Q_SIGNAL void headerRightChanged();
 
-    Q_PROPERTY(qreal headerOpacity READ headerOpacity WRITE setHeaderOpacity NOTIFY
-                       headerOpacityChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal headerOpacity
+               READ headerOpacity
+               WRITE setHeaderOpacity
+               NOTIFY headerOpacityChanged
+               STORED false)
+    // clang-format on
     void setHeaderOpacity(qreal val);
     qreal headerOpacity() const { return m_headerOpacity; }
     Q_SIGNAL void headerOpacityChanged();
 
-    Q_PROPERTY(int footerLeft READ footerLeft WRITE setFooterLeft NOTIFY footerLeftChanged)
+    // clang-format off
+    Q_PROPERTY(int footerLeft
+               READ footerLeft
+               WRITE setFooterLeft
+               NOTIFY footerLeftChanged)
+    // clang-format on
     void setFooterLeft(int val);
     int footerLeft() const { return m_footerLeft; }
     Q_SIGNAL void footerLeftChanged();
 
-    Q_PROPERTY(int footerCenter READ footerCenter WRITE setFooterCenter NOTIFY footerCenterChanged)
+    // clang-format off
+    Q_PROPERTY(int footerCenter
+               READ footerCenter
+               WRITE setFooterCenter
+               NOTIFY footerCenterChanged)
+    // clang-format on
     void setFooterCenter(int val);
     int footerCenter() const { return m_footerCenter; }
     Q_SIGNAL void footerCenterChanged();
 
-    Q_PROPERTY(int footerRight READ footerRight WRITE setFooterRight NOTIFY footerRightChanged)
+    // clang-format off
+    Q_PROPERTY(int footerRight
+               READ footerRight
+               WRITE setFooterRight
+               NOTIFY footerRightChanged)
+    // clang-format on
     void setFooterRight(int val);
     int footerRight() const { return m_footerRight; }
     Q_SIGNAL void footerRightChanged();
 
-    Q_PROPERTY(qreal footerOpacity READ footerOpacity WRITE setFooterOpacity NOTIFY
-                       footerOpacityChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal footerOpacity
+               READ footerOpacity
+               WRITE setFooterOpacity
+               NOTIFY footerOpacityChanged
+               STORED false)
+    // clang-format on
     void setFooterOpacity(qreal val);
     qreal footerOpacity() const { return m_footerOpacity; }
     Q_SIGNAL void footerOpacityChanged();
 
-    Q_PROPERTY(bool watermarkEnabled READ isWatermarkEnabled WRITE setWatermarkEnabled NOTIFY
-                       watermarkEnabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool watermarkEnabled
+               READ isWatermarkEnabled
+               WRITE setWatermarkEnabled
+               NOTIFY watermarkEnabledChanged)
+    // clang-format on
     void setWatermarkEnabled(bool val);
     bool isWatermarkEnabled() const { return m_watermarkEnabled; }
     Q_SIGNAL void watermarkEnabledChanged();
 
-    Q_PROPERTY(QString watermarkText READ watermarkText WRITE setWatermarkText NOTIFY
-                       watermarkTextChanged)
+    // clang-format off
+    Q_PROPERTY(QString watermarkText
+               READ watermarkText
+               WRITE setWatermarkText
+               NOTIFY watermarkTextChanged)
+    // clang-format on
     void setWatermarkText(const QString &val);
     QString watermarkText() const { return m_watermarkText; }
     Q_SIGNAL void watermarkTextChanged();
 
-    Q_PROPERTY(QString watermarkFont READ watermarkFont WRITE setWatermarkFont NOTIFY
-                       watermarkFontChanged)
+    // clang-format off
+    Q_PROPERTY(QString watermarkFont
+               READ watermarkFont
+               WRITE setWatermarkFont
+               NOTIFY watermarkFontChanged)
+    // clang-format on
     void setWatermarkFont(const QString &val);
     QString watermarkFont() const { return m_watermarkFont; }
     Q_SIGNAL void watermarkFontChanged();
 
-    Q_PROPERTY(int watermarkFontSize READ watermarkFontSize WRITE setWatermarkFontSize NOTIFY
-                       watermarkFontSizeChanged)
+    // clang-format off
+    Q_PROPERTY(int watermarkFontSize
+               READ watermarkFontSize
+               WRITE setWatermarkFontSize
+               NOTIFY watermarkFontSizeChanged)
+    // clang-format on
     void setWatermarkFontSize(int val);
     int watermarkFontSize() const { return m_watermarkFontSize; }
     Q_SIGNAL void watermarkFontSizeChanged();
 
-    Q_PROPERTY(QColor watermarkColor READ watermarkColor WRITE setWatermarkColor NOTIFY
-                       watermarkColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor watermarkColor
+               READ watermarkColor
+               WRITE setWatermarkColor
+               NOTIFY watermarkColorChanged)
+    // clang-format on
     void setWatermarkColor(const QColor &val);
     QColor watermarkColor() const { return m_watermarkColor; }
     Q_SIGNAL void watermarkColorChanged();
 
-    Q_PROPERTY(qreal watermarkOpacity READ watermarkOpacity WRITE setWatermarkOpacity NOTIFY
-                       watermarkOpacityChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal watermarkOpacity
+               READ watermarkOpacity
+               WRITE setWatermarkOpacity
+               NOTIFY watermarkOpacityChanged
+               STORED false)
+    // clang-format on
     void setWatermarkOpacity(qreal val);
     qreal watermarkOpacity() const { return m_watermarkOpacity; }
     Q_SIGNAL void watermarkOpacityChanged();
 
-    Q_PROPERTY(int watermarkRotation READ watermarkRotation WRITE setWatermarkRotation NOTIFY
-                       watermarkRotationChanged)
+    // clang-format off
+    Q_PROPERTY(int watermarkRotation
+               READ watermarkRotation
+               WRITE setWatermarkRotation
+               NOTIFY watermarkRotationChanged)
+    // clang-format on
     void setWatermarkRotation(int val);
     int watermarkRotation() const { return m_watermarkRotation; }
     Q_SIGNAL void watermarkRotationChanged();
 
-    Q_PROPERTY(int watermarkAlignment READ watermarkAlignment WRITE setWatermarkAlignment NOTIFY
-                       watermarkAlignmentChanged)
+    // clang-format off
+    Q_PROPERTY(int watermarkAlignment
+               READ watermarkAlignment
+               WRITE setWatermarkAlignment
+               NOTIFY watermarkAlignmentChanged)
+    // clang-format on
     void setWatermarkAlignment(int val);
     int watermarkAlignment() const { return m_watermarkAlignment; }
     Q_SIGNAL void watermarkAlignmentChanged();
@@ -342,31 +444,56 @@ public:
     ~ScriteDocument();
     Q_SIGNAL void aboutToDelete(ScriteDocument *doc);
 
-    Q_PROPERTY(bool readOnly READ isReadOnly NOTIFY readOnlyChanged)
+    // clang-format off
+    Q_PROPERTY(bool readOnly
+               READ isReadOnly
+               NOTIFY readOnlyChanged)
+    // clang-format on
     bool isReadOnly() const { return m_readOnly; }
     Q_SIGNAL void readOnlyChanged();
 
-    Q_PROPERTY(bool locked READ isLocked WRITE setLocked NOTIFY lockedChanged)
+    // clang-format off
+    Q_PROPERTY(bool locked
+               READ isLocked
+               WRITE setLocked
+               NOTIFY lockedChanged)
+    // clang-format on
     void setLocked(bool val);
     bool isLocked() const { return m_locked; }
     Q_SIGNAL void lockedChanged();
 
-    Q_PROPERTY(bool empty READ isEmpty NOTIFY emptyChanged)
+    // clang-format off
+    Q_PROPERTY(bool empty
+               READ isEmpty
+               NOTIFY emptyChanged)
+    // clang-format on
     bool isEmpty() const;
     Q_SIGNAL void emptyChanged();
 
-    Q_PROPERTY(QString documentId READ documentId NOTIFY documentIdChanged)
+    // clang-format off
+    Q_PROPERTY(QString documentId
+               READ documentId
+               NOTIFY documentIdChanged)
+    // clang-format on
     QString documentId() const { return m_documentId; }
     Q_SIGNAL void documentIdChanged();
 
     // Will be true of the currently open scrite document is from Scriptalay's
     // script library.
-    Q_PROPERTY(bool fromScriptalay READ isFromScriptalay NOTIFY fromScriptalayChanged)
+    // clang-format off
+    Q_PROPERTY(bool fromScriptalay
+               READ isFromScriptalay
+               NOTIFY fromScriptalayChanged)
+    // clang-format on
     void setFromScriptalay(bool val);
     bool isFromScriptalay() const { return m_fromScriptalay; }
     Q_SIGNAL void fromScriptalayChanged();
 
-    Q_PROPERTY(QString sessionId READ sessionId NOTIFY sessionIdChanged)
+    // clang-format off
+    Q_PROPERTY(QString sessionId
+               READ sessionId
+               NOTIFY sessionIdChanged)
+    // clang-format on
     QString sessionId() const { return m_sessionId; }
     Q_SIGNAL void sessionIdChanged();
 
@@ -374,26 +501,46 @@ public:
     // When this list is empty, anybody can alter the list.
     // When not empty, it can be altered only by the first collaborator in
     // the list. This attribute cannot be altered unless there is a User login.
-    Q_PROPERTY(QStringList collaborators READ collaborators WRITE setCollaborators NOTIFY
-                       collaboratorsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QStringList collaborators
+               READ collaborators
+               WRITE setCollaborators
+               NOTIFY collaboratorsChanged
+               STORED false)
+    // clang-format on
     void setCollaborators(const QStringList &val);
     QStringList collaborators() const { return m_collaborators; }
     Q_SIGNAL void collaboratorsChanged();
 
-    Q_PROPERTY(bool hasCollaborators READ hasCollaborators NOTIFY collaboratorsChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasCollaborators
+               READ hasCollaborators
+               NOTIFY collaboratorsChanged)
+    // clang-format on
     bool hasCollaborators() const { return !m_collaborators.isEmpty(); }
 
-    Q_PROPERTY(QString primaryCollaborator READ primaryCollaborator NOTIFY collaboratorsChanged)
+    // clang-format off
+    Q_PROPERTY(QString primaryCollaborator
+               READ primaryCollaborator
+               NOTIFY collaboratorsChanged)
+    // clang-format on
     QString primaryCollaborator() const
     {
         return m_collaborators.isEmpty() ? QString() : m_collaborators.first();
     }
 
-    Q_PROPERTY(QStringList otherCollaborators READ otherCollaborators NOTIFY collaboratorsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList otherCollaborators
+               READ otherCollaborators
+               NOTIFY collaboratorsChanged)
+    // clang-format on
     QStringList otherCollaborators() const { return m_collaborators.mid(1); }
 
-    Q_PROPERTY(bool canModifyCollaborators READ canModifyCollaborators NOTIFY
-                       canModifyCollaboratorsChanged)
+    // clang-format off
+    Q_PROPERTY(bool canModifyCollaborators
+               READ canModifyCollaborators
+               NOTIFY canModifyCollaboratorsChanged)
+    // clang-format on
     bool canModifyCollaborators() const;
     Q_SIGNAL void canModifyCollaboratorsChanged();
 
@@ -402,72 +549,130 @@ public:
     Q_INVOKABLE void enableCollaboration();
     Q_INVOKABLE void disableCollaboration();
 
-    Q_PROPERTY(int autoSaveDurationInSeconds READ autoSaveDurationInSeconds WRITE
-                       setAutoSaveDurationInSeconds NOTIFY autoSaveDurationInSecondsChanged
-                               STORED false)
+    // clang-format off
+    Q_PROPERTY(int autoSaveDurationInSeconds
+               READ autoSaveDurationInSeconds
+               WRITE setAutoSaveDurationInSeconds
+               NOTIFY autoSaveDurationInSecondsChanged
+               STORED false)
+    // clang-format on
     void setAutoSaveDurationInSeconds(int val);
     int autoSaveDurationInSeconds() const { return m_autoSaveDurationInSeconds; }
     Q_SIGNAL void autoSaveDurationInSecondsChanged();
 
-    Q_PROPERTY(bool autoSave READ isAutoSave WRITE setAutoSave NOTIFY autoSaveChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(bool autoSave
+               READ isAutoSave
+               WRITE setAutoSave
+               NOTIFY autoSaveChanged
+               STORED false)
+    // clang-format on
     void setAutoSave(bool val);
     bool isAutoSave() const { return m_autoSave; }
     Q_SIGNAL void autoSaveChanged();
 
-    Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(bool busy
+               READ isBusy
+               NOTIFY busyChanged
+               STORED false)
+    // clang-format on
     void setBusy(bool val);
     bool isBusy() const { return m_busy; }
     Q_SIGNAL void busyChanged();
 
-    Q_PROPERTY(QString busyMessage READ busyMessage NOTIFY busyMessageChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QString busyMessage
+               READ busyMessage
+               NOTIFY busyMessageChanged
+               STORED false)
+    // clang-format on
     Q_INVOKABLE void setBusyMessage(const QString &val);
     QString busyMessage() const { return m_busyMessage; }
     Q_SIGNAL void busyMessageChanged();
 
     Q_INVOKABLE void clearBusyMessage() { this->setBusyMessage(QString()); }
 
-    Q_PROPERTY(
-            QString documentWindowTitle READ documentWindowTitle NOTIFY documentWindowTitleChanged)
+    // clang-format off
+    Q_PROPERTY(QString documentWindowTitle
+               READ documentWindowTitle
+               NOTIFY documentWindowTitleChanged)
+    // clang-format on
     QString documentWindowTitle() const { return m_documentWindowTitle; }
     Q_SIGNAL void documentWindowTitleChanged(const QString &val);
 
-    Q_PROPERTY(Forms *forms READ forms NOTIFY formsChanged)
+    // clang-format off
+    Q_PROPERTY(Forms *forms
+               READ forms
+               NOTIFY formsChanged)
+    // clang-format on
     Forms *forms() const { return m_forms; }
     Q_SIGNAL void formsChanged();
 
-    Q_PROPERTY(Structure *structure READ structure NOTIFY structureChanged)
+    // clang-format off
+    Q_PROPERTY(Structure *structure
+               READ structure
+               NOTIFY structureChanged)
+    // clang-format on
     Structure *structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
 
-    Q_PROPERTY(Screenplay *screenplay READ screenplay NOTIFY screenplayChanged)
+    // clang-format off
+    Q_PROPERTY(Screenplay *screenplay
+               READ screenplay
+               NOTIFY screenplayChanged)
+    // clang-format on
     Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
-    Q_PROPERTY(
-            ScreenplayFormat *displayFormat READ formatting NOTIFY formattingChanged STORED false)
-    Q_PROPERTY(ScreenplayFormat *formatting READ formatting NOTIFY formattingChanged)
+    // clang-format off
+    Q_PROPERTY(ScreenplayFormat *displayFormat
+               READ formatting
+               NOTIFY formattingChanged
+               STORED false)
+    Q_PROPERTY(ScreenplayFormat *formatting
+               READ formatting
+               NOTIFY formattingChanged)
+    // clang-format on
     ScreenplayFormat *formatting() const { return m_formatting; }
     Q_SIGNAL void formattingChanged();
 
-    Q_PROPERTY(ScreenplayFormat *printFormat READ printFormat NOTIFY printFormatChanged)
+    // clang-format off
+    Q_PROPERTY(ScreenplayFormat *printFormat
+               READ printFormat
+               NOTIFY printFormatChanged)
+    // clang-format on
     ScreenplayFormat *printFormat() const { return m_printFormat; }
     Q_SIGNAL void printFormatChanged();
 
-    Q_PROPERTY(QStringList spellCheckIgnoreList READ spellCheckIgnoreList WRITE
-                       setSpellCheckIgnoreList NOTIFY spellCheckIgnoreListChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList spellCheckIgnoreList
+               READ spellCheckIgnoreList
+               WRITE setSpellCheckIgnoreList
+               NOTIFY spellCheckIgnoreListChanged)
+    // clang-format on
     void setSpellCheckIgnoreList(const QStringList &val);
     QStringList spellCheckIgnoreList() const { return m_spellCheckIgnoreList; }
     Q_SIGNAL void spellCheckIgnoreListChanged();
 
     Q_INVOKABLE void addToSpellCheckIgnoreList(const QString &word);
 
-    Q_PROPERTY(Forms *globalForms READ globalForms CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(Forms *globalForms
+               READ globalForms
+               CONSTANT STORED
+               false )
+    // clang-format on
     Forms *globalForms() const;
 
     Form *requestForm(const QString &id);
     void releaseForm(Form *form);
 
-    Q_PROPERTY(PageSetup *pageSetup READ pageSetup NOTIFY pageSetupChanged)
+    // clang-format off
+    Q_PROPERTY(PageSetup *pageSetup
+               READ pageSetup
+               NOTIFY pageSetupChanged)
+    // clang-format on
     PageSetup *pageSetup() const { return m_pageSetup; }
     Q_SIGNAL void pageSetupChanged();
 
@@ -476,43 +681,74 @@ public:
     Q_INVOKABLE Scene *createNewScene(bool fuzzyScreenplayInsert = true);
     Q_SIGNAL void newSceneCreated(Scene *scene, int screenplayIndex);
 
-    Q_PROPERTY(bool modified READ isModified NOTIFY modifiedChanged)
+    // clang-format off
+    Q_PROPERTY(bool modified
+               READ isModified
+               NOTIFY modifiedChanged)
+    // clang-format on
     bool isModified() const { return m_modified; }
     Q_SIGNAL void modifiedChanged();
     Q_SIGNAL void documentChanged();
 
-    Q_PROPERTY(QString fileName READ fileName NOTIFY fileNameChanged)
+    // clang-format off
+    Q_PROPERTY(QString fileName
+               READ fileName
+               NOTIFY fileNameChanged)
+    // clang-format on
     QString fileName() const { return m_fileName; }
     Q_SIGNAL void fileNameChanged();
 
-    Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged)
+    // clang-format off
+    Q_PROPERTY(bool loading
+               READ isLoading
+               NOTIFY loadingChanged)
+    // clang-format on
     bool isLoading() const { return m_loading; }
     Q_SIGNAL void loadingChanged();
 
-    Q_PROPERTY(QJsonObject userData READ userData WRITE setUserData NOTIFY userDataChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject userData
+               READ userData
+               WRITE setUserData
+               NOTIFY userDataChanged)
+    // clang-format on
     void setUserData(const QJsonObject &val);
     QJsonObject userData() const { return m_userData; }
     Q_SIGNAL void userDataChanged();
 
-    Q_PROPERTY(QJsonArray bookmarkedNotes READ bookmarkedNotes WRITE setBookmarkedNotes NOTIFY
-                       bookmarkedNotesChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonArray bookmarkedNotes
+               READ bookmarkedNotes
+               WRITE setBookmarkedNotes
+               NOTIFY bookmarkedNotesChanged)
+    // clang-format on
     void setBookmarkedNotes(const QJsonArray &val);
     QJsonArray bookmarkedNotes() const { return m_bookmarkedNotes; }
     Q_SIGNAL void bookmarkedNotesChanged();
 
-    Q_PROPERTY(bool isCreatedOnThisComputer READ isCreatedOnThisComputer NOTIFY
-                       createdOnThisComputerChanged)
+    // clang-format off
+    Q_PROPERTY(bool isCreatedOnThisComputer
+               READ isCreatedOnThisComputer
+               NOTIFY createdOnThisComputerChanged)
+    // clang-format on
     bool isCreatedOnThisComputer() const { return m_createdOnThisComputer; }
     Q_SIGNAL void createdOnThisComputerChanged();
 
-    Q_PROPERTY(int maxBackupCount READ maxBackupCount WRITE setMaxBackupCount NOTIFY
-                       maxBackupCountChanged)
+    // clang-format off
+    Q_PROPERTY(int maxBackupCount
+               READ maxBackupCount
+               WRITE setMaxBackupCount
+               NOTIFY maxBackupCountChanged)
+    // clang-format on
     void setMaxBackupCount(int val);
     int maxBackupCount() const { return m_maxBackupCount; }
     Q_SIGNAL void maxBackupCountChanged();
 
-    Q_PROPERTY(bool canImportFromClipboard READ canImportFromClipboard NOTIFY
-                       canImportFromClipboardChanged)
+    // clang-format off
+    Q_PROPERTY(bool canImportFromClipboard
+               READ canImportFromClipboard
+               NOTIFY canImportFromClipboardChanged)
+    // clang-format on
     bool canImportFromClipboard() const;
     Q_SIGNAL void canImportFromClipboardChanged();
 
@@ -537,26 +773,51 @@ public:
     Q_SIGNAL void openedAnonymously(const QString &fileName);
     Q_SIGNAL void requiresReload();
 
-    Q_PROPERTY(QAbstractListModel *backupFilesModel READ backupFilesModel CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(QAbstractListModel *backupFilesModel
+               READ backupFilesModel
+               CONSTANT STORED
+               false )
+    // clang-format on
     ScriteDocumentBackups *backupFilesModel() const
     {
         return &((const_cast<ScriteDocument *>(this))->m_documentBackupsModel);
     }
 
-    Q_PROPERTY(QStringList supportedImportFormats READ supportedImportFormats CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QStringList supportedImportFormats
+               READ supportedImportFormats
+               CONSTANT )
+    // clang-format on
     QStringList supportedImportFormats() const;
     Q_INVOKABLE QString importFormatFileSuffix(const QString &format) const;
 
-    Q_PROPERTY(QJsonArray supportedExportFormats READ supportedExportFormats CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QJsonArray supportedExportFormats
+               READ supportedExportFormats
+               CONSTANT )
+    // clang-format on
     QJsonArray supportedExportFormats() const;
 
-    Q_PROPERTY(QJsonArray supportedReports READ supportedReports CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QJsonArray supportedReports
+               READ supportedReports
+               CONSTANT )
+    // clang-format on
     QJsonArray supportedReports() const;
 
-    Q_PROPERTY(QJsonArray characterListReports READ characterListReports CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QJsonArray characterListReports
+               READ characterListReports
+               CONSTANT )
+    // clang-format on
     QJsonArray characterListReports() const;
 
-    Q_PROPERTY(QJsonArray sceneListReports READ sceneListReports CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QJsonArray sceneListReports
+               READ sceneListReports
+               CONSTANT )
+    // clang-format on
     QJsonArray sceneListReports() const;
 
     Q_INVOKABLE QString reportFileSuffix() const;
@@ -573,8 +834,12 @@ public:
     void setupExporter(AbstractExporter *exporter);
     void setupReportGenerator(AbstractReportGenerator *reportGenerator);
 
-    Q_PROPERTY(QAbstractListModel *structureElementConnectors READ structureElementConnectors
-                       CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(QAbstractListModel *structureElementConnectors
+               READ structureElementConnectors
+               CONSTANT STORED
+               false )
+    // clang-format on
     QAbstractListModel *structureElementConnectors() const;
 
     void clearModified();

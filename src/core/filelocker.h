@@ -57,7 +57,12 @@ public:
     explicit FileLocker(QObject *parent = nullptr);
     ~FileLocker();
 
-    Q_PROPERTY(QString filePath READ filePath WRITE setFilePath NOTIFY filePathChanged)
+    // clang-format off
+    Q_PROPERTY(QString filePath
+               READ filePath
+               WRITE setFilePath
+               NOTIFY filePathChanged)
+    // clang-format on
     void setFilePath(const QString &val);
     QString filePath() const { return m_filePath; }
     Q_SIGNAL void filePathChanged();
@@ -65,24 +70,45 @@ public:
     QString lockFilePath() const { return m_lockFilePath; }
 
     enum Strategy { MultipleReadSingleWrite, SingleReadSingleWrite };
-    Q_PROPERTY(Strategy strategy READ strategy WRITE setStrategy NOTIFY strategyChanged)
+    // clang-format off
+    Q_PROPERTY(Strategy strategy
+               READ strategy
+               WRITE setStrategy
+               NOTIFY strategyChanged)
+    // clang-format on
     void setStrategy(Strategy val);
     Strategy strategy() const { return m_strategy; }
     Q_SIGNAL void strategyChanged();
 
-    Q_PROPERTY(bool canRead READ canRead NOTIFY canReadChanged)
+    // clang-format off
+    Q_PROPERTY(bool canRead
+               READ canRead
+               NOTIFY canReadChanged)
+    // clang-format on
     bool canRead() const { return m_canRead; }
     Q_SIGNAL void canReadChanged();
 
-    Q_PROPERTY(bool canWrite READ canWrite NOTIFY canWriteChanged)
+    // clang-format off
+    Q_PROPERTY(bool canWrite
+               READ canWrite
+               NOTIFY canWriteChanged)
+    // clang-format on
     bool canWrite() const { return m_canWrite; }
     Q_SIGNAL void canWriteChanged();
 
-    Q_PROPERTY(QJsonObject lockInfo READ lockInfo NOTIFY lockInfoChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject lockInfo
+               READ lockInfo
+               NOTIFY lockInfoChanged)
+    // clang-format on
     QJsonObject lockInfo() const { return m_lockInfo; }
     Q_SIGNAL void lockInfoChanged();
 
-    Q_PROPERTY(bool claimed READ isClaimed NOTIFY claimedChanged)
+    // clang-format off
+    Q_PROPERTY(bool claimed
+               READ isClaimed
+               NOTIFY claimedChanged)
+    // clang-format on
     bool isClaimed() const { return m_claimed; }
     Q_SIGNAL void claimedChanged();
 

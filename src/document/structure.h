@@ -56,96 +56,198 @@ public:
 
     Q_INVOKABLE StructureElement *duplicate();
 
-    Q_PROPERTY(Structure *structure READ structure CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(Structure *structure
+               READ structure
+               CONSTANT STORED
+               false )
+    // clang-format on
     Structure *structure() const { return m_structure; }
 
-    Q_PROPERTY(qreal x READ x WRITE setX NOTIFY xChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal x
+               READ x
+               WRITE setX
+               NOTIFY xChanged
+               STORED false)
+    // clang-format on
     void setX(qreal val);
     qreal x() const { return m_x; }
     Q_SIGNAL void xChanged();
 
-    Q_PROPERTY(qreal y READ y WRITE setY NOTIFY yChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal y
+               READ y
+               WRITE setY
+               NOTIFY yChanged
+               STORED false)
+    // clang-format on
     void setY(qreal val);
     qreal y() const { return m_y; }
     Q_SIGNAL void yChanged();
 
-    Q_PROPERTY(qreal width READ width WRITE setWidth NOTIFY widthChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal width
+               READ width
+               WRITE setWidth
+               NOTIFY widthChanged
+               STORED false)
+    // clang-format on
     void setWidth(qreal val);
     qreal width() const { return m_width; }
     Q_SIGNAL void widthChanged();
 
-    Q_PROPERTY(qreal height READ height WRITE setHeight NOTIFY heightChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal height
+               READ height
+               WRITE setHeight
+               NOTIFY heightChanged
+               STORED false)
+    // clang-format on
     void setHeight(qreal val);
     qreal height() const { return m_height; }
     Q_SIGNAL void heightChanged();
 
-    Q_PROPERTY(QRectF geometry READ geometry NOTIFY geometryChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF geometry
+               READ geometry
+               NOTIFY geometryChanged)
+    // clang-format on
     QRectF geometry() const { return QRectF(m_x, m_y, m_width, m_height); }
     Q_SIGNAL void geometryChanged();
 
-    Q_PROPERTY(QQuickItem *follow READ follow WRITE setFollow NOTIFY followChanged RESET resetFollow
-                       STORED false)
+    // clang-format off
+    Q_PROPERTY(QQuickItem *follow
+               READ follow
+               WRITE setFollow
+               NOTIFY followChanged
+               RESET resetFollow
+               STORED false)
+    // clang-format on
     void setFollow(QQuickItem *val);
     QQuickItem *follow() const { return m_follow; }
     Q_SIGNAL void followChanged();
 
-    Q_PROPERTY(bool undoRedoEnabled READ isUndoRedoEnabled WRITE setUndoRedoEnabled NOTIFY
-                       undoRedoEnabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool undoRedoEnabled
+               READ isUndoRedoEnabled
+               WRITE setUndoRedoEnabled
+               NOTIFY undoRedoEnabledChanged)
+    // clang-format on
     void setUndoRedoEnabled(bool val);
     bool isUndoRedoEnabled() const { return m_undoRedoEnabled; }
     Q_SIGNAL void undoRedoEnabledChanged();
 
-    Q_PROPERTY(bool syncWithFollow READ isSyncWithFollow WRITE setSyncWithFollow NOTIFY
-                       syncWithFollowChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(bool syncWithFollow
+               READ isSyncWithFollow
+               WRITE setSyncWithFollow
+               NOTIFY syncWithFollowChanged
+               STORED false)
+    // clang-format on
     void setSyncWithFollow(bool val);
     bool isSyncWithFollow() const { return m_syncWithFollow; }
     Q_SIGNAL void syncWithFollowChanged();
 
-    Q_PROPERTY(qreal xf READ xf WRITE setXf NOTIFY xfChanged)
+    // clang-format off
+    Q_PROPERTY(qreal xf
+               READ xf
+               WRITE setXf
+               NOTIFY xfChanged)
+    // clang-format on
     void setXf(qreal val);
     qreal xf() const;
     Q_SIGNAL void xfChanged();
 
-    Q_PROPERTY(qreal yf READ yf WRITE setYf NOTIFY yfChanged)
+    // clang-format off
+    Q_PROPERTY(qreal yf
+               READ yf
+               WRITE setYf
+               NOTIFY yfChanged)
+    // clang-format on
     void setYf(qreal val);
     qreal yf() const;
     Q_SIGNAL void yfChanged();
 
-    Q_PROPERTY(QPointF position READ position WRITE setPosition NOTIFY positionChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QPointF position
+               READ position
+               WRITE setPosition
+               NOTIFY positionChanged
+               STORED false)
+    // clang-format on
     void setPosition(const QPointF &pos);
     QPointF position() const { return QPointF(m_x, m_y); }
     Q_SIGNAL void positionChanged();
 
-    Q_PROPERTY(Scene *scene READ scene WRITE setScene NOTIFY sceneChanged)
+    // clang-format off
+    Q_PROPERTY(Scene *scene
+               READ scene
+               WRITE setScene
+               NOTIFY sceneChanged)
+    // clang-format on
     void setScene(Scene *val);
     Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    // clang-format off
+    Q_PROPERTY(QString title
+               READ title
+               WRITE setTitle
+               NOTIFY titleChanged)
+    // clang-format on
     void setTitle(const QString &val);
     QString title() const;
     Q_SIGNAL void titleChanged();
 
-    Q_PROPERTY(QString nativeTitle READ nativeTitle NOTIFY titleChanged)
+    // clang-format off
+    Q_PROPERTY(QString nativeTitle
+               READ nativeTitle
+               NOTIFY titleChanged)
+    // clang-format on
     QString nativeTitle() const { return m_title; }
 
-    Q_PROPERTY(bool hasTitle READ hasTitle NOTIFY titleChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasTitle
+               READ hasTitle
+               NOTIFY titleChanged)
+    // clang-format on
     bool hasTitle() const { return !this->title().isEmpty(); }
 
-    Q_PROPERTY(bool hasNativeTitle READ hasNativeTitle NOTIFY titleChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasNativeTitle
+               READ hasNativeTitle
+               NOTIFY titleChanged)
+    // clang-format on
     bool hasNativeTitle() const { return !m_title.isEmpty(); }
 
-    Q_PROPERTY(bool selected READ isSelected WRITE setSelected NOTIFY selectedChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(bool selected
+               READ isSelected
+               WRITE setSelected
+               NOTIFY selectedChanged
+               STORED false)
+    // clang-format on
     void setSelected(bool val);
     bool isSelected() const { return m_selected; }
     Q_SIGNAL void selectedChanged();
 
-    Q_PROPERTY(QString stackId READ stackId WRITE setStackId NOTIFY stackIdChanged)
+    // clang-format off
+    Q_PROPERTY(QString stackId
+               READ stackId
+               WRITE setStackId
+               NOTIFY stackIdChanged)
+    // clang-format on
     void setStackId(const QString &val);
     QString stackId() const { return m_stackId; }
     Q_SIGNAL void stackIdChanged();
 
-    Q_PROPERTY(bool stackLeader READ isStackLeader WRITE setStackLeader NOTIFY stackLeaderChanged)
+    // clang-format off
+    Q_PROPERTY(bool stackLeader
+               READ isStackLeader
+               WRITE setStackLeader
+               NOTIFY stackLeaderChanged)
+    // clang-format on
     void setStackLeader(bool val);
     bool isStackLeader() const { return m_stackLeader; }
     Q_SIGNAL void stackLeaderChanged();
@@ -202,31 +304,59 @@ public:
     void setEnabled(bool val) { m_enabled = val; }
     bool isEnabled() const { return m_enabled; }
 
-    Q_PROPERTY(QString stackId READ stackId NOTIFY stackIdChanged)
+    // clang-format off
+    Q_PROPERTY(QString stackId
+               READ stackId
+               NOTIFY stackIdChanged)
+    // clang-format on
     QString stackId() const { return m_stackId; }
     Q_SIGNAL void stackIdChanged();
 
-    Q_PROPERTY(int actIndex READ actIndex NOTIFY actIndexChanged)
+    // clang-format off
+    Q_PROPERTY(int actIndex
+               READ actIndex
+               NOTIFY actIndexChanged)
+    // clang-format on
     int actIndex() const { return m_actIndex; }
     Q_SIGNAL void actIndexChanged();
 
-    Q_PROPERTY(StructureElement *stackLeader READ stackLeader NOTIFY stackLeaderChanged)
+    // clang-format off
+    Q_PROPERTY(StructureElement *stackLeader
+               READ stackLeader
+               NOTIFY stackLeaderChanged)
+    // clang-format on
     StructureElement *stackLeader() const;
     Q_SIGNAL void stackLeaderChanged();
 
-    Q_PROPERTY(int topmostElementIndex READ topmostElementIndex NOTIFY topmostElementChanged)
+    // clang-format off
+    Q_PROPERTY(int topmostElementIndex
+               READ topmostElementIndex
+               NOTIFY topmostElementChanged)
+    // clang-format on
     int topmostElementIndex() const;
     Q_SIGNAL void topmostElementIndexChanged();
 
-    Q_PROPERTY(StructureElement *topmostElement READ topmostElement NOTIFY topmostElementChanged)
+    // clang-format off
+    Q_PROPERTY(StructureElement *topmostElement
+               READ topmostElement
+               NOTIFY topmostElementChanged)
+    // clang-format on
     StructureElement *topmostElement() const;
     Q_SIGNAL void topmostElementChanged();
 
-    Q_PROPERTY(bool hasCurrentElement READ isHasCurrentElement NOTIFY hasCurrentElementChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasCurrentElement
+               READ isHasCurrentElement
+               NOTIFY hasCurrentElementChanged)
+    // clang-format on
     bool isHasCurrentElement() const { return m_hasCurrentElement; }
     Q_SIGNAL void hasCurrentElementChanged();
 
-    Q_PROPERTY(QRectF geometry READ geometry NOTIFY geometryChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF geometry
+               READ geometry
+               NOTIFY geometryChanged)
+    // clang-format on
     QRectF geometry() const { return m_geometry; }
     Q_SIGNAL void geometryChanged();
 
@@ -276,7 +406,11 @@ public:
     explicit StructureElementStacks(QObject *parent = nullptr);
     ~StructureElementStacks();
 
-    Q_PROPERTY(Structure *structure READ structure CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Structure *structure
+               READ structure
+               CONSTANT )
+    // clang-format on
     Structure *structure() const { return m_structure; }
 
     Q_INVOKABLE StructureElementStack *findStackById(const QString &stackID) const;
@@ -313,32 +447,64 @@ public:
 
     enum Direction { OfWith, WithOf };
     Q_ENUM(Direction)
-    Q_PROPERTY(Direction direction READ direction WRITE setDirection NOTIFY directionChanged)
+    // clang-format off
+    Q_PROPERTY(Direction direction
+               READ direction
+               WRITE setDirection
+               NOTIFY directionChanged)
+    // clang-format on
     void setDirection(Direction val);
     Direction direction() const { return m_direction; }
     Q_SIGNAL void directionChanged();
 
     static QString polishName(const QString &name);
 
-    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    // clang-format off
+    Q_PROPERTY(QString name
+               READ name
+               WRITE setName
+               NOTIFY nameChanged)
+    // clang-format on
     void setName(const QString &val);
     QString name() const { return m_name; }
     Q_SIGNAL void nameChanged();
 
-    Q_PROPERTY(Character *withCharacter READ with WRITE setWith NOTIFY withChanged RESET resetWith
-                       STORED false)
-    Q_PROPERTY(
-            Character *with READ with WRITE setWith NOTIFY withChanged RESET resetWith STORED false)
+    // clang-format off
+    Q_PROPERTY(Character *withCharacter
+               READ with
+               WRITE setWith
+               NOTIFY withChanged
+               RESET resetWith
+               STORED false)
+    Q_PROPERTY(Character *with
+               READ with
+               WRITE setWith
+               NOTIFY withChanged
+               RESET resetWith
+               STORED false)
+    // clang-format on
     void setWith(Character *val);
     Character *with() const { return m_with; }
     Q_SIGNAL void withChanged();
 
-    Q_PROPERTY(Character *ofCharacter READ of NOTIFY ofChanged STORED false)
-    Q_PROPERTY(Character *of READ of NOTIFY ofChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(Character *ofCharacter
+               READ of
+               NOTIFY ofChanged
+               STORED false)
+    Q_PROPERTY(Character *of
+               READ of
+               NOTIFY ofChanged
+               STORED false)
+    // clang-format on
     Character *of() const { return m_of; }
     Q_SIGNAL void ofChanged();
 
-    Q_PROPERTY(Notes *notes READ notes CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Notes *notes
+               READ notes
+               CONSTANT )
+    // clang-format on
     Notes *notes() const { return m_notes; }
 
     Q_SIGNAL void relationshipChanged();
@@ -377,14 +543,30 @@ public:
     ~Character();
     Q_SIGNAL void aboutToDelete(Character *ptr);
 
-    Q_PROPERTY(Structure *structure READ structure CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(Structure *structure
+               READ structure
+               CONSTANT STORED
+               false )
+    // clang-format on
     Structure *structure() const { return m_structure; }
 
-    Q_PROPERTY(bool valid READ isValid NOTIFY nameChanged)
+    // clang-format off
+    Q_PROPERTY(bool valid
+               READ isValid
+               NOTIFY nameChanged)
+    // clang-format on
     bool isValid() const { return !m_name.isEmpty(); }
 
-    Q_PROPERTY(QString id READ name NOTIFY nameChanged)
-    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    // clang-format off
+    Q_PROPERTY(QString id
+               READ name
+               NOTIFY nameChanged)
+    Q_PROPERTY(QString name
+               READ name
+               WRITE setName
+               NOTIFY nameChanged)
+    // clang-format on
     void setName(const QString &val);
     QString name() const { return m_name; }
     Q_SIGNAL void nameChanged();
@@ -393,20 +575,38 @@ public:
 
     Q_INVOKABLE void clearRenameError();
 
-    Q_PROPERTY(QString renameError READ renameError NOTIFY renameErrorChanged)
+    // clang-format off
+    Q_PROPERTY(QString renameError
+               READ renameError
+               NOTIFY renameErrorChanged)
+    // clang-format on
     QString renameError() const { return m_renameError; }
     Q_SIGNAL void renameErrorChanged();
 
-    Q_PROPERTY(bool visibleOnNotebook READ isVisibleOnNotebook WRITE setVisibleOnNotebook NOTIFY
-                       visibleOnNotebookChanged)
+    // clang-format off
+    Q_PROPERTY(bool visibleOnNotebook
+               READ isVisibleOnNotebook
+               WRITE setVisibleOnNotebook
+               NOTIFY visibleOnNotebookChanged)
+    // clang-format on
     void setVisibleOnNotebook(bool val);
     bool isVisibleOnNotebook() const { return m_visibleOnNotebook; }
     Q_SIGNAL void visibleOnNotebookChanged();
 
-    Q_PROPERTY(Notes *notes READ notes CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Notes *notes
+               READ notes
+               CONSTANT )
+    // clang-format on
     Notes *notes() const { return m_notes; }
 
-    Q_PROPERTY(QStringList photos READ photos WRITE setPhotos NOTIFY photosChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QStringList photos
+               READ photos
+               WRITE setPhotos
+               NOTIFY photosChanged
+               STORED false)
+    // clang-format on
     void setPhotos(const QStringList &val);
     QStringList photos() const { return m_photos; }
     Q_SIGNAL void photosChanged();
@@ -415,70 +615,137 @@ public:
     Q_INVOKABLE void removePhoto(int index);
     Q_INVOKABLE void removePhoto(const QString &photoPath);
 
-    Q_PROPERTY(QString keyPhoto READ keyPhoto NOTIFY keyPhotoChanged)
+    // clang-format off
+    Q_PROPERTY(QString keyPhoto
+               READ keyPhoto
+               NOTIFY keyPhotoChanged)
+    // clang-format on
     QString keyPhoto() const { return m_keyPhoto; }
     Q_SIGNAL void keyPhotoChanged();
 
-    Q_PROPERTY(
-            int keyPhotoIndex READ keyPhotoIndex WRITE setKeyPhotoIndex NOTIFY keyPhotoIndexChanged)
+    // clang-format off
+    Q_PROPERTY(int keyPhotoIndex
+               READ keyPhotoIndex
+               WRITE setKeyPhotoIndex
+               NOTIFY keyPhotoIndexChanged)
+    // clang-format on
     void setKeyPhotoIndex(int val);
     int keyPhotoIndex() const { return m_keyPhotoIndex; }
     Q_SIGNAL void keyPhotoIndexChanged();
 
-    Q_PROPERTY(bool hasKeyPhoto READ hasKeyPhoto NOTIFY keyPhotoChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasKeyPhoto
+               READ hasKeyPhoto
+               NOTIFY keyPhotoChanged)
+    // clang-format on
     bool hasKeyPhoto() const { return !m_keyPhoto.isEmpty(); }
 
-    Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)
+    // clang-format off
+    Q_PROPERTY(QString type
+               READ type
+               WRITE setType
+               NOTIFY typeChanged)
+    // clang-format on
     void setType(const QString &val);
     QString type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
-    Q_PROPERTY(QString designation READ designation WRITE setDesignation NOTIFY designationChanged)
+    // clang-format off
+    Q_PROPERTY(QString designation
+               READ designation
+               WRITE setDesignation
+               NOTIFY designationChanged)
+    // clang-format on
     void setDesignation(const QString &val);
     QString designation() const { return m_designation; }
     Q_SIGNAL void designationChanged();
 
-    Q_PROPERTY(QString gender READ gender WRITE setGender NOTIFY genderChanged)
+    // clang-format off
+    Q_PROPERTY(QString gender
+               READ gender
+               WRITE setGender
+               NOTIFY genderChanged)
+    // clang-format on
     void setGender(const QString &val);
     QString gender() const { return m_gender; }
     Q_SIGNAL void genderChanged();
 
-    Q_PROPERTY(QString age READ age WRITE setAge NOTIFY ageChanged)
+    // clang-format off
+    Q_PROPERTY(QString age
+               READ age
+               WRITE setAge
+               NOTIFY ageChanged)
+    // clang-format on
     void setAge(const QString &val);
     QString age() const { return m_age; }
     Q_SIGNAL void ageChanged();
 
-    Q_PROPERTY(QString height READ height WRITE setHeight NOTIFY heightChanged)
+    // clang-format off
+    Q_PROPERTY(QString height
+               READ height
+               WRITE setHeight
+               NOTIFY heightChanged)
+    // clang-format on
     void setHeight(const QString &val);
     QString height() const { return m_height; }
     Q_SIGNAL void heightChanged();
 
-    Q_PROPERTY(QString weight READ weight WRITE setWeight NOTIFY weightChanged)
+    // clang-format off
+    Q_PROPERTY(QString weight
+               READ weight
+               WRITE setWeight
+               NOTIFY weightChanged)
+    // clang-format on
     void setWeight(const QString &val);
     QString weight() const { return m_weight; }
     Q_SIGNAL void weightChanged();
 
-    Q_PROPERTY(QString bodyType READ bodyType WRITE setBodyType NOTIFY bodyTypeChanged)
+    // clang-format off
+    Q_PROPERTY(QString bodyType
+               READ bodyType
+               WRITE setBodyType
+               NOTIFY bodyTypeChanged)
+    // clang-format on
     void setBodyType(const QString &val);
     QString bodyType() const { return m_bodyType; }
     Q_SIGNAL void bodyTypeChanged();
 
-    Q_PROPERTY(QStringList aliases READ aliases WRITE setAliases NOTIFY aliasesChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList aliases
+               READ aliases
+               WRITE setAliases
+               NOTIFY aliasesChanged)
+    // clang-format on
     void setAliases(const QStringList &val);
     QStringList aliases() const { return m_aliases; }
     Q_SIGNAL void aliasesChanged();
 
-    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor color
+               READ color
+               WRITE setColor
+               NOTIFY colorChanged)
+    // clang-format on
     void setColor(const QColor &val);
     QColor color() const { return m_color; }
     Q_SIGNAL void colorChanged();
 
-    Q_PROPERTY(QJsonValue summary READ summary WRITE setSummary NOTIFY summaryChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonValue summary
+               READ summary
+               WRITE setSummary
+               NOTIFY summaryChanged)
+    // clang-format on
     void setSummary(const QJsonValue &val);
     QJsonValue summary() const { return m_summary; }
     Q_SIGNAL void summaryChanged();
 
-    Q_PROPERTY(QStringList tags READ tags WRITE setTags NOTIFY tagsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList tags
+               READ tags
+               WRITE setTags
+               NOTIFY tagsChanged)
+    // clang-format on
     void setTags(const QStringList &val);
     QStringList tags() const { return m_tags; }
     Q_SIGNAL void tagsChanged();
@@ -487,28 +754,49 @@ public:
     Q_INVOKABLE bool removeTag(const QString &tag);
     Q_INVOKABLE bool hasTag(const QString &tag) const;
 
-    Q_PROPERTY(bool hasTags READ hasTags NOTIFY tagsChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasTags
+               READ hasTags
+               NOTIFY tagsChanged)
+    // clang-format on
     bool hasTags() const { return !m_tags.isEmpty(); }
 
-    Q_PROPERTY(int priority READ priority WRITE setPriority NOTIFY priorityChanged)
+    // clang-format off
+    Q_PROPERTY(int priority
+               READ priority
+               WRITE setPriority
+               NOTIFY priorityChanged)
+    // clang-format on
     void setPriority(int val);
     int priority() const { return m_priority; }
     Q_SIGNAL void priorityChanged();
 
-    Q_PROPERTY(QAbstractListModel *relationshipsModel READ relationshipsModel CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(QAbstractListModel *relationshipsModel
+               READ relationshipsModel
+               CONSTANT STORED
+               false )
+    // clang-format on
     QObjectListModel<Relationship *> *relationshipsModel() const
     {
         return &((const_cast<Character *>(this))->m_relationships);
     }
 
-    Q_PROPERTY(QQmlListProperty<Relationship> relationships READ relationships NOTIFY
-                       relationshipCountChanged)
+    // clang-format off
+    Q_PROPERTY(QQmlListProperty<Relationship> relationships
+               READ relationships
+               NOTIFY relationshipCountChanged)
+    // clang-format on
     QQmlListProperty<Relationship> relationships();
     Q_INVOKABLE void addRelationship(Relationship *ptr);
     Q_INVOKABLE void removeRelationship(Relationship *ptr);
     Q_INVOKABLE Relationship *relationshipAt(int index) const;
     void setRelationships(const QList<Relationship *> &list);
-    Q_PROPERTY(int relationshipCount READ relationshipCount NOTIFY relationshipCountChanged)
+    // clang-format off
+    Q_PROPERTY(int relationshipCount
+               READ relationshipCount
+               NOTIFY relationshipCountChanged)
+    // clang-format on
     int relationshipCount() const { return m_relationships.size(); }
     Q_INVOKABLE void clearRelationships();
     Q_SIGNAL void relationshipCountChanged();
@@ -529,13 +817,21 @@ public:
     Q_INVOKABLE QList<Relationship *> findRelationshipsWith(const QString &name = QString()) const;
     Q_INVOKABLE QStringList unrelatedCharacterNames() const;
 
-    Q_PROPERTY(QJsonObject characterRelationshipGraph READ characterRelationshipGraph WRITE
-                       setCharacterRelationshipGraph NOTIFY characterRelationshipGraphChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject characterRelationshipGraph
+               READ characterRelationshipGraph
+               WRITE setCharacterRelationshipGraph
+               NOTIFY characterRelationshipGraphChanged)
+    // clang-format on
     void setCharacterRelationshipGraph(const QJsonObject &val);
     QJsonObject characterRelationshipGraph() const { return m_characterRelationshipGraph; }
     Q_SIGNAL void characterRelationshipGraphChanged();
 
-    Q_PROPERTY(Attachments *attachments READ attachments CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Attachments *attachments
+               READ attachments
+               CONSTANT )
+    // clang-format on
     Attachments *attachments() const { return m_attachments; }
 
     Q_SIGNAL void characterChanged();
@@ -611,16 +907,30 @@ public:
 
     Q_INVOKABLE Character *findCharacter(const QString &name) const;
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    // clang-format off
+    Q_PROPERTY(int count
+               READ count
+               NOTIFY countChanged)
+    // clang-format on
     int count() const;
     Q_SIGNAL void countChanged();
 
-    Q_PROPERTY(Structure *structure READ structure WRITE setStructure NOTIFY structureChanged)
+    // clang-format off
+    Q_PROPERTY(Structure *structure
+               READ structure
+               WRITE setStructure
+               NOTIFY structureChanged)
+    // clang-format on
     void setStructure(Structure *val);
     Structure *structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
 
-    Q_PROPERTY(QStringList tags READ tags WRITE setTags NOTIFY tagsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList tags
+               READ tags
+               WRITE setTags
+               NOTIFY tagsChanged)
+    // clang-format on
     void setTags(const QStringList &val);
     QStringList tags() const { return m_tags; }
     Q_SIGNAL void tagsChanged();
@@ -631,16 +941,28 @@ public:
     Q_INVOKABLE void clearTags();
     Q_INVOKABLE bool hasTag(const QString &tag) const;
 
-    Q_PROPERTY(QStringList availableTags READ availableTags NOTIFY availableTagsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList availableTags
+               READ availableTags
+               NOTIFY availableTagsChanged)
+    // clang-format on
     QStringList availableTags() const;
     Q_SIGNAL void availableTagsChanged();
 
-    Q_PROPERTY(QStringList allNames READ allNames NOTIFY allNamesChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList allNames
+               READ allNames
+               NOTIFY allNamesChanged)
+    // clang-format on
     QStringList allNames() const;
     Q_SIGNAL void allNamesChanged();
 
-    Q_PROPERTY(QStringList selectedCharacters READ selectedCharacters WRITE setSelectedCharacters
-                       NOTIFY selectedCharactersChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList selectedCharacters
+               READ selectedCharacters
+               WRITE setSelectedCharacters
+               NOTIFY selectedCharactersChanged)
+    // clang-format on
     void setSelectedCharacters(const QStringList &val);
     QStringList selectedCharacters() const { return m_selectedCharacters; }
     Q_SIGNAL void selectedCharactersChanged();
@@ -675,26 +997,52 @@ public:
     ~Annotation();
     Q_SIGNAL void aboutToDelete(Annotation *ptr);
 
-    Q_PROPERTY(Structure *structure READ structure CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(Structure *structure
+               READ structure
+               CONSTANT STORED
+               false )
+    // clang-format on
     Structure *structure() const { return m_structure; }
 
-    Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)
+    // clang-format off
+    Q_PROPERTY(QString type
+               READ type
+               WRITE setType
+               NOTIFY typeChanged)
+    // clang-format on
     void setType(const QString &val);
     QString type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
-    Q_PROPERTY(
-            bool resizable READ isResizable WRITE setResizable NOTIFY resizableChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(bool resizable
+               READ isResizable
+               WRITE setResizable
+               NOTIFY resizableChanged
+               STORED false)
+    // clang-format on
     void setResizable(bool val);
     bool isResizable() const { return m_resizable; }
     Q_SIGNAL void resizableChanged();
 
-    Q_PROPERTY(bool movable READ isMovable WRITE setMovable NOTIFY movableChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(bool movable
+               READ isMovable
+               WRITE setMovable
+               NOTIFY movableChanged
+               STORED false)
+    // clang-format on
     void setMovable(bool val);
     bool isMovable() const { return m_movable; }
     Q_SIGNAL void movableChanged();
 
-    Q_PROPERTY(QRectF geometry READ geometry WRITE setGeometry NOTIFY geometryChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF geometry
+               READ geometry
+               WRITE setGeometry
+               NOTIFY geometryChanged)
+    // clang-format on
     void setGeometry(const QRectF &val);
     QRectF geometry() const { return m_geometry; }
     Q_SIGNAL void geometryChanged();
@@ -712,7 +1060,12 @@ public:
         this->setGeometry(QRectF(x, y, w, h));
     }
 
-    Q_PROPERTY(QJsonObject attributes READ attributes WRITE setAttributes NOTIFY attributesChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject attributes
+               READ attributes
+               WRITE setAttributes
+               NOTIFY attributesChanged)
+    // clang-format on
     void setAttributes(const QJsonObject &val);
     QJsonObject attributes() const { return m_attributes; }
     Q_SIGNAL void attributesChanged();
@@ -721,8 +1074,13 @@ public:
     Q_INVOKABLE void removeAttribute(const QString &key);
     Q_INVOKABLE void saveAttributesAsDefault();
 
-    Q_PROPERTY(
-            QJsonArray metaData READ metaData WRITE setMetaData NOTIFY metaDataChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QJsonArray metaData
+               READ metaData
+               WRITE setMetaData
+               NOTIFY metaDataChanged
+               STORED false)
+    // clang-format on
     void setMetaData(const QJsonArray &val);
     QJsonArray metaData() const { return m_metaData; }
     Q_SIGNAL void metaDataChanged();
@@ -764,27 +1122,44 @@ public:
     ~Structure();
     Q_SIGNAL void aboutToDelete(Structure *ptr);
 
-    Q_PROPERTY(qreal canvasWidth READ canvasWidth WRITE setCanvasWidth NOTIFY canvasWidthChanged)
+    // clang-format off
+    Q_PROPERTY(qreal canvasWidth
+               READ canvasWidth
+               WRITE setCanvasWidth
+               NOTIFY canvasWidthChanged)
+    // clang-format on
     void setCanvasWidth(qreal val);
     qreal canvasWidth() const { return m_canvasWidth; }
     Q_SIGNAL void canvasWidthChanged();
 
-    Q_PROPERTY(
-            qreal canvasHeight READ canvasHeight WRITE setCanvasHeight NOTIFY canvasHeightChanged)
+    // clang-format off
+    Q_PROPERTY(qreal canvasHeight
+               READ canvasHeight
+               WRITE setCanvasHeight
+               NOTIFY canvasHeightChanged)
+    // clang-format on
     void setCanvasHeight(qreal val);
     qreal canvasHeight() const { return m_canvasHeight; }
     Q_SIGNAL void canvasHeightChanged();
 
-    Q_PROPERTY(qreal canvasGridSize READ canvasGridSize WRITE setCanvasGridSize NOTIFY
-                       canvasGridSizeChanged)
+    // clang-format off
+    Q_PROPERTY(qreal canvasGridSize
+               READ canvasGridSize
+               WRITE setCanvasGridSize
+               NOTIFY canvasGridSizeChanged)
+    // clang-format on
     void setCanvasGridSize(qreal val);
     qreal canvasGridSize() const { return m_canvasGridSize; }
     Q_SIGNAL void canvasGridSizeChanged();
 
     enum CanvasUIMode { SynopsisEditorUI, IndexCardUI };
     Q_ENUM(CanvasUIMode)
-    Q_PROPERTY(CanvasUIMode canvasUIMode READ canvasUIMode WRITE setCanvasUIMode NOTIFY
-                       canvasUIModeChanged)
+    // clang-format off
+    Q_PROPERTY(CanvasUIMode canvasUIMode
+               READ canvasUIMode
+               WRITE setCanvasUIMode
+               NOTIFY canvasUIModeChanged)
+    // clang-format on
     void setCanvasUIMode(CanvasUIMode val);
     CanvasUIMode canvasUIMode() const { return m_canvasUIMode; }
     Q_SIGNAL void canvasUIModeChanged();
@@ -792,8 +1167,12 @@ public:
     enum IndexCardContent { Synopsis, FeaturedPhoto };
     Q_ENUM(IndexCardContent)
 
-    Q_PROPERTY(IndexCardContent indexCardContent READ indexCardContent WRITE setIndexCardContent
-                       NOTIFY indexCardContentChanged)
+    // clang-format off
+    Q_PROPERTY(IndexCardContent indexCardContent
+               READ indexCardContent
+               WRITE setIndexCardContent
+               NOTIFY indexCardContentChanged)
+    // clang-format on
     void setIndexCardContent(IndexCardContent val);
     IndexCardContent indexCardContent() const { return m_indexCardContent; }
     Q_SIGNAL void indexCardContentChanged();
@@ -804,23 +1183,41 @@ public:
     void captureStructureAsImage(const QString &fileName);
     Q_SIGNAL void captureStructureAsImageRequest(const QString &fileName);
 
-    Q_PROPERTY(ScriteDocument *scriteDocument READ scriteDocument CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(ScriteDocument *scriteDocument
+               READ scriteDocument
+               CONSTANT STORED
+               false )
+    // clang-format on
     ScriteDocument *scriteDocument() const { return m_scriteDocument; }
 
-    Q_PROPERTY(QAbstractListModel *charactersModel READ charactersModel CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(QAbstractListModel *charactersModel
+               READ charactersModel
+               CONSTANT STORED
+               false )
+    // clang-format on
     QObjectListModel<Character *> *charactersModel() const
     {
         return &((const_cast<Structure *>(this))->m_characters);
     }
 
-    Q_PROPERTY(QQmlListProperty<Character> characters READ characters NOTIFY characterCountChanged)
+    // clang-format off
+    Q_PROPERTY(QQmlListProperty<Character> characters
+               READ characters
+               NOTIFY characterCountChanged)
+    // clang-format on
     QQmlListProperty<Character> characters();
     Q_INVOKABLE void addCharacter(Character *ptr);
     Q_INVOKABLE void removeCharacter(Character *ptr);
     Q_INVOKABLE Character *characterAt(int index) const;
     Q_INVOKABLE int indexOfCharacter(Character *ptr) const;
     void setCharacters(const QList<Character *> &list);
-    Q_PROPERTY(int characterCount READ characterCount NOTIFY characterCountChanged)
+    // clang-format off
+    Q_PROPERTY(int characterCount
+               READ characterCount
+               NOTIFY characterCountChanged)
+    // clang-format on
     int characterCount() const { return m_characters.size(); }
     Q_INVOKABLE void clearCharacters();
     Q_SIGNAL void characterCountChanged();
@@ -834,30 +1231,51 @@ public:
     QList<Character *> findCharacters(const QStringList &names,
                                       bool returnAssociativeList = false) const;
 
-    Q_PROPERTY(Notes *notes READ notes CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Notes *notes
+               READ notes
+               CONSTANT )
+    // clang-format on
     Notes *notes() const { return m_notes; }
 
-    Q_PROPERTY(QAbstractListModel *elementsModel READ elementsModel CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(QAbstractListModel *elementsModel
+               READ elementsModel
+               CONSTANT STORED
+               false )
+    // clang-format on
     QObjectListModel<StructureElement *> *elementsModel() const
     {
         return &((const_cast<Structure *>(this))->m_elements);
     }
 
-    Q_PROPERTY(
-            QRectF elementsBoundingBox READ elementsBoundingBox NOTIFY elementsBoundingBoxChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF elementsBoundingBox
+               READ elementsBoundingBox
+               NOTIFY elementsBoundingBoxChanged)
+    // clang-format on
     QRectF elementsBoundingBox() const
     {
         return m_elementsBoundingBoxAggregator.aggregateValue().toRectF();
     }
     Q_SIGNAL void elementsBoundingBoxChanged();
 
-    Q_PROPERTY(StructureElementStacks *elementStacks READ elementStacks CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(StructureElementStacks *elementStacks
+               READ elementStacks
+               CONSTANT STORED
+               false )
+    // clang-format on
     StructureElementStacks *elementStacks() const
     {
         return &((const_cast<Structure *>(this))->m_elementStacks);
     }
 
-    Q_PROPERTY(QQmlListProperty<StructureElement> elements READ elements NOTIFY elementsChanged)
+    // clang-format off
+    Q_PROPERTY(QQmlListProperty<StructureElement> elements
+               READ elements
+               NOTIFY elementsChanged)
+    // clang-format on
     QQmlListProperty<StructureElement> elements();
     Q_INVOKABLE void addElement(StructureElement *ptr);
     Q_INVOKABLE void removeElement(StructureElement *ptr);
@@ -866,7 +1284,11 @@ public:
     Q_INVOKABLE void moveElement(StructureElement *ptr, int toRow);
     void setElements(const QList<StructureElement *> &list);
     Q_INVOKABLE StructureElement *elementAt(int index) const;
-    Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
+    // clang-format off
+    Q_PROPERTY(int elementCount
+               READ elementCount
+               NOTIFY elementCountChanged)
+    // clang-format on
     int elementCount() const { return m_elements.size(); }
     Q_INVOKABLE void clearElements();
     Q_SIGNAL void elementCountChanged();
@@ -880,8 +1302,12 @@ public:
     Q_ENUM(LayoutType)
     Q_INVOKABLE QRectF layoutElements(Structure::LayoutType layoutType);
 
-    Q_PROPERTY(bool forceBeatBoardLayout READ isForceBeatBoardLayout WRITE setForceBeatBoardLayout
-                       NOTIFY forceBeatBoardLayoutChanged)
+    // clang-format off
+    Q_PROPERTY(bool forceBeatBoardLayout
+               READ isForceBeatBoardLayout
+               WRITE setForceBeatBoardLayout
+               NOTIFY forceBeatBoardLayoutChanged)
+    // clang-format on
     void setForceBeatBoardLayout(bool val);
     bool isForceBeatBoardLayout() const { return m_forceBeatBoardLayout; }
     Q_SIGNAL void forceBeatBoardLayoutChanged();
@@ -904,55 +1330,96 @@ public:
         return m_locationHeadingsMap;
     }
 
-    Q_PROPERTY(int currentElementIndex READ currentElementIndex WRITE setCurrentElementIndex NOTIFY
-                       currentElementIndexChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(int currentElementIndex
+               READ currentElementIndex
+               WRITE setCurrentElementIndex
+               NOTIFY currentElementIndexChanged
+               STORED false)
+    // clang-format on
     void setCurrentElementIndex(int val);
     int currentElementIndex() const { return m_currentElementIndex; }
     Q_SIGNAL void currentElementIndexChanged();
 
-    Q_PROPERTY(qreal zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged)
+    // clang-format off
+    Q_PROPERTY(qreal zoomLevel
+               READ zoomLevel
+               WRITE setZoomLevel
+               NOTIFY zoomLevelChanged)
+    // clang-format on
     void setZoomLevel(qreal val);
     qreal zoomLevel() const { return m_zoomLevel; }
     Q_SIGNAL void zoomLevelChanged();
 
-    Q_PROPERTY(QStringList characterNames READ characterNames NOTIFY characterNamesChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList characterNames
+               READ characterNames
+               NOTIFY characterNamesChanged)
+    // clang-format on
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
 
-    Q_PROPERTY(QStringList transitions READ transitions NOTIFY transitionsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList transitions
+               READ transitions
+               NOTIFY transitionsChanged)
+    // clang-format on
     QStringList transitions() const { return m_transitions; }
     Q_SIGNAL void transitionsChanged();
 
-    Q_PROPERTY(QStringList shots READ shots NOTIFY shotsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList shots
+               READ shots
+               NOTIFY shotsChanged)
+    // clang-format on
     QStringList shots() const { return m_shots; }
     Q_SIGNAL void shotsChanged();
 
-    Q_PROPERTY(QStringList characterTags READ characterTags NOTIFY characterTagsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList characterTags
+               READ characterTags
+               NOTIFY characterTagsChanged)
+    // clang-format on
     QStringList characterTags() const { return m_characterTags; }
     Q_SIGNAL void characterTagsChanged();
 
-    Q_PROPERTY(QStringList sceneTags READ sceneTags NOTIFY sceneTagsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList sceneTags
+               READ sceneTags
+               NOTIFY sceneTagsChanged)
+    // clang-format on
     QStringList sceneTags() const { return m_sceneTags; }
     Q_SIGNAL void sceneTagsChanged();
 
     QStringList filteredCharacterNames(const QStringList &tags) const;
 
-    Q_PROPERTY(QAbstractListModel *annotationsModel READ annotationsModel CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(QAbstractListModel *annotationsModel
+               READ annotationsModel
+               CONSTANT STORED
+               false )
+    // clang-format on
     QAbstractListModel *annotationsModel() const
     {
         return &((const_cast<Structure *>(this))->m_annotations);
     }
 
-    Q_PROPERTY(QRectF annotationsBoundingBox READ annotationsBoundingBox NOTIFY
-                       annotationsBoundingBoxChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF annotationsBoundingBox
+               READ annotationsBoundingBox
+               NOTIFY annotationsBoundingBoxChanged)
+    // clang-format on
     QRectF annotationsBoundingBox() const
     {
         return m_annotationsBoundingBoxAggregator.aggregateValue().toRectF();
     }
     Q_SIGNAL void annotationsBoundingBoxChanged();
 
-    Q_PROPERTY(
-            QQmlListProperty<Annotation> annotations READ annotations NOTIFY annotationCountChanged)
+    // clang-format off
+    Q_PROPERTY(QQmlListProperty<Annotation> annotations
+               READ annotations
+               NOTIFY annotationCountChanged)
+    // clang-format on
     QQmlListProperty<Annotation> annotations();
     Q_INVOKABLE void addAnnotation(Annotation *ptr);
     Q_INVOKABLE void removeAnnotation(Annotation *ptr);
@@ -962,33 +1429,62 @@ public:
     Q_INVOKABLE void bringToFront(Annotation *ptr);
     Q_INVOKABLE void sendToBack(Annotation *ptr);
     void setAnnotations(const QList<Annotation *> &list);
-    Q_PROPERTY(int annotationCount READ annotationCount NOTIFY annotationCountChanged)
+    // clang-format off
+    Q_PROPERTY(int annotationCount
+               READ annotationCount
+               NOTIFY annotationCountChanged)
+    // clang-format on
     int annotationCount() const { return m_annotations.size(); }
     Q_INVOKABLE void clearAnnotations();
     Q_SIGNAL void annotationCountChanged();
 
-    Q_PROPERTY(QString defaultGroupsDataFile READ defaultGroupsDataFile CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString defaultGroupsDataFile
+               READ defaultGroupsDataFile
+               CONSTANT )
+    // clang-format on
     QString defaultGroupsDataFile() const;
 
     Q_INVOKABLE void loadDefaultGroupsData();
 
-    Q_PROPERTY(QString groupsData READ groupsData WRITE setGroupsData NOTIFY groupsDataChanged)
+    // clang-format off
+    Q_PROPERTY(QString groupsData
+               READ groupsData
+               WRITE setGroupsData
+               NOTIFY groupsDataChanged)
+    // clang-format on
     void setGroupsData(const QString &val);
     QString groupsData() const { return m_groupsData; }
     Q_SIGNAL void groupsDataChanged();
 
-    Q_PROPERTY(QJsonArray groupsModel READ groupsModel NOTIFY groupsModelChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonArray groupsModel
+               READ groupsModel
+               NOTIFY groupsModelChanged)
+    // clang-format on
     QJsonArray groupsModel() const { return m_groupsModel; }
     Q_SIGNAL void groupsModelChanged();
 
-    Q_PROPERTY(QStringList groupCategories READ groupCategories NOTIFY groupsModelChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList groupCategories
+               READ groupCategories
+               NOTIFY groupsModelChanged)
+    // clang-format on
     QStringList groupCategories() const { return m_groupCategories; }
 
-    Q_PROPERTY(QVariantMap categoryActNames READ categoryActNames NOTIFY groupsModelChanged)
+    // clang-format off
+    Q_PROPERTY(QVariantMap categoryActNames
+               READ categoryActNames
+               NOTIFY groupsModelChanged)
+    // clang-format on
     QVariantMap categoryActNames() const { return m_categoryActNames; }
 
-    Q_PROPERTY(QString preferredGroupCategory READ preferredGroupCategory WRITE
-                       setPreferredGroupCategory NOTIFY preferredGroupCategoryChanged)
+    // clang-format off
+    Q_PROPERTY(QString preferredGroupCategory
+               READ preferredGroupCategory
+               WRITE setPreferredGroupCategory
+               NOTIFY preferredGroupCategoryChanged)
+    // clang-format on
     void setPreferredGroupCategory(const QString &val);
     QString preferredGroupCategory() const { return m_preferredGroupCategory; }
     Q_SIGNAL void preferredGroupCategoryChanged();
@@ -996,14 +1492,23 @@ public:
     Q_INVOKABLE QString presentableGroupNames(const QStringList &groups) const;
 
     // Local to the current Scrite document
-    Q_PROPERTY(QJsonArray indexCardFields READ indexCardFields WRITE setIndexCardFields NOTIFY
-                       indexCardFieldsChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonArray indexCardFields
+               READ indexCardFields
+               WRITE setIndexCardFields
+               NOTIFY indexCardFieldsChanged)
+    // clang-format on
     void setIndexCardFields(const QJsonArray &val);
     QJsonArray indexCardFields() const { return m_indexCardFields; }
     Q_SIGNAL void indexCardFieldsChanged();
 
-    Q_PROPERTY(QJsonArray defaultIndexCardFields READ defaultIndexCardFields WRITE
-                       setDefaultIndexCardFields NOTIFY defaultIndexCardFieldsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QJsonArray defaultIndexCardFields
+               READ defaultIndexCardFields
+               WRITE setDefaultIndexCardFields
+               NOTIFY defaultIndexCardFieldsChanged
+               STORED false)
+    // clang-format on
     void setDefaultIndexCardFields(const QJsonArray &val);
     QJsonArray defaultIndexCardFields() const { return m_defaultIndexCardFields; }
     Q_SIGNAL void defaultIndexCardFieldsChanged();
@@ -1014,20 +1519,33 @@ public:
 
     Q_SIGNAL void structureChanged();
 
-    Q_PROPERTY(bool canPaste READ canPaste NOTIFY canPasteChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(bool canPaste
+               READ canPaste
+               NOTIFY canPasteChanged
+               STORED false)
+    // clang-format on
     bool canPaste() const { return m_canPaste; }
     Q_SIGNAL void canPasteChanged();
 
     Q_INVOKABLE void copy(QObject *elementOrAnnotation);
     Q_INVOKABLE void paste(const QPointF &pos = QPointF());
 
-    Q_PROPERTY(QJsonObject characterRelationshipGraph READ characterRelationshipGraph WRITE
-                       setCharacterRelationshipGraph NOTIFY characterRelationshipGraphChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject characterRelationshipGraph
+               READ characterRelationshipGraph
+               WRITE setCharacterRelationshipGraph
+               NOTIFY characterRelationshipGraphChanged)
+    // clang-format on
     void setCharacterRelationshipGraph(const QJsonObject &val);
     QJsonObject characterRelationshipGraph() const { return m_characterRelationshipGraph; }
     Q_SIGNAL void characterRelationshipGraphChanged();
 
-    Q_PROPERTY(Attachments *attachments READ attachments CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Attachments *attachments
+               READ attachments
+               CONSTANT )
+    // clang-format on
     Attachments *attachments() const { return m_attachments; }
 
     StructureExporter *createExporter();
@@ -1161,39 +1679,69 @@ public:
 
     enum LineType { StraightLine, CurvedLine };
     Q_ENUM(LineType)
-    Q_PROPERTY(LineType lineType READ lineType WRITE setLineType NOTIFY lineTypeChanged)
+    // clang-format off
+    Q_PROPERTY(LineType lineType
+               READ lineType
+               WRITE setLineType
+               NOTIFY lineTypeChanged)
+    // clang-format on
     void setLineType(LineType val);
     LineType lineType() const { return m_lineType; }
     Q_SIGNAL void lineTypeChanged();
 
-    Q_PROPERTY(StructureElement *fromElement READ fromElement WRITE setFromElement NOTIFY
-                       fromElementChanged RESET resetFromElement)
+    // clang-format off
+    Q_PROPERTY(StructureElement *fromElement
+               READ fromElement
+               WRITE setFromElement
+               NOTIFY fromElementChanged
+               RESET resetFromElement)
+    // clang-format on
     void setFromElement(StructureElement *val);
     StructureElement *fromElement() const { return m_fromElement; }
     Q_SIGNAL void fromElementChanged();
 
-    Q_PROPERTY(StructureElement *toElement READ toElement WRITE setToElement NOTIFY toElementChanged
-                       RESET resetToElement)
+    // clang-format off
+    Q_PROPERTY(StructureElement *toElement
+               READ toElement
+               WRITE setToElement
+               NOTIFY toElementChanged
+               RESET resetToElement)
+    // clang-format on
     void setToElement(StructureElement *val);
     StructureElement *toElement() const { return m_toElement; }
     Q_SIGNAL void toElementChanged();
 
-    Q_PROPERTY(qreal arrowAndLabelSpacing READ arrowAndLabelSpacing WRITE setArrowAndLabelSpacing
-                       NOTIFY arrowAndLabelSpacingChanged)
+    // clang-format off
+    Q_PROPERTY(qreal arrowAndLabelSpacing
+               READ arrowAndLabelSpacing
+               WRITE setArrowAndLabelSpacing
+               NOTIFY arrowAndLabelSpacingChanged)
+    // clang-format on
     void setArrowAndLabelSpacing(qreal val);
     qreal arrowAndLabelSpacing() const { return m_arrowAndLabelSpacing; }
     Q_SIGNAL void arrowAndLabelSpacingChanged();
 
-    Q_PROPERTY(QPointF arrowPosition READ arrowPosition NOTIFY arrowPositionChanged)
+    // clang-format off
+    Q_PROPERTY(QPointF arrowPosition
+               READ arrowPosition
+               NOTIFY arrowPositionChanged)
+    // clang-format on
     QPointF arrowPosition() const { return m_arrowPosition; }
     Q_SIGNAL void arrowPositionChanged();
 
-    Q_PROPERTY(QPointF suggestedLabelPosition READ suggestedLabelPosition NOTIFY
-                       suggestedLabelPositionChanged)
+    // clang-format off
+    Q_PROPERTY(QPointF suggestedLabelPosition
+               READ suggestedLabelPosition
+               NOTIFY suggestedLabelPositionChanged)
+    // clang-format on
     QPointF suggestedLabelPosition() const { return m_suggestedLabelPosition; }
     Q_SIGNAL void suggestedLabelPositionChanged();
 
-    Q_PROPERTY(bool canBeVisible READ canBeVisible NOTIFY canBeVisibleChanged)
+    // clang-format off
+    Q_PROPERTY(bool canBeVisible
+               READ canBeVisible
+               NOTIFY canBeVisibleChanged)
+    // clang-format on
     bool canBeVisible() const;
     Q_SIGNAL void canBeVisibleChanged();
 
@@ -1242,42 +1790,69 @@ public:
     explicit StructureCanvasViewportFilterModel(QObject *parent = nullptr);
     ~StructureCanvasViewportFilterModel();
 
-    Q_PROPERTY(Structure *structure READ structure WRITE setStructure RESET resetStructure NOTIFY
-                       structureChanged)
+    // clang-format off
+    Q_PROPERTY(Structure *structure
+               READ structure
+               WRITE setStructure
+               RESET resetStructure
+               NOTIFY structureChanged)
+    // clang-format on
     void setStructure(Structure *val);
     Structure *structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
 
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool enabled
+               READ isEnabled
+               WRITE setEnabled
+               NOTIFY enabledChanged)
+    // clang-format on
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
     enum Type { AnnotationType, StructureElementType };
     Q_ENUM(Type)
-    Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
+    // clang-format off
+    Q_PROPERTY(Type type
+               READ type
+               WRITE setType
+               NOTIFY typeChanged)
+    // clang-format on
     void setType(Type val);
     Type type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
-    Q_PROPERTY(
-            QRectF viewportRect READ viewportRect WRITE setViewportRect NOTIFY viewportRectChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF viewportRect
+               READ viewportRect
+               WRITE setViewportRect
+               NOTIFY viewportRectChanged)
+    // clang-format on
     void setViewportRect(const QRectF &val);
     QRectF viewportRect() const { return m_viewportRect; }
     Q_SIGNAL void viewportRectChanged();
 
     enum ComputeStrategy { PreComputeStrategy, OnDemandComputeStrategy };
     Q_ENUM(ComputeStrategy)
-    Q_PROPERTY(ComputeStrategy computeStrategy READ computeStrategy WRITE setComputeStrategy NOTIFY
-                       computeStrategyChanged)
+    // clang-format off
+    Q_PROPERTY(ComputeStrategy computeStrategy
+               READ computeStrategy
+               WRITE setComputeStrategy
+               NOTIFY computeStrategyChanged)
+    // clang-format on
     void setComputeStrategy(ComputeStrategy val);
     ComputeStrategy computeStrategy() const { return m_computeStrategy; }
     Q_SIGNAL void computeStrategyChanged();
 
     enum FilterStrategy { ContainsStrategy, IntersectsStrategy };
     Q_ENUM(FilterStrategy)
-    Q_PROPERTY(FilterStrategy filterStrategy READ filterStrategy WRITE setFilterStrategy NOTIFY
-                       filterStrategyChanged)
+    // clang-format off
+    Q_PROPERTY(FilterStrategy filterStrategy
+               READ filterStrategy
+               WRITE setFilterStrategy
+               NOTIFY filterStrategyChanged)
+    // clang-format on
     void setFilterStrategy(FilterStrategy val);
     FilterStrategy filterStrategy() const { return m_filterStrategy; }
     Q_SIGNAL void filterStrategyChanged();

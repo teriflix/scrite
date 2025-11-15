@@ -27,93 +27,170 @@ public:
 
     enum Unit { Inch, Centimeter, Pixels };
     Q_ENUM(Unit)
-    Q_PROPERTY(Unit displayUnit READ displayUnit WRITE setDisplayUnit NOTIFY displayUnitChanged)
+    // clang-format off
+    Q_PROPERTY(Unit displayUnit
+               READ displayUnit
+               WRITE setDisplayUnit
+               NOTIFY displayUnitChanged)
+    // clang-format on
     void setDisplayUnit(Unit val);
     Unit displayUnit() const { return m_displayUnit; }
     Q_SIGNAL void displayUnitChanged();
 
-    Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
+    // clang-format off
+    Q_PROPERTY(QFont font
+               READ font
+               WRITE setFont
+               NOTIFY fontChanged)
+    // clang-format on
     void setFont(const QFont &val);
     QFont font() const { return m_font; }
     Q_SIGNAL void fontChanged();
 
-    Q_PROPERTY(Unit marginsUnit READ marginsUnit WRITE setMarginsUnit NOTIFY marginsUnitChanged)
+    // clang-format off
+    Q_PROPERTY(Unit marginsUnit
+               READ marginsUnit
+               WRITE setMarginsUnit
+               NOTIFY marginsUnitChanged)
+    // clang-format on
     void setMarginsUnit(Unit val);
     Unit marginsUnit() const { return m_marginsUnit; }
     Q_SIGNAL void marginsUnitChanged();
 
-    Q_PROPERTY(qreal leftMargin READ leftMargin WRITE setLeftMargin NOTIFY leftMarginChanged)
+    // clang-format off
+    Q_PROPERTY(qreal leftMargin
+               READ leftMargin
+               WRITE setLeftMargin
+               NOTIFY leftMarginChanged)
+    // clang-format on
     void setLeftMargin(qreal val);
     qreal leftMargin() const { return m_leftMargin; }
     Q_SIGNAL void leftMarginChanged();
 
-    Q_PROPERTY(qreal rightMargin READ rightMargin WRITE setRightMargin NOTIFY rightMarginChanged)
+    // clang-format off
+    Q_PROPERTY(qreal rightMargin
+               READ rightMargin
+               WRITE setRightMargin
+               NOTIFY rightMarginChanged)
+    // clang-format on
     void setRightMargin(qreal val);
     qreal rightMargin() const { return m_rightMargin; }
     Q_SIGNAL void rightMarginChanged();
 
-    Q_PROPERTY(qreal paragraphLeftMargin READ paragraphLeftMargin WRITE setParagraphLeftMargin
-                       NOTIFY paragraphLeftMarginChanged)
+    // clang-format off
+    Q_PROPERTY(qreal paragraphLeftMargin
+               READ paragraphLeftMargin
+               WRITE setParagraphLeftMargin
+               NOTIFY paragraphLeftMarginChanged)
+    // clang-format on
     void setParagraphLeftMargin(qreal val);
     qreal paragraphLeftMargin() const { return m_paragraphLeftMargin; }
     Q_SIGNAL void paragraphLeftMarginChanged();
 
-    Q_PROPERTY(qreal paragraphRightMargin READ paragraphRightMargin WRITE setParagraphRightMargin
-                       NOTIFY paragraphRightMarginChanged)
+    // clang-format off
+    Q_PROPERTY(qreal paragraphRightMargin
+               READ paragraphRightMargin
+               WRITE setParagraphRightMargin
+               NOTIFY paragraphRightMarginChanged)
+    // clang-format on
     void setParagraphRightMargin(qreal val);
     qreal paragraphRightMargin() const { return m_paragraphRightMargin; }
     Q_SIGNAL void paragraphRightMarginChanged();
 
-    Q_PROPERTY(QColor pageMarginColor READ pageMarginColor WRITE setPageMarginColor NOTIFY
-                       pageMarginColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor pageMarginColor
+               READ pageMarginColor
+               WRITE setPageMarginColor
+               NOTIFY pageMarginColorChanged)
+    // clang-format on
     void setPageMarginColor(const QColor &val);
     QColor pageMarginColor() const { return m_pageMarginColor; }
     Q_SIGNAL void pageMarginColorChanged();
 
-    Q_PROPERTY(QColor paragraphColor READ paragraphColor WRITE setParagraphColor NOTIFY
-                       paragraphColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor paragraphColor
+               READ paragraphColor
+               WRITE setParagraphColor
+               NOTIFY paragraphColorChanged)
+    // clang-format on
     void setParagraphColor(const QColor &val);
     QColor paragraphColor() const { return m_paragraphColor; }
     Q_SIGNAL void paragraphColorChanged();
 
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY
-                       backgroundColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor backgroundColor
+               READ backgroundColor
+               WRITE setBackgroundColor
+               NOTIFY backgroundColorChanged)
+    // clang-format on
     void setBackgroundColor(const QColor &val);
     QColor backgroundColor() const { return m_backgroundColor; }
     Q_SIGNAL void backgroundColorChanged();
 
-    Q_PROPERTY(QColor borderColor READ borderColor WRITE setBorderColor NOTIFY borderColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor borderColor
+               READ borderColor
+               WRITE setBorderColor
+               NOTIFY borderColorChanged)
+    // clang-format on
     void setBorderColor(const QColor &val);
     QColor borderColor() const { return m_borderColor; }
     Q_SIGNAL void borderColorChanged();
 
-    Q_PROPERTY(QColor majorTickColor READ majorTickColor WRITE setMajorTickColor NOTIFY
-                       majorTickColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor majorTickColor
+               READ majorTickColor
+               WRITE setMajorTickColor
+               NOTIFY majorTickColorChanged)
+    // clang-format on
     void setMajorTickColor(const QColor &val);
     QColor majorTickColor() const { return m_majorTickColor; }
     Q_SIGNAL void majorTickColorChanged();
 
-    Q_PROPERTY(QColor minorTickColor READ minorTickColor WRITE setMinorTickColor NOTIFY
-                       minorTickColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor minorTickColor
+               READ minorTickColor
+               WRITE setMinorTickColor
+               NOTIFY minorTickColorChanged)
+    // clang-format on
     void setMinorTickColor(const QColor &val);
     QColor minorTickColor() const { return m_minorTickColor; }
     Q_SIGNAL void minorTickColorChanged();
 
-    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor textColor
+               READ textColor
+               WRITE setTextColor
+               NOTIFY textColorChanged)
+    // clang-format on
     void setTextColor(const QColor &val);
     QColor textColor() const { return m_textColor; }
     Q_SIGNAL void textColorChanged();
 
-    Q_PROPERTY(qreal zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged)
+    // clang-format off
+    Q_PROPERTY(qreal zoomLevel
+               READ zoomLevel
+               WRITE setZoomLevel
+               NOTIFY zoomLevelChanged)
+    // clang-format on
     void setZoomLevel(qreal val);
     qreal zoomLevel() const { return m_zoomLevel; }
     Q_SIGNAL void zoomLevelChanged();
 
-    Q_PROPERTY(bool canConvert READ canConvert NOTIFY canConvertChanged)
+    // clang-format off
+    Q_PROPERTY(bool canConvert
+               READ canConvert
+               NOTIFY canConvertChanged)
+    // clang-format on
     bool canConvert() const { return m_canConvert; }
     Q_SIGNAL void canConvertChanged();
 
-    Q_PROPERTY(qreal resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
+    // clang-format off
+    Q_PROPERTY(qreal resolution
+               READ resolution
+               WRITE setResolution
+               NOTIFY resolutionChanged)
+    // clang-format on
     void setResolution(qreal val);
     qreal resolution() const { return m_resolution; }
     Q_SIGNAL void resolutionChanged();

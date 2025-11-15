@@ -32,57 +32,101 @@ public:
     explicit TabSequenceManager(QObject *parent = nullptr);
     ~TabSequenceManager();
 
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool enabled
+               READ isEnabled
+               WRITE setEnabled
+               NOTIFY enabledChanged)
+    // clang-format on
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    Q_PROPERTY(int tabKey READ tabKey WRITE setTabKey NOTIFY tabKeyChanged)
+    // clang-format off
+    Q_PROPERTY(int tabKey
+               READ tabKey
+               WRITE setTabKey
+               NOTIFY tabKeyChanged)
+    // clang-format on
     void setTabKey(int val);
     int tabKey() const { return m_tabKey; }
     Q_SIGNAL void tabKeyChanged();
 
-    Q_PROPERTY(int backtabKey READ backtabKey WRITE setBacktabKey NOTIFY backtabKeyChanged)
+    // clang-format off
+    Q_PROPERTY(int backtabKey
+               READ backtabKey
+               WRITE setBacktabKey
+               NOTIFY backtabKeyChanged)
+    // clang-format on
     void setBacktabKey(int val);
     int backtabKey() const { return m_backtabKey; }
     Q_SIGNAL void backtabKeyChanged();
 
-    Q_PROPERTY(int tabKeyModifiers READ tabKeyModifiers WRITE setTabKeyModifiers NOTIFY
-                       tabKeyModifiersChanged)
+    // clang-format off
+    Q_PROPERTY(int tabKeyModifiers
+               READ tabKeyModifiers
+               WRITE setTabKeyModifiers
+               NOTIFY tabKeyModifiersChanged)
+    // clang-format on
     void setTabKeyModifiers(int val);
     int tabKeyModifiers() const { return m_tabKeyModifiers; }
     Q_SIGNAL void tabKeyModifiersChanged();
 
-    Q_PROPERTY(int backtabKeyModifiers READ backtabKeyModifiers WRITE setBacktabKeyModifiers NOTIFY
-                       backtabKeyModifiersChanged)
+    // clang-format off
+    Q_PROPERTY(int backtabKeyModifiers
+               READ backtabKeyModifiers
+               WRITE setBacktabKeyModifiers
+               NOTIFY backtabKeyModifiersChanged)
+    // clang-format on
     void setBacktabKeyModifiers(int val);
     int backtabKeyModifiers() const { return m_backtabKeyModifiers; }
     Q_SIGNAL void backtabKeyModifiersChanged();
 
-    Q_PROPERTY(int disabledKeyModifier READ disabledKeyModifier WRITE setDisabledKeyModifier NOTIFY
-                       disabledKeyModifierChanged)
+    // clang-format off
+    Q_PROPERTY(int disabledKeyModifier
+               READ disabledKeyModifier
+               WRITE setDisabledKeyModifier
+               NOTIFY disabledKeyModifierChanged)
+    // clang-format on
     void setDisabledKeyModifier(int val);
     int disabledKeyModifier() const { return m_disabledKeyModifier; }
     Q_SIGNAL void disabledKeyModifierChanged();
 
-    Q_PROPERTY(int releaseFocusKey READ releaseFocusKey WRITE setReleaseFocusKey NOTIFY
-                       releaseFocusKeyChanged)
+    // clang-format off
+    Q_PROPERTY(int releaseFocusKey
+               READ releaseFocusKey
+               WRITE setReleaseFocusKey
+               NOTIFY releaseFocusKeyChanged)
+    // clang-format on
     void setReleaseFocusKey(int val);
     int releaseFocusKey() const { return m_releaseFocusKey; }
     Q_SIGNAL void releaseFocusKeyChanged();
 
-    Q_PROPERTY(bool releaseFocusEnabled READ isReleaseFocusEnabled WRITE setReleaseFocusEnabled
-                       NOTIFY releaseFocusEnabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool releaseFocusEnabled
+               READ isReleaseFocusEnabled
+               WRITE setReleaseFocusEnabled
+               NOTIFY releaseFocusEnabledChanged)
+    // clang-format on
     void setReleaseFocusEnabled(bool val);
     bool isReleaseFocusEnabled() const { return m_releaseFocusEnabled; }
     Q_SIGNAL void releaseFocusEnabledChanged();
 
-    Q_PROPERTY(bool wrapAround READ isWrapAround WRITE setWrapAround NOTIFY wrapAroundChanged)
+    // clang-format off
+    Q_PROPERTY(bool wrapAround
+               READ isWrapAround
+               WRITE setWrapAround
+               NOTIFY wrapAroundChanged)
+    // clang-format on
     void setWrapAround(bool val);
     bool isWrapAround() const { return m_wrapAround; }
     Q_SIGNAL void wrapAroundChanged();
 
-    Q_PROPERTY(QObject *currentItem READ currentItemObject NOTIFY currentItemChanged)
+    // clang-format off
+    Q_PROPERTY(QObject *currentItem
+               READ currentItemObject
+               NOTIFY currentItemChanged)
+    // clang-format on
     TabSequenceItem *currentItem() const { return m_currentItem; }
     QObject *currentItemObject() const;
     Q_SIGNAL void currentItemChanged();
@@ -143,26 +187,49 @@ public:
 
     static TabSequenceItem *qmlAttachedProperties(QObject *object);
 
-    Q_PROPERTY(QQuickItem *item READ item CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QQuickItem *item
+               READ item
+               CONSTANT )
+    // clang-format on
     QQuickItem *item() const;
 
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool enabled
+               READ isEnabled
+               WRITE setEnabled
+               NOTIFY enabledChanged)
+    // clang-format on
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    Q_PROPERTY(TabSequenceManager *manager READ manager WRITE setManager NOTIFY managerChanged RESET
-                       resetManager)
+    // clang-format off
+    Q_PROPERTY(TabSequenceManager *manager
+               READ manager
+               WRITE setManager
+               NOTIFY managerChanged
+               RESET resetManager)
+    // clang-format on
     void setManager(TabSequenceManager *val);
     TabSequenceManager *manager() const { return m_manager; }
     Q_SIGNAL void managerChanged();
 
-    Q_PROPERTY(int sequence READ sequence WRITE setSequence NOTIFY sequenceChanged)
+    // clang-format off
+    Q_PROPERTY(int sequence
+               READ sequence
+               WRITE setSequence
+               NOTIFY sequenceChanged)
+    // clang-format on
     void setSequence(int val);
     int sequence() const { return m_sequence; }
     Q_SIGNAL void sequenceChanged();
 
-    Q_PROPERTY(bool hasFocus READ hasFocus NOTIFY hasFocusChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasFocus
+               READ hasFocus
+               NOTIFY hasFocusChanged)
+    // clang-format on
     bool hasFocus() const;
     Q_SIGNAL void hasFocusChanged();
 

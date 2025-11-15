@@ -35,32 +35,54 @@ public:
         OutlineAndFill = 3
     };
     Q_ENUM(RenderType)
-    Q_PROPERTY(RenderType renderType READ renderType WRITE setRenderType NOTIFY renderTypeChanged)
+    // clang-format off
+    Q_PROPERTY(RenderType renderType
+               READ renderType
+               WRITE setRenderType
+               NOTIFY renderTypeChanged)
+    // clang-format on
     void setRenderType(RenderType val);
     RenderType renderType() const { return m_renderType; }
     Q_SIGNAL void renderTypeChanged();
 
     enum RenderingMechanism { UseOpenGL, UseQPainter, UseAntialiasedQPainter };
     Q_ENUM(RenderingMechanism)
-    Q_PROPERTY(RenderingMechanism renderingMechanism READ renderingMechanism WRITE
-                       setRenderingMechanism NOTIFY renderingMechanismChanged)
+    // clang-format off
+    Q_PROPERTY(RenderingMechanism renderingMechanism
+               READ renderingMechanism
+               WRITE setRenderingMechanism
+               NOTIFY renderingMechanismChanged)
+    // clang-format on
     void setRenderingMechanism(RenderingMechanism val);
     RenderingMechanism renderingMechanism() const { return m_renderingMechanism; }
     Q_SIGNAL void renderingMechanismChanged();
 
-    Q_PROPERTY(
-            QColor outlineColor READ outlineColor WRITE setOutlineColor NOTIFY outlineColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor outlineColor
+               READ outlineColor
+               WRITE setOutlineColor
+               NOTIFY outlineColorChanged)
+    // clang-format on
     void setOutlineColor(const QColor &val);
     QColor outlineColor() const { return m_outlineColor; }
     Q_SIGNAL void outlineColorChanged();
 
-    Q_PROPERTY(QColor fillColor READ fillColor WRITE setFillColor NOTIFY fillColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor fillColor
+               READ fillColor
+               WRITE setFillColor
+               NOTIFY fillColorChanged)
+    // clang-format on
     void setFillColor(const QColor &val);
     QColor fillColor() const { return m_fillColor; }
     Q_SIGNAL void fillColorChanged();
 
-    Q_PROPERTY(
-            qreal outlineWidth READ outlineWidth WRITE setOutlineWidth NOTIFY outlineWidthChanged)
+    // clang-format off
+    Q_PROPERTY(qreal outlineWidth
+               READ outlineWidth
+               WRITE setOutlineWidth
+               NOTIFY outlineWidthChanged)
+    // clang-format on
     void setOutlineWidth(const qreal &val);
     qreal outlineWidth() const { return m_outlineWidth; }
     Q_SIGNAL void outlineWidthChanged();
@@ -73,13 +95,21 @@ public:
         DashDotDotLine,
     };
     Q_ENUM(OutlineStyle)
-    Q_PROPERTY(OutlineStyle outlineStyle READ outlineStyle WRITE setOutlineStyle NOTIFY
-                       outlineStyleChanged)
+    // clang-format off
+    Q_PROPERTY(OutlineStyle outlineStyle
+               READ outlineStyle
+               WRITE setOutlineStyle
+               NOTIFY outlineStyleChanged)
+    // clang-format on
     void setOutlineStyle(OutlineStyle val);
     OutlineStyle outlineStyle() const { return m_outlineStyle; }
     Q_SIGNAL void outlineStyleChanged();
 
-    Q_PROPERTY(QRectF contentRect READ contentRect NOTIFY contentRectChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF contentRect
+               READ contentRect
+               NOTIFY contentRectChanged)
+    // clang-format on
     QRectF contentRect() const;
     Q_SIGNAL void contentRectChanged();
 

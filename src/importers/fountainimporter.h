@@ -23,8 +23,10 @@ class Parser;
 class FountainImporter : public AbstractImporter
 {
     Q_OBJECT
+    // clang-format off
     Q_CLASSINFO("Format", "Fountain")
     Q_CLASSINFO("NameFilters", "Fountain (*.fountain *.txt)")
+    // clang-format on
 
 public:
     Q_INVOKABLE explicit FountainImporter(QObject *parent = nullptr);

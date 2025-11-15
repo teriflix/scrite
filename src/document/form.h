@@ -35,23 +35,43 @@ public:
     ~FormQuestion();
     Q_SIGNAL void aboutToDelete(FormQuestion *ptr);
 
-    Q_PROPERTY(QString id READ id NOTIFY idChanged)
+    // clang-format off
+    Q_PROPERTY(QString id
+               READ id
+               NOTIFY idChanged)
+    // clang-format on
     QString id() const { return m_id; }
     Q_SIGNAL void idChanged();
 
-    Q_PROPERTY(QString number READ number NOTIFY numberChanged)
+    // clang-format off
+    Q_PROPERTY(QString number
+               READ number
+               NOTIFY numberChanged)
+    // clang-format on
     QString number() const { return m_number; }
     Q_SIGNAL void numberChanged();
 
-    Q_PROPERTY(QString questionText READ questionText NOTIFY questionTextChanged)
+    // clang-format off
+    Q_PROPERTY(QString questionText
+               READ questionText
+               NOTIFY questionTextChanged)
+    // clang-format on
     QString questionText() const { return m_questionText; }
     Q_SIGNAL void questionTextChanged();
 
-    Q_PROPERTY(QString answerHint READ answerHint NOTIFY answerHintChanged)
+    // clang-format off
+    Q_PROPERTY(QString answerHint
+               READ answerHint
+               NOTIFY answerHintChanged)
+    // clang-format on
     QString answerHint() const { return m_answerHint; }
     Q_SIGNAL void answerHintChanged();
 
-    Q_PROPERTY(int indentation READ indentation NOTIFY indentationChanged)
+    // clang-format off
+    Q_PROPERTY(int indentation
+               READ indentation
+               NOTIFY indentationChanged)
+    // clang-format on
     int indentation() const { return m_indentation; }
     Q_SIGNAL void indentationChanged();
 
@@ -66,11 +86,19 @@ public:
         LinearScale
     };
     Q_ENUM(Type)
-    Q_PROPERTY(Type type READ type NOTIFY typeChanged)
+    // clang-format off
+    Q_PROPERTY(Type type
+               READ type
+               NOTIFY typeChanged)
+    // clang-format on
     Type type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
-    Q_PROPERTY(QJsonObject metaData READ metaData NOTIFY metaDataChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject metaData
+               READ metaData
+               NOTIFY metaDataChanged)
+    // clang-format on
     QJsonObject metaData() const { return m_metaData; }
     Q_SIGNAL void metaDataChanged();
 
@@ -116,40 +144,77 @@ public:
         RelationshipForm
     };
     Q_ENUM(Type)
-    Q_PROPERTY(Type type READ type NOTIFY typeChanged)
+    // clang-format off
+    Q_PROPERTY(Type type
+               READ type
+               NOTIFY typeChanged)
+    // clang-format on
     Type type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
-    Q_PROPERTY(QString id READ id NOTIFY idChanged)
+    // clang-format off
+    Q_PROPERTY(QString id
+               READ id
+               NOTIFY idChanged)
+    // clang-format on
     QString id() const { return m_id; }
     Q_SIGNAL void idChanged();
 
-    Q_PROPERTY(QString title READ title NOTIFY titleChanged)
+    // clang-format off
+    Q_PROPERTY(QString title
+               READ title
+               NOTIFY titleChanged)
+    // clang-format on
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
-    Q_PROPERTY(QString subtitle READ subtitle NOTIFY subtitleChanged)
+    // clang-format off
+    Q_PROPERTY(QString subtitle
+               READ subtitle
+               NOTIFY subtitleChanged)
+    // clang-format on
     QString subtitle() const { return m_subtitle; }
     Q_SIGNAL void subtitleChanged();
 
-    Q_PROPERTY(QString createdBy READ createdBy NOTIFY createdByChanged)
+    // clang-format off
+    Q_PROPERTY(QString createdBy
+               READ createdBy
+               NOTIFY createdByChanged)
+    // clang-format on
     QString createdBy() const;
     Q_SIGNAL void createdByChanged();
 
-    Q_PROPERTY(QString version READ version NOTIFY versionChanged)
+    // clang-format off
+    Q_PROPERTY(QString version
+               READ version
+               NOTIFY versionChanged)
+    // clang-format on
     QString version() const;
     Q_SIGNAL void versionChanged();
 
-    Q_PROPERTY(QUrl moreInfoUrl READ moreInfoUrl NOTIFY moreInfoUrlChanged)
+    // clang-format off
+    Q_PROPERTY(QUrl moreInfoUrl
+               READ moreInfoUrl
+               NOTIFY moreInfoUrlChanged)
+    // clang-format on
     QUrl moreInfoUrl() const;
     Q_SIGNAL void moreInfoUrlChanged();
 
-    Q_PROPERTY(QAbstractListModel *questionsModel READ questionsModel CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(QAbstractListModel *questionsModel
+               READ questionsModel
+               CONSTANT STORED
+               false )
+    // clang-format on
     QObjectListModel<FormQuestion *> *questionsModel() const;
 
     Q_INVOKABLE FormQuestion *questionAt(int index) const;
 
-    Q_PROPERTY(int questionCount READ questionCount NOTIFY questionCountChanged)
+    // clang-format off
+    Q_PROPERTY(int questionCount
+               READ questionCount
+               NOTIFY questionCountChanged)
+    // clang-format on
     int questionCount() const { return m_questions.size(); }
     Q_SIGNAL void questionCountChanged();
 
@@ -202,7 +267,11 @@ public:
     explicit Forms(QObject *parent = nullptr);
     ~Forms();
 
-    Q_PROPERTY(int formCount READ formCount NOTIFY formCountChanged)
+    // clang-format off
+    Q_PROPERTY(int formCount
+               READ formCount
+               NOTIFY formCountChanged)
+    // clang-format on
     int formCount() const { return this->objectCount(); }
     Q_SIGNAL void formCountChanged();
 

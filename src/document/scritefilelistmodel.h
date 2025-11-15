@@ -37,13 +37,22 @@ public:
     enum Source { RecentFiles, Custom };
     Q_ENUM(Source)
 
-    Q_PROPERTY(Source source READ source WRITE setSource NOTIFY sourceChanged)
+    // clang-format off
+    Q_PROPERTY(Source source
+               READ source
+               WRITE setSource
+               NOTIFY sourceChanged)
+    // clang-format on
     void setSource(Source val);
     Source source() const { return m_source; }
     Q_SIGNAL void sourceChanged();
 
-    Q_PROPERTY(bool notifyMissingFiles READ isNotifyMissingFiles WRITE setNotifyMissingFiles NOTIFY
-                       notifyMissingFilesChanged)
+    // clang-format off
+    Q_PROPERTY(bool notifyMissingFiles
+               READ isNotifyMissingFiles
+               WRITE setNotifyMissingFiles
+               NOTIFY notifyMissingFilesChanged)
+    // clang-format on
     void setNotifyMissingFiles(bool val);
     bool isNotifyMissingFiles() const { return m_notifyMissingFiles; }
     Q_SIGNAL void notifyMissingFilesChanged();
@@ -52,13 +61,23 @@ public:
     Q_INVOKABLE static QStringList filesInFolder(const QString &folder);
 
     // Through this property we set the list of .scrite files to be accessed via this model
-    Q_PROPERTY(QStringList files READ files WRITE setFiles NOTIFY filesChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList files
+               READ files
+               WRITE setFiles
+               NOTIFY filesChanged)
+    // clang-format on
     void setFiles(const QStringList &val);
     QStringList files() const;
     Q_SIGNAL void filesChanged();
 
     // Here we specify the maximum number of files this model should maintain a list of
-    Q_PROPERTY(int maxCount READ maxCount WRITE setMaxCount NOTIFY maxCountChanged)
+    // clang-format off
+    Q_PROPERTY(int maxCount
+               READ maxCount
+               WRITE setMaxCount
+               NOTIFY maxCountChanged)
+    // clang-format on
     void setMaxCount(int val);
     int maxCount() const { return m_maxCount; }
     Q_SIGNAL void maxCountChanged();
@@ -77,7 +96,11 @@ public:
     Q_INVOKABLE void clear();
 
     // This property returns the number of items in the model
-    Q_PROPERTY(int count READ count NOTIFY filesChanged)
+    // clang-format off
+    Q_PROPERTY(int count
+               READ count
+               NOTIFY filesChanged)
+    // clang-format on
     int count() const { return m_files.size(); }
 
     // FileInfoRole returns an instance of ScriteFileInfo

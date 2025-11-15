@@ -47,59 +47,121 @@ public:
     explicit BoundingBoxEvaluator(QObject *parent = nullptr);
     ~BoundingBoxEvaluator();
 
-    Q_PROPERTY(qreal margin READ margin WRITE setMargin NOTIFY marginChanged)
+    // clang-format off
+    Q_PROPERTY(qreal margin
+               READ margin
+               WRITE setMargin
+               NOTIFY marginChanged)
+    // clang-format on
     void setMargin(qreal val);
     qreal margin() const { return m_margin; }
     Q_SIGNAL void marginChanged();
 
-    Q_PROPERTY(QRectF boundingBox READ boundingBox NOTIFY boundingBoxChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF boundingBox
+               READ boundingBox
+               NOTIFY boundingBoxChanged)
+    // clang-format on
     QRectF boundingBox() const { return m_boundingBox; }
     Q_SIGNAL void boundingBoxChanged();
 
     // Bounding box without initialRect consideration
-    Q_PROPERTY(QRectF tightBoundingBox READ tightBoundingBox NOTIFY tightBoundingBoxChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF tightBoundingBox
+               READ tightBoundingBox
+               NOTIFY tightBoundingBoxChanged)
+    // clang-format on
     QRectF tightBoundingBox() const { return m_tightBoundingBox; }
     Q_SIGNAL void tightBoundingBoxChanged();
 
-    Q_PROPERTY(qreal x READ x NOTIFY boundingBoxChanged)
+    // clang-format off
+    Q_PROPERTY(qreal x
+               READ x
+               NOTIFY boundingBoxChanged)
+    // clang-format on
     qreal x() const { return m_boundingBox.x(); }
 
-    Q_PROPERTY(qreal y READ y NOTIFY boundingBoxChanged)
+    // clang-format off
+    Q_PROPERTY(qreal y
+               READ y
+               NOTIFY boundingBoxChanged)
+    // clang-format on
     qreal y() const { return m_boundingBox.y(); }
 
-    Q_PROPERTY(qreal width READ width NOTIFY boundingBoxChanged)
+    // clang-format off
+    Q_PROPERTY(qreal width
+               READ width
+               NOTIFY boundingBoxChanged)
+    // clang-format on
     qreal width() const { return m_boundingBox.width(); }
 
-    Q_PROPERTY(qreal height READ height NOTIFY boundingBoxChanged)
+    // clang-format off
+    Q_PROPERTY(qreal height
+               READ height
+               NOTIFY boundingBoxChanged)
+    // clang-format on
     qreal height() const { return m_boundingBox.height(); }
 
-    Q_PROPERTY(qreal left READ left NOTIFY boundingBoxChanged)
+    // clang-format off
+    Q_PROPERTY(qreal left
+               READ left
+               NOTIFY boundingBoxChanged)
+    // clang-format on
     qreal left() const { return m_boundingBox.left(); }
 
-    Q_PROPERTY(qreal top READ top NOTIFY boundingBoxChanged)
+    // clang-format off
+    Q_PROPERTY(qreal top
+               READ top
+               NOTIFY boundingBoxChanged)
+    // clang-format on
     qreal top() const { return m_boundingBox.top(); }
 
-    Q_PROPERTY(qreal right READ right NOTIFY boundingBoxChanged)
+    // clang-format off
+    Q_PROPERTY(qreal right
+               READ right
+               NOTIFY boundingBoxChanged)
+    // clang-format on
     qreal right() const { return m_boundingBox.right(); }
 
-    Q_PROPERTY(qreal bottom READ bottom NOTIFY boundingBoxChanged)
+    // clang-format off
+    Q_PROPERTY(qreal bottom
+               READ bottom
+               NOTIFY boundingBoxChanged)
+    // clang-format on
     qreal bottom() const { return m_boundingBox.bottom(); }
 
-    Q_PROPERTY(QPointF center READ center NOTIFY boundingBoxChanged)
+    // clang-format off
+    Q_PROPERTY(QPointF center
+               READ center
+               NOTIFY boundingBoxChanged)
+    // clang-format on
     QPointF center() const { return m_boundingBox.center(); }
 
-    Q_PROPERTY(QRectF initialRect READ initialRect WRITE setInitialRect NOTIFY initialRectChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF initialRect
+               READ initialRect
+               WRITE setInitialRect
+               NOTIFY initialRectChanged)
+    // clang-format on
     void setInitialRect(const QRectF &val);
     QRectF initialRect() const { return m_initialRect; }
     Q_SIGNAL void initialRectChanged();
 
-    Q_PROPERTY(
-            qreal previewScale READ previewScale WRITE setPreviewScale NOTIFY previewScaleChanged)
+    // clang-format off
+    Q_PROPERTY(qreal previewScale
+               READ previewScale
+               WRITE setPreviewScale
+               NOTIFY previewScaleChanged)
+    // clang-format on
     void setPreviewScale(qreal val);
     qreal previewScale() const { return m_previewScale; }
     Q_SIGNAL void previewScaleChanged();
 
-    Q_PROPERTY(int itemCount READ itemCount NOTIFY itemCountChanged)
+    // clang-format off
+    Q_PROPERTY(int itemCount
+               READ itemCount
+               NOTIFY itemCountChanged)
+    // clang-format on
     int itemCount() const { return m_items.size(); }
     Q_SIGNAL void itemCountChanged();
 
@@ -161,53 +223,94 @@ public:
 
     QRectF boundingRect() const;
 
-    Q_PROPERTY(BoundingBoxEvaluator *evaluator READ evaluator WRITE setEvaluator NOTIFY
-                       evaluatorChanged RESET resetEvaluator STORED false)
+    // clang-format off
+    Q_PROPERTY(BoundingBoxEvaluator *evaluator
+               READ evaluator
+               WRITE setEvaluator
+               NOTIFY evaluatorChanged
+               RESET resetEvaluator
+               STORED false)
+    // clang-format on
     void setEvaluator(BoundingBoxEvaluator *val);
     BoundingBoxEvaluator *evaluator() const { return m_evaluator; }
     Q_SIGNAL void evaluatorChanged();
 
-    Q_PROPERTY(QVariant itemRect READ itemRect WRITE setItemRect NOTIFY itemRectChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant itemRect
+               READ itemRect
+               WRITE setItemRect
+               NOTIFY itemRectChanged)
+    // clang-format on
     void setItemRect(const QVariant &val);
     QVariant itemRect() const { return m_itemRect; }
     Q_SIGNAL void itemRectChanged();
 
-    Q_PROPERTY(qreal stackOrder READ stackOrder WRITE setStackOrder NOTIFY stackOrderChanged)
+    // clang-format off
+    Q_PROPERTY(qreal stackOrder
+               READ stackOrder
+               WRITE setStackOrder
+               NOTIFY stackOrderChanged)
+    // clang-format on
     void setStackOrder(qreal val);
     qreal stackOrder() const { return m_stackOrder; }
     Q_SIGNAL void stackOrderChanged();
 
-    Q_PROPERTY(bool previewEnabled READ isPreviewEnabled WRITE setPreviewEnabled NOTIFY
-                       previewEnabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool previewEnabled
+               READ isPreviewEnabled
+               WRITE setPreviewEnabled
+               NOTIFY previewEnabledChanged)
+    // clang-format on
     void setPreviewEnabled(bool val);
     bool isPreviewEnabled() const { return m_previewEnabled; }
     Q_SIGNAL void previewEnabledChanged();
 
-    Q_PROPERTY(QColor previewFillColor READ previewFillColor WRITE setPreviewFillColor NOTIFY
-                       previewFillColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor previewFillColor
+               READ previewFillColor
+               WRITE setPreviewFillColor
+               NOTIFY previewFillColorChanged)
+    // clang-format on
     void setPreviewFillColor(const QColor &val);
     QColor previewFillColor() const { return m_previewFillColor; }
     Q_SIGNAL void previewFillColorChanged();
 
-    Q_PROPERTY(QString previewImageSource READ previewImageSource WRITE setPreviewImageSource NOTIFY
-                       previewImageSourceChanged)
+    // clang-format off
+    Q_PROPERTY(QString previewImageSource
+               READ previewImageSource
+               WRITE setPreviewImageSource
+               NOTIFY previewImageSourceChanged)
+    // clang-format on
     void setPreviewImageSource(const QString &val);
     QString previewImageSource() const { return m_previewImageSource; }
     Q_SIGNAL void previewImageSourceChanged();
 
-    Q_PROPERTY(QColor previewBorderColor READ previewBorderColor WRITE setPreviewBorderColor NOTIFY
-                       previewBorderColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor previewBorderColor
+               READ previewBorderColor
+               WRITE setPreviewBorderColor
+               NOTIFY previewBorderColorChanged)
+    // clang-format on
     void setPreviewBorderColor(const QColor &val);
     QColor previewBorderColor() const { return m_previewBorderColor; }
     Q_SIGNAL void previewBorderColorChanged();
 
-    Q_PROPERTY(qreal previewBorderWidth READ previewBorderWidth WRITE setPreviewBorderWidth NOTIFY
-                       previewBorderWidthChanged)
+    // clang-format off
+    Q_PROPERTY(qreal previewBorderWidth
+               READ previewBorderWidth
+               WRITE setPreviewBorderWidth
+               NOTIFY previewBorderWidthChanged)
+    // clang-format on
     void setPreviewBorderWidth(qreal val);
     qreal previewBorderWidth() const { return m_previewBorderWidth; }
     Q_SIGNAL void previewBorderWidthChanged();
 
-    Q_PROPERTY(bool livePreview READ isLivePreview WRITE setLivePreview NOTIFY livePreviewChanged)
+    // clang-format off
+    Q_PROPERTY(bool livePreview
+               READ isLivePreview
+               WRITE setLivePreview
+               NOTIFY livePreviewChanged)
+    // clang-format on
     void setLivePreview(bool val);
     bool isLivePreview() const { return m_livePreview; }
     Q_SIGNAL void livePreviewChanged();
@@ -220,26 +323,44 @@ public:
         VisibleUponViewportContains
     };
     Q_ENUM(VisibilityMode)
-    Q_PROPERTY(VisibilityMode visibilityMode READ visibilityMode WRITE setVisibilityMode NOTIFY
-                       visibilityModeChanged)
+    // clang-format off
+    Q_PROPERTY(VisibilityMode visibilityMode
+               READ visibilityMode
+               WRITE setVisibilityMode
+               NOTIFY visibilityModeChanged)
+    // clang-format on
     void setVisibilityMode(VisibilityMode val);
     VisibilityMode visibilityMode() const { return m_visibilityMode; }
     Q_SIGNAL void visibilityModeChanged();
 
-    Q_PROPERTY(QQuickItem *viewportItem READ viewportItem WRITE setViewportItem NOTIFY
-                       viewportItemChanged RESET resetViewportItem STORED false)
+    // clang-format off
+    Q_PROPERTY(QQuickItem *viewportItem
+               READ viewportItem
+               WRITE setViewportItem
+               NOTIFY viewportItemChanged
+               RESET resetViewportItem
+               STORED false)
+    // clang-format on
     void setViewportItem(QQuickItem *val);
     QQuickItem *viewportItem() const { return m_viewportItem; }
     Q_SIGNAL void viewportItemChanged();
 
-    Q_PROPERTY(
-            QRectF viewportRect READ viewportRect WRITE setViewportRect NOTIFY viewportRectChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF viewportRect
+               READ viewportRect
+               WRITE setViewportRect
+               NOTIFY viewportRectChanged)
+    // clang-format on
     void setViewportRect(const QRectF &val);
     QRectF viewportRect() const { return m_viewportRect; }
     Q_SIGNAL void viewportRectChanged();
 
-    Q_PROPERTY(QByteArray visibilityProperty READ visibilityProperty WRITE setVisibilityProperty
-                       NOTIFY visibilityPropertyChanged)
+    // clang-format off
+    Q_PROPERTY(QByteArray visibilityProperty
+               READ visibilityProperty
+               WRITE setVisibilityProperty
+               NOTIFY visibilityPropertyChanged)
+    // clang-format on
     void setVisibilityProperty(const QByteArray &val);
     QByteArray visibilityProperty() const { return m_visibilityProperty; }
     Q_SIGNAL void visibilityPropertyChanged();
@@ -299,25 +420,42 @@ public:
     explicit BoundingBoxPreview(QQuickItem *parent = nullptr);
     ~BoundingBoxPreview();
 
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY
-                       backgroundColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor backgroundColor
+               READ backgroundColor
+               WRITE setBackgroundColor
+               NOTIFY backgroundColorChanged)
+    // clang-format on
     void setBackgroundColor(const QColor &val);
     QColor backgroundColor() const { return m_backgroundColor; }
     Q_SIGNAL void backgroundColorChanged();
 
-    Q_PROPERTY(qreal backgroundOpacity READ backgroundOpacity WRITE setBackgroundOpacity NOTIFY
-                       backgroundOpacityChanged)
+    // clang-format off
+    Q_PROPERTY(qreal backgroundOpacity
+               READ backgroundOpacity
+               WRITE setBackgroundOpacity
+               NOTIFY backgroundOpacityChanged)
+    // clang-format on
     void setBackgroundOpacity(qreal val);
     qreal backgroundOpacity() const { return m_backgroundOpacity; }
     Q_SIGNAL void backgroundOpacityChanged();
 
-    Q_PROPERTY(BoundingBoxEvaluator *evaluator READ evaluator WRITE setEvaluator NOTIFY
-                       evaluatorChanged RESET resetEvaluator)
+    // clang-format off
+    Q_PROPERTY(BoundingBoxEvaluator *evaluator
+               READ evaluator
+               WRITE setEvaluator
+               NOTIFY evaluatorChanged
+               RESET resetEvaluator)
+    // clang-format on
     void setEvaluator(BoundingBoxEvaluator *val);
     BoundingBoxEvaluator *evaluator() const { return m_evaluator; }
     Q_SIGNAL void evaluatorChanged();
 
-    Q_PROPERTY(bool isUpdatingPreview READ isUpdatingPreview NOTIFY isUpdatingPreviewChanged)
+    // clang-format off
+    Q_PROPERTY(bool isUpdatingPreview
+               READ isUpdatingPreview
+               NOTIFY isUpdatingPreviewChanged)
+    // clang-format on
     bool isUpdatingPreview() const { return !m_updatePreviewFutureWatcher.isNull(); }
     Q_SIGNAL void isUpdatingPreviewChanged();
 

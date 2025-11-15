@@ -35,49 +35,94 @@ public:
     bool operator!=(const UserInstallationInfo &other) const { return !(*this == other); }
     UserInstallationInfo &operator=(const UserInstallationInfo &other);
 
-    Q_PROPERTY(bool valid READ isValid)
+    // clang-format off
+    Q_PROPERTY(bool valid
+               READ isValid)
+    // clang-format on
     bool isValid() const { return !id.isEmpty(); }
 
-    Q_PROPERTY(QString id MEMBER id)
+    // clang-format off
+    Q_PROPERTY(QString id
+               MEMBER id)
+    // clang-format on
     QString id;
 
-    Q_PROPERTY(QString clientId MEMBER clientId)
+    // clang-format off
+    Q_PROPERTY(QString clientId
+               MEMBER clientId)
+    // clang-format on
     QString clientId;
 
-    Q_PROPERTY(QString deviceId MEMBER deviceId)
+    // clang-format off
+    Q_PROPERTY(QString deviceId
+               MEMBER deviceId)
+    // clang-format on
     QString deviceId;
 
-    Q_PROPERTY(QString platform MEMBER platform)
+    // clang-format off
+    Q_PROPERTY(QString platform
+               MEMBER platform)
+    // clang-format on
     QString platform;
 
-    Q_PROPERTY(QString platformVersion MEMBER platformVersion)
+    // clang-format off
+    Q_PROPERTY(QString platformVersion
+               MEMBER platformVersion)
+    // clang-format on
     QString platformVersion;
 
-    Q_PROPERTY(QString platformType MEMBER platformType)
+    // clang-format off
+    Q_PROPERTY(QString platformType
+               MEMBER platformType)
+    // clang-format on
     QString platformType;
 
-    Q_PROPERTY(QString hostName MEMBER hostName)
+    // clang-format off
+    Q_PROPERTY(QString hostName
+               MEMBER hostName)
+    // clang-format on
     QString hostName;
 
-    Q_PROPERTY(QString appVersion MEMBER appVersion)
+    // clang-format off
+    Q_PROPERTY(QString appVersion
+               MEMBER appVersion)
+    // clang-format on
     QString appVersion;
 
-    Q_PROPERTY(QStringList pastAppVersions MEMBER pastAppVersions)
+    // clang-format off
+    Q_PROPERTY(QStringList pastAppVersions
+               MEMBER pastAppVersions)
+    // clang-format on
     QStringList pastAppVersions;
 
-    Q_PROPERTY(QDateTime creationDate MEMBER creationDate)
+    // clang-format off
+    Q_PROPERTY(QDateTime creationDate
+               MEMBER creationDate)
+    // clang-format on
     QDateTime creationDate;
 
-    Q_PROPERTY(QDateTime lastActivationDate MEMBER lastActivationDate)
+    // clang-format off
+    Q_PROPERTY(QDateTime lastActivationDate
+               MEMBER lastActivationDate)
+    // clang-format on
     QDateTime lastActivationDate;
 
-    Q_PROPERTY(QDateTime lastSessionDate MEMBER lastSessionDate)
+    // clang-format off
+    Q_PROPERTY(QDateTime lastSessionDate
+               MEMBER lastSessionDate)
+    // clang-format on
     QDateTime lastSessionDate;
 
-    Q_PROPERTY(bool activated MEMBER activated)
+    // clang-format off
+    Q_PROPERTY(bool activated
+               MEMBER activated)
+    // clang-format on
     bool activated = false;
 
-    Q_PROPERTY(bool isCurrent READ isCurrent)
+    // clang-format off
+    Q_PROPERTY(bool isCurrent
+               READ isCurrent)
+    // clang-format on
     bool isCurrent() const; // TODO
 };
 Q_DECLARE_METATYPE(UserInstallationInfo)
@@ -98,37 +143,70 @@ public:
     bool operator!=(const UserSubscriptionPlanInfo &other) const { return !(*this == other); }
     UserSubscriptionPlanInfo &operator=(const UserSubscriptionPlanInfo &other);
 
-    Q_PROPERTY(QString name MEMBER name)
+    // clang-format off
+    Q_PROPERTY(QString name
+               MEMBER name)
+    // clang-format on
     QString name;
 
-    Q_PROPERTY(QString kind MEMBER kind)
+    // clang-format off
+    Q_PROPERTY(QString kind
+               MEMBER kind)
+    // clang-format on
     QString kind;
 
-    Q_PROPERTY(QString title MEMBER title)
+    // clang-format off
+    Q_PROPERTY(QString title
+               MEMBER title)
+    // clang-format on
     QString title;
 
-    Q_PROPERTY(QString subtitle MEMBER subtitle)
+    // clang-format off
+    Q_PROPERTY(QString subtitle
+               MEMBER subtitle)
+    // clang-format on
     QString subtitle;
 
-    Q_PROPERTY(int duration MEMBER duration)
+    // clang-format off
+    Q_PROPERTY(int duration
+               MEMBER duration)
+    // clang-format on
     int duration = 0;
 
-    Q_PROPERTY(bool exclusive MEMBER exclusive)
+    // clang-format off
+    Q_PROPERTY(bool exclusive
+               MEMBER exclusive)
+    // clang-format on
     bool exclusive = false;
 
-    Q_PROPERTY(QString currency MEMBER currency)
+    // clang-format off
+    Q_PROPERTY(QString currency
+               MEMBER currency)
+    // clang-format on
     QString currency;
 
-    Q_PROPERTY(qreal price MEMBER price)
+    // clang-format off
+    Q_PROPERTY(qreal price
+               MEMBER price)
+    // clang-format on
     qreal price = 0;
 
-    Q_PROPERTY(QStringList features MEMBER features)
+    // clang-format off
+    Q_PROPERTY(QStringList features
+               MEMBER features)
+    // clang-format on
     QStringList features;
 
-    Q_PROPERTY(QString featureNote MEMBER featureNote)
+    // clang-format off
+    Q_PROPERTY(QString featureNote
+               MEMBER featureNote)
+    // clang-format on
     QString featureNote;
 
-    Q_PROPERTY(int devices MEMBER devices)
+    // clang-format off
+    Q_PROPERTY(int devices
+               MEMBER devices)
+    // clang-format on
     int devices = 1;
 };
 Q_DECLARE_METATYPE(UserSubscriptionPlanInfo)
@@ -149,47 +227,90 @@ public:
     bool operator!=(const UserSubscriptionInfo &other) const { return !(*this == other); }
     UserSubscriptionInfo &operator=(const UserSubscriptionInfo &other);
 
-    Q_PROPERTY(bool valid READ isValid)
+    // clang-format off
+    Q_PROPERTY(bool valid
+               READ isValid)
+    // clang-format on
     bool isValid() const { return !id.isEmpty(); }
 
-    Q_PROPERTY(QString id MEMBER id)
+    // clang-format off
+    Q_PROPERTY(QString id
+               MEMBER id)
+    // clang-format on
     QString id;
 
-    Q_PROPERTY(QString kind MEMBER kind)
+    // clang-format off
+    Q_PROPERTY(QString kind
+               MEMBER kind)
+    // clang-format on
     QString kind;
 
-    Q_PROPERTY(UserSubscriptionPlanInfo plan MEMBER plan)
+    // clang-format off
+    Q_PROPERTY(UserSubscriptionPlanInfo plan
+               MEMBER plan)
+    // clang-format on
     UserSubscriptionPlanInfo plan;
 
-    Q_PROPERTY(QDateTime from MEMBER from)
+    // clang-format off
+    Q_PROPERTY(QDateTime from
+               MEMBER from)
+    // clang-format on
     QDateTime from;
 
-    Q_PROPERTY(QDateTime until MEMBER until)
+    // clang-format off
+    Q_PROPERTY(QDateTime until
+               MEMBER until)
+    // clang-format on
     QDateTime until;
 
-    Q_PROPERTY(QString wc_order_id MEMBER orderId)
-    Q_PROPERTY(QString orderId MEMBER orderId)
+    // clang-format off
+    Q_PROPERTY(QString wc_order_id
+               MEMBER orderId)
+    Q_PROPERTY(QString orderId
+               MEMBER orderId)
+    // clang-format on
     QString orderId;
 
-    Q_PROPERTY(QUrl detailsUrl MEMBER detailsUrl)
+    // clang-format off
+    Q_PROPERTY(QUrl detailsUrl
+               MEMBER detailsUrl)
+    // clang-format on
     QUrl detailsUrl;
 
-    Q_PROPERTY(bool isActive MEMBER isActive)
+    // clang-format off
+    Q_PROPERTY(bool isActive
+               MEMBER isActive)
+    // clang-format on
     bool isActive = false;
 
-    Q_PROPERTY(bool isUpcoming MEMBER isUpcoming)
+    // clang-format off
+    Q_PROPERTY(bool isUpcoming
+               MEMBER isUpcoming)
+    // clang-format on
     bool isUpcoming = false;
 
-    Q_PROPERTY(bool hasExpired MEMBER hasExpired)
+    // clang-format off
+    Q_PROPERTY(bool hasExpired
+               MEMBER hasExpired)
+    // clang-format on
     bool hasExpired = false;
 
-    Q_PROPERTY(int daysToUntil READ daysToUntil)
+    // clang-format off
+    Q_PROPERTY(int daysToUntil
+               READ daysToUntil)
+    // clang-format on
     int daysToUntil() const { return QDateTime::currentDateTime().daysTo(this->until) + 1; }
 
-    Q_PROPERTY(int daysToFrom READ daysToFrom)
+    // clang-format off
+    Q_PROPERTY(int daysToFrom
+               READ daysToFrom)
+    // clang-format on
     int daysToFrom() const { return QDateTime::currentDateTime().daysTo(this->from) + 1; }
 
-    Q_PROPERTY(QString description READ description)
+    // clang-format off
+    Q_PROPERTY(QString description
+               READ description)
+    // clang-format on
     QString description() const;
 
     // feature is anything from Scrite::AppFeature
@@ -214,88 +335,172 @@ public:
     bool operator!=(const UserInfo &other) const { return !(*this == other); }
     UserInfo &operator=(const UserInfo &other);
 
-    Q_PROPERTY(bool valid READ isValid)
+    // clang-format off
+    Q_PROPERTY(bool valid
+               READ isValid)
+    // clang-format on
     bool isValid() const { return !id.isEmpty(); }
 
-    Q_PROPERTY(QString id MEMBER id)
+    // clang-format off
+    Q_PROPERTY(QString id
+               MEMBER id)
+    // clang-format on
     QString id;
 
-    Q_PROPERTY(QString email MEMBER email)
+    // clang-format off
+    Q_PROPERTY(QString email
+               MEMBER email)
+    // clang-format on
     QString email;
 
-    Q_PROPERTY(QDateTime signUpDate MEMBER signUpDate)
+    // clang-format off
+    Q_PROPERTY(QDateTime signUpDate
+               MEMBER signUpDate)
+    // clang-format on
     QDateTime signUpDate;
 
-    Q_PROPERTY(QDateTime timestamp MEMBER timestamp)
+    // clang-format off
+    Q_PROPERTY(QDateTime timestamp
+               MEMBER timestamp)
+    // clang-format on
     QDateTime timestamp;
 
-    Q_PROPERTY(QString firstName MEMBER firstName)
+    // clang-format off
+    Q_PROPERTY(QString firstName
+               MEMBER firstName)
+    // clang-format on
     QString firstName;
 
-    Q_PROPERTY(QString lastName MEMBER lastName)
+    // clang-format off
+    Q_PROPERTY(QString lastName
+               MEMBER lastName)
+    // clang-format on
     QString lastName;
 
-    Q_PROPERTY(QString fullName MEMBER fullName)
+    // clang-format off
+    Q_PROPERTY(QString fullName
+               MEMBER fullName)
+    // clang-format on
     QString fullName;
 
-    Q_PROPERTY(QString experience MEMBER experience)
+    // clang-format off
+    Q_PROPERTY(QString experience
+               MEMBER experience)
+    // clang-format on
     QString experience;
 
-    Q_PROPERTY(QString phone MEMBER phone)
+    // clang-format off
+    Q_PROPERTY(QString phone
+               MEMBER phone)
+    // clang-format on
     QString phone;
 
-    Q_PROPERTY(QString city MEMBER city)
+    // clang-format off
+    Q_PROPERTY(QString city
+               MEMBER city)
+    // clang-format on
     QString city;
 
-    Q_PROPERTY(QString country MEMBER country)
+    // clang-format off
+    Q_PROPERTY(QString country
+               MEMBER country)
+    // clang-format on
     QString country;
 
-    Q_PROPERTY(QString wdyhas MEMBER wdyhas)
+    // clang-format off
+    Q_PROPERTY(QString wdyhas
+               MEMBER wdyhas)
+    // clang-format on
     QString wdyhas;
 
-    Q_PROPERTY(bool consentToActivityLog MEMBER consentToActivityLog)
+    // clang-format off
+    Q_PROPERTY(bool consentToActivityLog
+               MEMBER consentToActivityLog)
+    // clang-format on
     bool consentToActivityLog = false;
 
-    Q_PROPERTY(bool consentToEmail MEMBER consentToEmail)
+    // clang-format off
+    Q_PROPERTY(bool consentToEmail
+               MEMBER consentToEmail)
+    // clang-format on
     bool consentToEmail = false;
 
-    Q_PROPERTY(QList<UserInstallationInfo> installations MEMBER installations)
+    // clang-format off
+    Q_PROPERTY(QList<UserInstallationInfo> installations
+               MEMBER installations)
+    // clang-format on
     QList<UserInstallationInfo> installations;
 
-    Q_PROPERTY(QList<UserSubscriptionInfo> subscriptions MEMBER subscriptions)
+    // clang-format off
+    Q_PROPERTY(QList<UserSubscriptionInfo> subscriptions
+               MEMBER subscriptions)
+    // clang-format on
     QList<UserSubscriptionInfo> subscriptions;
 
-    Q_PROPERTY(UserSubscriptionInfo publicBetaSubscription MEMBER publicBetaSubscription)
+    // clang-format off
+    Q_PROPERTY(UserSubscriptionInfo publicBetaSubscription
+               MEMBER publicBetaSubscription)
+    // clang-format on
     UserSubscriptionInfo publicBetaSubscription;
 
-    Q_PROPERTY(int activeInstallationCount MEMBER activeInstallationCount)
+    // clang-format off
+    Q_PROPERTY(int activeInstallationCount
+               MEMBER activeInstallationCount)
+    // clang-format on
     int activeInstallationCount = 0;
 
-    Q_PROPERTY(bool hasActiveSubscription MEMBER hasActiveSubscription)
+    // clang-format off
+    Q_PROPERTY(bool hasActiveSubscription
+               MEMBER hasActiveSubscription)
+    // clang-format on
     bool hasActiveSubscription = false;
 
-    Q_PROPERTY(bool hasUpcomingSubscription MEMBER hasUpcomingSubscription)
+    // clang-format off
+    Q_PROPERTY(bool hasUpcomingSubscription
+               MEMBER hasUpcomingSubscription)
+    // clang-format on
     bool hasUpcomingSubscription = false;
 
-    Q_PROPERTY(bool hasTrialSubscription MEMBER hasTrialSubscription)
+    // clang-format off
+    Q_PROPERTY(bool hasTrialSubscription
+               MEMBER hasTrialSubscription)
+    // clang-format on
     bool hasTrialSubscription = false;
 
-    Q_PROPERTY(int paidSubscriptionCount MEMBER paidSubscriptionCount)
+    // clang-format off
+    Q_PROPERTY(int paidSubscriptionCount
+               MEMBER paidSubscriptionCount)
+    // clang-format on
     int paidSubscriptionCount = 0;
 
-    Q_PROPERTY(QDateTime subscribedUntil MEMBER subscribedUntil)
+    // clang-format off
+    Q_PROPERTY(QDateTime subscribedUntil
+               MEMBER subscribedUntil)
+    // clang-format on
     QDateTime subscribedUntil;
 
-    Q_PROPERTY(bool isEarlyAdopter MEMBER isEarlyAdopter)
+    // clang-format off
+    Q_PROPERTY(bool isEarlyAdopter
+               MEMBER isEarlyAdopter)
+    // clang-format on
     bool isEarlyAdopter = false;
 
-    Q_PROPERTY(QStringList availableFeatures MEMBER availableFeatures)
+    // clang-format off
+    Q_PROPERTY(QStringList availableFeatures
+               MEMBER availableFeatures)
+    // clang-format on
     QStringList availableFeatures;
 
-    Q_PROPERTY(QUrl badgeImageUrl MEMBER badgeImageUrl)
+    // clang-format off
+    Q_PROPERTY(QUrl badgeImageUrl
+               MEMBER badgeImageUrl)
+    // clang-format on
     QUrl badgeImageUrl;
 
-    Q_PROPERTY(QColor badgeTextColor MEMBER badgeTextColor)
+    // clang-format off
+    Q_PROPERTY(QColor badgeTextColor
+               MEMBER badgeTextColor)
+    // clang-format on
     QColor badgeTextColor = Qt::white;
 
     Q_INVOKABLE int daysToSubscribedUntil() const;
@@ -322,22 +527,37 @@ public:
     enum Type { LinkType, OtherType };
     Q_ENUM(Type)
 
-    Q_PROPERTY(Type type MEMBER type)
+    // clang-format off
+    Q_PROPERTY(Type type
+               MEMBER type)
+    // clang-format on
     Type type = LinkType;
 
-    Q_PROPERTY(QString text MEMBER text)
+    // clang-format off
+    Q_PROPERTY(QString text
+               MEMBER text)
+    // clang-format on
     QString text;
 
     enum Action { UrlAction, CommandAction, OtherAction };
     Q_ENUM(Action)
 
-    Q_PROPERTY(Action action MEMBER action)
+    // clang-format off
+    Q_PROPERTY(Action action
+               MEMBER action)
+    // clang-format on
     Action action = UrlAction;
 
-    Q_PROPERTY(QString endpoint MEMBER endpoint)
+    // clang-format off
+    Q_PROPERTY(QString endpoint
+               MEMBER endpoint)
+    // clang-format on
     QString endpoint;
 
-    Q_PROPERTY(QJsonValue params MEMBER params)
+    // clang-format off
+    Q_PROPERTY(QJsonValue params
+               MEMBER params)
+    // clang-format on
     QJsonValue params;
 };
 Q_DECLARE_METATYPE(UserMessageButton)
@@ -358,46 +578,82 @@ public:
     bool operator!=(const UserMessage &other) const { return !(*this == other); }
     UserMessage &operator=(const UserMessage &other);
 
-    Q_PROPERTY(bool valid READ isValid)
+    // clang-format off
+    Q_PROPERTY(bool valid
+               READ isValid)
+    // clang-format on
     bool isValid() const { return !id.isEmpty(); }
 
-    Q_PROPERTY(QString id MEMBER id)
+    // clang-format off
+    Q_PROPERTY(QString id
+               MEMBER id)
+    // clang-format on
     QString id;
 
     enum Type { DefaultType, ImportantType };
     Q_ENUM(Type)
 
-    Q_PROPERTY(Type type MEMBER type)
+    // clang-format off
+    Q_PROPERTY(Type type
+               MEMBER type)
+    // clang-format on
     Type type = DefaultType;
 
-    Q_PROPERTY(QString from MEMBER from)
+    // clang-format off
+    Q_PROPERTY(QString from
+               MEMBER from)
+    // clang-format on
     QString from;
 
-    Q_PROPERTY(QDateTime timestamp MEMBER timestamp)
+    // clang-format off
+    Q_PROPERTY(QDateTime timestamp
+               MEMBER timestamp)
+    // clang-format on
     QDateTime timestamp;
 
-    Q_PROPERTY(QDateTime expiresOn MEMBER expiresOn)
+    // clang-format off
+    Q_PROPERTY(QDateTime expiresOn
+               MEMBER expiresOn)
+    // clang-format on
     QDateTime expiresOn;
 
-    Q_PROPERTY(bool hasExpired READ hasExpired)
+    // clang-format off
+    Q_PROPERTY(bool hasExpired
+               READ hasExpired)
+    // clang-format on
     bool hasExpired() const
     {
         return this->isValid() && QDateTime::currentDateTime() > this->expiresOn;
     }
 
-    Q_PROPERTY(QString subject MEMBER subject)
+    // clang-format off
+    Q_PROPERTY(QString subject
+               MEMBER subject)
+    // clang-format on
     QString subject;
 
-    Q_PROPERTY(QUrl image MEMBER image)
+    // clang-format off
+    Q_PROPERTY(QUrl image
+               MEMBER image)
+    // clang-format on
     QUrl image;
 
-    Q_PROPERTY(QString body MEMBER body)
+    // clang-format off
+    Q_PROPERTY(QString body
+               MEMBER body)
+    // clang-format on
     QString body;
 
-    Q_PROPERTY(bool read MEMBER read)
+    // clang-format off
+    Q_PROPERTY(bool read
+               MEMBER read)
+    // clang-format on
     bool read = false;
 
-    Q_PROPERTY(QList<UserMessageButton> buttons MEMBER buttons)
+    // clang-format off
+    Q_PROPERTY(QList<UserMessageButton> buttons
+               MEMBER buttons)
+    // clang-format on
     QList<UserMessageButton> buttons;
 };
 Q_DECLARE_METATYPE(UserMessage)
@@ -413,11 +669,19 @@ public:
     static User *instance();
     ~User();
 
-    Q_PROPERTY(bool loggedIn READ isLoggedIn NOTIFY infoChanged)
+    // clang-format off
+    Q_PROPERTY(bool loggedIn
+               READ isLoggedIn
+               NOTIFY infoChanged)
+    // clang-format on
     bool isLoggedIn() const;
     Q_SIGNAL void loggedInChanged();
 
-    Q_PROPERTY(UserInfo info READ info NOTIFY infoChanged)
+    // clang-format off
+    Q_PROPERTY(UserInfo info
+               READ info
+               NOTIFY infoChanged)
+    // clang-format on
     UserInfo info() const { return m_info; }
     Q_SIGNAL void infoChanged();
 
@@ -427,18 +691,35 @@ public:
     }
     Q_SLOT void logActivity2(const QString &activity, const QJsonValue &data);
 
-    Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
+    // clang-format off
+    Q_PROPERTY(bool busy
+               READ isBusy
+               NOTIFY busyChanged)
+    // clang-format on
     bool isBusy() const;
     Q_SIGNAL void busyChanged();
 
-    Q_PROPERTY(QList<UserMessage> messages READ messages WRITE setMessages NOTIFY messagesChanged)
+    // clang-format off
+    Q_PROPERTY(QList<UserMessage> messages
+               READ messages
+               WRITE setMessages
+               NOTIFY messagesChanged)
+    // clang-format on
     QList<UserMessage> messages() const { return m_messages; }
     Q_SIGNAL void messagesChanged();
 
-    Q_PROPERTY(int totalMessageCount READ totalMessageCount NOTIFY messagesChanged)
+    // clang-format off
+    Q_PROPERTY(int totalMessageCount
+               READ totalMessageCount
+               NOTIFY messagesChanged)
+    // clang-format on
     int totalMessageCount() const { return m_messages.size(); }
 
-    Q_PROPERTY(int unreadMessageCount READ unreadMessageCount NOTIFY messagesChanged)
+    // clang-format off
+    Q_PROPERTY(int unreadMessageCount
+               READ unreadMessageCount
+               NOTIFY messagesChanged)
+    // clang-format on
     int unreadMessageCount() const;
 
     Q_INVOKABLE void checkForMessages();
@@ -485,17 +766,31 @@ public:
     static bool isEnabled(int feature);
     static bool isEnabled(const QString &featureName);
 
-    Q_PROPERTY(QString featureName READ featureName WRITE setFeatureName NOTIFY featureNameChanged)
+    // clang-format off
+    Q_PROPERTY(QString featureName
+               READ featureName
+               WRITE setFeatureName
+               NOTIFY featureNameChanged)
+    // clang-format on
     void setFeatureName(const QString &val);
     QString featureName() const { return m_featureName; }
     Q_SIGNAL void featureNameChanged();
 
-    Q_PROPERTY(int feature READ feature WRITE setFeature NOTIFY featureChanged)
+    // clang-format off
+    Q_PROPERTY(int feature
+               READ feature
+               WRITE setFeature
+               NOTIFY featureChanged)
+    // clang-format on
     void setFeature(int val);
     int feature() const { return m_feature; }
     Q_SIGNAL void featureChanged();
 
-    Q_PROPERTY(bool enabled READ isEnabled NOTIFY enabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool enabled
+               READ isEnabled
+               NOTIFY enabledChanged)
+    // clang-format on
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 

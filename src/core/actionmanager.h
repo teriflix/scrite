@@ -29,7 +29,9 @@ class ActionManager : public QAbstractListModel
 {
     Q_OBJECT
     QML_ELEMENT
+    // clang-format off
     Q_CLASSINFO("DefaultProperty", "actions")
+    // clang-format on
     QML_ATTACHED(ActionManagerAttached)
 
 public:
@@ -45,17 +47,31 @@ public:
     static bool restoreActionShortcut(QObject *action);
     static QObject *findActionForShortcut(const QString &shortcut);
 
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    // clang-format off
+    Q_PROPERTY(QString title
+               READ title
+               WRITE setTitle
+               NOTIFY titleChanged)
+    // clang-format on
     void setTitle(const QString &val);
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
-    Q_PROPERTY(int sortOrder READ sortOrder WRITE setSortOrder NOTIFY sortOrderChanged)
+    // clang-format off
+    Q_PROPERTY(int sortOrder
+               READ sortOrder
+               WRITE setSortOrder
+               NOTIFY sortOrderChanged)
+    // clang-format on
     void setSortOrder(int val);
     int sortOrder() const { return m_sortOrder; }
     Q_SIGNAL void sortOrderChanged();
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    // clang-format off
+    Q_PROPERTY(int count
+               READ count
+               NOTIFY countChanged)
+    // clang-format on
     int count() const { return m_actions.size(); }
     Q_SIGNAL void countChanged();
 
@@ -67,7 +83,10 @@ public:
 
     QList<QObject *> actions() const { return m_actions; }
 
-    Q_PROPERTY(QQmlListProperty<QObject> actions READ qmlActionsList)
+    // clang-format off
+    Q_PROPERTY(QQmlListProperty<QObject> actions
+               READ qmlActionsList)
+    // clang-format on
     QQmlListProperty<QObject> qmlActionsList();
     void addAction(QObject *ptr) { this->add(ptr); }
     void removeAction(QObject *ptr) { this->remove(ptr); }
@@ -122,7 +141,12 @@ class ActionManagerAttached : public QObject
 public:
     virtual ~ActionManagerAttached();
 
-    Q_PROPERTY(ActionManager *target READ target WRITE setTarget NOTIFY targetChanged)
+    // clang-format off
+    Q_PROPERTY(ActionManager *target
+               READ target
+               WRITE setTarget
+               NOTIFY targetChanged)
+    // clang-format on
     void setTarget(ActionManager *val);
     ActionManager *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
@@ -156,32 +180,62 @@ public:
 
     static ActionHandlerAttached *qmlAttachedProperties(QObject *parent);
 
-    Q_PROPERTY(int priority READ priority WRITE setPriority NOTIFY priorityChanged)
+    // clang-format off
+    Q_PROPERTY(int priority
+               READ priority
+               WRITE setPriority
+               NOTIFY priorityChanged)
+    // clang-format on
     void setPriority(int val);
     int priority() const { return m_priority; }
     Q_SIGNAL void priorityChanged();
 
-    Q_PROPERTY(bool checked READ isChecked WRITE setChecked NOTIFY checkedChanged)
+    // clang-format off
+    Q_PROPERTY(bool checked
+               READ isChecked
+               WRITE setChecked
+               NOTIFY checkedChanged)
+    // clang-format on
     void setChecked(bool val);
     bool isChecked() const { return m_checked; }
     Q_SIGNAL void checkedChanged();
 
-    Q_PROPERTY(bool down READ isDown WRITE setDown NOTIFY downChanged)
+    // clang-format off
+    Q_PROPERTY(bool down
+               READ isDown
+               WRITE setDown
+               NOTIFY downChanged)
+    // clang-format on
     void setDown(bool val);
     bool isDown() const { return m_down; }
     Q_SIGNAL void downChanged();
 
-    Q_PROPERTY(QString iconSource READ iconSource WRITE setIconSource NOTIFY iconSourceChanged)
+    // clang-format off
+    Q_PROPERTY(QString iconSource
+               READ iconSource
+               WRITE setIconSource
+               NOTIFY iconSourceChanged)
+    // clang-format on
     void setIconSource(const QString &val);
     QString iconSource() const { return m_iconSource; }
     Q_SIGNAL void iconSourceChanged();
 
-    Q_PROPERTY(QString tooltip READ tooltip WRITE setTooltip NOTIFY tooltipChanged)
+    // clang-format off
+    Q_PROPERTY(QString tooltip
+               READ tooltip
+               WRITE setTooltip
+               NOTIFY tooltipChanged)
+    // clang-format on
     void setTooltip(const QString &val);
     QString tooltip() const { return m_tooltip; }
     Q_SIGNAL void tooltipChanged();
 
-    Q_PROPERTY(QObject *action READ action WRITE setAction NOTIFY actionChanged)
+    // clang-format off
+    Q_PROPERTY(QObject *action
+               READ action
+               WRITE setAction
+               NOTIFY actionChanged)
+    // clang-format on
     void setAction(QObject *val);
     QObject *action() const { return m_action; }
     Q_SIGNAL void actionChanged();
@@ -220,14 +274,27 @@ class ActionHandlerAttached : public QObject
 public:
     virtual ~ActionHandlerAttached();
 
-    Q_PROPERTY(bool canHandle READ canHandle NOTIFY canHandleChanged)
+    // clang-format off
+    Q_PROPERTY(bool canHandle
+               READ canHandle
+               NOTIFY canHandleChanged)
+    // clang-format on
     bool canHandle() const;
     Q_SIGNAL void canHandleChanged();
 
-    Q_PROPERTY(ActionHandler *active READ active NOTIFY canHandleChanged)
+    // clang-format off
+    Q_PROPERTY(ActionHandler *active
+               READ active
+               NOTIFY canHandleChanged)
+    // clang-format on
     ActionHandler *active() const;
 
-    Q_PROPERTY(QList<ActionHandler *> all READ all NOTIFY canHandleChanged)
+    // clang-format off
+    Q_PROPERTY(QList<ActionHandler *>
+               all READ
+               all NOTIFY
+               canHandleChanged )
+    // clang-format on
     QList<ActionHandler *> all() const;
 
     Q_INVOKABLE bool trigger();
@@ -289,7 +356,11 @@ public:
     explicit ActionsModel(QObject *parent = nullptr);
     virtual ~ActionsModel();
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    // clang-format off
+    Q_PROPERTY(int count
+               READ count
+               NOTIFY countChanged)
+    // clang-format on
     int count() const { return m_items.size(); }
     Q_SIGNAL void countChanged();
 
@@ -359,13 +430,22 @@ public:
     Q_DECLARE_FLAGS(Filters, Filter)
     Q_FLAG(Filters)
 
-    Q_PROPERTY(QString actionTextStartsWith READ actionTextStartsWith WRITE setActionTextStartsWith
-                       NOTIFY actionTextStartsWithChanged)
+    // clang-format off
+    Q_PROPERTY(QString actionTextStartsWith
+               READ actionTextStartsWith
+               WRITE setActionTextStartsWith
+               NOTIFY actionTextStartsWithChanged)
+    // clang-format on
     void setActionTextStartsWith(const QString &val);
     QString actionTextStartsWith() const { return m_actionTextStartsWith; }
     Q_SIGNAL void actionTextStartsWithChanged();
 
-    Q_PROPERTY(Filters filters READ filters WRITE setFilters NOTIFY filtersChanged)
+    // clang-format off
+    Q_PROPERTY(Filters filters
+               READ filters
+               WRITE setFilters
+               NOTIFY filtersChanged)
+    // clang-format on
     void setFilters(Filters val);
     Filters filters() const { return m_filters; }
     Q_SIGNAL void filtersChanged();
@@ -399,7 +479,12 @@ class ShortcutInputHandler : public QObject
 public:
     virtual ~ShortcutInputHandler();
 
-    Q_PROPERTY(bool handleInput READ handleInput WRITE setHandleInput NOTIFY handleInputChanged)
+    // clang-format off
+    Q_PROPERTY(bool handleInput
+               READ handleInput
+               WRITE setHandleInput
+               NOTIFY handleInputChanged)
+    // clang-format on
     void setHandleInput(bool val);
     bool handleInput() const { return m_handleInput; }
     Q_SIGNAL void handleInputChanged();

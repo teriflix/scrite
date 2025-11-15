@@ -30,93 +30,154 @@ public:
     explicit SimpleTabBarItem(QQuickItem *parent = nullptr);
     ~SimpleTabBarItem();
 
-    Q_PROPERTY(int tabCount READ tabCount WRITE setTabCount NOTIFY tabCountChanged)
+    // clang-format off
+    Q_PROPERTY(int tabCount
+               READ tabCount
+               WRITE setTabCount
+               NOTIFY tabCountChanged)
+    // clang-format on
     void setTabCount(int val);
     int tabCount() const { return m_tabCount; }
     Q_SIGNAL void tabCountChanged();
 
-    Q_PROPERTY(int activeTabIndex READ activeTabIndex WRITE setActiveTabIndex NOTIFY
-                       activeTabIndexChanged)
+    // clang-format off
+    Q_PROPERTY(int activeTabIndex
+               READ activeTabIndex
+               WRITE setActiveTabIndex
+               NOTIFY activeTabIndexChanged)
+    // clang-format on
     void setActiveTabIndex(int val);
     int activeTabIndex() const { return m_activeTabIndex; }
     Q_SIGNAL void activeTabIndexChanged();
 
     enum TabLabelStyle { EnglishNumbers, RomanNumerals, Alphabets };
     Q_ENUM(TabLabelStyle)
-    Q_PROPERTY(TabLabelStyle tabLabelStyle READ tabLabelStyle WRITE setTabLabelStyle NOTIFY
-                       tabLabelStyleChanged)
+    // clang-format off
+    Q_PROPERTY(TabLabelStyle tabLabelStyle
+               READ tabLabelStyle
+               WRITE setTabLabelStyle
+               NOTIFY tabLabelStyleChanged)
+    // clang-format on
     void setTabLabelStyle(TabLabelStyle val);
     TabLabelStyle tabLabelStyle() const { return m_tabLabelStyle; }
     Q_SIGNAL void tabLabelStyleChanged();
 
-    Q_PROPERTY(QColor activeTabColor READ activeTabColor WRITE setActiveTabColor NOTIFY
-                       activeTabColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor activeTabColor
+               READ activeTabColor
+               WRITE setActiveTabColor
+               NOTIFY activeTabColorChanged)
+    // clang-format on
     void setActiveTabColor(const QColor &val);
     QColor activeTabColor() const { return m_activeTabColor; }
     Q_SIGNAL void activeTabColorChanged();
 
-    Q_PROPERTY(QColor inactiveTabColor READ inactiveTabColor WRITE setInactiveTabColor NOTIFY
-                       inactiveTabColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor inactiveTabColor
+               READ inactiveTabColor
+               WRITE setInactiveTabColor
+               NOTIFY inactiveTabColorChanged)
+    // clang-format on
     void setInactiveTabColor(const QColor &val);
     QColor inactiveTabColor() const { return m_inactiveTabColor; }
     Q_SIGNAL void inactiveTabColorChanged();
 
-    Q_PROPERTY(QColor activeTabBorderColor READ activeTabBorderColor WRITE setActiveTabBorderColor
-                       NOTIFY activeTabBorderColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor activeTabBorderColor
+               READ activeTabBorderColor
+               WRITE setActiveTabBorderColor
+               NOTIFY activeTabBorderColorChanged)
+    // clang-format on
     void setActiveTabBorderColor(const QColor &val);
     QColor activeTabBorderColor() const { return m_activeTabBorderColor; }
     Q_SIGNAL void activeTabBorderColorChanged();
 
-    Q_PROPERTY(QColor inactiveTabBorderColor READ inactiveTabBorderColor WRITE
-                       setInactiveTabBorderColor NOTIFY inactiveTabBorderColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor inactiveTabBorderColor
+               READ inactiveTabBorderColor
+               WRITE setInactiveTabBorderColor
+               NOTIFY inactiveTabBorderColorChanged)
+    // clang-format on
     void setInactiveTabBorderColor(const QColor &val);
     QColor inactiveTabBorderColor() const { return m_inactiveTabBorderColor; }
     Q_SIGNAL void inactiveTabBorderColorChanged();
 
-    Q_PROPERTY(qreal activeTabBorderWidth READ activeTabBorderWidth WRITE setActiveTabBorderWidth
-                       NOTIFY activeTabBorderWidthChanged)
+    // clang-format off
+    Q_PROPERTY(qreal activeTabBorderWidth
+               READ activeTabBorderWidth
+               WRITE setActiveTabBorderWidth
+               NOTIFY activeTabBorderWidthChanged)
+    // clang-format on
     void setActiveTabBorderWidth(qreal val);
     qreal activeTabBorderWidth() const { return m_activeTabBorderWidth; }
     Q_SIGNAL void activeTabBorderWidthChanged();
 
-    Q_PROPERTY(qreal inactiveTabBorderWidth READ inactiveTabBorderWidth WRITE
-                       setInactiveTabBorderWidth NOTIFY inactiveTabBorderWidthChanged)
+    // clang-format off
+    Q_PROPERTY(qreal inactiveTabBorderWidth
+               READ inactiveTabBorderWidth
+               WRITE setInactiveTabBorderWidth
+               NOTIFY inactiveTabBorderWidthChanged)
+    // clang-format on
     void setInactiveTabBorderWidth(qreal val);
     qreal inactiveTabBorderWidth() const { return m_inactiveTabBorderWidth; }
     Q_SIGNAL void inactiveTabBorderWidthChanged();
 
-    Q_PROPERTY(qreal tabCurveRadius READ tabCurveRadius WRITE setTabCurveRadius NOTIFY
-                       tabCurveRadiusChanged)
+    // clang-format off
+    Q_PROPERTY(qreal tabCurveRadius
+               READ tabCurveRadius
+               WRITE setTabCurveRadius
+               NOTIFY tabCurveRadiusChanged)
+    // clang-format on
     void setTabCurveRadius(qreal val);
     qreal tabCurveRadius() const { return m_tabCurveRadius; }
     Q_SIGNAL void tabCurveRadiusChanged();
 
-    Q_PROPERTY(QColor activeTabTextColor READ activeTabTextColor WRITE setActiveTabTextColor NOTIFY
-                       activeTabTextColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor activeTabTextColor
+               READ activeTabTextColor
+               WRITE setActiveTabTextColor
+               NOTIFY activeTabTextColorChanged)
+    // clang-format on
     void setActiveTabTextColor(const QColor &val);
     QColor activeTabTextColor() const { return m_activeTabTextColor; }
     Q_SIGNAL void activeTabTextColorChanged();
 
-    Q_PROPERTY(QColor inactiveTabTextColor READ inactiveTabTextColor WRITE setInactiveTabTextColor
-                       NOTIFY inactiveTabTextColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor inactiveTabTextColor
+               READ inactiveTabTextColor
+               WRITE setInactiveTabTextColor
+               NOTIFY inactiveTabTextColorChanged)
+    // clang-format on
     void setInactiveTabTextColor(const QColor &val);
     QColor inactiveTabTextColor() const { return m_inactiveTabTextColor; }
     Q_SIGNAL void inactiveTabTextColorChanged();
 
-    Q_PROPERTY(QFont activeTabFont READ activeTabFont WRITE setActiveTabFont NOTIFY
-                       activeTabFontChanged)
+    // clang-format off
+    Q_PROPERTY(QFont activeTabFont
+               READ activeTabFont
+               WRITE setActiveTabFont
+               NOTIFY activeTabFontChanged)
+    // clang-format on
     void setActiveTabFont(const QFont &val);
     QFont activeTabFont() const { return m_activeTabFont; }
     Q_SIGNAL void activeTabFontChanged();
 
-    Q_PROPERTY(QFont inactiveTabFont READ inactiveTabFont WRITE setInactiveTabFont NOTIFY
-                       inactiveTabFontChanged)
+    // clang-format off
+    Q_PROPERTY(QFont inactiveTabFont
+               READ inactiveTabFont
+               WRITE setInactiveTabFont
+               NOTIFY inactiveTabFontChanged)
+    // clang-format on
     void setInactiveTabFont(const QFont &val);
     QFont inactiveTabFont() const { return m_inactiveTabFont; }
     Q_SIGNAL void inactiveTabFontChanged();
 
-    Q_PROPERTY(qreal minimumTabWidth READ minimumTabWidth WRITE setMinimumTabWidth NOTIFY
-                       minimumTabWidthChanged)
+    // clang-format off
+    Q_PROPERTY(qreal minimumTabWidth
+               READ minimumTabWidth
+               WRITE setMinimumTabWidth
+               NOTIFY minimumTabWidthChanged)
+    // clang-format on
     void setMinimumTabWidth(qreal val);
     qreal minimumTabWidth() const { return m_minimumTabWidth; }
     Q_SIGNAL void minimumTabWidthChanged();
@@ -125,8 +186,12 @@ public:
     Q_ENUM(TabAttribute)
     Q_SIGNAL void attributeRequest(int index, TabAttribute attr);
 
-    Q_PROPERTY(QVariant requestedAttributeValue READ requestedAttributeValue WRITE
-                       setRequestedAttributeValue NOTIFY requestedAttributeValueChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant requestedAttributeValue
+               READ requestedAttributeValue
+               WRITE setRequestedAttributeValue
+               NOTIFY requestedAttributeValueChanged)
+    // clang-format on
     void setRequestedAttributeValue(const QVariant &val);
     QVariant requestedAttributeValue() const { return m_requestedAttributeValue; }
     Q_SIGNAL void requestedAttributeValueChanged();

@@ -29,9 +29,11 @@ class StatisticsReportKeyNumbers;
 class StatisticsReport : public AbstractReportGenerator
 {
     Q_OBJECT
+    // clang-format off
     Q_CLASSINFO("Title", "Statistics Report")
     Q_CLASSINFO("Description", "Generate a report with key statistics of the screenplay.")
     Q_CLASSINFO("Icon", ":/icons/reports/statistics_report.png")
+    // clang-format on
 
 public:
     Q_INVOKABLE explicit StatisticsReport(QObject *parent = nullptr);
@@ -44,85 +46,105 @@ public:
     bool requiresConfiguration() const { return true; }
     bool isSinglePageReport() const { return true; }
 
+    // clang-format off
     Q_CLASSINFO("includeCharacterPresenceGraphs_FieldGroup", "Basic")
     Q_CLASSINFO("includeCharacterPresenceGraphs_FieldLabel", "Include Character Presence Graphs.")
     Q_CLASSINFO("includeCharacterPresenceGraphs_FieldEditor", "CheckBox")
-    Q_PROPERTY(
-            bool includeCharacterPresenceGraphs READ isIncludeCharacterPresenceGraphs WRITE
-                    setIncludeCharacterPresenceGraphs NOTIFY includeCharacterPresenceGraphsChanged)
+    Q_PROPERTY(bool includeCharacterPresenceGraphs
+               READ isIncludeCharacterPresenceGraphs
+               WRITE setIncludeCharacterPresenceGraphs
+               NOTIFY includeCharacterPresenceGraphsChanged)
+    // clang-format on
     void setIncludeCharacterPresenceGraphs(bool val);
     bool isIncludeCharacterPresenceGraphs() const { return m_includeCharacterPresenceGraphs; }
     Q_SIGNAL void includeCharacterPresenceGraphsChanged();
 
+    // clang-format off
     Q_CLASSINFO("maxCharacterPresenceGraphs_FieldGroup", "Characters")
     Q_CLASSINFO("maxCharacterPresenceGraphs_FieldLabel", "Maximum Number Of Characters")
-    Q_CLASSINFO("maxCharacterPresenceGraphs_FieldNote",
-                "Value of ZERO, means you need all character's graphs plotted. If one or more "
-                "characters are explicitly picked, then preference is given to them.")
+    Q_CLASSINFO("maxCharacterPresenceGraphs_FieldNote", "Value of ZERO, means you need all character's graphs plotted. If one or more " "characters are explicitly picked, then preference is given to them.")
     Q_CLASSINFO("maxCharacterPresenceGraphs_FieldEditor", "IntegerSpinBox")
     Q_CLASSINFO("maxCharacterPresenceGraphs_FieldMinValue", "0")
     Q_CLASSINFO("maxCharacterPresenceGraphs_FieldMaxValue", "500")
     Q_CLASSINFO("maxCharacterPresenceGraphs_FieldDefaultValue", "6")
-    Q_PROPERTY(int maxCharacterPresenceGraphs READ maxCharacterPresenceGraphs WRITE
-                       setMaxCharacterPresenceGraphs NOTIFY maxCharacterPresenceGraphsChanged)
+    Q_PROPERTY(int maxCharacterPresenceGraphs
+               READ maxCharacterPresenceGraphs
+               WRITE setMaxCharacterPresenceGraphs
+               NOTIFY maxCharacterPresenceGraphsChanged)
+    // clang-format on
     void setMaxCharacterPresenceGraphs(int val);
     int maxCharacterPresenceGraphs() const { return m_maxCharacterPresenceGraphs; }
     Q_SIGNAL void maxCharacterPresenceGraphsChanged();
 
+    // clang-format off
     Q_CLASSINFO("characterNames_FieldGroup", "Characters")
     Q_CLASSINFO("characterNames_FieldLabel", "Characters to include in the presence graphs.")
-    Q_CLASSINFO("characterNames_FieldNote",
-                "Leave it empty to let Scrite automatically pick from most active characters.")
+    Q_CLASSINFO("characterNames_FieldNote", "Leave it empty to let Scrite automatically pick from most active characters.")
     Q_CLASSINFO("characterNames_FieldEditor", "MultipleCharacterNameSelector")
     Q_CLASSINFO("characterNames_IsPersistent", "false")
-    Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY
-                       characterNamesChanged)
+    Q_PROPERTY(QStringList characterNames
+               READ characterNames
+               WRITE setCharacterNames
+               NOTIFY characterNamesChanged)
+    // clang-format on
     void setCharacterNames(const QStringList &val);
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
 
+    // clang-format off
     Q_CLASSINFO("includeLocationPresenceGraphs_FieldGroup", "Basic")
     Q_CLASSINFO("includeLocationPresenceGraphs_FieldLabel", "Include Location Presence Graphs.")
     Q_CLASSINFO("includeLocationPresenceGraphs_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeLocationPresenceGraphs READ isIncludeLocationPresenceGraphs WRITE
-                       setIncludeLocationPresenceGraphs NOTIFY includeLocationPresenceGraphsChanged)
+    Q_PROPERTY(bool includeLocationPresenceGraphs
+               READ isIncludeLocationPresenceGraphs
+               WRITE setIncludeLocationPresenceGraphs
+               NOTIFY includeLocationPresenceGraphsChanged)
+    // clang-format on
     void setIncludeLocationPresenceGraphs(bool val);
     bool isIncludeLocationPresenceGraphs() const { return m_includeLocationPresenceGraphs; }
     Q_SIGNAL void includeLocationPresenceGraphsChanged();
 
+    // clang-format off
     Q_CLASSINFO("considerPreferredGroupCategoryOnly_FieldGroup", "Basic")
-    Q_CLASSINFO("considerPreferredGroupCategoryOnly_FieldLabel",
-                "Consider Preferred Group Category Only.")
+    Q_CLASSINFO("considerPreferredGroupCategoryOnly_FieldLabel", "Consider Preferred Group Category Only.")
     Q_CLASSINFO("considerPreferredGroupCategoryOnly_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool considerPreferredGroupCategoryOnly READ isConsiderPreferredGroupCategoryOnly
-                       WRITE setConsiderPreferredGroupCategoryOnly NOTIFY
-                               considerPreferredGroupCategoryOnlyChanged)
+    Q_PROPERTY(bool considerPreferredGroupCategoryOnly
+               READ isConsiderPreferredGroupCategoryOnly
+               WRITE setConsiderPreferredGroupCategoryOnly
+               NOTIFY considerPreferredGroupCategoryOnlyChanged)
+    // clang-format on
     void setConsiderPreferredGroupCategoryOnly(bool val);
     bool isConsiderPreferredGroupCategoryOnly() const;
     Q_SIGNAL void considerPreferredGroupCategoryOnlyChanged();
 
+    // clang-format off
     Q_CLASSINFO("maxLocationPresenceGraphs_FieldGroup", "Locations")
     Q_CLASSINFO("maxLocationPresenceGraphs_FieldLabel", "Maximum Number Of Locations")
-    Q_CLASSINFO("maxLocationPresenceGraphs_FieldNote",
-                "Value of ZERO, means you need all location's graphs plotted. If one or more "
-                "locations are explicitly picked, then preference is given to them.")
+    Q_CLASSINFO("maxLocationPresenceGraphs_FieldNote", "Value of ZERO, means you need all location's graphs plotted. If one or more " "locations are explicitly picked, then preference is given to them.")
     Q_CLASSINFO("maxLocationPresenceGraphs_FieldEditor", "IntegerSpinBox")
     Q_CLASSINFO("maxLocationPresenceGraphs_FieldMinValue", "0")
     Q_CLASSINFO("maxLocationPresenceGraphs_FieldMaxValue", "500")
     Q_CLASSINFO("maxLocationPresenceGraphs_FieldDefaultValue", "6")
-    Q_PROPERTY(int maxLocationPresenceGraphs READ maxLocationPresenceGraphs WRITE
-                       setMaxLocationPresenceGraphs NOTIFY maxLocationPresenceGraphsChanged)
+    Q_PROPERTY(int maxLocationPresenceGraphs
+               READ maxLocationPresenceGraphs
+               WRITE setMaxLocationPresenceGraphs
+               NOTIFY maxLocationPresenceGraphsChanged)
+    // clang-format on
     void setMaxLocationPresenceGraphs(int val);
     int maxLocationPresenceGraphs() const { return m_maxLocationPresenceGraphs; }
     Q_SIGNAL void maxLocationPresenceGraphsChanged();
 
+    // clang-format off
     Q_CLASSINFO("locations_FieldGroup", "Locations")
     Q_CLASSINFO("locations_FieldLabel", "Locations to include in the presence graphs.")
-    Q_CLASSINFO("locations_FieldNote",
-                "Leave it empty to let Scrite automatically pick from most busy locations.")
+    Q_CLASSINFO("locations_FieldNote", "Leave it empty to let Scrite automatically pick from most busy locations.")
     Q_CLASSINFO("locations_FieldEditor", "MultipleLocationSelector")
     Q_CLASSINFO("locations_IsPersistent", "false")
-    Q_PROPERTY(QStringList locations READ locations WRITE setLocations NOTIFY locationsChanged)
+    Q_PROPERTY(QStringList locations
+               READ locations
+               WRITE setLocations
+               NOTIFY locationsChanged)
+    // clang-format on
     void setLocations(const QStringList &val);
     QStringList locations() const { return m_locations; }
     Q_SIGNAL void locationsChanged();

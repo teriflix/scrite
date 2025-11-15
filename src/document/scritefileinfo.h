@@ -31,58 +31,100 @@ public:
     Q_INVOKABLE bool isValid() const;
 
     // Absolute file path
-    Q_PROPERTY(QString filePath MEMBER filePath)
+    // clang-format off
+    Q_PROPERTY(QString filePath
+               MEMBER filePath)
+    // clang-format on
     QString filePath;
 
     // Just file name
-    Q_PROPERTY(QString fileName MEMBER fileName)
+    // clang-format off
+    Q_PROPERTY(QString fileName
+               MEMBER fileName)
+    // clang-format on
     QString fileName;
 
     // Base file name
-    Q_PROPERTY(QString baseFileName MEMBER baseFileName)
+    // clang-format off
+    Q_PROPERTY(QString baseFileName
+               MEMBER baseFileName)
+    // clang-format on
     QString baseFileName;
 
     // File size in bytes
-    Q_PROPERTY(qint64 fileSize MEMBER fileSize)
+    // clang-format off
+    Q_PROPERTY(qint64 fileSize
+               MEMBER fileSize)
+    // clang-format on
     qint64 fileSize = 0;
 
     // Qt's file info
-    Q_PROPERTY(QFileInfo fileInfo MEMBER fileInfo)
+    // clang-format off
+    Q_PROPERTY(QFileInfo fileInfo
+               MEMBER fileInfo)
+    // clang-format on
     QFileInfo fileInfo;
 
     // Document ID
-    Q_PROPERTY(QString documentId MEMBER documentId)
+    // clang-format off
+    Q_PROPERTY(QString documentId
+               MEMBER documentId)
+    // clang-format on
     QString documentId;
 
     // Screenplay title (if specified)
-    Q_PROPERTY(QString title MEMBER title)
+    // clang-format off
+    Q_PROPERTY(QString title
+               MEMBER title)
+    // clang-format on
     QString title;
 
     // Screenplay subtitle (if specified)
-    Q_PROPERTY(QString subtitle MEMBER subtitle)
+    // clang-format off
+    Q_PROPERTY(QString subtitle
+               MEMBER subtitle)
+    // clang-format on
     QString subtitle;
 
     // Screenplay author (if specified)
-    Q_PROPERTY(QString author MEMBER author)
+    // clang-format off
+    Q_PROPERTY(QString author
+               MEMBER author)
+    // clang-format on
     QString author;
 
     // Screenplay logline (if specified)
-    Q_PROPERTY(QString logline MEMBER logline)
+    // clang-format off
+    Q_PROPERTY(QString logline
+               MEMBER logline)
+    // clang-format on
     QString logline;
 
     // Screenplay version (if specified)
-    Q_PROPERTY(QString version MEMBER version)
+    // clang-format off
+    Q_PROPERTY(QString version
+               MEMBER version)
+    // clang-format on
     QString version;
 
     // Screenplay cover-page-image if available (if specified)
-    Q_PROPERTY(QImage coverPageImage MEMBER coverPageImage)
+    // clang-format off
+    Q_PROPERTY(QImage coverPageImage
+               MEMBER coverPageImage)
+    // clang-format on
     QImage coverPageImage;
 
-    Q_PROPERTY(bool hasCoverPage MEMBER hasCoverPage)
+    // clang-format off
+    Q_PROPERTY(bool hasCoverPage
+               MEMBER hasCoverPage)
+    // clang-format on
     bool hasCoverPage = false;
 
     // Number of scenes in the screenplay (not structure)
-    Q_PROPERTY(int sceneCount MEMBER sceneCount)
+    // clang-format off
+    Q_PROPERTY(int sceneCount
+               MEMBER sceneCount)
+    // clang-format on
     int sceneCount = 0;
 
     // Static method to help load a file-info from a given file

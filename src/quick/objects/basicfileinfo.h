@@ -34,27 +34,55 @@ public:
     explicit BasicFileInfo(QObject *parent = nullptr);
     ~BasicFileInfo();
 
-    Q_PROPERTY(bool exists READ isExists NOTIFY fileInfoChanged)
+    // clang-format off
+    Q_PROPERTY(bool exists
+               READ isExists
+               NOTIFY fileInfoChanged)
+    // clang-format on
     bool isExists() const { return m_fileInfo.exists(); }
 
-    Q_PROPERTY(QString absoluteFilePath READ absoluteFilePath WRITE setAbsoluteFilePath NOTIFY
-                       fileInfoChanged)
+    // clang-format off
+    Q_PROPERTY(QString absoluteFilePath
+               READ absoluteFilePath
+               WRITE setAbsoluteFilePath
+               NOTIFY fileInfoChanged)
+    // clang-format on
     void setAbsoluteFilePath(const QString &val);
     QString absoluteFilePath() const { return m_fileInfo.absoluteFilePath(); }
 
-    Q_PROPERTY(QString absolutePath READ absolutePath WRITE setAbsolutePath NOTIFY fileInfoChanged)
+    // clang-format off
+    Q_PROPERTY(QString absolutePath
+               READ absolutePath
+               WRITE setAbsolutePath
+               NOTIFY fileInfoChanged)
+    // clang-format on
     void setAbsolutePath(const QString &val);
     QString absolutePath() const { return m_fileInfo.absolutePath(); }
 
-    Q_PROPERTY(QString fileName READ fileName WRITE setFileName NOTIFY fileInfoChanged)
+    // clang-format off
+    Q_PROPERTY(QString fileName
+               READ fileName
+               WRITE setFileName
+               NOTIFY fileInfoChanged)
+    // clang-format on
     void setFileName(const QString &val);
     QString fileName() const { return m_fileInfo.fileName(); }
 
-    Q_PROPERTY(QString suffix READ suffix WRITE setSuffix NOTIFY fileInfoChanged)
+    // clang-format off
+    Q_PROPERTY(QString suffix
+               READ suffix
+               WRITE setSuffix
+               NOTIFY fileInfoChanged)
+    // clang-format on
     void setSuffix(const QString &val);
     QString suffix() const { return m_fileInfo.suffix(); }
 
-    Q_PROPERTY(QString baseName READ baseName WRITE setBaseName NOTIFY fileInfoChanged)
+    // clang-format off
+    Q_PROPERTY(QString baseName
+               READ baseName
+               WRITE setBaseName
+               NOTIFY fileInfoChanged)
+    // clang-format on
     void setBaseName(const QString &val);
     QString baseName() const { return m_fileInfo.completeBaseName(); }
 

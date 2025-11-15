@@ -32,12 +32,23 @@ class AbstractObjectTracker : public QObject, public QQmlParserStatus
 public:
     ~AbstractObjectTracker();
 
-    Q_PROPERTY(QObject *target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
+    // clang-format off
+    Q_PROPERTY(QObject *target
+               READ target
+               WRITE setTarget
+               NOTIFY targetChanged
+               RESET resetTarget)
+    // clang-format on
     void setTarget(QObject *val);
     QObject *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
 
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool enabled
+               READ isEnabled
+               WRITE setEnabled
+               NOTIFY enabledChanged)
+    // clang-format on
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
@@ -74,7 +85,12 @@ public:
     explicit TrackProperty(QObject *parent = nullptr);
     ~TrackProperty();
 
-    Q_PROPERTY(QString property READ property WRITE setProperty NOTIFY propertyChanged)
+    // clang-format off
+    Q_PROPERTY(QString property
+               READ property
+               WRITE setProperty
+               NOTIFY propertyChanged)
+    // clang-format on
     void setProperty(const QString &val);
     QString property() const { return m_property; }
     Q_SIGNAL void propertyChanged();
@@ -95,19 +111,34 @@ public:
     explicit TrackModelRow(QObject *parent = nullptr);
     ~TrackModelRow();
 
-    Q_PROPERTY(int row READ row WRITE setRow NOTIFY rowChanged)
+    // clang-format off
+    Q_PROPERTY(int row
+               READ row
+               WRITE setRow
+               NOTIFY rowChanged)
+    // clang-format on
     void setRow(int val);
     int row() const { return m_row; }
     Q_SIGNAL void rowChanged();
 
-    Q_PROPERTY(QModelIndex rootIndex READ rootIndex WRITE setRootIndex NOTIFY rootIndexChanged)
+    // clang-format off
+    Q_PROPERTY(QModelIndex rootIndex
+               READ rootIndex
+               WRITE setRootIndex
+               NOTIFY rootIndexChanged)
+    // clang-format on
     void setRootIndex(const QModelIndex &val);
     QModelIndex rootIndex() const { return m_rootIndex; }
     Q_SIGNAL void rootIndexChanged();
 
     enum Event { RowAboutToRemove, RowRemoved, RowAboutToInsert, RowInserted };
     Q_ENUM(Event)
-    Q_PROPERTY(Event event READ rowEvent WRITE setRowEvent NOTIFY eventChanged)
+    // clang-format off
+    Q_PROPERTY(Event event
+               READ rowEvent
+               WRITE setRowEvent
+               NOTIFY eventChanged)
+    // clang-format on
     void setRowEvent(Event val);
     Event rowEvent() const { return m_event; }
     Q_SIGNAL void eventChanged();
@@ -147,7 +178,12 @@ public:
     explicit TrackSignal(QObject *parent = nullptr);
     ~TrackSignal();
 
-    Q_PROPERTY(QString signal READ signal WRITE setSignal NOTIFY signalChanged)
+    // clang-format off
+    Q_PROPERTY(QString signal
+               READ signal
+               WRITE setSignal
+               NOTIFY signalChanged)
+    // clang-format on
     void setSignal(const QString &val);
     QString signal() const { return m_signal; }
     Q_SIGNAL void signalChanged();
@@ -168,24 +204,41 @@ public:
     explicit TrackerPack(QObject *parent = nullptr);
     ~TrackerPack();
 
-    Q_PROPERTY(int delay READ delay WRITE setDelay NOTIFY delayChanged)
+    // clang-format off
+    Q_PROPERTY(int delay
+               READ delay
+               WRITE setDelay
+               NOTIFY delayChanged)
+    // clang-format on
     void setDelay(int val);
     int delay() const { return m_delay; }
     Q_SIGNAL void delayChanged();
 
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool enabled
+               READ isEnabled
+               WRITE setEnabled
+               NOTIFY enabledChanged)
+    // clang-format on
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
+    // clang-format off
     Q_CLASSINFO("DefaultProperty", "trackers")
-    Q_PROPERTY(QQmlListProperty<AbstractObjectTracker> trackers READ trackers NOTIFY
-                       trackerCountChanged)
+    Q_PROPERTY(QQmlListProperty<AbstractObjectTracker> trackers
+               READ trackers
+               NOTIFY trackerCountChanged)
+    // clang-format on
     QQmlListProperty<AbstractObjectTracker> trackers();
     Q_INVOKABLE void addTracker(AbstractObjectTracker *ptr);
     Q_INVOKABLE void removeTracker(AbstractObjectTracker *ptr);
     Q_INVOKABLE AbstractObjectTracker *trackerAt(int index) const;
-    Q_PROPERTY(int trackerCount READ trackerCount NOTIFY trackerCountChanged)
+    // clang-format off
+    Q_PROPERTY(int trackerCount
+               READ trackerCount
+               NOTIFY trackerCountChanged)
+    // clang-format on
     int trackerCount() const { return m_trackers.size(); }
     Q_INVOKABLE void clearTrackers();
     Q_SIGNAL void trackerCountChanged();

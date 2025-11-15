@@ -86,165 +86,298 @@ public:
 
     static int headingFontPointSize(int headingLevel);
 
-    Q_PROPERTY(QTextDocument *textDocument READ textDocument WRITE setTextDocument NOTIFY
-                       textDocumentChanged RESET resetTextDocument)
+    // clang-format off
+    Q_PROPERTY(QTextDocument *textDocument
+               READ textDocument
+               WRITE setTextDocument
+               NOTIFY textDocumentChanged
+               RESET resetTextDocument)
+    // clang-format on
     void setTextDocument(QTextDocument *val);
     QTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
-    Q_PROPERTY(Screenplay *screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged
-                       RESET resetScreenplay)
+    // clang-format off
+    Q_PROPERTY(Screenplay *screenplay
+               READ screenplay
+               WRITE setScreenplay
+               NOTIFY screenplayChanged
+               RESET resetScreenplay)
+    // clang-format on
     void setScreenplay(Screenplay *val);
     Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
-    Q_PROPERTY(ScreenplayFormat *formatting READ formatting WRITE setFormatting NOTIFY
-                       formattingChanged RESET resetFormatting)
+    // clang-format off
+    Q_PROPERTY(ScreenplayFormat *formatting
+               READ formatting
+               WRITE setFormatting
+               NOTIFY formattingChanged
+               RESET resetFormatting)
+    // clang-format on
     void setFormatting(ScreenplayFormat *val);
     ScreenplayFormat *formatting() const { return m_formatting; }
     Q_SIGNAL void formattingChanged();
 
-    Q_PROPERTY(bool titlePage READ hasTitlePage WRITE setTitlePage NOTIFY titlePageChanged)
+    // clang-format off
+    Q_PROPERTY(bool titlePage
+               READ hasTitlePage
+               WRITE setTitlePage
+               NOTIFY titlePageChanged)
+    // clang-format on
     void setTitlePage(bool val);
     bool hasTitlePage() const { return m_titlePage; }
     Q_SIGNAL void titlePageChanged();
 
-    Q_PROPERTY(bool includeLoglineInTitlePage READ isIncludeLoglineInTitlePage WRITE
-                       setIncludeLoglineInTitlePage NOTIFY includeLoglineInTitlePageChanged)
+    // clang-format off
+    Q_PROPERTY(bool includeLoglineInTitlePage
+               READ isIncludeLoglineInTitlePage
+               WRITE setIncludeLoglineInTitlePage
+               NOTIFY includeLoglineInTitlePageChanged)
+    // clang-format on
     void setIncludeLoglineInTitlePage(bool val);
     bool isIncludeLoglineInTitlePage() const { return m_includeLoglineInTitlePage; }
     Q_SIGNAL void includeLoglineInTitlePageChanged();
 
-    Q_PROPERTY(
-            bool sceneNumbers READ hasSceneNumbers WRITE setSceneNumbers NOTIFY sceneNumbersChanged)
+    // clang-format off
+    Q_PROPERTY(bool sceneNumbers
+               READ hasSceneNumbers
+               WRITE setSceneNumbers
+               NOTIFY sceneNumbersChanged)
+    // clang-format on
     void setSceneNumbers(bool val);
     bool hasSceneNumbers() const { return m_sceneNumbers; }
     Q_SIGNAL void sceneNumbersChanged();
 
-    Q_PROPERTY(bool sceneIcons READ hasSceneIcons WRITE setSceneIcons NOTIFY sceneIconsChanged)
+    // clang-format off
+    Q_PROPERTY(bool sceneIcons
+               READ hasSceneIcons
+               WRITE setSceneIcons
+               NOTIFY sceneIconsChanged)
+    // clang-format on
     void setSceneIcons(bool val);
     bool hasSceneIcons() const { return m_sceneIcons; }
     Q_SIGNAL void sceneIconsChanged();
 
-    Q_PROPERTY(bool sceneColors READ hasSceneColors WRITE setSceneColors NOTIFY sceneColorsChanged)
+    // clang-format off
+    Q_PROPERTY(bool sceneColors
+               READ hasSceneColors
+               WRITE setSceneColors
+               NOTIFY sceneColorsChanged)
+    // clang-format on
     void setSceneColors(bool val);
     bool hasSceneColors() const { return m_sceneColors; }
     Q_SIGNAL void sceneColorsChanged();
 
-    Q_PROPERTY(bool syncEnabled READ isSyncEnabled WRITE setSyncEnabled NOTIFY syncEnabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool syncEnabled
+               READ isSyncEnabled
+               WRITE setSyncEnabled
+               NOTIFY syncEnabledChanged)
+    // clang-format on
     void setSyncEnabled(bool val);
     bool isSyncEnabled() const { return m_syncEnabled; }
     Q_SIGNAL void syncEnabledChanged();
 
-    Q_PROPERTY(bool listSceneCharacters READ isListSceneCharacters WRITE setListSceneCharacters
-                       NOTIFY listSceneCharactersChanged)
+    // clang-format off
+    Q_PROPERTY(bool listSceneCharacters
+               READ isListSceneCharacters
+               WRITE setListSceneCharacters
+               NOTIFY listSceneCharactersChanged)
+    // clang-format on
     void setListSceneCharacters(bool val);
     bool isListSceneCharacters() const { return m_listSceneCharacters; }
     Q_SIGNAL void listSceneCharactersChanged();
 
-    Q_PROPERTY(QStringList highlightDialoguesOf READ highlightDialoguesOf WRITE
-                       setHighlightDialoguesOf NOTIFY highlightDialoguesOfChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList highlightDialoguesOf
+               READ highlightDialoguesOf
+               WRITE setHighlightDialoguesOf
+               NOTIFY highlightDialoguesOfChanged)
+    // clang-format on
     void setHighlightDialoguesOf(QStringList val);
     QStringList highlightDialoguesOf() const { return m_highlightDialoguesOf; }
     Q_SIGNAL void highlightDialoguesOfChanged();
 
-    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis
-                       NOTIFY includeSceneSynopsisChanged)
+    // clang-format off
+    Q_PROPERTY(bool includeSceneSynopsis
+               READ isIncludeSceneSynopsis
+               WRITE setIncludeSceneSynopsis
+               NOTIFY includeSceneSynopsisChanged)
+    // clang-format on
     void setIncludeSceneSynopsis(bool val);
     bool isIncludeSceneSynopsis() const { return m_includeSceneSynopsis; }
     Q_SIGNAL void includeSceneSynopsisChanged();
 
-    Q_PROPERTY(bool includeSceneFeaturedImage READ isIncludeSceneFeaturedImage WRITE
-                       setIncludeSceneFeaturedImage NOTIFY includeSceneFeaturedImageChanged)
+    // clang-format off
+    Q_PROPERTY(bool includeSceneFeaturedImage
+               READ isIncludeSceneFeaturedImage
+               WRITE setIncludeSceneFeaturedImage
+               NOTIFY includeSceneFeaturedImageChanged)
+    // clang-format on
     void setIncludeSceneFeaturedImage(bool val);
     bool isIncludeSceneFeaturedImage() const { return m_includeSceneFeaturedImage; }
     Q_SIGNAL void includeSceneFeaturedImageChanged();
 
-    Q_PROPERTY(bool includeSceneComments READ isIncludeSceneComments WRITE setIncludeSceneComments
-                       NOTIFY includeSceneCommentsChanged)
+    // clang-format off
+    Q_PROPERTY(bool includeSceneComments
+               READ isIncludeSceneComments
+               WRITE setIncludeSceneComments
+               NOTIFY includeSceneCommentsChanged)
+    // clang-format on
     void setIncludeSceneComments(bool val);
     bool isIncludeSceneComments() const { return m_includeSceneComments; }
     Q_SIGNAL void includeSceneCommentsChanged();
 
     enum Purpose { ForDisplay, ForPrinting };
     Q_ENUM(Purpose)
-    Q_PROPERTY(Purpose purpose READ purpose WRITE setPurpose NOTIFY purposeChanged)
+    // clang-format off
+    Q_PROPERTY(Purpose purpose
+               READ purpose
+               WRITE setPurpose
+               NOTIFY purposeChanged)
+    // clang-format on
     void setPurpose(Purpose val);
     Purpose purpose() const { return m_purpose; }
     Q_SIGNAL void purposeChanged();
 
-    Q_PROPERTY(bool printEachSceneOnANewPage READ isPrintEachSceneOnANewPage WRITE
-                       setPrintEachSceneOnANewPage NOTIFY printEachSceneOnANewPageChanged)
+    // clang-format off
+    Q_PROPERTY(bool printEachSceneOnANewPage
+               READ isPrintEachSceneOnANewPage
+               WRITE setPrintEachSceneOnANewPage
+               NOTIFY printEachSceneOnANewPageChanged)
+    // clang-format on
     void setPrintEachSceneOnANewPage(bool val);
     bool isPrintEachSceneOnANewPage() const { return m_printEachSceneOnANewPage; }
     Q_SIGNAL void printEachSceneOnANewPageChanged();
 
-    Q_PROPERTY(bool printEachActOnANewPage READ isPrintEachActOnANewPage WRITE
-                       setPrintEachActOnANewPage NOTIFY printEachActOnANewPageChanged)
+    // clang-format off
+    Q_PROPERTY(bool printEachActOnANewPage
+               READ isPrintEachActOnANewPage
+               WRITE setPrintEachActOnANewPage
+               NOTIFY printEachActOnANewPageChanged)
+    // clang-format on
     void setPrintEachActOnANewPage(bool val);
     bool isPrintEachActOnANewPage() const { return m_printEachActOnANewPage; }
     Q_SIGNAL void printEachActOnANewPageChanged();
 
-    Q_PROPERTY(bool includeActBreaks READ isIncludeActBreaks WRITE setIncludeActBreaks NOTIFY
-                       includeActBreaksChanged)
+    // clang-format off
+    Q_PROPERTY(bool includeActBreaks
+               READ isIncludeActBreaks
+               WRITE setIncludeActBreaks
+               NOTIFY includeActBreaksChanged)
+    // clang-format on
     void setIncludeActBreaks(bool val);
     bool isIncludeActBreaks() const { return m_includeActBreaks; }
     Q_SIGNAL void includeActBreaksChanged();
 
-    Q_PROPERTY(bool titlePageIsCentered READ isTitlePageIsCentered WRITE setTitlePageIsCentered
-                       NOTIFY titlePageIsCenteredChanged)
+    // clang-format off
+    Q_PROPERTY(bool titlePageIsCentered
+               READ isTitlePageIsCentered
+               WRITE setTitlePageIsCentered
+               NOTIFY titlePageIsCenteredChanged)
+    // clang-format on
     void setTitlePageIsCentered(bool val);
     bool isTitlePageIsCentered() const { return m_titlePageIsCentered; }
     Q_SIGNAL void titlePageIsCenteredChanged();
 
     // NOTE: this property is referred only if this->purpose() == ForPrinting
-    Q_PROPERTY(bool includeMoreAndContdMarkers READ isIncludeMoreAndContdMarkers WRITE
-                       setIncludeMoreAndContdMarkers NOTIFY includeMoreAndContdMarkersChanged)
+    // clang-format off
+    Q_PROPERTY(bool includeMoreAndContdMarkers
+               READ isIncludeMoreAndContdMarkers
+               WRITE setIncludeMoreAndContdMarkers
+               NOTIFY includeMoreAndContdMarkersChanged)
+    // clang-format on
     void setIncludeMoreAndContdMarkers(bool val);
     bool isIncludeMoreAndContdMarkers() const { return m_includeMoreAndContdMarkers; }
     Q_SIGNAL void includeMoreAndContdMarkersChanged();
 
-    Q_PROPERTY(bool updating READ isUpdating NOTIFY updatingChanged)
+    // clang-format off
+    Q_PROPERTY(bool updating
+               READ isUpdating
+               NOTIFY updatingChanged)
+    // clang-format on
     bool isUpdating() const { return m_updating; }
     Q_SIGNAL void updatingChanged();
 
-    Q_PROPERTY(int pageCount READ pageCount NOTIFY pageCountChanged)
+    // clang-format off
+    Q_PROPERTY(int pageCount
+               READ pageCount
+               NOTIFY pageCountChanged)
+    // clang-format on
     int pageCount() const { return m_pageCount; }
     Q_SIGNAL void pageCountChanged();
 
-    Q_PROPERTY(int currentPage READ currentPage NOTIFY currentPageChanged)
+    // clang-format off
+    Q_PROPERTY(int currentPage
+               READ currentPage
+               NOTIFY currentPageChanged)
+    // clang-format on
     int currentPage() const { return m_currentPage; }
     Q_SIGNAL void currentPageChanged();
 
-    Q_PROPERTY(qreal currentPosition READ currentPosition NOTIFY currentPositionChanged)
+    // clang-format off
+    Q_PROPERTY(qreal currentPosition
+               READ currentPosition
+               NOTIFY currentPositionChanged)
+    // clang-format on
     qreal currentPosition() const { return m_currentPosition; }
     Q_SIGNAL void currentPositionChanged();
 
-    Q_PROPERTY(int secondsPerPage READ secondsPerPage WRITE setSecondsPerPage NOTIFY
-                       timePerPageChanged)
+    // clang-format off
+    Q_PROPERTY(int secondsPerPage
+               READ secondsPerPage
+               WRITE setSecondsPerPage
+               NOTIFY timePerPageChanged)
+    // clang-format on
     void setSecondsPerPage(int val);
     int secondsPerPage() const;
 
-    Q_PROPERTY(QTime timePerPage READ timePerPage WRITE setTimePerPage NOTIFY timePerPageChanged)
+    // clang-format off
+    Q_PROPERTY(QTime timePerPage
+               READ timePerPage
+               WRITE setTimePerPage
+               NOTIFY timePerPageChanged)
+    // clang-format on
     void setTimePerPage(const QTime &val);
     QTime timePerPage() const { return m_timePerPage; }
     Q_SIGNAL void timePerPageChanged();
 
-    Q_PROPERTY(QString timePerPageAsString READ timePerPageAsString NOTIFY timePerPageChanged)
+    // clang-format off
+    Q_PROPERTY(QString timePerPageAsString
+               READ timePerPageAsString
+               NOTIFY timePerPageChanged)
+    // clang-format on
     QString timePerPageAsString() const;
 
-    Q_PROPERTY(QTime totalTime READ totalTime NOTIFY totalTimeChanged)
+    // clang-format off
+    Q_PROPERTY(QTime totalTime
+               READ totalTime
+               NOTIFY totalTimeChanged)
+    // clang-format on
     QTime totalTime() const { return m_totalTime; }
     Q_SIGNAL void totalTimeChanged();
 
-    Q_PROPERTY(QString totalTimeAsString READ totalTimeAsString NOTIFY totalTimeChanged)
+    // clang-format off
+    Q_PROPERTY(QString totalTimeAsString
+               READ totalTimeAsString
+               NOTIFY totalTimeChanged)
+    // clang-format on
     QString totalTimeAsString() const;
 
-    Q_PROPERTY(QTime currentTime READ currentTime NOTIFY currentTimeChanged)
+    // clang-format off
+    Q_PROPERTY(QTime currentTime
+               READ currentTime
+               NOTIFY currentTimeChanged)
+    // clang-format on
     QTime currentTime() const { return m_currentTime; }
     Q_SIGNAL void currentTimeChanged();
 
-    Q_PROPERTY(QString currentTimeAsString READ currentTimeAsString NOTIFY currentTimeChanged)
+    // clang-format off
+    Q_PROPERTY(QString currentTimeAsString
+               READ currentTimeAsString
+               NOTIFY currentTimeChanged)
+    // clang-format on
     QString currentTimeAsString() const;
 
     Q_INVOKABLE void print(QObject *printerObject);
@@ -259,8 +392,13 @@ public:
     Q_INVOKABLE qreal lengthInPixels(ScreenplayElement *from, ScreenplayElement *to) const;
     Q_INVOKABLE qreal lengthInPages(ScreenplayElement *from, ScreenplayElement *to) const;
 
-    Q_PROPERTY(QObject *injection READ injection WRITE setInjection NOTIFY injectionChanged RESET
-                       resetInjection)
+    // clang-format off
+    Q_PROPERTY(QObject *injection
+               READ injection
+               WRITE setInjection
+               NOTIFY injectionChanged
+               RESET resetInjection)
+    // clang-format on
     void setInjection(QObject *val);
     QObject *injection() const { return m_injection; }
     Q_SIGNAL void injectionChanged();

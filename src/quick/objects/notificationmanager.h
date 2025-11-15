@@ -32,7 +32,11 @@ public:
     explicit NotificationManager(QObject *parent = nullptr);
     ~NotificationManager();
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    // clang-format off
+    Q_PROPERTY(int count
+               READ count
+               NOTIFY countChanged)
+    // clang-format on
     int count() const;
     Q_SIGNAL void countChanged();
 

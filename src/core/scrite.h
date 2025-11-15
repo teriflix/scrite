@@ -35,10 +35,16 @@ struct Country
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_PROPERTY(QString code MEMBER code)
+    // clang-format off
+    Q_PROPERTY(QString code
+               MEMBER code)
+    // clang-format on
     QString code;
 
-    Q_PROPERTY(QString name MEMBER name)
+    // clang-format off
+    Q_PROPERTY(QString name
+               MEMBER name)
+    // clang-format on
     QString name;
 
     Country() { }
@@ -65,10 +71,16 @@ struct Currency
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_PROPERTY(QString code MEMBER code)
+    // clang-format off
+    Q_PROPERTY(QString code
+               MEMBER code)
+    // clang-format on
     QString code;
 
-    Q_PROPERTY(QString symbol MEMBER symbol)
+    // clang-format off
+    Q_PROPERTY(QString symbol
+               MEMBER symbol)
+    // clang-format on
     QString symbol;
 
     Currency() { }
@@ -101,10 +113,16 @@ struct Locale
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_PROPERTY(Country country MEMBER country)
+    // clang-format off
+    Q_PROPERTY(Country country
+               MEMBER country)
+    // clang-format on
     Country country;
 
-    Q_PROPERTY(Currency currency MEMBER currency)
+    // clang-format off
+    Q_PROPERTY(Currency currency
+               MEMBER currency)
+    // clang-format on
     Currency currency;
 
     Locale() { }
@@ -167,38 +185,82 @@ public:
     };
     Q_ENUM(ApplicationState)
 
-    Q_PROPERTY(Application *app READ app CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Application *app
+               READ app
+               CONSTANT )
+    // clang-format on
     static Application *app();
 
-    Q_PROPERTY(AppWindow *window READ window CONSTANT)
+    // clang-format off
+    Q_PROPERTY(AppWindow *window
+               READ window
+               CONSTANT )
+    // clang-format on
     static AppWindow *window();
 
-    Q_PROPERTY(User *user READ user CONSTANT)
+    // clang-format off
+    Q_PROPERTY(User *user
+               READ user
+               CONSTANT )
+    // clang-format on
     static User *user();
 
-    Q_PROPERTY(RestApi *restApi READ restApi CONSTANT)
+    // clang-format off
+    Q_PROPERTY(RestApi *restApi
+               READ restApi
+               CONSTANT )
+    // clang-format on
     static RestApi *restApi();
 
-    Q_PROPERTY(ScriteDocument *document READ document CONSTANT)
+    // clang-format off
+    Q_PROPERTY(ScriteDocument *document
+               READ document
+               CONSTANT )
+    // clang-format on
     static ScriteDocument *document();
 
-    Q_PROPERTY(ScriteDocumentVault *vault READ vault CONSTANT)
+    // clang-format off
+    Q_PROPERTY(ScriteDocumentVault *vault
+               READ vault
+               CONSTANT )
+    // clang-format on
     static ScriteDocumentVault *vault();
 
-    Q_PROPERTY(NotificationManager *notifications READ notifications CONSTANT)
+    // clang-format off
+    Q_PROPERTY(NotificationManager *notifications
+               READ notifications
+               CONSTANT )
+    // clang-format on
     static NotificationManager *notifications();
 
-    Q_PROPERTY(QString fileNameToOpen READ fileNameToOpen CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString fileNameToOpen
+               READ fileNameToOpen
+               CONSTANT )
+    // clang-format on
     static QString fileNameToOpen() { return m_fileNameToOpen; }
     static void setFileNameToOpen(const QString &val);
 
-    Q_PROPERTY(QStringList defaultTransitions READ defaultTransitions CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QStringList defaultTransitions
+               READ defaultTransitions
+               CONSTANT )
+    // clang-format on
     static QStringList defaultTransitions();
 
-    Q_PROPERTY(QStringList defaultShots READ defaultShots CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QStringList defaultShots
+               READ defaultShots
+               CONSTANT )
+    // clang-format on
     static QStringList defaultShots();
 
-    Q_PROPERTY(Locale locale READ locale CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Locale locale
+               READ locale
+               CONSTANT )
+    // clang-format on
     static Locale locale();
 
     Q_INVOKABLE static QString currencySymbol(const QString &code);

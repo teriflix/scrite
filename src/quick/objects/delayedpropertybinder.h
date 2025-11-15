@@ -27,26 +27,50 @@ public:
     explicit DelayedPropertyBinder(QQuickItem *parent = nullptr);
     ~DelayedPropertyBinder();
 
-    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    // clang-format off
+    Q_PROPERTY(QString name
+               READ name
+               WRITE setName
+               NOTIFY nameChanged)
+    // clang-format on
     void setName(const QString &val);
     QString name() const { return m_name; }
     Q_SIGNAL void nameChanged();
 
-    Q_PROPERTY(QVariant set READ set WRITE setSet NOTIFY setChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant set
+               READ set
+               WRITE setSet
+               NOTIFY setChanged)
+    // clang-format on
     void setSet(const QVariant &val);
     QVariant set() const { return m_set; }
     Q_SIGNAL void setChanged();
 
-    Q_PROPERTY(QVariant get READ get NOTIFY getChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant get
+               READ get
+               NOTIFY getChanged)
+    // clang-format on
     QVariant get() const { return m_get; }
     Q_SIGNAL void getChanged();
 
-    Q_PROPERTY(QVariant initial READ initial WRITE setInitial NOTIFY initialChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant initial
+               READ initial
+               WRITE setInitial
+               NOTIFY initialChanged)
+    // clang-format on
     void setInitial(const QVariant &val);
     QVariant initial() const { return m_initial; }
     Q_SIGNAL void initialChanged();
 
-    Q_PROPERTY(int delay READ delay WRITE setDelay NOTIFY delayChanged)
+    // clang-format off
+    Q_PROPERTY(int delay
+               READ delay
+               WRITE setDelay
+               NOTIFY delayChanged)
+    // clang-format on
     void setDelay(int val);
     int delay() const { return m_delay; }
     Q_SIGNAL void delayChanged();

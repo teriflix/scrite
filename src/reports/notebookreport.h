@@ -21,40 +21,62 @@
 class NotebookReport : public AbstractReportGenerator
 {
     Q_OBJECT
+    // clang-format off
     Q_CLASSINFO("Title", "Notebook Report")
     Q_CLASSINFO("Description", "Generates a report of notes in the Notebook.")
     Q_CLASSINFO("Icon", ":/icons/reports/notebook_report.png")
+    // clang-format on
 
 public:
     Q_INVOKABLE NotebookReport(QObject *parent = nullptr);
     ~NotebookReport();
 
+    // clang-format off
     Q_CLASSINFO("actsOnNewPage_FieldGroup", "Basic")
     Q_CLASSINFO("actsOnNewPage_FieldLabel", "Start each Act on a new page.")
     Q_CLASSINFO("actsOnNewPage_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool actsOnNewPage READ isActsOnNewPage WRITE setActsOnNewPage NOTIFY
-                       actsOnNewPageChanged)
+    Q_PROPERTY(bool actsOnNewPage
+               READ isActsOnNewPage
+               WRITE setActsOnNewPage
+               NOTIFY actsOnNewPageChanged)
+    // clang-format on
     void setActsOnNewPage(bool val);
     bool isActsOnNewPage() const { return m_actsOnNewPage; }
     Q_SIGNAL void actsOnNewPageChanged();
 
+    // clang-format off
     Q_CLASSINFO("episodesOnNewPage_FieldGroup", "Basic")
     Q_CLASSINFO("episodesOnNewPage_FieldLabel", "Start each Episode on a new page.")
     Q_CLASSINFO("episodesOnNewPage_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool episodesOnNewPage READ isEpisodesOnNewPage WRITE setEpisodesOnNewPage NOTIFY
-                       episodesOnNewPageChanged)
+    Q_PROPERTY(bool episodesOnNewPage
+               READ isEpisodesOnNewPage
+               WRITE setEpisodesOnNewPage
+               NOTIFY episodesOnNewPageChanged)
+    // clang-format on
     void setEpisodesOnNewPage(bool val);
     bool isEpisodesOnNewPage() const { return m_episodesOnNewPage; }
     Q_SIGNAL void episodesOnNewPageChanged();
 
     // Can be Scene, Structure, Screenplay, Character, Notes or Note
     // Otherwise it generates a dump of all notes in the Notebook
-    Q_PROPERTY(QObject *section READ section WRITE setSection NOTIFY sectionChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QObject *section
+               READ section
+               WRITE setSection
+               NOTIFY sectionChanged
+               STORED false)
+    // clang-format on
     void setSection(QObject *val);
     QObject *section() const { return m_section; }
     Q_SIGNAL void sectionChanged();
 
-    Q_PROPERTY(QJsonValue options READ options WRITE setOptions NOTIFY optionsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QJsonValue options
+               READ options
+               WRITE setOptions
+               NOTIFY optionsChanged
+               STORED false)
+    // clang-format on
     void setOptions(const QJsonValue &val);
     QJsonValue options() const { return m_options; }
     Q_SIGNAL void optionsChanged();

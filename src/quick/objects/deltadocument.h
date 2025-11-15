@@ -28,16 +28,29 @@ public:
     explicit DeltaDocument(QObject *parent = nullptr);
     ~DeltaDocument();
 
-    Q_PROPERTY(QJsonValue content READ content WRITE setContent NOTIFY contentChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonValue content
+               READ content
+               WRITE setContent
+               NOTIFY contentChanged)
+    // clang-format on
     void setContent(const QJsonValue &val);
     QJsonValue content() const { return m_content; }
     Q_SIGNAL void contentChanged();
 
-    Q_PROPERTY(QString plainText READ plainText NOTIFY plainTextChanged)
+    // clang-format off
+    Q_PROPERTY(QString plainText
+               READ plainText
+               NOTIFY plainTextChanged)
+    // clang-format on
     QString plainText() const { return m_plainText; }
     Q_SIGNAL void plainTextChanged();
 
-    Q_PROPERTY(QString html READ html NOTIFY htmlChanged)
+    // clang-format off
+    Q_PROPERTY(QString html
+               READ html
+               NOTIFY htmlChanged)
+    // clang-format on
     QString html() const { return m_html; }
     Q_SIGNAL void htmlChanged();
 

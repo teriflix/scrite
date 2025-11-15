@@ -29,22 +29,41 @@ public:
     explicit ItemPositionMapper(QObject *parent = nullptr);
     ~ItemPositionMapper();
 
-    Q_PROPERTY(QPointF position READ position WRITE setPosition NOTIFY positionChanged)
+    // clang-format off
+    Q_PROPERTY(QPointF position
+               READ position
+               WRITE setPosition
+               NOTIFY positionChanged)
+    // clang-format on
     void setPosition(const QPointF &val);
     QPointF position() const { return m_position; }
     Q_SIGNAL void positionChanged();
 
-    Q_PROPERTY(QQuickItem *from READ from WRITE setFrom NOTIFY fromChanged)
+    // clang-format off
+    Q_PROPERTY(QQuickItem *from
+               READ from
+               WRITE setFrom
+               NOTIFY fromChanged)
+    // clang-format on
     void setFrom(QQuickItem *val);
     QQuickItem *from() const { return m_from; }
     Q_SIGNAL void fromChanged();
 
-    Q_PROPERTY(QQuickItem *to READ to WRITE setTo NOTIFY toChanged)
+    // clang-format off
+    Q_PROPERTY(QQuickItem *to
+               READ to
+               WRITE setTo
+               NOTIFY toChanged)
+    // clang-format on
     void setTo(QQuickItem *val);
     QQuickItem *to() const { return m_to; }
     Q_SIGNAL void toChanged();
 
-    Q_PROPERTY(QPointF mappedPosition READ mappedPosition NOTIFY mappedPositionChanged)
+    // clang-format off
+    Q_PROPERTY(QPointF mappedPosition
+               READ mappedPosition
+               NOTIFY mappedPositionChanged)
+    // clang-format on
     QPointF mappedPosition() const { return m_mappedPosition; }
     Q_SIGNAL void mappedPositionChanged();
 

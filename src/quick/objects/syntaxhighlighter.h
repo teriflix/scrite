@@ -38,7 +38,12 @@ public:
 
     bool instantiatedInQml() const { return m_intantiatedInQml; }
 
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool enabled
+               READ isEnabled
+               WRITE setEnabled
+               NOTIFY enabledChanged)
+    // clang-format on
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
@@ -102,7 +107,9 @@ class SyntaxHighlighter : public QSyntaxHighlighter
     Q_OBJECT
     QML_ELEMENT
     QML_ATTACHED(SyntaxHighlighter)
+    // clang-format off
     Q_CLASSINFO("DefaultProperty", "delegates")
+    // clang-format on
 
 public:
     explicit SyntaxHighlighter(QObject *parent = nullptr);
@@ -111,14 +118,22 @@ public:
     static SyntaxHighlighter *qmlAttachedProperties(QObject *object);
     static SyntaxHighlighter *get(QObject *object) { return qmlAttachedProperties(object); }
 
-    Q_PROPERTY(QQuickTextDocument *textDocument READ textDocument WRITE setTextDocument NOTIFY
-                       textDocumentChanged)
+    // clang-format off
+    Q_PROPERTY(QQuickTextDocument *textDocument
+               READ textDocument
+               WRITE setTextDocument
+               NOTIFY textDocumentChanged)
+    // clang-format on
     void setTextDocument(QQuickTextDocument *val);
     QQuickTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
-    Q_PROPERTY(bool textDocumentUndoRedoEnabled READ isTextDocumentUndoRedoEnabled WRITE
-                       setTextDocumentUndoRedoEnabled NOTIFY textDocumentUndoRedoEnabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool textDocumentUndoRedoEnabled
+               READ isTextDocumentUndoRedoEnabled
+               WRITE setTextDocumentUndoRedoEnabled
+               NOTIFY textDocumentUndoRedoEnabledChanged)
+    // clang-format on
     void setTextDocumentUndoRedoEnabled(bool val);
     bool isTextDocumentUndoRedoEnabled() const { return m_textDocumentUndoRedoEnabled; }
     Q_SIGNAL void textDocumentUndoRedoEnabledChanged();
@@ -128,13 +143,20 @@ protected:
     void highlightBlock(const QString &text);
 
 public:
-    Q_PROPERTY(QQmlListProperty<AbstractSyntaxHighlighterDelegate> delegates READ delegates NOTIFY
-                       delegateCountChanged)
+    // clang-format off
+    Q_PROPERTY(QQmlListProperty<AbstractSyntaxHighlighterDelegate> delegates
+               READ delegates
+               NOTIFY delegateCountChanged)
+    // clang-format on
     QQmlListProperty<AbstractSyntaxHighlighterDelegate> delegates();
     Q_INVOKABLE void addDelegate(AbstractSyntaxHighlighterDelegate *ptr);
     Q_INVOKABLE void removeDelegate(AbstractSyntaxHighlighterDelegate *ptr);
     Q_INVOKABLE AbstractSyntaxHighlighterDelegate *delegateAt(int index) const;
-    Q_PROPERTY(int delegateCount READ delegateCount NOTIFY delegateCountChanged)
+    // clang-format off
+    Q_PROPERTY(int delegateCount
+               READ delegateCount
+               NOTIFY delegateCountChanged)
+    // clang-format on
     int delegateCount() const { return m_delegates.size(); }
     Q_INVOKABLE void clearDelegates();
     Q_SIGNAL void delegateCountChanged();
@@ -215,14 +237,23 @@ public:
     // If specified, it has to be a QFont value. When enforceDefaultFont is true,
     // the default font set here or that of this->document().defaultFont() will be
     // force applied to the document.
-    Q_PROPERTY(QVariant defaultFont READ defaultFont WRITE setDefaultFont NOTIFY defaultFontChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant defaultFont
+               READ defaultFont
+               WRITE setDefaultFont
+               NOTIFY defaultFontChanged)
+    // clang-format on
     void setDefaultFont(const QVariant &val);
     QVariant defaultFont() const { return m_defaultFont; }
     Q_SIGNAL void defaultFontChanged();
 
     // Keep this true if you want default font to be applied always.
-    Q_PROPERTY(bool enforceDefaultFont READ isEnforceDefaultFont WRITE setEnforceDefaultFont NOTIFY
-                       enforceDefaultFontChanged)
+    // clang-format off
+    Q_PROPERTY(bool enforceDefaultFont
+               READ isEnforceDefaultFont
+               WRITE setEnforceDefaultFont
+               NOTIFY enforceDefaultFontChanged)
+    // clang-format on
     void setEnforceDefaultFont(bool val);
     bool isEnforceDefaultFont() const { return m_enforceDefaultFont; }
     Q_SIGNAL void enforceDefaultFontChanged();
@@ -248,32 +279,62 @@ public:
 
     // All attributes of the font, except family will be applied.
 
-    Q_PROPERTY(QFont h1 READ h1 WRITE setH1 NOTIFY h1Changed)
+    // clang-format off
+    Q_PROPERTY(QFont h1
+               READ h1
+               WRITE setH1
+               NOTIFY h1Changed)
+    // clang-format on
     void setH1(const QFont &val);
     QFont h1() const { return m_h1; }
     Q_SIGNAL void h1Changed();
 
-    Q_PROPERTY(QFont h2 READ h2 WRITE setH2 NOTIFY h2Changed)
+    // clang-format off
+    Q_PROPERTY(QFont h2
+               READ h2
+               WRITE setH2
+               NOTIFY h2Changed)
+    // clang-format on
     void setH2(const QFont &val);
     QFont h2() const { return m_h2; }
     Q_SIGNAL void h2Changed();
 
-    Q_PROPERTY(QFont h3 READ h3 WRITE setH3 NOTIFY h3Changed)
+    // clang-format off
+    Q_PROPERTY(QFont h3
+               READ h3
+               WRITE setH3
+               NOTIFY h3Changed)
+    // clang-format on
     void setH3(const QFont &val);
     QFont h3() const { return m_h3; }
     Q_SIGNAL void h3Changed();
 
-    Q_PROPERTY(QFont h4 READ h4 WRITE setH4 NOTIFY h4Changed)
+    // clang-format off
+    Q_PROPERTY(QFont h4
+               READ h4
+               WRITE setH4
+               NOTIFY h4Changed)
+    // clang-format on
     void setH4(const QFont &val);
     QFont h4() const { return m_h4; }
     Q_SIGNAL void h4Changed();
 
-    Q_PROPERTY(QFont h5 READ h5 WRITE setH5 NOTIFY h5Changed)
+    // clang-format off
+    Q_PROPERTY(QFont h5
+               READ h5
+               WRITE setH5
+               NOTIFY h5Changed)
+    // clang-format on
     void setH5(const QFont &val);
     QFont h5() const { return m_h5; }
     Q_SIGNAL void h5Changed();
 
-    Q_PROPERTY(QFont normal READ normal WRITE setNormal NOTIFY normalChanged)
+    // clang-format off
+    Q_PROPERTY(QFont normal
+               READ normal
+               WRITE setNormal
+               NOTIFY normalChanged)
+    // clang-format on
     void setNormal(const QFont &val);
     QFont normal() const { return m_normal; }
     Q_SIGNAL void normalChanged();
@@ -304,31 +365,49 @@ public:
     explicit SpellCheckSyntaxHighlighterDelegate(QObject *parent = nullptr);
     ~SpellCheckSyntaxHighlighterDelegate();
 
-    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor textColor
+               READ textColor
+               WRITE setTextColor
+               NOTIFY textColorChanged)
+    // clang-format on
     void setTextColor(const QColor &val);
     QColor textColor() const { return m_textColor; }
     Q_SIGNAL void textColorChanged();
 
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY
-                       backgroundColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor backgroundColor
+               READ backgroundColor
+               WRITE setBackgroundColor
+               NOTIFY backgroundColorChanged)
+    // clang-format on
     void setBackgroundColor(const QColor &val);
     QColor backgroundColor() const { return m_backgroundColor; }
     Q_SIGNAL void backgroundColorChanged();
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
-                       cursorPositionChanged)
+    // clang-format off
+    Q_PROPERTY(int cursorPosition
+               READ cursorPosition
+               WRITE setCursorPosition
+               NOTIFY cursorPositionChanged)
+    // clang-format on
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
 
-    Q_PROPERTY(bool wordUnderCursorIsMisspelled READ isWordUnderCursorIsMisspelled NOTIFY
-                       wordUnderCursorIsMisspelledChanged)
+    // clang-format off
+    Q_PROPERTY(bool wordUnderCursorIsMisspelled
+               READ isWordUnderCursorIsMisspelled
+               NOTIFY wordUnderCursorIsMisspelledChanged)
+    // clang-format on
     bool isWordUnderCursorIsMisspelled() const { return m_wordUnderCursorIsMisspelled; }
     Q_SIGNAL void wordUnderCursorIsMisspelledChanged();
 
-    Q_PROPERTY(QStringList spellingSuggestionsForWordUnderCursor READ
-                       spellingSuggestionsForWordUnderCursor NOTIFY
-                               spellingSuggestionsForWordUnderCursorChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList spellingSuggestionsForWordUnderCursor
+               READ spellingSuggestionsForWordUnderCursor
+               NOTIFY spellingSuggestionsForWordUnderCursorChanged)
+    // clang-format on
     QStringList spellingSuggestionsForWordUnderCursor() const
     {
         return m_spellingSuggestionsForWordUnderCursor;
@@ -391,24 +470,41 @@ public:
     explicit TextLimiterSyntaxHighlighterDelegate(QObject *parent = nullptr);
     ~TextLimiterSyntaxHighlighterDelegate();
 
-    Q_PROPERTY(TextLimiter *textLimiter READ textLimiter WRITE setTextLimiter NOTIFY
-                       textLimiterChanged)
+    // clang-format off
+    Q_PROPERTY(TextLimiter *textLimiter
+               READ textLimiter
+               WRITE setTextLimiter
+               NOTIFY textLimiterChanged)
+    // clang-format on
     void setTextLimiter(TextLimiter *val);
     TextLimiter *textLimiter() const { return m_textLimiter; }
     Q_SIGNAL void textLimiterChanged();
 
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY
-                       backgroundColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor backgroundColor
+               READ backgroundColor
+               WRITE setBackgroundColor
+               NOTIFY backgroundColorChanged)
+    // clang-format on
     void setBackgroundColor(const QColor &val);
     QColor backgroundColor() const { return m_backgroundColor; }
     Q_SIGNAL void backgroundColorChanged();
 
-    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor textColor
+               READ textColor
+               WRITE setTextColor
+               NOTIFY textColorChanged)
+    // clang-format on
     void setTextColor(const QColor &val);
     QColor textColor() const { return m_textColor; }
     Q_SIGNAL void textColorChanged();
 
-    Q_PROPERTY(int cursorLimitPosition READ cursorLimitPosition NOTIFY cursorLimitPositionChanged)
+    // clang-format off
+    Q_PROPERTY(int cursorLimitPosition
+               READ cursorLimitPosition
+               NOTIFY cursorLimitPositionChanged)
+    // clang-format on
     int cursorLimitPosition() const { return m_cursorLimitPosition; }
     Q_SIGNAL void cursorLimitPositionChanged();
 

@@ -32,21 +32,38 @@ public:
     explicit GenericArrayModel(QObject *parent = nullptr);
     ~GenericArrayModel();
 
-    Q_PROPERTY(QJsonArray array READ array WRITE setArray NOTIFY arrayChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonArray array
+               READ array
+               WRITE setArray
+               NOTIFY arrayChanged)
+    // clang-format on
     void setArray(const QJsonArray &val);
     QJsonArray array() const { return m_array; }
     Q_SIGNAL void arrayChanged();
 
-    Q_PROPERTY(bool arrayHasObjects READ arrayHasObjects NOTIFY arrayChanged)
+    // clang-format off
+    Q_PROPERTY(bool arrayHasObjects
+               READ arrayHasObjects
+               NOTIFY arrayChanged)
+    // clang-format on
     bool arrayHasObjects() const;
 
-    Q_PROPERTY(QStringList objectMembers READ objectMembers WRITE setObjectMembers NOTIFY
-                       objectMembersChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList objectMembers
+               READ objectMembers
+               WRITE setObjectMembers
+               NOTIFY objectMembersChanged)
+    // clang-format on
     void setObjectMembers(const QStringList &val);
     QStringList objectMembers() const { return m_objectMembers; }
     Q_SIGNAL void objectMembersChanged();
 
-    Q_PROPERTY(QJsonObject objectMemberRoles READ objectMemberRoles NOTIFY objectMembersChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject objectMemberRoles
+               READ objectMemberRoles
+               NOTIFY objectMembersChanged)
+    // clang-format on
     QJsonObject objectMemberRoles() const;
 
     Q_INVOKABLE QString roleNameOf(int role) const;
@@ -55,7 +72,11 @@ public:
     Q_INVOKABLE QJsonArray stringListArray(const QStringList &list) const;
     Q_INVOKABLE QJsonArray arrayFromCsv(const QString &text) const;
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    // clang-format off
+    Q_PROPERTY(int count
+               READ count
+               NOTIFY countChanged)
+    // clang-format on
     int count() const { return m_array.size(); }
     Q_SIGNAL void countChanged();
 
@@ -70,7 +91,12 @@ public:
 
     Q_INVOKABLE int firstIndexOf(const QString &member, const QVariant &value) const;
 
-    Q_PROPERTY(bool editable READ isEditable WRITE setEditable NOTIFY editableChanged)
+    // clang-format off
+    Q_PROPERTY(bool editable
+               READ isEditable
+               WRITE setEditable
+               NOTIFY editableChanged)
+    // clang-format on
     void setEditable(bool val);
     bool isEditable() const { return m_editable; }
     Q_SIGNAL void editableChanged();
@@ -102,8 +128,13 @@ public:
     explicit GenericArraySortFilterProxyModel(QObject *parent = nullptr);
     ~GenericArraySortFilterProxyModel();
 
-    Q_PROPERTY(GenericArrayModel *arrayModel READ arrayModel WRITE setArrayModel NOTIFY
-                       arrayModelChanged RESET resetArrayModel)
+    // clang-format off
+    Q_PROPERTY(GenericArrayModel *arrayModel
+               READ arrayModel
+               WRITE setArrayModel
+               NOTIFY arrayModelChanged
+               RESET resetArrayModel)
+    // clang-format on
     void setArrayModel(GenericArrayModel *val);
     GenericArrayModel *arrayModel() const { return m_arrayModel; }
     Q_SIGNAL void arrayModelChanged();

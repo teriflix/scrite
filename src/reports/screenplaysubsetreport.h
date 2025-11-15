@@ -19,32 +19,40 @@
 class ScreenplaySubsetReport : public AbstractScreenplaySubsetReport
 {
     Q_OBJECT
+    // clang-format off
     Q_CLASSINFO("Title", "Screenplay Subset")
     Q_CLASSINFO("Description", "Generate screenplay with only a subset of scenes selected by you.")
     Q_CLASSINFO("Icons", ":/icons/reports/screenplay_subset_report.png")
+    // clang-format on
 
 public:
     Q_INVOKABLE explicit ScreenplaySubsetReport(QObject *parent = nullptr);
     ~ScreenplaySubsetReport();
 
+    // clang-format off
     Q_CLASSINFO("sceneNumbers_FieldGroup", "Scenes")
     Q_CLASSINFO("sceneNumbers_FieldLabel", "Scenes to include in the report")
     Q_CLASSINFO("sceneNumbers_FieldEditor", "MultipleSceneSelector")
-    Q_CLASSINFO("sceneNumbers_FieldNote",
-                "If no scenes are selected, then the report is generted for all scenes in the "
-                "screenplay.")
+    Q_CLASSINFO("sceneNumbers_FieldNote", "If no scenes are selected, then the report is generted for all scenes in the " "screenplay.")
     Q_CLASSINFO("sceneNumbers_IsPersistent", "false")
-    Q_PROPERTY(QList<int> sceneNumbers READ sceneNumbers WRITE setSceneNumbers NOTIFY
-                       sceneNumbersChanged)
+    Q_PROPERTY(QList<int> sceneNumbers
+               READ sceneNumbers
+               WRITE setSceneNumbers
+               NOTIFY sceneNumbersChanged)
+    // clang-format on
     void setSceneNumbers(const QList<int> &val);
     QList<int> sceneNumbers() const { return m_sceneNumbers; }
     Q_SIGNAL void sceneNumbersChanged();
 
+    // clang-format off
     Q_CLASSINFO("generateSummary_FieldGroup", "Options")
     Q_CLASSINFO("generateSummary_FieldLabel", "Generate summary")
     Q_CLASSINFO("generateSummary_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool generateSummary READ generateSummary WRITE setGenerateSummary NOTIFY
-                       generateSummaryChanged)
+    Q_PROPERTY(bool generateSummary
+               READ generateSummary
+               WRITE setGenerateSummary
+               NOTIFY generateSummaryChanged)
+    // clang-format on
     void setGenerateSummary(bool val);
     bool generateSummary() const { return m_generateSummary; }
     Q_SIGNAL void generateSummaryChanged();

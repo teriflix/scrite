@@ -29,26 +29,48 @@ public:
     explicit NetworkStatus(QObject *parent = nullptr);
     virtual ~NetworkStatus();
 
-    Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
+    // clang-format off
+    Q_PROPERTY(bool busy
+               READ isBusy
+               NOTIFY busyChanged)
+    // clang-format on
     bool isBusy() const { return m_reply != nullptr; }
     Q_SIGNAL void busyChanged();
 
-    Q_PROPERTY(bool online READ isOnline NOTIFY onlineChanged)
+    // clang-format off
+    Q_PROPERTY(bool online
+               READ isOnline
+               NOTIFY onlineChanged)
+    // clang-format on
     bool isOnline() const { return m_online; }
     Q_SIGNAL void onlineChanged();
 
-    Q_PROPERTY(int interval READ interval WRITE setInterval NOTIFY intervalChanged)
+    // clang-format off
+    Q_PROPERTY(int interval
+               READ interval
+               WRITE setInterval
+               NOTIFY intervalChanged)
+    // clang-format on
     void setInterval(int val);
     int interval() const { return m_interval; }
     Q_SIGNAL void intervalChanged();
 
-    Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
+    // clang-format off
+    Q_PROPERTY(QUrl url
+               READ url
+               WRITE setUrl
+               NOTIFY urlChanged)
+    // clang-format on
     void setUrl(const QUrl &val);
     QUrl url() const { return m_url; }
     Q_SIGNAL void urlChanged();
 
-    Q_PROPERTY(QNetworkAccessManager *networkAccessManager READ networkAccessManager WRITE
-                       setNetworkAccessManager NOTIFY networkAccessManagerChanged)
+    // clang-format off
+    Q_PROPERTY(QNetworkAccessManager *networkAccessManager
+               READ networkAccessManager
+               WRITE setNetworkAccessManager
+               NOTIFY networkAccessManagerChanged)
+    // clang-format on
     void setNetworkAccessManager(QNetworkAccessManager *val);
     QNetworkAccessManager *networkAccessManager() const { return m_networkAccessManager; }
     Q_SIGNAL void networkAccessManagerChanged();

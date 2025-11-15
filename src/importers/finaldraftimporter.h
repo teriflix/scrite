@@ -20,8 +20,10 @@
 class FinalDraftImporter : public AbstractImporter
 {
     Q_OBJECT
+    // clang-format off
     Q_CLASSINFO("Format", "Final Draft")
     Q_CLASSINFO("NameFilters", "Final Draft (*.fdx)")
+    // clang-format on
 
 public:
     Q_INVOKABLE explicit FinalDraftImporter(QObject *parent = nullptr);

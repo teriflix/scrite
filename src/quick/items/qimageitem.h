@@ -27,8 +27,12 @@ public:
     QImageItem(QQuickItem *parentItem = nullptr);
     ~QImageItem();
 
-    Q_PROPERTY(bool useSoftwareRenderer READ useSoftwareRenderer WRITE setUseSoftwareRenderer NOTIFY
-                       useSoftwareRendererChanged)
+    // clang-format off
+    Q_PROPERTY(bool useSoftwareRenderer
+               READ useSoftwareRenderer
+               WRITE setUseSoftwareRenderer
+               NOTIFY useSoftwareRendererChanged)
+    // clang-format on
     void setUseSoftwareRenderer(bool val);
     bool useSoftwareRenderer() const { return m_useSoftwareRenderer; }
     Q_SIGNAL void useSoftwareRendererChanged();
@@ -36,19 +40,33 @@ public:
     enum FillMode { Stretch, PreserveAspectFit, PreserveAspectCrop };
     Q_ENUM(FillMode)
 
-    Q_PROPERTY(FillMode fillMode READ fillMode WRITE setFillMode NOTIFY fillModeChanged)
+    // clang-format off
+    Q_PROPERTY(FillMode fillMode
+               READ fillMode
+               WRITE setFillMode
+               NOTIFY fillModeChanged)
+    // clang-format on
     void setFillMode(FillMode val);
     FillMode fillMode() const { return m_fillMode; }
     Q_SIGNAL void fillModeChanged();
 
     Q_INVOKABLE static QImage fromIcon(const QIcon &icon, const QSize &size);
 
-    Q_PROPERTY(QImage image READ image WRITE setImage NOTIFY imageChanged)
+    // clang-format off
+    Q_PROPERTY(QImage image
+               READ image
+               WRITE setImage
+               NOTIFY imageChanged)
+    // clang-format on
     void setImage(const QImage &val);
     QImage image() const { return m_image; }
     Q_SIGNAL void imageChanged();
 
-    Q_PROPERTY(bool imageIsEmpty READ imageIsEmpty NOTIFY imageChanged)
+    // clang-format off
+    Q_PROPERTY(bool imageIsEmpty
+               READ imageIsEmpty
+               NOTIFY imageChanged)
+    // clang-format on
     bool imageIsEmpty() const { return m_image.isNull() || m_image.size().isEmpty(); }
 
 protected:

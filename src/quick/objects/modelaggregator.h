@@ -36,33 +36,61 @@ public:
     FinalizeFunction finalizeFunction() const { return m_finalizeFunction; }
     Q_SIGNAL void finalizeFunctionChanged();
 
-    Q_PROPERTY(QAbstractItemModel *model READ model WRITE setModel RESET resetModel NOTIFY
-                       modelChanged)
+    // clang-format off
+    Q_PROPERTY(QAbstractItemModel *model
+               READ model
+               WRITE setModel
+               RESET resetModel
+               NOTIFY modelChanged)
+    // clang-format on
     void setModel(QAbstractItemModel *val);
     QAbstractItemModel *model() const { return m_model; }
     Q_SIGNAL void modelChanged();
 
-    Q_PROPERTY(QModelIndex rootIndex READ rootIndex WRITE setRootIndex NOTIFY rootIndexChanged)
+    // clang-format off
+    Q_PROPERTY(QModelIndex rootIndex
+               READ rootIndex
+               WRITE setRootIndex
+               NOTIFY rootIndexChanged)
+    // clang-format on
     void setRootIndex(const QModelIndex &val);
     QModelIndex rootIndex() const { return m_rootIndex; }
     Q_SIGNAL void rootIndexChanged();
 
-    Q_PROPERTY(int column READ column WRITE setColumn NOTIFY columnChanged)
+    // clang-format off
+    Q_PROPERTY(int column
+               READ column
+               WRITE setColumn
+               NOTIFY columnChanged)
+    // clang-format on
     void setColumn(int val);
     int column() const { return m_column; }
     Q_SIGNAL void columnChanged();
 
-    Q_PROPERTY(QVariant aggregateValue READ aggregateValue NOTIFY aggregateValueChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant aggregateValue
+               READ aggregateValue
+               NOTIFY aggregateValueChanged)
+    // clang-format on
     QVariant aggregateValue() const { return m_aggregateValue; }
     Q_SIGNAL void aggregateValueChanged();
 
-    Q_PROPERTY(QVariant initialValue READ initialValue WRITE setInitialValue NOTIFY
-                       initialValueChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant initialValue
+               READ initialValue
+               WRITE setInitialValue
+               NOTIFY initialValueChanged)
+    // clang-format on
     void setInitialValue(const QVariant &val);
     QVariant initialValue() const { return m_initialValue; }
     Q_SIGNAL void initialValueChanged();
 
-    Q_PROPERTY(int delay READ delay WRITE setDelay NOTIFY delayChanged)
+    // clang-format off
+    Q_PROPERTY(int delay
+               READ delay
+               WRITE setDelay
+               NOTIFY delayChanged)
+    // clang-format on
     void setDelay(int val);
     int delay() const { return m_delay; }
     Q_SIGNAL void delayChanged();

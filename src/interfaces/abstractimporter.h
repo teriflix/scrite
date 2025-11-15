@@ -25,13 +25,25 @@ class AbstractImporter : public AbstractDeviceIO
 public:
     ~AbstractImporter();
 
-    Q_PROPERTY(QString format READ format CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString format
+               READ format
+               CONSTANT )
+    // clang-format on
     QString format() const;
 
-    Q_PROPERTY(QString nameFilters READ nameFilters CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString nameFilters
+               READ nameFilters
+               CONSTANT )
+    // clang-format on
     QString nameFilters() const;
 
-    Q_PROPERTY(bool featureEnabled READ isFeatureEnabled NOTIFY featureEnabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool featureEnabled
+               READ isFeatureEnabled
+               NOTIFY featureEnabledChanged)
+    // clang-format on
     bool isFeatureEnabled() const;
     Q_SIGNAL void featureEnabledChanged();
 

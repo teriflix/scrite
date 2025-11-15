@@ -26,18 +26,31 @@ public:
     explicit BatchChange(QObject *parent = nullptr);
     ~BatchChange();
 
-    Q_PROPERTY(QVariant trackChangesOn READ trackChangesOn WRITE setTrackChangesOn NOTIFY
-                       trackChangesOnChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant trackChangesOn
+               READ trackChangesOn
+               WRITE setTrackChangesOn
+               NOTIFY trackChangesOnChanged)
+    // clang-format on
     void setTrackChangesOn(const QVariant &val);
     QVariant trackChangesOn() const { return m_trackChangesOn; }
     Q_SIGNAL void trackChangesOnChanged();
 
-    Q_PROPERTY(int delay READ delay WRITE setDelay NOTIFY delayChanged)
+    // clang-format off
+    Q_PROPERTY(int delay
+               READ delay
+               WRITE setDelay
+               NOTIFY delayChanged)
+    // clang-format on
     void setDelay(int val);
     int delay() const { return m_delay; }
     Q_SIGNAL void delayChanged();
 
-    Q_PROPERTY(QVariant value READ value NOTIFY valueChanged)
+    // clang-format off
+    Q_PROPERTY(QVariant value
+               READ value
+               NOTIFY valueChanged)
+    // clang-format on
     QVariant value() const { return m_value; }
     Q_SIGNAL void valueChanged();
 

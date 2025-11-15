@@ -31,7 +31,12 @@ public:
 
     static ContextMenuEvent *qmlAttachedProperties(QObject *object);
 
-    Q_PROPERTY(bool active READ isActive WRITE setActive NOTIFY activeChanged)
+    // clang-format off
+    Q_PROPERTY(bool active
+               READ isActive
+               WRITE setActive
+               NOTIFY activeChanged)
+    // clang-format on
     void setActive(bool val);
     bool isActive() const { return m_active; }
     Q_SIGNAL void activeChanged();
@@ -39,7 +44,12 @@ public:
     enum Mode { GlobalEventFilterMode, ItemEventFilterMode };
     Q_ENUM(Mode)
 
-    Q_PROPERTY(Mode mode READ mode WRITE setMode NOTIFY modeChanged)
+    // clang-format off
+    Q_PROPERTY(Mode mode
+               READ mode
+               WRITE setMode
+               NOTIFY modeChanged)
+    // clang-format on
     void setMode(Mode val);
     Mode mode() const { return m_mode; }
     Q_SIGNAL void modeChanged();

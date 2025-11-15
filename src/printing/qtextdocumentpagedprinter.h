@@ -38,7 +38,11 @@ public:
     explicit HeaderFooter(Type type, QObject *parent = nullptr);
     ~HeaderFooter();
 
-    Q_PROPERTY(Type type READ type CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Type type
+               READ type
+               CONSTANT )
+    // clang-format on
     Type type() const { return m_type; }
 
     enum Field {
@@ -68,38 +72,72 @@ public:
     };
     Q_ENUM(Field)
 
-    Q_PROPERTY(Field left READ left WRITE setLeft NOTIFY leftChanged)
+    // clang-format off
+    Q_PROPERTY(Field left
+               READ left
+               WRITE setLeft
+               NOTIFY leftChanged)
+    // clang-format on
     void setLeft(Field val);
     Field left() const { return m_left; }
     Q_SIGNAL void leftChanged();
 
-    Q_PROPERTY(Field center READ center WRITE setCenter NOTIFY centerChanged)
+    // clang-format off
+    Q_PROPERTY(Field center
+               READ center
+               WRITE setCenter
+               NOTIFY centerChanged)
+    // clang-format on
     void setCenter(Field val);
     Field center() const { return m_center; }
     Q_SIGNAL void centerChanged();
 
-    Q_PROPERTY(Field right READ right WRITE setRight NOTIFY rightChanged)
+    // clang-format off
+    Q_PROPERTY(Field right
+               READ right
+               WRITE setRight
+               NOTIFY rightChanged)
+    // clang-format on
     void setRight(Field val);
     Field right() const { return m_right; }
     Q_SIGNAL void rightChanged();
 
-    Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
+    // clang-format off
+    Q_PROPERTY(QFont font
+               READ font
+               WRITE setFont
+               NOTIFY fontChanged)
+    // clang-format on
     void setFont(const QFont &val);
     QFont font() const { return m_font; }
     Q_SIGNAL void fontChanged();
 
-    Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity NOTIFY opacityChanged)
+    // clang-format off
+    Q_PROPERTY(qreal opacity
+               READ opacity
+               WRITE setOpacity
+               NOTIFY opacityChanged)
+    // clang-format on
     void setOpacity(qreal val);
     qreal opacity() const { return m_opacity; }
     Q_SIGNAL void opacityChanged();
 
-    Q_PROPERTY(bool visibleFromPageOne READ isVisibleFromPageOne WRITE setVisibleFromPageOne NOTIFY
-                       visibleFromPageOneChanged)
+    // clang-format off
+    Q_PROPERTY(bool visibleFromPageOne
+               READ isVisibleFromPageOne
+               WRITE setVisibleFromPageOne
+               NOTIFY visibleFromPageOneChanged)
+    // clang-format on
     void setVisibleFromPageOne(bool val);
     bool isVisibleFromPageOne() const { return m_visibleFromPageOne; }
     Q_SIGNAL void visibleFromPageOneChanged();
 
-    Q_PROPERTY(QRectF rect READ rect WRITE setRect NOTIFY rectChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF rect
+               READ rect
+               WRITE setRect
+               NOTIFY rectChanged)
+    // clang-format on
     void setRect(const QRectF &val);
     QRectF rect() const { return m_rect; }
     Q_SIGNAL void rectChanged();
@@ -138,48 +176,92 @@ public:
     explicit Watermark(QObject *parent = nullptr);
     ~Watermark();
 
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool enabled
+               READ isEnabled
+               WRITE setEnabled
+               NOTIFY enabledChanged)
+    // clang-format on
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    // clang-format off
+    Q_PROPERTY(QString text
+               READ text
+               WRITE setText
+               NOTIFY textChanged)
+    // clang-format on
     void setText(const QString &val);
     QString text() const { return m_text; }
     Q_SIGNAL void textChanged();
 
-    Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
+    // clang-format off
+    Q_PROPERTY(QFont font
+               READ font
+               WRITE setFont
+               NOTIFY fontChanged)
+    // clang-format on
     void setFont(const QFont &val);
     QFont font() const { return m_font; }
     Q_SIGNAL void fontChanged();
 
-    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor color
+               READ color
+               WRITE setColor
+               NOTIFY colorChanged)
+    // clang-format on
     void setColor(const QColor &val);
     QColor color() const { return m_color; }
     Q_SIGNAL void colorChanged();
 
-    Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity NOTIFY opacityChanged)
+    // clang-format off
+    Q_PROPERTY(qreal opacity
+               READ opacity
+               WRITE setOpacity
+               NOTIFY opacityChanged)
+    // clang-format on
     void setOpacity(qreal val);
     qreal opacity() const { return m_opacity; }
     Q_SIGNAL void opacityChanged();
 
-    Q_PROPERTY(qreal rotation READ rotation WRITE setRotation NOTIFY rotationChanged)
+    // clang-format off
+    Q_PROPERTY(qreal rotation
+               READ rotation
+               WRITE setRotation
+               NOTIFY rotationChanged)
+    // clang-format on
     void setRotation(qreal val);
     qreal rotation() const { return m_rotation; }
     Q_SIGNAL void rotationChanged();
 
-    Q_PROPERTY(Qt::Alignment alignment READ alignment WRITE setAlignment NOTIFY alignmentChanged)
+    // clang-format off
+    Q_PROPERTY(Qt::Alignment alignment
+               READ alignment
+               WRITE setAlignment
+               NOTIFY alignmentChanged)
+    // clang-format on
     void setAlignment(Qt::Alignment val);
     Qt::Alignment alignment() const { return m_alignment; }
     Q_SIGNAL void alignmentChanged();
 
-    Q_PROPERTY(bool visibleFromPageOne READ isVisibleFromPageOne WRITE setVisibleFromPageOne NOTIFY
-                       visibleFromPageOneChanged)
+    // clang-format off
+    Q_PROPERTY(bool visibleFromPageOne
+               READ isVisibleFromPageOne
+               WRITE setVisibleFromPageOne
+               NOTIFY visibleFromPageOneChanged)
+    // clang-format on
     void setVisibleFromPageOne(bool val);
     bool isVisibleFromPageOne() const { return m_visibleFromPageOne; }
     Q_SIGNAL void visibleFromPageOneChanged();
 
-    Q_PROPERTY(QRectF rect READ rect WRITE setRect NOTIFY rectChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF rect
+               READ rect
+               WRITE setRect
+               NOTIFY rectChanged)
+    // clang-format on
     void setRect(const QRectF &val);
     QRectF rect() const { return m_rect; }
     Q_SIGNAL void rectChanged();
@@ -215,13 +297,25 @@ public:
     explicit QTextDocumentPagedPrinter(QObject *parent = nullptr);
     ~QTextDocumentPagedPrinter();
 
-    Q_PROPERTY(HeaderFooter *header READ header CONSTANT)
+    // clang-format off
+    Q_PROPERTY(HeaderFooter *header
+               READ header
+               CONSTANT )
+    // clang-format on
     HeaderFooter *header() const { return m_header; }
 
-    Q_PROPERTY(HeaderFooter *footer READ footer CONSTANT)
+    // clang-format off
+    Q_PROPERTY(HeaderFooter *footer
+               READ footer
+               CONSTANT )
+    // clang-format on
     HeaderFooter *footer() const { return m_footer; }
 
-    Q_PROPERTY(Watermark *watermark READ watermark CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Watermark *watermark
+               READ watermark
+               CONSTANT )
+    // clang-format on
     Watermark *watermark() const { return m_watermark; }
 
     void setSideBar(QTextDocumentPageSideBarInterface *val) { m_sideBar = val; }

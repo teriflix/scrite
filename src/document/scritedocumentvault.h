@@ -34,15 +34,28 @@ public:
     static ScriteDocumentVault *instance();
     ~ScriteDocumentVault();
 
-    Q_PROPERTY(QString folder READ folder CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString folder
+               READ folder
+               CONSTANT )
+    // clang-format on
     QString folder() const { return m_folder; }
 
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool enabled
+               READ isEnabled
+               WRITE setEnabled
+               NOTIFY enabledChanged)
+    // clang-format on
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    Q_PROPERTY(int documentCount READ documentCount NOTIFY documentCountChanged)
+    // clang-format off
+    Q_PROPERTY(int documentCount
+               READ documentCount
+               NOTIFY documentCountChanged)
+    // clang-format on
     int documentCount() const { return m_fileInfoList.size(); }
     Q_SIGNAL void documentCountChanged();
 

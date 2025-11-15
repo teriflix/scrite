@@ -32,12 +32,22 @@ class EventFilterResult : public QObject
 public:
     ~EventFilterResult();
 
-    Q_PROPERTY(bool filter READ filter WRITE setFilter NOTIFY filterChanged)
+    // clang-format off
+    Q_PROPERTY(bool filter
+               READ filter
+               WRITE setFilter
+               NOTIFY filterChanged)
+    // clang-format on
     void setFilter(bool val);
     bool filter() const { return m_filter; }
     Q_SIGNAL void filterChanged();
 
-    Q_PROPERTY(bool acceptEvent READ acceptEvent WRITE setAcceptEvent NOTIFY acceptEventChanged)
+    // clang-format off
+    Q_PROPERTY(bool acceptEvent
+               READ acceptEvent
+               WRITE setAcceptEvent
+               NOTIFY acceptEventChanged)
+    // clang-format on
     void setAcceptEvent(bool val);
     bool acceptEvent() const { return m_acceptEvent; }
     Q_SIGNAL void acceptEventChanged();
@@ -64,23 +74,43 @@ public:
 
     static EventFilter *qmlAttachedProperties(QObject *object);
 
-    Q_PROPERTY(bool active READ isActive WRITE setActive NOTIFY activeChanged)
+    // clang-format off
+    Q_PROPERTY(bool active
+               READ isActive
+               WRITE setActive
+               NOTIFY activeChanged)
+    // clang-format on
     void setActive(bool val);
     bool isActive() const { return m_active; }
     Q_SIGNAL void activeChanged();
 
-    Q_PROPERTY(QObject *target READ target WRITE setTarget NOTIFY targetChanged RESET resetTarget)
+    // clang-format off
+    Q_PROPERTY(QObject *target
+               READ target
+               WRITE setTarget
+               NOTIFY targetChanged
+               RESET resetTarget)
+    // clang-format on
     void setTarget(QObject *val);
     QObject *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
 
-    Q_PROPERTY(QList<int> events READ events WRITE setEvents NOTIFY eventsChanged)
+    // clang-format off
+    Q_PROPERTY(QList<int> events
+               READ events
+               WRITE setEvents
+               NOTIFY eventsChanged)
+    // clang-format on
     void setEvents(const QList<int> &val);
     QList<int> events() const { return m_events; }
     Q_SIGNAL void eventsChanged();
 
-    Q_PROPERTY(bool acceptHoverEvents READ isAcceptHoverEvents WRITE setAcceptHoverEvents NOTIFY
-                       acceptHoverEventsChanged)
+    // clang-format off
+    Q_PROPERTY(bool acceptHoverEvents
+               READ isAcceptHoverEvents
+               WRITE setAcceptHoverEvents
+               NOTIFY acceptHoverEventsChanged)
+    // clang-format on
     void setAcceptHoverEvents(bool val);
     bool isAcceptHoverEvents() const;
     Q_SIGNAL void acceptHoverEventsChanged();

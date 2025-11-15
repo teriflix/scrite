@@ -19,9 +19,11 @@
 class LocationReport : public AbstractReportGenerator
 {
     Q_OBJECT
+    // clang-format off
     Q_CLASSINFO("Title", "Location Report")
     Q_CLASSINFO("Description", "Generate a summary report of all locations in the screenplay.")
     Q_CLASSINFO("Icon", ":/icons/reports/location_report.png")
+    // clang-format on
 
 public:
     Q_INVOKABLE explicit LocationReport(QObject *parent = nullptr);

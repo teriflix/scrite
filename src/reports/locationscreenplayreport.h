@@ -19,27 +19,37 @@
 class LocationScreenplayReport : public AbstractScreenplaySubsetReport
 {
     Q_OBJECT
+    // clang-format off
     Q_CLASSINFO("Title", "Location Screenplay")
-    Q_CLASSINFO("Description",
-                "Generate screenplay with only those scenes at one or more locations.")
+    Q_CLASSINFO("Description", "Generate screenplay with only those scenes at one or more locations.")
+    // clang-format on
 
 public:
     Q_INVOKABLE explicit LocationScreenplayReport(QObject *parent = nullptr);
     ~LocationScreenplayReport();
 
+    // clang-format off
     Q_CLASSINFO("locations_FieldGroup", "Locations")
     Q_CLASSINFO("locations_FieldLabel", "Locations to include in the report")
     Q_CLASSINFO("locations_FieldEditor", "MultipleLocationSelector")
-    Q_PROPERTY(QStringList locations READ locations WRITE setLocations NOTIFY locationsChanged)
+    Q_PROPERTY(QStringList locations
+               READ locations
+               WRITE setLocations
+               NOTIFY locationsChanged)
+    // clang-format on
     void setLocations(const QStringList &val);
     QStringList locations() const { return m_locations; }
     Q_SIGNAL void locationsChanged();
 
+    // clang-format off
     Q_CLASSINFO("generateSummary_FieldGroup", "PDF Options")
     Q_CLASSINFO("generateSummary_FieldLabel", "Generate summary")
     Q_CLASSINFO("generateSummary_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool generateSummary READ generateSummary WRITE setGenerateSummary NOTIFY
-                       generateSummaryChanged)
+    Q_PROPERTY(bool generateSummary
+               READ generateSummary
+               WRITE setGenerateSummary
+               NOTIFY generateSummaryChanged)
+    // clang-format on
     void setGenerateSummary(bool val);
     bool generateSummary() const { return m_generateSummary; }
     Q_SIGNAL void generateSummaryChanged();

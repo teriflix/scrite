@@ -33,26 +33,50 @@ public:
                               QObject *parent = nullptr);
     ~EnumerationModel();
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    // clang-format off
+    Q_PROPERTY(int count
+               READ count
+               NOTIFY countChanged)
+    // clang-format on
     int count() const { return m_items.size(); }
     Q_SIGNAL void countChanged();
 
-    Q_PROPERTY(QList<int> ignoreList READ ignoreList WRITE setIgnoreList NOTIFY ignoreListChanged)
+    // clang-format off
+    Q_PROPERTY(QList<int> ignoreList
+               READ ignoreList
+               WRITE setIgnoreList
+               NOTIFY ignoreListChanged)
+    // clang-format on
     void setIgnoreList(QList<int> val);
     QList<int> ignoreList() const { return m_ignoreList; }
     Q_SIGNAL void ignoreListChanged();
 
-    Q_PROPERTY(QString className READ className WRITE setClassName NOTIFY classNameChanged)
+    // clang-format off
+    Q_PROPERTY(QString className
+               READ className
+               WRITE setClassName
+               NOTIFY classNameChanged)
+    // clang-format on
     void setClassName(const QString &val);
     QString className() const;
     Q_SIGNAL void classNameChanged();
 
-    Q_PROPERTY(QObject *object READ object WRITE setObject NOTIFY objectChanged)
+    // clang-format off
+    Q_PROPERTY(QObject *object
+               READ object
+               WRITE setObject
+               NOTIFY objectChanged)
+    // clang-format on
     void setObject(QObject *val);
     QObject *object() const { return m_object; }
     Q_SIGNAL void objectChanged();
 
-    Q_PROPERTY(QString enumeration READ enumeration WRITE setEnumeration NOTIFY enumerationChanged)
+    // clang-format off
+    Q_PROPERTY(QString enumeration
+               READ enumeration
+               WRITE setEnumeration
+               NOTIFY enumerationChanged)
+    // clang-format on
     void setEnumeration(const QString &val);
     QString enumeration() const { return m_enumeration; }
     Q_SIGNAL void enumerationChanged();

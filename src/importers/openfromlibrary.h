@@ -28,7 +28,9 @@ class Library;
 class LibraryService : public AbstractImporter
 {
     Q_OBJECT
+    // clang-format off
     Q_CLASSINFO("Format", "Library")
+    // clang-format on
     QML_ELEMENT
 
 public:
@@ -38,14 +40,26 @@ public:
     // This this class cannot be used to import anything from a local file system
     bool canImport(const QString &) const { return false; }
 
-    Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
+    // clang-format off
+    Q_PROPERTY(bool busy
+               READ busy
+               NOTIFY busyChanged)
+    // clang-format on
     bool busy() const;
     Q_SIGNAL void busyChanged();
 
-    Q_PROPERTY(Library *screenplays READ screenplays CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Library *screenplays
+               READ screenplays
+               CONSTANT )
+    // clang-format on
     static Library *screenplays();
 
-    Q_PROPERTY(Library *templates READ templates CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Library *templates
+               READ templates
+               CONSTANT )
+    // clang-format on
     static Library *templates();
 
     Q_INVOKABLE void reload();
@@ -78,20 +92,36 @@ public:
     enum Type { Screenplays, Templates };
     Q_ENUM(Type)
 
-    Q_PROPERTY(Type type READ type CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Type type
+               READ type
+               CONSTANT )
+    // clang-format on
     Type type() const { return m_type; }
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    // clang-format off
+    Q_PROPERTY(int count
+               READ count
+               NOTIFY countChanged)
+    // clang-format on
     int count() const { return m_records.size(); }
     Q_SIGNAL void countChanged();
 
     Q_INVOKABLE QJsonObject recordAt(int index) const;
 
-    Q_PROPERTY(QUrl baseUrl READ baseUrl NOTIFY baseUrlChanged)
+    // clang-format off
+    Q_PROPERTY(QUrl baseUrl
+               READ baseUrl
+               NOTIFY baseUrlChanged)
+    // clang-format on
     QUrl baseUrl() const { return m_baseUrl; }
     Q_SIGNAL void baseUrlChanged();
 
-    Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
+    // clang-format off
+    Q_PROPERTY(bool busy
+               READ isBusy
+               NOTIFY busyChanged)
+    // clang-format on
     bool isBusy() const { return m_busy; }
     Q_SIGNAL void busyChanged();
 

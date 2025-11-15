@@ -19,97 +19,138 @@
 class PdfExporter : public AbstractTextDocumentExporter
 {
     Q_OBJECT
+    // clang-format off
     Q_CLASSINFO("Format", "Screenplay/Adobe PDF")
     Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
     Q_CLASSINFO("Description", "Exports the current screenplay to PDF format.")
     Q_CLASSINFO("Icon", ":/icons/exporter/pdf.png")
+    // clang-format on
 
 public:
     Q_INVOKABLE explicit PdfExporter(QObject *parent = nullptr);
     ~PdfExporter();
 
+    // clang-format off
     Q_CLASSINFO("generateTitlePage_FieldLabel", "Generate title page.")
     Q_CLASSINFO("generateTitlePage_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool generateTitlePage READ isGenerateTitlePage WRITE setGenerateTitlePage NOTIFY
-                       generateTitlePageChanged)
+    Q_PROPERTY(bool generateTitlePage
+               READ isGenerateTitlePage
+               WRITE setGenerateTitlePage
+               NOTIFY generateTitlePageChanged)
+    // clang-format on
     void setGenerateTitlePage(bool val);
     bool isGenerateTitlePage() const { return m_generateTitlePage; }
     Q_SIGNAL void generateTitlePageChanged();
 
+    // clang-format off
     Q_CLASSINFO("includeLogline_FieldLabel", "Include logline in title page.")
     Q_CLASSINFO("includeLogline_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeLogline READ isIncludeLogline WRITE setIncludeLogline NOTIFY
-                       includeLoglineChanged)
+    Q_PROPERTY(bool includeLogline
+               READ isIncludeLogline
+               WRITE setIncludeLogline
+               NOTIFY includeLoglineChanged)
+    // clang-format on
     void setIncludeLogline(bool val);
     bool isIncludeLogline() const { return m_includeLogline; }
     Q_SIGNAL void includeLoglineChanged();
 
-    Q_CLASSINFO("usePageBreaks_FieldLabel",
-                "Use (MORE) and (CONT'D) breaks where appropriate. [May increase page count]")
+    // clang-format off
+    Q_CLASSINFO("usePageBreaks_FieldLabel", "Use (MORE) and (CONT'D) breaks where appropriate. [May increase page count]")
     Q_CLASSINFO("usePageBreaks_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool usePageBreaks READ usePageBreaks WRITE setUsePageBreaks NOTIFY
-                       usePageBreaksChanged)
+    Q_PROPERTY(bool usePageBreaks
+               READ usePageBreaks
+               WRITE setUsePageBreaks
+               NOTIFY usePageBreaksChanged)
+    // clang-format on
     void setUsePageBreaks(bool val);
     bool usePageBreaks() const { return m_usePageBreaks; }
     Q_SIGNAL void usePageBreaksChanged();
 
+    // clang-format off
     Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated PDF.")
     Q_CLASSINFO("includeSceneNumbers_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers
-                       NOTIFY includeSceneNumbersChanged)
+    Q_PROPERTY(bool includeSceneNumbers
+               READ isIncludeSceneNumbers
+               WRITE setIncludeSceneNumbers
+               NOTIFY includeSceneNumbersChanged)
+    // clang-format on
     void setIncludeSceneNumbers(bool val);
     bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
     Q_SIGNAL void includeSceneNumbersChanged();
 
+    // clang-format off
     Q_CLASSINFO("includeSceneIcons_FieldLabel", "Include scene icons in the generated PDF.")
     Q_CLASSINFO("includeSceneIcons_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeSceneIcons READ isIncludeSceneIcons WRITE setIncludeSceneIcons NOTIFY
-                       includeSceneIconsChanged)
+    Q_PROPERTY(bool includeSceneIcons
+               READ isIncludeSceneIcons
+               WRITE setIncludeSceneIcons
+               NOTIFY includeSceneIconsChanged)
+    // clang-format on
     void setIncludeSceneIcons(bool val);
     bool isIncludeSceneIcons() const { return m_includeSceneIcons; }
     Q_SIGNAL void includeSceneIconsChanged();
 
+    // clang-format off
     Q_CLASSINFO("printEachSceneOnANewPage_FieldLabel", "Print each scene on a new page.")
     Q_CLASSINFO("printEachSceneOnANewPage_FieldEditor", "CheckBox")
-    Q_CLASSINFO("printEachSceneOnANewPage_FieldNote",
-                "Automatically turned off if acts are included or printed on a new page.")
-    Q_PROPERTY(bool printEachSceneOnANewPage READ isPrintEachSceneOnANewPage WRITE
-                       setPrintEachSceneOnANewPage NOTIFY printEachSceneOnANewPageChanged)
+    Q_CLASSINFO("printEachSceneOnANewPage_FieldNote", "Automatically turned off if acts are included or printed on a new page.")
+    Q_PROPERTY(bool printEachSceneOnANewPage
+               READ isPrintEachSceneOnANewPage
+               WRITE setPrintEachSceneOnANewPage
+               NOTIFY printEachSceneOnANewPageChanged)
+    // clang-format on
     void setPrintEachSceneOnANewPage(bool val);
     bool isPrintEachSceneOnANewPage() const { return m_printEachSceneOnANewPage; }
     Q_SIGNAL void printEachSceneOnANewPageChanged();
 
+    // clang-format off
     Q_CLASSINFO("printEachActOnANewPage_FieldLabel", "Print each act on a new page.")
     Q_CLASSINFO("printEachActOnANewPage_FieldEditor", "CheckBox")
-    Q_CLASSINFO("printEachActOnANewPage_FieldNote",
-                "Automatically includes act breaks in the generated PDF.")
-    Q_PROPERTY(bool printEachActOnANewPage READ isPrintEachActOnANewPage WRITE
-                       setPrintEachActOnANewPage NOTIFY printEachActOnANewPageChanged)
+    Q_CLASSINFO("printEachActOnANewPage_FieldNote", "Automatically includes act breaks in the generated PDF.")
+    Q_PROPERTY(bool printEachActOnANewPage
+               READ isPrintEachActOnANewPage
+               WRITE setPrintEachActOnANewPage
+               NOTIFY printEachActOnANewPageChanged)
+    // clang-format on
     void setPrintEachActOnANewPage(bool val);
     bool isPrintEachActOnANewPage() const { return m_printEachActOnANewPage; }
     Q_SIGNAL void printEachActOnANewPageChanged();
 
+    // clang-format off
     Q_CLASSINFO("includeActBreaks_FieldLabel", "Include act breaks.")
     Q_CLASSINFO("includeActBreaks_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeActBreaks READ isIncludeActBreaks WRITE setIncludeActBreaks NOTIFY
-                       includeActBreaksChanged)
+    Q_PROPERTY(bool includeActBreaks
+               READ isIncludeActBreaks
+               WRITE setIncludeActBreaks
+               NOTIFY includeActBreaksChanged)
+    // clang-format on
     void setIncludeActBreaks(bool val);
     bool isIncludeActBreaks() const { return m_includeActBreaks; }
     Q_SIGNAL void includeActBreaksChanged();
 
+    // clang-format off
     Q_CLASSINFO("watermark_FieldLabel", "Watermark text, if enabled.")
     Q_CLASSINFO("watermark_FieldEditor", "TextBox")
     Q_CLASSINFO("watermark_IsPersistent", "false")
     Q_CLASSINFO("watermark_Feature", "watermark")
-    Q_PROPERTY(QString watermark READ watermark WRITE setWatermark NOTIFY watermarkChanged)
+    Q_PROPERTY(QString watermark
+               READ watermark
+               WRITE setWatermark
+               NOTIFY watermarkChanged)
+    // clang-format on
     void setWatermark(const QString &val);
     QString watermark() const { return m_watermark; }
     Q_SIGNAL void watermarkChanged();
 
+    // clang-format off
     Q_CLASSINFO("comment_FieldLabel", "Comment text for use with header & footer.")
     Q_CLASSINFO("comment_FieldEditor", "TextBox")
     Q_CLASSINFO("comment_IsPersistent", "false")
-    Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)
+    Q_PROPERTY(QString comment
+               READ comment
+               WRITE setComment
+               NOTIFY commentChanged)
+    // clang-format on
     void setComment(const QString &val);
     QString comment() const { return m_comment; }
     Q_SIGNAL void commentChanged();

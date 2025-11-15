@@ -31,37 +31,69 @@ public:
     explicit ScreenplayTextDocumentOffsets(QObject *parent = nullptr);
     ~ScreenplayTextDocumentOffsets();
 
-    Q_PROPERTY(Screenplay *screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)
+    // clang-format off
+    Q_PROPERTY(Screenplay *screenplay
+               READ screenplay
+               WRITE setScreenplay
+               NOTIFY screenplayChanged)
+    // clang-format on
     void setScreenplay(Screenplay *val);
     Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
-    Q_PROPERTY(QTextDocument *document READ document WRITE setDocument NOTIFY documentChanged)
+    // clang-format off
+    Q_PROPERTY(QTextDocument *document
+               READ document
+               WRITE setDocument
+               NOTIFY documentChanged)
+    // clang-format on
     void setDocument(QTextDocument *val);
     QTextDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
 
-    Q_PROPERTY(ScreenplayFormat *format READ format WRITE setFormat NOTIFY formatChanged)
+    // clang-format off
+    Q_PROPERTY(ScreenplayFormat *format
+               READ format
+               WRITE setFormat
+               NOTIFY formatChanged)
+    // clang-format on
     void setFormat(ScreenplayFormat *val);
     ScreenplayFormat *format() const { return m_format; }
     Q_SIGNAL void formatChanged();
 
-    Q_PROPERTY(QString fileName READ fileName WRITE setFileName NOTIFY fileNameChanged)
+    // clang-format off
+    Q_PROPERTY(QString fileName
+               READ fileName
+               WRITE setFileName
+               NOTIFY fileNameChanged)
+    // clang-format on
     void setFileName(const QString &val);
     QString fileName() const { return m_fileName; }
     Q_SIGNAL void fileNameChanged();
 
-    Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
+    // clang-format off
+    Q_PROPERTY(bool busy
+               READ isBusy
+               NOTIFY busyChanged)
+    // clang-format on
     bool isBusy() const { return m_busy; }
     Q_SIGNAL void busyChanged();
 
     Q_INVOKABLE QString fileNameFrom(const QString &mediaFileNameOrUrl) const;
 
-    Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
+    // clang-format off
+    Q_PROPERTY(QString errorMessage
+               READ errorMessage
+               NOTIFY errorMessageChanged)
+    // clang-format on
     QString errorMessage() const { return m_errorMessage; }
     Q_SIGNAL void errorMessageChanged();
 
-    Q_PROPERTY(bool hasError READ hasError NOTIFY errorMessageChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasError
+               READ hasError
+               NOTIFY errorMessageChanged)
+    // clang-format on
     bool hasError() const { return !m_errorMessage.isEmpty(); }
 
     Q_INVOKABLE void clearErrorMessage() { this->setErrorMessage(QString()); }

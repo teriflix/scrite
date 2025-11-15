@@ -34,20 +34,40 @@ class CharacterRelationshipGraphNode : public QObject, public GraphLayout::Abstr
 public:
     ~CharacterRelationshipGraphNode();
 
-    Q_PROPERTY(Character *character READ character NOTIFY characterChanged RESET resetCharacter)
+    // clang-format off
+    Q_PROPERTY(Character *character
+               READ character
+               NOTIFY characterChanged
+               RESET resetCharacter)
+    // clang-format on
     Character *character() const { return m_character; }
     Q_SIGNAL void characterChanged();
 
-    Q_PROPERTY(bool marked READ isMarked WRITE setMarked NOTIFY markedChanged)
+    // clang-format off
+    Q_PROPERTY(bool marked
+               READ isMarked
+               WRITE setMarked
+               NOTIFY markedChanged)
+    // clang-format on
     void setMarked(bool val);
     bool isMarked() const { return m_marked; }
     Q_SIGNAL void markedChanged();
 
-    Q_PROPERTY(QRectF rect READ rect NOTIFY rectChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF rect
+               READ rect
+               NOTIFY rectChanged)
+    // clang-format on
     QRectF rect() const { return m_rect; }
     Q_SIGNAL void rectChanged();
 
-    Q_PROPERTY(QQuickItem *item READ item WRITE setItem NOTIFY itemChanged RESET resetItem)
+    // clang-format off
+    Q_PROPERTY(QQuickItem *item
+               READ item
+               WRITE setItem
+               NOTIFY itemChanged
+               RESET resetItem)
+    // clang-format on
     void setItem(QQuickItem *val);
     QQuickItem *item() const { return m_item; }
     Q_SIGNAL void itemChanged();
@@ -95,30 +115,58 @@ class CharacterRelationshipGraphEdge : public QObject, public GraphLayout::Abstr
 public:
     ~CharacterRelationshipGraphEdge();
 
-    Q_PROPERTY(Relationship *relationship READ relationship NOTIFY relationshipChanged RESET
-                       resetRelationship)
+    // clang-format off
+    Q_PROPERTY(Relationship *relationship
+               READ relationship
+               NOTIFY relationshipChanged
+               RESET resetRelationship)
+    // clang-format on
     Relationship *relationship() const { return m_relationship; }
     Q_SIGNAL void relationshipChanged();
 
-    Q_PROPERTY(QString forwardLabel READ forwardLabel NOTIFY forwardLabelChanged)
+    // clang-format off
+    Q_PROPERTY(QString forwardLabel
+               READ forwardLabel
+               NOTIFY forwardLabelChanged)
+    // clang-format on
     QString forwardLabel() const { return m_forwardLabel; }
     Q_SIGNAL void forwardLabelChanged();
 
-    Q_PROPERTY(QString reverseLabel READ reverseLabel NOTIFY reverseLabelChanged)
+    // clang-format off
+    Q_PROPERTY(QString reverseLabel
+               READ reverseLabel
+               NOTIFY reverseLabelChanged)
+    // clang-format on
     QString reverseLabel() const { return m_reverseLabel; }
     Q_SIGNAL void reverseLabelChanged();
 
-    Q_PROPERTY(QPainterPath path READ path NOTIFY pathChanged)
+    // clang-format off
+    Q_PROPERTY(QPainterPath path
+               READ path
+               NOTIFY pathChanged)
+    // clang-format on
     QPainterPath path() const { return m_path; }
     Q_SIGNAL void pathChanged();
 
-    Q_PROPERTY(QString pathString READ pathString NOTIFY pathChanged)
+    // clang-format off
+    Q_PROPERTY(QString pathString
+               READ pathString
+               NOTIFY pathChanged)
+    // clang-format on
     QString pathString() const;
 
-    Q_PROPERTY(QPointF labelPosition READ labelPosition NOTIFY pathChanged)
+    // clang-format off
+    Q_PROPERTY(QPointF labelPosition
+               READ labelPosition
+               NOTIFY pathChanged)
+    // clang-format on
     QPointF labelPosition() const { return m_labelPos; }
 
-    Q_PROPERTY(qreal labelAngle READ labelAngle NOTIFY pathChanged)
+    // clang-format off
+    Q_PROPERTY(qreal labelAngle
+               READ labelAngle
+               NOTIFY pathChanged)
+    // clang-format on
     qreal labelAngle() const { return m_labelAngle; }
 
     // GraphLayout::AbstractEdge interface
@@ -165,89 +213,168 @@ public:
     explicit CharacterRelationshipGraph(QObject *parent = nullptr);
     ~CharacterRelationshipGraph();
 
-    Q_PROPERTY(QAbstractListModel *nodes READ nodes CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(QAbstractListModel *nodes
+               READ nodes
+               CONSTANT STORED
+               false )
+    // clang-format on
     QAbstractListModel *nodes() const
     {
         return &((const_cast<CharacterRelationshipGraph *>(this))->m_nodes);
     }
 
-    Q_PROPERTY(QAbstractListModel *edges READ edges CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(QAbstractListModel *edges
+               READ edges
+               CONSTANT STORED
+               false )
+    // clang-format on
     QAbstractListModel *edges() const
     {
         return &(const_cast<CharacterRelationshipGraph *>(this))->m_edges;
     }
 
-    Q_PROPERTY(bool empty READ isEmpty NOTIFY emptyChanged)
+    // clang-format off
+    Q_PROPERTY(bool empty
+               READ isEmpty
+               NOTIFY emptyChanged)
+    // clang-format on
     bool isEmpty() const;
     Q_SIGNAL void emptyChanged();
 
-    Q_PROPERTY(QSizeF nodeSize READ nodeSize WRITE setNodeSize NOTIFY nodeSizeChanged)
+    // clang-format off
+    Q_PROPERTY(QSizeF nodeSize
+               READ nodeSize
+               WRITE setNodeSize
+               NOTIFY nodeSizeChanged)
+    // clang-format on
     void setNodeSize(const QSizeF &val);
     QSizeF nodeSize() const { return m_nodeSize; }
     Q_SIGNAL void nodeSizeChanged();
 
-    Q_PROPERTY(Structure *structure READ structure WRITE setStructure NOTIFY structureChanged RESET
-                       resetStructure)
+    // clang-format off
+    Q_PROPERTY(Structure *structure
+               READ structure
+               WRITE setStructure
+               NOTIFY structureChanged
+               RESET resetStructure)
+    // clang-format on
     void setStructure(Structure *val);
     Structure *structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
 
-    Q_PROPERTY(Scene *scene READ scene WRITE setScene NOTIFY sceneChanged RESET resetScene)
+    // clang-format off
+    Q_PROPERTY(Scene *scene
+               READ scene
+               WRITE setScene
+               NOTIFY sceneChanged
+               RESET resetScene)
+    // clang-format on
     void setScene(Scene *val);
     Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
-    Q_PROPERTY(Character *character READ character WRITE setCharacter NOTIFY characterChanged RESET
-                       resetCharacter)
+    // clang-format off
+    Q_PROPERTY(Character *character
+               READ character
+               WRITE setCharacter
+               NOTIFY characterChanged
+               RESET resetCharacter)
+    // clang-format on
     void setCharacter(Character *val);
     Character *character() const { return m_character; }
     Q_SIGNAL void characterChanged();
 
-    Q_PROPERTY(QString title READ title NOTIFY titleChanged)
+    // clang-format off
+    Q_PROPERTY(QString title
+               READ title
+               NOTIFY titleChanged)
+    // clang-format on
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
-    Q_PROPERTY(int maxTime READ maxTime WRITE setMaxTime NOTIFY maxTimeChanged)
+    // clang-format off
+    Q_PROPERTY(int maxTime
+               READ maxTime
+               WRITE setMaxTime
+               NOTIFY maxTimeChanged)
+    // clang-format on
     void setMaxTime(int val);
     int maxTime() const { return m_maxTime; }
     Q_SIGNAL void maxTimeChanged();
 
-    Q_PROPERTY(
-            int maxIterations READ maxIterations WRITE setMaxIterations NOTIFY maxIterationsChanged)
+    // clang-format off
+    Q_PROPERTY(int maxIterations
+               READ maxIterations
+               WRITE setMaxIterations
+               NOTIFY maxIterationsChanged)
+    // clang-format on
     void setMaxIterations(int val);
     int maxIterations() const { return m_maxIterations; }
     Q_SIGNAL void maxIterationsChanged();
 
-    Q_PROPERTY(QRectF graphBoundingRect READ graphBoundingRect NOTIFY graphBoundingRectChanged)
+    // clang-format off
+    Q_PROPERTY(QRectF graphBoundingRect
+               READ graphBoundingRect
+               NOTIFY graphBoundingRectChanged)
+    // clang-format on
     QRectF graphBoundingRect() const { return m_graphBoundingRect; }
     Q_SIGNAL void graphBoundingRectChanged();
 
-    Q_PROPERTY(qreal leftMargin READ leftMargin WRITE setLeftMargin NOTIFY leftMarginChanged)
+    // clang-format off
+    Q_PROPERTY(qreal leftMargin
+               READ leftMargin
+               WRITE setLeftMargin
+               NOTIFY leftMarginChanged)
+    // clang-format on
     void setLeftMargin(qreal val);
     qreal leftMargin() const { return m_leftMargin; }
     Q_SIGNAL void leftMarginChanged();
 
-    Q_PROPERTY(qreal topMargin READ topMargin WRITE setTopMargin NOTIFY topMarginChanged)
+    // clang-format off
+    Q_PROPERTY(qreal topMargin
+               READ topMargin
+               WRITE setTopMargin
+               NOTIFY topMarginChanged)
+    // clang-format on
     void setTopMargin(qreal val);
     qreal topMargin() const { return m_topMargin; }
     Q_SIGNAL void topMarginChanged();
 
-    Q_PROPERTY(qreal rightMargin READ rightMargin WRITE setRightMargin NOTIFY rightMarginChanged)
+    // clang-format off
+    Q_PROPERTY(qreal rightMargin
+               READ rightMargin
+               WRITE setRightMargin
+               NOTIFY rightMarginChanged)
+    // clang-format on
     void setRightMargin(qreal val);
     qreal rightMargin() const { return m_rightMargin; }
     Q_SIGNAL void rightMarginChanged();
 
-    Q_PROPERTY(
-            qreal bottomMargin READ bottomMargin WRITE setBottomMargin NOTIFY bottomMarginChanged)
+    // clang-format off
+    Q_PROPERTY(qreal bottomMargin
+               READ bottomMargin
+               WRITE setBottomMargin
+               NOTIFY bottomMarginChanged)
+    // clang-format on
     void setBottomMargin(qreal val);
     qreal bottomMargin() const { return m_bottomMargin; }
     Q_SIGNAL void bottomMarginChanged();
 
-    Q_PROPERTY(bool dirty READ isDirty NOTIFY dirtyChanged)
+    // clang-format off
+    Q_PROPERTY(bool dirty
+               READ isDirty
+               NOTIFY dirtyChanged)
+    // clang-format on
     bool isDirty() const { return m_dirty; }
     Q_SIGNAL void dirtyChanged();
 
-    Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
+    // clang-format off
+    Q_PROPERTY(bool busy
+               READ isBusy
+               NOTIFY busyChanged)
+    // clang-format on
     bool isBusy() const { return m_busy; }
     Q_SIGNAL void busyChanged();
 

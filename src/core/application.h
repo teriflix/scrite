@@ -57,63 +57,127 @@ public:
     QString installationId() const;
     QDateTime installationTimestamp() const;
 
-    Q_PROPERTY(int appState READ appState NOTIFY appStateChanged)
+    // clang-format off
+    Q_PROPERTY(int appState
+               READ appState
+               NOTIFY appStateChanged)
+    // clang-format on
     int appState() const;
     Q_SIGNAL void appStateChanged();
 
-    Q_PROPERTY(int launchCounter READ launchCounter CONSTANT)
+    // clang-format off
+    Q_PROPERTY(int launchCounter
+               READ launchCounter
+               CONSTANT )
+    // clang-format on
     int launchCounter() const;
 
-    Q_PROPERTY(QString buildTimestamp READ buildTimestamp CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString buildTimestamp
+               READ buildTimestamp
+               CONSTANT )
+    // clang-format on
     QString buildTimestamp() const;
 
-    Q_PROPERTY(QPalette palette READ palette CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QPalette palette
+               READ palette
+               CONSTANT )
+    // clang-format on
 
-    Q_PROPERTY(qreal devicePixelRatio READ devicePixelRatio CONSTANT)
+    // clang-format off
+    Q_PROPERTY(qreal devicePixelRatio
+               READ devicePixelRatio
+               CONSTANT )
+    // clang-format on
 
-    Q_PROPERTY(QFont font READ applicationFont NOTIFY applicationFontChanged)
+    // clang-format off
+    Q_PROPERTY(QFont font
+               READ applicationFont
+               NOTIFY applicationFontChanged)
+    // clang-format on
     QFont applicationFont() const { return this->font(); }
     Q_SIGNAL void applicationFontChanged();
 
-    Q_PROPERTY(int idealFontPointSize READ idealFontPointSize NOTIFY idealFontPointSizeChanged)
+    // clang-format off
+    Q_PROPERTY(int idealFontPointSize
+               READ idealFontPointSize
+               NOTIFY idealFontPointSizeChanged)
+    // clang-format on
     int idealFontPointSize() const { return m_idealFontPointSize; }
     Q_SIGNAL void idealFontPointSizeChanged();
 
-    Q_PROPERTY(int customFontPointSize READ customFontPointSize WRITE setCustomFontPointSize NOTIFY
-                       customFontPointSizeChanged)
+    // clang-format off
+    Q_PROPERTY(int customFontPointSize
+               READ customFontPointSize
+               WRITE setCustomFontPointSize
+               NOTIFY customFontPointSizeChanged)
+    // clang-format on
     void setCustomFontPointSize(int val);
     int customFontPointSize() const { return m_customFontPointSize; }
     Q_SIGNAL void customFontPointSizeChanged();
 
-    Q_PROPERTY(QVersionNumber version READ version CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QVersionNumber version
+               READ version
+               CONSTANT )
+    // clang-format on
     QVersionNumber version() const { return m_versionNumber; }
 
-    Q_PROPERTY(QString versionAsString READ versionAsString CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString versionAsString
+               READ versionAsString
+               CONSTANT )
+    // clang-format on
     QString versionAsString() const { return m_versionNumber.toString(); }
 
-    Q_PROPERTY(QStringList availableThemes READ availableThemes CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QStringList availableThemes
+               READ availableThemes
+               CONSTANT )
+    // clang-format on
     static QStringList availableThemes();
 
     static QString queryQtQuickStyleFor(const QString &theme);
 
-    Q_PROPERTY(bool usingMaterialTheme READ usingMaterialTheme CONSTANT)
+    // clang-format off
+    Q_PROPERTY(bool usingMaterialTheme
+               READ usingMaterialTheme
+               CONSTANT )
+    // clang-format on
     static bool usingMaterialTheme();
 
-    Q_PROPERTY(QString baseWindowTitle READ baseWindowTitle WRITE setBaseWindowTitle NOTIFY
-                       baseWindowTitleChanged)
+    // clang-format off
+    Q_PROPERTY(QString baseWindowTitle
+               READ baseWindowTitle
+               WRITE setBaseWindowTitle
+               NOTIFY baseWindowTitleChanged)
+    // clang-format on
     void setBaseWindowTitle(const QString &val);
     QString baseWindowTitle() const { return m_baseWindowTitle; }
     Q_SIGNAL void baseWindowTitleChanged();
 
-    Q_PROPERTY(QVersionNumber versionNumber READ versionNumber CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QVersionNumber versionNumber
+               READ versionNumber
+               CONSTANT )
+    // clang-format on
     QVersionNumber versionNumber() const { return m_versionNumber; }
 
     QString settingsFilePath() const;
 
-    Q_PROPERTY(AutoUpdate *autoUpdate READ autoUpdate CONSTANT)
+    // clang-format off
+    Q_PROPERTY(AutoUpdate *autoUpdate
+               READ autoUpdate
+               CONSTANT )
+    // clang-format on
     AutoUpdate *autoUpdate() const;
 
-    Q_PROPERTY(Forms *forms READ forms CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Forms *forms
+               READ forms
+               CONSTANT )
+    // clang-format on
     Forms *forms() const;
 
     static QFontDatabase &fontDatabase();

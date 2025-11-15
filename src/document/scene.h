@@ -56,36 +56,70 @@ public:
     explicit SceneHeading(QObject *parent = nullptr);
     ~SceneHeading();
 
-    Q_PROPERTY(Scene *scene READ scene CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(Scene *scene
+               READ scene
+               CONSTANT STORED
+               false )
+    // clang-format on
     Scene *scene() const { return m_scene; }
 
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool enabled
+               READ isEnabled
+               WRITE setEnabled
+               NOTIFY enabledChanged)
+    // clang-format on
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    Q_PROPERTY(
-            QString locationType READ locationType WRITE setLocationType NOTIFY locationTypeChanged)
+    // clang-format off
+    Q_PROPERTY(QString locationType
+               READ locationType
+               WRITE setLocationType
+               NOTIFY locationTypeChanged)
+    // clang-format on
     void setLocationType(const QString &val);
     QString locationType() const { return m_locationType; }
     Q_SIGNAL void locationTypeChanged();
 
-    Q_PROPERTY(QString location READ location WRITE setLocation NOTIFY locationChanged)
+    // clang-format off
+    Q_PROPERTY(QString location
+               READ location
+               WRITE setLocation
+               NOTIFY locationChanged)
+    // clang-format on
     void setLocation(const QString &val);
     QString location() const { return m_location; }
     Q_SIGNAL void locationChanged();
 
-    Q_PROPERTY(QString moment READ moment WRITE setMoment NOTIFY momentChanged)
+    // clang-format off
+    Q_PROPERTY(QString moment
+               READ moment
+               WRITE setMoment
+               NOTIFY momentChanged)
+    // clang-format on
     void setMoment(const QString &val);
     QString moment() const { return m_moment; }
     Q_SIGNAL void momentChanged();
 
-    Q_PROPERTY(QString editText READ text NOTIFY textChanged)
-    Q_PROPERTY(QString text READ text NOTIFY textChanged)
+    // clang-format off
+    Q_PROPERTY(QString editText
+               READ text
+               NOTIFY textChanged)
+    Q_PROPERTY(QString text
+               READ text
+               NOTIFY textChanged)
+    // clang-format on
     QString text() const { return this->toString(EditMode); }
     Q_SIGNAL void textChanged();
 
-    Q_PROPERTY(QString displayText READ displayText NOTIFY textChanged)
+    // clang-format off
+    Q_PROPERTY(QString displayText
+               READ displayText
+               NOTIFY textChanged)
+    // clang-format on
     QString displayText() const { return this->toString(DisplayMode); }
 
     static bool parse(const QString &text, QString &locationType, QString &location,
@@ -93,7 +127,11 @@ public:
 
     Q_INVOKABLE void parseFrom(const QString &text);
 
-    Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
+    // clang-format off
+    Q_PROPERTY(int wordCount
+               READ wordCount
+               NOTIFY wordCountChanged)
+    // clang-format on
     int wordCount() const { return m_wordCount; }
     Q_SIGNAL void wordCountChanged();
 
@@ -131,10 +169,20 @@ public:
     ~SceneElement();
     Q_SIGNAL void aboutToDelete(SceneElement *element);
 
-    Q_PROPERTY(Scene *scene READ scene CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(Scene *scene
+               READ scene
+               CONSTANT STORED
+               false )
+    // clang-format on
     Scene *scene() const { return m_scene; }
 
-    Q_PROPERTY(SpellCheckService *spellCheck READ spellCheck CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(SpellCheckService *spellCheck
+               READ spellCheck
+               CONSTANT STORED
+               false )
+    // clang-format on
     SpellCheckService *spellCheck() const;
 
     /*
@@ -142,7 +190,12 @@ public:
      * set an ID is automatically generated whenever the property value is
      * queried for the first time.
      */
-    Q_PROPERTY(QString id READ id WRITE setId NOTIFY idChanged)
+    // clang-format off
+    Q_PROPERTY(QString id
+               READ id
+               WRITE setId
+               NOTIFY idChanged)
+    // clang-format on
     void setId(const QString &val);
     QString id() const;
     Q_SIGNAL void idChanged();
@@ -160,6 +213,7 @@ public:
         All = -1
     };
     Q_ENUM(Type)
+    // clang-format off
     Q_CLASSINFO("Type.Action:icon", "qrc:/icons/screenplay/action.png")
     Q_CLASSINFO("Type.Character:icon", "qrc:/icons/screenplay/character.png")
     Q_CLASSINFO("Type.Dialogue:icon", "qrc:/icons/screenplay/dialogue.png")
@@ -167,22 +221,42 @@ public:
     Q_CLASSINFO("Type.Shot:icon", "qrc:/icons/screenplay/shot.png")
     Q_CLASSINFO("Type.Transition:icon", "qrc:/icons/screenplay/transition.png")
     Q_CLASSINFO("Type.Heading:icon", "qrc:/icons/screenplay/heading.png")
+    // clang-format on
 
-    Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
+    // clang-format off
+    Q_PROPERTY(Type type
+               READ type
+               WRITE setType
+               NOTIFY typeChanged)
     Q_CLASSINFO("UndoBundleFor_type", "cursorPosition")
+    // clang-format on
     void setType(Type val);
     Type type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
-    Q_PROPERTY(QString typeAsString READ typeAsString NOTIFY typeChanged)
+    // clang-format off
+    Q_PROPERTY(QString typeAsString
+               READ typeAsString
+               NOTIFY typeChanged)
+    // clang-format on
     QString typeAsString() const;
 
-    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    // clang-format off
+    Q_PROPERTY(QString text
+               READ text
+               WRITE setText
+               NOTIFY textChanged)
+    // clang-format on
     void setText(const QString &val);
     QString text() const { return m_text; }
     Q_SIGNAL void textChanged(const QString &val);
 
-    Q_PROPERTY(Qt::Alignment alignment READ alignment WRITE setAlignment NOTIFY alignmentChanged)
+    // clang-format off
+    Q_PROPERTY(Qt::Alignment alignment
+               READ alignment
+               WRITE setAlignment
+               NOTIFY alignmentChanged)
+    // clang-format on
     void setAlignment(Qt::Alignment val);
     Qt::Alignment alignment() const;
     Q_SIGNAL void alignmentChanged();
@@ -194,7 +268,11 @@ public:
     QList<int> autoCapitalizePositions() const;
     static QList<int> autoCapitalizePositions(const QString &text);
 
-    Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
+    // clang-format off
+    Q_PROPERTY(int wordCount
+               READ wordCount
+               NOTIFY wordCountChanged)
+    // clang-format on
     int wordCount() const { return m_wordCount; }
     Q_SIGNAL void wordCountChanged();
 
@@ -321,15 +399,27 @@ public:
 
     Scene *clone(QObject *parent) const;
 
-    Q_PROPERTY(StructureElement *structureElement READ structureElement NOTIFY
-                       structureElementChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(StructureElement *structureElement
+               READ structureElement
+               NOTIFY structureElementChanged
+               STORED false)
+    // clang-format on
     StructureElement *structureElement() const { return m_structureElement; }
     Q_SIGNAL void structureElementChanged();
 
-    Q_PROPERTY(bool empty READ isEmpty NOTIFY sceneChanged)
+    // clang-format off
+    Q_PROPERTY(bool empty
+               READ isEmpty
+               NOTIFY sceneChanged)
+    // clang-format on
     bool isEmpty() const;
 
-    Q_PROPERTY(bool hasContent READ hasContent NOTIFY sceneChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasContent
+               READ hasContent
+               NOTIFY sceneChanged)
+    // clang-format on
     bool hasContent() const;
 
     /*
@@ -337,87 +427,165 @@ public:
      * set an ID is automatically generated whenever the property value is
      * queried for the first time.
      */
-    Q_PROPERTY(QString id READ id WRITE setId NOTIFY idChanged)
+    // clang-format off
+    Q_PROPERTY(QString id
+               READ id
+               WRITE setId
+               NOTIFY idChanged)
+    // clang-format on
     void setId(const QString &val);
     QString id() const;
     Q_SIGNAL void idChanged();
 
-    Q_PROPERTY(QString name READ name NOTIFY synopsisChanged)
+    // clang-format off
+    Q_PROPERTY(QString name
+               READ name
+               NOTIFY synopsisChanged)
+    // clang-format on
     QString name() const;
 
-    Q_PROPERTY(QString title READ synopsis WRITE setSynopsis NOTIFY synopsisChanged STORED false)
-    Q_PROPERTY(QString synopsis READ synopsis WRITE setSynopsis NOTIFY synopsisChanged)
+    // clang-format off
+    Q_PROPERTY(QString title
+               READ synopsis
+               WRITE setSynopsis
+               NOTIFY synopsisChanged
+               STORED false)
+    Q_PROPERTY(QString synopsis
+               READ synopsis
+               WRITE setSynopsis
+               NOTIFY synopsisChanged)
+    // clang-format on
     void setSynopsis(const QString &val);
     QString synopsis() const { return m_synopsis; }
     Q_SIGNAL void synopsisChanged();
 
     void inferSynopsisFromContent();
 
-    Q_PROPERTY(bool hasSynopsis READ hasSynopsis NOTIFY synopsisChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasSynopsis
+               READ hasSynopsis
+               NOTIFY synopsisChanged)
+    // clang-format on
     bool hasSynopsis() const { return !m_synopsis.isEmpty(); }
 
     Q_INVOKABLE void trimSynopsis();
 
-    Q_PROPERTY(QStringList indexCardFieldValues READ indexCardFieldValues WRITE
-                       setIndexCardFieldValues NOTIFY indexCardFieldValuesChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList indexCardFieldValues
+               READ indexCardFieldValues
+               WRITE setIndexCardFieldValues
+               NOTIFY indexCardFieldValuesChanged)
+    // clang-format on
     void setIndexCardFieldValues(const QStringList &val);
     QStringList indexCardFieldValues() const { return m_indexCardFieldValues; }
     Q_SIGNAL void indexCardFieldValuesChanged();
 
-    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor color
+               READ color
+               WRITE setColor
+               NOTIFY colorChanged)
+    // clang-format on
     void setColor(const QColor &val);
     QColor color() const { return m_color; }
     Q_SIGNAL void colorChanged();
 
-    Q_PROPERTY(QColor highlightColor READ highlightColor NOTIFY colorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor highlightColor
+               READ highlightColor
+               NOTIFY colorChanged)
+    // clang-format on
     QColor highlightColor() const;
 
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool enabled
+               READ isEnabled
+               WRITE setEnabled
+               NOTIFY enabledChanged)
+    // clang-format on
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
     // Keep this updated and synced with SceneTypeImage.qml
+    // clang-format off
     Q_CLASSINFO("Type.Standard:icon", "qrc:/icons/content/blank.png")
     Q_CLASSINFO("Type.Song:icon", "qrc:/icons/content/queue_mus24px.png")
     Q_CLASSINFO("Type.Action:icon", "qrc:/icons/content/fight_scene.png")
     Q_CLASSINFO("Type.Montage:icon", "qrc:/icons/content/camera_alt.png")
+    // clang-format on
 
     enum Type { Standard = 0, Song, Action, Montage };
     Q_ENUM(Type)
-    Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
+    // clang-format off
+    Q_PROPERTY(Type type
+               READ type
+               WRITE setType
+               NOTIFY typeChanged)
+    // clang-format on
     void setType(Type val);
     Type type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
-    Q_PROPERTY(QString comments READ comments WRITE setComments NOTIFY commentsChanged)
+    // clang-format off
+    Q_PROPERTY(QString comments
+               READ comments
+               WRITE setComments
+               NOTIFY commentsChanged)
+    // clang-format on
     void setComments(const QString &val);
     QString comments() const { return m_comments; }
     Q_SIGNAL void commentsChanged();
 
-    Q_PROPERTY(bool isBeingReset READ isBeingReset NOTIFY resetStateChanged)
+    // clang-format off
+    Q_PROPERTY(bool isBeingReset
+               READ isBeingReset
+               NOTIFY resetStateChanged)
+    // clang-format on
     bool isBeingReset() const { return m_isBeingReset; }
     Q_SIGNAL void resetStateChanged();
 
-    Q_PROPERTY(bool undoRedoEnabled READ isUndoRedoEnabled WRITE setUndoRedoEnabled NOTIFY
-                       undoRedoEnabledChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(bool undoRedoEnabled
+               READ isUndoRedoEnabled
+               WRITE setUndoRedoEnabled
+               NOTIFY undoRedoEnabledChanged
+               STORED false)
+    // clang-format on
     void setUndoRedoEnabled(bool val);
     bool isUndoRedoEnabled() const { return m_undoRedoEnabled; }
     Q_SIGNAL void undoRedoEnabledChanged();
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
-                       cursorPositionChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(int cursorPosition
+               READ cursorPosition
+               WRITE setCursorPosition
+               NOTIFY cursorPositionChanged
+               STORED false)
+    // clang-format on
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
 
-    Q_PROPERTY(SceneHeading *heading READ heading CONSTANT)
+    // clang-format off
+    Q_PROPERTY(SceneHeading *heading
+               READ heading
+               CONSTANT )
+    // clang-format on
     SceneHeading *heading() const { return m_heading; }
 
-    Q_PROPERTY(bool hasCharacters READ hasCharacters NOTIFY characterNamesChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasCharacters
+               READ hasCharacters
+               NOTIFY characterNamesChanged)
+    // clang-format on
     bool hasCharacters() const { return !m_characterElementMap.isEmpty(); }
 
-    Q_PROPERTY(QStringList characterNames READ characterNames NOTIFY characterNamesChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList characterNames
+               READ characterNames
+               NOTIFY characterNamesChanged)
+    // clang-format on
     QStringList characterNames() const { return m_sortedCharacterNames; }
     Q_SIGNAL void characterNamesChanged();
 
@@ -429,37 +597,68 @@ public:
     Q_INVOKABLE bool isCharacterVisible(const QString &characterName) const;
     void scanMuteCharacters(const QStringList &characterNames = QStringList());
 
-    Q_PROPERTY(QString act READ act NOTIFY actChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QString act
+               READ act
+               NOTIFY actChanged
+               STORED false)
+    // clang-format on
     void setAct(const QString &val);
     QString act() const { return m_act; }
     Q_SIGNAL void actChanged();
 
-    Q_PROPERTY(int actIndex READ actIndex NOTIFY actIndexChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(int actIndex
+               READ actIndex
+               NOTIFY actIndexChanged
+               STORED false)
+    // clang-format on
     void setActIndex(const int &val);
     int actIndex() const { return m_actIndex; }
     Q_SIGNAL void actIndexChanged();
 
-    Q_PROPERTY(int episodeIndex READ episodeIndex NOTIFY episodeIndexChanged)
+    // clang-format off
+    Q_PROPERTY(int episodeIndex
+               READ episodeIndex
+               NOTIFY episodeIndexChanged)
+    // clang-format on
     void setEpisodeIndex(const int &val);
     int episodeIndex() const { return m_episodeIndex; }
     Q_SIGNAL void episodeIndexChanged();
 
-    Q_PROPERTY(QString episode READ episode NOTIFY episodeChanged)
+    // clang-format off
+    Q_PROPERTY(QString episode
+               READ episode
+               NOTIFY episodeChanged)
+    // clang-format on
     void setEpisode(const QString &val);
     QString episode() const { return m_episode; }
     Q_SIGNAL void episodeChanged();
 
-    Q_PROPERTY(QList<int> screenplayElementIndexList READ screenplayElementIndexList NOTIFY
-                       screenplayElementIndexListChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QList<int> screenplayElementIndexList
+               READ screenplayElementIndexList
+               NOTIFY screenplayElementIndexListChanged
+               STORED false)
+    // clang-format on
     void setScreenplayElementIndexList(const QList<int> &val);
     QList<int> screenplayElementIndexList() const { return m_screenplayElementIndexList; }
     Q_SIGNAL void screenplayElementIndexListChanged();
 
-    Q_PROPERTY(bool addedToScreenplay READ isAddedToScreenplay NOTIFY addedToScreenplayChanged)
+    // clang-format off
+    Q_PROPERTY(bool addedToScreenplay
+               READ isAddedToScreenplay
+               NOTIFY addedToScreenplayChanged)
+    // clang-format on
     bool isAddedToScreenplay() const { return !m_screenplayElementIndexList.isEmpty(); }
     Q_SIGNAL void addedToScreenplayChanged();
 
-    Q_PROPERTY(QStringList groups READ groups WRITE setGroups NOTIFY groupsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList groups
+               READ groups
+               WRITE setGroups
+               NOTIFY groupsChanged)
+    // clang-format on
     void setGroups(const QStringList &val);
     QStringList groups() const { return m_groups; }
     Q_SIGNAL void groupsChanged();
@@ -469,7 +668,12 @@ public:
     Q_INVOKABLE bool isInGroup(const QString &group) const;
     void verifyGroups(const QJsonArray &groupsModel);
 
-    Q_PROPERTY(QStringList tags READ tags WRITE setTags NOTIFY tagsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList tags
+               READ tags
+               WRITE setTags
+               NOTIFY tagsChanged)
+    // clang-format on
     void setTags(const QStringList &val);
     QStringList tags() const { return m_tags; }
     Q_SIGNAL void tagsChanged();
@@ -478,11 +682,19 @@ public:
     Q_INVOKABLE void removeTag(const QString &tag);
     Q_INVOKABLE bool hasTag(const QString &tag) const;
 
-    Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
+    // clang-format off
+    Q_PROPERTY(int wordCount
+               READ wordCount
+               NOTIFY wordCountChanged)
+    // clang-format on
     int wordCount() const { return m_wordCount; }
     Q_SIGNAL void wordCountChanged();
 
-    Q_PROPERTY(QQmlListProperty<SceneElement> elements READ elements NOTIFY elementCountChanged)
+    // clang-format off
+    Q_PROPERTY(QQmlListProperty<SceneElement> elements
+               READ elements
+               NOTIFY elementCountChanged)
+    // clang-format on
     QQmlListProperty<SceneElement> elements();
     Q_INVOKABLE SceneElement *appendElement(const QString &text, int type = SceneElement::Action);
     Q_INVOKABLE void addElement(SceneElement *ptr);
@@ -493,7 +705,11 @@ public:
     Q_INVOKABLE int indexOfElement(SceneElement *ptr) { return m_elements.indexOf(ptr); }
     Q_INVOKABLE SceneElement *elementAt(int index) const;
     void setElements(const QList<SceneElement *> &list);
-    Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
+    // clang-format off
+    Q_PROPERTY(int elementCount
+               READ elementCount
+               NOTIFY elementCountChanged)
+    // clang-format on
     int elementCount() const;
     Q_INVOKABLE void clearElements();
     Q_SIGNAL void elementCountChanged();
@@ -508,7 +724,11 @@ public:
     Q_SIGNAL void sceneAboutToReset();
     Q_SIGNAL void sceneReset(int elementIndex);
 
-    Q_PROPERTY(Notes *notes READ notes CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Notes *notes
+               READ notes
+               CONSTANT )
+    // clang-format on
     Notes *notes() const { return m_notes; }
 
     Q_INVOKABLE void beginUndoCapture(bool allowMerging = true);
@@ -517,7 +737,11 @@ public:
     Q_INVOKABLE bool polishText(Scene *previousScene = nullptr);
     Q_INVOKABLE bool capitalizeSentences();
 
-    Q_PROPERTY(QString summary READ summary NOTIFY summaryChanged)
+    // clang-format off
+    Q_PROPERTY(QString summary
+               READ summary
+               NOTIFY summaryChanged)
+    // clang-format on
     QString summary() const { return m_summary; }
     Q_SIGNAL void summaryChanged();
 
@@ -538,13 +762,21 @@ public:
     bool resetFromByteArray(const QByteArray &bytes);
     static Scene *fromByteArray(const QByteArray &bytes);
 
-    Q_PROPERTY(QJsonObject characterRelationshipGraph READ characterRelationshipGraph WRITE
-                       setCharacterRelationshipGraph NOTIFY characterRelationshipGraphChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject characterRelationshipGraph
+               READ characterRelationshipGraph
+               WRITE setCharacterRelationshipGraph
+               NOTIFY characterRelationshipGraphChanged)
+    // clang-format on
     void setCharacterRelationshipGraph(const QJsonObject &val);
     QJsonObject characterRelationshipGraph() const { return m_characterRelationshipGraph; }
     Q_SIGNAL void characterRelationshipGraphChanged();
 
-    Q_PROPERTY(Attachments *attachments READ attachments CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Attachments *attachments
+               READ attachments
+               CONSTANT )
+    // clang-format on
     Attachments *attachments() const { return m_attachments; }
 
     // QObjectSerializer::Interface interface
@@ -651,49 +883,88 @@ public:
     explicit SceneSizeHintItem(QQuickItem *parent = nullptr);
     ~SceneSizeHintItem();
 
-    Q_PROPERTY(Scene *scene READ scene WRITE setScene NOTIFY sceneChanged RESET sceneReset)
+    // clang-format off
+    Q_PROPERTY(Scene *scene
+               READ scene
+               WRITE setScene
+               NOTIFY sceneChanged
+               RESET sceneReset)
+    // clang-format on
     void setScene(Scene *val);
     Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
-    Q_PROPERTY(bool trackSceneChanges READ trackSceneChanges WRITE setTrackSceneChanges NOTIFY
-                       trackSceneChangesChanged)
+    // clang-format off
+    Q_PROPERTY(bool trackSceneChanges
+               READ trackSceneChanges
+               WRITE setTrackSceneChanges
+               NOTIFY trackSceneChangesChanged)
+    // clang-format on
     void setTrackSceneChanges(bool val);
     bool trackSceneChanges() const { return m_trackSceneChanges; }
     Q_SIGNAL void trackSceneChangesChanged();
 
-    Q_PROPERTY(ScreenplayFormat *format READ format WRITE setFormat NOTIFY formatChanged)
+    // clang-format off
+    Q_PROPERTY(ScreenplayFormat *format
+               READ format
+               WRITE setFormat
+               NOTIFY formatChanged)
+    // clang-format on
     void setFormat(ScreenplayFormat *val);
     ScreenplayFormat *format() const { return m_format; }
     Q_SIGNAL void formatChanged();
 
-    Q_PROPERTY(bool trackFormatChanges READ trackFormatChanges WRITE setTrackFormatChanges NOTIFY
-                       trackFormatChangesChanged)
+    // clang-format off
+    Q_PROPERTY(bool trackFormatChanges
+               READ trackFormatChanges
+               WRITE setTrackFormatChanges
+               NOTIFY trackFormatChangesChanged)
+    // clang-format on
     void setTrackFormatChanges(bool val);
     bool trackFormatChanges() const { return m_trackFormatChanges; }
     Q_SIGNAL void trackFormatChangesChanged();
 
-    Q_PROPERTY(qreal contentWidth READ contentWidth NOTIFY contentWidthChanged)
+    // clang-format off
+    Q_PROPERTY(qreal contentWidth
+               READ contentWidth
+               NOTIFY contentWidthChanged)
+    // clang-format on
     qreal contentWidth() const { return m_contentWidth; }
     Q_SIGNAL void contentWidthChanged();
 
-    Q_PROPERTY(qreal contentHeight READ contentHeight NOTIFY contentHeightChanged)
+    // clang-format off
+    Q_PROPERTY(qreal contentHeight
+               READ contentHeight
+               NOTIFY contentHeightChanged)
+    // clang-format on
     qreal contentHeight() const { return m_contentHeight; }
     Q_SIGNAL void contentHeightChanged();
 
-    Q_PROPERTY(
-            bool asynchronous READ isAsynchronous WRITE setAsynchronous NOTIFY asynchronousChanged)
+    // clang-format off
+    Q_PROPERTY(bool asynchronous
+               READ isAsynchronous
+               WRITE setAsynchronous
+               NOTIFY asynchronousChanged)
+    // clang-format on
     void setAsynchronous(bool val);
     bool isAsynchronous() const { return m_asynchronous; }
     Q_SIGNAL void asynchronousChanged();
 
-    Q_PROPERTY(bool active READ isActive WRITE setActive NOTIFY activeChanged)
+    // clang-format off
+    Q_PROPERTY(bool active
+               READ isActive
+               WRITE setActive
+               NOTIFY activeChanged)
+    // clang-format on
     void setActive(bool val);
     bool isActive() const { return m_active; }
     Q_SIGNAL void activeChanged();
 
-    Q_PROPERTY(bool hasPendingComputeSize READ hasPendingComputeSize NOTIFY
-                       hasPendingComputeSizeChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasPendingComputeSize
+               READ hasPendingComputeSize
+               NOTIFY hasPendingComputeSizeChanged)
+    // clang-format on
     bool hasPendingComputeSize() const { return m_hasPendingComputeSize; }
     Q_SIGNAL void hasPendingComputeSizeChanged();
 
@@ -746,39 +1017,76 @@ public:
     Q_INVOKABLE void toggle(int row);
     Q_SIGNAL void toggled(int row);
 
-    Q_PROPERTY(QStringList groupActs READ groupActs NOTIFY groupActsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList groupActs
+               READ groupActs
+               NOTIFY groupActsChanged)
+    // clang-format on
     QStringList groupActs() const { return m_groupActs; }
     Q_SIGNAL void groupActsChanged();
 
-    Q_PROPERTY(bool hasGroupActs READ hasGroupActs NOTIFY groupActsChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasGroupActs
+               READ hasGroupActs
+               NOTIFY groupActsChanged)
+    // clang-format on
     bool hasGroupActs() const { return !m_groupActs.isEmpty(); }
 
-    Q_PROPERTY(QStringList sceneStackIds READ sceneStackIds NOTIFY sceneStackIdsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList sceneStackIds
+               READ sceneStackIds
+               NOTIFY sceneStackIdsChanged)
+    // clang-format on
     QStringList sceneStackIds() const { return m_sceneStackIds; }
     Q_SIGNAL void sceneStackIdsChanged();
 
-    Q_PROPERTY(bool hasSceneStackIds READ hasSceneStackIds NOTIFY sceneStackIdsChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasSceneStackIds
+               READ hasSceneStackIds
+               NOTIFY sceneStackIdsChanged)
+    // clang-format on
     bool hasSceneStackIds() const { return !m_sceneStackIds.isEmpty(); }
 
-    Q_PROPERTY(QStringList sceneActs READ sceneActs NOTIFY sceneActsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList sceneActs
+               READ sceneActs
+               NOTIFY sceneActsChanged)
+    // clang-format on
     QStringList sceneActs() const { return m_sceneActs; }
     Q_SIGNAL void sceneActsChanged();
 
-    Q_PROPERTY(bool hasSceneActs READ hasSceneActs NOTIFY sceneActsChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasSceneActs
+               READ hasSceneActs
+               NOTIFY sceneActsChanged)
+    // clang-format on
     bool hasSceneActs() const { return !m_sceneActs.isEmpty(); }
 
     // Custom properties
-    Q_PROPERTY(Structure *structure READ structure WRITE setStructure NOTIFY structureChanged)
+    // clang-format off
+    Q_PROPERTY(Structure *structure
+               READ structure
+               WRITE setStructure
+               NOTIFY structureChanged)
+    // clang-format on
     void setStructure(Structure *val);
     Structure *structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
 
-    Q_PROPERTY(QQmlListProperty<Scene> scenes READ scenes NOTIFY sceneCountChanged)
+    // clang-format off
+    Q_PROPERTY(QQmlListProperty<Scene> scenes
+               READ scenes
+               NOTIFY sceneCountChanged)
+    // clang-format on
     QQmlListProperty<Scene> scenes();
     Q_INVOKABLE void addScene(Scene *ptr);
     Q_INVOKABLE void removeScene(Scene *ptr);
     Q_INVOKABLE Scene *sceneAt(int index) const;
-    Q_PROPERTY(int sceneCount READ sceneCount NOTIFY sceneCountChanged)
+    // clang-format off
+    Q_PROPERTY(int sceneCount
+               READ sceneCount
+               NOTIFY sceneCountChanged)
+    // clang-format on
     int sceneCount() const { return m_scenes.size(); }
     Q_INVOKABLE void clearScenes();
     Q_SIGNAL void sceneCountChanged();

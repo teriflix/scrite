@@ -112,8 +112,12 @@ class ScreenplayPaginatorWorker : public QObject
 public:
     virtual ~ScreenplayPaginatorWorker();
 
-    Q_PROPERTY(bool synchronousSync READ isSynchronousSync WRITE setSynchronousSync NOTIFY
-                       synchronousSyncChanged)
+    // clang-format off
+    Q_PROPERTY(bool synchronousSync
+               READ isSynchronousSync
+               WRITE setSynchronousSync
+               NOTIFY synchronousSyncChanged)
+    // clang-format on
     void setSynchronousSync(bool val);
     bool isSynchronousSync() const { return m_synchronousSync; }
     Q_SIGNAL void synchronousSyncChanged();

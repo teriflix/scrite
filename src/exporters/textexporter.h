@@ -19,10 +19,12 @@
 class TextExporter : public AbstractExporter
 {
     Q_OBJECT
+    // clang-format off
     Q_CLASSINFO("Format", "Screenplay/Text File")
     Q_CLASSINFO("NameFilters", "Text File (*.txt)")
     Q_CLASSINFO("Description", "Exports the current screenplay as a text file.")
     Q_CLASSINFO("Icon", ":/icons/exporter/text.png")
+    // clang-format on
 
 public:
     Q_INVOKABLE explicit TextExporter(QObject *parent = nullptr);
@@ -32,37 +34,53 @@ public:
     bool canBundleFonts() const { return false; }
     bool requiresConfiguration() const { return true; }
 
+    // clang-format off
     Q_CLASSINFO("maxLettersPerLine_FieldLabel", "Number of characters per line:")
     Q_CLASSINFO("maxLettersPerLine_FieldEditor", "IntegerSpinBox")
     Q_CLASSINFO("maxLettersPerLine_FieldMinValue", "30")
     Q_CLASSINFO("maxLettersPerLine_FieldMaxValue", "150")
     Q_CLASSINFO("maxLettersPerLine_FieldDefaultValue", "60")
-    Q_PROPERTY(int maxLettersPerLine READ maxLettersPerLine WRITE setMaxLettersPerLine NOTIFY
-                       maxLettersPerLineChanged)
+    Q_PROPERTY(int maxLettersPerLine
+               READ maxLettersPerLine
+               WRITE setMaxLettersPerLine
+               NOTIFY maxLettersPerLineChanged)
+    // clang-format on
     void setMaxLettersPerLine(int val);
     int maxLettersPerLine() const { return m_maxLettersPerLine; }
     Q_SIGNAL void maxLettersPerLineChanged();
 
+    // clang-format off
     Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers.")
     Q_CLASSINFO("includeSceneNumbers_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers
-                       NOTIFY includeSceneNumbersChanged)
+    Q_PROPERTY(bool includeSceneNumbers
+               READ isIncludeSceneNumbers
+               WRITE setIncludeSceneNumbers
+               NOTIFY includeSceneNumbersChanged)
+    // clang-format on
     void setIncludeSceneNumbers(bool val);
     bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
     Q_SIGNAL void includeSceneNumbersChanged();
 
+    // clang-format off
     Q_CLASSINFO("includeEpisodeAndActBreaks_FieldLabel", "Include episode and act breaks.")
     Q_CLASSINFO("includeEpisodeAndActBreaks_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeEpisodeAndActBreaks READ isIncludeEpisodeAndActBreaks WRITE
-                       setIncludeEpisodeAndActBreaks NOTIFY includeEpisodeAndActBreaksChanged)
+    Q_PROPERTY(bool includeEpisodeAndActBreaks
+               READ isIncludeEpisodeAndActBreaks
+               WRITE setIncludeEpisodeAndActBreaks
+               NOTIFY includeEpisodeAndActBreaksChanged)
+    // clang-format on
     void setIncludeEpisodeAndActBreaks(bool val);
     bool isIncludeEpisodeAndActBreaks() const { return m_includeEpisodeAndActBreaks; }
     Q_SIGNAL void includeEpisodeAndActBreaksChanged();
 
+    // clang-format off
     Q_CLASSINFO("includeSceneSynopsis_FieldLabel", "Include scene synopsis.")
     Q_CLASSINFO("includeSceneSynopsis_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis
-                       NOTIFY includeSceneSynopsisChanged)
+    Q_PROPERTY(bool includeSceneSynopsis
+               READ isIncludeSceneSynopsis
+               WRITE setIncludeSceneSynopsis
+               NOTIFY includeSceneSynopsisChanged)
+    // clang-format on
     void setIncludeSceneSynopsis(bool val);
     bool isIncludeSceneSynopsis() const { return m_includeSceneSynopsis; }
     Q_SIGNAL void includeSceneSynopsisChanged();

@@ -28,12 +28,22 @@ public:
                             QObject *parent = nullptr);
     ~ExecLaterTimer();
 
-    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    // clang-format off
+    Q_PROPERTY(QString name
+               READ name
+               WRITE setName
+               NOTIFY nameChanged)
+    // clang-format on
     void setName(const QString &val);
     QString name() const { return m_name; }
     Q_SIGNAL void nameChanged();
 
-    Q_PROPERTY(bool repeat READ isRepeat WRITE setRepeat NOTIFY repeatChanged)
+    // clang-format off
+    Q_PROPERTY(bool repeat
+               READ isRepeat
+               WRITE setRepeat
+               NOTIFY repeatChanged)
+    // clang-format on
     void setRepeat(bool val);
     bool isRepeat() const { return m_repeat; }
     Q_SIGNAL void repeatChanged();

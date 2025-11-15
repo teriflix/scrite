@@ -37,48 +37,93 @@ public:
     explicit ScreenplayAdapter(QObject *parent = nullptr);
     ~ScreenplayAdapter();
 
-    Q_PROPERTY(QObject *source READ source WRITE setSource NOTIFY sourceChanged RESET resetSource)
+    // clang-format off
+    Q_PROPERTY(QObject *source
+               READ source
+               WRITE setSource
+               NOTIFY sourceChanged
+               RESET resetSource)
+    // clang-format on
     void setSource(QObject *val);
     QObject *source() const { return m_source; }
     Q_SIGNAL void sourceChanged();
 
     void setSourceModel(QAbstractItemModel *model);
 
-    Q_PROPERTY(bool isSourceScene READ isSourceScene NOTIFY sourceChanged)
+    // clang-format off
+    Q_PROPERTY(bool isSourceScene
+               READ isSourceScene
+               NOTIFY sourceChanged)
+    // clang-format on
     bool isSourceScene() const;
 
-    Q_PROPERTY(bool isSourceScreenplay READ isSourceScreenplay NOTIFY sourceChanged)
+    // clang-format off
+    Q_PROPERTY(bool isSourceScreenplay
+               READ isSourceScreenplay
+               NOTIFY sourceChanged)
+    // clang-format on
     bool isSourceScreenplay() const;
 
-    Q_PROPERTY(Screenplay *screenplay READ screenplay NOTIFY sourceChanged)
+    // clang-format off
+    Q_PROPERTY(Screenplay *screenplay
+               READ screenplay
+               NOTIFY sourceChanged)
+    // clang-format on
     Screenplay *screenplay() const;
 
-    Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
+    // clang-format off
+    Q_PROPERTY(int elementCount
+               READ elementCount
+               NOTIFY elementCountChanged)
+    // clang-format on
     int elementCount() const { return this->rowCount(QModelIndex()); }
     Q_SIGNAL void elementCountChanged() const;
 
-    Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
+    // clang-format off
+    Q_PROPERTY(int currentIndex
+               READ currentIndex
+               WRITE setCurrentIndex
+               NOTIFY currentIndexChanged)
+    // clang-format on
     void setCurrentIndex(int val);
     int currentIndex() const;
     Q_SIGNAL void currentIndexChanged();
 
-    Q_PROPERTY(ScreenplayElement *currentElement READ currentElement NOTIFY currentIndexChanged)
+    // clang-format off
+    Q_PROPERTY(ScreenplayElement *currentElement
+               READ currentElement
+               NOTIFY currentIndexChanged)
+    // clang-format on
     ScreenplayElement *currentElement() const;
 
-    Q_PROPERTY(Scene *currentScene READ currentScene NOTIFY currentIndexChanged)
+    // clang-format off
+    Q_PROPERTY(Scene *currentScene
+               READ currentScene
+               NOTIFY currentIndexChanged)
+    // clang-format on
     Scene *currentScene() const;
 
-    Q_PROPERTY(
-            bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasNonStandardScenes
+               READ hasNonStandardScenes
+               NOTIFY hasNonStandardScenesChanged)
+    // clang-format on
     bool hasNonStandardScenes() const;
     Q_SIGNAL void hasNonStandardScenesChanged();
 
-    Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
+    // clang-format off
+    Q_PROPERTY(int wordCount
+               READ wordCount
+               NOTIFY wordCountChanged)
+    // clang-format on
     int wordCount() const;
     Q_SIGNAL void wordCountChanged();
 
-    Q_PROPERTY(bool heightHintsAvailable READ isHeightHintsAvailable NOTIFY
-                       heightHintsAvailableChanged)
+    // clang-format off
+    Q_PROPERTY(bool heightHintsAvailable
+               READ isHeightHintsAvailable
+               NOTIFY heightHintsAvailableChanged)
+    // clang-format on
     bool isHeightHintsAvailable() const;
     Q_SIGNAL void heightHintsAvailableChanged();
 

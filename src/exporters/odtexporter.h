@@ -19,22 +19,25 @@
 class OdtExporter : public AbstractTextDocumentExporter
 {
     Q_OBJECT
+    // clang-format off
     Q_CLASSINFO("Format", "Screenplay/Open Document Format")
     Q_CLASSINFO("NameFilters", "Open Document Format (*.odt)")
-    Q_CLASSINFO("Description",
-                "Exports the current screenplay to Open Document Text file format. Such files can "
-                "be opened in Google Docs, Microsoft Word and Libre/Open Office.")
+    Q_CLASSINFO("Description", "Exports the current screenplay to Open Document Text file format. Such files can " "be opened in Google Docs, Microsoft Word and Libre/Open Office.")
     Q_CLASSINFO("Icon", ":/icons/exporter/odt.png")
+    // clang-format on
 
 public:
     Q_INVOKABLE explicit OdtExporter(QObject *parent = nullptr);
     ~OdtExporter();
 
-    Q_CLASSINFO("includeSceneNumbers_FieldLabel",
-                "Include scene numbers in the generated document.")
+    // clang-format off
+    Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated document.")
     Q_CLASSINFO("includeSceneNumbers_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers
-                       NOTIFY includeSceneNumbersChanged)
+    Q_PROPERTY(bool includeSceneNumbers
+               READ isIncludeSceneNumbers
+               WRITE setIncludeSceneNumbers
+               NOTIFY includeSceneNumbersChanged)
+    // clang-format on
     void setIncludeSceneNumbers(bool val);
     bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
     Q_SIGNAL void includeSceneNumbersChanged();

@@ -33,31 +33,58 @@ struct FileInfo
 public:
     QFileInfo info;
 
-    Q_PROPERTY(bool valid READ valid)
+    // clang-format off
+    Q_PROPERTY(bool valid
+               READ valid)
+    // clang-format on
     bool valid() const { return info != QFileInfo(); }
 
-    Q_PROPERTY(bool exists READ exists)
+    // clang-format off
+    Q_PROPERTY(bool exists
+               READ exists)
+    // clang-format on
     bool exists() const { return info.exists(); }
 
-    Q_PROPERTY(bool readable READ readable)
+    // clang-format off
+    Q_PROPERTY(bool readable
+               READ readable)
+    // clang-format on
     bool readable() const { return info.isReadable(); }
 
-    Q_PROPERTY(bool writable READ writable)
+    // clang-format off
+    Q_PROPERTY(bool writable
+               READ writable)
+    // clang-format on
     bool writable() const { return info.isWritable(); }
 
-    Q_PROPERTY(QString baseName READ baseName)
+    // clang-format off
+    Q_PROPERTY(QString baseName
+               READ baseName)
+    // clang-format on
     QString baseName() const { return info.baseName(); }
 
-    Q_PROPERTY(QString absoluteFilePath READ absoluteFilePath)
+    // clang-format off
+    Q_PROPERTY(QString absoluteFilePath
+               READ absoluteFilePath)
+    // clang-format on
     QString absoluteFilePath() const { return info.absoluteFilePath(); }
 
-    Q_PROPERTY(QString absolutePath READ absolutePath)
+    // clang-format off
+    Q_PROPERTY(QString absolutePath
+               READ absolutePath)
+    // clang-format on
     QString absolutePath() const { return info.absolutePath(); }
 
-    Q_PROPERTY(QString suffix READ suffix)
+    // clang-format off
+    Q_PROPERTY(QString suffix
+               READ suffix)
+    // clang-format on
     QString suffix() const { return info.suffix(); }
 
-    Q_PROPERTY(QString fileName READ fileName)
+    // clang-format off
+    Q_PROPERTY(QString fileName
+               READ fileName)
+    // clang-format on
     QString fileName() const { return info.fileName(); }
 
     FileInfo &operator=(const FileInfo &other)
@@ -76,10 +103,16 @@ class ObjectConfigFieldChoice
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_PROPERTY(QString key MEMBER key)
+    // clang-format off
+    Q_PROPERTY(QString key
+               MEMBER key)
+    // clang-format on
     QString key;
 
-    Q_PROPERTY(QString value MEMBER value)
+    // clang-format off
+    Q_PROPERTY(QString value
+               MEMBER value)
+    // clang-format on
     QString value;
 
     ObjectConfigFieldChoice &operator=(const ObjectConfigFieldChoice &other)
@@ -102,34 +135,64 @@ struct ObjectConfigField
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_PROPERTY(QString name MEMBER name)
+    // clang-format off
+    Q_PROPERTY(QString name
+               MEMBER name)
+    // clang-format on
     QString name;
 
-    Q_PROPERTY(QString label MEMBER label)
+    // clang-format off
+    Q_PROPERTY(QString label
+               MEMBER label)
+    // clang-format on
     QString label;
 
-    Q_PROPERTY(QString note MEMBER note)
+    // clang-format off
+    Q_PROPERTY(QString note
+               MEMBER note)
+    // clang-format on
     QString note;
 
-    Q_PROPERTY(QString editor MEMBER editor)
+    // clang-format off
+    Q_PROPERTY(QString editor
+               MEMBER editor)
+    // clang-format on
     QString editor;
 
-    Q_PROPERTY(QVariant min MEMBER min)
+    // clang-format off
+    Q_PROPERTY(QVariant min
+               MEMBER min)
+    // clang-format on
     QVariant min;
 
-    Q_PROPERTY(QVariant max MEMBER max)
+    // clang-format off
+    Q_PROPERTY(QVariant max
+               MEMBER max)
+    // clang-format on
     QVariant max;
 
-    Q_PROPERTY(QVariant ideal MEMBER ideal)
+    // clang-format off
+    Q_PROPERTY(QVariant ideal
+               MEMBER ideal)
+    // clang-format on
     QVariant ideal;
 
-    Q_PROPERTY(QString group MEMBER group)
+    // clang-format off
+    Q_PROPERTY(QString group
+               MEMBER group)
+    // clang-format on
     QString group;
 
-    Q_PROPERTY(QString feature MEMBER feature)
+    // clang-format off
+    Q_PROPERTY(QString feature
+               MEMBER feature)
+    // clang-format on
     QString feature;
 
-    Q_PROPERTY(QList<Utils::ObjectConfigFieldChoice> choices MEMBER choices)
+    // clang-format off
+    Q_PROPERTY(QList<Utils::ObjectConfigFieldChoice> choices
+               MEMBER choices)
+    // clang-format on
     QList<Utils::ObjectConfigFieldChoice> choices;
 
     ObjectConfigField &operator=(const ObjectConfigField &other)
@@ -163,13 +226,22 @@ struct ObjectConfigFieldGroup
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_PROPERTY(QString name MEMBER name)
+    // clang-format off
+    Q_PROPERTY(QString name
+               MEMBER name)
+    // clang-format on
     QString name;
 
-    Q_PROPERTY(QString description MEMBER description)
+    // clang-format off
+    Q_PROPERTY(QString description
+               MEMBER description)
+    // clang-format on
     QString description;
 
-    Q_PROPERTY(QList<Utils::ObjectConfigField> fields MEMBER fields)
+    // clang-format off
+    Q_PROPERTY(QList<Utils::ObjectConfigField> fields
+               MEMBER fields)
+    // clang-format on
     QList<Utils::ObjectConfigField> fields;
 
     ObjectConfigFieldGroup &operator=(const ObjectConfigFieldGroup &other)
@@ -194,19 +266,34 @@ struct ObjectConfig
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_PROPERTY(bool valid READ isValid)
+    // clang-format off
+    Q_PROPERTY(bool valid
+               READ isValid)
+    // clang-format on
     bool isValid() const { return fields.size() > 0 && groups.size() >= 1; }
 
-    Q_PROPERTY(QString title MEMBER title)
+    // clang-format off
+    Q_PROPERTY(QString title
+               MEMBER title)
+    // clang-format on
     QString title;
 
-    Q_PROPERTY(QString description MEMBER description)
+    // clang-format off
+    Q_PROPERTY(QString description
+               MEMBER description)
+    // clang-format on
     QString description;
 
-    Q_PROPERTY(QList<Utils::ObjectConfigField> fields MEMBER fields)
+    // clang-format off
+    Q_PROPERTY(QList<Utils::ObjectConfigField> fields
+               MEMBER fields)
+    // clang-format on
     QList<Utils::ObjectConfigField> fields;
 
-    Q_PROPERTY(QList<Utils::ObjectConfigFieldGroup> groups MEMBER groups)
+    // clang-format off
+    Q_PROPERTY(QList<Utils::ObjectConfigFieldGroup> groups
+               MEMBER groups)
+    // clang-format on
     QList<Utils::ObjectConfigFieldGroup> groups;
 
     ObjectConfig &operator=(const ObjectConfig &other)
@@ -266,52 +353,112 @@ public:
     enum Type { LinuxDesktop, WindowsDesktop, MacOSDesktop };
     Q_ENUM(Type)
 
-    Q_PROPERTY(Type type READ type CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Type type
+               READ type
+               CONSTANT )
+    // clang-format on
     static Type type();
 
-    Q_PROPERTY(QString typeString READ typeString CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString typeString
+               READ typeString
+               CONSTANT )
+    // clang-format on
     static QString typeString();
 
-    Q_PROPERTY(bool isLinuxDesktop READ isLinuxDesktop CONSTANT)
+    // clang-format off
+    Q_PROPERTY(bool isLinuxDesktop
+               READ isLinuxDesktop
+               CONSTANT )
+    // clang-format on
     static bool isLinuxDesktop() { return type() == LinuxDesktop; }
 
-    Q_PROPERTY(bool isWindowsDesktop READ isWindowsDesktop CONSTANT)
+    // clang-format off
+    Q_PROPERTY(bool isWindowsDesktop
+               READ isWindowsDesktop
+               CONSTANT )
+    // clang-format on
     static bool isWindowsDesktop() { return type() == WindowsDesktop; }
 
-    Q_PROPERTY(bool isMacOSDesktop READ isMacOSDesktop CONSTANT)
+    // clang-format off
+    Q_PROPERTY(bool isMacOSDesktop
+               READ isMacOSDesktop
+               CONSTANT )
+    // clang-format on
     static bool isMacOSDesktop() { return type() == MacOSDesktop; }
 
-    Q_PROPERTY(int osMajorVersion READ osMajorVersion CONSTANT)
+    // clang-format off
+    Q_PROPERTY(int osMajorVersion
+               READ osMajorVersion
+               CONSTANT )
+    // clang-format on
     static int osMajorVersion();
 
-    Q_PROPERTY(QList<int> osVersion READ osVersion CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QList<int> osVersion
+               READ osVersion
+               CONSTANT )
+    // clang-format on
     static QList<int> osVersion();
 
-    Q_PROPERTY(QString osVersionString READ osVersionString CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString osVersionString
+               READ osVersionString
+               CONSTANT )
+    // clang-format on
     static QString osVersionString();
 
-    Q_PROPERTY(QString qtVersionString READ qtVersionString CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString qtVersionString
+               READ qtVersionString
+               CONSTANT )
+    // clang-format on
     static QString qtVersionString();
 
-    Q_PROPERTY(QString openSslVersionString READ openSslVersionString CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString openSslVersionString
+               READ openSslVersionString
+               CONSTANT )
+    // clang-format on
     static QString openSslVersionString();
 
     enum Architecture { x86, x64 };
     Q_ENUM(Architecture)
 
-    Q_PROPERTY(Architecture architecture READ architecture CONSTANT)
+    // clang-format off
+    Q_PROPERTY(Architecture architecture
+               READ architecture
+               CONSTANT )
+    // clang-format on
     static Architecture architecture();
 
-    Q_PROPERTY(QString architectureString READ architectureString CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString architectureString
+               READ architectureString
+               CONSTANT )
+    // clang-format on
     static QString architectureString();
 
-    Q_PROPERTY(QString hostName READ hostName CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString hostName
+               READ hostName
+               CONSTANT )
+    // clang-format on
     static QString hostName();
 
-    Q_PROPERTY(QString settingsPath READ settingsPath CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString settingsPath
+               READ settingsPath
+               CONSTANT )
+    // clang-format on
     static QString settingsPath(); // Folder in which settings.ini is stored
 
-    Q_PROPERTY(QString settingsFile READ settingsFile CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString settingsFile
+               READ settingsFile
+               CONSTANT )
+    // clang-format on
     static QString settingsFile(); // Complete path to settings.ini file
 
     Q_INVOKABLE static QString configPath(const QString &relativeName);
@@ -324,7 +471,11 @@ class Gui : public QObject
     QML_SINGLETON
 
 public:
-    Q_PROPERTY(QImage emptyQImage READ emptyQImage CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QImage emptyQImage
+               READ emptyQImage
+               CONSTANT )
+    // clang-format on
     static QImage emptyQImage();
 
     Q_INVOKABLE static QString shortcut(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
@@ -402,7 +553,11 @@ class ObjectRegistry : public QObject
     QML_SINGLETON
 
 public:
-    Q_PROPERTY(QAbstractListModel *model READ model CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QAbstractListModel *model
+               READ model
+               CONSTANT )
+    // clang-format on
     static QAbstractListModel *model();
 
     static void remove(QObject *object);
@@ -431,7 +586,12 @@ public:
 
     static ObjectRegister *qmlAttachedProperties(QObject *parent);
 
-    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    // clang-format off
+    Q_PROPERTY(QString name
+               READ name
+               WRITE setName
+               NOTIFY nameChanged)
+    // clang-format on
     void setName(const QString &val);
     QString name() const { return m_name; }
     Q_SIGNAL void nameChanged();
@@ -471,7 +631,11 @@ public:
     Q_INVOKABLE static QList<QColor>
     paletteForVersion(const QVersionNumber &version = QVersionNumber());
 
-    Q_PROPERTY(QVariantList palette READ paletteAsVariantList CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QVariantList palette
+               READ paletteAsVariantList
+               CONSTANT )
+    // clang-format on
     static QList<QColor> palette();
 
     Q_INVOKABLE static QColor pick(int index);

@@ -40,10 +40,16 @@ struct ScenePageBreak
     Q_GADGET
 
 public:
-    Q_PROPERTY(int cursorPosition MEMBER cursorPosition)
+    // clang-format off
+    Q_PROPERTY(int cursorPosition
+               MEMBER cursorPosition)
+    // clang-format on
     int cursorPosition = -1;
 
-    Q_PROPERTY(int pageNumber MEMBER pageNumber)
+    // clang-format off
+    Q_PROPERTY(int pageNumber
+               MEMBER pageNumber)
+    // clang-format on
     int pageNumber = -1;
 
     ScenePageBreak();
@@ -61,25 +67,46 @@ struct ScreenplayPaginatorRecord
     Q_GADGET
 
 public:
-    Q_PROPERTY(bool valid READ isValid)
+    // clang-format off
+    Q_PROPERTY(bool valid
+               READ isValid)
+    // clang-format on
     bool isValid() const { return this->serialNumber > 0; }
 
-    Q_PROPERTY(int serialNumber MEMBER serialNumber)
+    // clang-format off
+    Q_PROPERTY(int serialNumber
+               MEMBER serialNumber)
+    // clang-format on
     int serialNumber = -1;
 
-    Q_PROPERTY(qreal pixelLength MEMBER pixelLength)
+    // clang-format off
+    Q_PROPERTY(qreal pixelLength
+               MEMBER pixelLength)
+    // clang-format on
     qreal pixelLength = 0;
 
-    Q_PROPERTY(qreal pageLength MEMBER pageLength)
+    // clang-format off
+    Q_PROPERTY(qreal pageLength
+               MEMBER pageLength)
+    // clang-format on
     qreal pageLength = 0;
 
-    Q_PROPERTY(QTime timeLength MEMBER timeLength)
+    // clang-format off
+    Q_PROPERTY(QTime timeLength
+               MEMBER timeLength)
+    // clang-format on
     QTime timeLength;
 
-    Q_PROPERTY(QList<ScenePageBreak> pageBreaks MEMBER pageBreaks)
+    // clang-format off
+    Q_PROPERTY(QList<ScenePageBreak> pageBreaks
+               MEMBER pageBreaks)
+    // clang-format on
     QList<ScenePageBreak> pageBreaks;
 
-    Q_PROPERTY(ScreenplayElement *screenplayElement MEMBER screenplayElement)
+    // clang-format off
+    Q_PROPERTY(ScreenplayElement *screenplayElement
+               MEMBER screenplayElement)
+    // clang-format on
     QPointer<ScreenplayElement> screenplayElement;
 
     ScreenplayPaginatorRecord();
@@ -105,17 +132,32 @@ public:
 
     Q_INVOKABLE void useDefaultFormatAndScreenplay();
 
-    Q_PROPERTY(Screenplay *screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)
+    // clang-format off
+    Q_PROPERTY(Screenplay *screenplay
+               READ screenplay
+               WRITE setScreenplay
+               NOTIFY screenplayChanged)
+    // clang-format on
     void setScreenplay(Screenplay *val);
     Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
-    Q_PROPERTY(ScreenplayFormat *format READ format WRITE setFormat NOTIFY formatChanged)
+    // clang-format off
+    Q_PROPERTY(ScreenplayFormat *format
+               READ format
+               WRITE setFormat
+               NOTIFY formatChanged)
+    // clang-format on
     void setFormat(ScreenplayFormat *val);
     ScreenplayFormat *format() const { return m_format; }
     Q_SIGNAL void formatChanged();
 
-    Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool enabled
+               READ enabled
+               WRITE setEnabled
+               NOTIFY enabledChanged)
+    // clang-format on
     void setEnabled(bool val);
     bool enabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
@@ -144,28 +186,56 @@ public:
     static QTime pageToTimeLength(qreal pixelLength, ScreenplayFormat *format,
                                   const QTextDocument *document);
 
-    Q_PROPERTY(int pageCount READ pageCount NOTIFY paginationUpdated)
+    // clang-format off
+    Q_PROPERTY(int pageCount
+               READ pageCount
+               NOTIFY paginationUpdated)
+    // clang-format on
     int pageCount() const { return m_pageCount; }
 
-    Q_PROPERTY(QTime totalTime READ totalTime NOTIFY paginationUpdated)
+    // clang-format off
+    Q_PROPERTY(QTime totalTime
+               READ totalTime
+               NOTIFY paginationUpdated)
+    // clang-format on
     QTime totalTime() const { return m_totalTime; }
 
-    Q_PROPERTY(qreal totalPixelLength READ totalPixelLength NOTIFY paginationUpdated)
+    // clang-format off
+    Q_PROPERTY(qreal totalPixelLength
+               READ totalPixelLength
+               NOTIFY paginationUpdated)
+    // clang-format on
     qreal totalPixelLength() const { return m_totalPixelLength; }
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
-                       cursorPositionChanged)
+    // clang-format off
+    Q_PROPERTY(int cursorPosition
+               READ cursorPosition
+               WRITE setCursorPosition
+               NOTIFY cursorPositionChanged)
+    // clang-format on
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
 
-    Q_PROPERTY(int cursorPage READ cursorPage NOTIFY cursorUpdated)
+    // clang-format off
+    Q_PROPERTY(int cursorPage
+               READ cursorPage
+               NOTIFY cursorUpdated)
+    // clang-format on
     int cursorPage() const { return m_cursorPage; }
 
-    Q_PROPERTY(QTime cursorTime READ cursorTime NOTIFY cursorUpdated)
+    // clang-format off
+    Q_PROPERTY(QTime cursorTime
+               READ cursorTime
+               NOTIFY cursorUpdated)
+    // clang-format on
     QTime cursorTime() const { return m_cursorTime; }
 
-    Q_PROPERTY(qreal cursorPixelOffset READ cursorPixelOffset NOTIFY cursorUpdated)
+    // clang-format off
+    Q_PROPERTY(qreal cursorPixelOffset
+               READ cursorPixelOffset
+               NOTIFY cursorUpdated)
+    // clang-format on
     qreal cursorPixelOffset() const { return m_cursorPixelOffset; }
 
     Q_INVOKABLE int indexOf(ScreenplayElement *element) const;
@@ -244,34 +314,67 @@ public:
     explicit ScreenplayPaginatorWatcher(QObject *parent = nullptr);
     virtual ~ScreenplayPaginatorWatcher();
 
-    Q_PROPERTY(ScreenplayPaginator *paginator READ paginator WRITE setPaginator NOTIFY
-                       paginatorChanged)
+    // clang-format off
+    Q_PROPERTY(ScreenplayPaginator *paginator
+               READ paginator
+               WRITE setPaginator
+               NOTIFY paginatorChanged)
+    // clang-format on
     void setPaginator(ScreenplayPaginator *val);
     ScreenplayPaginator *paginator() const { return m_paginator; }
     Q_SIGNAL void paginatorChanged();
 
-    Q_PROPERTY(ScreenplayElement *element READ element WRITE setElement NOTIFY elementChanged)
+    // clang-format off
+    Q_PROPERTY(ScreenplayElement *element
+               READ element
+               WRITE setElement
+               NOTIFY elementChanged)
+    // clang-format on
     void setElement(ScreenplayElement *val);
     ScreenplayElement *element() const { return m_element; }
     Q_SIGNAL void elementChanged();
 
-    Q_PROPERTY(bool hasValidRecord READ hasValidRecord NOTIFY recordChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasValidRecord
+               READ hasValidRecord
+               NOTIFY recordChanged)
+    // clang-format on
     bool hasValidRecord() const { return m_record.isValid(); }
 
-    Q_PROPERTY(ScreenplayPaginatorRecord record READ record NOTIFY recordChanged)
+    // clang-format off
+    Q_PROPERTY(ScreenplayPaginatorRecord record
+               READ record
+               NOTIFY recordChanged)
+    // clang-format on
     ScreenplayPaginatorRecord record() const { return m_record; }
     Q_SIGNAL void recordChanged();
 
-    Q_PROPERTY(qreal pixelLength READ pixelLength NOTIFY recordChanged)
+    // clang-format off
+    Q_PROPERTY(qreal pixelLength
+               READ pixelLength
+               NOTIFY recordChanged)
+    // clang-format on
     qreal pixelLength() const { return m_record.pixelLength; }
 
-    Q_PROPERTY(qreal pageLength READ pageLength NOTIFY recordChanged)
+    // clang-format off
+    Q_PROPERTY(qreal pageLength
+               READ pageLength
+               NOTIFY recordChanged)
+    // clang-format on
     qreal pageLength() const { return m_record.pageLength; }
 
-    Q_PROPERTY(QTime timeLength READ timeLength NOTIFY recordChanged)
+    // clang-format off
+    Q_PROPERTY(QTime timeLength
+               READ timeLength
+               NOTIFY recordChanged)
+    // clang-format on
     QTime timeLength() const { return m_record.timeLength; }
 
-    Q_PROPERTY(QList<ScenePageBreak> pageBreaks READ pageBreaks NOTIFY recordChanged)
+    // clang-format off
+    Q_PROPERTY(QList<ScenePageBreak> pageBreaks
+               READ pageBreaks
+               NOTIFY recordChanged)
+    // clang-format on
     QList<ScenePageBreak> pageBreaks() const { return m_record.pageBreaks; }
 
 private:

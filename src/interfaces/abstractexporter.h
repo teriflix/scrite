@@ -28,23 +28,47 @@ public:
     ~AbstractExporter();
     Q_SIGNAL void aboutToDelete(AbstractExporter *ptr);
 
-    Q_PROPERTY(QString format READ format CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString format
+               READ format
+               CONSTANT )
+    // clang-format on
     QString format() const;
 
-    Q_PROPERTY(QString formatName READ formatName CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString formatName
+               READ formatName
+               CONSTANT )
+    // clang-format on
     QString formatName() const;
 
-    Q_PROPERTY(QString nameFilters READ nameFilters CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString nameFilters
+               READ nameFilters
+               CONSTANT )
+    // clang-format on
     QString nameFilters() const;
 
-    Q_PROPERTY(bool featureEnabled READ isFeatureEnabled NOTIFY featureEnabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool featureEnabled
+               READ isFeatureEnabled
+               NOTIFY featureEnabledChanged)
+    // clang-format on
     bool isFeatureEnabled() const;
     Q_SIGNAL void featureEnabledChanged();
 
-    Q_PROPERTY(bool canCopyToClipboard READ canCopyToClipboard CONSTANT)
+    // clang-format off
+    Q_PROPERTY(bool canCopyToClipboard
+               READ canCopyToClipboard
+               CONSTANT )
+    // clang-format on
     virtual bool canCopyToClipboard() const { return false; }
 
-    Q_PROPERTY(bool requiresConfiguration READ requiresConfiguration CONSTANT)
+    // clang-format off
+    Q_PROPERTY(bool requiresConfiguration
+               READ requiresConfiguration
+               CONSTANT )
+    // clang-format on
     virtual bool requiresConfiguration() const { return false; }
 
     Q_INVOKABLE bool setConfigurationValue(const QString &name, const QVariant &value);

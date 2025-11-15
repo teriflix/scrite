@@ -40,129 +40,240 @@ public:
     ~ScreenplayElement();
     Q_SIGNAL void aboutToDelete(ScreenplayElement *element);
 
-    Q_PROPERTY(int serialNumber READ serialNumber CONSTANT)
+    // clang-format off
+    Q_PROPERTY(int serialNumber
+               READ serialNumber
+               CONSTANT )
+    // clang-format on
     int serialNumber() const { return m_serialNumber; }
 
-    Q_PROPERTY(int elementIndex READ elementIndex NOTIFY elementIndexChanged)
+    // clang-format off
+    Q_PROPERTY(int elementIndex
+               READ elementIndex
+               NOTIFY elementIndexChanged)
+    // clang-format on
     int elementIndex() const { return m_elementIndex; }
     Q_SIGNAL void elementIndexChanged();
 
-    Q_PROPERTY(int actIndex READ actIndex NOTIFY actIndexChanged)
+    // clang-format off
+    Q_PROPERTY(int actIndex
+               READ actIndex
+               NOTIFY actIndexChanged)
+    // clang-format on
     int actIndex() const { return m_actIndex; }
     Q_SIGNAL void actIndexChanged();
 
-    Q_PROPERTY(int episodeIndex READ episodeIndex NOTIFY episodeIndexChanged)
+    // clang-format off
+    Q_PROPERTY(int episodeIndex
+               READ episodeIndex
+               NOTIFY episodeIndexChanged)
+    // clang-format on
     int episodeIndex() const { return m_episodeIndex; }
     Q_SIGNAL void episodeIndexChanged();
 
     enum ElementType { SceneElementType, BreakElementType };
     Q_ENUM(ElementType)
-    Q_PROPERTY(
-            ElementType elementType READ elementType WRITE setElementType NOTIFY elementTypeChanged)
+    // clang-format off
+    Q_PROPERTY(ElementType elementType
+               READ elementType
+               WRITE setElementType
+               NOTIFY elementTypeChanged)
+    // clang-format on
     void setElementType(ElementType val);
     ElementType elementType() const { return m_elementType; }
     Q_SIGNAL void elementTypeChanged();
 
-    Q_PROPERTY(int breakType READ breakType WRITE setBreakType NOTIFY breakTypeChanged)
+    // clang-format off
+    Q_PROPERTY(int breakType
+               READ breakType
+               WRITE setBreakType
+               NOTIFY breakTypeChanged)
+    // clang-format on
     void setBreakType(int val);
     int breakType() const { return m_breakType; }
     Q_SIGNAL void breakTypeChanged();
 
-    Q_PROPERTY(QString breakTitle READ breakTitle NOTIFY breakTitleChanged)
+    // clang-format off
+    Q_PROPERTY(QString breakTitle
+               READ breakTitle
+               NOTIFY breakTitleChanged)
+    // clang-format on
     QString breakTitle() const { return m_breakTitle.isEmpty() ? this->sceneID() : m_breakTitle; }
     Q_SIGNAL void breakTitleChanged();
 
-    Q_PROPERTY(QString breakSubtitle READ breakSubtitle WRITE setBreakSubtitle NOTIFY
-                       breakSubtitleChanged)
+    // clang-format off
+    Q_PROPERTY(QString breakSubtitle
+               READ breakSubtitle
+               WRITE setBreakSubtitle
+               NOTIFY breakSubtitleChanged)
+    // clang-format on
     void setBreakSubtitle(const QString &val);
     QString breakSubtitle() const { return m_breakSubtitle; }
     Q_SIGNAL void breakSubtitleChanged();
 
-    Q_PROPERTY(Screenplay *screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged
-                       STORED false RESET resetScreenplay)
+    // clang-format off
+    Q_PROPERTY(Screenplay *screenplay
+               READ screenplay
+               WRITE setScreenplay
+               NOTIFY screenplayChanged
+               STORED false
+               RESET resetScreenplay)
+    // clang-format on
     void setScreenplay(Screenplay *val);
     Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
-    Q_PROPERTY(QString sceneID READ sceneID WRITE setSceneFromID NOTIFY sceneChanged)
+    // clang-format off
+    Q_PROPERTY(QString sceneID
+               READ sceneID
+               WRITE setSceneFromID
+               NOTIFY sceneChanged)
+    // clang-format on
     void setSceneFromID(const QString &val);
     QString sceneID() const;
 
-    Q_PROPERTY(int sceneNumber READ sceneNumber NOTIFY sceneNumberChanged)
+    // clang-format off
+    Q_PROPERTY(int sceneNumber
+               READ sceneNumber
+               NOTIFY sceneNumberChanged)
+    // clang-format on
     int sceneNumber() const
     {
         return m_customSceneNumber < 0 ? m_sceneNumber : m_customSceneNumber;
     }
     Q_SIGNAL void sceneNumberChanged();
 
-    Q_PROPERTY(QString userSceneNumber READ userSceneNumber WRITE setUserSceneNumber NOTIFY
-                       userSceneNumberChanged)
+    // clang-format off
+    Q_PROPERTY(QString userSceneNumber
+               READ userSceneNumber
+               WRITE setUserSceneNumber
+               NOTIFY userSceneNumberChanged)
+    // clang-format on
     void setUserSceneNumber(const QString &val);
     QString userSceneNumber() const { return m_userSceneNumber; }
     Q_SIGNAL void userSceneNumberChanged();
 
-    Q_PROPERTY(bool hasUserSceneNumber READ hasUserSceneNumber NOTIFY userSceneNumberChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasUserSceneNumber
+               READ hasUserSceneNumber
+               NOTIFY userSceneNumberChanged)
+    // clang-format on
     bool hasUserSceneNumber() const { return !m_userSceneNumber.isEmpty(); }
 
-    Q_PROPERTY(
-            QString resolvedSceneNumber READ resolvedSceneNumber NOTIFY resolvedSceneNumberChanged)
+    // clang-format off
+    Q_PROPERTY(QString resolvedSceneNumber
+               READ resolvedSceneNumber
+               NOTIFY resolvedSceneNumberChanged)
+    // clang-format on
     QString resolvedSceneNumber() const;
     Q_SIGNAL void resolvedSceneNumberChanged();
 
-    Q_PROPERTY(Scene *scene READ scene NOTIFY sceneChanged STORED false RESET resetScene)
+    // clang-format off
+    Q_PROPERTY(Scene *scene
+               READ scene
+               NOTIFY sceneChanged
+               STORED false
+               RESET resetScene)
+    // clang-format on
     void setScene(Scene *val);
     Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
-    Q_PROPERTY(bool expanded READ isExpanded WRITE setExpanded NOTIFY expandedChanged)
+    // clang-format off
+    Q_PROPERTY(bool expanded
+               READ isExpanded
+               WRITE setExpanded
+               NOTIFY expandedChanged)
+    // clang-format on
     void setExpanded(bool val);
     bool isExpanded() const { return m_expanded; }
     Q_SIGNAL void expandedChanged();
 
-    Q_PROPERTY(bool omitted READ isOmitted WRITE setOmitted NOTIFY omittedChanged)
+    // clang-format off
+    Q_PROPERTY(bool omitted
+               READ isOmitted
+               WRITE setOmitted
+               NOTIFY omittedChanged)
+    // clang-format on
     void setOmitted(bool val);
     bool isOmitted() const { return m_omitted; }
     Q_SIGNAL void omittedChanged();
 
-    Q_PROPERTY(
-            QJsonValue userData READ userData WRITE setUserData NOTIFY userDataChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QJsonValue userData
+               READ userData
+               WRITE setUserData
+               NOTIFY userDataChanged
+               STORED false)
+    // clang-format on
     void setUserData(const QJsonValue &val);
     QJsonValue userData() const { return m_userData; }
     Q_SIGNAL void userDataChanged();
 
-    Q_PROPERTY(qreal heightHint READ heightHint WRITE setHeightHint NOTIFY heightHintChanged)
+    // clang-format off
+    Q_PROPERTY(qreal heightHint
+               READ heightHint
+               WRITE setHeightHint
+               NOTIFY heightHintChanged)
+    // clang-format on
     void setHeightHint(qreal val);
     qreal heightHint() const { return m_heightHint; }
     Q_SIGNAL void heightHintChanged();
 
-    Q_PROPERTY(bool selected READ isSelected WRITE setSelected NOTIFY selectedChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(bool selected
+               READ isSelected
+               WRITE setSelected
+               NOTIFY selectedChanged
+               STORED false)
+    // clang-format on
     void setSelected(bool val);
     bool isSelected() const { return m_selected; }
     Q_SIGNAL void selectedChanged();
 
-    Q_PROPERTY(
-            QString breakSummary READ breakSummary WRITE setBreakSummary NOTIFY breakSummaryChanged)
+    // clang-format off
+    Q_PROPERTY(QString breakSummary
+               READ breakSummary
+               WRITE setBreakSummary
+               NOTIFY breakSummaryChanged)
+    // clang-format on
     void setBreakSummary(const QString &val);
     QString breakSummary() const { return m_breakSummary; }
     Q_SIGNAL void breakSummaryChanged();
 
-    Q_PROPERTY(bool pageBreakAfter READ isPageBreakAfter WRITE setPageBreakAfter NOTIFY
-                       pageBreakAfterChanged)
+    // clang-format off
+    Q_PROPERTY(bool pageBreakAfter
+               READ isPageBreakAfter
+               WRITE setPageBreakAfter
+               NOTIFY pageBreakAfterChanged)
+    // clang-format on
     void setPageBreakAfter(bool val);
     bool isPageBreakAfter() const { return m_pageBreakAfter; }
     Q_SIGNAL void pageBreakAfterChanged();
 
-    Q_PROPERTY(bool pageBreakBefore READ isPageBreakBefore WRITE setPageBreakBefore NOTIFY
-                       pageBreakBeforeChanged)
+    // clang-format off
+    Q_PROPERTY(bool pageBreakBefore
+               READ isPageBreakBefore
+               WRITE setPageBreakBefore
+               NOTIFY pageBreakBeforeChanged)
+    // clang-format on
     void setPageBreakBefore(bool val);
     bool isPageBreakBefore() const { return m_pageBreakBefore; }
     Q_SIGNAL void pageBreakBeforeChanged();
 
-    Q_PROPERTY(Notes *notes READ notes NOTIFY notesChanged)
+    // clang-format off
+    Q_PROPERTY(Notes *notes
+               READ notes
+               NOTIFY notesChanged)
+    // clang-format on
     Notes *notes() const { return m_notes ? m_notes : (m_scene ? m_scene->notes() : nullptr); }
     Q_SIGNAL void notesChanged();
 
-    Q_PROPERTY(Attachments *attachments READ attachments NOTIFY attachmentsChanged)
+    // clang-format off
+    Q_PROPERTY(Attachments *attachments
+               READ attachments
+               NOTIFY attachmentsChanged)
+    // clang-format on
     Attachments *attachments() const
     {
         return m_attachments ? m_attachments : (m_scene ? m_scene->attachments() : nullptr);
@@ -171,7 +282,11 @@ public:
 
     Q_INVOKABLE void toggleSelection() { this->setSelected(!m_selected); }
 
-    Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
+    // clang-format off
+    Q_PROPERTY(int wordCount
+               READ wordCount
+               NOTIFY wordCountChanged)
+    // clang-format on
     int wordCount() const;
     Q_SIGNAL void wordCountChanged();
 
@@ -275,19 +390,34 @@ struct ScreenplayBreakInfo
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_PROPERTY(int index MEMBER index)
+    // clang-format off
+    Q_PROPERTY(int index
+               MEMBER index)
+    // clang-format on
     int index = -1;
 
-    Q_PROPERTY(int number MEMBER number)
+    // clang-format off
+    Q_PROPERTY(int number
+               MEMBER number)
+    // clang-format on
     int number = -1;
 
-    Q_PROPERTY(QString title MEMBER title)
+    // clang-format off
+    Q_PROPERTY(QString title
+               MEMBER title)
+    // clang-format on
     QString title;
 
-    Q_PROPERTY(QString subtitle MEMBER subtitle)
+    // clang-format off
+    Q_PROPERTY(QString subtitle
+               MEMBER subtitle)
+    // clang-format on
     QString subtitle;
 
-    Q_PROPERTY(QString path MEMBER path)
+    // clang-format off
+    Q_PROPERTY(QString path
+               MEMBER path)
+    // clang-format on
     QString path;
 };
 Q_DECLARE_METATYPE(ScreenplayBreakInfo)
@@ -307,82 +437,161 @@ public:
 
     static QString standardCoverPathPhotoPath();
 
-    Q_PROPERTY(ScriteDocument *scriteDocument READ scriteDocument CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(ScriteDocument *scriteDocument
+               READ scriteDocument
+               CONSTANT STORED
+               false )
+    // clang-format on
     ScriteDocument *scriteDocument() const { return m_scriteDocument; }
 
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    // clang-format off
+    Q_PROPERTY(QString title
+               READ title
+               WRITE setTitle
+               NOTIFY titleChanged)
+    // clang-format on
     void setTitle(const QString &val);
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
-    Q_PROPERTY(QString subtitle READ subtitle WRITE setSubtitle NOTIFY subtitleChanged)
+    // clang-format off
+    Q_PROPERTY(QString subtitle
+               READ subtitle
+               WRITE setSubtitle
+               NOTIFY subtitleChanged)
+    // clang-format on
     void setSubtitle(const QString &val);
     QString subtitle() const { return m_subtitle; }
     Q_SIGNAL void subtitleChanged();
 
-    Q_PROPERTY(QString logline READ logline WRITE setLogline NOTIFY loglineChanged)
+    // clang-format off
+    Q_PROPERTY(QString logline
+               READ logline
+               WRITE setLogline
+               NOTIFY loglineChanged)
+    // clang-format on
     void setLogline(const QString &val);
     QString logline() const { return m_logline; }
     Q_SIGNAL void loglineChanged();
 
-    Q_PROPERTY(QString loglineComments READ loglineComments WRITE setLoglineComments NOTIFY
-                       loglineCommentsChanged)
+    // clang-format off
+    Q_PROPERTY(QString loglineComments
+               READ loglineComments
+               WRITE setLoglineComments
+               NOTIFY loglineCommentsChanged)
+    // clang-format on
     void setLoglineComments(const QString &val);
     QString loglineComments() const { return m_loglineComments; }
     Q_SIGNAL void loglineCommentsChanged();
 
-    Q_PROPERTY(QString basedOn READ basedOn WRITE setBasedOn NOTIFY basedOnChanged)
+    // clang-format off
+    Q_PROPERTY(QString basedOn
+               READ basedOn
+               WRITE setBasedOn
+               NOTIFY basedOnChanged)
+    // clang-format on
     void setBasedOn(const QString &val);
     QString basedOn() const { return m_basedOn; }
     Q_SIGNAL void basedOnChanged();
 
-    Q_PROPERTY(QString authorValue READ authorValue WRITE setAuthor NOTIFY authorChanged)
-    Q_PROPERTY(QString author READ author WRITE setAuthor NOTIFY authorChanged)
+    // clang-format off
+    Q_PROPERTY(QString authorValue
+               READ authorValue
+               WRITE setAuthor
+               NOTIFY authorChanged)
+    Q_PROPERTY(QString author
+               READ author
+               WRITE setAuthor
+               NOTIFY authorChanged)
+    // clang-format on
     void setAuthor(const QString &val);
     QString author() const;
     QString authorValue() const { return m_author; }
     Q_SIGNAL void authorChanged();
 
-    Q_PROPERTY(QString contact READ contact WRITE setContact NOTIFY contactChanged)
+    // clang-format off
+    Q_PROPERTY(QString contact
+               READ contact
+               WRITE setContact
+               NOTIFY contactChanged)
+    // clang-format on
     void setContact(const QString &val);
     QString contact() const { return m_contact; }
     Q_SIGNAL void contactChanged();
 
-    Q_PROPERTY(QString address READ address WRITE setAddress NOTIFY addressChanged)
+    // clang-format off
+    Q_PROPERTY(QString address
+               READ address
+               WRITE setAddress
+               NOTIFY addressChanged)
+    // clang-format on
     void setAddress(QString val);
     QString address() const { return m_address; }
     Q_SIGNAL void addressChanged();
 
-    Q_PROPERTY(QString phoneNumber READ phoneNumber WRITE setPhoneNumber NOTIFY phoneNumberChanged)
+    // clang-format off
+    Q_PROPERTY(QString phoneNumber
+               READ phoneNumber
+               WRITE setPhoneNumber
+               NOTIFY phoneNumberChanged)
+    // clang-format on
     void setPhoneNumber(QString val);
     QString phoneNumber() const { return m_phoneNumber; }
     Q_SIGNAL void phoneNumberChanged();
 
-    Q_PROPERTY(QString email READ email WRITE setEmail NOTIFY emailChanged)
+    // clang-format off
+    Q_PROPERTY(QString email
+               READ email
+               WRITE setEmail
+               NOTIFY emailChanged)
+    // clang-format on
     void setEmail(QString val);
     QString email() const { return m_email; }
     Q_SIGNAL void emailChanged();
 
-    Q_PROPERTY(QString website READ website WRITE setWebsite NOTIFY websiteChanged)
+    // clang-format off
+    Q_PROPERTY(QString website
+               READ website
+               WRITE setWebsite
+               NOTIFY websiteChanged)
+    // clang-format on
     void setWebsite(QString val);
     QString website() const { return m_website; }
     Q_SIGNAL void websiteChanged();
 
-    Q_PROPERTY(QString version READ version WRITE setVersion NOTIFY versionChanged)
+    // clang-format off
+    Q_PROPERTY(QString version
+               READ version
+               WRITE setVersion
+               NOTIFY versionChanged)
+    // clang-format on
     void setVersion(const QString &val);
     QString version() const { return m_version; }
     Q_SIGNAL void versionChanged();
 
-    Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY emptyChanged)
+    // clang-format off
+    Q_PROPERTY(bool isEmpty
+               READ isEmpty
+               NOTIFY emptyChanged)
+    // clang-format on
     bool isEmpty() const;
     Q_SIGNAL void emptyChanged();
 
-    Q_PROPERTY(bool heightHintsAvailable READ isHeightHintsAvailable NOTIFY
-                       heightHintsAvailableChanged)
+    // clang-format off
+    Q_PROPERTY(bool heightHintsAvailable
+               READ isHeightHintsAvailable
+               NOTIFY heightHintsAvailableChanged)
+    // clang-format on
     bool isHeightHintsAvailable() const { return m_heightHintsAvailable; }
     Q_SIGNAL void heightHintsAvailableChanged();
 
-    Q_PROPERTY(QString coverPagePhoto READ coverPagePhoto NOTIFY coverPagePhotoChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QString coverPagePhoto
+               READ coverPagePhoto
+               NOTIFY coverPagePhotoChanged
+               STORED false)
+    // clang-format on
     Q_INVOKABLE void setCoverPagePhoto(const QString &val);
     Q_INVOKABLE void clearCoverPagePhoto();
     QString coverPagePhoto() const { return m_coverPagePhoto; }
@@ -390,47 +599,76 @@ public:
 
     enum CoverPagePhotoSize { SmallCoverPhoto, MediumCoverPhoto, LargeCoverPhoto };
     Q_ENUM(CoverPagePhotoSize)
-    Q_PROPERTY(CoverPagePhotoSize coverPagePhotoSize READ coverPagePhotoSize WRITE
-                       setCoverPagePhotoSize NOTIFY coverPagePhotoSizeChanged)
+    // clang-format off
+    Q_PROPERTY(CoverPagePhotoSize coverPagePhotoSize
+               READ coverPagePhotoSize
+               WRITE setCoverPagePhotoSize
+               NOTIFY coverPagePhotoSizeChanged)
+    // clang-format on
     void setCoverPagePhotoSize(CoverPagePhotoSize val);
     CoverPagePhotoSize coverPagePhotoSize() const { return m_coverPagePhotoSize; }
     Q_SIGNAL void coverPagePhotoSizeChanged();
 
-    Q_PROPERTY(bool titlePageIsCentered READ isTitlePageIsCentered WRITE setTitlePageIsCentered
-                       NOTIFY titlePageIsCenteredChanged)
+    // clang-format off
+    Q_PROPERTY(bool titlePageIsCentered
+               READ isTitlePageIsCentered
+               WRITE setTitlePageIsCentered
+               NOTIFY titlePageIsCenteredChanged)
+    // clang-format on
     void setTitlePageIsCentered(bool val);
     bool isTitlePageIsCentered() const { return m_titlePageIsCentered; }
     Q_SIGNAL void titlePageIsCenteredChanged();
 
-    Q_PROPERTY(bool hasTitlePageAttributes READ hasTitlePageAttributes NOTIFY
-                       hasTitlePageAttributesChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasTitlePageAttributes
+               READ hasTitlePageAttributes
+               NOTIFY hasTitlePageAttributesChanged)
+    // clang-format on
     bool hasTitlePageAttributes() const { return m_hasTitlePageAttributes; }
     Q_SIGNAL void hasTitlePageAttributesChanged();
 
-    Q_PROPERTY(
-            bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasNonStandardScenes
+               READ hasNonStandardScenes
+               NOTIFY hasNonStandardScenesChanged)
+    // clang-format on
     bool hasNonStandardScenes() const { return m_hasNonStandardScenes; }
     Q_SIGNAL void hasNonStandardScenesChanged();
 
-    Q_PROPERTY(bool hasSelectedElements READ hasSelectedElements NOTIFY hasSelectedElementsChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasSelectedElements
+               READ hasSelectedElements
+               NOTIFY hasSelectedElementsChanged)
+    // clang-format on
     bool hasSelectedElements() const;
     Q_SIGNAL void hasSelectedElementsChanged();
 
-    Q_PROPERTY(int selectedElementsCount READ selectedElementsCount NOTIFY
-                       selectedElementsCountChanged)
+    // clang-format off
+    Q_PROPERTY(int selectedElementsCount
+               READ selectedElementsCount
+               NOTIFY selectedElementsCountChanged)
+    // clang-format on
     int selectedElementsCount() const;
     Q_SIGNAL void selectedElementsCountChanged();
 
     enum OmitStatus { Omitted, NotOmitted, PartiallyOmitted };
     Q_ENUM(OmitStatus)
 
-    Q_PROPERTY(OmitStatus selectedElementsOmitStatus READ selectedElementsOmitStatus WRITE
-                       setSelectedElementsOmitStatus NOTIFY selectedElementsOmitStatusChanged)
+    // clang-format off
+    Q_PROPERTY(OmitStatus selectedElementsOmitStatus
+               READ selectedElementsOmitStatus
+               WRITE setSelectedElementsOmitStatus
+               NOTIFY selectedElementsOmitStatusChanged)
+    // clang-format on
     void setSelectedElementsOmitStatus(OmitStatus val);
     OmitStatus selectedElementsOmitStatus() const;
     Q_SIGNAL void selectedElementsOmitStatusChanged();
 
-    Q_PROPERTY(QQmlListProperty<ScreenplayElement> elements READ elements NOTIFY elementsChanged)
+    // clang-format off
+    Q_PROPERTY(QQmlListProperty<ScreenplayElement> elements
+               READ elements
+               NOTIFY elementsChanged)
+    // clang-format on
     QQmlListProperty<ScreenplayElement> elements();
     Q_INVOKABLE void addElement(ScreenplayElement *ptr);
     Q_INVOKABLE void addScene(Scene *scene);
@@ -448,7 +686,11 @@ public:
     void setSelection(const QList<ScreenplayElement *> &elements);
     Q_INVOKABLE ScreenplayElement *elementAt(int index) const;
     Q_INVOKABLE ScreenplayElement *elementWithIndex(int index) const;
-    Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
+    // clang-format off
+    Q_PROPERTY(int elementCount
+               READ elementCount
+               NOTIFY elementCountChanged)
+    // clang-format on
     int elementCount() const;
     Q_INVOKABLE void clearElements();
     Q_SIGNAL void elementCountChanged();
@@ -501,26 +743,46 @@ public:
     Q_SIGNAL void breakTitleChanged();
     void updateBreakTitlesLater();
 
-    Q_PROPERTY(int sceneCount READ sceneCount NOTIFY sceneCountChanged)
+    // clang-format off
+    Q_PROPERTY(int sceneCount
+               READ sceneCount
+               NOTIFY sceneCountChanged)
+    // clang-format on
     int sceneCount() const { return m_sceneCount; }
     Q_SIGNAL void sceneCountChanged();
 
-    Q_PROPERTY(int actCount READ actCount NOTIFY actCountChanged)
+    // clang-format off
+    Q_PROPERTY(int actCount
+               READ actCount
+               NOTIFY actCountChanged)
+    // clang-format on
     int actCount() const { return m_actCount; }
     Q_SIGNAL void actCountChanged();
 
-    Q_PROPERTY(int episodeCount READ episodeCount NOTIFY episodeCountChanged)
+    // clang-format off
+    Q_PROPERTY(int episodeCount
+               READ episodeCount
+               NOTIFY episodeCountChanged)
+    // clang-format on
     int episodeCount() const { return m_episodeCount; }
     Q_SIGNAL void episodeCountChanged();
 
-    Q_PROPERTY(QList<ScreenplayBreakInfo> episodeInfoList READ episodeInfoList NOTIFY
-                       episodeCountChanged)
+    // clang-format off
+    Q_PROPERTY(QList<ScreenplayBreakInfo> episodeInfoList
+               READ episodeInfoList
+               NOTIFY episodeCountChanged)
+    // clang-format on
     QList<ScreenplayBreakInfo> episodeInfoList() const;
 
     Q_SIGNAL void screenplayChanged();
 
-    Q_PROPERTY(int currentElementIndex READ currentElementIndex WRITE setCurrentElementIndex NOTIFY
-                       currentElementIndexChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(int currentElementIndex
+               READ currentElementIndex
+               WRITE setCurrentElementIndex
+               NOTIFY currentElementIndexChanged
+               STORED false)
+    // clang-format on
     void setCurrentElementIndex(int val);
     int currentElementIndex() const { return m_currentElementIndex; }
     Q_SIGNAL void currentElementIndexChanged(int val);
@@ -530,8 +792,14 @@ public:
     Q_INVOKABLE int previousSceneElementIndex() const;
     Q_INVOKABLE int nextSceneElementIndex() const;
 
-    Q_PROPERTY(Scene *activeScene READ activeScene WRITE setActiveScene NOTIFY activeSceneChanged
-                       STORED false RESET resetActiveScene)
+    // clang-format off
+    Q_PROPERTY(Scene *activeScene
+               READ activeScene
+               WRITE setActiveScene
+               NOTIFY activeSceneChanged
+               STORED false
+               RESET resetActiveScene)
+    // clang-format on
     void setActiveScene(Scene *val);
     Scene *activeScene() const { return m_activeScene; }
     Q_SIGNAL void activeSceneChanged();
@@ -541,13 +809,25 @@ public:
     Q_INVOKABLE QJsonArray search(const QString &text, int flags = 0) const;
     Q_INVOKABLE int replace(const QString &text, const QString &replacementText, int flags = 0);
 
-    Q_PROPERTY(int minimumParagraphCount READ minimumParagraphCount NOTIFY paragraphCountChanged)
+    // clang-format off
+    Q_PROPERTY(int minimumParagraphCount
+               READ minimumParagraphCount
+               NOTIFY paragraphCountChanged)
+    // clang-format on
     int minimumParagraphCount() const { return m_minimumParagraphCount; }
 
-    Q_PROPERTY(int maximumParagraphCount READ maximumParagraphCount NOTIFY paragraphCountChanged)
+    // clang-format off
+    Q_PROPERTY(int maximumParagraphCount
+               READ maximumParagraphCount
+               NOTIFY paragraphCountChanged)
+    // clang-format on
     int maximumParagraphCount() const { return m_maximumParagraphCount; }
 
-    Q_PROPERTY(int averageParagraphCount READ averageParagraphCount NOTIFY paragraphCountChanged)
+    // clang-format off
+    Q_PROPERTY(int averageParagraphCount
+               READ averageParagraphCount
+               NOTIFY paragraphCountChanged)
+    // clang-format on
     int averageParagraphCount() const { return m_averageParagraphCount; }
 
     Q_SIGNAL void paragraphCountChanged();
@@ -557,11 +837,19 @@ public:
     Q_INVOKABLE bool polishText();
     Q_INVOKABLE bool capitalizeSentences();
 
-    Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
+    // clang-format off
+    Q_PROPERTY(int wordCount
+               READ wordCount
+               NOTIFY wordCountChanged)
+    // clang-format on
     int wordCount() const { return m_wordCount; }
     Q_SIGNAL void wordCountChanged();
 
-    Q_PROPERTY(bool canPaste READ canPaste NOTIFY canPasteChanged)
+    // clang-format off
+    Q_PROPERTY(bool canPaste
+               READ canPaste
+               NOTIFY canPasteChanged)
+    // clang-format on
     bool canPaste() const;
     Q_SIGNAL void canPasteChanged();
 
@@ -696,12 +984,21 @@ public:
     explicit ScreenplayTracks(QObject *parent = nullptr);
     ~ScreenplayTracks();
 
-    Q_PROPERTY(Screenplay *screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)
+    // clang-format off
+    Q_PROPERTY(Screenplay *screenplay
+               READ screenplay
+               WRITE setScreenplay
+               NOTIFY screenplayChanged)
+    // clang-format on
     void setScreenplay(Screenplay *val);
     Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
-    Q_PROPERTY(int trackCount READ trackCount NOTIFY trackCountChanged)
+    // clang-format off
+    Q_PROPERTY(int trackCount
+               READ trackCount
+               NOTIFY trackCountChanged)
+    // clang-format on
     int trackCount() const { return m_data.size(); }
     Q_SIGNAL void trackCountChanged();
 

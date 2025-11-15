@@ -30,13 +30,25 @@ class AbstractDeviceIO : public QObject
 public:
     ~AbstractDeviceIO();
 
-    Q_PROPERTY(QString fileName READ fileName WRITE setFileName NOTIFY fileNameChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QString fileName
+               READ fileName
+               WRITE setFileName
+               NOTIFY fileNameChanged
+               STORED false)
+    // clang-format on
     void setFileName(const QString &val);
     QString fileName() const { return m_fileName; }
     Q_SIGNAL void fileNameChanged();
 
-    Q_PROPERTY(ScriteDocument *document READ document WRITE setDocument NOTIFY documentChanged RESET
-                       resetDocument STORED false)
+    // clang-format off
+    Q_PROPERTY(ScriteDocument *document
+               READ document
+               WRITE setDocument
+               NOTIFY documentChanged
+               RESET resetDocument
+               STORED false)
+    // clang-format on
     void setDocument(ScriteDocument *val);
     ScriteDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();

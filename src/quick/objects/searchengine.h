@@ -39,34 +39,56 @@ public:
 
     static SearchAgent *qmlAttachedProperties(QObject *object);
 
-    Q_PROPERTY(
-            SearchEngine *engine READ engine WRITE setEngine NOTIFY engineChanged RESET resetEngine)
+    // clang-format off
+    Q_PROPERTY(SearchEngine *engine
+               READ engine
+               WRITE setEngine
+               NOTIFY engineChanged
+               RESET resetEngine)
+    // clang-format on
     void setEngine(SearchEngine *val);
     SearchEngine *engine() const { return m_engine; }
     Q_SIGNAL void engineChanged();
 
-    Q_PROPERTY(int sequenceNumber READ sequenceNumber WRITE setSequenceNumber NOTIFY
-                       sequenceNumberChanged)
+    // clang-format off
+    Q_PROPERTY(int sequenceNumber
+               READ sequenceNumber
+               WRITE setSequenceNumber
+               NOTIFY sequenceNumberChanged)
+    // clang-format on
     void setSequenceNumber(int val);
     int sequenceNumber() const { return m_sequenceNumber; }
     Q_SIGNAL void sequenceNumberChanged();
 
     Q_SIGNAL void searchRequest(const QString &string);
 
-    Q_PROPERTY(int searchResultCount READ searchResultCount WRITE setSearchResultCount NOTIFY
-                       searchResultCountChanged)
+    // clang-format off
+    Q_PROPERTY(int searchResultCount
+               READ searchResultCount
+               WRITE setSearchResultCount
+               NOTIFY searchResultCountChanged)
+    // clang-format on
     void setSearchResultCount(int val);
     int searchResultCount() const { return m_searchResultCount; }
     Q_SIGNAL void searchResultCountChanged();
 
-    Q_PROPERTY(int currentSearchResultIndex READ currentSearchResultIndex WRITE
-                       setCurrentSearchResultIndex NOTIFY currentSearchResultIndexChanged)
+    // clang-format off
+    Q_PROPERTY(int currentSearchResultIndex
+               READ currentSearchResultIndex
+               WRITE setCurrentSearchResultIndex
+               NOTIFY currentSearchResultIndexChanged)
+    // clang-format on
     void setCurrentSearchResultIndex(int val);
     int currentSearchResultIndex() const { return m_currentSearchResultIndex; }
     Q_SIGNAL void currentSearchResultIndexChanged();
 
-    Q_PROPERTY(QQuickTextDocument *textDocument READ textDocument WRITE setTextDocument NOTIFY
-                       textDocumentChanged RESET resetTextDocument)
+    // clang-format off
+    Q_PROPERTY(QQuickTextDocument *textDocument
+               READ textDocument
+               WRITE setTextDocument
+               NOTIFY textDocumentChanged
+               RESET resetTextDocument)
+    // clang-format on
     void setTextDocument(QQuickTextDocument *val);
     QQuickTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
@@ -110,11 +132,18 @@ public:
     explicit SearchEngine(QObject *parent = nullptr);
     ~SearchEngine();
 
-    Q_PROPERTY(
-            QQmlListProperty<SearchAgent> searchAgents READ searchAgents NOTIFY searchAgentsChanged)
+    // clang-format off
+    Q_PROPERTY(QQmlListProperty<SearchAgent> searchAgents
+               READ searchAgents
+               NOTIFY searchAgentsChanged)
+    // clang-format on
     QQmlListProperty<SearchAgent> searchAgents();
     Q_INVOKABLE SearchAgent *searchAgentAt(int index) const;
-    Q_PROPERTY(int searchAgentCount READ searchAgentCount NOTIFY searchAgentCountChanged)
+    // clang-format off
+    Q_PROPERTY(int searchAgentCount
+               READ searchAgentCount
+               NOTIFY searchAgentCountChanged)
+    // clang-format on
     int searchAgentCount() const { return m_searchAgents.size(); }
     Q_INVOKABLE void clearSearchAgents();
     Q_SIGNAL void searchAgentCountChanged();
@@ -126,34 +155,57 @@ public:
         SearchWholeWords = 0x00004
     };
     Q_DECLARE_FLAGS(SearchFlags, SearchFlag)
-    Q_PROPERTY(
-            SearchFlags searchFlags READ searchFlags WRITE setSearchFlags NOTIFY searchFlagsChanged)
+    // clang-format off
+    Q_PROPERTY(SearchFlags searchFlags
+               READ searchFlags
+               WRITE setSearchFlags
+               NOTIFY searchFlagsChanged)
+    // clang-format on
     void setSearchFlags(SearchFlags val);
     SearchFlags searchFlags() const { return m_searchFlags; }
     Q_SIGNAL void searchFlagsChanged();
 
-    Q_PROPERTY(bool isSearchCaseSensitive READ isIsSearchCaseSensitive WRITE
-                       setIsSearchCaseSensitive NOTIFY searchFlagsChanged)
+    // clang-format off
+    Q_PROPERTY(bool isSearchCaseSensitive
+               READ isIsSearchCaseSensitive
+               WRITE setIsSearchCaseSensitive
+               NOTIFY searchFlagsChanged)
+    // clang-format on
     void setIsSearchCaseSensitive(bool val) { m_searchFlags.setFlag(SearchCaseSensitively, val); }
     bool isIsSearchCaseSensitive() const { return m_searchFlags.testFlag(SearchCaseSensitively); }
 
-    Q_PROPERTY(bool isSearchWholeWords READ isIsSearchWholeWords WRITE setIsSearchWholeWords NOTIFY
-                       searchFlagsChanged)
+    // clang-format off
+    Q_PROPERTY(bool isSearchWholeWords
+               READ isIsSearchWholeWords
+               WRITE setIsSearchWholeWords
+               NOTIFY searchFlagsChanged)
+    // clang-format on
     void setIsSearchWholeWords(bool val) { m_searchFlags.setFlag(SearchWholeWords, val); }
     bool isIsSearchWholeWords() const { return m_searchFlags.testFlag(SearchWholeWords); }
 
-    Q_PROPERTY(
-            QString searchString READ searchString WRITE setSearchString NOTIFY searchStringChanged)
+    // clang-format off
+    Q_PROPERTY(QString searchString
+               READ searchString
+               WRITE setSearchString
+               NOTIFY searchStringChanged)
+    // clang-format on
     void setSearchString(const QString &val);
     QString searchString() const { return m_searchString; }
     Q_SIGNAL void searchStringChanged();
 
-    Q_PROPERTY(int searchResultCount READ searchResultCount NOTIFY searchResultCountChanged)
+    // clang-format off
+    Q_PROPERTY(int searchResultCount
+               READ searchResultCount
+               NOTIFY searchResultCountChanged)
+    // clang-format on
     int searchResultCount() const { return m_searchResults.size(); }
     Q_SIGNAL void searchResultCountChanged();
 
-    Q_PROPERTY(int currentSearchResultIndex READ currentSearchResultIndex NOTIFY
-                       currentSearchResultIndexChanged)
+    // clang-format off
+    Q_PROPERTY(int currentSearchResultIndex
+               READ currentSearchResultIndex
+               NOTIFY currentSearchResultIndexChanged)
+    // clang-format on
     int currentSearchResultIndex() const { return m_currentSearchResultIndex; }
     Q_SIGNAL void currentSearchResultIndexChanged();
 
@@ -206,30 +258,51 @@ public:
     explicit TextDocumentSearch(QObject *parent = nullptr);
     ~TextDocumentSearch();
 
-    Q_PROPERTY(QQuickTextDocument *textDocument READ textDocument WRITE setTextDocument NOTIFY
-                       textDocumentChanged RESET resetTextDocument)
+    // clang-format off
+    Q_PROPERTY(QQuickTextDocument *textDocument
+               READ textDocument
+               WRITE setTextDocument
+               NOTIFY textDocumentChanged
+               RESET resetTextDocument)
+    // clang-format on
     void setTextDocument(QQuickTextDocument *val);
     QQuickTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
-    Q_PROPERTY(
-            QString searchString READ searchString WRITE setSearchString NOTIFY searchStringChanged)
+    // clang-format off
+    Q_PROPERTY(QString searchString
+               READ searchString
+               WRITE setSearchString
+               NOTIFY searchStringChanged)
+    // clang-format on
     void setSearchString(const QString &val);
     QString searchString() const { return m_searchString; }
     Q_SIGNAL void searchStringChanged();
 
-    Q_PROPERTY(int searchResultCount READ searchResultCount NOTIFY searchResultCountChanged)
+    // clang-format off
+    Q_PROPERTY(int searchResultCount
+               READ searchResultCount
+               NOTIFY searchResultCountChanged)
+    // clang-format on
     int searchResultCount() const { return m_searchResults.size(); }
     Q_SIGNAL void searchResultCountChanged();
 
-    Q_PROPERTY(int currentResultIndex READ currentResultIndex WRITE setCurrentResultIndex NOTIFY
-                       currentResultIndexChanged)
+    // clang-format off
+    Q_PROPERTY(int currentResultIndex
+               READ currentResultIndex
+               WRITE setCurrentResultIndex
+               NOTIFY currentResultIndexChanged)
+    // clang-format on
     void setCurrentResultIndex(int val);
     int currentResultIndex() const { return m_currentResultIndex; }
     Q_SIGNAL void currentResultIndexChanged();
 
-    Q_PROPERTY(SearchEngine::SearchFlags searchFlags READ searchFlags WRITE setSearchFlags NOTIFY
-                       searchFlagsChanged)
+    // clang-format off
+    Q_PROPERTY(SearchEngine::SearchFlags searchFlags
+               READ searchFlags
+               WRITE setSearchFlags
+               NOTIFY searchFlagsChanged)
+    // clang-format on
     void setSearchFlags(SearchEngine::SearchFlags val);
     SearchEngine::SearchFlags searchFlags() const { return m_searchFlags; }
     Q_SIGNAL void searchFlagsChanged();

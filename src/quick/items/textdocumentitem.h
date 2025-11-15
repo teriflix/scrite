@@ -27,30 +27,52 @@ public:
     explicit TextDocumentItem(QQuickItem *parent = nullptr);
     ~TextDocumentItem();
 
-    Q_PROPERTY(QTextDocument *document READ document WRITE setDocument NOTIFY documentChanged)
+    // clang-format off
+    Q_PROPERTY(QTextDocument *document
+               READ document
+               WRITE setDocument
+               NOTIFY documentChanged)
+    // clang-format on
     void setDocument(QTextDocument *val);
     QTextDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
 
-    Q_PROPERTY(qreal documentScale READ documentScale WRITE setDocumentScale NOTIFY
-                       documentScaleChanged)
+    // clang-format off
+    Q_PROPERTY(qreal documentScale
+               READ documentScale
+               WRITE setDocumentScale
+               NOTIFY documentScaleChanged)
+    // clang-format on
     void setDocumentScale(qreal val);
     qreal documentScale() const { return m_documentScale; }
     Q_SIGNAL void documentScaleChanged();
 
-    Q_PROPERTY(QQuickItem *flickable READ flickable WRITE setFlickable NOTIFY flickableChanged)
+    // clang-format off
+    Q_PROPERTY(QQuickItem *flickable
+               READ flickable
+               WRITE setFlickable
+               NOTIFY flickableChanged)
+    // clang-format on
     void setFlickable(QQuickItem *val);
     QQuickItem *flickable() const { return m_flickable; }
     Q_SIGNAL void flickableChanged();
 
-    Q_PROPERTY(qreal verticalPadding READ verticalPadding WRITE setVerticalPadding NOTIFY
-                       verticalPaddingChanged)
+    // clang-format off
+    Q_PROPERTY(qreal verticalPadding
+               READ verticalPadding
+               WRITE setVerticalPadding
+               NOTIFY verticalPaddingChanged)
+    // clang-format on
     void setVerticalPadding(qreal val);
     qreal verticalPadding() const { return m_verticalPadding; }
     Q_SIGNAL void verticalPaddingChanged();
 
-    Q_PROPERTY(
-            bool invertColors READ isInvertColors WRITE setInvertColors NOTIFY invertColorsChanged)
+    // clang-format off
+    Q_PROPERTY(bool invertColors
+               READ isInvertColors
+               WRITE setInvertColors
+               NOTIFY invertColorsChanged)
+    // clang-format on
     void setInvertColors(bool val);
     bool isInvertColors() const { return m_invertColors; }
     Q_SIGNAL void invertColorsChanged();

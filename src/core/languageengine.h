@@ -34,16 +34,28 @@ struct TransliterationOption
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_PROPERTY(QObject *transliterator MEMBER transliteratorObject)
+    // clang-format off
+    Q_PROPERTY(QObject *transliterator
+               MEMBER transliteratorObject)
+    // clang-format on
     QPointer<QObject> transliteratorObject; // must be of type AbstractTransliterationEngine
 
-    Q_PROPERTY(int languageCode MEMBER languageCode)
+    // clang-format off
+    Q_PROPERTY(int languageCode
+               MEMBER languageCode)
+    // clang-format on
     int languageCode = -1;
 
-    Q_PROPERTY(QString id MEMBER id)
+    // clang-format off
+    Q_PROPERTY(QString id
+               MEMBER id)
+    // clang-format on
     QString id;
 
-    Q_PROPERTY(QString name MEMBER name)
+    // clang-format off
+    Q_PROPERTY(QString name
+               MEMBER name)
+    // clang-format on
     QString name;
 
     // This should be set to true if the app needs to show a popup to display
@@ -52,10 +64,16 @@ public:
     // This should be set to false, unless there is a transliteration engine that's
     // statically linked to the Scrite code, which is the case for platform/OS
     // input methods.
-    Q_PROPERTY(bool inApp MEMBER inApp)
+    // clang-format off
+    Q_PROPERTY(bool inApp
+               MEMBER inApp)
+    // clang-format on
     bool inApp = false;
 
-    Q_PROPERTY(bool valid READ isValid)
+    // clang-format off
+    Q_PROPERTY(bool valid
+               READ isValid)
+    // clang-format on
     bool isValid() const;
 
     Q_INVOKABLE bool activate();
@@ -89,28 +107,52 @@ struct Language
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_PROPERTY(int code MEMBER code)
+    // clang-format off
+    Q_PROPERTY(int code
+               MEMBER code)
+    // clang-format on
     int code = -1;
 
-    Q_PROPERTY(QString name READ name)
+    // clang-format off
+    Q_PROPERTY(QString name
+               READ name)
+    // clang-format on
     QString name() const;
 
-    Q_PROPERTY(QString nativeName READ nativeName)
+    // clang-format off
+    Q_PROPERTY(QString nativeName
+               READ nativeName)
+    // clang-format on
     QString nativeName() const;
 
-    Q_PROPERTY(QString glyph READ glyph)
+    // clang-format off
+    Q_PROPERTY(QString glyph
+               READ glyph)
+    // clang-format on
     QString glyph() const;
 
-    Q_PROPERTY(QUrl iconSource READ iconSource)
+    // clang-format off
+    Q_PROPERTY(QUrl iconSource
+               READ iconSource)
+    // clang-format on
     QUrl iconSource() const;
 
-    Q_PROPERTY(QKeySequence keySequence MEMBER keySequence)
+    // clang-format off
+    Q_PROPERTY(QKeySequence keySequence
+               MEMBER keySequence)
+    // clang-format on
     QKeySequence keySequence;
 
-    Q_PROPERTY(QString preferredTransliterationOptionId MEMBER preferredTransliterationOptionId)
+    // clang-format off
+    Q_PROPERTY(QString preferredTransliterationOptionId
+               MEMBER preferredTransliterationOptionId)
+    // clang-format on
     QString preferredTransliterationOptionId;
 
-    Q_PROPERTY(bool valid READ isValid)
+    // clang-format off
+    Q_PROPERTY(bool valid
+               READ isValid)
+    // clang-format on
     bool isValid() const { return code >= 0; }
 
     Q_INVOKABLE int charScript() const; // Returns QtChar::Script
@@ -152,7 +194,11 @@ public:
     Q_INVOKABLE Language findLanguage(int code) const;
     Q_INVOKABLE Language languageAt(int index) const;
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    // clang-format off
+    Q_PROPERTY(int count
+               READ count
+               NOTIFY countChanged)
+    // clang-format on
     int count() const { return m_languages.size(); }
     Q_SIGNAL void countChanged();
 
@@ -197,25 +243,45 @@ class SupportedLanguages : public AbstractLanguagesModel
 public:
     ~SupportedLanguages();
 
-    Q_PROPERTY(int activeLanguageCode READ activeLanguageCode WRITE setActiveLanguageCode NOTIFY
-                       activeLanguageCodeChanged)
+    // clang-format off
+    Q_PROPERTY(int activeLanguageCode
+               READ activeLanguageCode
+               WRITE setActiveLanguageCode
+               NOTIFY activeLanguageCodeChanged)
+    // clang-format on
     void setActiveLanguageCode(int val);
     int activeLanguageCode() const { return m_activeLanguageCode; }
     Q_SIGNAL void activeLanguageCodeChanged();
 
-    Q_PROPERTY(int defaultLanguageCode READ defaultLanguageCode WRITE setDefaultLanguageCode NOTIFY
-                       defaultLanguageCodeChanged)
+    // clang-format off
+    Q_PROPERTY(int defaultLanguageCode
+               READ defaultLanguageCode
+               WRITE setDefaultLanguageCode
+               NOTIFY defaultLanguageCodeChanged)
+    // clang-format on
     void setDefaultLanguageCode(int val);
     int defaultLanguageCode() const { return m_defaultLanguageCode; }
     Q_SIGNAL void defaultLanguageCodeChanged();
 
-    Q_PROPERTY(Language activeLanguage READ activeLanguage NOTIFY activeLanguageCodeChanged)
+    // clang-format off
+    Q_PROPERTY(Language activeLanguage
+               READ activeLanguage
+               NOTIFY activeLanguageCodeChanged)
+    // clang-format on
     Language activeLanguage() const;
 
-    Q_PROPERTY(Language defaultLanguage READ defaultLanguage NOTIFY defaultLanguageCodeChanged)
+    // clang-format off
+    Q_PROPERTY(Language defaultLanguage
+               READ defaultLanguage
+               NOTIFY defaultLanguageCodeChanged)
+    // clang-format on
     Language defaultLanguage() const;
 
-    Q_PROPERTY(int activeLanguageRow READ activeLanguageRow NOTIFY activeLanguageRowChanged)
+    // clang-format off
+    Q_PROPERTY(int activeLanguageRow
+               READ activeLanguageRow
+               NOTIFY activeLanguageRowChanged)
+    // clang-format on
     int activeLanguageRow() const;
     Q_SIGNAL void activeLanguageRowChanged();
 
@@ -280,10 +346,16 @@ struct AlphabetMapping
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_PROPERTY(QString latin MEMBER latin)
+    // clang-format off
+    Q_PROPERTY(QString latin
+               MEMBER latin)
+    // clang-format on
     QString latin;
 
-    Q_PROPERTY(QString unicode MEMBER unicode)
+    // clang-format off
+    Q_PROPERTY(QString unicode
+               MEMBER unicode)
+    // clang-format on
     QString unicode;
 
     bool operator==(const AlphabetMapping &other) const
@@ -302,26 +374,44 @@ struct AlphabetMappings
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_PROPERTY(bool valid READ isValid)
+    // clang-format off
+    Q_PROPERTY(bool valid
+               READ isValid)
+    // clang-format on
     bool isValid() const
     {
         return language.isValid() && !consonants.isEmpty() && !digits.isEmpty()
                 && !symbols.isEmpty() && !vowels.isEmpty();
     }
 
-    Q_PROPERTY(Language language MEMBER language)
+    // clang-format off
+    Q_PROPERTY(Language language
+               MEMBER language)
+    // clang-format on
     Language language;
 
-    Q_PROPERTY(QList<AlphabetMapping> consonants MEMBER consonants)
+    // clang-format off
+    Q_PROPERTY(QList<AlphabetMapping> consonants
+               MEMBER consonants)
+    // clang-format on
     QList<AlphabetMapping> consonants;
 
-    Q_PROPERTY(QList<AlphabetMapping> digits MEMBER digits)
+    // clang-format off
+    Q_PROPERTY(QList<AlphabetMapping> digits
+               MEMBER digits)
+    // clang-format on
     QList<AlphabetMapping> digits;
 
-    Q_PROPERTY(QList<AlphabetMapping> symbols MEMBER symbols)
+    // clang-format off
+    Q_PROPERTY(QList<AlphabetMapping> symbols
+               MEMBER symbols)
+    // clang-format on
     QList<AlphabetMapping> symbols;
 
-    Q_PROPERTY(QList<AlphabetMapping> vowels MEMBER vowels)
+    // clang-format off
+    Q_PROPERTY(QList<AlphabetMapping> vowels
+               MEMBER vowels)
+    // clang-format on
     QList<AlphabetMapping> vowels;
 };
 Q_DECLARE_METATYPE(AlphabetMappings)
@@ -336,10 +426,18 @@ public:
     explicit DefaultTransliteration(QObject *parent = nullptr);
     ~DefaultTransliteration();
 
-    Q_PROPERTY(QString driver READ driver CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString driver
+               READ driver
+               CONSTANT )
+    // clang-format on
     static QString driver();
 
-    Q_PROPERTY(QList<int> supportedLanguageCodes READ supportedLanguageCodes CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QList<int> supportedLanguageCodes
+               READ supportedLanguageCodes
+               CONSTANT )
+    // clang-format on
     static QList<int> supportedLanguageCodes();
 
     Q_INVOKABLE bool supportsLanguageCode(int code) const;
@@ -363,12 +461,20 @@ public:
     ~AbstractTransliterationEngine();
 
     /** Returns the default language supported by this engine */
-    Q_PROPERTY(int defaultLanguage READ defaultLanguage NOTIFY defaultLanguageChanged)
+    // clang-format off
+    Q_PROPERTY(int defaultLanguage
+               READ defaultLanguage
+               NOTIFY defaultLanguageChanged)
+    // clang-format on
     virtual int defaultLanguage() const { return QLocale::English; }
     Q_SIGNAL void defaultLanguageChanged();
 
     /* Unique name among all transliterators supported */
-    Q_PROPERTY(QString name READ name CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString name
+               READ name
+               CONSTANT )
+    // clang-format on
     virtual QString name() const = 0;
 
     /** should return true if it supports transliteration to the said language */
@@ -479,34 +585,65 @@ public:
 
     static LanguageTransliterator *qmlAttachedProperties(QObject *object);
 
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool enabled
+               READ isEnabled
+               WRITE setEnabled
+               NOTIFY enabledChanged)
+    // clang-format on
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    Q_PROPERTY(TransliterationOption option READ option WRITE setOption NOTIFY optionChanged)
+    // clang-format off
+    Q_PROPERTY(TransliterationOption option
+               READ option
+               WRITE setOption
+               NOTIFY optionChanged)
+    // clang-format on
     void setOption(const TransliterationOption &val);
     TransliterationOption option() const { return m_option; }
     Q_SIGNAL void optionChanged();
 
-    Q_PROPERTY(QObject *popup READ popup WRITE setPopup NOTIFY popupChanged)
+    // clang-format off
+    Q_PROPERTY(QObject *popup
+               READ popup
+               WRITE setPopup
+               NOTIFY popupChanged)
+    // clang-format on
     void setPopup(QObject *val);
     QObject *popup() const { return m_popup; }
     Q_SIGNAL void popupChanged();
 
-    Q_PROPERTY(QString currentWord READ currentWord NOTIFY currentWordChanged)
+    // clang-format off
+    Q_PROPERTY(QString currentWord
+               READ currentWord
+               NOTIFY currentWordChanged)
+    // clang-format on
     QString currentWord() const { return m_currentWord.originalString; }
     Q_SIGNAL void currentWordChanged();
 
-    Q_PROPERTY(QString commitString READ commitString NOTIFY commitStringChanged)
+    // clang-format off
+    Q_PROPERTY(QString commitString
+               READ commitString
+               NOTIFY commitStringChanged)
+    // clang-format on
     QString commitString() const { return m_currentWord.commitString; }
     Q_SIGNAL void commitStringChanged();
 
-    Q_PROPERTY(QRect textRect READ textRect NOTIFY textRectChanged)
+    // clang-format off
+    Q_PROPERTY(QRect textRect
+               READ textRect
+               NOTIFY textRectChanged)
+    // clang-format on
     QRect textRect() const { return m_currentWord.textRect; }
     Q_SIGNAL void textRectChanged() const;
 
-    Q_PROPERTY(QObject *editor READ editor CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QObject *editor
+               READ editor
+               CONSTANT )
+    // clang-format on
     QObject *editor() const { return m_editor; }
 
 protected:
@@ -544,22 +681,40 @@ struct ScriptBoundary
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_PROPERTY(int start MEMBER start)
+    // clang-format off
+    Q_PROPERTY(int start
+               MEMBER start)
+    // clang-format on
     int start = -1;
 
-    Q_PROPERTY(int end MEMBER end)
+    // clang-format off
+    Q_PROPERTY(int end
+               MEMBER end)
+    // clang-format on
     int end = -1;
 
-    Q_PROPERTY(QString text MEMBER text)
+    // clang-format off
+    Q_PROPERTY(QString text
+               MEMBER text)
+    // clang-format on
     QString text;
 
-    Q_PROPERTY(QChar::Script script MEMBER script)
+    // clang-format off
+    Q_PROPERTY(QChar::Script script
+               MEMBER script)
+    // clang-format on
     QChar::Script script = QChar::Script_Unknown;
 
-    Q_PROPERTY(QString fontFamily READ fontFamily)
+    // clang-format off
+    Q_PROPERTY(QString fontFamily
+               READ fontFamily)
+    // clang-format on
     QString fontFamily() const;
 
-    Q_PROPERTY(bool valid READ isValid)
+    // clang-format off
+    Q_PROPERTY(bool valid
+               READ isValid)
+    // clang-format on
     bool isValid() const;
 };
 Q_DECLARE_METATYPE(ScriptBoundary)
@@ -591,10 +746,18 @@ public:
     static LanguageEngine *instance();
     ~LanguageEngine();
 
-    Q_PROPERTY(AvailableLanguages *availableLanguages READ availableLanguages CONSTANT)
+    // clang-format off
+    Q_PROPERTY(AvailableLanguages *availableLanguages
+               READ availableLanguages
+               CONSTANT )
+    // clang-format on
     AvailableLanguages *availableLanguages() const { return m_availableLanguages; }
 
-    Q_PROPERTY(SupportedLanguages *supportedLanguages READ supportedLanguages CONSTANT)
+    // clang-format off
+    Q_PROPERTY(SupportedLanguages *supportedLanguages
+               READ supportedLanguages
+               CONSTANT )
+    // clang-format on
     SupportedLanguages *supportedLanguages() const { return m_supportedLanguages; }
 
     Q_INVOKABLE bool setScriptFontFamily(QChar::Script script, const QString &fontFamily);

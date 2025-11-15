@@ -39,52 +39,96 @@ public:
 
     enum Format { AdobePDF, OpenDocumentFormat };
     Q_ENUM(Format)
-    Q_PROPERTY(Format format READ format WRITE setFormat NOTIFY formatChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(Format format
+               READ format
+               WRITE setFormat
+               NOTIFY formatChanged
+               STORED false)
+    // clang-format on
     void setFormat(Format val);
     Format format() const { return m_format; }
     Q_SIGNAL void formatChanged();
 
-    Q_PROPERTY(QString title READ title CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString title
+               READ title
+               CONSTANT )
+    // clang-format on
     virtual QString title() const;
 
-    Q_PROPERTY(QString description READ description CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString description
+               READ description
+               CONSTANT )
+    // clang-format on
     virtual QString description() const;
 
-    Q_PROPERTY(QIcon icon READ icon CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QIcon icon
+               READ icon
+               CONSTANT )
+    // clang-format on
     virtual QIcon icon() const;
 
-    Q_PROPERTY(bool singlePageReport READ isSinglePageReport CONSTANT)
+    // clang-format off
+    Q_PROPERTY(bool singlePageReport
+               READ isSinglePageReport
+               CONSTANT )
+    // clang-format on
     virtual bool isSinglePageReport() const { return false; }
 
-    Q_PROPERTY(bool featureEnabled READ isFeatureEnabled NOTIFY featureEnabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool featureEnabled
+               READ isFeatureEnabled
+               NOTIFY featureEnabledChanged)
+    // clang-format on
     bool isFeatureEnabled() const;
     Q_SIGNAL void featureEnabledChanged();
 
+    // clang-format off
     Q_CLASSINFO("watermark_FieldGroup", "Basic")
     Q_CLASSINFO("watermark_FieldLabel", "Watermark text, if enabled. (PDF Only)")
     Q_CLASSINFO("watermark_FieldEditor", "TextBox")
     Q_CLASSINFO("watermark_IsPersistent", "false")
     Q_CLASSINFO("watermark_Feature", "watermark")
-    Q_PROPERTY(QString watermark READ watermark WRITE setWatermark NOTIFY watermarkChanged)
+    Q_PROPERTY(QString watermark
+               READ watermark
+               WRITE setWatermark
+               NOTIFY watermarkChanged)
+    // clang-format on
     void setWatermark(const QString &val);
     QString watermark() const { return m_watermark; }
     Q_SIGNAL void watermarkChanged();
 
+    // clang-format off
     Q_CLASSINFO("comment_FieldGroup", "Basic")
     Q_CLASSINFO("comment_FieldLabel", "Comment text for use with header & footer. (PDF Only)")
     Q_CLASSINFO("comment_FieldEditor", "TextBox")
     Q_CLASSINFO("comment_IsPersistent", "false")
-    Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)
+    Q_PROPERTY(QString comment
+               READ comment
+               WRITE setComment
+               NOTIFY commentChanged)
+    // clang-format on
     void setComment(const QString &val);
     QString comment() const { return m_comment; }
     Q_SIGNAL void commentChanged();
 
     Q_INVOKABLE virtual bool supportsFormat(AbstractReportGenerator::Format) const { return true; }
 
-    Q_PROPERTY(QString name READ name CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QString name
+               READ name
+               CONSTANT )
+    // clang-format on
     QString name() const;
 
-    Q_PROPERTY(bool requiresConfiguration READ requiresConfiguration CONSTANT)
+    // clang-format off
+    Q_PROPERTY(bool requiresConfiguration
+               READ requiresConfiguration
+               CONSTANT )
+    // clang-format on
     virtual bool requiresConfiguration() const { return false; }
 
     Q_INVOKABLE bool setConfigurationValue(const QString &name, const QVariant &value);

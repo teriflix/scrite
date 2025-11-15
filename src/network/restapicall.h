@@ -40,7 +40,11 @@ public:
     static RestApi *instance();
     ~RestApi();
 
-    Q_PROPERTY(QObject *sessionApiQueue READ sessionApiQueueObject CONSTANT)
+    // clang-format off
+    Q_PROPERTY(QObject *sessionApiQueue
+               READ sessionApiQueueObject
+               CONSTANT )
+    // clang-format on
     QObject *sessionApiQueueObject() const;
     RestApiCallQueue *sessionApiQueue() const { return m_sessionApiQueue; }
 
@@ -83,68 +87,139 @@ public:
 
     enum Type { GET, POST };
     Q_ENUM(Type)
-    Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
+    // clang-format off
+    Q_PROPERTY(Type type
+               READ type
+               WRITE setType
+               NOTIFY typeChanged)
+    // clang-format on
     void setType(Type val);
     virtual Type type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
-    Q_PROPERTY(bool useSessionToken READ useSessionToken WRITE setUseSessionToken NOTIFY
-                       useSessionTokenChanged)
+    // clang-format off
+    Q_PROPERTY(bool useSessionToken
+               READ useSessionToken
+               WRITE setUseSessionToken
+               NOTIFY useSessionTokenChanged)
+    // clang-format on
     void setUseSessionToken(bool val);
     virtual bool useSessionToken() const { return m_useSessionToken; }
     Q_SIGNAL void useSessionTokenChanged();
 
-    Q_PROPERTY(QString api READ api WRITE setApi NOTIFY apiChanged)
+    // clang-format off
+    Q_PROPERTY(QString api
+               READ api
+               WRITE setApi
+               NOTIFY apiChanged)
+    // clang-format on
     void setApi(const QString &val);
     virtual QString api() const { return m_api; }
     Q_SIGNAL void apiChanged();
 
-    Q_PROPERTY(QJsonObject data READ data WRITE setData NOTIFY dataChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject data
+               READ data
+               WRITE setData
+               NOTIFY dataChanged)
+    // clang-format on
     void setData(const QJsonObject &val);
     virtual QJsonObject data() const { return m_data; }
     Q_SIGNAL void dataChanged();
 
-    Q_PROPERTY(QJsonObject response READ response NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject response
+               READ response
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonObject response() const { return m_response; }
     Q_SIGNAL void responseChanged();
 
-    Q_PROPERTY(QString responseCode READ responseCode NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QString responseCode
+               READ responseCode
+               NOTIFY responseChanged)
+    // clang-format on
     QString responseCode() const;
 
-    Q_PROPERTY(QString responseText READ responseText NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QString responseText
+               READ responseText
+               NOTIFY responseChanged)
+    // clang-format on
     QString responseText() const;
 
-    Q_PROPERTY(QJsonObject responseData READ responseData NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject responseData
+               READ responseData
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonObject responseData() const;
 
-    Q_PROPERTY(bool hasResponse READ hasResponse NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasResponse
+               READ hasResponse
+               NOTIFY responseChanged)
+    // clang-format on
     bool hasResponse() const { return !m_response.isEmpty(); }
 
-    Q_PROPERTY(QJsonObject error READ error NOTIFY errorChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject error
+               READ error
+               NOTIFY errorChanged)
+    // clang-format on
     QJsonObject error() const { return m_error; }
     Q_SIGNAL void errorChanged();
 
-    Q_PROPERTY(QString errorCode READ errorCode NOTIFY errorChanged)
+    // clang-format off
+    Q_PROPERTY(QString errorCode
+               READ errorCode
+               NOTIFY errorChanged)
+    // clang-format on
     QString errorCode() const;
 
-    Q_PROPERTY(QString errorText READ errorText NOTIFY errorChanged)
+    // clang-format off
+    Q_PROPERTY(QString errorText
+               READ errorText
+               NOTIFY errorChanged)
+    // clang-format on
     QString errorText() const;
 
-    Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorChanged)
+    // clang-format off
+    Q_PROPERTY(QString errorMessage
+               READ errorMessage
+               NOTIFY errorChanged)
+    // clang-format on
     QString errorMessage() const;
 
-    Q_PROPERTY(QJsonObject errorData READ errorData NOTIFY errorChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject errorData
+               READ errorData
+               NOTIFY errorChanged)
+    // clang-format on
     QJsonObject errorData() const;
 
-    Q_PROPERTY(bool hasError READ hasError NOTIFY errorChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasError
+               READ hasError
+               NOTIFY errorChanged)
+    // clang-format on
     bool hasError() const { return !m_error.isEmpty(); }
 
-    Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
+    // clang-format off
+    Q_PROPERTY(bool busy
+               READ isBusy
+               NOTIFY busyChanged)
+    // clang-format on
     bool isBusy() const { return m_reply != nullptr; }
     Q_SIGNAL void busyChanged();
 
-    Q_PROPERTY(bool reportNetworkErrors READ isReportNetworkErrors WRITE setReportNetworkErrors
-                       NOTIFY reportNetworkErrorsChanged)
+    // clang-format off
+    Q_PROPERTY(bool reportNetworkErrors
+               READ isReportNetworkErrors
+               WRITE setReportNetworkErrors
+               NOTIFY reportNetworkErrorsChanged)
+    // clang-format on
     void setReportNetworkErrors(bool val);
     bool isReportNetworkErrors() const { return m_reportNetworkErrors; }
     Q_SIGNAL void reportNetworkErrorsChanged();
@@ -208,18 +283,38 @@ public:
 
     static RestApiCallQueue *find(RestApiCall *call);
 
-    Q_PROPERTY(RestApiCall *current READ current NOTIFY currentChanged FINAL)
+    // clang-format off
+    Q_PROPERTY(RestApiCall *current
+               READ current
+               NOTIFY currentChanged
+               FINAL )
+    // clang-format on
     RestApiCall *current() const { return m_current; }
     Q_SIGNAL void currentChanged();
 
-    Q_PROPERTY(bool busy READ isBusy NOTIFY currentChanged FINAL)
+    // clang-format off
+    Q_PROPERTY(bool busy
+               READ isBusy
+               NOTIFY currentChanged
+               FINAL )
+    // clang-format on
     bool isBusy() const { return m_current != nullptr; }
 
-    Q_PROPERTY(int size READ size NOTIFY sizeChanged FINAL)
+    // clang-format off
+    Q_PROPERTY(int size
+               READ size
+               NOTIFY sizeChanged
+               FINAL )
+    // clang-format on
     int size() const { return m_queue.size(); }
     Q_SIGNAL void sizeChanged();
 
-    Q_PROPERTY(bool empty READ isEmpty NOTIFY sizeChanged FINAL)
+    // clang-format off
+    Q_PROPERTY(bool empty
+               READ isEmpty
+               NOTIFY sizeChanged
+               FINAL )
+    // clang-format on
     int isEmpty() const { return m_queue.isEmpty(); }
 
     Q_INVOKABLE bool enqueue(RestApiCall *call);
@@ -249,19 +344,34 @@ public:
     RestApiCallList(QObject *parent = nullptr);
     ~RestApiCallList();
 
-    Q_PROPERTY(int busyCount READ busyCount NOTIFY busyCountChanged)
+    // clang-format off
+    Q_PROPERTY(int busyCount
+               READ busyCount
+               NOTIFY busyCountChanged)
+    // clang-format on
     int busyCount() const { return m_busyCount; }
     Q_SIGNAL void busyCountChanged();
 
-    Q_PROPERTY(bool busy READ isBusy NOTIFY busyCountChanged)
+    // clang-format off
+    Q_PROPERTY(bool busy
+               READ isBusy
+               NOTIFY busyCountChanged)
+    // clang-format on
     bool isBusy() const { return m_busyCount > 0; }
 
-    Q_PROPERTY(QQmlListProperty<RestApiCall> calls READ calls)
+    // clang-format off
+    Q_PROPERTY(QQmlListProperty<RestApiCall> calls
+               READ calls)
+    // clang-format on
     QQmlListProperty<RestApiCall> calls();
     Q_INVOKABLE void addCall(RestApiCall *ptr);
     Q_INVOKABLE void removeCall(RestApiCall *ptr);
     Q_INVOKABLE RestApiCall *callAt(int index) const;
-    Q_PROPERTY(int callCount READ callCount NOTIFY callCountChanged)
+    // clang-format off
+    Q_PROPERTY(int callCount
+               READ callCount
+               NOTIFY callCountChanged)
+    // clang-format on
     int callCount() const { return this->size(); }
     Q_INVOKABLE void clearCalls();
     Q_SIGNAL void callCountChanged();
@@ -293,13 +403,25 @@ public:
     AppMinimumVersionRestApiCall(QObject *parent = nullptr);
     ~AppMinimumVersionRestApiCall();
 
-    Q_PROPERTY(QVersionNumber minimumVersion READ minimumVersion NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QVersionNumber minimumVersion
+               READ minimumVersion
+               NOTIFY responseChanged)
+    // clang-format on
     QVersionNumber minimumVersion() const;
 
-    Q_PROPERTY(QVersionNumber currentVersion READ currentVersion NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QVersionNumber currentVersion
+               READ currentVersion
+               NOTIFY responseChanged)
+    // clang-format on
     QVersionNumber currentVersion() const;
 
-    Q_PROPERTY(bool isVersionSupported READ isVersionSupported NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(bool isVersionSupported
+               READ isVersionSupported
+               NOTIFY responseChanged)
+    // clang-format on
     bool isVersionSupported() const;
 
     // RestApiCall interface
@@ -317,37 +439,71 @@ public:
     AppCheckUserRestApiCall(QObject *parent = nullptr);
     ~AppCheckUserRestApiCall();
 
-    Q_PROPERTY(QString email READ email WRITE setEmail NOTIFY emailChanged)
+    // clang-format off
+    Q_PROPERTY(QString email
+               READ email
+               WRITE setEmail
+               NOTIFY emailChanged)
+    // clang-format on
     void setEmail(const QString &val);
     QString email() const { return m_email; }
     Q_SIGNAL void emailChanged();
 
-    Q_PROPERTY(QString firstName READ firstName WRITE setFirstName NOTIFY firstNameChanged)
+    // clang-format off
+    Q_PROPERTY(QString firstName
+               READ firstName
+               WRITE setFirstName
+               NOTIFY firstNameChanged)
+    // clang-format on
     void setFirstName(const QString &val);
     QString firstName() const { return m_firstName; }
     Q_SIGNAL void firstNameChanged();
 
-    Q_PROPERTY(QString lastName READ lastName WRITE setLastName NOTIFY lastNameChanged)
+    // clang-format off
+    Q_PROPERTY(QString lastName
+               READ lastName
+               WRITE setLastName
+               NOTIFY lastNameChanged)
+    // clang-format on
     void setLastName(const QString &val);
     QString lastName() const { return m_lastName; }
     Q_SIGNAL void lastNameChanged();
 
-    Q_PROPERTY(QString experience READ experience WRITE setExperience NOTIFY experienceChanged)
+    // clang-format off
+    Q_PROPERTY(QString experience
+               READ experience
+               WRITE setExperience
+               NOTIFY experienceChanged)
+    // clang-format on
     void setExperience(const QString &val);
     QString experience() const { return m_experience; }
     Q_SIGNAL void experienceChanged();
 
-    Q_PROPERTY(QString phone READ phone WRITE setPhone NOTIFY phoneChanged)
+    // clang-format off
+    Q_PROPERTY(QString phone
+               READ phone
+               WRITE setPhone
+               NOTIFY phoneChanged)
+    // clang-format on
     void setPhone(const QString &val);
     QString phone() const { return m_phone; }
     Q_SIGNAL void phoneChanged();
 
-    Q_PROPERTY(QString wdyhas READ wdyhas WRITE setWdyhas NOTIFY wdyhasChanged)
+    // clang-format off
+    Q_PROPERTY(QString wdyhas
+               READ wdyhas
+               WRITE setWdyhas
+               NOTIFY wdyhasChanged)
+    // clang-format on
     void setWdyhas(const QString &val);
     QString wdyhas() const { return m_wdyhas; }
     Q_SIGNAL void wdyhasChanged();
 
-    Q_PROPERTY(QJsonObject userInfo READ userInfo NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject userInfo
+               READ userInfo
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonObject userInfo() const { return this->responseData(); }
 
     // RestApiCall interface
@@ -374,10 +530,18 @@ public:
     AppLatestReleaseRestApiCall(QObject *parent = nullptr);
     ~AppLatestReleaseRestApiCall();
 
-    Q_PROPERTY(QJsonObject latestRelease READ latestRelease NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject latestRelease
+               READ latestRelease
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonObject latestRelease() const { return this->responseData(); }
 
-    Q_PROPERTY(QJsonObject update READ update NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject update
+               READ update
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonObject update() const { return m_update; }
 
     // RestApiCall interface
@@ -418,13 +582,21 @@ public:
     AppActivateDeviceRestApiCall(QObject *parent = nullptr);
     ~AppActivateDeviceRestApiCall();
 
-    Q_PROPERTY(QString activationCode READ activationCode WRITE setActivationCode NOTIFY
-                       activationCodeChanged)
+    // clang-format off
+    Q_PROPERTY(QString activationCode
+               READ activationCode
+               WRITE setActivationCode
+               NOTIFY activationCodeChanged)
+    // clang-format on
     void setActivationCode(const QString &val);
     QString activationCode() const { return m_activationCode; }
     Q_SIGNAL void activationCodeChanged();
 
-    Q_PROPERTY(QJsonObject tokens READ tokens NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject tokens
+               READ tokens
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonObject tokens() const { return this->responseData(); }
 
     // RestApiCall interface
@@ -449,7 +621,11 @@ public:
     AppPlanTaxonomyRestApiCall(QObject *parent = nullptr);
     ~AppPlanTaxonomyRestApiCall();
 
-    Q_PROPERTY(QJsonObject taxonomy READ taxonomy NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject taxonomy
+               READ taxonomy
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonObject taxonomy() const { return this->responseData(); }
 
     // RestApiCall interface
@@ -467,11 +643,19 @@ public:
     UserMeRestApiCall(QObject *parent = nullptr);
     ~UserMeRestApiCall();
 
-    Q_PROPERTY(QJsonObject userInfo READ userInfo NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject userInfo
+               READ userInfo
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonObject userInfo() const { return this->responseData(); }
 
-    Q_PROPERTY(QJsonObject updatedFields READ updatedFields WRITE setUpdatedFields NOTIFY
-                       updatedFieldsChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject updatedFields
+               READ updatedFields
+               WRITE setUpdatedFields
+               NOTIFY updatedFieldsChanged)
+    // clang-format on
     void setUpdatedFields(const QJsonObject &val);
     QJsonObject updatedFields() const { return m_updatedFields; }
     Q_SIGNAL void updatedFieldsChanged();
@@ -499,7 +683,11 @@ private:
 public:
     ~UserMessagesRestApiCall();
 
-    Q_PROPERTY(QJsonArray messages READ messages NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonArray messages
+               READ messages
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonArray messages() const { return this->response().value("data").toArray(); }
 
     // RestApiCall interface
@@ -520,7 +708,11 @@ public:
     UserHelpTipsRestApiCall(QObject *parent = nullptr);
     ~UserHelpTipsRestApiCall();
 
-    Q_PROPERTY(QJsonObject helpTips READ helpTips NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject helpTips
+               READ helpTips
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonObject helpTips() const { return this->responseData(); }
 
     // RestApiCall interface
@@ -538,7 +730,12 @@ public:
     UserCheckRestApiCall(QObject *parent = nullptr);
     ~UserCheckRestApiCall();
 
-    Q_PROPERTY(QStringList emails READ emails WRITE setEmails NOTIFY emailsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList emails
+               READ emails
+               WRITE setEmails
+               NOTIFY emailsChanged)
+    // clang-format on
     void setEmails(const QStringList &val);
     QStringList emails() const { return m_emails; }
     Q_SIGNAL void emailsChanged();
@@ -562,13 +759,22 @@ public:
     UserActivityRestApiCall(QObject *parent = nullptr);
     ~UserActivityRestApiCall();
 
-    Q_PROPERTY(QString activity READ activity WRITE setActivity NOTIFY activityChanged)
+    // clang-format off
+    Q_PROPERTY(QString activity
+               READ activity
+               WRITE setActivity
+               NOTIFY activityChanged)
+    // clang-format on
     void setActivity(const QString &val);
     QString activity() const { return m_activity; }
     Q_SIGNAL void activityChanged();
 
-    Q_PROPERTY(QJsonValue activityData READ activityData WRITE setActivityData NOTIFY
-                       activityDataChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonValue activityData
+               READ activityData
+               WRITE setActivityData
+               NOTIFY activityDataChanged)
+    // clang-format on
     void setActivityData(const QJsonValue &val);
     QJsonValue activityData() const { return m_activityData; }
     Q_SIGNAL void activityDataChanged();
@@ -593,7 +799,11 @@ public:
     InstallationCurrentRestApiCall(QObject *parent = nullptr);
     ~InstallationCurrentRestApiCall();
 
-    Q_PROPERTY(QJsonObject installationInfo READ installationInfo NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject installationInfo
+               READ installationInfo
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonObject installationInfo() const { return this->responseData(); }
 
     // RestApiCall interface
@@ -611,13 +821,25 @@ public:
     InstallationAllRestApiCall(QObject *parent = nullptr);
     ~InstallationAllRestApiCall();
 
-    Q_PROPERTY(int activeInstallationCount READ activeInstallationCount NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(int activeInstallationCount
+               READ activeInstallationCount
+               NOTIFY responseChanged)
+    // clang-format on
     int activeInstallationCount() const;
 
-    Q_PROPERTY(int allowedInstallationCount READ allowedInstallationCount NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(int allowedInstallationCount
+               READ allowedInstallationCount
+               NOTIFY responseChanged)
+    // clang-format on
     int allowedInstallationCount() const;
 
-    Q_PROPERTY(QJsonArray installationsInfo READ installationsInfo NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonArray installationsInfo
+               READ installationsInfo
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonArray installationsInfo() const;
 
     // RestApiCall interface
@@ -677,8 +899,12 @@ public:
     InstallationDeactivateOtherRestApiCall(QObject *parent = nullptr);
     ~InstallationDeactivateOtherRestApiCall();
 
-    Q_PROPERTY(QString installationId READ installationId WRITE setInstallationId NOTIFY
-                       installationIdChanged)
+    // clang-format off
+    Q_PROPERTY(QString installationId
+               READ installationId
+               WRITE setInstallationId
+               NOTIFY installationIdChanged)
+    // clang-format on
     void setInstallationId(const QString &val);
     QString installationId() const { return m_installationId; }
     Q_SIGNAL void installationIdChanged();
@@ -704,13 +930,25 @@ public:
     SessionCurrentRestApiCall(QObject *parent = nullptr);
     ~SessionCurrentRestApiCall();
 
-    Q_PROPERTY(QJsonObject user READ user NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject user
+               READ user
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonObject user() const;
 
-    Q_PROPERTY(QJsonObject installation READ installation NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject installation
+               READ installation
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonObject installation() const;
 
-    Q_PROPERTY(QDateTime since READ since NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QDateTime since
+               READ since
+               NOTIFY responseChanged)
+    // clang-format on
     QDateTime since() const;
 
     // RestApiCall interface
@@ -736,7 +974,11 @@ public:
     enum Status { Unknown = -1, Invalid, Valid };
     Q_ENUM(Status)
 
-    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
+    // clang-format off
+    Q_PROPERTY(Status status
+               READ status
+               NOTIFY statusChanged)
+    // clang-format on
     Status status() const;
     Q_SIGNAL void statusChanged();
 
@@ -784,10 +1026,18 @@ public:
     SubscriptionPlansRestApiCall(QObject *parent = nullptr);
     ~SubscriptionPlansRestApiCall();
 
-    Q_PROPERTY(QJsonArray plans READ plans NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonArray plans
+               READ plans
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonArray plans() const;
 
-    Q_PROPERTY(QJsonArray subscriptionHistory READ subscriptionHistory NOTIFY responseChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonArray subscriptionHistory
+               READ subscriptionHistory
+               NOTIFY responseChanged)
+    // clang-format on
     QJsonArray subscriptionHistory() const;
 
     // RestApiCall interface
@@ -805,7 +1055,12 @@ public:
     SubscriptionReferralCodeRestApiCall(QObject *parent = nullptr);
     ~SubscriptionReferralCodeRestApiCall();
 
-    Q_PROPERTY(QString code READ code WRITE setCode NOTIFY codeChanged)
+    // clang-format off
+    Q_PROPERTY(QString code
+               READ code
+               WRITE setCode
+               NOTIFY codeChanged)
+    // clang-format on
     void setCode(const QString &val);
     QString code() const { return m_code; }
     Q_SIGNAL void codeChanged();
@@ -829,7 +1084,12 @@ public:
     SubscriptionTrialDeclineReasonApiCall(QObject *parent = nullptr);
     ~SubscriptionTrialDeclineReasonApiCall();
 
-    Q_PROPERTY(QString reason READ reason WRITE setReason NOTIFY reasonChanged)
+    // clang-format off
+    Q_PROPERTY(QString reason
+               READ reason
+               WRITE setReason
+               NOTIFY reasonChanged)
+    // clang-format on
     void setReason(const QString &val);
     QString reason() const { return m_reason; }
     Q_SIGNAL void reasonChanged();
@@ -853,7 +1113,12 @@ public:
     SubscriptionPlanActivationRestApiCall(QObject *parent = nullptr);
     ~SubscriptionPlanActivationRestApiCall();
 
-    Q_PROPERTY(QString activationApi READ api WRITE setApi NOTIFY apiChanged)
+    // clang-format off
+    Q_PROPERTY(QString activationApi
+               READ api
+               WRITE setApi
+               NOTIFY apiChanged)
+    // clang-format on
 
     // RestApiCall interface
     Type type() const { return POST; }
@@ -871,11 +1136,19 @@ public:
     AbstractScriptalayRestApiCall(QObject *parent = nullptr);
     ~AbstractScriptalayRestApiCall();
 
-    Q_PROPERTY(QUrl baseUrl READ baseUrl NOTIFY baseUrlChanged)
+    // clang-format off
+    Q_PROPERTY(QUrl baseUrl
+               READ baseUrl
+               NOTIFY baseUrlChanged)
+    // clang-format on
     QUrl baseUrl() const { return m_baseUrl; }
     Q_SIGNAL void baseUrlChanged();
 
-    Q_PROPERTY(QJsonArray records READ records NOTIFY recordsChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonArray records
+               READ records
+               NOTIFY recordsChanged)
+    // clang-format on
     QJsonArray records() const { return m_records; }
     Q_SIGNAL void recordsChanged();
 

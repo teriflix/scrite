@@ -41,99 +41,181 @@ class SceneElementFormat : public QObject, public Modifiable, public QObjectSeri
 public:
     ~SceneElementFormat();
 
-    Q_PROPERTY(ScreenplayFormat *format READ format CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(ScreenplayFormat *format
+               READ format
+               CONSTANT STORED
+               false )
+    // clang-format on
     ScreenplayFormat *format() const { return m_format; }
 
-    Q_PROPERTY(SceneElement::Type elementType READ elementType CONSTANT)
+    // clang-format off
+    Q_PROPERTY(SceneElement::Type elementType
+               READ elementType
+               CONSTANT )
+    // clang-format on
     SceneElement::Type elementType() const { return m_elementType; }
     Q_SIGNAL void elementTypeChanged();
 
     enum Tristate { Auto = -1, Unset = 0, Set = 1 };
     Q_ENUM(Tristate)
 
-    Q_PROPERTY(QFont font READ font NOTIFY fontChanged)
+    // clang-format off
+    Q_PROPERTY(QFont font
+               READ font
+               NOTIFY fontChanged)
+    // clang-format on
     QFont font() const;
     Q_SIGNAL void fontChanged();
 
-    Q_PROPERTY(QFont font2 READ font2 NOTIFY font2Changed);
+    // clang-format off
+    Q_PROPERTY(QFont font2
+               READ font2
+               NOTIFY font2Changed)
+    // clang-format on
     QFont font2() const;
     Q_SIGNAL void font2Changed();
 
-    Q_PROPERTY(Tristate fontBold READ fontBold WRITE setFontBold NOTIFY fontBoldChanged)
+    // clang-format off
+    Q_PROPERTY(Tristate fontBold
+               READ fontBold
+               WRITE setFontBold
+               NOTIFY fontBoldChanged)
+    // clang-format on
     void setFontBold(Tristate val);
     Tristate fontBold() const { return m_fontBold; }
     Q_SIGNAL void fontBoldChanged();
 
-    Q_PROPERTY(Tristate fontItalics READ fontItalics WRITE setFontItalics NOTIFY fontItalicsChanged)
+    // clang-format off
+    Q_PROPERTY(Tristate fontItalics
+               READ fontItalics
+               WRITE setFontItalics
+               NOTIFY fontItalicsChanged)
+    // clang-format on
     void setFontItalics(Tristate val);
     Tristate fontItalics() const { return m_fontItalics; }
     Q_SIGNAL void fontItalicsChanged();
 
-    Q_PROPERTY(Tristate fontUnderline READ fontUnderline WRITE setFontUnderline NOTIFY
-                       fontUnderlineChanged)
+    // clang-format off
+    Q_PROPERTY(Tristate fontUnderline
+               READ fontUnderline
+               WRITE setFontUnderline
+               NOTIFY fontUnderlineChanged)
+    // clang-format on
     void setFontUnderline(Tristate val);
     Tristate fontUnderline() const { return m_fontUnderline; }
     Q_SIGNAL void fontUnderlineChanged();
 
-    Q_PROPERTY(
-            int fontPointSize READ fontPointSize WRITE setFontPointSize NOTIFY fontPointSizeChanged)
+    // clang-format off
+    Q_PROPERTY(int fontPointSize
+               READ fontPointSize
+               WRITE setFontPointSize
+               NOTIFY fontPointSizeChanged)
+    // clang-format on
     void setFontPointSize(int val);
     int fontPointSize() const { return m_fontPointSize; }
     Q_SIGNAL void fontPointSizeChanged();
 
-    Q_PROPERTY(QFont::Capitalization fontCapitalization READ fontCapitalization WRITE
-                       setFontCapitalization NOTIFY fontCapitalizationChanged)
+    // clang-format off
+    Q_PROPERTY(QFont::Capitalization fontCapitalization
+               READ fontCapitalization
+               WRITE setFontCapitalization
+               NOTIFY fontCapitalizationChanged)
+    // clang-format on
     void setFontCapitalization(QFont::Capitalization val);
     QFont::Capitalization fontCapitalization() const { return m_fontCapitalization; }
     Q_SIGNAL void fontCapitalizationChanged();
 
-    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor textColor
+               READ textColor
+               WRITE setTextColor
+               NOTIFY textColorChanged)
+    // clang-format on
     void setTextColor(const QColor &val);
     QColor textColor() const { return m_textColor; }
     Q_SIGNAL void textColorChanged();
 
-    Q_PROPERTY(Qt::Alignment textAlignment READ textAlignment WRITE setTextAlignment NOTIFY
-                       textAlignmentChanged)
+    // clang-format off
+    Q_PROPERTY(Qt::Alignment textAlignment
+               READ textAlignment
+               WRITE setTextAlignment
+               NOTIFY textAlignmentChanged)
+    // clang-format on
     void setTextAlignment(Qt::Alignment val);
     Qt::Alignment textAlignment() const { return m_textAlignment; }
     Q_SIGNAL void textAlignmentChanged();
 
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY
-                       backgroundColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor backgroundColor
+               READ backgroundColor
+               WRITE setBackgroundColor
+               NOTIFY backgroundColorChanged)
+    // clang-format on
     void setBackgroundColor(const QColor &val);
     QColor backgroundColor() const { return m_backgroundColor; }
     Q_SIGNAL void backgroundColorChanged();
 
-    Q_PROPERTY(qreal textIndent READ textIndent WRITE setTextIndent NOTIFY textIndentChanged)
+    // clang-format off
+    Q_PROPERTY(qreal textIndent
+               READ textIndent
+               WRITE setTextIndent
+               NOTIFY textIndentChanged)
+    // clang-format on
     void setTextIndent(qreal val);
     qreal textIndent() const { return m_textIndent; }
     Q_SIGNAL void textIndentChanged();
 
-    Q_PROPERTY(qreal lineHeight READ lineHeight WRITE setLineHeight NOTIFY lineHeightChanged)
+    // clang-format off
+    Q_PROPERTY(qreal lineHeight
+               READ lineHeight
+               WRITE setLineHeight
+               NOTIFY lineHeightChanged)
+    // clang-format on
     void setLineHeight(qreal val);
     qreal lineHeight() const { return m_lineHeight; }
     Q_SIGNAL void lineHeightChanged();
 
-    Q_PROPERTY(qreal lineSpacingBefore READ lineSpacingBefore WRITE setLineSpacingBefore NOTIFY
-                       lineSpacingBeforeChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal lineSpacingBefore
+               READ lineSpacingBefore
+               WRITE setLineSpacingBefore
+               NOTIFY lineSpacingBeforeChanged
+               STORED false)
+    // clang-format on
     void setLineSpacingBefore(qreal val);
     qreal lineSpacingBefore() const { return m_lineSpacingBefore; }
     Q_SIGNAL void lineSpacingBeforeChanged();
 
-    Q_PROPERTY(qreal leftMargin READ leftMargin WRITE setLeftMargin NOTIFY leftMarginChanged
-                       STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal leftMargin
+               READ leftMargin
+               WRITE setLeftMargin
+               NOTIFY leftMarginChanged
+               STORED false)
+    // clang-format on
     void setLeftMargin(qreal val);
     qreal leftMargin() const { return m_leftMargin; }
     Q_SIGNAL void leftMarginChanged();
 
-    Q_PROPERTY(qreal rightMargin READ rightMargin WRITE setRightMargin NOTIFY rightMarginChanged
-                       STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal rightMargin
+               READ rightMargin
+               WRITE setRightMargin
+               NOTIFY rightMarginChanged
+               STORED false)
+    // clang-format on
     void setRightMargin(qreal val);
     qreal rightMargin() const { return m_rightMargin; }
     Q_SIGNAL void rightMarginChanged();
 
-    Q_PROPERTY(int defaultLanguageCode READ defaultLanguageCode WRITE setDefaultLanguageCode NOTIFY
-                       defaultLanguageCodeChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(int defaultLanguageCode
+               READ defaultLanguageCode
+               WRITE setDefaultLanguageCode
+               NOTIFY defaultLanguageCodeChanged
+               STORED false)
+    // clang-format on
     void setDefaultLanguageCode(int val);
     int defaultLanguageCode() const { return m_defaultLanguageCode; }
     Q_SIGNAL void defaultLanguageCodeChanged();
@@ -163,7 +245,11 @@ public:
     Q_INVOKABLE bool hasChangesToCommit() { return m_nrChangesDuringTransation > 0; }
     Q_INVOKABLE void commitTransaction();
 
-    Q_PROPERTY(bool inTransaction READ isInTransaction NOTIFY inTransactionChanged)
+    // clang-format off
+    Q_PROPERTY(bool inTransaction
+               READ isInTransaction
+               NOTIFY inTransactionChanged)
+    // clang-format on
     bool isInTransaction() const { return m_inTransaction; }
     Q_SIGNAL void inTransactionChanged();
 
@@ -222,72 +308,158 @@ public:
     explicit ScreenplayPageLayout(ScreenplayFormat *parent = nullptr);
     ~ScreenplayPageLayout();
 
-    Q_PROPERTY(ScreenplayFormat *format READ format CONSTANT)
+    // clang-format off
+    Q_PROPERTY(ScreenplayFormat *format
+               READ format
+               CONSTANT )
+    // clang-format on
     ScreenplayFormat *format() const { return m_format; }
 
     enum PaperSize { A4, Letter };
     Q_ENUM(PaperSize)
-    Q_PROPERTY(PaperSize paperSize READ paperSize WRITE setPaperSize NOTIFY paperSizeChanged
-                       STORED false)
+    // clang-format off
+    Q_PROPERTY(PaperSize paperSize
+               READ paperSize
+               WRITE setPaperSize
+               NOTIFY paperSizeChanged
+               STORED false)
+    // clang-format on
     void setPaperSize(PaperSize val);
     PaperSize paperSize() const { return m_paperSize; }
     Q_SIGNAL void paperSizeChanged();
 
-    Q_PROPERTY(QMarginsF margins READ margins NOTIFY rectsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QMarginsF margins
+               READ margins
+               NOTIFY rectsChanged
+               STORED false)
+    // clang-format on
     QMarginsF margins() const { return m_margins; }
     Q_SIGNAL void marginsChanged();
 
-    Q_PROPERTY(qreal leftMargin READ leftMargin NOTIFY rectsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal leftMargin
+               READ leftMargin
+               NOTIFY rectsChanged
+               STORED false)
+    // clang-format on
     qreal leftMargin() const { return m_margins.left(); }
 
-    Q_PROPERTY(qreal topMargin READ topMargin NOTIFY rectsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal topMargin
+               READ topMargin
+               NOTIFY rectsChanged
+               STORED false)
+    // clang-format on
     qreal topMargin() const { return m_margins.top(); }
 
-    Q_PROPERTY(qreal rightMargin READ rightMargin NOTIFY rectsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal rightMargin
+               READ rightMargin
+               NOTIFY rectsChanged
+               STORED false)
+    // clang-format on
     qreal rightMargin() const { return m_margins.right(); }
 
-    Q_PROPERTY(qreal bottomMargin READ bottomMargin NOTIFY rectsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal bottomMargin
+               READ bottomMargin
+               NOTIFY rectsChanged
+               STORED false)
+    // clang-format on
     qreal bottomMargin() const { return m_margins.bottom(); }
 
-    Q_PROPERTY(QRectF paperRect READ paperRect NOTIFY rectsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QRectF paperRect
+               READ paperRect
+               NOTIFY rectsChanged
+               STORED false)
+    // clang-format on
     QRectF paperRect() const { return m_paperRect; }
     Q_SIGNAL void paperRectChanged();
 
-    Q_PROPERTY(qreal paperWidth READ paperWidth NOTIFY rectsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal paperWidth
+               READ paperWidth
+               NOTIFY rectsChanged
+               STORED false)
+    // clang-format on
     qreal paperWidth() const { return m_paperRect.width(); }
 
-    Q_PROPERTY(qreal pageWidth READ pageWidth NOTIFY rectsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal pageWidth
+               READ pageWidth
+               NOTIFY rectsChanged
+               STORED false)
+    // clang-format on
     qreal pageWidth() const { return m_paperRect.width(); }
 
-    Q_PROPERTY(QRectF paintRect READ paintRect NOTIFY rectsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QRectF paintRect
+               READ paintRect
+               NOTIFY rectsChanged
+               STORED false)
+    // clang-format on
     QRectF paintRect() const { return m_paintRect; }
     Q_SIGNAL void paintRectChanged();
 
-    Q_PROPERTY(QRectF headerRect READ headerRect NOTIFY rectsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QRectF headerRect
+               READ headerRect
+               NOTIFY rectsChanged
+               STORED false)
+    // clang-format on
     QRectF headerRect() const { return m_headerRect; }
     Q_SIGNAL void headerRectChanged();
 
-    Q_PROPERTY(QRectF footerRect READ footerRect NOTIFY rectsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QRectF footerRect
+               READ footerRect
+               NOTIFY rectsChanged
+               STORED false)
+    // clang-format on
     QRectF footerRect() const { return m_footerRect; }
     Q_SIGNAL void footerRectChanged();
 
-    Q_PROPERTY(QRectF contentRect READ contentRect NOTIFY rectsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(QRectF contentRect
+               READ contentRect
+               NOTIFY rectsChanged
+               STORED false)
+    // clang-format on
     QRectF contentRect() const { return m_paintRect; }
 
-    Q_PROPERTY(qreal contentWidth READ contentWidth NOTIFY rectsChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(qreal contentWidth
+               READ contentWidth
+               NOTIFY rectsChanged
+               STORED false)
+    // clang-format on
     qreal contentWidth() const { return m_paintRect.width(); }
 
-    Q_PROPERTY(qreal defaultResolution READ defaultResolution NOTIFY defaultResolutionChanged)
+    // clang-format off
+    Q_PROPERTY(qreal defaultResolution
+               READ defaultResolution
+               NOTIFY defaultResolutionChanged)
+    // clang-format on
     qreal defaultResolution() const { return m_defaultResolution; }
     Q_SIGNAL void defaultResolutionChanged();
 
-    Q_PROPERTY(qreal customResolution READ customResolution WRITE setCustomResolution NOTIFY
-                       customResolutionChanged)
+    // clang-format off
+    Q_PROPERTY(qreal customResolution
+               READ customResolution
+               WRITE setCustomResolution
+               NOTIFY customResolutionChanged)
+    // clang-format on
     void setCustomResolution(qreal val);
     qreal customResolution() const { return m_customResolution; }
     Q_SIGNAL void customResolutionChanged();
 
-    Q_PROPERTY(qreal resolution READ resolution NOTIFY resolutionChanged)
+    // clang-format off
+    Q_PROPERTY(qreal resolution
+               READ resolution
+               NOTIFY resolutionChanged)
+    // clang-format on
     qreal resolution() const { return m_resolution; }
     Q_SIGNAL void resolutionChanged();
 
@@ -336,11 +508,22 @@ public:
     explicit ScreenplayFormat(QObject *parent = nullptr);
     ~ScreenplayFormat();
 
-    Q_PROPERTY(ScriteDocument *scriteDocument READ scriteDocument CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(ScriteDocument *scriteDocument
+               READ scriteDocument
+               CONSTANT STORED
+               false )
+    // clang-format on
     ScriteDocument *scriteDocument() const { return m_scriteDocument; }
 
-    Q_PROPERTY(QScreen *screen READ screen WRITE setScreen NOTIFY screenChanged RESET resetScreen
-                       STORED false)
+    // clang-format off
+    Q_PROPERTY(QScreen *screen
+               READ screen
+               WRITE setScreen
+               NOTIFY screenChanged
+               RESET resetScreen
+               STORED false)
+    // clang-format on
     Q_INVOKABLE void setScreen(QScreen *val);
     QScreen *screen() const { return m_screen; }
     Q_SIGNAL void screenChanged();
@@ -349,39 +532,74 @@ public:
 
     qreal screenDevicePixelRatio() const { return m_screen ? m_screen->devicePixelRatio() : 1.0; }
 
-    Q_PROPERTY(qreal devicePixelRatio READ devicePixelRatio NOTIFY fontZoomLevelIndexChanged)
+    // clang-format off
+    Q_PROPERTY(qreal devicePixelRatio
+               READ devicePixelRatio
+               NOTIFY fontZoomLevelIndexChanged)
+    // clang-format on
     qreal devicePixelRatio() const;
 
-    Q_PROPERTY(ScreenplayPageLayout *pageLayout READ pageLayout CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(ScreenplayPageLayout *pageLayout
+               READ pageLayout
+               CONSTANT STORED
+               false )
+    // clang-format on
     ScreenplayPageLayout *pageLayout() const { return m_pageLayout; }
 
-    Q_PROPERTY(int defaultLanguageCode READ defaultLanguageCode WRITE setDefaultLanguageCode NOTIFY
-                       defaultLanguageCodeChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(int defaultLanguageCode
+               READ defaultLanguageCode
+               WRITE setDefaultLanguageCode
+               NOTIFY defaultLanguageCodeChanged
+               STORED false)
+    // clang-format on
     void setDefaultLanguageCode(int val);
     int defaultLanguageCode() const { return m_defaultLanguageCode; }
     Q_SIGNAL void defaultLanguageCodeChanged();
 
-    Q_PROPERTY(QFont defaultFont READ defaultFont NOTIFY defaultFontChanged)
+    // clang-format off
+    Q_PROPERTY(QFont defaultFont
+               READ defaultFont
+               NOTIFY defaultFontChanged)
+    // clang-format on
     QFont defaultFont() const;
     Q_SIGNAL void defaultFontChanged();
 
-    Q_PROPERTY(QFont defaultFont2 READ defaultFont2 NOTIFY fontPointSizeDeltaChanged)
+    // clang-format off
+    Q_PROPERTY(QFont defaultFont2
+               READ defaultFont2
+               NOTIFY fontPointSizeDeltaChanged)
+    // clang-format on
     QFont defaultFont2() const;
 
     QFontMetrics defaultFontMetrics() const { return QFontMetrics(this->defaultFont()); }
     QFontMetrics defaultFont2Metrics() const { return QFontMetrics(this->defaultFont2()); }
 
-    Q_PROPERTY(int fontPointSizeDelta READ fontPointSizeDelta NOTIFY fontPointSizeDeltaChanged)
+    // clang-format off
+    Q_PROPERTY(int fontPointSizeDelta
+               READ fontPointSizeDelta
+               NOTIFY fontPointSizeDeltaChanged)
+    // clang-format on
     int fontPointSizeDelta() const { return m_fontPointSizeDelta; }
     Q_SIGNAL void fontPointSizeDeltaChanged();
 
-    Q_PROPERTY(int fontZoomLevelIndex READ fontZoomLevelIndex WRITE setFontZoomLevelIndex NOTIFY
-                       fontZoomLevelIndexChanged STORED false)
+    // clang-format off
+    Q_PROPERTY(int fontZoomLevelIndex
+               READ fontZoomLevelIndex
+               WRITE setFontZoomLevelIndex
+               NOTIFY fontZoomLevelIndexChanged
+               STORED false)
+    // clang-format on
     void setFontZoomLevelIndex(int val);
     int fontZoomLevelIndex() const { return m_fontZoomLevelIndex; }
     Q_SIGNAL void fontZoomLevelIndexChanged();
 
-    Q_PROPERTY(QVariantList fontZoomLevels READ fontZoomLevels NOTIFY fontZoomLevelsChanged)
+    // clang-format off
+    Q_PROPERTY(QVariantList fontZoomLevels
+               READ fontZoomLevels
+               NOTIFY fontZoomLevelsChanged)
+    // clang-format on
     QVariantList fontZoomLevels() const { return m_fontZoomLevels; }
     Q_SIGNAL void fontZoomLevelsChanged();
 
@@ -389,7 +607,10 @@ public:
     Q_INVOKABLE SceneElementFormat *elementFormat(int type) const;
     Q_SIGNAL void formatChanged();
 
-    Q_PROPERTY(QQmlListProperty<SceneElementFormat> elementFormats READ elementFormats)
+    // clang-format off
+    Q_PROPERTY(QQmlListProperty<SceneElementFormat> elementFormats
+               READ elementFormats)
+    // clang-format on
     QQmlListProperty<SceneElementFormat> elementFormats();
 
     void applyToAll(const SceneElementFormat *from, SceneElementFormat::Properties properties);
@@ -399,8 +620,12 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int, QByteArray> roleNames() const;
 
-    Q_PROPERTY(int secondsPerPage READ secondsPerPage WRITE setSecondsPerPage NOTIFY
-                       secondsPerPageChanged)
+    // clang-format off
+    Q_PROPERTY(int secondsPerPage
+               READ secondsPerPage
+               WRITE setSecondsPerPage
+               NOTIFY secondsPerPageChanged)
+    // clang-format on
     void setSecondsPerPage(int val);
     int secondsPerPage() const { return m_secondsPerPage; }
     Q_SIGNAL void secondsPerPageChanged();
@@ -414,7 +639,11 @@ public:
     Q_INVOKABLE bool hasChangesToCommit() { return m_nrChangesDuringTransation > 0; }
     Q_INVOKABLE void commitTransaction();
 
-    Q_PROPERTY(bool inTransaction READ isInTransaction NOTIFY inTransactionChanged)
+    // clang-format off
+    Q_PROPERTY(bool inTransaction
+               READ isInTransaction
+               NOTIFY inTransactionChanged)
+    // clang-format on
     bool isInTransaction() const { return m_inTransaction; }
     Q_SIGNAL void inTransactionChanged();
 
@@ -462,51 +691,88 @@ public:
     explicit TextFormat(QObject *parent = nullptr);
     ~TextFormat();
 
-    Q_PROPERTY(bool bold READ isBold WRITE setBold NOTIFY boldChanged)
+    // clang-format off
+    Q_PROPERTY(bool bold
+               READ isBold
+               WRITE setBold
+               NOTIFY boldChanged)
+    // clang-format on
     void setBold(bool val);
     bool isBold() const { return m_bold; }
     Q_SIGNAL void boldChanged();
 
     Q_INVOKABLE void toggleBold() { this->setBold(!m_bold); }
 
-    Q_PROPERTY(bool italics READ isItalics WRITE setItalics NOTIFY italicsChanged)
+    // clang-format off
+    Q_PROPERTY(bool italics
+               READ isItalics
+               WRITE setItalics
+               NOTIFY italicsChanged)
+    // clang-format on
     void setItalics(bool val);
     bool isItalics() const { return m_italics; }
     Q_SIGNAL void italicsChanged();
 
     Q_INVOKABLE void toggleItalics() { this->setItalics(!m_italics); }
 
-    Q_PROPERTY(bool underline READ isUnderline WRITE setUnderline NOTIFY underlineChanged)
+    // clang-format off
+    Q_PROPERTY(bool underline
+               READ isUnderline
+               WRITE setUnderline
+               NOTIFY underlineChanged)
+    // clang-format on
     void setUnderline(bool val);
     bool isUnderline() const { return m_underline; }
     Q_SIGNAL void underlineChanged();
 
     Q_INVOKABLE void toggleUnderline() { this->setUnderline(!m_underline); }
 
-    Q_PROPERTY(bool strikeout READ isStrikeout WRITE setStrikeout NOTIFY strikeoutChanged)
+    // clang-format off
+    Q_PROPERTY(bool strikeout
+               READ isStrikeout
+               WRITE setStrikeout
+               NOTIFY strikeoutChanged)
+    // clang-format on
     void setStrikeout(bool val);
     bool isStrikeout() const { return m_strikeout; }
     Q_SIGNAL void strikeoutChanged();
 
     Q_INVOKABLE void toggleStrikeout() { this->setStrikeout(!m_strikeout); }
 
-    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor textColor
+               READ textColor
+               WRITE setTextColor
+               NOTIFY textColorChanged)
+    // clang-format on
     void setTextColor(const QColor &val);
     QColor textColor() const { return m_textColor; }
     Q_SIGNAL void textColorChanged();
 
-    Q_PROPERTY(bool hasTextColor READ hasTextColor NOTIFY textColorChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasTextColor
+               READ hasTextColor
+               NOTIFY textColorChanged)
+    // clang-format on
     bool hasTextColor() const { return m_textColor.alpha() > 0; }
 
     Q_INVOKABLE void resetTextColor() { this->setTextColor(Qt::transparent); }
 
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY
-                       backgroundColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor backgroundColor
+               READ backgroundColor
+               WRITE setBackgroundColor
+               NOTIFY backgroundColorChanged)
+    // clang-format on
     void setBackgroundColor(const QColor &val);
     QColor backgroundColor() const { return m_backgroundColor; }
     Q_SIGNAL void backgroundColorChanged();
 
-    Q_PROPERTY(bool hasBackgroundColor READ hasBackgroundColor NOTIFY backgroundColorChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasBackgroundColor
+               READ hasBackgroundColor
+               NOTIFY backgroundColorChanged)
+    // clang-format on
     bool hasBackgroundColor() const { return m_backgroundColor.alpha() > 0; }
 
     Q_INVOKABLE void resetBackgroundColor() { this->setBackgroundColor(Qt::transparent); }
@@ -543,74 +809,127 @@ public:
     explicit SceneDocumentBinder(QObject *parent = nullptr);
     ~SceneDocumentBinder();
 
-    Q_PROPERTY(ScreenplayFormat *screenplayFormat READ screenplayFormat WRITE setScreenplayFormat
-                       NOTIFY screenplayFormatChanged RESET resetScreenplayFormat)
+    // clang-format off
+    Q_PROPERTY(ScreenplayFormat *screenplayFormat
+               READ screenplayFormat
+               WRITE setScreenplayFormat
+               NOTIFY screenplayFormatChanged
+               RESET resetScreenplayFormat)
+    // clang-format on
     void setScreenplayFormat(ScreenplayFormat *val);
     ScreenplayFormat *screenplayFormat() const { return m_screenplayFormat; }
     Q_SIGNAL void screenplayFormatChanged();
 
-    Q_PROPERTY(Scene *scene READ scene WRITE setScene NOTIFY sceneChanged RESET resetScene)
+    // clang-format off
+    Q_PROPERTY(Scene *scene
+               READ scene
+               WRITE setScene
+               NOTIFY sceneChanged
+               RESET resetScene)
+    // clang-format on
     void setScene(Scene *val);
     Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
-    Q_PROPERTY(
-            ScreenplayElement *screenplayElement READ screenplayElement WRITE setScreenplayElement
-                    NOTIFY screenplayElementChanged RESET resetScreenplayElement)
+    // clang-format off
+    Q_PROPERTY(ScreenplayElement *screenplayElement
+               READ screenplayElement
+               WRITE setScreenplayElement
+               NOTIFY screenplayElementChanged
+               RESET resetScreenplayElement)
+    // clang-format on
     void setScreenplayElement(ScreenplayElement *val);
     ScreenplayElement *screenplayElement() const { return m_screenplayElement; }
     Q_SIGNAL void screenplayElementChanged();
 
-    Q_PROPERTY(QQuickTextDocument *textDocument READ textDocument WRITE setTextDocument NOTIFY
-                       textDocumentChanged RESET resetTextDocument)
+    // clang-format off
+    Q_PROPERTY(QQuickTextDocument *textDocument
+               READ textDocument
+               WRITE setTextDocument
+               NOTIFY textDocumentChanged
+               RESET resetTextDocument)
+    // clang-format on
     void setTextDocument(QQuickTextDocument *val);
     QQuickTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
-    Q_PROPERTY(bool spellCheckEnabled READ isSpellCheckEnabled WRITE setSpellCheckEnabled NOTIFY
-                       spellCheckEnabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool spellCheckEnabled
+               READ isSpellCheckEnabled
+               WRITE setSpellCheckEnabled
+               NOTIFY spellCheckEnabledChanged)
+    // clang-format on
     void setSpellCheckEnabled(bool val);
     bool isSpellCheckEnabled() const { return m_spellCheckEnabled; }
     Q_SIGNAL void spellCheckEnabledChanged();
 
-    Q_PROPERTY(bool liveSpellCheckEnabled READ isLiveSpellCheckEnabled WRITE
-                       setLiveSpellCheckEnabled NOTIFY liveSpellCheckEnabledChanged)
+    // clang-format off
+    Q_PROPERTY(bool liveSpellCheckEnabled
+               READ isLiveSpellCheckEnabled
+               WRITE setLiveSpellCheckEnabled
+               NOTIFY liveSpellCheckEnabledChanged)
+    // clang-format on
     void setLiveSpellCheckEnabled(bool val);
     bool isLiveSpellCheckEnabled() const { return m_liveSpellCheckEnabled; }
     Q_SIGNAL void liveSpellCheckEnabledChanged();
 
-    Q_PROPERTY(bool autoCapitalizeSentences READ isAutoCapitalizeSentences WRITE
-                       setAutoCapitalizeSentences NOTIFY autoCapitalizeSentencesChanged)
+    // clang-format off
+    Q_PROPERTY(bool autoCapitalizeSentences
+               READ isAutoCapitalizeSentences
+               WRITE setAutoCapitalizeSentences
+               NOTIFY autoCapitalizeSentencesChanged)
+    // clang-format on
     void setAutoCapitalizeSentences(bool val);
     bool isAutoCapitalizeSentences() const { return m_autoCapitalizeSentences; }
     Q_SIGNAL void autoCapitalizeSentencesChanged();
 
     // Adds : at end of shots & transitions, CONT'D for characters where applicable.
-    Q_PROPERTY(bool autoPolishParagraphs READ isAutoPolishParagraphs WRITE setAutoPolishParagraphs
-                       NOTIFY autoPolishParagraphsChanged)
+    // clang-format off
+    Q_PROPERTY(bool autoPolishParagraphs
+               READ isAutoPolishParagraphs
+               WRITE setAutoPolishParagraphs
+               NOTIFY autoPolishParagraphsChanged)
+    // clang-format on
     void setAutoPolishParagraphs(bool val);
     bool isAutoPolishParagraphs() const { return m_autoPolishParagraphs; }
     Q_SIGNAL void autoPolishParagraphsChanged();
 
-    Q_PROPERTY(qreal textWidth READ textWidth WRITE setTextWidth NOTIFY textWidthChanged)
+    // clang-format off
+    Q_PROPERTY(qreal textWidth
+               READ textWidth
+               WRITE setTextWidth
+               NOTIFY textWidthChanged)
+    // clang-format on
     void setTextWidth(qreal val);
     qreal textWidth() const { return m_textWidth; }
     Q_SIGNAL void textWidthChanged();
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
-                       cursorPositionChanged)
+    // clang-format off
+    Q_PROPERTY(int cursorPosition
+               READ cursorPosition
+               WRITE setCursorPosition
+               NOTIFY cursorPositionChanged)
+    // clang-format on
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
 
-    Q_PROPERTY(int selectionStartPosition READ selectionStartPosition WRITE
-                       setSelectionStartPosition NOTIFY selectionStartPositionChanged)
+    // clang-format off
+    Q_PROPERTY(int selectionStartPosition
+               READ selectionStartPosition
+               WRITE setSelectionStartPosition
+               NOTIFY selectionStartPositionChanged)
+    // clang-format on
     void setSelectionStartPosition(int val);
     int selectionStartPosition() const { return m_selectionStartPosition; }
     Q_SIGNAL void selectionStartPositionChanged();
 
-    Q_PROPERTY(int selectionEndPosition READ selectionEndPosition WRITE setSelectionEndPosition
-                       NOTIFY selectionEndPositionChanged)
+    // clang-format off
+    Q_PROPERTY(int selectionEndPosition
+               READ selectionEndPosition
+               WRITE setSelectionEndPosition
+               NOTIFY selectionEndPositionChanged)
+    // clang-format on
     void setSelectionEndPosition(int val);
     int selectionEndPosition() const { return m_selectionEndPosition; }
     Q_SIGNAL void selectionEndPositionChanged();
@@ -620,67 +939,115 @@ public:
 
     Q_INVOKABLE bool changeTextCase(SceneDocumentBinder::TextCasing casing);
 
-    Q_PROPERTY(bool applyTextFormat READ isApplyTextFormat WRITE setApplyTextFormat NOTIFY
-                       applyTextFormatChanged)
+    // clang-format off
+    Q_PROPERTY(bool applyTextFormat
+               READ isApplyTextFormat
+               WRITE setApplyTextFormat
+               NOTIFY applyTextFormatChanged)
+    // clang-format on
     void setApplyTextFormat(bool val);
     bool isApplyTextFormat() const { return m_applyTextFormat; }
     Q_SIGNAL void applyTextFormatChanged();
 
-    Q_PROPERTY(TextFormat *textFormat READ textFormat CONSTANT)
+    // clang-format off
+    Q_PROPERTY(TextFormat *textFormat
+               READ textFormat
+               CONSTANT )
+    // clang-format on
     TextFormat *textFormat() const { return m_textFormat; }
 
     Q_SIGNAL void requestCursorPosition(int position);
 
-    Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY
-                       characterNamesChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList characterNames
+               READ characterNames
+               WRITE setCharacterNames
+               NOTIFY characterNamesChanged)
+    // clang-format on
     void setCharacterNames(const QStringList &val);
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
 
-    Q_PROPERTY(
-            QStringList transitions READ transitions WRITE setTransitions NOTIFY transitionsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList transitions
+               READ transitions
+               WRITE setTransitions
+               NOTIFY transitionsChanged)
+    // clang-format on
     void setTransitions(const QStringList &val);
     QStringList transitions() const { return m_transitions; }
     Q_SIGNAL void transitionsChanged();
 
-    Q_PROPERTY(QStringList shots READ shots WRITE setShots NOTIFY shotsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList shots
+               READ shots
+               WRITE setShots
+               NOTIFY shotsChanged)
+    // clang-format on
     void setShots(const QStringList &val);
     QStringList shots() const { return m_shots; }
     Q_SIGNAL void shotsChanged();
 
-    Q_PROPERTY(SceneElement *currentElement READ currentElement NOTIFY currentElementChanged RESET
-                       resetCurrentElement)
+    // clang-format off
+    Q_PROPERTY(SceneElement *currentElement
+               READ currentElement
+               NOTIFY currentElementChanged
+               RESET resetCurrentElement)
+    // clang-format on
     SceneElement *currentElement() const { return m_currentElement; }
     Q_SIGNAL void currentElementChanged();
 
-    Q_PROPERTY(int currentElementCursorPosition READ currentElementCursorPosition NOTIFY
-                       cursorPositionChanged)
+    // clang-format off
+    Q_PROPERTY(int currentElementCursorPosition
+               READ currentElementCursorPosition
+               NOTIFY cursorPositionChanged)
+    // clang-format on
     int currentElementCursorPosition() const { return m_currentElementCursorPosition; }
 
-    Q_PROPERTY(QList<SceneElement *> selectedElements READ selectedElements NOTIFY
-                       selectedElementsChanged)
+    // clang-format off
+    Q_PROPERTY(QList<SceneElement *>
+               selectedElements READ
+               selectedElements NOTIFY
+               selectedElementsChanged )
+    // clang-format on
     QList<SceneElement *> selectedElements() const;
     Q_SIGNAL void selectedElementsChanged();
 
     Q_INVOKABLE SceneElement *sceneElementAt(int cursorPosition) const;
     Q_INVOKABLE QRectF sceneElementBoundingRect(SceneElement *sceneElement) const;
 
-    Q_PROPERTY(bool forceSyncDocument READ isForceSyncDocument WRITE setForceSyncDocument NOTIFY
-                       forceSyncDocumentChanged)
+    // clang-format off
+    Q_PROPERTY(bool forceSyncDocument
+               READ isForceSyncDocument
+               WRITE setForceSyncDocument
+               NOTIFY forceSyncDocumentChanged)
+    // clang-format on
     void setForceSyncDocument(bool val);
     bool isForceSyncDocument() const { return m_forceSyncDocument; }
     Q_SIGNAL void forceSyncDocumentChanged();
 
-    Q_PROPERTY(bool applyLanguageFonts READ isApplyLanguageFonts WRITE setApplyLanguageFonts NOTIFY
-                       applyLanguageFontsChanged)
+    // clang-format off
+    Q_PROPERTY(bool applyLanguageFonts
+               READ isApplyLanguageFonts
+               WRITE setApplyLanguageFonts
+               NOTIFY applyLanguageFontsChanged)
+    // clang-format on
     void setApplyLanguageFonts(bool val);
     bool isApplyLanguageFonts() const { return m_applyLanguageFonts; }
     Q_SIGNAL void applyLanguageFontsChanged();
 
-    Q_PROPERTY(QString nextTabFormatAsString READ nextTabFormatAsString NOTIFY nextTabFormatChanged)
+    // clang-format off
+    Q_PROPERTY(QString nextTabFormatAsString
+               READ nextTabFormatAsString
+               NOTIFY nextTabFormatChanged)
+    // clang-format on
     QString nextTabFormatAsString() const;
 
-    Q_PROPERTY(int nextTabFormat READ nextTabFormat NOTIFY nextTabFormatChanged)
+    // clang-format off
+    Q_PROPERTY(int nextTabFormat
+               READ nextTabFormat
+               NOTIFY nextTabFormatChanged)
+    // clang-format on
     int nextTabFormat() const;
     Q_SIGNAL void nextTabFormatChanged();
 
@@ -695,13 +1062,19 @@ public:
     Q_INVOKABLE int cursorPositionAtBlock(int blockNumber) const;
     Q_INVOKABLE int currentBlockPosition() const;
 
-    Q_PROPERTY(QStringList spellingSuggestions READ spellingSuggestions NOTIFY
-                       spellingSuggestionsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList spellingSuggestions
+               READ spellingSuggestions
+               NOTIFY spellingSuggestionsChanged)
+    // clang-format on
     QStringList spellingSuggestions() const { return m_spellingSuggestions; }
     Q_SIGNAL void spellingSuggestionsChanged();
 
-    Q_PROPERTY(bool wordUnderCursorIsMisspelled READ isWordUnderCursorIsMisspelled NOTIFY
-                       wordUnderCursorIsMisspelledChanged)
+    // clang-format off
+    Q_PROPERTY(bool wordUnderCursorIsMisspelled
+               READ isWordUnderCursorIsMisspelled
+               NOTIFY wordUnderCursorIsMisspelledChanged)
+    // clang-format on
     bool isWordUnderCursorIsMisspelled() const { return m_wordUnderCursorIsMisspelled; }
     Q_SIGNAL void wordUnderCursorIsMisspelledChanged();
 
@@ -725,31 +1098,56 @@ public:
         this->addWordAtPositionToIgnoreList(m_cursorPosition);
     }
 
-    Q_PROPERTY(QStringList autoCompleteHints READ autoCompleteHints NOTIFY autoCompleteHintsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList autoCompleteHints
+               READ autoCompleteHints
+               NOTIFY autoCompleteHintsChanged)
+    // clang-format on
     QStringList autoCompleteHints() const { return m_autoCompleteHints; }
     Q_SIGNAL void autoCompleteHintsChanged();
 
-    Q_PROPERTY(QStringList priorityAutoCompleteHints READ priorityAutoCompleteHints NOTIFY
-                       autoCompleteHintsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList priorityAutoCompleteHints
+               READ priorityAutoCompleteHints
+               NOTIFY autoCompleteHintsChanged)
+    // clang-format on
     QStringList priorityAutoCompleteHints() const { return m_priorityAutoCompleteHints; }
 
-    Q_PROPERTY(SceneElement::Type autoCompleteHintsFor READ autoCompleteHintsFor NOTIFY
-                       autoCompleteHintsForChanged)
+    // clang-format off
+    Q_PROPERTY(SceneElement::Type autoCompleteHintsFor
+               READ autoCompleteHintsFor
+               NOTIFY autoCompleteHintsForChanged)
+    // clang-format on
     SceneElement::Type autoCompleteHintsFor() const { return m_autoCompleteHintsFor; }
     Q_SIGNAL void autoCompleteHintsForChanged();
 
-    Q_PROPERTY(QString completionPrefix READ completionPrefix NOTIFY completionPrefixChanged)
+    // clang-format off
+    Q_PROPERTY(QString completionPrefix
+               READ completionPrefix
+               NOTIFY completionPrefixChanged)
+    // clang-format on
     QString completionPrefix() const { return m_completionPrefix; }
     Q_SIGNAL void completionPrefixChanged();
 
-    Q_PROPERTY(int completionPrefixStart READ completionPrefixStart NOTIFY completionPrefixChanged)
+    // clang-format off
+    Q_PROPERTY(int completionPrefixStart
+               READ completionPrefixStart
+               NOTIFY completionPrefixChanged)
+    // clang-format on
     int completionPrefixStart() const { return m_completionPrefixStart; }
 
-    Q_PROPERTY(int completionPrefixEnd READ completionPrefixEnd NOTIFY completionPrefixChanged)
+    // clang-format off
+    Q_PROPERTY(int completionPrefixEnd
+               READ completionPrefixEnd
+               NOTIFY completionPrefixChanged)
+    // clang-format on
     int completionPrefixEnd() const { return m_completionPrefixEnd; }
 
-    Q_PROPERTY(bool hasCompletionPrefixBoundary READ hasCompletionPrefixBoundary NOTIFY
-                       completionPrefixChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasCompletionPrefixBoundary
+               READ hasCompletionPrefixBoundary
+               NOTIFY completionPrefixChanged)
+    // clang-format on
     bool hasCompletionPrefixBoundary() const
     {
         return m_completionPrefixStart >= 0 && m_completionPrefixEnd >= 0;
@@ -763,15 +1161,27 @@ public:
         TransitionCompletionMode
     };
     Q_ENUM(CompletionMode)
-    Q_PROPERTY(CompletionMode completionMode READ completionMode NOTIFY completionModeChanged)
+    // clang-format off
+    Q_PROPERTY(CompletionMode completionMode
+               READ completionMode
+               NOTIFY completionModeChanged)
+    // clang-format on
     CompletionMode completionMode() const { return m_completionMode; }
     Q_SIGNAL void completionModeChanged();
 
-    Q_PROPERTY(QFont currentFont READ currentFont NOTIFY currentFontChanged)
+    // clang-format off
+    Q_PROPERTY(QFont currentFont
+               READ currentFont
+               NOTIFY currentFontChanged)
+    // clang-format on
     QFont currentFont() const;
     Q_SIGNAL void currentFontChanged();
 
-    Q_PROPERTY(int documentLoadCount READ documentLoadCount NOTIFY documentLoadCountChanged)
+    // clang-format off
+    Q_PROPERTY(int documentLoadCount
+               READ documentLoadCount
+               NOTIFY documentLoadCountChanged)
+    // clang-format on
     int documentLoadCount() const { return m_documentLoadCount; }
     Q_SIGNAL void documentLoadCountChanged();
 
@@ -781,9 +1191,12 @@ public:
     Q_INVOKABLE void copy(int fromPosition, int toPosition);
     Q_INVOKABLE int paste(int fromPosition = -1);
 
-    Q_PROPERTY(bool applyFormattingEvenInTransaction READ isApplyFormattingEvenInTransaction WRITE
-                       setApplyFormattingEvenInTransaction NOTIFY
-                               applyFormattingEvenInTransactionChanged)
+    // clang-format off
+    Q_PROPERTY(bool applyFormattingEvenInTransaction
+               READ isApplyFormattingEvenInTransaction
+               WRITE setApplyFormattingEvenInTransaction
+               NOTIFY applyFormattingEvenInTransactionChanged)
+    // clang-format on
     void setApplyFormattingEvenInTransaction(bool val);
     bool isApplyFormattingEvenInTransaction() const { return m_applyFormattingEvenInTransaction; }
     Q_SIGNAL void applyFormattingEvenInTransactionChanged();

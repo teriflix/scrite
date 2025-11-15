@@ -33,62 +33,118 @@ public:
 
     static Notification *qmlAttachedProperties(QObject *object);
 
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    // clang-format off
+    Q_PROPERTY(QString title
+               READ title
+               WRITE setTitle
+               NOTIFY titleChanged)
+    // clang-format on
     void setTitle(const QString &val);
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
-    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    // clang-format off
+    Q_PROPERTY(QString text
+               READ text
+               WRITE setText
+               NOTIFY textChanged)
+    // clang-format on
     void setText(const QString &val);
     QString text() const { return m_text; }
     Q_SIGNAL void textChanged();
 
-    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor color
+               READ color
+               WRITE setColor
+               NOTIFY colorChanged)
+    // clang-format on
     void setColor(const QColor &val);
     QColor color() const { return m_color; }
     Q_SIGNAL void colorChanged();
 
-    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
+    // clang-format off
+    Q_PROPERTY(QColor textColor
+               READ textColor
+               WRITE setTextColor
+               NOTIFY textColorChanged)
+    // clang-format on
     void setTextColor(const QColor &val);
     QColor textColor() const { return m_textColor; }
     Q_SIGNAL void textColorChanged();
 
-    Q_PROPERTY(QUrl image READ image WRITE setImage NOTIFY imageChanged)
+    // clang-format off
+    Q_PROPERTY(QUrl image
+               READ image
+               WRITE setImage
+               NOTIFY imageChanged)
+    // clang-format on
     void setImage(const QUrl &val);
     QUrl image() const { return m_image; }
     Q_SIGNAL void imageChanged();
 
-    Q_PROPERTY(bool hasImage READ hasImage NOTIFY imageChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasImage
+               READ hasImage
+               NOTIFY imageChanged)
+    // clang-format on
     bool hasImage() const { return !m_image.isEmpty(); }
 
-    Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
+    // clang-format off
+    Q_PROPERTY(bool active
+               READ active
+               WRITE setActive
+               NOTIFY activeChanged)
+    // clang-format on
     void setActive(bool val);
     bool active() const { return m_active; }
     Q_SIGNAL void activeChanged();
 
-    Q_PROPERTY(bool autoClose READ autoClose WRITE setAutoClose NOTIFY autoCloseChanged)
+    // clang-format off
+    Q_PROPERTY(bool autoClose
+               READ autoClose
+               WRITE setAutoClose
+               NOTIFY autoCloseChanged)
+    // clang-format on
     void setAutoClose(bool val);
     bool autoClose() const { return m_autoClose; }
     Q_SIGNAL void autoCloseChanged();
 
-    Q_PROPERTY(int autoCloseDelay READ autoCloseDelay WRITE setAutoCloseDelay NOTIFY
-                       autoCloseDelayChanged)
+    // clang-format off
+    Q_PROPERTY(int autoCloseDelay
+               READ autoCloseDelay
+               WRITE setAutoCloseDelay
+               NOTIFY autoCloseDelayChanged)
+    // clang-format on
     void setAutoCloseDelay(int val);
     int autoCloseDelay() const { return m_autoCloseDelay; }
     Q_SIGNAL void autoCloseDelayChanged();
 
-    Q_PROPERTY(bool closeOnButtonClick READ isCloseOnButtonClick WRITE setCloseOnButtonClick NOTIFY
-                       closeOnButtonClickChanged)
+    // clang-format off
+    Q_PROPERTY(bool closeOnButtonClick
+               READ isCloseOnButtonClick
+               WRITE setCloseOnButtonClick
+               NOTIFY closeOnButtonClickChanged)
+    // clang-format on
     void setCloseOnButtonClick(bool val);
     bool isCloseOnButtonClick() const { return m_closeOnButtonClick; }
     Q_SIGNAL void closeOnButtonClickChanged();
 
-    Q_PROPERTY(QStringList buttons READ buttons WRITE setButtons NOTIFY buttonsChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList buttons
+               READ buttons
+               WRITE setButtons
+               NOTIFY buttonsChanged)
+    // clang-format on
     void setButtons(const QStringList &val);
     QStringList buttons() const { return m_buttons; }
     Q_SIGNAL void buttonsChanged();
 
-    Q_PROPERTY(bool hasButtons READ hasButtons NOTIFY buttonsChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasButtons
+               READ hasButtons
+               NOTIFY buttonsChanged)
+    // clang-format on
     bool hasButtons() const { return !m_buttons.isEmpty(); }
 
     Q_INVOKABLE void notifyButtonClick(int index);

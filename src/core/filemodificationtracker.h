@@ -28,7 +28,12 @@ public:
     FileModificationTracker(QObject *parent = nullptr);
     ~FileModificationTracker();
 
-    Q_PROPERTY(QString filePath READ filePath WRITE setFilePath NOTIFY filePathChanged)
+    // clang-format off
+    Q_PROPERTY(QString filePath
+               READ filePath
+               WRITE setFilePath
+               NOTIFY filePathChanged)
+    // clang-format on
     void setFilePath(const QString &val);
     QString filePath() const { return m_filePath; }
     Q_SIGNAL void filePathChanged();

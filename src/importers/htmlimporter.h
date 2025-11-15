@@ -20,8 +20,10 @@
 class HtmlImporter : public AbstractImporter
 {
     Q_OBJECT
+    // clang-format off
     Q_CLASSINFO("Format", "HTML")
     Q_CLASSINFO("NameFilters", "HTML (*.html)")
+    // clang-format on
 
 public:
     Q_INVOKABLE explicit HtmlImporter(QObject *parent = nullptr);

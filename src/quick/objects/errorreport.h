@@ -31,34 +31,63 @@ public:
     ~ErrorReport();
     Q_SIGNAL void aboutToDelete(ErrorReport *val);
 
-    Q_PROPERTY(ErrorReport *proxyFor READ proxyFor WRITE setProxyFor NOTIFY proxyForChanged RESET
-                       resetProxyFor)
+    // clang-format off
+    Q_PROPERTY(ErrorReport *proxyFor
+               READ proxyFor
+               WRITE setProxyFor
+               NOTIFY proxyForChanged
+               RESET resetProxyFor)
+    // clang-format on
     void setProxyFor(ErrorReport *val);
     ErrorReport *proxyFor() const { return m_proxyFor; }
     Q_SIGNAL void proxyForChanged();
 
-    Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
+    // clang-format off
+    Q_PROPERTY(QString errorMessage
+               READ errorMessage
+               NOTIFY errorMessageChanged)
+    // clang-format on
     void setErrorMessage(const QString &val, const QJsonObject &details = QJsonObject());
     QString errorMessage() const { return m_errorMessage; }
     Q_SIGNAL void errorMessageChanged();
 
-    Q_PROPERTY(QJsonObject details READ details NOTIFY errorMessageChanged)
+    // clang-format off
+    Q_PROPERTY(QJsonObject details
+               READ details
+               NOTIFY errorMessageChanged)
+    // clang-format on
     QJsonObject details() const { return m_details; }
 
-    Q_PROPERTY(bool hasError READ hasError NOTIFY errorMessageChanged)
+    // clang-format off
+    Q_PROPERTY(bool hasError
+               READ hasError
+               NOTIFY errorMessageChanged)
+    // clang-format on
     bool hasError() const { return !m_errorMessage.isEmpty(); }
 
-    Q_PROPERTY(int warningMessageCount READ warningMessageCount NOTIFY warningMessageCountChanged)
+    // clang-format off
+    Q_PROPERTY(int warningMessageCount
+               READ warningMessageCount
+               NOTIFY warningMessageCountChanged)
+    // clang-format on
     int warningMessageCount() const { return m_warningMessages.size(); }
     Q_SIGNAL void warningMessageCountChanged();
 
-    Q_PROPERTY(QString lastWarningMessage READ lastWarningMessage NOTIFY warningMessageCountChanged)
+    // clang-format off
+    Q_PROPERTY(QString lastWarningMessage
+               READ lastWarningMessage
+               NOTIFY warningMessageCountChanged)
+    // clang-format on
     QString lastWarningMessage() const
     {
         return m_warningMessages.empty() ? QString() : m_warningMessages.last();
     }
 
-    Q_PROPERTY(QStringList warningMessages READ warningMessages NOTIFY warningMessageCountChanged)
+    // clang-format off
+    Q_PROPERTY(QStringList warningMessages
+               READ warningMessages
+               NOTIFY warningMessageCountChanged)
+    // clang-format on
     QStringList warningMessages() const { return m_warningMessages; }
 
     Q_INVOKABLE void clear();

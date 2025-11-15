@@ -39,8 +39,13 @@ public:
     explicit NotebookModel(QObject *parent = nullptr);
     ~NotebookModel();
 
-    Q_PROPERTY(ScriteDocument *document READ document WRITE setDocument RESET resetDocument NOTIFY
-                       documentChanged)
+    // clang-format off
+    Q_PROPERTY(ScriteDocument *document
+               READ document
+               WRITE setDocument
+               RESET resetDocument
+               NOTIFY documentChanged)
+    // clang-format on
     void setDocument(ScriteDocument *val);
     ScriteDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
@@ -80,7 +85,12 @@ public:
     Q_INVOKABLE QModelIndex findModelIndexForCategory(NotebookModel::ItemCategory cat) const;
     Q_INVOKABLE void refresh();
 
-    Q_PROPERTY(BookmarkedNotes *bookmarkedNotes READ bookmarkedNotes CONSTANT STORED false)
+    // clang-format off
+    Q_PROPERTY(BookmarkedNotes *bookmarkedNotes
+               READ bookmarkedNotes
+               CONSTANT STORED
+               false )
+    // clang-format on
     BookmarkedNotes *bookmarkedNotes() const { return m_bookmarkedNotes; }
     Q_SIGNAL void bookmarkedNotesChanged();
 
