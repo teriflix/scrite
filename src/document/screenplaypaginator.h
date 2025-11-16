@@ -120,6 +120,7 @@ Q_DECLARE_METATYPE(QList<ScreenplayPaginatorRecord>)
 
 class QThread;
 class ScreenplayPaginatorWorker;
+class ScreenplayPaginatorWorkerNode;
 class ScreenplayPaginator : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
@@ -303,6 +304,7 @@ private:
 
     QThread *m_workerThread = nullptr;
     ScreenplayPaginatorWorker *m_worker = nullptr;
+    ScreenplayPaginatorWorkerNode *m_workerNode = nullptr;
 };
 
 class ScreenplayPaginatorWatcher : public QObject

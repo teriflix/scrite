@@ -84,15 +84,16 @@ ScreenplayPaginator::ScreenplayPaginator(QObject *parent) : QObject(parent)
 
     m_worker = new ScreenplayPaginatorWorker;
     m_worker->moveToThread(m_workerThread);
-    connect(m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater);
-    connect(m_worker, &ScreenplayPaginatorWorker::paginationComplete, this,
-            &ScreenplayPaginator::onPaginationComplete);
-    connect(m_worker, &ScreenplayPaginatorWorker::cursorQueryResponse, this,
-            &ScreenplayPaginator::onCursorQueryResponse);
 
+    connect(m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater);
     m_workerThread->start();
 
-    QTimer::singleShot(0, this, &ScreenplayPaginator::useDefaultFormatAndScreenplay);
+    m_workerNode = new ScreenplayPaginatorWorkerNode(this);
+    connect(m_workerNode, &ScreenplayPaginatorWorkerNode::paginationComplete, this,
+            &ScreenplayPaginator::onPaginationComplete);
+    connect(m_workerNode, &ScreenplayPaginatorWorkerNode::cursorQueryResponse, this,
+            &ScreenplayPaginator::onCursorQueryResponse);
+    m_workerNode->setWorker(m_worker);
 
     connect(this, &ScreenplayPaginator::enabledChanged, this, &ScreenplayPaginator::reset);
     connect(this, &ScreenplayPaginator::formatChanged, this, &ScreenplayPaginator::onFormatChanged);
@@ -100,6 +101,8 @@ ScreenplayPaginator::ScreenplayPaginator(QObject *parent) : QObject(parent)
             &ScreenplayPaginator::onScreenplayReset);
     connect(this, &ScreenplayPaginator::cursorPositionChanged, this,
             &ScreenplayPaginator::onCursorPositionChanged);
+
+    QTimer::singleShot(0, this, &ScreenplayPaginator::useDefaultFormatAndScreenplay);
 }
 
 ScreenplayPaginator::~ScreenplayPaginator()
@@ -544,8 +547,7 @@ void ScreenplayPaginator::onFormatChanged()
             m_format == nullptr ? ScriteDocument::instance()->printFormat() : m_format;
 
     const QJsonObject formatJson = QObjectSerializer::toJson(format);
-    QMetaObject::invokeMethod(m_worker, "useFormat", Qt::QueuedConnection,
-                              Q_ARG(QJsonObject, formatJson));
+    m_workerNode->useFormat(formatJson);
 }
 
 void ScreenplayPaginator::onScreenplayReset()
@@ -554,8 +556,7 @@ void ScreenplayPaginator::onScreenplayReset()
         return;
 
     QList<SceneContent> screenplayContent = SceneContent::fromScreenplay(m_screenplay);
-    QMetaObject::invokeMethod(m_worker, "reset", Qt::QueuedConnection,
-                              Q_ARG(QList<SceneContent>, screenplayContent));
+    m_workerNode->reset(screenplayContent);
 }
 
 void ScreenplayPaginator::onScreenplayDestroyed()
@@ -572,8 +573,7 @@ void ScreenplayPaginator::onScreenplayElementInserted(ScreenplayElement *element
         return;
 
     SceneContent sceneContent = SceneContent::fromScreenplayElement(element);
-    QMetaObject::invokeMethod(m_worker, "insertElement", Qt::QueuedConnection, Q_ARG(int, index),
-                              Q_ARG(SceneContent, sceneContent));
+    m_workerNode->insertElement(index, sceneContent);
 }
 
 void ScreenplayPaginator::onScreenplayElementRemoved(ScreenplayElement *element, int index)
@@ -582,7 +582,7 @@ void ScreenplayPaginator::onScreenplayElementRemoved(ScreenplayElement *element,
         return;
 
     Q_UNUSED(element)
-    QMetaObject::invokeMethod(m_worker, "removeElement", Qt::QueuedConnection, Q_ARG(int, index));
+    m_workerNode->removeElement(index);
 }
 
 void ScreenplayPaginator::onScreenplayElementOmitted(ScreenplayElement *element, int index)
@@ -591,7 +591,7 @@ void ScreenplayPaginator::onScreenplayElementOmitted(ScreenplayElement *element,
         return;
 
     Q_UNUSED(element)
-    QMetaObject::invokeMethod(m_worker, "omitElement", Qt::QueuedConnection, Q_ARG(int, index));
+    m_workerNode->omitElement(index);
 }
 
 void ScreenplayPaginator::onScreenplayElementIncluded(ScreenplayElement *element, int index)
@@ -600,7 +600,7 @@ void ScreenplayPaginator::onScreenplayElementIncluded(ScreenplayElement *element
         return;
 
     Q_UNUSED(element)
-    QMetaObject::invokeMethod(m_worker, "includeElement", Qt::QueuedConnection, Q_ARG(int, index));
+    m_workerNode->includeElement(index);
 }
 
 void ScreenplayPaginator::onScreenplayElementSceneReset(ScreenplayElement *element, Scene *scene)
@@ -610,8 +610,7 @@ void ScreenplayPaginator::onScreenplayElementSceneReset(ScreenplayElement *eleme
 
     Q_UNUSED(scene)
     SceneContent sceneContent = SceneContent::fromScreenplayElement(element);
-    QMetaObject::invokeMethod(m_worker, "updateScene", Qt::QueuedConnection,
-                              Q_ARG(SceneContent, sceneContent));
+    m_workerNode->updateScene(sceneContent);
 }
 
 void ScreenplayPaginator::onScreenplayElementSceneHeadingChanged(ScreenplayElement *element,
@@ -622,8 +621,7 @@ void ScreenplayPaginator::onScreenplayElementSceneHeadingChanged(ScreenplayEleme
 
     Q_UNUSED(element)
     SceneParagraph paragraph = SceneParagraph::fromSceneHeading(sceneHeading);
-    QMetaObject::invokeMethod(m_worker, "updateParagraph", Qt::QueuedConnection,
-                              Q_ARG(SceneParagraph, paragraph));
+    m_workerNode->updateParagraph(paragraph);
 }
 
 void ScreenplayPaginator::onScreenplayElementSceneElementChanged(ScreenplayElement *element,
@@ -634,8 +632,7 @@ void ScreenplayPaginator::onScreenplayElementSceneElementChanged(ScreenplayEleme
 
     Q_UNUSED(element)
     SceneParagraph paragraph = SceneParagraph::fromSceneElement(sceneElement);
-    QMetaObject::invokeMethod(m_worker, "updateParagraph", Qt::QueuedConnection,
-                              Q_ARG(SceneParagraph, paragraph));
+    m_workerNode->updateParagraph(paragraph);
 }
 
 void ScreenplayPaginator::onCursorPositionChanged()
@@ -657,9 +654,7 @@ void ScreenplayPaginator::onCursorPositionChanged()
     }
 
     const int currentSerialNumber = currentElement->serialNumber();
-
-    QMetaObject::invokeMethod(m_worker, "query", Qt::QueuedConnection, Q_ARG(int, m_cursorPosition),
-                              Q_ARG(int, currentSerialNumber));
+    m_workerNode->queryCursor(m_cursorPosition, currentSerialNumber);
 }
 
 void ScreenplayPaginator::onCursorQueryResponse(int cursorPosition, qreal pixelOffset,

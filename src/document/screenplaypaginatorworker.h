@@ -148,7 +148,7 @@ public slots:
     void includeElement(int index);
     void updateScene(const SceneContent &sceneContent);
     void updateParagraph(const SceneParagraph &paragraph);
-    void query(int cursorPosition, int currentSerialNumber);
+    void queryCursor(int cursorPosition, int currentSerialNumber);
 
 signals:
     void cursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber,
@@ -182,6 +182,37 @@ private:
     bool m_synchronousSync = false;
     int m_syncInterval = 500;
     qint64 m_lastSyncDocumentTimestamp = 0;
+};
+
+class ScreenplayPaginatorWorkerNode : public QObject
+{
+    Q_OBJECT
+
+public:
+    ScreenplayPaginatorWorkerNode(QObject *parent = nullptr);
+    ~ScreenplayPaginatorWorkerNode();
+
+    void setWorker(ScreenplayPaginatorWorker *worker);
+    ScreenplayPaginatorWorker *worker() const { return m_worker; }
+
+signals:
+    void useFormat(const QJsonObject &format);
+    void reset(const QList<SceneContent> &screenplayContent);
+    void insertElement(int index, const SceneContent &sceneContent);
+    void removeElement(int index);
+    void omitElement(int index);
+    void includeElement(int index);
+    void updateScene(const SceneContent &sceneContent);
+    void updateParagraph(const SceneParagraph &paragraph);
+    void queryCursor(int cursorPosition, int currentSerialNumber);
+
+    void cursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber,
+                             const QTime &time);
+    void paginationComplete(const QList<ScreenplayPaginatorRecord> &items, qreal pixelLength,
+                            int pageCount, const QTime &totalTime);
+
+private:
+    QPointer<ScreenplayPaginatorWorker> m_worker;
 };
 
 #endif // SCREENPLAYPAGINATORWORKER_H

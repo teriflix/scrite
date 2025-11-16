@@ -31,6 +31,13 @@
 #include <QThread>
 #include <QtMath>
 
+// These macros are only used for testing the functionality of the worker.
+// ---- DO NOT ENABLE THESE IN PRODUCTION CODE ---
+
+// #define ENABLE_GUI_LOG
+// #define ENABLE_PDF_ODT_LOG
+// #define ENABLE_FUNCTION_PROFILER
+
 static void registerPaginatorTypes()
 {
     static bool done = false;
@@ -447,7 +454,7 @@ void ScreenplayPaginatorWorker::updateParagraph(const SceneParagraph &paragraph)
     this->scheduleSyncDocument(Q_FUNC_INFO);
 }
 
-void ScreenplayPaginatorWorker::query(int cursorPosition, int currentSerialNumber)
+void ScreenplayPaginatorWorker::queryCursor(int cursorPosition, int currentSerialNumber)
 {
     qreal pixelOffset = this->cursorPixelOffset(cursorPosition, currentSerialNumber);
     QTime time = ScreenplayPaginator::pixelToTimeLength(pixelOffset, m_format, m_document);
@@ -458,8 +465,8 @@ void ScreenplayPaginatorWorker::query(int cursorPosition, int currentSerialNumbe
 
 void ScreenplayPaginatorWorker::syncDocument()
 {
-#if 0
-    PROFILE_THIS_FUNCTION2;
+#ifdef ENABLE_FUNCTION_PROFILER
+    PROFILE_THIS_FUNCTION;
 #endif
 
     if (m_syncDocumentTimer != nullptr)
@@ -472,7 +479,7 @@ void ScreenplayPaginatorWorker::syncDocument()
 
     m_lastSyncDocumentTimestamp = now;
 
-#if 0
+#ifdef ENABLE_GUI_LOG
     Utils::Gui::log(QStringLiteral("ScreenplayPaginatorWorker::syncDocument(): %1 scenes")
                             .arg(m_screenplayContent.size()));
 #endif
@@ -698,11 +705,13 @@ void ScreenplayPaginatorWorker::syncDocument()
                          * minimumSyncInterval,
                  minimumSyncInterval);
 
-#if 0
-    QTextDocumentWriter writer(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation) + "/scrite.odt");
+#ifdef ENABLE_PDF_ODT_LOG
+    QTextDocumentWriter writer(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)
+                               + "/scrite.odt");
     writer.write(m_document);
 
-    QPdfWriter pdfWriter(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation) + "/scrite.pdf");
+    QPdfWriter pdfWriter(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)
+                         + "/scrite.pdf");
     m_document->print(&pdfWriter);
 #endif
 }
@@ -723,7 +732,7 @@ void ScreenplayPaginatorWorker::scheduleSyncDocument(const char *purpose)
         connect(QThread::currentThread(), &QThread::finished, m_syncDocumentTimer, &QTimer::stop);
     }
 
-#if 0
+#ifdef ENABLE_GUI_LOG
     Utils::Gui::log(QStringLiteral("ScreenplayPaginatorWorker::scheduleSyncDocument(%1): %2 scenes")
                             .arg(purpose ? purpose : "NONE")
                             .arg(m_screenplayContent.size()));
@@ -738,8 +747,8 @@ void ScreenplayPaginatorWorker::scheduleSyncDocument(const char *purpose)
 qreal ScreenplayPaginatorWorker::cursorPixelOffset(int cursorPosition,
                                                    int currentSerialNumber) const
 {
-#if 0
-    PROFILE_THIS_FUNCTION2;
+#ifdef ENABLE_FUNCTION_PROFILER
+    PROFILE_THIS_FUNCTION;
 #endif
 
     if (m_document == nullptr || cursorPosition < 0 || currentSerialNumber < 0)
@@ -852,4 +861,49 @@ QList<ScenePageBreak> ScreenplayPaginatorWorker::evaluateScenePageBreaks(
     }
 
     return ret;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+ScreenplayPaginatorWorkerNode::ScreenplayPaginatorWorkerNode(QObject *parent) : QObject(parent) { }
+
+ScreenplayPaginatorWorkerNode::~ScreenplayPaginatorWorkerNode() { }
+
+void ScreenplayPaginatorWorkerNode::setWorker(ScreenplayPaginatorWorker *worker)
+{
+    if (m_worker == worker)
+        return;
+
+    if (!m_worker.isNull()) {
+        disconnect(this, nullptr, m_worker, nullptr);
+        disconnect(m_worker, nullptr, this, nullptr);
+    }
+
+    m_worker = worker;
+
+    if (!m_worker.isNull()) {
+        connect(this, &ScreenplayPaginatorWorkerNode::useFormat, m_worker,
+                &ScreenplayPaginatorWorker::useFormat);
+        connect(this, &ScreenplayPaginatorWorkerNode::reset, m_worker,
+                &ScreenplayPaginatorWorker::reset);
+        connect(this, &ScreenplayPaginatorWorkerNode::insertElement, m_worker,
+                &ScreenplayPaginatorWorker::insertElement);
+        connect(this, &ScreenplayPaginatorWorkerNode::removeElement, m_worker,
+                &ScreenplayPaginatorWorker::removeElement);
+        connect(this, &ScreenplayPaginatorWorkerNode::omitElement, m_worker,
+                &ScreenplayPaginatorWorker::omitElement);
+        connect(this, &ScreenplayPaginatorWorkerNode::includeElement, m_worker,
+                &ScreenplayPaginatorWorker::includeElement);
+        connect(this, &ScreenplayPaginatorWorkerNode::updateScene, m_worker,
+                &ScreenplayPaginatorWorker::updateScene);
+        connect(this, &ScreenplayPaginatorWorkerNode::updateParagraph, m_worker,
+                &ScreenplayPaginatorWorker::updateParagraph);
+        connect(this, &ScreenplayPaginatorWorkerNode::queryCursor, m_worker,
+                &ScreenplayPaginatorWorker::queryCursor);
+
+        connect(m_worker, &ScreenplayPaginatorWorker::cursorQueryResponse, this,
+                &ScreenplayPaginatorWorkerNode::cursorQueryResponse);
+        connect(m_worker, &ScreenplayPaginatorWorker::paginationComplete, this,
+                &ScreenplayPaginatorWorkerNode::paginationComplete);
+    }
 }
