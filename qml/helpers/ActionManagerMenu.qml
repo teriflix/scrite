@@ -71,7 +71,7 @@ Menu {
                 text: {
                     const sc = Gui.nativeShortcut(objectItem.shortcut)
                     if(sc === "")
-                        return ""
+                        return objectItem.tooltip !== undefined ? objectItem.tooltip : ""
 
                     const tt = objectItem.tooltip !== undefined ? objectItem.tooltip : objectItem.text
                     return tt + " (" + sc + " )"
