@@ -650,7 +650,8 @@ void ScreenplayPaginatorWorker::scheduleSyncDocument(const char *purpose)
     Q_UNUSED(purpose)
 #endif
 
-    m_syncDocumentTimer->start(m_syncInterval);
+    if (!m_syncDocumentTimer->isActive())
+        m_syncDocumentTimer->start(m_syncInterval);
 }
 
 qreal ScreenplayPaginatorWorker::cursorPixelOffset(int cursorPosition,
