@@ -24,6 +24,53 @@
 
 namespace Utils {
 
+struct KeyCombinations
+{
+    Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
+
+public:
+    // clang-format off
+    Q_PROPERTY(bool controlModifier
+               MEMBER controlModifier)
+    // clang-format on
+    bool controlModifier = false;
+
+    // clang-format off
+    Q_PROPERTY(bool shiftModifier
+               MEMBER shiftModifier)
+    // clang-format on
+    bool shiftModifier = false;
+
+    // clang-format off
+    Q_PROPERTY(bool altModifier
+               MEMBER altModifier)
+    // clang-format on
+    bool altModifier = false;
+
+    // clang-format off
+    Q_PROPERTY(bool metaModifier
+               MEMBER metaModifier)
+    // clang-format on
+    bool metaModifier = false;
+
+    // clang-format off
+    Q_PROPERTY(QList<int> keyCodes
+               MEMBER keyCodes)
+    // clang-format on
+    QList<int> keyCodes;
+
+    // clang-format off
+    Q_PROPERTY(QStringList keys
+               MEMBER keys)
+    // clang-format on
+    QStringList keys;
+
+    Q_INVOKABLE QString toShortcut() const;
+    Q_INVOKABLE QKeySequence toKeySequence() const;
+};
+
 struct FileInfo
 {
     Q_GADGET
@@ -462,6 +509,8 @@ public:
     static QString settingsFile(); // Complete path to settings.ini file
 
     Q_INVOKABLE static QString configPath(const QString &relativeName);
+
+    Q_INVOKABLE static QString modifierDescription(int modifier);
 };
 
 class Gui : public QObject
@@ -480,6 +529,7 @@ public:
 
     Q_INVOKABLE static QString shortcut(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
     Q_INVOKABLE static QKeySequence keySequence(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
+    Q_INVOKABLE static Utils::KeyCombinations keyCombinations(const QString &shortcut);
 
     // StandardKey is one of QKeySequence::StandardKey in C++, or StandardKey.xyz in QML
     Q_INVOKABLE static QString standardShortcut(int standardKey);

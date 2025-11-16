@@ -213,6 +213,7 @@ FocusScope {
 
                             enabled: shortcutIsEditable
                             opacity: enabled ? 1 : 0.5
+                            description: "Shortcut for <b>" + actionManager.title + "</b> » <i>" + qmlAction.text + "</i>"
                             shortcut: Gui.nativeShortcut(qmlAction.shortcut)
                             placeholderText: qmlAction.defaultShortcut !== undefined ? ("Default: " + Gui.nativeShortcut(qmlAction.defaultShortcut)) : ""
 

@@ -12,6 +12,7 @@ singleton RenameCharacterDialog 1.0 RenameCharacterDialog.qml
 singleton ReportConfigurationDialog 1.0 ReportConfigurationDialog.qml
 singleton SettingsDialog 1.0 SettingsDialog.qml
 singleton ShortcutEditorDialog 1.0 ShortcutEditorDialog.qml
+singleton ShortcutInputDialog 1.0 ShortcutInputDialog.qml
 singleton SplashScreen 1.0 SplashScreen.qml
 singleton StructureIndexCardFieldsDialog 1.0 StructureIndexCardFieldsDialog.qml
 singleton StructureStoryBeatsDialog 1.0 StructureStoryBeatsDialog.qml

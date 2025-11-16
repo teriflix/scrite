@@ -43,6 +43,7 @@ void Utils::registerTypes()
 {
     static bool typesRegistered = false;
     if (!typesRegistered) {
+        qRegisterMetaType<Utils::KeyCombinations>("Utils::KeyCombinations");
         qRegisterMetaType<Utils::FileInfo>("Utils::FileInfo");
         qRegisterMetaType<Utils::ObjectConfigFieldChoice>("Utils::ObjectConfigFieldChoice");
         qRegisterMetaType<QList<Utils::ObjectConfigFieldChoice>>(
@@ -56,6 +57,42 @@ void Utils::registerTypes()
 
         typesRegistered = true;
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+QString Utils::KeyCombinations::toShortcut() const
+{
+    const QKeySequence ks = this->toKeySequence();
+    if (ks.isEmpty())
+        return QString();
+    return ks.toString();
+}
+
+QKeySequence Utils::KeyCombinations::toKeySequence() const
+{
+    if (this->keyCodes.isEmpty())
+        return QKeySequence();
+
+    int k1 = 0, k2 = 0, k3 = 0, k4 = 0;
+    if (this->metaModifier)
+        k1 |= Qt::MetaModifier;
+    if (this->controlModifier)
+        k1 += Qt::ControlModifier;
+    if (this->altModifier)
+        k1 |= Qt::AltModifier;
+    if (this->shiftModifier)
+        k1 += Qt::ShiftModifier;
+
+    k1 += this->keyCodes[0];
+    if (this->keyCodes.size() >= 2)
+        k2 = this->keyCodes[1];
+    if (this->keyCodes.size() >= 3)
+        k3 = this->keyCodes[2];
+    if (this->keyCodes.size() >= 4)
+        k4 = this->keyCodes[3];
+
+    return QKeySequence(k1, k2, k3, k4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -193,6 +230,23 @@ QString Utils::Platform::configPath(const QString &relativeName)
     return ret;
 }
 
+QString Utils::Platform::modifierDescription(int modifier)
+{
+
+    switch (modifier) {
+    case Qt::ShiftModifier:
+        return QStringLiteral("Shift") + (isMacOSDesktop() ? " ⇧" : "");
+    case Qt::ControlModifier:
+        return QStringLiteral("Ctrl") + (isMacOSDesktop() ? " ⌃" : "");
+    case Qt::AltModifier:
+        return QStringLiteral("Alt") + (isMacOSDesktop() ? " ⌥" : "");
+    case Qt::MetaModifier:
+        return QStringLiteral("Meta") + (isMacOSDesktop() ? " ⌘" : "");
+    }
+
+    return QString();
+}
+
 /**
  * \brief Returns the architecture of the platform.
  * \return The architecture as Utils::Platform::Architecture.
@@ -236,6 +290,36 @@ QString Utils::Gui::shortcut(int k1, int k2, int k3, int k4)
 QKeySequence Utils::Gui::keySequence(int k1, int k2, int k3, int k4)
 {
     return QKeySequence(k1, k2, k3, k4);
+}
+
+Utils::KeyCombinations Utils::Gui::keyCombinations(const QString &shortcut)
+{
+    Utils::KeyCombinations result;
+    const QKeySequence keySequence = QKeySequence::fromString(shortcut);
+    for (int i = 0; i < keySequence.count(); i++) {
+        const int key = keySequence[i];
+        if (i == 0) {
+            if (key & Qt::ControlModifier)
+                result.controlModifier = true;
+            if (key & Qt::AltModifier)
+                result.altModifier = true;
+            if (key & Qt::ShiftModifier)
+                result.shiftModifier = true;
+            if (key & Qt::MetaModifier)
+                result.metaModifier = true;
+            // Note: Qt::KeypadModifier and Qt::GroupSwitchModifier are not handled in the struct
+        }
+
+        const int keyOnly = key
+                & ~(Qt::ControlModifier | Qt::AltModifier | Qt::ShiftModifier | Qt::MetaModifier
+                    | Qt::KeypadModifier | Qt::GroupSwitchModifier);
+        if (keyOnly != 0) {
+            result.keyCodes.append(static_cast<Qt::Key>(keyOnly));
+            result.keys.append(QKeySequence(keyOnly).toString(QKeySequence::PortableText));
+        }
+    }
+
+    return result;
 }
 
 QString Utils::Gui::standardShortcut(int standardKey)
