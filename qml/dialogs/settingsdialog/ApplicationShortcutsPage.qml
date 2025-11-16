@@ -46,7 +46,16 @@ FocusScope {
                 Layout.fillWidth: true
 
                 focus: true
-                placeholderText: "Filter / Search"
+                placeholderText: "Filter by name"
+            }
+
+            TextField {
+                id: _filterGroup
+
+                Layout.fillWidth: true
+
+                focus: true
+                placeholderText: "Filter by group"
             }
 
             ToolButton {
@@ -249,6 +258,11 @@ FocusScope {
 
         filters: root.filterMethod === ApplicationShortcutsPage.FilterMethod.EditableShortcutsOnly ?
                      ActionsModelFilter.ShortcutsEditorFilters : ActionsModelFilter.ShortcutsDockFilters
-        actionTextStartsWith: _filterText.text
+        actionText: _filterText.text
+        actionManagerTitle: _filterGroup.text
+
+        onModelReset: _actionsView.currentIndex = -1
+        onRowsRemoved: _actionsView.currentIndex = -1
+        onRowsInserted: _actionsView.currentIndex = -1
     }
 }

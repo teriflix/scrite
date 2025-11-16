@@ -1193,13 +1193,24 @@ void ActionsModelFilter::setSourceModel(QAbstractItemModel *model)
         QSortFilterProxyModel::setSourceModel(model);
 }
 
-void ActionsModelFilter::setActionTextStartsWith(const QString &val)
+void ActionsModelFilter::setActionManagerTitle(const QString &val)
 {
-    if (m_actionTextStartsWith == val)
+    if (m_actionManagerTitleFilter == val)
         return;
 
-    m_actionTextStartsWith = val;
-    emit actionTextStartsWithChanged();
+    m_actionManagerTitleFilter = val;
+    emit actionManagerTitleChanged();
+
+    this->invalidateFilter();
+}
+
+void ActionsModelFilter::setActionText(const QString &val)
+{
+    if (m_actionTextFilter == val)
+        return;
+
+    m_actionTextFilter = val;
+    emit actionTextChanged();
 
     this->invalidateFilter();
 }
@@ -1293,11 +1304,19 @@ bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &sou
     bool accept = true;
 
     if (accept && m_filters.testFlag(ActionsWithText)) {
-        const QString text = action->property("text").toString();
-        accept &= !text.isEmpty();
+        const QString actionText = action->property("text").toString();
+        accept &= !actionText.isEmpty();
 
-        if (!m_actionTextStartsWith.isEmpty())
-            accept &= text.startsWith(m_actionTextStartsWith, Qt::CaseInsensitive);
+        if (accept) {
+            const QString actionManagerTitle = manager->title();
+            bool textAccept = m_actionManagerTitleFilter.isEmpty()
+                    ? true
+                    : actionManagerTitle.contains(m_actionManagerTitleFilter, Qt::CaseInsensitive);
+            textAccept &= m_actionTextFilter.isEmpty()
+                    ? true
+                    : actionText.contains(m_actionTextFilter, Qt::CaseInsensitive);
+            accept &= textAccept;
+        }
     }
 
     if (accept && m_filters.testFlag(ActionsWithShortcut)) {

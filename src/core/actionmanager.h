@@ -431,14 +431,24 @@ public:
     Q_FLAG(Filters)
 
     // clang-format off
-    Q_PROPERTY(QString actionTextStartsWith
-               READ actionTextStartsWith
-               WRITE setActionTextStartsWith
-               NOTIFY actionTextStartsWithChanged)
+    Q_PROPERTY(QString actionManagerTitle
+               READ actionManagerTitle
+               WRITE setActionManagerTitle
+               NOTIFY actionManagerTitleChanged)
     // clang-format on
-    void setActionTextStartsWith(const QString &val);
-    QString actionTextStartsWith() const { return m_actionTextStartsWith; }
-    Q_SIGNAL void actionTextStartsWithChanged();
+    void setActionManagerTitle(const QString &val);
+    QString actionManagerTitle() const { return m_actionManagerTitleFilter; }
+    Q_SIGNAL void actionManagerTitleChanged();
+
+    // clang-format off
+    Q_PROPERTY(QString actionText
+               READ actionText
+               WRITE setActionText
+               NOTIFY actionTextChanged)
+    // clang-format on
+    void setActionText(const QString &val);
+    QString actionText() const { return m_actionTextFilter; }
+    Q_SIGNAL void actionTextChanged();
 
     // clang-format off
     Q_PROPERTY(Filters filters
@@ -467,7 +477,8 @@ protected:
 
 private:
     Filters m_filters = AllActions;
-    QString m_actionTextStartsWith;
+    QString m_actionTextFilter;
+    QString m_actionManagerTitleFilter;
 };
 
 class ShortcutInputHandler : public QObject
