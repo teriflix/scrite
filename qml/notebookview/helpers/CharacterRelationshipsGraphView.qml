@@ -407,8 +407,6 @@ Rectangle {
             spacing: 10
 
             FlatToolButton {
-                ToolTip.text: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
-
                 suggestedWidth: parent.height
                 suggestedHeight: parent.height
 
@@ -416,18 +414,18 @@ Rectangle {
                 checkable: true
                 checked: Runtime.workspaceSettings.mouseWheelZoomsInCharacterGraph
                 iconSource: "qrc:/icons/hardware/mouse.png"
+                toolTipText: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
 
                 onCheckedChanged: Runtime.workspaceSettings.mouseWheelZoomsInCharacterGraph = checked
             }
 
             FlatToolButton {
-                ToolTip.text: "Zoom One"
-
                 suggestedWidth: parent.height
                 suggestedHeight: parent.height
 
                 autoRepeat: true
                 iconSource: "qrc:/icons/navigation/zoom_one.png"
+                toolTipText: "Zoom One"
 
                 onClicked: {
                     _canvas.reloadIfDirty()
@@ -441,13 +439,12 @@ Rectangle {
             }
 
             FlatToolButton {
-                ToolTip.text: "Zoom Fit"
-
                 suggestedWidth: parent.height
                 suggestedHeight: parent.height
 
                 autoRepeat: true
                 iconSource: "qrc:/icons/navigation/zoom_fit.png"
+                toolTipText: "Zoom Fit"
 
                 onClicked: { _canvas.reloadIfDirty(); _canvas.zoomFit() }
             }
@@ -622,18 +619,19 @@ Rectangle {
             }
 
             MouseArea {
-                ToolTip.text: (_graph.character && character.name === _graph.character.name) ?
-                              "Double click to add a relationship to this character." :
-                              "Double click to switch to " + character.name + "'s notes."
-                ToolTip.delay: 1500
-                ToolTip.visible: containsMouse && !_removeRelationshipConfirmation.active && !pressed
-
                 anchors.fill: parent
 
                 hoverEnabled: true
 
                 drag.axis: Drag.XAndYAxis
                 drag.target: !Scrite.document.readOnly ? parent : null
+
+                ToolTipPopup {
+                    text: (_graph.character && character.name === _graph.character.name) ?
+                              "Double click to add a relationship to this character." :
+                              "Double click to switch to " + character.name + "'s notes."
+                    visible: container.containsMouse && !_removeRelationshipConfirmation.active && !container.pressed
+                }
 
                 onPressed: {
                     _canvasScroll.interactive = false

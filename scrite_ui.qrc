@@ -314,5 +314,6 @@
         <file>qml/screenplayeditor/delegates/scenedelegate/LowResolutionSceneContent.qml</file>
         <file>qml/screenplayeditor/delegates/scenedelegate/HighResolutionSceneContent.qml</file>
         <file>qml/screenplayeditor/delegates/AbstractScreenplayElementSceneDelegate.qml</file>
+        <file>qml/helpers/ToolTipPopup.qml</file>
     </qresource>
 </RCC>

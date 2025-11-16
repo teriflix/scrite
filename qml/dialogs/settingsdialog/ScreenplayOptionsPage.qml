@@ -63,8 +63,11 @@ Item {
                     onToggled: Runtime.screenplayEditorSettings.singleClickAutoComplete = checked
                     hoverEnabled: true
 
-                    ToolTip.text: "If checked, single click on an option in auto-complete popup will apply it in the screenplay editor."
-                    ToolTip.visible: hovered
+                    ToolTipPopup {
+                        text: "If checked, single click on an option in auto-complete popup will apply it in the screenplay editor."
+                        visible: container.hovered
+                    }
+
                 }
 
                 VclCheckBox {
@@ -75,8 +78,10 @@ Item {
                     onToggled: Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences = checked
                     hoverEnabled: true
 
-                    ToolTip.text: "If checked, it automatically capitalizes first letter of every sentence while typing."
-                    ToolTip.visible: hovered
+                    ToolTipPopup {
+                        visible: container.hovered
+                        text: "If checked, it automatically capitalizes first letter of every sentence while typing."
+                    }
                 }
 
                 VclCheckBox {
@@ -87,8 +92,10 @@ Item {
                     onToggled: Runtime.screenplayEditorSettings.enableAutoPolishParagraphs = checked
                     hoverEnabled: true
 
-                    ToolTip.text: "If checked, CONT'D will be automatically added/removed appropriately."
-                    ToolTip.visible: hovered
+                    ToolTipPopup {
+                        visible: container.hovered
+                        text: "If checked, CONT'D will be automatically added/removed appropriately."
+                    }
                 }
 
                 VclCheckBox {
@@ -99,8 +106,10 @@ Item {
                     onToggled: Runtime.screenplayEditorSettings.captureInvisibleCharacters = checked
                     hoverEnabled: true
 
-                    ToolTip.visible: hovered
-                    ToolTip.text: "In a scene if a dialogues are only written in parenthesis (eg: VO, OS, etc..), then the character will be captured as invisible."
+                    ToolTipPopup {
+                        text: "In a scene if a dialogues are only written in parenthesis (eg: VO, OS, etc..), then the character will be captured as invisible."
+                        visible: container.hovered
+                    }
                 }
 
                 VclCheckBox {
@@ -111,8 +120,10 @@ Item {
                     onToggled: Runtime.screenplayEditorSettings.autoAdjustEditorWidthInScreenplayEditor = checked
                     hoverEnabled: true
 
-                    ToolTip.text: "If checked, the editor width is automatically adjusted when you first launch Scrite or switch back to the screenplay tab."
-                    ToolTip.visible: hovered
+                    ToolTipPopup {
+                        text: "If checked, the editor width is automatically adjusted when you first launch Scrite or switch back to the screenplay tab."
+                        visible: container.hovered
+                    }
                 }
 
                 RowLayout {
@@ -160,8 +171,10 @@ Item {
 
                         onValueChanged: Runtime.screenplayEditorSettings.slpSynopsisLineCount = value
 
-                        ToolTip.text: "Max lines to show on the scene list panel. Range: " + from + "-" + to
-                        ToolTip.visible: hovered
+                        ToolTipPopup{
+                            text: "Max lines to show on the scene list panel. Range: " + from + "-" + to
+                            visible: container.hovered
+                        }
                     }
                 }
 
@@ -182,8 +195,10 @@ Item {
 
                         onValueChanged: Runtime.screenplayEditorSettings.placeholderInterval = Runtime.bounded(from, value, to)
 
-                        ToolTip.text: "Delay in ms after which scene content is loaded while scrolling. Range: " + from + "-" + to
-                        ToolTip.visible: hovered
+                        ToolTipPopup {
+                            visible: container.hovered
+                            text: "Delay in ms after which scene content is loaded while scrolling. Range: " + from + "-" + to
+                        }
                     }
                 }
             }
@@ -273,8 +288,10 @@ Item {
 
                     onToggled: Runtime.screenplayEditorSettings.pasteByLinkingScenesWhenPossible = checked
 
-                    ToolTip.visible: hovered
-                    ToolTip.text: "Copy/pasting within the screenplay editor links scenes, without creating duplicates. Uncheck this to allow creation of duplicate scenes."
+                    ToolTipPopup {
+                        text: "Copy/pasting within the screenplay editor links scenes, without creating duplicates. Uncheck this to allow creation of duplicate scenes."
+                        visible: container.hovered
+                    }
                 }
             }
         }

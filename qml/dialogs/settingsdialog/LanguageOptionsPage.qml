@@ -111,8 +111,9 @@ Item {
 
                                 visible: _listView.count > 1 && language.code !== QtLocale.English
                                 opacity: hovered ? 1 : 0.5
-                                icon.source: "qrc:/icons/action/delete.png"
                                 hoverEnabled: true
+
+                                icon.source: "qrc:/icons/action/delete.png"
 
                                 onClicked: _private.deleteLanguage(language)
                             }

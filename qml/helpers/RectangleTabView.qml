@@ -61,8 +61,11 @@ Item {
                     anchors.fill: parent
                     onClicked: tabBar.currentIndex = index
                     hoverEnabled: true
-                    ToolTip.visible: containsMouse
-                    ToolTip.text: tabTooltipRole === "" ? modelData : modelData[tabTooltipRole]
+
+                    ToolTipPopup {
+                        text: tabTooltipRole === "" ? modelData : modelData[tabTooltipRole]
+                        visible: container.containsMouse
+                    }
                 }
             }
         }

@@ -52,9 +52,10 @@ ListView {
 
         property bool isSelected: root.currentIndex === index
 
-        ToolTip.text: objectItem.originalFileName
-        ToolTip.visible: _delegateMouseArea.containsMouse
-        ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+        ToolTipPopup {
+            text: objectItem.originalFileName
+            visible: _delegateMouseArea.containsMouse
+        }
 
         width: root.delegateSize
         height: root.delegateSize

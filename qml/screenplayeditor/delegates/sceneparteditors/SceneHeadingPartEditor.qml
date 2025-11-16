@@ -73,12 +73,14 @@ AbstractScenePartEditor {
                     fillMode: Image.PreserveAspectFit
 
                     MouseArea {
-                        ToolTip.text: "" + root.scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + "). Refer Settings > Screenplay > Options tab."
-                        ToolTip.visible: containsMouse
-
                         anchors.fill: parent
 
                         hoverEnabled: enabled
+
+                        ToolTipPopup {
+                            text: "" + root.scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + ").\nRefer Settings > Screenplay > Options tab."
+                            visible: container.containsMouse
+                        }
 
                         onClicked: SettingsDialog.launch("Screenplay")
                     }
@@ -175,8 +177,7 @@ AbstractScenePartEditor {
             Layout.maximumWidth: root.pageRightMargin
 
             FlatToolButton {
-                ToolTip.text: "Scene Menu"
-
+                toolTipText: "Scene Menu"
                 Layout.preferredWidth: suggestedWidth
                 Layout.preferredHeight: suggestedHeight
 

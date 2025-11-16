@@ -154,7 +154,7 @@ Item {
                 enabled: JSON.stringify(Scrite.document.structure.defaultIndexCardFields) !== JSON.stringify(indexCardFieldsModel.array)
 
                 text: "Use Defaults"
-                ToolTip.text: "Click this button to use your global default index card fields in this document."
+                toolTipText: "Click this button to use your global default index card fields in this document."
 
                 onClicked: {
                     if(Scrite.document.structure.indexCardFields.length > 0) {

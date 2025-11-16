@@ -77,8 +77,7 @@ AbstractScenePartEditor {
             spacing: _tagsInput.spacing
 
             FlatToolButton {
-                ToolTip.text: "Formal Story Beats/Tags"
-
+                toolTipText: "Formal Story Beats/Tags"
                 suggestedWidth: _tagsInput.label.height
                 suggestedHeight: _tagsInput.label.height
 

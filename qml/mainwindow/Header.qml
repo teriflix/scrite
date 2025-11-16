@@ -226,13 +226,14 @@ Rectangle {
                     Material.accent: Runtime.colors.accent.key
                     Material.primary: Runtime.colors.primary.key
 
-                    ToolTip.text: {
-                        const tt = qmlAction.tooltip !== undefined ? qmlAction.tooltip : qmlAction.text
-                        const sc = Gui.nativeShortcut(qmlAction.shortcut)
-                        return sc === "" ? tt : (tt + " (" + sc + " )")
+                    ToolTipPopup {
+                        text: {
+                            const tt = qmlAction.tooltip !== undefined ? qmlAction.tooltip : qmlAction.text
+                            const sc = Gui.nativeShortcut(qmlAction.shortcut)
+                            return sc === "" ? tt : (tt + " (" + sc + " )")
+                        }
+                        visible: container.hovered
                     }
-                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-                    ToolTip.visible: ToolTip.text !== "" && hovered
 
                     action: qmlAction
                     down: qmlAction.down

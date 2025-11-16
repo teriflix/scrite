@@ -72,10 +72,9 @@ AbstractScenePartEditor {
 
                 Layout.fillWidth: true
 
-                ToolTip.text: "Edit Index Card Fields"
-                ToolTip.visible: hovered
-
                 visible: root.screenplayAdapter.currentIndex === root.index
+                toolTipText: "Edit Index Card Fields"
+
                 icon.source: "qrc:/icons/action/edit.png"
 
                 onClicked: StructureIndexCardFieldsDialog.launch()

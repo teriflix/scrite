@@ -50,28 +50,25 @@ Rectangle {
         layoutDirection: Qt.RightToLeft
 
         FlatToolButton {
-            ToolTip.text: "Clear the screenplay, while retaining the scenes."
-
             enabled: !Scrite.document.readOnly
             iconSource: "qrc:/icons/content/clear_all.png"
+            toolTipText: "Clear the screenplay, while retaining the scenes."
 
             onClicked: root.clearRequest()
         }
 
         FlatToolButton {
-            ToolTip.text: "Increase size of blocks in this view."
-
             autoRepeat: true
             iconSource: "qrc:/icons/navigation/zoom_in.png"
+            toolTipText: "Increase size of blocks in this view."
 
             onClicked: root.zoomInRequest()
         }
 
         FlatToolButton {
-            ToolTip.text: "Decrease size of blocks in this view."
-
             autoRepeat: true
             iconSource: "qrc:/icons/navigation/zoom_out.png"
+            toolTipText: "Decrease size of blocks in this view."
 
             onClicked: root.zoomOutRequest()
         }

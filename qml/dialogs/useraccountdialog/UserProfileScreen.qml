@@ -108,9 +108,10 @@ Item {
                 MouseArea {
                     anchors.fill: parent
 
-                    ToolTip.text: "Ask questions, post feedback, request features and connect with other Scrite users."
-                    ToolTip.visible: containsMouse
-                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                    ToolTipPopup {
+                        text: "Ask questions, post feedback, request features and connect with other Scrite users."
+                        visible: container.hovered
+                    }
 
                     cursorShape: Qt.PointingHandCursor
                     hoverEnabled: true

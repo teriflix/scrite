@@ -163,8 +163,6 @@ Item {
                     }
 
                     FlatToolButton {
-                        ToolTip.text: "Closes the video player until a video file is loaded."
-
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.margins: 4
@@ -173,6 +171,7 @@ Item {
                         iconSource: "qrc:/icons/navigation/arrow_up_inverted.png"
                         onClicked: Runtime.scritedSettings.videoPlayerVisible = false
                         opacity: hovered ? 1 : 0.5
+                        toolTipText: "Closes the video player until a video file is loaded."
                         visible: !_private.mediaIsLoaded
                     }
 
@@ -327,11 +326,10 @@ Item {
                                 width: parent.width
 
                                 VclToolButton {
-                                    ToolTip.text: "Load a video file for this screenplay."
-
                                     enabled: Scrite.document.screenplay.elementCount > 0
                                     focusPolicy: Qt.NoFocus
                                     suggestedHeight: 36
+                                    toolTipText: "Load a video file for this screenplay."
 
                                     icon.source: "qrc:/icons/mediaplayer/movie_inverted.png"
 
@@ -339,11 +337,10 @@ Item {
                                 }
 
                                 VclToolButton {
-                                    ToolTip.text: "Play / Pause"
-
                                     enabled: _mediaPlayer.status !== MediaPlayer.NoMedia
                                     focusPolicy: Qt.NoFocus
                                     suggestedHeight: 36
+                                    toolTipText: "Play / Pause"
 
                                     icon.source: {
                                         if(_mediaPlayer.playbackState === MediaPlayer.PlayingState)
@@ -383,11 +380,10 @@ Item {
                                 }
 
                                 VclToolButton {
-                                    ToolTip.text: "Rewind by " + _private.skipDuration + " seconds"
-
                                     enabled: _mediaPlayer.status !== MediaPlayer.NoMedia && _mediaPlayer.position > 0
                                     focusPolicy: Qt.NoFocus
                                     suggestedHeight: 36
+                                    toolTipText: "Rewind by " + _private.skipDuration + " seconds"
 
                                     icon.source: "qrc:/icons/mediaplayer/rewind_10_inverted.png"
 
@@ -395,10 +391,9 @@ Item {
                                 }
 
                                 VclToolButton {
-                                    ToolTip.text: "Forward by " + _private.skipDuration + " seconds"
-
                                     enabled: _mediaPlayer.status !== MediaPlayer.NoMedia && _mediaPlayer.position < _mediaPlayer.duration
                                     focusPolicy: Qt.NoFocus
+                                    toolTipText: "Forward by " + _private.skipDuration + " seconds"
                                     suggestedHeight: 36
 
                                     icon.source: "qrc:/icons/mediaplayer/forward_10_inverted.png"
@@ -406,11 +401,10 @@ Item {
                                 }
 
                                 VclToolButton {
-                                    ToolTip.text: _videoOutput.fillMode === VideoOutput.PreserveAspectCrop ? "Fit video" : "Fill video"
-
                                     enabled: _mediaPlayer.status !== MediaPlayer.NoMedia
                                     focusPolicy: Qt.NoFocus
                                     suggestedHeight: 36
+                                    toolTipText: _videoOutput.fillMode === VideoOutput.PreserveAspectCrop ? "Fit video" : "Fill video"
 
                                     icon.source: "qrc:/icons/navigation/zoom_fit_inverted.png"
 
@@ -756,8 +750,6 @@ Item {
                     }
 
                     FlatToolButton {
-                        ToolTip.text: "Shows the video player."
-
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.topMargin: 4
@@ -766,6 +758,7 @@ Item {
                         enabled: visible
                         iconSource: "qrc:/icons/navigation/arrow_down.png"
                         opacity: hovered ? 1 : 0.5
+                        toolTipText: "Shows the video player."
                         visible: !_videoArea.visible
 
                         onClicked: Runtime.scritedSettings.videoPlayerVisible = true

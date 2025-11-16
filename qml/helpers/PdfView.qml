@@ -233,21 +233,22 @@ Item {
 
             // Download & Refresh buttons
             VclToolButton {
-                ToolTip.text: "Regenerates this PDF and refreshes its content."
-
                 text: "Refresh"
                 visible: displayRefreshButton
+                toolTipText: "Regenerates this PDF and refreshes its content."
+
                 icon.source: "qrc:/icons/navigation/refresh.png"
 
                 onClicked: refreshRequest()
             }
 
             VclToolButton {
-                ToolTip.text: "Save this PDF to your computer."
 
                 text: "Save PDF"
                 down: _saveMenu.visible
                 visible: (allowFileSave || saveFeatureDisabled)
+                toolTipText: "Save this PDF to your computer."
+
                 icon.source: "qrc:/icons/file/file_download.png"
 
                 onClicked: {
@@ -298,10 +299,10 @@ Item {
             VclToolButton {
                 id: _revealFileButton
 
-                ToolTip.text: "Reveal the location of this PDF on your computer."
-
                 text: "Reveal"
                 visible: allowFileReveal
+                toolTipText: "Reveal the location of this PDF on your computer."
+
                 icon.source: "qrc:/icons/file/folder_open.png"
 
                 onClicked: File.revealOnDesktop( Url.toPath(_pdfDoc.source) )

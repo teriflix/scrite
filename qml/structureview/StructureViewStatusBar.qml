@@ -54,6 +54,8 @@ Rectangle {
     border.color: Runtime.colors.primary.borderColor
 
     VclText {
+        id: _statusText
+
         anchors.left: parent.left
         anchors.right: _statusBarControls.left
         anchors.margins: 10
@@ -77,11 +79,13 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
 
-            ToolTip.text: parent.text
-            ToolTip.visible: containsMouse
-
             enabled: parent.truncated
             hoverEnabled: true
+
+            ToolTipPopup {
+                text: _statusText.text
+                visible: container.containsMouse
+            }
         }
     }
 
@@ -95,8 +99,6 @@ Rectangle {
         spacing: 10
 
         FlatToolButton {
-            ToolTip.text: "Toggle between index-card view options."
-
             suggestedWidth: parent.height
             suggestedHeight: parent.height
 
@@ -104,6 +106,7 @@ Rectangle {
             checkable: false
             autoRepeat: false
             iconSource: "qrc:/icons/content/view_options.png"
+            toolTipText: "Toggle between index-card view options."
 
             onClicked: _structureViewOptionsMenu.show()
 
@@ -177,8 +180,6 @@ Rectangle {
         }
 
         FlatToolButton {
-            ToolTip.text: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
-
             suggestedWidth: parent.height
             suggestedHeight: parent.height
 
@@ -186,13 +187,12 @@ Rectangle {
             checkable: true
             autoRepeat: false
             iconSource: "qrc:/icons/hardware/mouse.png"
+            toolTipText: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
 
             onCheckedChanged: Runtime.workspaceSettings.mouseWheelZoomsInStructureCanvas = checked
         }
 
         FlatToolButton {
-            ToolTip.text: "Preview"
-
             suggestedWidth: parent.height
             suggestedHeight: parent.height
 
@@ -200,6 +200,7 @@ Rectangle {
             checked: canvasPreviewVisible
             checkable: true
             iconSource: "qrc:/icons/action/thumbnail.png"
+            toolTipText: "Preview"
 
             onToggled: Runtime.structureCanvasSettings.showPreview = checked
         }
@@ -213,14 +214,13 @@ Rectangle {
         FlatToolButton {
             id: _cmdZoomOne
 
-            ToolTip.text: "Zoom One"
-
             suggestedWidth: parent.height
             suggestedHeight: parent.height
 
             enabled: root.canvasItemsBoundingBox.itemCount > 0
             autoRepeat: true
             iconSource: "qrc:/icons/navigation/zoom_one.png"
+            toolTipText: "Zoom One"
 
             onClicked: root.zoomOneRequest()
         }
@@ -228,14 +228,13 @@ Rectangle {
         FlatToolButton {
             id: _cmdZoomFit
 
-            ToolTip.text: "Zoom Fit"
-
             suggestedWidth: parent.height
             suggestedHeight: parent.height
 
             enabled: root.canvasItemsBoundingBox.itemCount > 0
             autoRepeat: true
             iconSource: "qrc:/icons/navigation/zoom_fit.png"
+            toolTipText: "Zoom Fit"
 
             onClicked: root.zoomFitRequest(root.canvasItemsBoundingBox.boundingBox)
         }

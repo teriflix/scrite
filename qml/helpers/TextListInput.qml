@@ -75,10 +75,10 @@ Flow {
 
     FlatToolButton {
         id: _labelIcon
-        ToolTip.text: root.labelText
 
         suggestedWidth: _label.height
         suggestedHeight: _label.height
+        toolTipText: root.labelText
 
         iconSource: root.labelIconSource
 
@@ -191,13 +191,14 @@ Flow {
         enabled: !root.readOnly
 
         MouseArea {
-            ToolTip.text: root.addTextButtonTooltip
-            ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-            ToolTip.visible: containsMouse
-
             anchors.fill: parent
 
             hoverEnabled: true
+
+            ToolTipPopup {
+                text: root.addTextButtonTooltip
+                visible: container.containsMouse
+            }
 
             onClicked: _newInputLoader.active = true
             onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5

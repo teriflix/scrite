@@ -164,9 +164,10 @@ Item {
     }
 
     MouseArea {
-        ToolTip.text: _text.text
-        ToolTip.visible: containsMouse && _text.text !== "" && _text.truncated
-        ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+        ToolTipPopup {
+            text: _text.text
+            visible: container.containsMouse && _text.text !== "" && _text.truncated
+        }
 
         anchors.fill: parent
 

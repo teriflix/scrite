@@ -25,17 +25,18 @@ Image {
 
     signal clicked()
 
-    ToolTip.text: {
-        switch(sceneType) {
-        case Scene.Song: return "This is a Song scene."
-        case Scene.Action: return "This is a Action scene."
-        case Scene.Montage: return "This is a Montage scene."
-        default: break
+    ToolTipPopup {
+        text: {
+            switch(sceneType) {
+            case Scene.Song: return "This is a Song scene."
+            case Scene.Action: return "This is a Action scene."
+            case Scene.Montage: return "This is a Montage scene."
+            default: break
+            }
+            return ""
         }
-        return ""
+        visible: _mouseArea.containsMouse && showTooltip
     }
-    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-    ToolTip.visible: _mouseArea.containsMouse && showTooltip
 
     width: 32
     height: 32

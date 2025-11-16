@@ -84,11 +84,11 @@ Flickable {
                         if(containsMouse) {
                             _toolTipItem.x = mouseX
                             _toolTipItem.y = mouseY
-                            _toolTipItem.ToolTip.text = "'" + _outerTrackDelegate.trackData.category + "' Track"
-                            _toolTipItem.ToolTip.visible = true
+                            _tooltipPopup.text = "'" + _outerTrackDelegate.trackData.category + "' Track"
+                            _tooltipPopup.visible = true
                             _toolTipItem.source = _trackMouseArea
                         } else if(_toolTipItem.source === _trackMouseArea) {
-                            _toolTipItem.ToolTip.visible = false
+                            _tooltipPopup.visible = false
                             _toolTipItem.source = null
                         }
                     }
@@ -153,11 +153,11 @@ Flickable {
 
                                     _toolTipItem.x = mouseX + parent.x
                                     _toolTipItem.y = mouseY
-                                    _toolTipItem.ToolTip.text = ttText
-                                    _toolTipItem.ToolTip.visible = true
+                                    _tooltipPopup.text = ttText
+                                    _tooltipPopup.visible = true
                                     _toolTipItem.source = _groupMouseArea
                                 } else if(_toolTipItem.source === _groupMouseArea) {
-                                    _toolTipItem.ToolTip.visible = false
+                                    _tooltipPopup.visible = false
                                     _toolTipItem.source = null
                                 }
                             }
@@ -169,8 +169,16 @@ Flickable {
 
         Item {
             id: _toolTipItem
+
             property MouseArea source: null
-            ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+
+            ToolTipPopup {
+                id: _tooltipPopup
+
+                y: -height - 15
+
+                container: _toolTipItem
+            }
         }
     }
 }

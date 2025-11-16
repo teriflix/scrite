@@ -56,21 +56,22 @@ Rectangle {
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
             MouseArea {
-                ToolTip.text: _headingText.text
-                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-                ToolTip.visible: _headingText.truncated && containsMouse
-
                 anchors.fill: parent
                 hoverEnabled: _headingText.truncated
+
+                ToolTipPopup {
+                    text: _headingText.text
+                    visible: _headingText.truncated && container.containsMouse
+                }
 
                 onClicked: root.clicked()
             }
         }
 
         VclToolButton {
-            ToolTip.text: "Scene List Options"
-
             down: _menu.visible
+            toolTipText: "Scene List Options"
+
             icon.source: "qrc:/icons/content/view_options.png"
 
             onClicked: _menu.open()

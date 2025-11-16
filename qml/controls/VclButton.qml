@@ -18,13 +18,24 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/helpers"
 
 Button {
-    id: button
+    id: root
+
+    property bool toolTipVisible: hovered
+    property string toolTipText
 
     Material.primary: Runtime.colors.primary.key
     Material.accent: Runtime.colors.accent.key
     Material.theme: Runtime.colors.theme
+
+    Component.onCompleted: {
+        if(!Scrite.app.usingMaterialTheme) {
+            background = backgroundComponent.createObject(root)
+            font.pointSize = Runtime.idealFontMetrics.font.pointSize
+        }
+    }
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
@@ -37,22 +48,21 @@ Button {
         Rectangle {
             implicitWidth: 120
             implicitHeight: 30
-            color: button.down ? border.color : Runtime.colors.primary.button.background
+            color: root.down ? border.color : Runtime.colors.primary.button.background
             border.width: 1
             border.color: Qt.darker(Runtime.colors.primary.button.background,1.25)
         }
     }
 
-    Component.onCompleted: {
-        if(!Scrite.app.usingMaterialTheme) {
-            background = backgroundComponent.createObject(button)
-            font.pointSize = Runtime.idealFontMetrics.font.pointSize
-        }
+    ToolTipPopup {
+        container: root
+        text: root.toolTipText
+        visible: text !== "" && root.toolTipVisible
     }
 
     QtObject {
         id: _private
 
-        property rect textRect: GMath.boundingRect(button.text, button.font)
+        property rect textRect: GMath.boundingRect(root.text, root.font)
     }
 }

@@ -71,9 +71,11 @@ Item {
                         MessageBox.information("Requires Restart", "Scrite will use <b>" + currentText + "</b> theme upon restart.")
                 }
 
-                ToolTip.text: "Scrite's UI is designed for use with Material theme and with software rendering disabled. If the UI is not rendering properly on your computer, then switching to a different theme may help."
-                ToolTip.visible: hovered
-                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                ToolTipPopup {
+                    container: parent
+                    text: "Scrite's UI is designed for use with Material theme and with software rendering disabled. If the UI is not rendering properly on your computer, then switching to a different theme may help."
+                    visible: parent.hovered
+                }
             }
         }
 

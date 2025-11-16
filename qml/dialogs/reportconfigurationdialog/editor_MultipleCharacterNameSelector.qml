@@ -106,9 +106,12 @@ ColumnLayout {
                     hoverEnabled: true
                     onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
                     onClicked: characterNameListView.visible = true
-                    ToolTip.visible: containsMouse
-                    ToolTip.text: "Add another character."
-                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+
+                    ToolTipPopup {
+                        container: parent
+                        text: "Add another character."
+                        visible: parent.containsMouse
+                    }
                 }
             }
 
@@ -122,14 +125,18 @@ ColumnLayout {
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
+
                     onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
                     onClicked: {
                         characterNameListView.selectedCharacters = []
                         characterNameListView.visible = true
                     }
-                    ToolTip.visible: containsMouse
-                    ToolTip.text: "Remove all characters and start fresh."
-                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+
+                    ToolTipPopup {
+                        container: parent
+                        text: "Remove all characters and start fresh."
+                        visible: parent.containsMouse
+                    }
                 }
             }
         }

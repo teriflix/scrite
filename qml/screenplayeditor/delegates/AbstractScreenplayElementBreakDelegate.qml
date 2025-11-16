@@ -98,7 +98,11 @@ AbstractScreenplayElementDelegate {
                 Layout.preferredWidth: root.pageRightMargin
 
                 FlatToolButton {
-                    ToolTip.text: {
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    width: root.fontMetrics.lineSpacing
+                    height: root.fontMetrics.lineSpacing
+                    toolTipText: {
                         let ret = "Deletes this "
                         switch(root.screenplayElement.breakType) {
                         case Screenplay.Act: ret += "act"; break;
@@ -108,12 +112,6 @@ AbstractScreenplayElementDelegate {
                         ret += " break."
                         return ret
                     }
-
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    width: root.fontMetrics.lineSpacing
-                    height: root.fontMetrics.lineSpacing
-
                     iconSource: "qrc:/icons/action/delete.png"
 
                     onClicked: Runtime.screenplayAdapter.screenplay.removeElement(root.screenplayElement)

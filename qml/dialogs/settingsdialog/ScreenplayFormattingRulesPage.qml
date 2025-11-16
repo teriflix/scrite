@@ -363,8 +363,11 @@ Item {
             }
 
             SimpleToolButton {
-                ToolTip.visible: containsMouse
-                ToolTip.text: "Copy one or more attributes of " + paragraphTypeComboBox.currentText + " to other paragraph types."
+                ToolTipPopup {
+                    container: parent
+                    visible: parent.containsMouse
+                    text: "Copy one or more attributes of " + paragraphTypeComboBox.currentText + " to other paragraph types."
+                }
 
                 hoverEnabled: true
                 iconSource: "qrc:/icons/action/done_all.png"
@@ -524,8 +527,8 @@ Item {
 
             VclButton {
                 text: "Factory Reset"
-                ToolTip.text: "Restores formatting options to defaults for current document only."
-                ToolTip.visible: hovered
+                toolTipText: "Restores formatting options to defaults for current document only."
+
                 onClicked: {
                     Scrite.document.formatting.resetToFactoryDefaults()
                     Scrite.document.printFormat.resetToFactoryDefaults()
@@ -534,8 +537,8 @@ Item {
 
             VclButton {
                 text: "Make Default"
-                ToolTip.visible: hovered
-                ToolTip.text: "Saves current formatting options as default for all current and future documents."
+                toolTipText: "Saves current formatting options as default for all current and future documents."
+
                 onClicked: Scrite.document.formatting.saveAsUserDefaults()
             }
         }

@@ -67,9 +67,11 @@ Item {
                         }
                     }
 
-                    ToolTip.text: "If texts are not being rendered properly on your display, then switch to native text rendering. Otherwise, keep this setting unchecked."
-                    ToolTip.visible: hovered
-                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                    ToolTipPopup {
+                        container: parent
+                        text: "If texts are not being rendered properly on your display, then switch to native text rendering. Otherwise, keep this setting unchecked."
+                        visible: parent.hovered
+                    }
                 }
 
                 VclCheckBox {
@@ -83,9 +85,12 @@ Item {
                             MessageBox.information("Requires Restart", msg)
                         }
                     }
-                    ToolTip.text: "If you feel that Scrite is not responding fast enough, then you may want to switch to using a Software Renderer to speed things up. Otherwise, keep this option unchecked for best experience."
-                    ToolTip.visible: hovered
-                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+
+                    ToolTipPopup {
+                        container: parent
+                        text: "If you feel that Scrite is not responding fast enough, then you may want to switch to using a Software Renderer to speed things up. Otherwise, keep this option unchecked for best experience."
+                        visible: parent.hovered
+                    }
                 }
             }
         }
@@ -362,7 +367,12 @@ Item {
                     stepSize: 0.1
                     snapMode: Slider.SnapAlways
                     onMoved: Runtime.workspaceSettings.flickScrollSpeedFactor = value
-                    ToolTip.text: "Configure the scroll sensitivity of your mouse and trackpad."
+
+                    ToolTipPopup {
+                        container: parent
+                        text: "Configure the scroll sensitivity of your mouse and trackpad."
+                        visible: parent.hovered
+                    }
                 }
 
                 VclLabel {
@@ -371,8 +381,8 @@ Item {
 
                 FlatToolButton {
                     iconSource: "qrc:/icons/action/reset.png"
+                    toolTipText: "Reset flick/scroll speed to 100%"
                     onClicked: Runtime.workspaceSettings.flickScrollSpeedFactor = 1
-                    ToolTip.text: "Reset flick/scroll speed to 100%"
                 }
             }
         }

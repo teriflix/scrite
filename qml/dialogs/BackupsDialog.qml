@@ -130,8 +130,8 @@ DialogLauncher {
                         text: "Open in This Window"
                         enabled: backupFilesView.currentIndex >= 0
                         hoverEnabled: true
-                        ToolTip.visible: hovered
-                        ToolTip.text: "Closes the current document and loads the selected backup."
+                        toolTipText: "Closes the current document and loads the selected backup."
+
                         onClicked: {
                             var task = OpenFileTask.openAnonymously(backupFilesView.currentBackupFilePath)
                             task.finished.connect(dialog.close)
@@ -142,8 +142,8 @@ DialogLauncher {
                         text: "Open in New Window"
                         enabled: backupFilesView.currentIndex >= 0
                         hoverEnabled: true
-                        ToolTip.visible: hovered
-                        ToolTip.text: "Loads the selected backup in a new window."
+                        toolTipText: "Loads the selected backup in a new window."
+
                         onClicked: {
                             const filePath = backupFilesView.currentBackupFilePath
 

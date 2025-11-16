@@ -29,14 +29,6 @@ ToolButton {
     Material.primary: Runtime.colors.primary.key
     Material.theme: Runtime.colors.theme
 
-    ToolTip.text: {
-        const tt = action.tooltip !== undefined ? action.tooltip : action.text
-        const sc = Gui.nativeShortcut(action.shortcut)
-        return sc === "" ? tt : (tt + " ( " + sc + " )")
-    }
-    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-    ToolTip.visible: ToolTip.text !== "" && hovered
-
     flat: true
     down: action.down !== undefined ? action.down === true : pressed
     display: action.icon.source == "" && action.icon.name == "" ? ToolButton.TextOnly : ToolButton.IconOnly
@@ -46,4 +38,15 @@ ToolButton {
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
     icon.color: action.icon.color
+
+    ToolTipPopup {
+        container: root
+
+        text: {
+            const sc = Gui.nativeShortcut(action.shortcut)
+            const tt = action.tooltip !== undefined ? action.tooltip : action.text
+            return sc === "" ? tt : (tt + " ( " + sc + " )")
+        }
+        visible: text !== "" && hovered
+    }
 }

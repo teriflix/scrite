@@ -229,11 +229,17 @@ DialogLauncher {
                                         wrapMode: Text.WordWrap
 
                                         MouseArea {
-                                            ToolTip.text: attributes.tooltip
-                                            ToolTip.visible: containsMouse
+                                            id: _featureLabelMouseArea
 
                                             anchors.fill: parent
                                             hoverEnabled: true
+                                        }
+
+                                        ToolTipPopup {
+                                            container: _featureLabelMouseArea
+
+                                            text: attributes.tooltip
+                                            visible: _featureLabelMouseArea.containsMouse
                                         }
                                     }
                                 }

@@ -48,19 +48,13 @@ Menu {
         model: _private.visibleActions.ready ? _private.visibleActions : 0
 
         delegate: MenuItem {
+            id: _menuItem
+
             required property var objectItem
 
             Material.accent: Runtime.colors.accent.key
             Material.primary: Runtime.colors.primary.key
             Material.theme: Runtime.colors.theme
-
-            ToolTip.text: {
-                const tt = objectItem.tooltip !== undefined ? objectItem.tooltip : objectItem.text
-                const sc = Gui.nativeShortcut(objectItem.shortcut)
-                return sc === "" ? tt : (tt + " (" + sc + " )")
-            }
-            ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-            ToolTip.visible: ToolTip.text !== "" && hovered
 
             action: objectItem
             focusPolicy: Qt.NoFocus
@@ -70,6 +64,20 @@ Menu {
             icon.color: action.icon.color
 
             // We need a better way to show shortcuts. This is not going to work!
+
+            ToolTipPopup {
+                container: _menuItem
+
+                text: {
+                    const sc = Gui.nativeShortcut(objectItem.shortcut)
+                    if(sc === "")
+                        return ""
+
+                    const tt = objectItem.tooltip !== undefined ? objectItem.tooltip : objectItem.text
+                    return tt + " (" + sc + " )"
+                }
+                visible: text !== "" && _menuItem.hovered
+            }
         }
     }
 

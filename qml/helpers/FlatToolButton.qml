@@ -45,21 +45,19 @@ Item {
     property string text
     property string iconSource: ""
     property string shortcutText: _shortcut.portableText
+    property string toolTipText: shortcutText === "" ? text : (text + "\t(" + Gui.nativeShortcut(shortcutText) + ")")
 
     property bool down: _mouseArea.pressed
     property bool hasMenu: false
     property bool checked: false
     property bool checkable: false
     property bool autoRepeat: false
+    property bool toolTipVisible: toolTipText !== "" && (_mouseArea.containsMouse && !down)
 
     readonly property alias containsMouse: _mouseArea.containsMouse
 
     signal toggled()
     signal clicked()
-
-    ToolTip.text: shortcutText === "" ? text : (text + "\t(" + Gui.nativeShortcut(shortcutText) + ")")
-    ToolTip.visible: ToolTip.text === "" ? false : (_mouseArea.containsMouse && !down)
-    ToolTip.delay: 500
 
     width: suggestedWidth
     height: suggestedHeight
@@ -138,6 +136,12 @@ Item {
         hoverEnabled: true
 
         onClicked: root.click()
+    }
+
+    ToolTipPopup {
+        container: root
+        text: root.toolTipText
+        visible: text !== "" && root.toolTipVisible
     }
 
     function click() {

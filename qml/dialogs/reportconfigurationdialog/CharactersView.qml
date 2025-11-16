@@ -44,11 +44,13 @@ Rectangle {
 
         FlatToolButton {
             id: filterButton
-            iconSource: "qrc:/icons/action/filter.png"
-            ToolTip.text: "Filter character names by their tags."
-            enabled: charactersModel.availableTags.length > 0
-            onClicked: tagsMenu.open()
+
             down: tagsMenu.visible
+            enabled: charactersModel.availableTags.length > 0
+            iconSource: "qrc:/icons/action/filter.png"
+            toolTipText: "Filter character names by their tags."
+
+            onClicked: tagsMenu.open()
 
             VclText {
                 anchors.right: parent.right

@@ -130,8 +130,10 @@ RowLayout {
             anchors.fill: parent
             hoverEnabled: true
 
-            ToolTip.text: parent.text
-            ToolTip.visible: parent.truncated && containsMouse
+            ToolTipPopup {
+                visible: container.hovered
+                text: parent.text
+            }
         }
     }
 }

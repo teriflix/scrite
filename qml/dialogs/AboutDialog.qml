@@ -254,42 +254,50 @@ DialogLauncher {
                     RowLayout {
                         spacing: -8
 
-                        ToolButton {
+                        VclToolButton {
                             Layout.preferredWidth: 50
                             Layout.preferredHeight: 50
+
                             flat: true
+                            toolTipText: "Post about Scrite on your Facebook page."
                             icon.source: "../../icons/action/share_on_facebook.png"
+
                             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_facebook")
-                            ToolTip.text: "Post about Scrite on your Facebook page."
                         }
 
-                        ToolButton {
+                        VclToolButton {
                             Layout.preferredWidth: 50
                             Layout.preferredHeight: 50
+
                             flat: true
+                            toolTipText: "Post about Scrite on your LinkedIn page."
                             icon.source: "../../icons/action/share_on_linkedin.png"
+
                             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_linkedin")
-                            ToolTip.text: "Post about Scrite on your LinkedIn page."
                         }
 
-                        ToolButton {
+                        VclToolButton {
                             Layout.preferredWidth: 50
                             Layout.preferredHeight: 50
+
                             flat: true
+                            toolTipText: "Tweet about Scrite from your handle."
                             icon.source: "../../icons/action/share_on_twitter.png"
+
                             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_twitter")
-                            ToolTip.text: "Tweet about Scrite from your handle."
                         }
 
-                        ToolButton {
+                        VclToolButton {
+                            readonly property string url: "mailto:?Subject=Take a look at Scrite&Body=I am using Scrite and I thought you should check it out as well. Visit https://www.scrite.io"
+
                             Layout.preferredWidth: 50
                             Layout.preferredHeight: 50
+
                             flat: true
+                            toolTipText: "Send an email about Scrite."
                             icon.source: "../../icons/action/share_on_email.png"
 
-                            readonly property string url: "mailto:?Subject=Take a look at Scrite&Body=I am using Scrite and I thought you should check it out as well. Visit https://www.scrite.io"
                             onClicked: Qt.openUrlExternally(url)
-                            ToolTip.text: "Send an email about Scrite."
                         }
                     }
                 }

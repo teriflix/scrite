@@ -151,14 +151,13 @@ Item {
                 spacing: _sceneTagsList.spacing
 
                 FlatToolButton {
-                    ToolTip.text: "Formal Story Beats/Tags"
-
                     suggestedWidth: _sceneTagsList.label.height
                     suggestedHeight: _sceneTagsList.label.height
 
                     enabled: Runtime.appFeatures.structure.enabled
                     opacity: enabled ? 1 : 0.5
                     iconSource: "qrc:/icons/action/tag.png"
+                    toolTipText: "Formal Story Beats/Tags"
 
                     onClicked: _private.popupFormalTagsMenu()
                 }

@@ -18,8 +18,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
-
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -132,7 +130,7 @@ Item {
             }
 
             MouseArea {
-                ToolTip.visible: hoverEnabled && containsMouse
+                id: _mouseArea
 
                 Drag.active: _dragMouseArea.drag.active
                 Drag.dragType: Drag.Automatic
@@ -156,9 +154,11 @@ Item {
                 hoverEnabled: true // !isBreakElement
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-                onContainsMouseChanged: {
-                    if(containsMouse)
-                        ToolTip.text = _private.evalToolTipText()
+                ToolTipPopup {
+                    y: -height - 15
+                    container: _mouseArea
+                    text: _private.evalToolTipText()
+                    visible: _mouseArea.hoverEnabled && _mouseArea.containsMouse
                 }
 
                 onPressed: screenplayElementList.forceActiveFocus()
@@ -244,13 +244,18 @@ Item {
                         fillMode: Image.PreserveAspectFit
 
                         MouseArea {
+                            id: _warningIconMouseArea
+
                             anchors.fill: parent
 
                             enabled: parent.visible
                             hoverEnabled: enabled
 
-                            ToolTip.text: "" + root.scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + "). Refer Settings > Screenplay > Options tab."
-                            ToolTip.visible: containsMouse
+                            ToolTipPopup {
+                                container: _warningIconMouseArea
+                                text: "" + root.scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + ").\nRefer Settings > Screenplay > Options tab."
+                                visible: _warningIconMouseArea.containsMouse
+                            }
                         }
                     }
                 }

@@ -161,7 +161,7 @@ Rectangle {
                         fillMode: Image.PreserveAspectFit
 
                         MouseArea {
-                            ToolTip.text: "" + root.scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + "). Refer Settings > Screenplay > Options tab."
+                            ToolTip.text: "" + root.scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + ").\nRefer Settings > Screenplay > Options tab."
                             ToolTip.visible: containsMouse
 
                             anchors.fill: parent

@@ -224,9 +224,8 @@ Item {
                     FlatToolButton {
                         id: _addButton
 
-                        ToolTip.text: "Add Character"
-
                         iconSource: "qrc:/icons/content/person_add.png"
+                        toolTipText: "Add Character"
 
                         onClicked: {
                             let chName = _nameField.text
@@ -248,9 +247,8 @@ Item {
                     FlatToolButton {
                         id: _addAllButton
 
-                        ToolTip.text: "Add Existing Characters"
-
                         iconSource: "qrc:/icons/content/persons_add.png"
+                        toolTipText: "Add Existing Characters"
 
                         onClicked: AddCharactersDialog.launch()
                     }

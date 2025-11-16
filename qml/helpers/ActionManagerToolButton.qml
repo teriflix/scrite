@@ -31,10 +31,6 @@ ToolButton {
     Material.primary: Runtime.colors.primary.key
     Material.theme: Runtime.colors.theme
 
-    ToolTip.text: display === ToolButton.IconOnly ? actionManager.title : ""
-    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-    ToolTip.visible: display === ToolButton.IconOnly ? hovered : false
-
     display: actionManager.iconSource !== undefined ? ToolButton.IconOnly : ToolButton.TextOnly
     down: _menu.visible
     focusPolicy: Qt.NoFocus
@@ -56,5 +52,12 @@ ToolButton {
 
             actionManager: root.actionManager
         }
+    }
+
+    ToolTipPopup {
+        container: root
+
+        text: display === ToolButton.IconOnly ? actionManager.title : ""
+        visible: display === ToolButton.IconOnly ? text !== "" && hovered : false
     }
 }

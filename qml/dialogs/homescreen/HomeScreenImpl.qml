@@ -719,11 +719,10 @@ Item {
         id: quickFilesRecentFilesDelegate
 
         LinkButton {
+            id: _quickRecentFile
+
             required property int index
             required property var fileInfo
-
-            ToolTip.text: fileInfo.filePath
-            ToolTip.visible: containsMouse && _private.layoutType === 1
 
             width: ListView.view.width
 
@@ -746,6 +745,13 @@ Item {
             iconSource: fileInfo.hasCoverPage ? "" : "qrc:/icons/filetype/document.png"
             iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
             showPoster: fileInfo.hasCoverPage
+
+            ToolTipPopup {
+                container: _quickRecentFile
+                text: fileInfo.filePath
+                visible: _quickRecentFile.containsMouse && _private.layoutType === 1
+            }
+
             onClicked: {
                 if(fileInfo.filePath === Scrite.document.fileName)
                     closeRequest()
@@ -801,14 +807,13 @@ Item {
                     Layout.preferredWidth: quickFileOptionsLabel.height
 
                     visible: Runtime.recentFiles.count > 0
+                    toolTipText: "Click to remove items from the recent files list."
+
                     icon.width: quickFileOptionsLabel.height * 0.75
                     icon.height: quickFileOptionsLabel.height * 0.75
                     icon.source: "qrc:/icons/action/edit.png"
 
                     onClicked: EditRecentFilesDialog.launch()
-
-                    ToolTip.text: "Click to remove items from the recent files list."
-                    ToolTip.visible: hovered
                 }
 
                 VclLabel {
@@ -1485,13 +1490,19 @@ Item {
                             color: currentIndex === index ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c100.text
 
                             MouseArea {
+                                id: _missingFileMouseArea
+
                                 anchors.fill: parent
                                 hoverEnabled: parent.truncated
 
-                                ToolTip.visible: parent.truncated && containsMouse
-                                ToolTip.text: modelData
-
                                 onClicked: missingFilesList.currentIndex = index
+                            }
+
+                            ToolTipPopup {
+                                container: _missingFileMouseArea
+
+                                text: modelData
+                                visible: _missingFileMouseArea.containsMouse
                             }
                         }
 

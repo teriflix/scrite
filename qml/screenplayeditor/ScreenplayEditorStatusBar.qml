@@ -63,9 +63,10 @@ Rectangle {
     Item {
         anchors.fill: _metricsDisplay
 
-        ToolTip.text: "Page count and time estimates are approximate, assuming " + Scrite.document.printFormat.secondsPerPage + "(s) per page."
-        ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-        ToolTip.visible: _metricsDisplayOverlayMouseArea.containsMouse
+        ToolTipPopup {
+            text: "Page count and time estimates are approximate, assuming " + Scrite.document.printFormat.secondsPerPage + "(s) per page."
+            visible: _metricsDisplayOverlayMouseArea.containsMouse
+        }
 
         MouseArea {
             id: _metricsDisplayOverlayMouseArea
@@ -448,15 +449,16 @@ Rectangle {
         MouseArea {
             id: _iconButtonMouseArea
 
-            ToolTip.text: parent.tooltipText
-            ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-            ToolTip.visible: containsMouse && !pressed
-
             anchors.fill: parent
 
             hoverEnabled: true
 
             onClicked: parent.clicked()
+        }
+
+        ToolTipPopup {
+            text: parent.tooltipText
+            visible: _iconButtonMouseArea.containsMouse && !_iconButtonMouseArea.pressed
         }
     }
 

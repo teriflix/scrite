@@ -310,9 +310,8 @@ DialogLauncher {
 
                         text: "Use As Defaults"
                         hoverEnabled: true
-                        ToolTip.visible: hovered && defaultsSavedNotice.opacity === 0
-                        ToolTip.text: "Click this button to use Address, Author, Contact, Email, Phone and Website field values from this dialogue as default from now on."
-                        ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                        toolTipText: "Click this button to use Address, Author, Contact, Email, Phone and Website field values from this dialogue as default from now on."
+                        toolTipVisible: hovered && defaultsSavedNotice.opacity === 0
 
                         onClicked: {
                             Runtime.titlePageSettings.author = Scrite.document.screenplay.author

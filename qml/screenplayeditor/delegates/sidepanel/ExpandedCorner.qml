@@ -46,9 +46,7 @@ Item {
             FlatToolButton {
                 required property var modelData
 
-                ToolTip.text: modelData.toolTip
-                ToolTip.visible: hovered
-
+                toolTipText: modelData.toolTip
                 suggestedWidth: _layout.width
                 suggestedHeight: _layout.width
 

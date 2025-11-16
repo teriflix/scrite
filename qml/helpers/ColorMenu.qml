@@ -52,10 +52,11 @@ VclMenu {
                 icon.source: "qrc:/icons/content/add_circle_outline.png"
                 suggestedWidth: colorGrid.cellSize
                 suggestedHeight: colorGrid.cellSize
-                ToolTip.text: "Pick a custom color"
+                toolTipText: "Pick a custom color"
+
                 onClicked: {
-                    var color = Color.pick("white")
-                    var colors = Runtime.workspaceSettings.customColors
+                    let color = Color.pick("white")
+                    let colors = Runtime.workspaceSettings.customColors
                     colors.unshift(color)
                     if(colors.length > 10)
                         colors.pop()

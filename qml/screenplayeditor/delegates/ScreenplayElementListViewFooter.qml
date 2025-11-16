@@ -65,7 +65,7 @@ Loader {
                 spacing: 20
 
                 VclToolButton {
-                    ToolTip.text: "Add Scene (Ctrl+Shift+N)"
+                    toolTipText: "Add Scene (Ctrl+Shift+N)"
 
                     icon.source: "qrc:/icons/action/add_scene.png"
 
@@ -77,7 +77,7 @@ Loader {
                 }
 
                 VclToolButton {
-                    ToolTip.text: "Add Act Break (Ctrl+Shift+B)"
+                    toolTipText: "Add Act Break (Ctrl+Shift+B)"
 
                     icon.source: "qrc:/icons/action/add_act.png"
 
@@ -85,7 +85,7 @@ Loader {
                 }
 
                 VclToolButton {
-                    ToolTip.text: "Add Episode Break (Ctrl+Shift+P)"
+                    toolTipText: "Add Episode Break (Ctrl+Shift+P)"
 
                     icon.source: "qrc:/icons/action/add_episode.png"
 

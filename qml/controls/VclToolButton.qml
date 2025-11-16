@@ -16,6 +16,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
 import "qrc:/qml/globals"
+import "qrc:/qml/helpers"
 
 ToolButton {
     id: root
@@ -30,12 +31,12 @@ ToolButton {
     property string shortcut
     property string shortcutText: shortcut
 
+    property bool toolTipVisible: hovered
+    property string toolTipText: shortcutText === "" ? text : (text + "\t(" + Gui.nativeShortcut(shortcutText) + ")")
+
     Material.theme: Runtime.colors.theme
     Material.accent: Runtime.colors.accent.key
     Material.primary: Runtime.colors.primary.key
-
-    ToolTip.text: shortcutText === "" ? text : (text + "\t(" + Gui.nativeShortcut(shortcutText) + ")")
-    ToolTip.visible: ToolTip.text === "" ? false : hovered
 
     implicitWidth: suggestedWidth
     implicitHeight: suggestedHeight
@@ -100,5 +101,11 @@ ToolButton {
     action: Action {
         text: root.text
         shortcut: root.shortcut
+    }
+
+    ToolTipPopup {
+        container: root
+        text: root.toolTipText
+        visible: text !== "" && root.toolTipVisible
     }
 }

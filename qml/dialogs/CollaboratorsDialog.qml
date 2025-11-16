@@ -145,12 +145,14 @@ DialogLauncher {
 
                                 FlatToolButton {
                                     id: deleteIcon
+
                                     Layout.alignment: Qt.AlignVCenter
 
                                     opacity: delegateMouseArea.containsMouse || containsMouse ? (enabled ? 1 : 0.5) : 0
                                     iconSource: "qrc:/icons/action/close.png"
-                                    onClicked: Scrite.document.removeCollaborator(collaboratorEmail)
                                     enabled: Scrite.document.canModifyCollaborators
+
+                                    onClicked: Scrite.document.removeCollaborator(collaboratorEmail)
                                 }
                             }
                         }
@@ -188,6 +190,7 @@ DialogLauncher {
 
                             FlatToolButton {
                                 id: addCollaboratorButton
+
                                 Layout.alignment: Qt.AlignVCenter
 
                                 iconSource: "qrc:/icons/content/add_box.png"

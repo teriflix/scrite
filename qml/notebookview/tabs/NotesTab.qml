@@ -176,10 +176,11 @@ Item {
                 FlatToolButton {
                     id: _newNoteButton
 
-                    ToolTip.text: "Add a new text or form note."
-
                     anchors.centerIn: parent
+
                     iconSource: "qrc:/icons/action/note_add.png"
+                    toolTipText: "Add a new text or form note."
+
                     onClicked: _private.popupNewNoteMenu(_newNoteButton)
                 }
             }

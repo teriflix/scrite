@@ -207,11 +207,10 @@ Item {
                 }
 
                 VclToolButton {
-                    ToolTip.text: (checked ? "Hide replace field." : "Show replace field.") + " (" + Gui.nativeShortcut("Ctrl+Shift+F") + ")"
-
                     anchors.verticalCenter: parent.verticalCenter
 
                     suggestedHeight: 40
+                    toolTipText: (checked ? "Hide replace field." : "Show replace field.") + " (" + Gui.nativeShortcut("Ctrl+Shift+F") + ")"
 
                     down: checked
                     checked: _replaceUiRect.visible
