@@ -20,6 +20,7 @@
 #include "timeprofiler.h"
 
 #include <QAbstractTextDocumentLayout>
+#include <QJsonDocument>
 #include <QMetaObject>
 #include <QMetaProperty>
 #include <QPdfWriter>
@@ -63,18 +64,46 @@ bool SceneParagraph::isValid() const
             && (this->type == SceneElement::Heading || !this->id.isEmpty());
 }
 
+SceneParagraph::SceneParagraph(const QString &_sceneId, const QString &_id, bool _enabled,
+                               int _type, const QString _text, Qt::Alignment _alignment,
+                               const QVector<QTextLayout::FormatRange> &_formats)
+{
+    this->sceneId = _sceneId;
+    this->id = _id;
+    this->enabled = _enabled;
+    this->type = _type;
+    this->text = _text;
+    this->alignment = _alignment;
+    this->formats = _formats;
+}
+
+bool SceneParagraph::operator==(const SceneParagraph &other) const
+{
+    return this->sceneId == other.sceneId && this->id == other.id && this->enabled == other.enabled
+            && this->type == other.type && this->text == other.text
+            && this->alignment == other.alignment && this->formats == other.formats;
+}
+
+SceneParagraph &SceneParagraph::operator=(const SceneParagraph &other)
+{
+    this->sceneId = other.sceneId;
+    this->id = other.id;
+    this->enabled = other.enabled;
+    this->type = other.type;
+    this->text = other.text;
+    this->alignment = other.alignment;
+    this->formats = other.formats;
+    return *this;
+}
+
 SceneParagraph SceneParagraph::fromSceneHeading(const SceneHeading *heading)
 {
     if (heading == nullptr || heading->scene() == nullptr)
         return SceneParagraph();
 
-    return { heading->scene()->id(),
-             QString(),
-             heading->isEnabled(),
-             SceneElement::Heading,
-             heading->displayText(),
-             Qt::AlignLeft,
-             QVector<QTextLayout::FormatRange>() };
+    return SceneParagraph(heading->scene()->id(), QString(), heading->isEnabled(),
+                          SceneElement::Heading, heading->displayText(), Qt::AlignLeft,
+                          QVector<QTextLayout::FormatRange>());
 }
 
 SceneParagraph SceneParagraph::fromSceneElement(const SceneElement *element)
@@ -82,19 +111,43 @@ SceneParagraph SceneParagraph::fromSceneElement(const SceneElement *element)
     if (element == nullptr || element->scene() == nullptr)
         return SceneParagraph();
 
-    return { element->scene()->id(),
-             element->id(),
-             true,
-             element->type(),
-             element->formattedText(),
-             element->alignment(),
-             element->textFormats() };
+    return SceneParagraph(element->scene()->id(), element->id(), true, element->type(),
+                          element->formattedText(), element->alignment(), element->textFormats());
 }
 
 bool SceneContent::isValid() const
 {
     return this->type >= 0
             && (this->type == ScreenplayElement::SceneElementType ? !this->id.isEmpty() : true);
+}
+
+SceneContent::SceneContent(int _type, int _breakType, int _serialNumber, bool _omitted,
+                           const QString &_id, const QList<SceneParagraph> &_paragraph)
+{
+    this->type = _type;
+    this->breakType = _breakType;
+    this->serialNumber = _serialNumber;
+    this->omitted = _omitted;
+    this->id = _id;
+    this->paragraphs = _paragraph;
+}
+
+bool SceneContent::operator==(const SceneContent &other) const
+{
+    return this->type == other.type && this->breakType == other.breakType
+            && this->serialNumber == other.serialNumber && this->omitted == other.omitted
+            && this->id == other.id && this->paragraphs == other.paragraphs;
+}
+
+SceneContent &SceneContent::operator=(const SceneContent &other)
+{
+    this->type = other.type;
+    this->breakType = other.breakType;
+    this->serialNumber = other.serialNumber;
+    this->omitted = other.omitted;
+    this->id = other.id;
+    this->paragraphs = other.paragraphs;
+    return *this;
 }
 
 SceneContent SceneContent::fromScreenplayElement(const ScreenplayElement *element)
@@ -270,6 +323,7 @@ PaginatorDocumentInsights::BlockRange::operator=(const BlockRange &other)
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 const char *PaginatorDocumentInsights::property = "#PaginatorDocumentInsights";
+static const int minimumSyncInterval = 500;
 
 ScreenplayPaginatorWorker::ScreenplayPaginatorWorker(QTextDocument *document,
                                                      ScreenplayFormat *format, QObject *parent)
@@ -293,14 +347,25 @@ void ScreenplayPaginatorWorker::useFormat(const QJsonObject &format)
 {
     if (m_defaultFormat == nullptr) {
         m_formatJson = format;
-        this->scheduleSyncDocument(Q_FUNC_INFO);
+        if (!m_formatDirty) {
+            m_formatDirty = true;
+            this->scheduleSyncDocument(Q_FUNC_INFO);
+        }
     }
 }
 
 void ScreenplayPaginatorWorker::reset(const QList<SceneContent> &screenplayContent)
 {
+    const int dSize = qAbs(m_screenplayContent.size() - screenplayContent.size());
     m_screenplayContent = screenplayContent;
-    this->scheduleSyncDocument(Q_FUNC_INFO);
+
+    /* If there has been a drastic change in content-size, then lets get to syncing
+     * right away instead of scheduling it for later */
+    if (dSize > 2) {
+        this->syncDocument();
+    } else {
+        this->scheduleSyncDocument(Q_FUNC_INFO);
+    }
 }
 
 void ScreenplayPaginatorWorker::insertElement(int index, const SceneContent &sceneContent)
@@ -351,6 +416,9 @@ void ScreenplayPaginatorWorker::updateScene(const SceneContent &sceneContent)
     if (it == m_screenplayContent.end())
         return;
 
+    if (sceneContent == *it)
+        return;
+
     *it = sceneContent;
     this->scheduleSyncDocument(Q_FUNC_INFO);
 }
@@ -370,6 +438,9 @@ void ScreenplayPaginatorWorker::updateParagraph(const SceneParagraph &paragraph)
             sceneIt->paragraphs.begin(), sceneIt->paragraphs.end(),
             [paragraph](const SceneParagraph &item) { return (item.id == paragraph.id); });
     if (paraIt == sceneIt->paragraphs.end())
+        return;
+
+    if (paragraph == *paraIt)
         return;
 
     *paraIt = paragraph;
@@ -401,7 +472,13 @@ void ScreenplayPaginatorWorker::syncDocument()
 
     m_lastSyncDocumentTimestamp = now;
 
+#if 0
+    Utils::Gui::log(QStringLiteral("ScreenplayPaginatorWorker::syncDocument(): %1 scenes")
+                            .arg(m_screenplayContent.size()));
+#endif
+
     if (m_screenplayContent.isEmpty()) {
+        m_syncInterval = minimumSyncInterval;
         paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime());
         return;
     }
@@ -446,10 +523,10 @@ void ScreenplayPaginatorWorker::syncDocument()
     }
 
     // Everytime this function is called, its possible that the format got updated.
-    if (m_format != m_defaultFormat && !m_formatJson.isEmpty()) {
+    if (m_format != m_defaultFormat && m_formatDirty && !m_formatJson.isEmpty()) {
         QObjectSerializer::fromJson(m_formatJson, m_format);
         m_format->pageLayout()->evaluateRectsNow();
-        m_formatJson = QJsonObject();
+        m_formatDirty = false;
     }
 
     // Maybe we don't even have a document just yet
@@ -616,7 +693,10 @@ void ScreenplayPaginatorWorker::syncDocument()
     // But if a particular document took 650ms to paginate, then the following line updates
     // the sync interval to 1000ms. In anycase, the sync interval is always updated upwards
     // to the nearest multiple of 500.
-    m_syncInterval = qMax(static_cast<int>(std::ceil(elapsedTimer.elapsed() / 500.0)) * 500, 500);
+    m_syncInterval =
+            qMax(static_cast<int>(std::ceil(elapsedTimer.elapsed() / qreal(minimumSyncInterval)))
+                         * minimumSyncInterval,
+                 minimumSyncInterval);
 
 #if 0
     QTextDocumentWriter writer(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation) + "/scrite.odt");
@@ -644,8 +724,9 @@ void ScreenplayPaginatorWorker::scheduleSyncDocument(const char *purpose)
     }
 
 #if 0
-    Utils::Gui::log(
-            QStringLiteral("ScreenplayPaginatorWorker::scheduleSyncDocument(%1)").arg(purpose ? purpose : "NONE"));
+    Utils::Gui::log(QStringLiteral("ScreenplayPaginatorWorker::scheduleSyncDocument(%1): %2 scenes")
+                            .arg(purpose ? purpose : "NONE")
+                            .arg(m_screenplayContent.size()));
 #else
     Q_UNUSED(purpose)
 #endif

@@ -40,6 +40,15 @@ struct SceneParagraph
 
     bool isValid() const;
 
+    SceneParagraph() { }
+    SceneParagraph(const QString &_sceneId, const QString &_id, bool _enabled, int _type,
+                   const QString _text, Qt::Alignment _alignment,
+                   const QVector<QTextLayout::FormatRange> &_formats);
+    SceneParagraph(const SceneParagraph &other) { *this = other; }
+    bool operator!=(const SceneParagraph &other) const { return !(*this == other); }
+    bool operator==(const SceneParagraph &other) const;
+    SceneParagraph &operator=(const SceneParagraph &other);
+
     static SceneParagraph fromSceneHeading(const SceneHeading *heading);
     static SceneParagraph fromSceneElement(const SceneElement *element);
 };
@@ -58,6 +67,14 @@ struct SceneContent
     QList<SceneParagraph> paragraphs;
 
     bool isValid() const;
+
+    SceneContent() { }
+    SceneContent(int _type, int _breakType, int _serialNumber, bool _omitted, const QString &_id,
+                 const QList<SceneParagraph> &_paragraph);
+    SceneContent(const SceneContent &other) { *this = other; }
+    bool operator!=(const SceneContent &other) const { return !(*this == other); }
+    bool operator==(const SceneContent &other) const;
+    SceneContent &operator=(const SceneContent &other);
 
     static SceneContent fromScreenplayElement(const ScreenplayElement *element);
     static QList<SceneContent> fromScreenplay(const Screenplay *screenplay);
@@ -155,15 +172,16 @@ private:
 
 private:
     friend class ScreenplayPaginator;
+    QJsonObject m_formatJson;
     QList<SceneContent> m_screenplayContent;
     QTextDocument *m_document = nullptr;
     QTimer *m_syncDocumentTimer = nullptr;
-    qint64 m_lastSyncDocumentTimestamp = 0;
-    ScreenplayFormat *m_format = nullptr;
     ScreenplayFormat *m_defaultFormat = nullptr;
-    QJsonObject m_formatJson;
+    ScreenplayFormat *m_format = nullptr;
+    bool m_formatDirty = false;
     bool m_synchronousSync = false;
     int m_syncInterval = 500;
+    qint64 m_lastSyncDocumentTimestamp = 0;
 };
 
 #endif // SCREENPLAYPAGINATORWORKER_H

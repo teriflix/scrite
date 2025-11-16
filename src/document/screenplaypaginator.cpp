@@ -97,7 +97,7 @@ ScreenplayPaginator::ScreenplayPaginator(QObject *parent) : QObject(parent)
     connect(this, &ScreenplayPaginator::enabledChanged, this, &ScreenplayPaginator::reset);
     connect(this, &ScreenplayPaginator::formatChanged, this, &ScreenplayPaginator::onFormatChanged);
     connect(this, &ScreenplayPaginator::screenplayChanged, this,
-            &ScreenplayPaginator::onScreenplayChanged);
+            &ScreenplayPaginator::onScreenplayReset);
     connect(this, &ScreenplayPaginator::cursorPositionChanged, this,
             &ScreenplayPaginator::onCursorPositionChanged);
 }
@@ -132,7 +132,7 @@ void ScreenplayPaginator::setScreenplay(Screenplay *val)
 
     connect(m_screenplay, &Screenplay::aboutToDelete, this,
             &ScreenplayPaginator::onScreenplayDestroyed);
-    connect(m_screenplay, &Screenplay::modelReset, this, &ScreenplayPaginator::onScreenplayChanged);
+    connect(m_screenplay, &Screenplay::modelReset, this, &ScreenplayPaginator::onScreenplayReset);
     connect(m_screenplay, &Screenplay::elementInserted, this,
             &ScreenplayPaginator::onScreenplayElementInserted);
     connect(m_screenplay, &Screenplay::elementRemoved, this,
@@ -189,7 +189,7 @@ void ScreenplayPaginator::reset()
 {
     this->clear();
     this->onFormatChanged();
-    this->onScreenplayChanged();
+    this->onScreenplayReset();
     this->onCursorPositionChanged();
 }
 
@@ -548,7 +548,7 @@ void ScreenplayPaginator::onFormatChanged()
                               Q_ARG(QJsonObject, formatJson));
 }
 
-void ScreenplayPaginator::onScreenplayChanged()
+void ScreenplayPaginator::onScreenplayReset()
 {
     if (!m_enabled)
         return;

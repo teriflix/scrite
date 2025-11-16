@@ -261,7 +261,7 @@ private:
 
     void onFormatChanged();
 
-    void onScreenplayChanged();
+    void onScreenplayReset();
     void onScreenplayDestroyed();
     void onScreenplayElementInserted(ScreenplayElement *element, int index);
     void onScreenplayElementRemoved(ScreenplayElement *element, int index);
