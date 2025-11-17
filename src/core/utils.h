@@ -27,7 +27,7 @@ namespace Utils {
 struct KeyCombinations
 {
     Q_GADGET
-    QML_ELEMENT
+    QML_ANONYMOUS
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
@@ -74,7 +74,7 @@ public:
 struct FileInfo
 {
     Q_GADGET
-    QML_ELEMENT
+    QML_ANONYMOUS
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
@@ -146,7 +146,7 @@ public:
 class ObjectConfigFieldChoice
 {
     Q_GADGET
-    QML_ELEMENT
+    QML_ANONYMOUS
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
@@ -178,7 +178,7 @@ public:
 struct ObjectConfigField
 {
     Q_GADGET
-    QML_ELEMENT
+    QML_ANONYMOUS
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
@@ -269,7 +269,7 @@ public:
 struct ObjectConfigFieldGroup
 {
     Q_GADGET
-    QML_ELEMENT
+    QML_ANONYMOUS
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
@@ -309,7 +309,7 @@ public:
 struct ObjectConfig
 {
     Q_GADGET
-    QML_ELEMENT
+    QML_ANONYMOUS
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
