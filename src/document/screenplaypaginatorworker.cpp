@@ -473,8 +473,7 @@ void ScreenplayPaginatorWorker::syncDocument()
         m_syncDocumentTimer->stop();
 
     const qint64 now = QDateTime::currentMSecsSinceEpoch();
-    if (!m_synchronousSync
-        && now - m_lastSyncDocumentTimestamp < ScreenplayPaginatorWorker::m_syncInterval)
+    if (!m_synchronousSync && now - m_lastSyncDocumentTimestamp < m_syncInterval)
         return;
 
     m_lastSyncDocumentTimestamp = now;
@@ -740,7 +739,8 @@ void ScreenplayPaginatorWorker::scheduleSyncDocument(const char *purpose)
     Q_UNUSED(purpose)
 #endif
 
-    if (!m_syncDocumentTimer->isActive())
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (!m_syncDocumentTimer->isActive() || now - m_lastSyncDocumentTimestamp < 3 * m_syncInterval)
         m_syncDocumentTimer->start(m_syncInterval);
 }
 
