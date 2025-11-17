@@ -365,6 +365,20 @@ Item {
         font.pointSize: Scrite.app.idealFontPointSize
     }
 
+    readonly property FontMetrics shortcutFontMetrics: FontMetrics {
+        font.pointSize: Scrite.app.idealFontPointSize
+        font.family: {
+            // We need ZERO and the letter O to be rendered distinctly
+            // We also need small-L and capital-I and digit-1 to look disctinct.
+            switch(Platform.type) {
+            case Platform.WindowsDesktop: return "Consolas"
+            case Platform.MacOSDesktop: return "Monaco"
+            case Platform.LinuxDesktop: return "DejaVu Sans Mono"
+            }
+            return "Courier Prime"
+        }
+    }
+
     readonly property FontMetrics sceneEditorFontMetrics: FontMetrics {
         readonly property int lettersPerLine: 70
         readonly property int marginLetters: 5

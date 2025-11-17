@@ -316,5 +316,7 @@
         <file>qml/screenplayeditor/delegates/AbstractScreenplayElementSceneDelegate.qml</file>
         <file>qml/helpers/ToolTipPopup.qml</file>
         <file>qml/dialogs/ShortcutInputDialog.qml</file>
+        <file>qml/commandcenter/CommandCenter.qml</file>
+        <file>qml/commandcenter/qmldir</file>
     </qresource>
 </RCC>

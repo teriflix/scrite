@@ -1303,6 +1303,17 @@ bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &sou
 
     bool accept = true;
 
+    if (accept && m_filters.testFlag(HideCommandCenterActions)) {
+        const QMetaProperty hideInCmdCenter = action->metaObject()->property(
+                action->metaObject()->indexOfProperty("hideInCommandCenter"));
+        if (hideInCmdCenter.isValid() && !hideInCmdCenter.isWritable()
+            && hideInCmdCenter.userType() == QMetaType::Bool) {
+            const bool hide = hideInCmdCenter.read(action).toBool();
+            if (hide)
+                accept = false;
+        }
+    }
+
     if (accept && m_filters.testFlag(ActionsWithText)) {
         const QString actionText = action->property("text").toString();
         accept &= !actionText.isEmpty();

@@ -112,8 +112,8 @@ DialogLauncher {
                                 padding: 8
                                 visible: text !== ""
 
-                                font.family: _dialog.fontFamily
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
+                                font.family: Runtime.shortcutFontMetrics.font.family
+                                font.pointSize: Runtime.shortcutFontMetrics.font.pointSize + 4
 
                                 text: {
                                     let comps = []
@@ -137,7 +137,7 @@ DialogLauncher {
 
                                 Layout.alignment: Qt.AlignBaseline
 
-                                Layout.preferredWidth: Math.max(Runtime.idealFontMetrics.averageCharacterWidth*8, contentWidth)
+                                Layout.preferredWidth: Math.max(Runtime.shortcutFontMetrics.averageCharacterWidth*8, contentWidth)
 
                                 EventFilter.target: Scrite.app
                                 EventFilter.events: [EventFilter.KeyPress,EventFilter.KeyRelease]
@@ -165,8 +165,8 @@ DialogLauncher {
                                 focus: true
 
                                 horizontalAlignment: Text.AlignHCenter
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
-                                font.family: _dialog.fontFamily
+                                font.pointSize: Runtime.shortcutFontMetrics.font.pointSize + 4
+                                font.family: Runtime.shortcutFontMetrics.font.family
 
                                 SequentialAnimation {
                                     id: _keysFieldColorAnimation
@@ -179,8 +179,8 @@ DialogLauncher {
                                         NumberAnimation {
                                             target: _keysField
                                             properties: "font.pointSize"
-                                            from: Runtime.idealFontMetrics.font.pointSize + 4
-                                            to: Runtime.idealFontMetrics.font.pointSize + 8
+                                            from: Runtime.shortcutFontMetrics.font.pointSize + 4
+                                            to: Runtime.shortcutFontMetrics.font.pointSize + 8
                                         }
 
                                         ColorAnimation {
@@ -200,8 +200,8 @@ DialogLauncher {
                                         NumberAnimation {
                                             target: _keysField
                                             properties: "font.pointSize"
-                                            from: Runtime.idealFontMetrics.font.pointSize + 8
-                                            to: Runtime.idealFontMetrics.font.pointSize + 4
+                                            from: Runtime.shortcutFontMetrics.font.pointSize + 8
+                                            to: Runtime.shortcutFontMetrics.font.pointSize + 4
                                         }
 
                                         ColorAnimation {
@@ -341,8 +341,8 @@ DialogLauncher {
             padding: 12
 
             font.bold: parent.checked
-            font.family: _dialog.fontFamily
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            font.family: Runtime.shortcutFontMetrics.font.family
+            font.pointSize: Runtime.shortcutFontMetrics.font.pointSize
         }
 
         MouseArea {

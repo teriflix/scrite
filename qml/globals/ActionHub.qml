@@ -1765,6 +1765,17 @@ Item {
             shortcut: defaultShortcut
             text: "Installations"
         }
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool hideInCommandCenter: true
+            readonly property string defaultShortcut: "Ctrl+/"
+
+            enabled: ActionHandler.canHandle
+            objectName: "commandCenter"
+            shortcut: defaultShortcut
+            text: "Command Center"
+        }
     }
 
     function init(_parent) {

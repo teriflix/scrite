@@ -42,18 +42,9 @@ Item {
         padding: 8
         text: root.nativeShortcut
 
+        font.family: Runtime.shortcutFontMetrics.font.family
+        font.pointSize: Runtime.shortcutFontMetrics.font.pointSize
         font.underline: _mouseArea.containsMouse
-        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-        font.family: {
-            // We need ZERO and the letter O to be rendered distinctly
-            // We also need small-L and capital-I and digit-1 to look disctinct.
-            switch(Platform.type) {
-            case Platform.WindowsDesktop: return "Consolas"
-            case Platform.MacOSDesktop: return "Monaco"
-            case Platform.LinuxDesktop: return "DejaVu Sans Mono"
-            }
-            return "Courier Prime"
-        }
     }
 
     VclText {

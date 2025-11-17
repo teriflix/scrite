@@ -25,6 +25,7 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 import "qrc:/qml/overlays"
+import "qrc:/qml/commandcenter"
 import "qrc:/qml/notifications"
 import "qrc:/qml/floatingdockpanels"
 
@@ -54,6 +55,7 @@ Rectangle {
             // Initialize runtime
             Runtime.init(scriteRoot)
             ActionHub.init(scriteRoot)
+            CommandCenter.init(scriteRoot)
             SubscriptionPlanOperations.init(scriteRoot)
 
             // Determine font size provided by QML
