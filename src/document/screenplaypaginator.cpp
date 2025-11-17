@@ -701,9 +701,6 @@ bool ScreenplayPaginator::aggregate(ScreenplayElement *from, ScreenplayElement *
         || (pixelLength == nullptr && pageLength == nullptr && timeLength == nullptr))
         return false;
 
-    int start = this->indexOf(from);
-    int end = until == nullptr ? start : this->indexOf(until);
-
     if (pixelLength)
         *pixelLength = 0;
     if (pageLength)
@@ -711,9 +708,18 @@ bool ScreenplayPaginator::aggregate(ScreenplayElement *from, ScreenplayElement *
     if (timeLength)
         *timeLength = QTime(0, 0, 0);
 
+    int start = this->indexOf(from);
+    if (start < 0)
+        return false;
+
+    int end = until == nullptr ? start : this->indexOf(until);
+    if (end < 0)
+        end = start;
+
     for (int i = start; i <= end; i++) {
-        const ScreenplayPaginatorRecord record = m_records.at(i);
-        if (record.screenplayElement->elementType() != ScreenplayElement::SceneElementType)
+        const ScreenplayPaginatorRecord &record = m_records[i];
+        if (record.screenplayElement.isNull()
+            || record.screenplayElement->elementType() != ScreenplayElement::SceneElementType)
             continue;
 
         if (pixelLength)
