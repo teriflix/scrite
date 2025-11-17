@@ -194,7 +194,7 @@ Item {
                                 opacity: enabled ? 1 : 0.5
                                 description: "Shortcut for switching to <b>" + _private.language.nativeName + "</b> language"
                                 enabled: !DefaultTransliteration.supportsLanguageCode(_private.language.code) && _private.language.code !== QtLocale.English
-                                shortcut: Gui.nativeShortcut(_private.language.shortcut())
+                                portableShortcut: _private.language.shortcut()
 
                                 onShortcutEdited: (newShortcut) => {
                                                       const conflictingAction = _private.actionsModel.findActionForShortcut(newShortcut)

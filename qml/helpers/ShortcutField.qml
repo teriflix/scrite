@@ -26,8 +26,9 @@ Item {
     id: root
 
     required property string description
+    required property string portableShortcut
+    property string nativeShortcut: Gui.nativeShortcut(portableShortcut)
 
-    property alias shortcut: _text.text
     property alias placeholderText: _placeholder.text
 
     signal shortcutEdited(string newShortcut)
@@ -39,6 +40,7 @@ Item {
         id: _text
 
         padding: 8
+        text: root.nativeShortcut
 
         font.underline: _mouseArea.containsMouse
         font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -73,6 +75,6 @@ Item {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
 
-        onClicked: ShortcutInputDialog.launch(root.shortcut, root.description, root.shortcutEdited)
+        onClicked: ShortcutInputDialog.launch(root.portableShortcut, root.description, root.shortcutEdited)
     }
 }
