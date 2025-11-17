@@ -1226,6 +1226,15 @@ void ActionsModelFilter::setFilters(Filters val)
     this->invalidateFilter();
 }
 
+void ActionsModelFilter::setCustomFilterMode(bool val)
+{
+    if (m_customFilterMode == val)
+        return;
+
+    m_customFilterMode = val;
+    emit customFilterModeChanged();
+}
+
 QObject *ActionsModelFilter::findActionForShortcut(const QString &shortcut) const
 {
     // NOTE: This function returns from the source model, which means the returned action
@@ -1271,6 +1280,11 @@ int ActionsModelFilter::restoreAllActionShortcuts()
     return restoreCount;
 }
 
+void ActionsModelFilter::filter()
+{
+    this->invalidateFilter();
+}
+
 void ActionsModelFilter::componentComplete()
 {
     if (this->sourceModel() == nullptr)
@@ -1293,13 +1307,6 @@ bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &sou
     QObject *action = sourceActionModel->actionAt(source_row);
     if (manager == nullptr || action == nullptr)
         return false;
-
-    if (m_filters == CustomFilter) {
-        BooleanResult result;
-
-        emit const_cast<ActionsModelFilter *>(this)->filterRequest(action, manager, &result);
-        return result.value();
-    }
 
     bool accept = true;
 
@@ -1355,6 +1362,12 @@ bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &sou
     if (accept & m_filters.testFlag(EnabledActions)) {
         const QVariant enabledFlag = action->property(_QQuickActionEnabledProperty);
         accept &= enabledFlag.toBool();
+    }
+
+    if (accept && m_customFilterMode) {
+        BooleanResult result;
+        emit const_cast<ActionsModelFilter *>(this)->filterRequest(action, manager, &result);
+        accept = result.value();
     }
 
     return accept;

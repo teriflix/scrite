@@ -84,6 +84,8 @@ Popup {
                 placeholderText: "Search for a command or topic ..."
 
                 font: Runtime.idealFontMetrics.font
+
+                onTextEdited: _actionsModel.filter()
             }
 
             ListView {
@@ -178,7 +180,16 @@ Popup {
         id: _actionsModel
 
         filters: ActionsModelFilter.CommandCenterFilters
-        actionText: _commandText.text
+        customFilterMode: true
+
+        onFilterRequest: (qmlAction, actionManager, result) => {
+            if(_commandText.length === 0)
+                result.value = true
+            else {
+                const text = (actionManager.title + ": " + qmlAction.text).toLowerCase()
+                result.value = (text.indexOf(_commandText.text.toLowerCase()) >= 0)
+            }
+        }
 
         onModelReset: Qt.callLater(_private.resetCurrentActionViewItem)
         onRowsRemoved: Qt.callLater(_private.resetCurrentActionViewItem)
@@ -195,6 +206,7 @@ Popup {
 
     onAboutToShow: {
         _commandText.text = ""
+        _actionsModel.filter()
         contentItem.forceActiveFocus()
     }
 

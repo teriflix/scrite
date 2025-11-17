@@ -182,28 +182,28 @@ Item {
         ActionHandler {
             id: _userAccountHandler
 
-            action: ActionHub.applicationOptions.find("userAccount")
+            action: ActionHub.userOptions.find("userAccount")
             enabled: Runtime.allowAppUsage
 
             onTriggered: UserAccountDialog.launch()
         }
 
         ActionHandler {
-            action: ActionHub.applicationOptions.find("messages")
+            action: ActionHub.userOptions.find("messages")
             enabled: Runtime.allowAppUsage
 
             onTriggered: UserAccountDialog.launch("Notifications")
         }
 
         ActionHandler {
-            action: ActionHub.applicationOptions.find("subscriptions")
+            action: ActionHub.userOptions.find("subscriptions")
             enabled: Runtime.allowAppUsage
 
             onTriggered: UserAccountDialog.launch("Subscriptions")
         }
 
         ActionHandler {
-            action: ActionHub.applicationOptions.find("installations")
+            action: ActionHub.userOptions.find("installations")
             enabled: Runtime.allowAppUsage
 
             onTriggered: UserAccountDialog.launch("Installations")

@@ -1727,6 +1727,22 @@ Item {
         }
 
         Action {
+            readonly property bool visible: false
+            readonly property bool hideInCommandCenter: true
+            readonly property string defaultShortcut: "Ctrl+/"
+
+            enabled: ActionHandler.canHandle
+            objectName: "commandCenter"
+            shortcut: defaultShortcut
+            text: "Command Center"
+        }
+    }
+
+    readonly property ActionManager userOptions: ActionManager {
+        title: "User"
+        objectName: "userOptions"
+
+        Action {
             readonly property string defaultShortcut: "F8"
             property bool visible: enabled
 
@@ -1764,17 +1780,6 @@ Item {
             objectName: "installations"
             shortcut: defaultShortcut
             text: "Installations"
-        }
-
-        Action {
-            readonly property bool visible: false
-            readonly property bool hideInCommandCenter: true
-            readonly property string defaultShortcut: "Ctrl+/"
-
-            enabled: ActionHandler.canHandle
-            objectName: "commandCenter"
-            shortcut: defaultShortcut
-            text: "Command Center"
         }
     }
 

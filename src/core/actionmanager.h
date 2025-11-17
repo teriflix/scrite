@@ -423,7 +423,6 @@ public:
         VisibleActions = 16,
         EnabledActions = 32,
         HideCommandCenterActions = 64,
-        CustomFilter = -1,
         ShortcutsDockFilters = ActionsWithText | ActionsWithShortcut,
         ShortcutsEditorFilters = ActionsWithText | ActionsWithShortcut | ActionsWithDefaultShortcut
                 | ActionsWithObjectName,
@@ -462,9 +461,20 @@ public:
     Filters filters() const { return m_filters; }
     Q_SIGNAL void filtersChanged();
 
+    // clang-format off
+    Q_PROPERTY(bool customFilterMode
+               READ isCustomFilterMode
+               WRITE setCustomFilterMode
+               NOTIFY customFilterModeChanged)
+    // clang-format on
+    void setCustomFilterMode(bool val);
+    bool isCustomFilterMode() const { return m_customFilterMode; }
+    Q_SIGNAL void customFilterModeChanged();
+
     Q_INVOKABLE QObject *findActionForShortcut(const QString &shortcut) const;
     Q_INVOKABLE bool restoreActionShortcut(QObject *action) const;
     Q_INVOKABLE int restoreAllActionShortcuts();
+    Q_INVOKABLE void filter();
 
     // QQmlParserStatus interface
     void classBegin() { }
@@ -478,6 +488,7 @@ protected:
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
 
 private:
+    bool m_customFilterMode = false;
     Filters m_filters = AllActions;
     QString m_actionTextFilter;
     QString m_actionManagerTitleFilter;
