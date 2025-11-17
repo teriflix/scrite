@@ -53,22 +53,30 @@ Popup {
         implicitHeight: _layout.height + 10
 
         focus: true
-        clip: true
 
         ColumnLayout {
             id: _layout
+
+            anchors.centerIn: parent
 
             width: parent.width - 10
 
             spacing: 20
 
             VclLabel {
-                Layout.alignment: Qt.AlignHCenter
+                Layout.fillWidth: true
 
                 text: "Command Center"
+                color: Runtime.colors.accent.c500.text
+                padding: 8
+                horizontalAlignment: Text.AlignHCenter
 
                 font.bold: true
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
+
+                background: Rectangle {
+                    color: Runtime.colors.accent.c500.background
+                }
             }
 
             TextField {
@@ -104,6 +112,7 @@ Popup {
                 }
 
                 model: _actionsModel
+                clip: true
                 currentIndex: 0
 
                 highlightFollowsCurrentItem: true
@@ -125,6 +134,9 @@ Popup {
 
                     width: _actionsView.width
                     height: _delegateLayout.height
+
+                    enabled: qmlAction.enabled
+                    opacity: enabled ? 1 : 0.5
 
                     MouseArea {
                         anchors.fill: parent
@@ -155,16 +167,16 @@ Popup {
                             elide: Text.ElideRight
                             font: Runtime.idealFontMetrics.font
                             padding: 10
-                            text: "<b>" + actionManager.title + "</b>: " + qmlAction.text
+                            text: "<b>" + actionManager.title + "</b>: " + qmlAction.text + (qmlAction.checkable & qmlAction.checked ? " ✔" : "")
                         }
 
                         Link {
-                            Layout.preferredWidth: _delegateLayout.width * 0.3
+                            Layout.preferredWidth: _delegateLayout.width * 0.2
 
                             enabled: shortcutIsEditable
                             font: Runtime.idealFontMetrics.font
-                            opacity: enabled ? 1 : 0.5
                             text: Gui.nativeShortcut(qmlAction.shortcut)
+                            elide: Text.ElideMiddle
 
                             onClicked: {
                                 ShortcutEditorDialog.launch()
@@ -213,17 +225,32 @@ Popup {
     }
 
     onAboutToShow: {
+        _private.beforeLanguage = Runtime.language.activeCode
+        Runtime.language.setActiveCode(QtLocale.English)
+
         _commandText.text = ""
         _actionsModel.filter()
         contentItem.forceActiveFocus()
     }
 
+    onAboutToHide: {
+        if(_private.beforeLanguage > 0)
+            Runtime.language.setActiveCode(_private.beforeLanguage)
+
+        _private.beforeLanguage = -1
+    }
+
     QtObject {
         id: _private
 
+        property int beforeLanguage: -1
+
         function trigger(qmlAction) {
-            if(qmlAction.enabled)
+            if(qmlAction.enabled) {
+                if(ActionHub.languageOptions.contains(qmlAction))
+                    beforeLanguage = -1
                 qmlAction.trigger()
+            }
             root.close()
         }
 

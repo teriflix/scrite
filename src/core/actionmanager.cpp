@@ -215,6 +215,11 @@ bool ActionManager::remove(QObject *action)
     return this->removeInternal(action);
 }
 
+bool ActionManager::contains(QObject *action) const
+{
+    return m_actions.contains(action);
+}
+
 QObject *ActionManager::find(const QString &actionName) const
 {
     auto it = std::find_if(m_actions.begin(), m_actions.end(), [actionName](QObject *action) {

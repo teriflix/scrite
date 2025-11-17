@@ -560,6 +560,10 @@ Item {
         readonly property AppFeature templates: AppFeature {
             feature: Scrite.TemplateFeature
         }
+
+        readonly property AppFeature emailSupport: AppFeature {
+            featureName: "support/email"
+        }
     }
 
     // This model provides access to recently accessed files. It is updated from

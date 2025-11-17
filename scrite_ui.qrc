@@ -11,6 +11,8 @@
         <file>qml/ScritedView.qml</file>
         <file>qml/StructureView.qml</file>
         <file>qml/TimelineView.qml</file>
+        <file>qml/commandcenter/CommandCenter.qml</file>
+        <file>qml/commandcenter/qmldir</file>
         <file>qml/controls/VclButton.qml</file>
         <file>qml/controls/VclCheckBox.qml</file>
         <file>qml/controls/VclComboBox.qml</file>
@@ -38,7 +40,10 @@
         <file>qml/dialogs/PdfDialog.qml</file>
         <file>qml/dialogs/RenameCharacterDialog.qml</file>
         <file>qml/dialogs/ReportConfigurationDialog.qml</file>
+        <file>qml/dialogs/ScreenplayPageSetupDialog.qml</file>
         <file>qml/dialogs/SettingsDialog.qml</file>
+        <file>qml/dialogs/ShortcutEditorDialog.qml</file>
+        <file>qml/dialogs/ShortcutInputDialog.qml</file>
         <file>qml/dialogs/SplashScreen.qml</file>
         <file>qml/dialogs/StructureIndexCardFieldsDialog.qml</file>
         <file>qml/dialogs/StructureStoryBeatsDialog.qml</file>
@@ -150,6 +155,7 @@
         <file>qml/helpers/TextListInput.qml</file>
         <file>qml/helpers/TextTabBar.qml</file>
         <file>qml/helpers/TextViewEdit.qml</file>
+        <file>qml/helpers/ToolTipPopup.qml</file>
         <file>qml/helpers/TrapeziumTabView.qml</file>
         <file>qml/helpers/UiElementHighlight.qml</file>
         <file>qml/helpers/UserAccountToolButton.qml</file>
@@ -172,6 +178,7 @@
         <file>qml/notebookview/dialogs/qmldir</file>
         <file>qml/notebookview/helpers/CharacterRelationshipsGraphView.qml</file>
         <file>qml/notebookview/helpers/CheckListView.qml</file>
+        <file>qml/notebookview/helpers/DeleteConfirmationPopup.qml</file>
         <file>qml/notebookview/helpers/FormField.qml</file>
         <file>qml/notebookview/helpers/FormView.qml</file>
         <file>qml/notebookview/helpers/TextNoteView.qml</file>
@@ -179,6 +186,7 @@
         <file>qml/notebookview/menus/FormMenu.qml</file>
         <file>qml/notebookview/menus/NewNoteMenu.qml</file>
         <file>qml/notebookview/menus/NoteMenu.qml</file>
+        <file>qml/notebookview/pages/AbstractNotePage.qml</file>
         <file>qml/notebookview/pages/AbstractNotebookPage.qml</file>
         <file>qml/notebookview/pages/BookmarksNotebookPage.qml</file>
         <file>qml/notebookview/pages/BreakSummaryPage.qml</file>
@@ -187,6 +195,7 @@
         <file>qml/notebookview/pages/CheckListNotePage.qml</file>
         <file>qml/notebookview/pages/FormNotePage.qml</file>
         <file>qml/notebookview/pages/GenericNotebookPage.qml</file>
+        <file>qml/notebookview/pages/NotesPage.qml</file>
         <file>qml/notebookview/pages/SceneNotesPage.qml</file>
         <file>qml/notebookview/pages/ScreenplayPage.qml</file>
         <file>qml/notebookview/pages/TextNotePage.qml</file>
@@ -222,6 +231,7 @@
         <file>qml/screenplayeditor/ScreenplaySceneElementsContextMenu.qml</file>
         <file>qml/screenplayeditor/delegates/AbstractScreenplayElementBreakDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/AbstractScreenplayElementDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/AbstractScreenplayElementSceneDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/OmittedScreenplayElementDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/ScreenplayActBreakDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/ScreenplayElementListViewFooter.qml</file>
@@ -229,6 +239,8 @@
         <file>qml/screenplayeditor/delegates/ScreenplayElementSceneDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/ScreenplayEpisodeBreakDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/ScreenplayIntervalBreakDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/scenedelegate/HighResolutionSceneContent.qml</file>
+        <file>qml/screenplayeditor/delegates/scenedelegate/LowResolutionSceneContent.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/AbstractScenePartEditor.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/SceneCharacterListPartEditor.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/SceneContentEditor.qml</file>
@@ -307,16 +319,5 @@
         <file>qml/timelineview/TimelineViewFooter.qml</file>
         <file>qml/timelineview/TimelineViewHighlightedItemAnimation.qml</file>
         <file>qml/timelineview/qmldir</file>
-        <file>qml/notebookview/pages/NotesPage.qml</file>
-        <file>qml/notebookview/helpers/DeleteConfirmationPopup.qml</file>
-        <file>qml/notebookview/pages/AbstractNotePage.qml</file>
-        <file>qml/dialogs/ShortcutEditorDialog.qml</file>
-        <file>qml/screenplayeditor/delegates/scenedelegate/LowResolutionSceneContent.qml</file>
-        <file>qml/screenplayeditor/delegates/scenedelegate/HighResolutionSceneContent.qml</file>
-        <file>qml/screenplayeditor/delegates/AbstractScreenplayElementSceneDelegate.qml</file>
-        <file>qml/helpers/ToolTipPopup.qml</file>
-        <file>qml/dialogs/ShortcutInputDialog.qml</file>
-        <file>qml/commandcenter/CommandCenter.qml</file>
-        <file>qml/commandcenter/qmldir</file>
     </qresource>
 </RCC>

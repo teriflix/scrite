@@ -33,15 +33,36 @@ DialogLauncher {
 
     function launch() { return doLaunch() }
 
-    name: "ShortcutEditorDialog"
+    name: "ScreenplayPageSetupDialog"
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
         width: Math.min(Scrite.window.width-80, 800)
         height: Math.min(Scrite.window.height-80, 750)
 
-        title: "Shortcuts"
+        title: "Page Setup"
 
-        content: ApplicationShortcutsPage { }
+        content: Flickable {
+            id: _flickable
+
+            contentWidth: _pageContainer.width
+            contentHeight: _pageContainer.height
+
+            ScrollBar.vertical: VclScrollBar { }
+
+            Item {
+                id: _pageContainer
+
+                width: _flickable.width
+                height: _page.height
+
+                ScreenplayPageSetupPage {
+                    id: _page
+
+                    x: 20
+                    width: parent.width-20
+                }
+            }
+        }
     }
 }

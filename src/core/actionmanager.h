@@ -77,6 +77,7 @@ public:
 
     Q_INVOKABLE bool add(QObject *action);
     Q_INVOKABLE bool remove(QObject *action);
+    Q_INVOKABLE bool contains(QObject *action) const;
     Q_INVOKABLE QObject *at(int index) const { return m_actions.at(index); }
     Q_INVOKABLE QObject *find(const QString &actionName) const;
     Q_INVOKABLE QObject *findByShortcut(const QString &shortcut) const;

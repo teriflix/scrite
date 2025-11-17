@@ -270,6 +270,7 @@ Item {
         objectName: "appOptions"
 
         Action {
+            readonly property var keywords: ["theme", "dark mode"]
             readonly property string defaultShortcut: "Ctrl+,"
 
             text: "Settings"
@@ -314,18 +315,6 @@ Item {
         }
 
         Action {
-            readonly property string defaultShortcut: "F1"
-
-            text: "Help"
-            objectName: "help"
-            shortcut: defaultShortcut
-
-            icon.source: "qrc:/icons/action/help.png"
-
-            onTriggered: Qt.openUrlExternally("https://www.scrite.io/index.php/help/")
-        }
-
-        Action {
             readonly property bool allowShortcut: true
 
             text: "About"
@@ -337,6 +326,70 @@ Item {
         }
     }
 
+    readonly property ActionManager helpSupportOptions: ActionManager {
+        title: "Help & Support"
+        objectName: "helpSupport"
+
+        Action {
+            readonly property string defaultShortcut: "F1"
+
+            text: "User Guides"
+            objectName: "userGuides"
+            shortcut: defaultShortcut
+
+            icon.source: "qrc:/icons/action/help.png"
+
+            onTriggered: Qt.openUrlExternally("https://www.scrite.io/help/")
+        }
+
+        Action {
+            readonly property var keywords: ["mobile", "device count", "cloud", "realtime collaboration"]
+
+            text: "FAQs"
+
+            onTriggered: Qt.openUrlExternally("https://www.scrite.io/faqs/")
+        }
+
+        Action {
+            readonly property var keywords: ["support", "community", "question", "bug", "feedback", "feature request"]
+
+            text: "Discord"
+
+            onTriggered: Qt.openUrlExternally("https://www.scrite.io/forum/")
+        }
+
+        Action {
+            readonly property var keywords: ["terms", "privacy", "refund"]
+
+            text: "Policies"
+
+            onTriggered: Qt.openUrlExternally("https://www.scrite.io/policies/")
+        }
+
+        Action {
+            readonly property var keywords: ["contact", "phone"]
+
+            text: "Email Support"
+
+            onTriggered: {
+                if(Runtime.appFeatures.emailSupport.enabled)
+                    Qt.openUrlExternally("mailto:support@scrite.io")
+                else
+                    MessageBox.information("No Email Support", "Your subscription plan does not include email support. Please seek support on Discord.")
+            }
+        }
+
+        Action {
+            readonly property var keywords: ["github"]
+
+            text: "Source Code"
+
+            onTriggered: {
+                Qt.openUrlExternally("https://github.com/teriflix/scrite")
+            }
+        }
+    }
+
     readonly property ActionManager languageOptions: ActionManager {
         property string iconSource: LanguageEngine.supportedLanguages.activeLanguage.iconSource
 
@@ -344,6 +397,7 @@ Item {
         objectName: "languageOptions"
 
         Action {
+            readonly property var keywords: ["add language", "input methods", "input tools", "baraha", "nudi", "ism"]
             property int sortOrder: LanguageEngine.supportedLanguages.count + 1
 
             text: "More Languages ..."
@@ -1124,6 +1178,17 @@ Item {
 
             onTriggered: _private.addInterval()
         }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+            readonly property var keywords: ["watermark", "header", "footer", "page size"]
+
+            text: "Page Setup & Watermark"
+            objectName: "pageSetup"
+
+            onTriggered: ScreenplayPageSetupDialog.launch()
+        }
     }
 
     readonly property ActionManager structureCanvasOperations: ActionManager {
@@ -1749,7 +1814,7 @@ Item {
 
             checkable: true
             checked: Runtime.applicationSettings.enableAnimations
-            text: "Animations"
+            text: (Runtime.applicationSettings.enableAnimations ? "Disable " : "Enable ") + "Animations"
             shortcut: defaultShortcut
             objectName: "animations"
 
@@ -1784,6 +1849,7 @@ Item {
         objectName: "userOptions"
 
         Action {
+            readonly property var keywords: ["logout", "logs", "activity", "analytics"]
             readonly property string defaultShortcut: "F8"
             property bool visible: enabled
 
@@ -1805,6 +1871,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property var keywords: ["plan", "purchase", "buy", "license"]
             readonly property string defaultShortcut: "F10"
 
             enabled: ActionHandler.canHandle
@@ -1815,6 +1882,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property var keywords: ["device"]
             readonly property string defaultShortcut: "F11"
 
             enabled: ActionHandler.canHandle
