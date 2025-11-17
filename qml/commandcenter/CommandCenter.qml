@@ -77,20 +77,13 @@ Popup {
 
                 Keys.onUpPressed: _actionsView.currentIndex = Math.max(_actionsView.currentIndex-1,0)
                 Keys.onDownPressed: _actionsView.currentIndex = Math.min(_actionsView.currentIndex+1, _actionsView.count-1)
+                Keys.onEnterPressed: _actionsView.triggerCurrentItem()
+                Keys.onReturnPressed: _actionsView.triggerCurrentItem()
 
                 focus: true
                 placeholderText: "Search for a command or topic ..."
 
                 font: Runtime.idealFontMetrics.font
-
-                onEditingFinished: {
-                    const currentDelegate = _actionsView.currentItem
-                    if(currentDelegate != null) {
-                        _private.trigger(currentDelegate.qmlAction)
-                    } else {
-                        root.close()
-                    }
-                }
             }
 
             ListView {
@@ -99,6 +92,14 @@ Popup {
                 Layout.fillWidth: true
                 Layout.minimumHeight: Scrite.window.height * 0.2
                 Layout.maximumWidth: Scrite.window.height * 0.7
+
+                function triggerCurrentItem() {
+                    if(currentItem != null) {
+                        _private.trigger(currentItem.qmlAction)
+                    } else {
+                        root.close()
+                    }
+                }
 
                 model: _actionsModel
                 currentIndex: 0
