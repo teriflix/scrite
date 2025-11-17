@@ -31,6 +31,10 @@ Item {
 
     property alias placeholderText: _placeholder.text
 
+    function editShortcut() {
+        ShortcutInputDialog.launch(portableShortcut, description, shortcutEdited)
+    }
+
     signal shortcutEdited(string newShortcut)
 
     implicitWidth: Math.max(_text.contentWidth, _placeholder.contentWidth)
@@ -66,6 +70,6 @@ Item {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
 
-        onClicked: ShortcutInputDialog.launch(root.portableShortcut, root.description, root.shortcutEdited)
+        onClicked: root.editShortcut()
     }
 }

@@ -143,6 +143,17 @@ DialogLauncher {
                                 EventFilter.events: [EventFilter.KeyPress,EventFilter.KeyRelease]
                                 EventFilter.onFilter: (object,event,result) => {
                                     if(event.type === EventFilter.KeyPress) {
+                                        if(event.modifiers !== Qt.NoModifier) {
+                                            if(event.key === Qt.Key_Escape) {
+                                                _dialog.close()
+                                            } else {
+                                                event.accept = false
+                                                result.acceptEvent = false
+                                                result.filter = false
+                                            }
+                                            return
+                                        }
+
                                         const ks = Gui.shortcut(event.key)
                                         const kc = Gui.keyCombinations(ks)
                                         text = kc.keys.join(_dialog.delimiter)

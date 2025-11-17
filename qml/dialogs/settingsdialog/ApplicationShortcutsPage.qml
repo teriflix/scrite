@@ -31,7 +31,11 @@ FocusScope {
     property int filterMethod: ApplicationShortcutsPage.FilterMethod.EditableShortcutsOnly
     property real availableHeight: 500
 
+    Component.onCompleted: forceActiveFocus()
+
     height: availableHeight
+
+    focus: true
 
     ColumnLayout {
         anchors.fill: parent
@@ -45,17 +49,15 @@ FocusScope {
 
                 Layout.fillWidth: true
 
+                Keys.onUpPressed: _actionsView.currentIndex = Math.max(_actionsView.currentIndex-1,0)
+                Keys.onDownPressed: _actionsView.currentIndex = Math.min(_actionsView.currentIndex+1, _actionsView.count-1)
+                Keys.onEnterPressed: _actionsView.editCurrentItem()
+                Keys.onReturnPressed: _actionsView.editCurrentItem()
+
                 focus: true
                 placeholderText: "Filter by name"
-            }
 
-            TextField {
-                id: _filterGroup
-
-                Layout.fillWidth: true
-
-                focus: true
-                placeholderText: "Filter by group"
+                onTextEdited: _actionsModel.filter()
             }
 
             ToolButton {
@@ -132,6 +134,16 @@ FocusScope {
             ListView {
                 id: _actionsView
 
+                function resetCurrentItem() {
+                    currentIndex = count > 0 ? 0 : -1
+                }
+
+                function editCurrentItem() {
+                    if(currentItem != null) {
+                        currentItem.editShortcut()
+                    }
+                }
+
                 anchors.fill: parent
                 anchors.margins: 1
 
@@ -177,6 +189,10 @@ FocusScope {
                     required property bool shortcutIsEditable
                     required property string groupName
 
+                    function editShortcut() {
+                        _shortcutField.editShortcut()
+                    }
+
                     width: _actionsView.height < _actionsView.contentHeight ? _actionsView.width - 17 : _actionsView.width
                     height: _delegateLayout.height
 
@@ -209,6 +225,8 @@ FocusScope {
                         }
 
                         ShortcutField {
+                            id: _shortcutField
+
                             Layout.preferredWidth: _delegateLayout.width * 0.3
 
                             enabled: shortcutIsEditable
@@ -259,11 +277,19 @@ FocusScope {
 
         filters: root.filterMethod === ApplicationShortcutsPage.FilterMethod.EditableShortcutsOnly ?
                      ActionsModelFilter.ShortcutsEditorFilters : ActionsModelFilter.ShortcutsDockFilters
-        actionText: _filterText.text
-        actionManagerTitle: _filterGroup.text
+        customFilterMode: true
 
-        onModelReset: _actionsView.currentIndex = -1
-        onRowsRemoved: _actionsView.currentIndex = -1
-        onRowsInserted: _actionsView.currentIndex = -1
+        onFilterRequest: (qmlAction, actionManager, result) => {
+            if(_filterText.length === 0)
+                result.value = true
+            else {
+                const text = (actionManager.title + ": " + qmlAction.text).toLowerCase()
+                result.value = (text.indexOf(_filterText.text.toLowerCase()) >= 0)
+            }
+        }
+
+        onModelReset: Qt.callLater(_actionsView.resetCurrentItem)
+        onRowsRemoved: Qt.callLater(_actionsView.resetCurrentItem)
+        onRowsInserted: Qt.callLater(_actionsView.resetCurrentItem)
     }
 }
