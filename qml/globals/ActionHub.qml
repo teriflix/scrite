@@ -97,6 +97,7 @@ Item {
         objectName: "fileOperations"
 
         Action {
+            readonly property var keywords: ["file", "open"]
             readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Open)
 
             enabled: Runtime.allowAppUsage
@@ -177,6 +178,7 @@ Item {
         }
 
         Action {
+            readonly property var keywords: ["print"]
             readonly property bool visible: false
             readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Print)
 
@@ -204,17 +206,19 @@ Item {
         // So, that rules out creating just Action {} as delegate. It has to be
         // nested in an Item.
         delegate: Item {
-            required property var modelData // { name, icon, key, description, category }
+            required property var modelData // { className, name, icon, key, description, category }
 
             visible: false
 
             Action {
+                readonly property bool allowShortcut: true
                 property string tooltip: modelData.description
 
                 ActionManager.target: root.exportOptions
 
                 text: modelData.name
                 enabled: Runtime.allowAppUsage
+                objectName: "export" + modelData.className
 
                 icon.source: "qrc" + modelData.icon
 
@@ -237,17 +241,19 @@ Item {
         // So, that rules out creating just Action {} as delegate. It has to be
         // nested in an Item.
         delegate: Item {
-            required property var modelData // { name, icon, description }
+            required property var modelData // { className, name, icon, description }
 
             visible: false
 
             Action {
+                readonly property bool allowShortcut: true
                 property string tooltip: modelData.description
 
                 ActionManager.target: root.reportOptions
 
                 text: modelData.name
                 enabled: Runtime.allowAppUsage
+                objectName: "report" + modelData.className
 
                 icon.source: "qrc" + modelData.icon
 

@@ -22,54 +22,30 @@ import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 
-Item {
+Link {
     id: root
 
     required property string description
     required property string portableShortcut
+
+    property string placeholderText: "None Set"
     property string nativeShortcut: Gui.nativeShortcut(portableShortcut)
 
-    property alias placeholderText: _placeholder.text
-
     function editShortcut() {
-        ShortcutInputDialog.launch(portableShortcut, description, shortcutEdited)
+        if(enabled)
+            ShortcutInputDialog.launch(portableShortcut, description, shortcutEdited)
     }
 
     signal shortcutEdited(string newShortcut)
 
-    implicitWidth: Math.max(_text.contentWidth, _placeholder.contentWidth)
-    implicitHeight: Math.max(_text.height, _placeholder.height)
+    defaultColor: Runtime.colors.primary.c10.text
 
-    VclText {
-        id: _text
+    padding: 8
+    text: root.nativeShortcut === "" ? placeholderText : root.nativeShortcut
 
-        padding: 8
-        text: root.nativeShortcut
+    font.family: Runtime.shortcutFontMetrics.font.family
+    font.pointSize: Runtime.shortcutFontMetrics.font.pointSize
+    font.underline: containsMouse
 
-        font.family: Runtime.shortcutFontMetrics.font.family
-        font.pointSize: Runtime.shortcutFontMetrics.font.pointSize
-        font.underline: _mouseArea.containsMouse
-    }
-
-    VclText {
-        id: _placeholder
-
-        text: "No shortcut set."
-        padding: _text.padding
-        visible: _text.text === ""
-
-        font.underline: _mouseArea.containsMouse
-        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-    }
-
-    MouseArea {
-        id: _mouseArea
-
-        anchors.fill: parent
-
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-
-        onClicked: root.editShortcut()
-    }
+    onClicked: editShortcut()
 }

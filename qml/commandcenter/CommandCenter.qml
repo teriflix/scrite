@@ -186,8 +186,16 @@ Popup {
             if(_commandText.length === 0)
                 result.value = true
             else {
+                const givenText = _commandText.text.toLowerCase()
                 const text = (actionManager.title + ": " + qmlAction.text).toLowerCase()
-                result.value = (text.indexOf(_commandText.text.toLowerCase()) >= 0)
+                let accept = (text.indexOf(givenText) >= 0)
+                if(accept || qmlAction.keywords === undefined) {
+                    result.value = accept
+                    return
+                }
+
+                const keywords = qmlAction.keywords.join(", ")
+                result.value = keywords.indexOf(givenText) >= 0
             }
         }
 

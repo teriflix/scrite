@@ -30,6 +30,7 @@ static const char *_QQuickActionVisibilityChanged = SIGNAL(visibleChanged());
 static const QByteArray _QQuickActionShortcutProperty = QByteArrayLiteral("shortcut");
 static const char *_QQuickActionShortcutChanged = SIGNAL(shortcutChanged(QKeySequence));
 static const QByteArray _QQuickActionDefaultShortcutProperty = QByteArrayLiteral("defaultShortcut");
+static const QByteArray _QQuickActionAllowShortcutProperty = QByteArrayLiteral("allowShortcut");
 static const QByteArray _QQuickActionEnabledProperty = QByteArrayLiteral("enabled");
 static const QByteArray _QQuickActionTriggerCount = QByteArrayLiteral("triggerCount");
 static const char *_QQuickActionTriggerCountChanged = SIGNAL(triggerCountChanged());
@@ -99,7 +100,8 @@ bool ActionManager::canChangeActionShortcut(QObject *action)
      * Actions with editable shortcuts must meet the following criteria
      *
      * 1. They should have an objectName
-     * 2. They should have a readonly string property by name defaultShortcut
+     * 2. They should have a readonly string property by name defaultShortcut or
+     *    a readonly shortcut that allows assigning of shortcuts.
      * 3. They must belong to an ActionManager
      */
 
@@ -117,8 +119,15 @@ bool ActionManager::canChangeActionShortcut(QObject *action)
     const QMetaProperty defaultShortcutProperty =
             mo->property(mo->indexOfProperty(_QQuickActionDefaultShortcutProperty));
     if (!defaultShortcutProperty.isValid() || defaultShortcutProperty.isWritable()
-        || defaultShortcutProperty.userType() != QMetaType::QString)
+        || defaultShortcutProperty.userType() != QMetaType::QString) {
+        const QMetaProperty allowShortcutProperty =
+                mo->property(mo->indexOfProperty(_QQuickActionAllowShortcutProperty));
+        if (allowShortcutProperty.isValid() && !allowShortcutProperty.isWritable()
+            && allowShortcutProperty.userType() == QMetaType::Bool)
+            return allowShortcutProperty.read(action).toBool();
+
         return false;
+    }
 
     return true;
 }
@@ -353,22 +362,13 @@ void ActionManager::onActionShortcutChanged(const QKeySequence &newShortcut)
     if (row < 0)
         return;
 
-    if (action->objectName().isEmpty())
+    if (!ActionManager::canChangeActionShortcut(action))
         return;
 
     if (m_shortcutMap.value(action->objectName()).toString() == newShortcut.toString())
         return;
 
     const QKeySequence defaultShortcut = defaultActionShortcut(action);
-
-    /**
-     * We only want to save shortcuts for those actions that supply a defaultShortcut.
-     * If they are not supplying one, then it clearly means that shortcuts (even if
-     * assigned) are hardcoded, and not meant to be changed.
-     */
-    if (defaultShortcut.isEmpty())
-        return;
-
     if (defaultShortcut == newShortcut)
         m_shortcutMap.remove(action->objectName());
     else

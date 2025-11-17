@@ -1626,13 +1626,14 @@ QJsonArray ScriteDocument::supportedExportFormats() const
         for (const QByteArray &key : qAsConst(keys)) {
             const QString skey = QString::fromLatin1(key);
             const QStringList fields = skey.split("/");
+            const QMetaObject *mo = deviceIOFactories->ExporterFactory.find(key);
 
             QJsonObject item;
+            item.insert("className", QString::fromLatin1(mo->className()));
             item.insert("key", skey);
             item.insert("category", fields.first());
             item.insert("name", fields.last());
 
-            const QMetaObject *mo = deviceIOFactories->ExporterFactory.find(key);
             const int d_cii = mo->indexOfClassInfo("Description");
             item.insert("description",
                         d_cii >= 0 ? QString::fromLatin1(mo->classInfo(d_cii).value())
@@ -1662,9 +1663,11 @@ QJsonArray ScriteDocument::supportedReports() const
 
         for (const QByteArray &key : keys) {
             QJsonObject item;
+            const QMetaObject *mo = deviceIOFactories->ReportsFactory.find(key);
+
+            item.insert("className", QString::fromLatin1(mo->className()));
             item.insert("name", QString::fromLatin1(key));
 
-            const QMetaObject *mo = deviceIOFactories->ReportsFactory.find(key);
             const int d_cii = mo->indexOfClassInfo("Description");
             item.insert("description",
                         d_cii >= 0 ? QString::fromLatin1(mo->classInfo(d_cii).value())

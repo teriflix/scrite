@@ -338,6 +338,9 @@ QKeySequence Utils::Gui::standardKeySequence(int standardKey)
  */
 QString Utils::Gui::nativeShortcut(const QString &shortcut)
 {
+    if (shortcut.isEmpty())
+        return QString();
+
     const QKeySequence keySequence = QKeySequence::fromString(shortcut);
     if (keySequence.isEmpty())
         return QString();

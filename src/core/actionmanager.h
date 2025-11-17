@@ -423,9 +423,7 @@ public:
         VisibleActions = 16,
         EnabledActions = 32,
         HideCommandCenterActions = 64,
-        ShortcutsDockFilters = ActionsWithText | ActionsWithShortcut,
-        ShortcutsEditorFilters = ActionsWithText | ActionsWithShortcut | ActionsWithDefaultShortcut
-                | ActionsWithObjectName,
+        ShortcutsEditorFilters = ActionsWithText | ActionsWithObjectName,
         CommandCenterFilters = ActionsWithText | EnabledActions | HideCommandCenterActions
     };
     Q_DECLARE_FLAGS(Filters, Filter)

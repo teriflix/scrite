@@ -26,9 +26,6 @@ import "qrc:/qml/controls"
 FocusScope {
     id: root
 
-    enum FilterMethod { EditableShortcutsOnly, AllShortcuts }
-
-    property int filterMethod: ApplicationShortcutsPage.FilterMethod.EditableShortcutsOnly
     property real availableHeight: 500
 
     Component.onCompleted: forceActiveFocus()
@@ -58,47 +55,6 @@ FocusScope {
                 placeholderText: "Filter by name"
 
                 onTextEdited: _actionsModel.filter()
-            }
-
-            ToolButton {
-                id: _filterMethod
-
-                ToolTip.text: "Filter Options"
-                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-                ToolTip.visible: hovered
-
-                icon.source: "qrc:/icons/content/view_options.png"
-
-                onClicked: {
-                    _optionsMenu.popup()
-                }
-
-                VclMenu {
-                    id: _optionsMenu
-
-                    width: Math.max( Runtime.idealFontMetrics.boundingRect(_option1.text).width,
-                                    Runtime.idealFontMetrics.boundingRect(_option2.text).width ) + 100
-
-                    VclMenuItem {
-                        id: _option1
-
-                        checkable: true
-                        checked: root.filterMethod === ApplicationShortcutsPage.FilterMethod.EditableShortcutsOnly
-                        text: "Only those with editable shortcuts"
-
-                        onClicked: root.filterMethod = ApplicationShortcutsPage.FilterMethod.EditableShortcutsOnly
-                    }
-
-                    VclMenuItem {
-                        id: _option2
-
-                        checkable: true
-                        checked: root.filterMethod === ApplicationShortcutsPage.FilterMethod.AllShortcuts
-                        text: "All shortcuts"
-
-                        onClicked: root.filterMethod = ApplicationShortcutsPage.FilterMethod.AllShortcuts
-                    }
-                }
             }
 
             ToolButton {
@@ -233,7 +189,7 @@ FocusScope {
                             opacity: enabled ? 1 : 0.5
                             description: "Shortcut for <b>" + actionManager.title + "</b> » <i>" + qmlAction.text + "</i>"
                             portableShortcut: qmlAction.shortcut
-                            placeholderText: qmlAction.defaultShortcut !== undefined ? ("Default: " + Gui.nativeShortcut(qmlAction.defaultShortcut)) : ""
+                            placeholderText: qmlAction.defaultShortcut !== undefined ? ("Default: " + Gui.nativeShortcut(qmlAction.defaultShortcut)) : "None Set"
 
                             onActiveFocusChanged: {
                                 if(activeFocus) {
@@ -275,8 +231,7 @@ FocusScope {
     ActionsModelFilter {
         id: _actionsModel
 
-        filters: root.filterMethod === ApplicationShortcutsPage.FilterMethod.EditableShortcutsOnly ?
-                     ActionsModelFilter.ShortcutsEditorFilters : ActionsModelFilter.ShortcutsDockFilters
+        filters: ActionsModelFilter.ShortcutsEditorFilters
         customFilterMode: true
 
         onFilterRequest: (qmlAction, actionManager, result) => {
