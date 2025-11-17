@@ -135,6 +135,7 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
             property bool visible: Scrite.document.backupFilesModel.count > 0
 
             enabled: Runtime.allowAppUsage && visible
@@ -325,6 +326,8 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
             text: "About"
             objectName: "about"
 
@@ -825,6 +828,8 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
             enabled: _private.sceneElement && Runtime.allowAppUsage
             checkable: true
             checked: _private.sceneElement ? _private.sceneElement.alignment === Qt.AlignLeft : false
@@ -837,6 +842,8 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
             enabled: _private.sceneElement && Runtime.allowAppUsage
             checkable: true
             checked: _private.sceneElement ? _private.sceneElement.alignment === Qt.AlignHCenter : false
@@ -849,6 +856,8 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
             enabled: _private.sceneElement && Runtime.allowAppUsage
             checkable: true
             checked: _private.sceneElement ? _private.sceneElement.alignment === Qt.AlignRight : false
@@ -1122,6 +1131,8 @@ Item {
         objectName: "structureCanvasOperations"
 
         Action {
+            readonly property bool allowShortcut: true
+
             property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
 
             enabled: ActionHandler.canHandle
@@ -1132,6 +1143,8 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
             property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
 
             enabled: ActionHandler.canHandle
@@ -1142,6 +1155,8 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
             checkable: true
             checked: ActionHandler.canHandle ? ActionHandler.active.checked : false
             enabled: ActionHandler.canHandle
@@ -1152,6 +1167,8 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
             enabled: ActionHandler.canHandle
             objectName: "selectAll"
             text: "Select All"
@@ -1160,6 +1177,8 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
             enabled: ActionHandler.canHandle
             objectName: "layout"
             text: "Layout Options"
@@ -1168,6 +1187,8 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
             checkable: true
             checked: ActionHandler.canHandle ? ActionHandler.active.checked : false
             enabled: ActionHandler.canHandle
@@ -1178,6 +1199,8 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
             property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
 
             enabled: ActionHandler.canHandle
@@ -1188,6 +1211,8 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
             property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
 
             enabled: ActionHandler.canHandle
@@ -1198,6 +1223,8 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
             property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
 
             enabled: ActionHandler.canHandle
@@ -1208,6 +1235,7 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
             readonly property string tooltip: "Scene Type (Action/Montage/Song)"
             property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
 
@@ -1219,6 +1247,7 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
             enabled: ActionHandler.canHandle
             objectName: "delete"
             text: "Delete"
@@ -1249,9 +1278,11 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
             enabled: ActionHandler.canHandle
             objectName: "pdfExport"
-            text: "Export to PDF"
+            text: "Structure Canvas PDF"
 
             icon.source: "qrc:/icons/file/generate_pdf.png"
         }
@@ -1262,6 +1293,7 @@ Item {
         objectName: "notebookOperations"
 
         Action {
+            readonly property bool allowShortcut: true
             readonly property string tooltip: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
 
             checkable: true
@@ -1276,7 +1308,7 @@ Item {
         Action {
             // We won't provide shortcut here, because NotebookView is expected
             // to handle editOptions.refresh which already has F5 mapped to it.
-
+            readonly property bool allowShortcut: true
             readonly property string tooltip: "Reloads the notebook tree."
 
             enabled: ActionHandler.canHandle
@@ -1290,6 +1322,7 @@ Item {
             // This is different from the action we have for generating PDF
             // export of the screenplay itself. This is specifically for
             // generating PDF export of the Notebook report.
+            readonly property bool allowShortcut: true
             property string tooltip: ActionHandler.active ? ActionHandler.active.tooltip : text
 
             enabled: ActionHandler.canHandle
@@ -1313,6 +1346,7 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
             property bool down: ActionHandler.active ? ActionHandler.active.down : false
 
             enabled: ActionHandler.canHandle
@@ -1336,6 +1370,7 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
             property string tooltip: ActionHandler.active ? ActionHandler.active.tooltip : "Delete the current note or character"
 
             enabled: ActionHandler.canHandle
