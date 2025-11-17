@@ -53,6 +53,7 @@ Popup {
         implicitHeight: _layout.height + 10
 
         focus: true
+        clip: true
 
         ColumnLayout {
             id: _layout
@@ -92,8 +93,7 @@ Popup {
                 id: _actionsView
 
                 Layout.fillWidth: true
-                Layout.minimumHeight: Scrite.window.height * 0.2
-                Layout.maximumWidth: Scrite.window.height * 0.7
+                Layout.preferredHeight: Scrite.window.height * 0.3
 
                 function triggerCurrentItem() {
                     if(currentItem != null) {
@@ -123,7 +123,7 @@ Popup {
                     required property bool shortcutIsEditable
                     required property string groupName
 
-                    width: _actionsView.height < _actionsView.contentHeight ? _actionsView.width - 17 : _actionsView.width
+                    width: _actionsView.width
                     height: _delegateLayout.height
 
                     MouseArea {
