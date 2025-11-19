@@ -567,7 +567,7 @@ void Application::revealFileOnDesktop(const QString &pathIn)
 
     Notification *notification = new Notification(this);
     connect(notification, &Notification::dismissed, &Notification::deleteLater);
-    if (fi.isFile()) {
+    if (fi.exists()) {
         notification->setTitle(QStringLiteral("File available"));
 
 #ifdef Q_OS_MAC
@@ -589,8 +589,8 @@ void Application::revealFileOnDesktop(const QString &pathIn)
 #endif
 
     } else {
-        notification->setTitle(QStringLiteral("Unable to open folder"));
-        notification->setText(fi.absolutePath());
+        notification->setTitle(QStringLiteral("Unable to show path."));
+        notification->setText(fi.absoluteFilePath());
     }
 #ifdef Q_OS_MAC
     notification->setAutoClose(true);

@@ -6,7 +6,7 @@ TARGET = Scrite
 CONFIG += c++17
 DEFINES += PHTRANSLATE_STATICLIB
 
-VERSION = 1.9.2
+VERSION = 1.9.3
 DEFINES += SCRITE_VERSION=\\\"$$VERSION\\\"
 
 #QT += testlib
@@ -338,7 +338,7 @@ QTQUICK_COMPILER_SKIPPED_RESOURCES += scrite_misc.qrc
 macx {
     ICON = appicon.icns
     QMAKE_INFO_PLIST = Info.plist
-    VERSION_INFO = "1.9.2-macos"
+    VERSION_INFO = "1.9.3-macos"
 
     HEADERS += src/core/platformtransliterator_macos.h
     OBJECTIVE_SOURCES += src/core/platformtransliterator_macos.mm
@@ -350,9 +350,9 @@ macx {
 
 win32 {
     contains(QT_ARCH, i386) {
-        VERSION_INFO = "1.9.2-windows-x86"
+        VERSION_INFO = "1.9.3-windows-x86"
     } else {
-        VERSION_INFO = "1.9.2-windows-x64"
+        VERSION_INFO = "1.9.3-windows-x64"
     }
 
     RC_ICONS = appicon.ico
@@ -364,7 +364,7 @@ win32 {
 
 linux {
     CONFIG+=use_gold_linker
-    VERSION_INFO = "1.9.2-linux"
+    VERSION_INFO = "1.9.3-linux"
 
     SOURCES += src/core/platformtransliterator_linux.cpp
 }
