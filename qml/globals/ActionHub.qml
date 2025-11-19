@@ -135,6 +135,18 @@ Item {
         }
 
         Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+            readonly property string tooltip: "Import from Final Draft, HTML, Plain Text & Fountain file formats."
+
+            enabled: Runtime.allowAppUsage
+            objectName: "import"
+            text: "Import"
+
+            onTriggered: HomeScreen.launch(text)
+        }
+
+        Action {
             readonly property bool allowShortcut: true
             property bool visible: Scrite.document.backupFilesModel.count > 0
 

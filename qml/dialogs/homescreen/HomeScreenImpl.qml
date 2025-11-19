@@ -29,6 +29,7 @@ Item {
     id: root
 
     property string mode
+
     signal closeRequest()
 
     Component.onCompleted: {
@@ -76,7 +77,14 @@ Item {
                     push(scriptalayPage)
                 }
 
-                Component.onCompleted: _private.showScriptalay.connect(onShowScriptalay)
+                function onShowImportPanel() {
+                    push(importPage)
+                }
+
+                Component.onCompleted: {
+                    _private.showScriptalay.connect(onShowScriptalay)
+                    _private.showImportPanel.connect(onShowImportPanel)
+                }
             }
         }
     }
@@ -1566,12 +1574,16 @@ Item {
         signal showPosterRequest(Item _source, var _image, string _logline)
         signal hidePosterRequest(Item _source)
         signal showScriptalay()
+        signal showImportPanel()
 
         function switchMode() {
             Runtime.execLater(root, 500, () => {
-                                if(root.mode === "Scriptalay")
-                                    _private.showScriptalay()
-                            })
+                                  if(root.mode === "Scriptalay") {
+                                      _private.showScriptalay()
+                                  } else { if(root.mode === "Import")
+                                      _private.showImportPanel()
+                                  }
+                              })
         }
     }
 }
