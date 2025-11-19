@@ -54,6 +54,15 @@ Item {
             Layout.fillWidth: true
 
             z: 1
+
+            ActionHandler {
+                action: ActionHub.applicationOptions.find("toggleToolbarVisibility")
+
+                checked: _header.visible
+                onToggled: (source) => {
+                               _header.visible = !_header.visible
+                           }
+            }
         }
 
         Workspace {

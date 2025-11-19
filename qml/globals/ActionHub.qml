@@ -2005,15 +2005,14 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: "Ctrl+Alt+A"
+            readonly property string defaultShortcut: "Ctrl+Shift+/"
 
+            enabled: ActionHandler.canHandle
             checkable: true
-            checked: Runtime.applicationSettings.enableAnimations
-            text: (Runtime.applicationSettings.enableAnimations ? "Disable " : "Enable ") + "Animations"
+            checked: ActionHandler.active ? ActionHandler.active.checked : true
+            text: "Toggle ToolBar Visibility"
             shortcut: defaultShortcut
-            objectName: "animations"
-
-            onToggled: Runtime.applicationSettings.enableAnimations = !Runtime.applicationSettings.enableAnimations
+            objectName: "toggleToolbarVisibility"
         }
 
         Action {
@@ -2036,6 +2035,19 @@ Item {
             objectName: "commandCenter"
             shortcut: defaultShortcut
             text: "Command Center"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+Alt+A"
+
+            checkable: true
+            checked: Runtime.applicationSettings.enableAnimations
+            text: (Runtime.applicationSettings.enableAnimations ? "Disable " : "Enable ") + "Animations"
+            shortcut: defaultShortcut
+            objectName: "animations"
+
+            onToggled: Runtime.applicationSettings.enableAnimations = !Runtime.applicationSettings.enableAnimations
         }
     }
 
