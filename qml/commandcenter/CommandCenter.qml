@@ -137,11 +137,11 @@ Popup {
                         width: parent.width
 
                         Image {
-                            Layout.alignment: Qt.AlignTop
-                            Layout.topMargin: 10
+                            Layout.alignment: _descriptionLabel.visible ? Qt.AlignTop : Qt.AlignVCenter
+                            Layout.topMargin: _descriptionLabel.visible ? 10 : 0
                             Layout.leftMargin: 12
-                            Layout.preferredHeight: Runtime.iconImageSize
-                            Layout.preferredWidth: Runtime.iconImageSize
+                            Layout.preferredHeight: _nameLabel.height * 0.5
+                            Layout.preferredWidth: _nameLabel.height * 0.5
 
                             fillMode: Image.PreserveAspectFit
                             source: qmlAction.icon.source !== "" ? qmlAction.icon.source : "qrc:/icons/content/blank.png"
