@@ -147,6 +147,7 @@ Item {
         }
 
         Action {
+            readonly property var keywords: ["recover", "restore"]
             readonly property bool allowShortcut: true
             property bool visible: Scrite.document.backupFilesModel.count > 0
 
@@ -157,6 +158,28 @@ Item {
             icon.source: "qrc:/icons/file/backup_open.png"
 
             onTriggered: BackupsDialog.launch()
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+
+            enabled: Scrite.document.backupFilesModel.count > 0
+            objectName: "revealBackupsFolder"
+            text: "Reveal Backups Folder"
+
+            onTriggered: File.revealOnDesktop(Scrite.document.backupFilesModel.backupsFolder)
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+            readonly property var keywords: ["vault"]
+
+            objectName: "recoveryVault"
+            text: "Recover"
+
+            onTriggered: HomeScreen.launch(text)
         }
 
         Action {
@@ -435,6 +458,19 @@ Item {
             icon.source: "qrc:/icons/action/settings_applications.png"
 
             onTriggered: SettingsDialog.launch()
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+
+            text: "Reveal Settings Folder"
+            objectName: "revealSettingsFolder"
+
+            onTriggered: {
+                const fileInfo = File.info(Platform.settingsPath)
+                File.revealOnDesktop(fileInfo.absolutePath)
+            }
         }
 
         Action {

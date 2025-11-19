@@ -77,8 +77,13 @@ Item {
                     push(importPage)
                 }
 
+                function onShowVaultPanel() {
+                    push(vaultPage)
+                }
+
                 Component.onCompleted: {
                     _private.showScriptalay.connect(onShowScriptalay)
+                    _private.showVaultPanel.connect(onShowVaultPanel)
                     _private.showImportPanel.connect(onShowImportPanel)
                 }
             }
@@ -1128,16 +1133,28 @@ Item {
             }
         }
 
-        VclLabel {
+        ColumnLayout {
             anchors.centerIn: parent
 
             width: parent.width * 0.8
 
-            horizontalAlignment: Text.AlignHCenter
-            text: "No documents found in vault."
-            visible: Scrite.vault.documentCount === 0
-            wrapMode: Text.WordWrap
+            VclLabel {
+                Layout.fillWidth: true
+
+                horizontalAlignment: Text.AlignHCenter
+                text: Scrite.vault.busy ? "Looking for documents in the vault ..." : "No documents found in vault."
+                visible: Scrite.vault.documentCount === 0
+                wrapMode: Text.WordWrap
+            }
+
+            BusyIndicator {
+                Layout.alignment: Qt.AlignHCenter
+
+                visible: Scrite.vault.busy
+                running: Scrite.vault.busy
+            }
         }
+
     }
 
     component ImportPage : Item {
@@ -1570,14 +1587,17 @@ Item {
         signal showPosterRequest(Item _source, var _image, string _logline)
         signal hidePosterRequest(Item _source)
         signal showScriptalay()
+        signal showVaultPanel()
         signal showImportPanel()
 
         function switchMode() {
             Runtime.execLater(root, 500, () => {
                                   if(root.mode === "Scriptalay") {
                                       _private.showScriptalay()
-                                  } else { if(root.mode === "Import")
+                                  } else if(root.mode === "Import") {
                                       _private.showImportPanel()
+                                  } else if(root.mode === "Recover") {
+                                      _private.showVaultPanel()
                                   }
                               })
         }

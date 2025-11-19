@@ -92,6 +92,15 @@ ScriteDocumentVault::ScriteDocumentVault(QObject *parent) : QAbstractListModel(p
     this->pauseSaveToVault();
 }
 
+void ScriteDocumentVault::setBusy(bool val)
+{
+    if (m_busy == val)
+        return;
+
+    m_busy = val;
+    emit busyChanged();
+}
+
 ScriteDocumentVault::~ScriteDocumentVault()
 {
     this->cleanup();
@@ -279,10 +288,13 @@ void ScriteDocumentVault::updateModelFromFolder()
         futureWatcher->deleteLater();
     }
 
+    this->setBusy(true);
+
     futureWatcher = new QFutureWatcher<QList<ScriteFileInfo>>(this);
     connect(futureWatcher, &QFutureWatcher<QList<ScriteFileInfo>>::finished, this, [=]() {
         m_allFileInfoList = futureWatcher->result();
         this->prepareModel();
+        this->setBusy(false);
         futureWatcher->deleteLater();
     });
 

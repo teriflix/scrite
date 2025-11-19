@@ -98,6 +98,13 @@ public:
     Q_SIGNAL void documentFilePathChanged();
 
     // clang-format off
+    Q_PROPERTY(QString backupsFolder
+               READ backupsFolder
+               NOTIFY documentFilePathChanged)
+    // clang-format on
+    QString backupsFolder() const;
+
+    // clang-format off
     Q_PROPERTY(int count
                READ count
                NOTIFY countChanged)

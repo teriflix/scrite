@@ -79,6 +79,16 @@ ScriteDocumentBackups::ScriteDocumentBackups(QObject *parent) : QAbstractListMod
 
 ScriteDocumentBackups::~ScriteDocumentBackups() { }
 
+QString ScriteDocumentBackups::backupsFolder() const
+{
+    const QFileInfo fi(m_documentFilePath);
+    if (!fi.exists() || fi.suffix() != QStringLiteral("scrite"))
+        return QString();
+
+    return (fi.absolutePath() + QStringLiteral("/") + fi.completeBaseName()
+            + QStringLiteral(" Backups"));
+}
+
 QJsonObject ScriteDocumentBackups::at(int index) const
 {
     QJsonObject ret;
@@ -176,8 +186,7 @@ void ScriteDocumentBackups::loadBackupFileInformation()
         return;
     }
 
-    const QString backupDirPath(fi.absolutePath() + QStringLiteral("/") + fi.completeBaseName()
-                                + QStringLiteral(" Backups"));
+    const QString backupDirPath = this->backupsFolder();
     QDir backupDir(backupDirPath);
     if (!backupDir.exists()) {
         this->clear();

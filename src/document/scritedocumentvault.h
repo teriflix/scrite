@@ -35,6 +35,14 @@ public:
     ~ScriteDocumentVault();
 
     // clang-format off
+    Q_PROPERTY(bool busy
+               READ busy
+               NOTIFY busyChanged)
+    // clang-format on
+    bool busy() const { return m_busy; }
+    Q_SIGNAL void busyChanged();
+
+    // clang-format off
     Q_PROPERTY(QString folder
                READ folder
                CONSTANT )
@@ -77,6 +85,8 @@ public:
 private:
     ScriteDocumentVault(QObject *parent = nullptr);
 
+    void setBusy(bool val);
+
     void onDocumentAboutToReset();
     void onDocumentJustReset();
     void onDocumentJustSaved();
@@ -93,6 +103,7 @@ private:
     void prepareModel();
 
 private:
+    bool m_busy = false;
     bool m_enabled = true;
     QString m_folder;
     QTimer m_saveToVaultTimer;
