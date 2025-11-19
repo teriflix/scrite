@@ -165,14 +165,16 @@ FocusScope {
 
                         Image {
                             Layout.leftMargin: 12
-                            Layout.preferredHeight: Runtime.iconImageSize
-                            Layout.preferredWidth: Runtime.iconImageSize
+                            Layout.preferredHeight: _name.height * 0.55
+                            Layout.preferredWidth: _name.height * 0.55
 
                             fillMode: Image.PreserveAspectFit
                             source: qmlAction.icon.source !== "" ? qmlAction.icon.source : "qrc:/icons/content/blank.png"
                         }
 
                         VclLabel {
+                            id: _name
+
                             Layout.fillWidth: true
 
                             text: qmlAction.text
