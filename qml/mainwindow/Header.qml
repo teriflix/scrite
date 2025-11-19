@@ -35,7 +35,7 @@ Rectangle {
         width: parent.width
 
         ToolButton {
-            Layout.rightMargin: Runtime.iconImageSize * 2
+            id: _mainMenuButton
 
             display: ToolButton.TextBesideIcon
             down: _mainMenu.visible
@@ -69,6 +69,14 @@ Rectangle {
                     actionManager: ActionHub.appOptions
                 }
             }
+        }
+
+        Rectangle {
+            Layout.fillHeight: true
+            Layout.preferredWidth: 1
+
+            visible: _mainMenuButton.visible
+            color: Runtime.colors.primary.borderColor
         }
 
         RowLayout {
