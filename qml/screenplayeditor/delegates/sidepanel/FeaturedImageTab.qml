@@ -33,6 +33,7 @@ AbstractScenePartEditor {
         anchors.fill: parent
 
         enabled: !root.readOnly
+        scene: root.scene
         fillModeAttrib: "commentsPanelFillMode"
         defaultFillMode: Image.PreserveAspectCrop
     }

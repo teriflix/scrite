@@ -277,7 +277,7 @@ Item {
             defaultFillMode: Image.PreserveAspectFit
             fillModeAttrib: "notebookFillMode"
             mipmap: true
-            scene: sceneNotesItem.scene
+            scene: root.scene
         }
     }
 
