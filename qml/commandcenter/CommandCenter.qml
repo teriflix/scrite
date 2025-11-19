@@ -176,8 +176,8 @@ Popup {
                                 elide: Text.ElideRight
                                 maximumLineCount: 3
                                 wrapMode: Text.WordWrap
-                                font: Runtime.minimumFontMetrics
-                                text: qmlAction.tooltip !== "" ? qmlAction.tooltip : ""
+                                font: Runtime.minimumFontMetrics.font
+                                text: qmlAction.tooltip !== undefined ? qmlAction.tooltip : ""
                                 visible: text !== ""
                             }
                         }

@@ -14,11 +14,12 @@
 #include "qimageitem.h"
 #include "application.h"
 
-#include <QSGNode>
-#include <QSGTexture>
-#include <QQuickWindow>
-#include <QSGOpaqueTextureMaterial>
 #include <QPainter>
+#include <QQuickWindow>
+#include <QSGNode>
+#include <QSGOpaqueTextureMaterial>
+#include <QSGTexture>
+#include <QUuid>
 
 QImageItem::QImageItem(QQuickItem *parentItem) : QQuickPaintedItem(parentItem)
 {
@@ -175,4 +176,74 @@ QSGNode *QImageItem::updatePaintNode(QSGNode *oldRoot, UpdatePaintNodeData *data
     opacityNode->appendChildNode(geoNode);
 
     return rootNode;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+Q_GLOBAL_STATIC(QList<ImageIcon *>, QImageIconList);
+
+ImageIcon::ImageIcon(QObject *parent) : QObject(parent)
+{
+    ::QImageIconList->append(this);
+}
+
+ImageIcon::~ImageIcon()
+{
+    ::QImageIconList->removeOne(this);
+}
+
+ImageIcon *ImageIcon::qmlAttachedProperties(QObject *parent)
+{
+    return new ImageIcon(parent);
+}
+
+QUrl ImageIcon::url() const
+{
+    return "image://imageIcon/" + m_imageId;
+}
+
+void ImageIcon::setImage(const QImage &val)
+{
+    if (m_image == val)
+        return;
+
+    m_image = val;
+    if (m_image.isNull())
+        m_imageId = QStringLiteral("empty");
+    else {
+        static int imageCounter = 0;
+        m_imageId = QStringLiteral("icon-") + QString::number(++imageCounter);
+    }
+
+    emit imageChanged();
+}
+
+ImageIconProvider::ImageIconProvider() : QQuickImageProvider(QQuickImageProvider::Image) { }
+
+ImageIconProvider::~ImageIconProvider() { }
+
+QString ImageIconProvider::name()
+{
+    return QStringLiteral("imageIcon");
+}
+
+QImage ImageIconProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
+{
+    auto it = std::find_if(QImageIconList->constBegin(), QImageIconList->constEnd(),
+                           [id](ImageIcon *icon) { return icon->imageId() == id; });
+
+    if (it != QImageIconList->end()) {
+        const ImageIcon *i = *it;
+
+        QImage image = i->image();
+        if (requestedSize.isValid() && requestedSize != image.size())
+            image = image.scaled(requestedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+        if (size)
+            *size = image.size();
+
+        return image;
+    }
+
+    return QImage();
 }

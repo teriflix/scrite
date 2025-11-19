@@ -621,6 +621,8 @@ Item {
         }
     }
 
+    readonly property LibraryService libraryService : LibraryService { }
+
     // This model is how the screenplay of the current ScriteDocument is accessed.
     readonly property ScreenplayAdapter screenplayAdapter: ScreenplayAdapter {
         property string sessionId

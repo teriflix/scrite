@@ -13,6 +13,7 @@
 
 #include "user.h"
 #include "scrite.h"
+#include "qimageitem.h"
 #include "appwindow.h"
 #include "callgraph.h"
 #include "application.h"
@@ -92,6 +93,7 @@ AppWindow::AppWindow()
     // Register image providers
     this->engine()->addImageProvider(ColorImageProvider::name(), new ColorImageProvider);
     this->engine()->addImageProvider(BasicFileIconProvider::name(), new BasicFileIconProvider);
+    this->engine()->addImageProvider(ImageIconProvider::name(), new ImageIconProvider);
 
     const bool useNativeTextRendering = [=]() -> bool {
 #ifdef Q_OS_WIN

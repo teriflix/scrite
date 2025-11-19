@@ -712,7 +712,7 @@ public:
     Q_INVOKABLE static QString path(const QString &name);
     Q_INVOKABLE static QString read(const QString &fileName);
 
-    Q_INVOKABLE static FileInfo info(const QString &path);
+    Q_INVOKABLE static Utils::FileInfo info(const QString &path);
 
     static QString sanitiseName(const QString &fileName, QSet<QChar> *removedChars = nullptr);
 };

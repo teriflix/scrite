@@ -121,7 +121,7 @@ private:
 
 private slots:
     void onSortOrderChanged();
-    void onVisibilityChanged();
+    void onActionDataChanged();
     void onActionShortcutChanged(const QKeySequence &newShortcut);
 
 private:
@@ -385,6 +385,7 @@ private:
 
     void onActionManagerReset();
     void onActionManagerNameChanged();
+    void onActionManagerDataChanged(const QModelIndex &start, const QModelIndex &end);
     void onActionManagerRowsRemoved(const QModelIndex &index, int start, int end);
     void onActionManagerRowsInserted(const QModelIndex &index, int start, int end);
 

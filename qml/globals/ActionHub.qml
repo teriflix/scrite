@@ -203,6 +203,147 @@ Item {
 
             onTriggered: ExportConfigurationDialog.launch("Screenplay/Adobe PDF")
         }
+
+        // Action to reveal vault folder
+        // Action to reveal backup folder
+        // Action to reveal settings folder
+    }
+
+    readonly property ActionManager recentFileOperations: ActionManager {
+        title: "Open Recent"
+        objectName: "recentFileOperations"
+    }
+
+    Repeater {
+        model: Runtime.recentFiles
+
+        // Repeater delegates can only be Item {}, they cannot be QObject types.
+        // So, that rules out creating just Action {} as delegate. It has to be
+        // nested in an Item.
+        delegate: Item {
+            required property int index
+            required property var fileInfo
+
+            visible: false
+
+            Action {
+                readonly property bool visible: true
+                property var keywords: [fileInfo.subtitle, fileInfo.author, fileInfo.logline]
+                property string tooltip: fileInfo.filePath
+
+                ActionManager.target: root.recentFileOperations
+
+                ImageIcon.image: fileInfo.hasCoverPage ? fileInfo.coverPageImage : Gui.emptyQImage
+
+                text: {
+                    let ret = ""
+                    if(fileInfo.title !== "") {
+                        ret += fileInfo.title
+
+                        if(fileInfo.version !== "")
+                            ret += " (" + fileInfo.version + ")"
+                    } else
+                        ret = fileInfo.baseFileName
+                    return ret
+                }
+                enabled: true
+
+                icon.color: "transparent"
+                icon.source: fileInfo.hasCoverPage ? ImageIcon.url : "qrc:/icons/filetype/document.png"
+
+                onTriggered: OpenFileTask.open(fileInfo.filePath)
+            }
+        }
+    }
+
+    readonly property ActionManager templateOperations: ActionManager {
+        title: "Templates"
+        objectName: "templateOperations"
+
+        Action {
+            readonly property bool visible: true
+            readonly property string tooltip: "Create a new screenplay by interpreting text on the clipboard as fountain file."
+
+            enabled: Scrite.document.canImportFromClipboard
+            text: "New from Clipboard"
+            icon.source: "qrc:/icons/filetype/document.png"
+
+            onTriggered: {
+                SaveFileTask.save( () => {
+                                        Scrite.document.importFromClipboard()
+                                    } )
+            }
+        }
+    }
+
+    Repeater {
+        model: Runtime.appFeatures.templates.enabled ? Runtime.libraryService.templates : []
+
+        // Repeater delegates can only be Item {}, they cannot be QObject types.
+        // So, that rules out creating just Action {} as delegate. It has to be
+        // nested in an Item.
+        delegate: Item {
+            required property int index
+            required property var record
+
+            visible: false
+
+            Action {
+                readonly property bool visible: true
+                property string tooltip: record.description
+
+                ActionManager.target: root.templateOperations
+
+                text: record.name
+                enabled: true
+
+                icon.color: "transparent"
+                icon.source: index === 0 ? record.poster : Runtime.libraryService.templates.baseUrl + "/" + record.poster
+
+                onTriggered: {
+                    let task = OpenFromLibraryTask.openTemplateAt(Runtime.libraryService, index)
+                    task.finished.connect(closeRequest)
+                }
+            }
+        }
+    }
+
+    readonly property ActionManager scriptalayOperations: ActionManager {
+        title: "Scriptalay"
+        objectName: "scriptalayOperations"
+    }
+
+    Repeater {
+        model: Runtime.appFeatures.scriptalay.enabled ? Runtime.libraryService.screenplays : []
+
+        // Repeater delegates can only be Item {}, they cannot be QObject types.
+        // So, that rules out creating just Action {} as delegate. It has to be
+        // nested in an Item.
+        delegate: Item {
+            required property int index
+            required property var record
+
+            visible: false
+
+            Action {
+                readonly property bool visible: true
+                property string tooltip: record.authors
+                property var keywords: [record.logline]
+
+                ActionManager.target: root.scriptalayOperations
+
+                text: record.name
+                enabled: true
+
+                icon.color: "transparent"
+                icon.source: Runtime.libraryService.screenplays.baseUrl + "/" + record.poster
+
+                onTriggered: {
+                    let task = OpenFromLibraryTask.openScreenplayAt(Runtime.libraryService, index)
+                    task.finished.connect(closeRequest)
+                }
+            }
+        }
     }
 
     readonly property ActionManager exportOptions: ActionManager {

@@ -37,10 +37,6 @@ Item {
         root.modeChanged.connect(_private.switchMode)
     }
 
-    LibraryService {
-        id: libraryService
-    }
-
     Loader {
         anchors.fill: parent
         sourceComponent: {
@@ -640,7 +636,7 @@ Item {
                     id: templatesView
                     anchors.fill: parent
                     anchors.margins: 1
-                    model: Runtime.appFeatures.templates.enabled ? libraryService.templates : []
+                    model: Runtime.appFeatures.templates.enabled ? Runtime.libraryService.templates : []
                     visible: Runtime.appFeatures.templates.enabled
                     currentIndex: -1
                     clip: true
@@ -676,14 +672,14 @@ Item {
 
                         width: templatesView.width
 
-                        iconSource: index === 0 ? record.poster : libraryService.templates.baseUrl + "/" + record.poster
+                        iconSource: index === 0 ? record.poster : Runtime.libraryService.templates.baseUrl + "/" + record.poster
                         showPoster: index > 0
                         text: record.name
                         tooltip: record.description
 
                         onClicked: {
                             SaveFileTask.save( () => {
-                                                    var task = OpenFromLibraryTask.openTemplateAt(libraryService, index)
+                                                    var task = OpenFromLibraryTask.openTemplateAt(Runtime.libraryService, index)
                                                     task.finished.connect(closeRequest)
                                                 } )
                         }
@@ -692,7 +688,7 @@ Item {
 
                 BusyIndicator {
                     anchors.centerIn: parent
-                    running: libraryService.busy
+                    running: Runtime.libraryService.busy
                 }
             }
         }
@@ -785,14 +781,14 @@ Item {
 
             width: ListView.view.width
 
-            iconSource: libraryService.screenplays.baseUrl + "/" + record.poster
+            iconSource: Runtime.libraryService.screenplays.baseUrl + "/" + record.poster
             showPoster: true
             text: record.name
             tooltip: "<i>" + record.authors + "</i><br/><br/>" + record.logline
 
             onClicked: {
                 SaveFileTask.save( () => {
-                                        var task = OpenFromLibraryTask.openScreenplayAt(libraryService, index)
+                                        var task = OpenFromLibraryTask.openScreenplayAt(Runtime.libraryService, index)
                                         task.finished.connect(closeRequest)
                                     } )
             }
@@ -847,7 +843,7 @@ Item {
                     id: quickFilesView // shows either Scriptalay or Recent Files
                     anchors.fill: parent
                     anchors.margins: 1
-                    model: scriptalayMode ? libraryService.screenplays : Runtime.recentFiles
+                    model: scriptalayMode ? Runtime.libraryService.screenplays : Runtime.recentFiles
                     currentIndex: -1
                     clip: true
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
@@ -894,7 +890,7 @@ Item {
         function openSelected() {
             SaveFileTask.save( () => {
                                     if(screenplaysView.currentIndex >= 0) {
-                                         var task = OpenFromLibraryTask.openScreenplayAt(libraryService, screenplaysView.currentIndex)
+                                         var task = OpenFromLibraryTask.openScreenplayAt(Runtime.libraryService, screenplaysView.currentIndex)
                                          task.finished.connect(closeRequest)
                                      }
                                 } )
@@ -917,7 +913,7 @@ Item {
                     anchors.fill: parent
                     anchors.margins: 1
                     clip: true
-                    model: libraryService.screenplays
+                    model: Runtime.libraryService.screenplays
                     currentIndex: -1
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                     highlight: Rectangle {
@@ -936,7 +932,7 @@ Item {
 
                         text: record.name
                         singleClick: false
-                        iconSource: libraryService.screenplays.baseUrl + "/" + record.poster
+                        iconSource: Runtime.libraryService.screenplays.baseUrl + "/" + record.poster
 
                         onClicked: screenplaysView.currentIndex = index
                         onDoubleClicked: {
@@ -1014,7 +1010,7 @@ Item {
                             TextArea {
                                 id: screenplayDetailsText
                                 width: screenplayDetailsFlick.width-20
-                                property var record: screenplaysView.currentIndex >= 0 ? libraryService.screenplays.recordAt(screenplaysView.currentIndex) : undefined
+                                property var record: screenplaysView.currentIndex >= 0 ? Runtime.libraryService.screenplays.recordAt(screenplaysView.currentIndex) : undefined
                                 textFormat: record ? TextArea.RichText : TextArea.MarkdownText
                                 wrapMode: Text.WordWrap
                                 padding: 8
@@ -1363,7 +1359,7 @@ Item {
             }
             buttons: VclButton {
                 text: "Open"
-                enabled: scriptalayPageItem.contentItem.hasSelection && libraryService.screenplays.count > 0
+                enabled: scriptalayPageItem.contentItem.hasSelection && Runtime.libraryService.screenplays.count > 0
                 onClicked: scriptalayPageItem.contentItem.openSelected()
             }
         }

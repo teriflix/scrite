@@ -16,6 +16,7 @@
 
 #include <QIcon>
 #include <QImage>
+#include <QQuickImageProvider>
 #include <QQuickPaintedItem>
 
 class QImageItem : public QQuickPaintedItem
@@ -85,6 +86,56 @@ private:
         SceneGraphPaintMode,
         PainterPaintMode
     } lastPaintMode = UnknownPaintMode;
+};
+
+class ImageIcon : public QObject
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_ATTACHED(ImageIcon)
+
+public:
+    virtual ~ImageIcon();
+
+    static ImageIcon *qmlAttachedProperties(QObject *parent);
+
+    // clang-format off
+    Q_PROPERTY(QUrl url
+               READ url
+               NOTIFY imageChanged)
+    // clang-format on
+    QUrl url() const;
+
+    // clang-format off
+    Q_PROPERTY(QImage image
+               READ image
+               WRITE setImage
+               NOTIFY imageChanged)
+    // clang-format on
+    void setImage(const QImage &val);
+    QImage image() const { return m_image; }
+    Q_SIGNAL void imageChanged();
+
+    QString imageId() const { return m_imageId; }
+
+protected:
+    explicit ImageIcon(QObject *parent = nullptr);
+
+private:
+    QImage m_image;
+    QString m_imageId;
+};
+
+class ImageIconProvider : public QQuickImageProvider
+{
+public:
+    explicit ImageIconProvider();
+    ~ImageIconProvider();
+
+    static QString name();
+
+    // QQuickImageProvider interface
+    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
 };
 
 #endif // QIMAGEITEM_H

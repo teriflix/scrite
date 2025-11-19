@@ -25,6 +25,14 @@
 static const char *_QQuickAction = "QQuickAction";
 static const QByteArray _QQuickActionSortOrderProperty = QByteArrayLiteral("sortOrder");
 static const char *_QQuickActionSortOrderChanged = SIGNAL(sortOrderChanged());
+static const QByteArray _QQuickActionTextProperty = QByteArrayLiteral("text");
+static const char *_QQuickActionTextChanged = SIGNAL(textChanged(QString));
+static const QByteArray _QQuickActionIconProperty = QByteArrayLiteral("icon");
+static const char *_QQuickActionIconChanged = SIGNAL(iconChanged(QQuickIcon));
+static const QByteArray _QQuickActionTooltipProperty = QByteArrayLiteral("tooltip");
+static const char *_QQuickActionTooltipChanged = SIGNAL(tooltipChanged());
+static const QByteArray _QQuickActionKeywordsProperty = QByteArrayLiteral("keywords");
+static const char *_QQuickActionKeywordsChanged = SIGNAL(keywordsChanged());
 static const QByteArray _QQuickActionVisibleProperty = QByteArrayLiteral("visible");
 static const char *_QQuickActionVisibilityChanged = SIGNAL(visibleChanged());
 static const QByteArray _QQuickActionShortcutProperty = QByteArrayLiteral("shortcut");
@@ -314,9 +322,27 @@ bool ActionManager::addInternal(QObject *action)
         if (visibleProperty.isValid()) {
             if (visibleProperty.isWritable() && !visibleProperty.isConstant()
                 && visibleProperty.hasNotifySignal())
-                connect(action, _QQuickActionVisibilityChanged, this, SLOT(onVisibilityChanged()));
+                connect(action, _QQuickActionVisibilityChanged, this, SLOT(onActionDataChanged()));
         }
 
+        const QMetaProperty tooltipProperty = action->metaObject()->property(
+                action->metaObject()->indexOfProperty(_QQuickActionTooltipProperty));
+        if (tooltipProperty.isValid()) {
+            if (tooltipProperty.isWritable() && !tooltipProperty.isConstant()
+                && tooltipProperty.hasNotifySignal())
+                connect(action, _QQuickActionTooltipChanged, this, SLOT(onActionDataChanged()));
+        }
+
+        const QMetaProperty keywordsProperty = action->metaObject()->property(
+                action->metaObject()->indexOfProperty(_QQuickActionKeywordsProperty));
+        if (keywordsProperty.isValid()) {
+            if (keywordsProperty.isWritable() && !keywordsProperty.isConstant()
+                && keywordsProperty.hasNotifySignal())
+                connect(action, _QQuickActionKeywordsChanged, this, SLOT(onActionDataChanged()));
+        }
+
+        connect(action, _QQuickActionTextChanged, this, SLOT(onActionDataChanged()));
+        connect(action, _QQuickActionIconChanged, this, SLOT(onActionDataChanged()));
         connect(action, _QQuickActionShortcutChanged, this,
                 SLOT(onActionShortcutChanged(QKeySequence)));
 
@@ -488,7 +514,7 @@ void ActionManager::onSortOrderChanged()
     m_sortActionsTimer->start();
 }
 
-void ActionManager::onVisibilityChanged()
+void ActionManager::onActionDataChanged()
 {
     QObject *action = this->sender();
 
@@ -1011,6 +1037,8 @@ void ActionsModel::reload()
                 &ActionsModel::onActionManagerRowsRemoved);
         connect(actionManager, &ActionManager::rowsInserted, this,
                 &ActionsModel::onActionManagerRowsInserted);
+        connect(actionManager, &ActionManager::dataChanged, this,
+                &ActionsModel::onActionManagerDataChanged);
 
         const QList<QObject *> actions = actionManager->actions();
         for (QObject *action : actions) {
@@ -1029,8 +1057,13 @@ void ActionsModel::onActionManagerReset()
 
     const QPair<int, int> rowRange = this->findRowRange(actionManager);
     const int removeStart = rowRange.first, removeEnd = rowRange.second;
-    if (removeStart < 0 || removeEnd < 0)
+    if (removeStart < 0 || removeEnd < 0) {
+        /** we could have inserted actions from this action-manager at the end, but then
+         *  we would have a hard time figuring out the insert indexes based on the sort
+         *  order. Its better off to simply reload the whole thing in such a case */
+        this->reload();
         return;
+    }
 
     this->beginRemoveRows(QModelIndex(), removeStart, removeEnd);
     for (int i = removeEnd; i >= removeStart; i--)
@@ -1038,8 +1071,10 @@ void ActionsModel::onActionManagerReset()
     this->endRemoveRows();
 
     const QList<QObject *> actions = actionManager->actions();
-    const int insertStart = removeStart, insertEnd = removeStart + actions.size() - 1;
+    if (actions.isEmpty())
+        return;
 
+    const int insertStart = removeStart, insertEnd = removeStart + actions.size() - 1;
     this->beginInsertRows(QModelIndex(), insertStart, insertEnd);
     for (int i = 0; i < actions.size(); i++)
         m_items.insert(insertStart + i, Item({ actionManager, actions.at(i) }));
@@ -1059,6 +1094,49 @@ void ActionsModel::onActionManagerNameChanged()
     const QModelIndex start = this->index(rowRange.first, 0);
     const QModelIndex end = this->index(rowRange.second, 0);
     emit dataChanged(start, end);
+}
+
+void ActionsModel::onActionManagerDataChanged(const QModelIndex &start, const QModelIndex &end)
+{
+    if (!start.isValid() || !end.isValid())
+        return;
+
+    ActionManager *actionManager = qobject_cast<ActionManager *>(this->sender());
+    if (actionManager == nullptr)
+        return;
+
+    // Ensure that all the changed actions actually exist
+    for (int i = start.row(); i <= end.row(); i++) {
+        QObject *changedAction = start.data(ActionManager::ActionRole).value<QObject *>();
+        if (changedAction) {
+            auto it = std::find_if(m_items.begin(), m_items.end(),
+                                   [actionManager, changedAction](const Item &item) {
+                                       return item.actionManager == actionManager
+                                               && item.action == changedAction;
+                                   });
+            if (it == m_items.end()) {
+                this->reload();
+                return;
+            }
+        }
+    }
+
+    auto it = std::find_if(m_items.begin(), m_items.end(), [actionManager](const Item &item) {
+        return item.actionManager == actionManager;
+    });
+
+    if (it == m_items.end()) {
+        /** we could have inserted actions from this action-manager at the end, but then
+         *  we would have a hard time figuring out the insert indexes based on the sort
+         *  order. Its better off to simply reload the whole thing in such a case */
+        this->reload();
+        return;
+    }
+
+    const int offset = std::distance(m_items.begin(), it);
+    const QModelIndex start2 = this->index(start.row() + offset);
+    const QModelIndex end2 = this->index(end.row() + offset);
+    emit dataChanged(start2, end2);
 }
 
 void ActionsModel::onActionManagerRowsRemoved(const QModelIndex &index, int start, int end)
@@ -1097,8 +1175,13 @@ void ActionsModel::onActionManagerRowsInserted(const QModelIndex &index, int sta
         return item.actionManager == actionManager;
     });
 
-    if (it == m_items.end())
+    if (it == m_items.end()) {
+        /** we could have inserted actions from this action-manager at the end, but then
+         *  we would have a hard time figuring out the insert indexes based on the sort
+         *  order. Its better off to simply reload the whole thing in such a case */
+        this->reload();
         return;
+    }
 
     const int offset = std::distance(m_items.begin(), it);
     this->beginInsertRows(QModelIndex(), start + offset, end + offset);
@@ -1327,7 +1410,7 @@ bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &sou
     }
 
     if (accept && m_filters.testFlag(ActionsWithText)) {
-        const QString actionText = action->property("text").toString();
+        const QString actionText = action->property(_QQuickActionTextProperty).toString();
         accept &= !actionText.isEmpty();
 
         if (accept) {
