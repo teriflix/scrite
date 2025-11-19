@@ -811,7 +811,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: "Ctrl+-"
+            readonly property string defaultShortcut: "Ctrl+`"
 
             enabled: ActionHandler.canHandle
             objectName: "editSceneContent"
@@ -1264,6 +1264,26 @@ Item {
 
             onTriggered: Scrite.document.structure.resetSceneNumbers()
         }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+="
+
+            enabled: ActionHandler.canHandle
+            objectName: "zoomIn"
+            shortcut: defaultShortcut
+            text: "Zoom In"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+-"
+
+            enabled: ActionHandler.canHandle
+            objectName: "zoomOut"
+            shortcut: defaultShortcut
+            text: "Zoom Out"
+        }
     }
 
     readonly property ActionManager screenplayOperations: ActionManager {
@@ -1505,6 +1525,26 @@ Item {
             text: "Structure Canvas PDF"
 
             icon.source: "qrc:/icons/file/generate_pdf.png"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Alt+="
+
+            enabled: ActionHandler.canHandle
+            objectName: "zoomIn"
+            shortcut: defaultShortcut
+            text: "Zoom In"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Alt+-"
+
+            enabled: ActionHandler.canHandle
+            objectName: "zoomOut"
+            shortcut: defaultShortcut
+            text: "Zoom Out"
         }
     }
 

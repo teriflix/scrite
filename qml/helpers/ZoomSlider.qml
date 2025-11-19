@@ -35,6 +35,9 @@ Item {
     signal zoomInRequest()
     signal zoomOutRequest()
 
+    function zoomIn() { _zoomInButton.clicked() }
+    function zoomOut() { _zoomOutButton.clicked() }
+
     implicitWidth: _layout.width
     implicitHeight: Runtime.idealFontMetrics.height + 8
 
@@ -44,6 +47,8 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
 
         IconButton {
+            id: _zoomOutButton
+
             enabled: _slider.value > _slider.from
             source: "qrc:/icons/navigation/zoom_out.png"
             tooltipText: "Zoom Out"
@@ -74,6 +79,8 @@ Item {
         }
 
         IconButton {
+            id: _zoomInButton
+
             source: "qrc:/icons/navigation/zoom_in.png"
             enabled: _slider.value < _slider.to
             tooltipText: "Zoom In"

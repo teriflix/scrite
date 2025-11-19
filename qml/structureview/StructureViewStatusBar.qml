@@ -254,6 +254,21 @@ Rectangle {
             onSliderMoved: root.zoomToRequest(zoomLevel)
             onZoomInRequest: root.zoomInRequest()
             onZoomOutRequest: root.zoomOutRequest()
+
+
+            ActionHandler {
+                enabled: _zoomSlider.value < _zoomSlider.to
+                action: ActionHub.structureCanvasOperations.find("zoomIn")
+
+                onTriggered: _zoomSlider.zoomIn()
+            }
+
+            ActionHandler {
+                enabled: _zoomSlider.value > _zoomSlider.from
+                action: ActionHub.structureCanvasOperations.find("zoomOut")
+
+                onTriggered: _zoomSlider.zoomOut()
+            }
         }
     }
 }

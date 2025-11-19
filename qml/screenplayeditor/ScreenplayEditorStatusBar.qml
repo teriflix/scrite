@@ -394,6 +394,20 @@ Rectangle {
         stepSize: 1
         zoomSliderVisible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
 
+        ActionHandler {
+            enabled: _zoomSlider.value < _zoomSlider.to
+            action: ActionHub.screenplayEditorOptions.find("zoomIn")
+
+            onTriggered: _zoomSlider.zoomIn()
+        }
+
+        ActionHandler {
+            enabled: _zoomSlider.value > _zoomSlider.from
+            action: ActionHub.screenplayEditorOptions.find("zoomOut")
+
+            onTriggered: _zoomSlider.zoomOut()
+        }
+
         Connections {
             target: screenplayFormat
 
