@@ -23,6 +23,7 @@ class TwoColumnReport : public AbstractReportGenerator
     QML_UNCREATABLE("Instances must be created using ScriteDocument only.")
     // clang-format off
     Q_CLASSINFO("Title", "Two Column Report")
+    Q_CLASSINFO("Keywords", "audio video format,av format,left right format")
     Q_CLASSINFO("Description", "Generate screenplay output in two columns.")
     Q_CLASSINFO("Icon", ":/icons/reports/twocolumn_report.png")
     // clang-format on

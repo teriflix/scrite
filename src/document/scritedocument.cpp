@@ -1647,6 +1647,11 @@ QJsonArray ScriteDocument::supportedExportFormats() const
                         n_cii >= 0 ? QString::fromLatin1(mo->classInfo(n_cii).value())
                                    : QStringLiteral("Scrite Document (*.scrite)"));
 
+            const int k_cii = mo->indexOfClassInfo("Keywords");
+            item.insert("keywords",
+                        k_cii >= 0 ? QString::fromLatin1(mo->classInfo(k_cii).value())
+                                   : QStringLiteral(""));
+
             exporters.append(item);
         }
     }
@@ -1676,6 +1681,11 @@ QJsonArray ScriteDocument::supportedReports() const
             item.insert("icon",
                         i_cii >= 0 ? QString::fromLatin1(mo->classInfo(i_cii).value())
                                    : QStringLiteral(":/icons/reports/reports_menu_item.png"));
+
+            const int k_cii = mo->indexOfClassInfo("Keywords");
+            item.insert("keywords",
+                        k_cii >= 0 ? QString::fromLatin1(mo->classInfo(k_cii).value())
+                                   : QStringLiteral(""));
 
             reports.append(item);
         }

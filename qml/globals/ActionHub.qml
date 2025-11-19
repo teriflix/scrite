@@ -207,13 +207,14 @@ Item {
         // So, that rules out creating just Action {} as delegate. It has to be
         // nested in an Item.
         delegate: Item {
-            required property var modelData // { className, name, icon, key, description, category }
+            required property var modelData // { className, name, icon, key, description, category, keywords }
 
             visible: false
 
             Action {
                 readonly property bool allowShortcut: true
-                property string tooltip: modelData.description
+                readonly property string tooltip: modelData.description
+                readonly property string keywords: modelData.keywords
 
                 ActionManager.target: root.exportOptions
 
@@ -248,7 +249,8 @@ Item {
 
             Action {
                 readonly property bool allowShortcut: true
-                property string tooltip: modelData.description
+                readonly property string tooltip: modelData.description
+                readonly property string keywords: modelData.keywords
 
                 ActionManager.target: root.reportOptions
 
@@ -397,7 +399,7 @@ Item {
         objectName: "languageOptions"
 
         Action {
-            readonly property var keywords: ["add language", "input methods", "input tools", "baraha", "nudi", "ism"]
+            readonly property var keywords: ["add language", "input methods", "input tools", "baraha", "nudi", "ism", "font"]
             property int sortOrder: LanguageEngine.supportedLanguages.count + 1
 
             text: "More Languages ..."
@@ -1871,7 +1873,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property var keywords: ["plan", "purchase", "buy", "license"]
+            readonly property var keywords: ["plan", "purchase", "buy", "license", "pricing", "price", "discount"]
             readonly property string defaultShortcut: "F10"
 
             enabled: ActionHandler.canHandle

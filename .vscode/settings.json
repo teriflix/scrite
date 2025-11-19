@@ -3,6 +3,13 @@
         "list": "cpp",
         "xmemory": "cpp",
         "ctime": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "format": "cpp",
+        "initializer_list": "cpp",
+        "vector": "cpp",
+        "xiosbase": "cpp",
+        "xstring": "cpp",
+        "xutility": "cpp",
+        "algorithm": "cpp"
     }
 }

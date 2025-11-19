@@ -44,7 +44,7 @@ Popup {
 
     parent: Scrite.window.contentItem
 
-    width: Math.min(640, Scrite.window.width * 0.75)
+    width: Math.min(720, Scrite.window.width * 0.75)
 
     modal: false
     closePolicy: Popup.CloseOnPressOutside|Popup.CloseOnEscape
@@ -62,22 +62,6 @@ Popup {
             width: parent.width - 10
 
             spacing: 20
-
-            VclLabel {
-                Layout.fillWidth: true
-
-                text: "Command Center"
-                color: Runtime.colors.accent.c500.text
-                padding: 8
-                horizontalAlignment: Text.AlignHCenter
-
-                font.bold: true
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
-
-                background: Rectangle {
-                    color: Runtime.colors.accent.c500.background
-                }
-            }
 
             TextField {
                 id: _commandText
@@ -101,7 +85,7 @@ Popup {
                 id: _actionsView
 
                 Layout.fillWidth: true
-                Layout.preferredHeight: Scrite.window.height * 0.3
+                Layout.preferredHeight: Scrite.window.height * 0.4
 
                 function triggerCurrentItem() {
                     if(currentItem != null) {
@@ -153,6 +137,8 @@ Popup {
                         width: parent.width
 
                         Image {
+                            Layout.alignment: Qt.AlignTop
+                            Layout.topMargin: 10
                             Layout.leftMargin: 12
                             Layout.preferredHeight: Runtime.iconImageSize
                             Layout.preferredWidth: Runtime.iconImageSize
@@ -161,16 +147,44 @@ Popup {
                             source: qmlAction.icon.source !== "" ? qmlAction.icon.source : "qrc:/icons/content/blank.png"
                         }
 
-                        VclLabel {
+                        ColumnLayout {
+                            Layout.alignment: Qt.AlignTop
                             Layout.fillWidth: true
 
-                            elide: Text.ElideRight
-                            font: Runtime.idealFontMetrics.font
-                            padding: 10
-                            text: "<b>" + actionManager.title + "</b>: " + qmlAction.text + (qmlAction.checkable & qmlAction.checked ? " ✔" : "")
+                            spacing: 0
+
+                            VclLabel {
+                                id: _nameLabel
+
+                                Layout.fillWidth: true
+
+                                elide: Text.ElideRight
+                                font: Runtime.idealFontMetrics.font
+                                padding: 10
+                                bottomPadding: _descriptionLabel.visible ? 2 : 10
+                                text: "<b>" + actionManager.title + "</b>: " + qmlAction.text + (qmlAction.checkable & qmlAction.checked ? " ✔" : "")
+                            }
+
+                            VclLabel {
+                                id: _descriptionLabel
+
+                                Layout.fillWidth: true
+                                Layout.leftMargin: 10
+                                Layout.rightMargin: 10
+                                Layout.bottomMargin: 10
+
+                                elide: Text.ElideRight
+                                maximumLineCount: 3
+                                wrapMode: Text.WordWrap
+                                font: Runtime.minimumFontMetrics
+                                text: qmlAction.tooltip !== "" ? qmlAction.tooltip : ""
+                                visible: text !== ""
+                            }
                         }
 
                         Link {
+                            Layout.alignment: Qt.AlignTop
+                            Layout.topMargin: 10
                             Layout.preferredWidth: _delegateLayout.width * 0.2
 
                             enabled: shortcutIsEditable
@@ -199,15 +213,21 @@ Popup {
                 result.value = true
             else {
                 const givenText = _commandText.text.toLowerCase()
-                const text = (actionManager.title + ": " + qmlAction.text).toLowerCase()
-                let accept = (text.indexOf(givenText) >= 0)
-                if(accept || qmlAction.keywords === undefined) {
-                    result.value = accept
-                    return
+
+                let text = (actionManager.title + ": " + qmlAction.text)
+                if(qmlAction.keywords !== undefined) {
+                    if(typeof qmlAction.keywords === "string")
+                        text += ", " + qmlAction.keywords
+                    else if(qmlAction.keywords.length > 0)
+                        text += ", " + qmlAction.keywords.join(", ")
+                }
+                if(qmlAction.tooltip !== undefined) {
+                    text += ", " + qmlAction.tooltip
                 }
 
-                const keywords = qmlAction.keywords.join(", ")
-                result.value = keywords.indexOf(givenText) >= 0
+                text = text.toLowerCase()
+
+                result.value = (text.indexOf(givenText) >= 0)
             }
         }
 
