@@ -2005,7 +2005,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: "Ctrl+Shift+/"
+            readonly property string defaultShortcut: "Ctrl+."
 
             enabled: ActionHandler.canHandle
             checkable: true
