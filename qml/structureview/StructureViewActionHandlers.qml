@@ -356,7 +356,7 @@ Item {
         iconSource: {
             if(sceneType === Scene.Standard)
                 return "qrc:/icons/content/standard_scene.png"
-            return sceneTypeModel[sceneType].icon
+            return sceneTypeModel.valueToIcon(sceneType)
         }
 
         onTriggered: (source) => {
