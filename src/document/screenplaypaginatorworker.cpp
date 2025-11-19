@@ -369,6 +369,7 @@ void ScreenplayPaginatorWorker::reset(const QList<SceneContent> &screenplayConte
     /* If there has been a drastic change in content-size, then lets get to syncing
      * right away instead of scheduling it for later */
     if (dSize > 2) {
+        m_lastSyncDocumentTimestamp = 0;
         this->syncDocument();
     } else {
         this->scheduleSyncDocument(Q_FUNC_INFO);
@@ -718,6 +719,7 @@ void ScreenplayPaginatorWorker::syncDocument()
 void ScreenplayPaginatorWorker::scheduleSyncDocument(const char *purpose)
 {
     if (m_synchronousSync) {
+        m_lastSyncDocumentTimestamp = 0;
         this->syncDocument();
         return;
     }
