@@ -18,8 +18,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
-
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -56,9 +54,14 @@ Flickable {
             model: Runtime.screenplayTracks
 
             Rectangle {
-                id: _outerTrackDelegate
+                id: _track
 
-                readonly property var trackData: modelData
+                required property int index
+                required property var track // of type ScreenplayTrack, a Q_GADGET declared in screenplay.h
+                                            // struct ScreenplayTrack { QString name; QList<ScreenplayTrackItem> items; }
+
+                property var items: track.items
+                property string name: track.name
 
                 y: index * (Runtime.minimumFontMetrics.height + 10)
 
@@ -82,30 +85,33 @@ Flickable {
 
                     function maybeTooltip() {
                         if(containsMouse) {
-                            _toolTipItem.x = mouseX
-                            _toolTipItem.y = mouseY
-                            _tooltipPopup.text = "'" + _outerTrackDelegate.trackData.category + "' Track"
-                            _tooltipPopup.visible = true
-                            _toolTipItem.source = _trackMouseArea
-                        } else if(_toolTipItem.source === _trackMouseArea) {
-                            _tooltipPopup.visible = false
-                            _toolTipItem.source = null
+                            _toolTip.set(mouseX, mouseY, _track.name, _trackMouseArea)
+                        } else if(_toolTip.source === _trackMouseArea) {
+                            _toolTip.unset(_trackMouseArea)
                         }
                     }
                 }
 
                 Repeater {
-                    model: _outerTrackDelegate.trackData.tracks
+                    model: _track.items
 
                     Rectangle {
-                        id: _innerTrackDelegate
+                        id: _trackItem
 
-                        readonly property var groupData: _outerTrackDelegate.trackData.tracks[index]
-                        readonly property var groupExtents: screenplayElementList.extents(_innerTrackDelegate.groupData.startIndex, _innerTrackDelegate.groupData.endIndex)
+                        required property int index
+                        required property var modelData // of type ScreenplayTrackItem, a Q_GADGET declared in screenplay.h
+                                                        // struct ScreenplayTrackItem { int startIndex, endIndex; QString name; }
 
-                        x: groupExtents.from
+                        property var extents: screenplayElementList.extents(startIndex, endIndex)
 
-                        width: groupExtents.to - groupExtents.from
+                        property int startIndex: modelData.startIndex
+                        property int endIndex: modelData.endIndex
+
+                        property string name: modelData.name
+
+                        x: extents.from
+
+                        width: extents.to - extents.from
                         height: parent.height-4
 
                         color: parent.border.color
@@ -124,11 +130,11 @@ Flickable {
                             color: Color.textColorFor(parent.color)
                             horizontalAlignment: Text.AlignHCenter
 
-                            text: _innerTrackDelegate.groupData.group
+                            text: _trackItem.name
                         }
 
                         MouseArea {
-                            id: _groupMouseArea
+                            id: _trackItemMouseArea
 
                             anchors.fill: parent
 
@@ -140,26 +146,24 @@ Flickable {
 
                             function maybeTooltip() {
                                 if(containsMouse) {
-                                    var ttText = "<b>" + _outerTrackDelegate.trackData.category + " &gt; " + _innerTrackDelegate.groupData.group + "</b>, "
-                                    if(_innerTrackDelegate.groupData.endIndex === _innerTrackDelegate.groupData.startIndex)
-                                        ttText += "1 Scene"
-                                    else
-                                        ttText += (1 + _innerTrackDelegate.groupData.endIndex - _innerTrackDelegate.groupData.startIndex) + " Scenes"
-                                    if(!Runtime.paginator.paused) {
-                                        var from = Scrite.document.screenplay.elementWithIndex(_innerTrackDelegate.groupData.startIndex)
-                                        var to = Scrite.document.screenplay.elementWithIndex(_innerTrackDelegate.groupData.endIndex)
-                                        ttText += ", Duration: " + TMath.timeLengthString(Runtime.paginator.timeLength(from, to))
-                                    }
-
-                                    _toolTipItem.x = mouseX + parent.x
-                                    _toolTipItem.y = mouseY
-                                    _tooltipPopup.text = ttText
-                                    _tooltipPopup.visible = true
-                                    _toolTipItem.source = _groupMouseArea
-                                } else if(_toolTipItem.source === _groupMouseArea) {
-                                    _tooltipPopup.visible = false
-                                    _toolTipItem.source = null
+                                    _toolTip.set(mouseX + _trackItem.x, mouseY, toolTipText(), _trackItemMouseArea)
+                                } else if(_toolTip.source === _trackItemMouseArea) {
+                                    _toolTip.unset(_trackItemMouseArea)
                                 }
+                            }
+
+                            function toolTipText() {
+                                let ret = "<b>" + _track.name + " &gt; " + _trackItem.name + "</b>, "
+                                if(_trackItem.endIndex === _trackItem.startIndex)
+                                    ret += "1 Scene"
+                                else
+                                    ret += (1 + _trackItem.endIndex - _trackItem.startIndex) + " Scenes"
+                                if(!Runtime.paginator.paused) {
+                                    let from = Scrite.document.screenplay.elementWithIndex(_trackItem.startIndex)
+                                    let to = Scrite.document.screenplay.elementWithIndex(_trackItem.endIndex)
+                                    ret += ", Duration: " + TMath.timeLengthString(Runtime.paginator.timeLength(from, to))
+                                }
+                                return ret
                             }
                         }
                     }
@@ -168,16 +172,36 @@ Flickable {
         }
 
         Item {
-            id: _toolTipItem
+            id: _toolTip
 
             property MouseArea source: null
+
+            function set(_x, _y, _text, _source) {
+                if((_text === "" || _text === undefined) && source === _source) {
+                    unset(_source)
+                    return
+                }
+
+                x = _x
+                y = _y
+                source = _source
+                _tooltipPopup.text = _text
+                _tooltipPopup.visible = true
+            }
+
+            function unset(_source) {
+                if(source === _source) {
+                    _tooltipPopup.visible = false
+                    source = null
+                }
+            }
 
             ToolTipPopup {
                 id: _tooltipPopup
 
                 y: -height - 15
 
-                container: _toolTipItem
+                container: _toolTip
             }
         }
     }

@@ -3584,24 +3584,27 @@ void ScreenplayTracks::setScreenplay(Screenplay *val)
     emit screenplayChanged();
 }
 
+ScreenplayTrack ScreenplayTracks::trackAt(int index) const
+{
+    return index < 0 || index >= m_tracks.size() ? ScreenplayTrack() : m_tracks.at(index);
+}
+
 int ScreenplayTracks::rowCount(const QModelIndex &parent) const
 {
-    return parent.isValid() ? 0 : m_data.size();
+    return parent.isValid() ? 0 : m_tracks.size();
 }
 
 QVariant ScreenplayTracks::data(const QModelIndex &index, int role) const
 {
-    if (index.row() < 0 || index.row() >= m_data.size() || role != ModelDataRole)
+    if (index.row() < 0 || index.row() >= m_tracks.size() || role != TrackRole)
         return QVariant();
 
-    return m_data.at(index.row());
+    return QVariant::fromValue<ScreenplayTrack>(m_tracks[index.row()]);
 }
 
 QHash<int, QByteArray> ScreenplayTracks::roleNames() const
 {
-    QHash<int, QByteArray> roles;
-    roles[ModelDataRole] = "modelData";
-    return roles;
+    return { { TrackRole, QByteArrayLiteral("track") } };
 }
 
 void ScreenplayTracks::timerEvent(QTimerEvent *te)
@@ -3616,11 +3619,11 @@ void ScreenplayTracks::timerEvent(QTimerEvent *te)
 void ScreenplayTracks::refresh()
 {
     if (m_screenplay.isNull()) {
-        if (m_data.isEmpty())
+        if (m_tracks.isEmpty())
             return;
 
         this->beginResetModel();
-        m_data.clear();
+        m_tracks.clear();
         this->endResetModel();
 
         return;
@@ -3628,7 +3631,13 @@ void ScreenplayTracks::refresh()
 
     const QString slash = QStringLiteral("/");
 
-    QMap<QString, QMap<QString, QList<ScreenplayElement *>>> map;
+    // Structure tag -> list of elements. Here tag could be Opening Image, Catalyst, B Story etc.
+    typedef QMap<QString, QList<ScreenplayElement *>> TagElementsMap;
+
+    // Structure group -> tags map. Here structure group is Save The Cat, Heroes Journey etc..
+    typedef QMap<QString, TagElementsMap> StructureTagsMap;
+
+    StructureTagsMap structureTagsMap;
     for (int i = 0; i < m_screenplay->elementCount(); i++) {
         ScreenplayElement *element = m_screenplay->elementAt(i);
         if (element->elementType() != ScreenplayElement::SceneElementType)
@@ -3639,115 +3648,103 @@ void ScreenplayTracks::refresh()
             continue;
 
         for (const QString &sceneGroup : sceneGroups) {
-            const QString categoryName = sceneGroup.section(slash, 0, 0);
-            const QString groupName = sceneGroup.section(slash, 1);
-            map[categoryName][groupName].append(element);
+            const QString structureGroup = sceneGroup.section(slash, 0, 0);
+            const QString tagName = sceneGroup.section(slash, 1);
+            structureTagsMap[structureGroup][tagName].append(element);
         }
     }
 
-    const QString startIndexKey = QStringLiteral("startIndex");
-    const QString endIndexKey = QStringLiteral("endIndex");
-    const QString groupKey = QStringLiteral("group");
-
     this->beginResetModel();
 
-    m_data.clear();
+    m_tracks.clear();
 
-    QMap<QString, QMap<QString, QList<ScreenplayElement *>>>::iterator it = map.begin();
-    QMap<QString, QMap<QString, QList<ScreenplayElement *>>>::iterator end = map.end();
+    StructureTagsMap::iterator it = structureTagsMap.begin();
+    StructureTagsMap::iterator end = structureTagsMap.end();
     while (it != end) {
-        const QString category = Utils::SMath::titleCased(it.key());
-        const QMap<QString, QList<ScreenplayElement *>> groupElementsMap = it.value();
+        const QString structureGroup = Utils::SMath::titleCased(it.key());
+        const TagElementsMap tagElementsMap = it.value();
 
-        QVariantList categoryTrackItems;
+        QList<ScreenplayTrackItem> trackItems;
 
-        QMap<QString, QList<ScreenplayElement *>>::const_iterator it2 = groupElementsMap.begin();
-        QMap<QString, QList<ScreenplayElement *>>::const_iterator end2 = groupElementsMap.end();
+        TagElementsMap::const_iterator it2 = tagElementsMap.begin();
+        TagElementsMap::const_iterator end2 = tagElementsMap.end();
         while (it2 != end2) {
-            const QString group = Utils::SMath::titleCased(it2.key());
+            const QString tagName = Utils::SMath::titleCased(it2.key());
+
             QList<ScreenplayElement *> elements = it2.value();
             std::sort(elements.begin(), elements.end(),
                       [](ScreenplayElement *a, ScreenplayElement *b) {
                           return a->elementIndex() < b->elementIndex();
                       });
 
-            QVariantMap groupTrackItem;
+            ScreenplayTrackItem currentTrackItem;
 
             for (ScreenplayElement *element : qAsConst(elements)) {
-                const QVariantMap elementItem = { { startIndexKey, element->elementIndex() },
-                                                  { endIndexKey, element->elementIndex() },
-                                                  { groupKey, group } };
+                const ScreenplayTrackItem trackItem(element->elementIndex(),
+                                                    element->elementIndex(), tagName);
 
-                if (groupTrackItem.isEmpty())
-                    groupTrackItem = elementItem;
+                if (!currentTrackItem.isValid())
+                    currentTrackItem = trackItem;
                 else {
-                    const int diff = element->elementIndex()
-                            - groupTrackItem.value(endIndexKey, -10).toInt();
+                    const int diff = element->elementIndex() - currentTrackItem.endIndex;
                     if (diff == 1)
-                        groupTrackItem.insert(endIndexKey, element->elementIndex());
+                        currentTrackItem.endIndex = element->elementIndex();
                     else {
-                        categoryTrackItems.append(groupTrackItem);
-                        groupTrackItem = elementItem;
+                        trackItems.append(currentTrackItem);
+                        currentTrackItem = trackItem;
                     }
                 }
             }
 
-            if (!groupTrackItem.isEmpty())
-                categoryTrackItems.append(groupTrackItem);
+            if (currentTrackItem.isValid())
+                trackItems.append(currentTrackItem);
 
             ++it2;
         }
 
-        std::sort(categoryTrackItems.begin(), categoryTrackItems.end(),
-                  [startIndexKey, endIndexKey](const QVariant &a, const QVariant &b) {
-                      const QVariantMap trackA = a.toMap();
-                      const QVariantMap trackB = b.toMap();
-                      const int trackASize = trackA.value(endIndexKey).toInt()
-                              - trackA.value(startIndexKey).toInt();
-                      const int trackBSize = trackB.value(endIndexKey).toInt()
-                              - trackB.value(startIndexKey).toInt();
+        std::sort(trackItems.begin(), trackItems.end(),
+                  [](const ScreenplayTrackItem &a, const ScreenplayTrackItem &b) {
+                      const int trackASize = a.endIndex - a.startIndex;
+                      const int trackBSize = b.endIndex - b.startIndex;
                       return trackASize > trackBSize;
                   });
 
-        QList<QVariantList> nonIntersectionTracks;
-        nonIntersectionTracks << QVariantList();
+        QList<ScreenplayTrack> distinctTracks;
 
-        auto includeTrack = [&nonIntersectionTracks, startIndexKey, endIndexKey,
-                             groupKey](const QVariantMap &trackB) {
-            for (int i = 0; i < nonIntersectionTracks.size(); i++) {
-                QVariantList &list = nonIntersectionTracks[i];
+        auto includeTrackItem = [&distinctTracks,
+                                 structureGroup](const ScreenplayTrackItem &trackItem) {
+            for (ScreenplayTrack &distinctTrack : distinctTracks) {
                 bool intersectionFound = false;
-                for (const QVariant &listItem : list) {
-                    const QVariantMap &trackA = listItem.toMap();
-                    const int startA = trackA.value(startIndexKey).toInt();
-                    const int endA = trackA.value(endIndexKey).toInt();
-                    const int startB = trackB.value(startIndexKey).toInt();
-                    const int endB = trackB.value(endIndexKey).toInt();
-                    if ((startA <= startB && startB <= endA) || (startA <= endB && endB <= endA)) {
-                        intersectionFound = true;
+                for (const ScreenplayTrackItem &distinctTrackItem : qAsConst(distinctTrack.items)) {
+                    const bool trackItemStartsInTheMiddle =
+                            (distinctTrackItem.startIndex <= trackItem.startIndex)
+                            && (trackItem.startIndex <= distinctTrackItem.endIndex);
+                    const bool trackItemEndsInTheMiddle =
+                            (distinctTrackItem.endIndex <= trackItem.endIndex
+                             && trackItem.endIndex <= distinctTrackItem.endIndex);
+                    intersectionFound = (trackItemStartsInTheMiddle || trackItemEndsInTheMiddle);
+                    if (intersectionFound)
                         break;
-                    }
                 }
+
                 if (!intersectionFound) {
-                    list << trackB;
+                    distinctTrack.items.append(trackItem);
                     return;
                 }
             }
 
-            QVariantList newTrack;
-            newTrack << trackB;
-            nonIntersectionTracks << newTrack;
+            ScreenplayTrack newDistinctTrack;
+            newDistinctTrack.name = structureGroup;
+            newDistinctTrack.items.append(trackItem);
+
+            distinctTracks.append(newDistinctTrack);
         };
 
-        for (const QVariant &item : qAsConst(categoryTrackItems))
-            includeTrack(item.toMap());
+        for (const ScreenplayTrackItem &trackItem : qAsConst(trackItems))
+            includeTrackItem(trackItem);
 
-        for (const QVariantList &tracks : qAsConst(nonIntersectionTracks)) {
-            QVariantMap row;
-            row.insert(QStringLiteral("category"), category);
-            row.insert(QStringLiteral("tracks"), tracks);
-            m_data.append(row);
-        }
+        for (const ScreenplayTrack &distinctTrack : qAsConst(distinctTracks))
+            m_tracks.append(distinctTrack);
 
         ++it;
     }

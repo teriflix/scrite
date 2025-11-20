@@ -971,6 +971,96 @@ private:
     ExecLaterTimer m_selectedElementsOmitStatusChangedTimer;
 };
 
+struct ScreenplayTrackItem
+{
+    Q_GADGET
+
+public:
+    Q_PROPERTY(bool valid READ isValid)
+    bool isValid() const { return startIndex >= 0 && endIndex >= startIndex && !name.isEmpty(); }
+
+    // clang-format off
+    Q_PROPERTY(int startIndex
+               MEMBER startIndex)
+    // clang-format on
+    int startIndex = -1; // elementIndex in Screenplay class
+
+    // clang-format off
+    Q_PROPERTY(int endIndex
+               MEMBER endIndex)
+    // clang-format on
+    int endIndex = -1; // elementIndex in Screenplay class
+
+    // clang-format off
+    Q_PROPERTY(QString name
+               MEMBER name)
+    // clang-format on
+    QString name; // Eg. Opening Image, Catalyst, B Story etc..
+
+    ScreenplayTrackItem() { }
+    ScreenplayTrackItem(int _startIndex, int _endIndex, const QString &_name)
+        : startIndex(_startIndex), endIndex(_endIndex), name(_name)
+    {
+    }
+    ScreenplayTrackItem(const ScreenplayTrackItem &other) { *this = other; }
+    bool operator!=(const ScreenplayTrackItem &other) const { return !(*this == other); }
+    ScreenplayTrackItem &operator=(const ScreenplayTrackItem &other)
+    {
+        this->startIndex = other.startIndex;
+        this->endIndex = other.endIndex;
+        this->name = other.name;
+        return *this;
+    }
+    bool operator==(const ScreenplayTrackItem &other) const
+    {
+        return this->startIndex == other.startIndex && this->endIndex == other.endIndex
+                && this->name == other.name;
+    }
+};
+Q_DECLARE_METATYPE(ScreenplayTrackItem)
+Q_DECLARE_METATYPE(QList<ScreenplayTrackItem>)
+
+struct ScreenplayTrack
+{
+    Q_GADGET
+
+public:
+    Q_PROPERTY(bool valid READ isValid)
+    bool isValid() const { return !name.isEmpty() && !items.isEmpty(); }
+
+    // clang-format off
+    Q_PROPERTY(QString name
+               MEMBER name)
+    // clang-format on
+    QString name; // Eg. Save The Cat, Heroes Journey etc..
+
+    // clang-format off
+    Q_PROPERTY(QList<ScreenplayTrackItem> items
+               MEMBER items)
+    // clang-format on
+    QList<ScreenplayTrackItem> items;
+
+    ScreenplayTrack() { }
+    ScreenplayTrack(const QString &_name, const QList<ScreenplayTrackItem> &_items)
+        : name(_name), items(_items)
+    {
+    }
+    ScreenplayTrack(const ScreenplayTrack &other) { *this = other; }
+    bool operator!=(const ScreenplayTrack &other) const { return !(*this == other); }
+    ScreenplayTrack &operator=(const ScreenplayTrack &other)
+    {
+        this->name = other.name;
+        this->items = other.items;
+        return *this;
+    }
+    bool operator==(const ScreenplayTrack &other) const
+    {
+        return this->name == other.name && this->items == other.items;
+    }
+};
+Q_DECLARE_METATYPE(ScreenplayTrack)
+Q_DECLARE_METATYPE(QList<ScreenplayTrack>)
+
 /**
  * Looks up scenes in a screenplay and determines tracks that it can overlay on top of scenes
  * based on the groups to which various scene belong
@@ -999,11 +1089,13 @@ public:
                READ trackCount
                NOTIFY trackCountChanged)
     // clang-format on
-    int trackCount() const { return m_data.size(); }
+    int trackCount() const { return m_tracks.size(); }
     Q_SIGNAL void trackCountChanged();
 
+    Q_INVOKABLE ScreenplayTrack trackAt(int index) const;
+
     // QAbstractItemModel interface
-    enum { ModelDataRole = Qt::UserRole };
+    enum { TrackRole = Qt::UserRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int, QByteArray> roleNames() const;
@@ -1018,7 +1110,7 @@ private:
 
 private:
     QObjectProperty<Screenplay> m_screenplay;
-    QList<QVariantMap> m_data;
+    QList<ScreenplayTrack> m_tracks;
     ExecLaterTimer m_refreshTimer;
 };
 
