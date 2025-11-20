@@ -88,9 +88,9 @@ Item {
     }
 
     TimelineTracksView {
-        id: _screenplayTracksFlick
+        id: _screenplayTracksView
 
-        screenplayElementList: _screenplayElementList
+        listView: _screenplayElementList
 
         anchors.left: _screenplayElementList.left
         anchors.top: parent.top
@@ -103,7 +103,7 @@ Item {
 
         anchors.left: _screenplayTools.right
         anchors.right: parent.right
-        anchors.top: _screenplayTracksFlick.bottom
+        anchors.top: _screenplayTracksView.bottom
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
         anchors.topMargin: Runtime.screenplayTracks.trackCount > 0 ? 0 : 3
