@@ -29,6 +29,7 @@ RubberBand 1.0 RubberBand.qml
 SceneFeaturedImage 1.0 SceneFeaturedImage.qml
 SceneHeadingTextField 1.0 SceneHeadingTextField.qml
 SceneTypeImage 1.0 SceneTypeImage.qml
+ScreenplayTracksView 1.0 ScreenplayTracksView.qml
 ScrollArea 1.0 ScrollArea.qml
 SearchBar 1.0 SearchBar.qml
 ShortcutField 1.0 ShortcutField.qml
