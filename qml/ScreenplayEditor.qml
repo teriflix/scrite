@@ -136,8 +136,7 @@ Rectangle {
             anchors.top: parent.top
 
             x: {
-                if(_private.sidePanelExpanded &&
-                   _private.showSceneComments && Runtime.screenplayEditorSettings.sceneSidePanelOpen) {
+                if(_private.showSceneComments && Runtime.screenplayEditorSettings.sceneSidePanelOpen) {
                     const commentsPanelSpace = Runtime.bounded(Runtime.minSceneSidePanelWidth,
                                                                (parent.width - width),
                                                                Runtime.maxSceneSidePanelWidth)
