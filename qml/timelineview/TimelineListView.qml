@@ -18,8 +18,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
-
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -163,10 +161,10 @@ ListView {
         function removeCurrentElement() {
             if(Scrite.document.loading)
                 return
-            var cidx = currentIndex
+            let cidx = currentIndex
             if(cidx < 0)
                 return
-            var celement = Scrite.document.screenplay.elementAt(cidx)
+            let celement = Scrite.document.screenplay.elementAt(cidx)
             if(celement)
                 Scrite.document.screenplay.removeElement(celement)
         }
@@ -179,15 +177,15 @@ ListView {
         }
 
         function extents(startIndex, endIndex) {
-            var x = 0;
-            var ret = { "from": 0, "to": 0 }
+            let x = 0;
+            let ret = { "from": 0, "to": 0 }
             if(startIndex < 0 || endIndex < 0)
                 return ret;
 
-            var idx = -1
-            var nrElements = Scrite.document.screenplay.elementCount
-            for(var i=0; i<nrElements; i++) {
-                var element = Scrite.document.screenplay.elementAt(i)
+            let idx = -1
+            let nrElements = Scrite.document.screenplay.elementCount
+            for(let i=0; i<nrElements; i++) {
+                let element = Scrite.document.screenplay.elementAt(i)
                 if(element.elementType === ScreenplayElement.SceneElementType)
                     ++idx
                 if(idx === startIndex)
@@ -195,7 +193,7 @@ ListView {
                 if(element.elementType === ScreenplayElement.BreakElementType)
                     x += breakDelegateWidth
                 else {
-                    var sceneElementCount = element.scene ? element.scene.elementCount : 1
+                    let sceneElementCount = element.scene ? element.scene.elementCount : 1
                     x += Math.max(minimumDelegateWidth, sceneElementCount*perElementWidth*zoomLevel)
                 }
                 if(idx === endIndex)

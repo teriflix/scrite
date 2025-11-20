@@ -324,8 +324,7 @@ Item {
                 icon.source: index === 0 ? record.poster : Runtime.libraryService.templates.baseUrl + "/" + record.poster
 
                 onTriggered: {
-                    let task = OpenFromLibraryTask.openTemplateAt(Runtime.libraryService, index)
-                    task.finished.connect(closeRequest)
+                    OpenFromLibraryTask.openTemplateAt(Runtime.libraryService, index)
                 }
             }
         }
@@ -362,8 +361,7 @@ Item {
                 icon.source: Runtime.libraryService.screenplays.baseUrl + "/" + record.poster
 
                 onTriggered: {
-                    let task = OpenFromLibraryTask.openScreenplayAt(Runtime.libraryService, index)
-                    task.finished.connect(closeRequest)
+                    OpenFromLibraryTask.openScreenplayAt(Runtime.libraryService, index)
                 }
             }
         }

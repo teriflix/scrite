@@ -36,10 +36,12 @@ Flickable {
         result.accepted = true
     }
 
-    height: contentHeight
+    implicitWidth: listView.orientation === Qt.Vertical ? contentWidth : 0
+    implicitHeight: listView.orientation === Qt.Horizontal ? contentHeight : 0
 
     clip: true
-    contentX: listView.contentX - listView.originX
+    contentX: listView.orientation === Qt.Horizontal ? listView.contentX - listView.originX : 0
+    contentY: listView.orientation === Qt.Vertical ? listView.contentY - listView.originY : 0
     interactive: false
     contentWidth: _content.width
     contentHeight: _content.height
@@ -51,7 +53,7 @@ Flickable {
         height: listView.orientation === Qt.Horizontal ? Runtime.screenplayTracks.trackCount * (Runtime.minimumFontMetrics.height + 10) : listView.contentHeight
 
         Repeater {
-            model: Runtime.screenplayTracks
+            model: _private.model
 
             Rectangle {
                 id: _track
@@ -65,11 +67,11 @@ Flickable {
 
                 property real offset: index * (Runtime.minimumFontMetrics.height + 10)
 
-                x: listView.orientation == Qt.Vertical ? offset : 0
-                y: listView.orientation == Qt.Horizontal ? offset : 0
+                x: listView.orientation === Qt.Vertical ? offset : 0
+                y: listView.orientation === Qt.Horizontal ? offset : 0
 
-                width: _content.width
-                height: Runtime.minimumFontMetrics.height + 8
+                width: listView.orientation === Qt.Horizontal ? _content.width : Runtime.minimumFontMetrics.height + 8
+                height: listView.orientation === Qt.Horizontal ? Runtime.minimumFontMetrics.height + 8 : _content.height
 
                 color: Color.translucent( border.color, 0.1 )
                 border.color: Runtime.colors.accent.c900.background
@@ -127,7 +129,7 @@ Flickable {
 
                             width: (listView.orientation === Qt.Vertical ? parent.height : parent.width) - 10
 
-                            rotation: listView.orientation === Qt.Vertical ? 90 : 0
+                            rotation: listView.orientation === Qt.Vertical ? -90 : 0
                             transformOrigin: Item.Center
 
                             font: Runtime.minimumFontMetrics.font
@@ -151,7 +153,7 @@ Flickable {
 
                             function maybeTooltip() {
                                 if(containsMouse) {
-                                    _toolTip.set(mouseX + _trackItem.x, mouseY, toolTipText(), _trackItemMouseArea)
+                                    _toolTip.set(mouseX + _trackItem.x, mouseY + _trackItem.y, toolTipText(), _trackItemMouseArea)
                                 } else if(_toolTip.source === _trackItemMouseArea) {
                                     _toolTip.unset(_trackItemMouseArea)
                                 }
@@ -181,14 +183,17 @@ Flickable {
 
             property MouseArea source: null
 
+            width: root.listView.orientation === Qt.Vertical ? root.contentWidth : 1
+            height: root.listView.orientation === Qt.Horizontal ? 1 : root.contentHeight
+
             function set(_x, _y, _text, _source) {
                 if((_text === "" || _text === undefined) && source === _source) {
                     unset(_source)
                     return
                 }
 
-                x = _x
-                y = _y
+                x = root.listView.orientation === Qt.Horizontal ? _x : root.width
+                y = root.listView.orientation === Qt.Vertical ? _y : 0
                 source = _source
                 _tooltipPopup.text = _text
                 _tooltipPopup.visible = true
@@ -204,11 +209,32 @@ Flickable {
             ToolTipPopup {
                 id: _tooltipPopup
 
-                x: listView.orientation === Qt.Vertical ? 15 : 0
+                x: listView.orientation === Qt.Vertical ? Runtime.minimumFontMetrics.lineSpacing : 0
                 y: listView.orientation === Qt.Horizontal ? -height - 15 : 0
 
                 container: _toolTip
             }
+        }
+    }
+
+    Connections {
+        target: root.listView
+
+        function onCacheBufferChanged() {
+            Qt.callLater(_private.reload)
+        }
+    }
+
+    QtObject {
+        id: _private
+
+        property bool displayTracks: true
+
+        property ScreenplayTracks model: root.enabled && displayTracks ? Runtime.screenplayTracks : null
+
+        function reload() {
+            displayTracks = false
+            Qt.callLater( () => { _private.displayTracks = true } )
         }
     }
 }

@@ -1,3 +1,4 @@
+SceneListPanel 1.0 SceneListPanel.qml
 SceneListPanelDelegate 1.0 SceneListPanelDelegate.qml
 SceneListPanelFooter 1.0 SceneListPanelFooter.qml
 SceneListPanelHeader 1.0 SceneListPanelHeader.qml

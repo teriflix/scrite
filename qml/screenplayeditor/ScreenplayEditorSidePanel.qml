@@ -19,7 +19,6 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
@@ -57,10 +56,6 @@ Item {
     QtObject {
         id: _private
 
-        readonly property string dragDropMimeType: "sceneListView/sceneID"
-        readonly property real sceneIconSize: (Runtime.sceneEditorFontMetrics.xHeight + Runtime.sceneEditorFontMetrics.lineSpacing)/2
-        readonly property real sceneIconPadding: 8
-
         readonly property Component emptyScreenplayContent: Item {
             VclLabel {
                 anchors.top: parent.top
@@ -88,148 +83,38 @@ Item {
                                       }
                                   }
 
-            ListView {
-                id: _sceneListView
-
-                ScrollBar.vertical: VclScrollBar { flickable: _sceneListView }
-
-                FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-
+            RowLayout {
                 anchors.fill: parent
 
-                clip: true
-                model: root.screenplayAdapter
-                focus: true
-                currentIndex: root.screenplayAdapter.currentIndex
+                spacing: 0
 
-                boundsBehavior: ListView.StopAtBounds
-                boundsMovement: ListView.StopAtBounds
-                highlightMoveDuration: 0
-                highlightResizeDuration: 0
-                highlightFollowsCurrentItem: true
+                ScreenplayTracksView {
+                    id: _screenplayTracksView
 
-                highlightRangeMode: ListView.ApplyRange
-                keyNavigationWraps: false
-                keyNavigationEnabled: true
-                preferredHighlightEnd: height*0.8
-                preferredHighlightBegin: height*0.2
+                    Layout.fillHeight: true
 
-                header: SceneListPanelHeader {
-                    width: _sceneListView.width
-
-                    color: root.screenplayAdapter.currentIndex < 0 ? Runtime.colors.primary.c300.background : Runtime.colors.primary.c10.background
-
-                    leftPadding: _sceneListView.__leftPadding
-                    rightPadding: _sceneListView.__rightPadding
-
-                    onClicked: {
-                        if(root.screenplayAdapter.isSourceScreenplay)
-                            root.screenplayAdapter.screenplay.clearSelection()
-                        root.screenplayAdapter.currentIndex = -1
-
-                        root.positionScreenplayEditorAtTitlePage()
-                    }
+                    enabled: _delegateCount.get === root.screenplayAdapter.elementCount
+                    visible: root.screenplayAdapter.isSourceScreenplay
+                    listView: _sceneListView
                 }
 
-                footer: SceneListPanelFooter {
-                    width: _sceneListView.width
+                SceneListPanel {
+                    id: _sceneListView
 
-                    dragDropMimeType: _private.dragDropMimeType
-
-                    onDropEntered: (drag) => {
-                                       _sceneListView.forceActiveFocus()
-                                   }
-
-                    onDropExited: () => { } // Nothing to do here
-
-                    onDropRequest: (drop) => {
-                                       _moveElementTask.targetIndex = root.screenplayAdapter.elementCount
-                                   }
-                }
-
-                delegate: SceneListPanelDelegate {
-                    id: _delegate
-
-                    width: _sceneListView.width
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
 
                     readOnly: root.readOnly
-                    viewHasFocus: root.FocusTracker.hasFocus
-                    leftPadding: _sceneListView.__leftPadding
-                    rightPadding: _sceneListView.__rightPadding
-                    sceneIconSize: _private.sceneIconSize
-                    leftPaddingRatio: _sceneListView.__leftPaddingRatio
-                    sceneIconPadding: _private.sceneIconPadding
-                    dragDropMimeType: _private.dragDropMimeType
                     screenplayAdapter: root.screenplayAdapter
-
-                    onDragStarted: () => {
-                                       _moveElementTask.draggedElement = _delegate.screenplayElement
-                                   }
-
-                    onDragFinished: (dropAction) => {
-                                        _sceneListView.forceLayout()
-                                    }
-
-                    onDropEntered: (drag) => {
-                                        _sceneListView.forceActiveFocus()
-                                   }
-
-                    onDropExited: () => { } // Nothing to do here
-
-                    onDropRequest: (drop) => {
-                                       _moveElementTask.targetIndex = _delegate.index
-                                   }
-
-                    onContextMenuRequest: () => {
-                                              if(screenplayElementType === ScreenplayElement.BreakElementType) {
-                                                  _breakElementContextMenu.element = _delegate.screenplayElement
-                                                  _breakElementContextMenu.popup(_delegate)
-                                              } else {
-                                                  _sceneElementsContextMenu.element = _delegate.screenplayElement
-                                                  _sceneElementsContextMenu.popup(_delegate)
-                                              }
-                                          }
-
-                    onCollapseSideListPanelRequest: () => {
-                                                        _sidePanel.expanded = false
-                                                    }
-                }
-
-                property real __leftPadding: Math.max(2*_private.sceneIconPadding, (_private.sceneIconSize + 2*_private.sceneIconPadding)*__leftPaddingRatio)
-                property real __rightPadding: (_sceneListView.contentHeight > _sceneListView.height) ? 17 : 5
-                property real __leftPaddingRatio: root.screenplayAdapter.hasNonStandardScenes ? 1 : 0
-
-                Behavior on __leftPaddingRatio {
-                    enabled: Runtime.applicationSettings.enableAnimations
-                    NumberAnimation { duration: Runtime.stdAnimationDuration }
+                    tracksVisible: _screenplayTracksView.visible
                 }
             }
 
-            ScreenplayBreakElementsContextMenu {
-                id: _breakElementContextMenu
+            DelayedPropertyBinder {
+                id: _delegateCount
 
-                enabled: !root.readOnly
-            }
-
-            ScreenplaySceneElementsContextMenu {
-                id: _sceneElementsContextMenu
-
-                enabled: !root.readOnly
-            }
-
-            SceneListPanelMoveElementsTask {
-                id: _moveElementTask
-
-                sceneListView: _sceneListView
-            }
-
-            Connections {
-                target: root.screenplayAdapter.screenplay
-                enabled: root.screenplayAdapter.isSourceScreenplay
-
-                function onElementMoved(element, from, to) {
-                    Qt.callLater(_sceneListView.forceLayout)
-                }
+                set: _sceneListView.delegateCount
+                delay: Runtime.stdAnimationDuration
             }
         }
     }

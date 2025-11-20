@@ -70,7 +70,7 @@ bool QtApplicationEventNotificationCallback(void **cbdata);
 void ApplicationQtMessageHandler(QtMsgType type, const QMessageLogContext &context,
                                  const QString &message)
 {
-#if 0 // QT_NO_DEBUG_OUTPUT
+#if QT_NO_DEBUG_OUTPUT
     Q_UNUSED(type)
     Q_UNUSED(context)
     Q_UNUSED(message)
