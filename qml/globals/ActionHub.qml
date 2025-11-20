@@ -502,7 +502,7 @@ Item {
             checkable: true
             checked: Runtime.screenplayTracksSettings.displayStructureTracks
             enabled: Runtime.appFeatures.structure.enabled
-            text: "Display Keywords Tracks"
+            text: "Display Structure Tracks"
 
             onToggled: Runtime.screenplayTracksSettings.displayStructureTracks = !Runtime.screenplayTracksSettings.displayStructureTracks
         }
