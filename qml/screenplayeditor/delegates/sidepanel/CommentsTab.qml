@@ -65,7 +65,7 @@ AbstractScenePartEditor {
         }
 
         onTextChanged: () => {
-                           if(root.scene && root.scene.comments !== text) {
+                           if(activeFocus && root.scene && root.scene.comments !== text) {
                                root.scene.comments = text
                            }
                        }

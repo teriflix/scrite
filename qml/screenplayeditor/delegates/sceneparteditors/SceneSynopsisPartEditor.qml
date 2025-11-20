@@ -50,7 +50,7 @@ AbstractScenePartEditor {
         placeholderText: "Scene Synopsis"
 
         font.family: root.font.family
-        font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
+        font.pointSize: Math.max( Math.ceil(root.font.pointSize * root.zoomLevel), Runtime.minimumFontMetrics.font.pointSize)
 
         background: Item { }
 

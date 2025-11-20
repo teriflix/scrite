@@ -62,7 +62,7 @@ Item {
             border.color: Runtime.colors.primary.borderColor
         }
 
-        onTextChanged: root.scene.comments = text
+        onTextEdited: root.scene.comments = text
     }
 
     VclScrollBar {
