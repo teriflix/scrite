@@ -114,16 +114,24 @@ void ItemPositionMapper::trackMovement(QQuickItem *item, QList<QObject *> &list)
     QQuickItem *ptr = item;
     while (ptr) {
         list.append(ptr);
-        connect(ptr, SIGNAL(destroyed(QObject *)), this, SLOT(trackedObjectDestroyed(QObject *)));
-        connect(ptr, SIGNAL(xChanged()), &m_recomputePositionTimer, SLOT(start()));
-        connect(ptr, SIGNAL(yChanged()), &m_recomputePositionTimer, SLOT(start()));
-        connect(ptr, SIGNAL(widthChanged()), &m_recomputePositionTimer, SLOT(start()));
-        connect(ptr, SIGNAL(heightChanged()), &m_recomputePositionTimer, SLOT(start()));
-        connect(ptr, SIGNAL(rotationChanged()), &m_recomputePositionTimer, SLOT(start()));
-        connect(ptr, SIGNAL(scaleChanged()), &m_recomputePositionTimer, SLOT(start()));
-        connect(ptr, SIGNAL(transformOriginChanged(TransformOrigin)), &m_recomputePositionTimer,
-                SLOT(start()));
-        connect(ptr, SIGNAL(parentChanged(QQuickItem *)), &m_recomputePositionTimer, SLOT(start()));
+        connect(ptr, &QQuickItem::destroyed, this, &ItemPositionMapper::trackedObjectDestroyed);
+
+        connect(ptr, &QQuickItem::xChanged, &m_recomputePositionTimer, qOverload<>(&QTimer::start),
+                Qt::QueuedConnection);
+        connect(ptr, &QQuickItem::yChanged, &m_recomputePositionTimer, qOverload<>(&QTimer::start),
+                Qt::QueuedConnection);
+        connect(ptr, &QQuickItem::widthChanged, &m_recomputePositionTimer,
+                qOverload<>(&QTimer::start), Qt::QueuedConnection);
+        connect(ptr, &QQuickItem::heightChanged, &m_recomputePositionTimer,
+                qOverload<>(&QTimer::start), Qt::QueuedConnection);
+        connect(ptr, &QQuickItem::rotationChanged, &m_recomputePositionTimer,
+                qOverload<>(&QTimer::start), Qt::QueuedConnection);
+        connect(ptr, &QQuickItem::scaleChanged, &m_recomputePositionTimer,
+                qOverload<>(&QTimer::start), Qt::QueuedConnection);
+        connect(ptr, &QQuickItem::transformOriginChanged, &m_recomputePositionTimer,
+                qOverload<>(&QTimer::start), Qt::QueuedConnection);
+        connect(ptr, &QQuickItem::parentChanged, &m_recomputePositionTimer,
+                qOverload<>(&QTimer::start), Qt::QueuedConnection);
         ptr = ptr->parentItem();
     }
 
@@ -142,4 +150,6 @@ void ItemPositionMapper::recomputeMappedPosition()
 {
     if (!m_to.isNull() && !m_from.isNull())
         this->setMappedPosition(m_to->mapFromItem(m_from, m_position));
+    else
+        this->setMappedPosition(QPointF());
 }

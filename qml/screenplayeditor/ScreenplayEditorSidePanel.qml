@@ -83,30 +83,57 @@ Item {
                                       }
                                   }
 
-            RowLayout {
+            ColumnLayout {
                 anchors.fill: parent
 
-                spacing: 0
+                SceneListPanelHeader {
+                    Layout.fillWidth: true
 
-                ScreenplayTracksView {
-                    id: _screenplayTracksView
+                    color: Runtime.colors.primary.c400.background
 
-                    Layout.fillHeight: true
+                    leftPadding: 10
+                    rightPadding: 10
 
-                    enabled: _delegateCount.get === root.screenplayAdapter.elementCount
-                    visible: Runtime.sceneListPanelSettings.displayTracks && Runtime.screenplayTracksSettings.displayTracks && root.screenplayAdapter.isSourceScreenplay
-                    listView: _sceneListView
+                    onClicked: {
+                        if(root.screenplayAdapter.isSourceScreenplay)
+                            root.screenplayAdapter.screenplay.clearSelection()
+                        root.screenplayAdapter.currentIndex = -1
+
+                        root.positionScreenplayEditorAtTitlePage()
+                    }
                 }
 
-                SceneListPanel {
-                    id: _sceneListView
-
+                RowLayout {
                     Layout.fillWidth: true
-                    Layout.fillHeight: true
 
-                    readOnly: root.readOnly
-                    screenplayAdapter: root.screenplayAdapter
-                    tracksVisible: _screenplayTracksView.visible
+                    spacing: 0
+
+                    ScreenplayTracksView {
+                        id: _screenplayTracksView
+
+                        Layout.fillHeight: true
+
+                        enabled: _delegateCount.get === root.screenplayAdapter.elementCount && (isSceneTextModeHeading ? 1 : maximumLineCount) === 1
+                        visible: Runtime.sceneListPanelSettings.displayTracks && Runtime.screenplayTracksSettings.displayTracks && root.screenplayAdapter.isSourceScreenplay
+                        listView: _sceneListView
+                        screenplay: root.screenplayAdapter.screenplay
+
+                        property int maximumLineCount: Runtime.bounded(1,Runtime.screenplayEditorSettings.slpSynopsisLineCount,5)
+                        property bool isSceneTextModeHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
+                        onMaximumLineCountChanged: reload()
+                        onIsSceneTextModeHeadingChanged: reload()
+                    }
+
+                    SceneListPanel {
+                        id: _sceneListView
+
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        readOnly: root.readOnly
+                        screenplayAdapter: root.screenplayAdapter
+                        tracksVisible: _screenplayTracksView.visible
+                    }
                 }
             }
 
@@ -114,6 +141,7 @@ Item {
                 id: _delegateCount
 
                 set: _sceneListView.delegateCount
+                initial: 0
                 delay: Runtime.stdAnimationDuration
             }
         }

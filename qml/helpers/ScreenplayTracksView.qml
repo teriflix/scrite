@@ -26,6 +26,9 @@ Flickable {
     id: root
 
     required property ListView listView
+    required property Screenplay screenplay
+
+    function reload() { _private.reload() }
 
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
@@ -36,12 +39,12 @@ Flickable {
         result.accepted = true
     }
 
-    implicitWidth: listView.orientation === Qt.Vertical ? contentWidth : 0
-    implicitHeight: listView.orientation === Qt.Horizontal ? contentHeight : 0
+    implicitWidth: _private.model ? (listView.orientation === Qt.Vertical ? contentWidth : 0) : 0
+    implicitHeight: _private.model ? (listView.orientation === Qt.Horizontal ? contentHeight : 0) : 0
 
     clip: true
-    contentX: listView.orientation === Qt.Horizontal ? listView.contentX - listView.originX : 0
-    contentY: listView.orientation === Qt.Vertical ? listView.contentY - listView.originY : 0
+    contentX: listView.orientation === Qt.Horizontal ? listView.contentX : 0
+    contentY: listView.orientation === Qt.Vertical ? listView.contentY : 0
     interactive: false
     contentWidth: _content.width
     contentHeight: _content.height
@@ -108,12 +111,43 @@ Flickable {
                         required property var modelData // of type ScreenplayTrackItem, a Q_GADGET declared in screenplay.h
                                                         // struct ScreenplayTrackItem { int startIndex, endIndex; QString name; }
 
-                        property var extents: listView.extents(startIndex, endIndex)
+                        property QtObject extents: QtObject {
+                            property real from: {
+                                if(_trackItem.startItem === null || _trackItem.endItem === null)
+                                    return 0
 
-                        property int startIndex: modelData.startIndex
-                        property int endIndex: modelData.endIndex
+                                const pos = listView.contentItem.mapFromItem(_trackItem.startItem, 0, 0)
+                                return listView.orientation === Qt.Horizontal ? pos.x : pos.y
+                            }
+                            property real to: {
+                                if(_trackItem.startItem === null || _trackItem.endItem === null)
+                                    return 0
+
+                                const pos = listView.contentItem.mapFromItem(_trackItem.endItem, 0, 0)
+                                return (listView.orientation === Qt.Horizontal ? pos.x + _trackItem.endItem.width : pos.y + _trackItem.endItem.height) + _private.trackMargin
+                            }
+                        }
+
+                        property int startIndex: root.screenplay.indexOfElement(root.screenplay.elementWithIndex(modelData.startIndex))
+                        property int endIndex: modelData.startIndex === modelData.endIndex ? startIndex : root.screenplay.indexOfElement(root.screenplay.elementWithIndex(modelData.endIndex))
+
+                        property Item startItem: listView.itemAtIndex(startIndex)
+                        property Item endItem: listView.itemAtIndex(endIndex)
 
                         property string name: modelData.name
+
+                        property rect itemRect: Qt.rect(x, y, width, height)
+
+                        function lookupItems() {
+                            if(!startItem)
+                                startItem = listView.itemAtIndex(startIndex)
+                            if(!endItem)
+                                endItem = listView.itemAtIndex(endIndex)
+                            if(!startItem || !endItem)
+                                Qt.callLater(lookupItems)
+                        }
+
+                        Component.onCompleted: Qt.callLater(lookupItems)
 
                         x: listView.orientation === Qt.Horizontal ? extents.from : 2
                         y: listView.orientation === Qt.Vertical ? extents.from : 2
@@ -122,7 +156,7 @@ Flickable {
                         height: listView.orientation === Qt.Horizontal ? parent.height-4 : extents.to - extents.from
 
                         color: parent.border.color
-                        visible: GMath.doRectanglesIntersect(Qt.rect(x,y,width,height), _private.viewportRect)
+                        visible: GMath.doRectanglesIntersect(itemRect, _private.viewportRect)
 
                         border.color: Color.translucent(Color.textColorFor(color), 0.25)
                         border.width: 0.5
@@ -164,13 +198,13 @@ Flickable {
 
                             function toolTipText() {
                                 let ret = "<b>" + (_track.keywordsTrack ? "" : _track.name + " &gt; ") + _trackItem.name + "</b>, "
-                                if(_trackItem.endIndex === _trackItem.startIndex)
+                                if(_trackItem.modelData.endIndex === _trackItem.modelData.startIndex)
                                     ret += "1 Scene"
                                 else
-                                    ret += (1 + _trackItem.endIndex - _trackItem.startIndex) + " Scenes"
-                                if(!Runtime.paginator.paused) {
-                                    let from = Scrite.document.screenplay.elementWithIndex(_trackItem.startIndex)
-                                    let to = Scrite.document.screenplay.elementWithIndex(_trackItem.endIndex)
+                                    ret += (1 + _trackItem.modelData.endIndex - _trackItem.modelData.startIndex) + " Scenes"
+                                if(!Runtime.paginator.paused && Runtime.paginator.screenplay === root.screenplay) {
+                                    let from = root.screenplay.elementAt(_trackItem.startIndex)
+                                    let to = root.screenplay.elementAt(_trackItem.endIndex)
                                     ret += ", Duration: " + TMath.timeLengthString(Runtime.paginator.timeLength(from, to))
                                 }
                                 return ret
@@ -223,6 +257,20 @@ Flickable {
     Connections {
         target: root.listView
 
+        ignoreUnknownSignals: true
+
+        function onHeaderItemChanged() {
+            Qt.callLater(_private.reload)
+        }
+
+        function onDelegateCountChanged() {
+            Qt.callLater(_private.reload)
+        }
+
+        function onCountChanged() {
+            Qt.callLater(_private.reload)
+        }
+
         function onCacheBufferChanged() {
             Qt.callLater(_private.reload)
         }
@@ -231,6 +279,8 @@ Flickable {
     QtObject {
         id: _private
 
+        property real trackMargin: 0.5
+        property real headerSize: root.listView.headerItem ? (root.listView.orientation === Qt.Horizontal ? root.listView.headerItem.width : root.listView.headerItem.height) : 0
         property bool displayTracks: true
 
         property rect viewportRect: Qt.rect( visibleArea.xPosition * contentWidth,
@@ -240,9 +290,15 @@ Flickable {
 
         property ScreenplayTracks model: root.enabled && displayTracks ? Runtime.screenplayTracks : null
 
+        readonly property SequentialAnimation reloadTask: SequentialAnimation {
+            alwaysRunToEnd: false
+            ScriptAction { script: _private.displayTracks = false }
+            PauseAnimation { duration: Runtime.stdAnimationDuration  }
+            ScriptAction { script: _private.displayTracks = true }
+        }
+
         function reload() {
-            displayTracks = false
-            Qt.callLater( () => { _private.displayTracks = true } )
+            reloadTask.start()
         }
     }
 }

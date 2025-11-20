@@ -171,36 +171,9 @@ ListView {
 
         function updateCacheBuffer() {
             if(Runtime.screenplayTracks.trackCount > 0)
-                cacheBuffer = Math.max(extents(count-1, count-1).to + 20, contentWidth)
+                cacheBuffer = contentWidth
             else
                 cacheBuffer = 0
-        }
-
-        function extents(startIndex, endIndex) {
-            let x = 0;
-            let ret = { "from": 0, "to": 0 }
-            if(startIndex < 0 || endIndex < 0)
-                return ret;
-
-            let idx = -1
-            let nrElements = Scrite.document.screenplay.elementCount
-            for(let i=0; i<nrElements; i++) {
-                let element = Scrite.document.screenplay.elementAt(i)
-                if(element.elementType === ScreenplayElement.SceneElementType)
-                    ++idx
-                if(idx === startIndex)
-                    ret.from = x+7.5
-                if(element.elementType === ScreenplayElement.BreakElementType)
-                    x += breakDelegateWidth
-                else {
-                    let sceneElementCount = element.scene ? element.scene.elementCount : 1
-                    x += Math.max(minimumDelegateWidth, sceneElementCount*perElementWidth*zoomLevel)
-                }
-                if(idx === endIndex)
-                    break
-            }
-            ret.to = x-2.5
-            return ret
         }
     }
 }

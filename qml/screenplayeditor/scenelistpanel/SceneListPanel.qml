@@ -58,23 +58,6 @@ ListView {
     preferredHighlightEnd: height*0.8
     preferredHighlightBegin: height*0.2
 
-    header: SceneListPanelHeader {
-        width: root.width
-
-        color: root.screenplayAdapter.currentIndex < 0 ? Runtime.colors.primary.c300.background : Runtime.colors.primary.c10.background
-
-        leftPadding: root.__leftPadding
-        rightPadding: root.__rightPadding
-
-        onClicked: {
-            if(root.screenplayAdapter.isSourceScreenplay)
-                root.screenplayAdapter.screenplay.clearSelection()
-            root.screenplayAdapter.currentIndex = -1
-
-            root.positionScreenplayEditorAtTitlePage()
-        }
-    }
-
     footer: SceneListPanelFooter {
         width: root.width
 
@@ -185,6 +168,7 @@ ListView {
     }
 
     onCountChanged: Qt.callLater(_private.updateCacheBuffer)
+    onDelegateChanged: Qt.callLater(_private.updateCacheBuffer)
 
     QtObject {
         id: _private
@@ -197,47 +181,9 @@ ListView {
 
         function updateCacheBuffer() {
             if(tracksVisible)
-                cacheBuffer = Math.max(extents(count-1, count-1).to + 20, contentHeight)
+                cacheBuffer = contentHeight
             else
                 cacheBuffer = 0
-        }
-
-        function extents(startIndex, endIndex) {
-            const screenplay = root.screenplayAdapter.screenplay
-            const extentMargin = 0.5
-
-            let x = 0;
-            let ret = { "from": 0, "to": 0 }
-            if(startIndex < 0 || endIndex < 0 || startIndex >= count || endIndex >= count || startIndex > endIndex)
-                return ret
-
-            let startElementIndex = -1
-            let endElementIndex = -1
-
-            const elementCount = screenplay.elementCount
-            let sceneElementIndex = -1
-            for(let i=0; i<elementCount; i++) {
-                const element = screenplay.elementAt(i)
-                if(element.elementType === ScreenplayElement.SceneElementType) {
-                    sceneElementIndex = sceneElementIndex+1
-                    if(startIndex === sceneElementIndex)
-                        startElementIndex = i
-                    if(endIndex === sceneElementIndex)
-                        endElementIndex = i
-                    if(startElementIndex >= 0 && endElementIndex >= 0)
-                        break
-                }
-            }
-
-            const startItem = itemAtIndex(startElementIndex)
-            const endItem = startElementIndex === endElementIndex ? startItem : itemAtIndex(endElementIndex)
-            if(startItem === null || endItem === null)
-                return ret
-
-            ret.from = contentItem.mapFromItem(startItem, 0, 0).y + extentMargin + headerItem.height
-            ret.to = contentItem.mapFromItem(endItem, 0, 0).y + endItem.height + headerItem.height - extentMargin
-
-            return ret
         }
     }
 }

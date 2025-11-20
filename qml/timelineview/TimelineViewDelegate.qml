@@ -443,7 +443,7 @@ Item {
             if(_private.sceneLengthWatcher.hasValidRecord)
                 ret += ", Duration: " + TMath.timeLengthString(_private.sceneLengthWatcher.timeLength)
 
-            if(parent.width < screenplayElementList.minimumDelegateWidthForTextVisibility) {
+            if(root.width < screenplayElementList.minimumDelegateWidthForTextVisibility) {
                 let str = _private.sceneTitle
 
                 if(str.length > 140)

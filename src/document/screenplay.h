@@ -986,13 +986,13 @@ public:
     Q_PROPERTY(int startIndex
                MEMBER startIndex)
     // clang-format on
-    int startIndex = -1; // elementIndex in Screenplay class
+    int startIndex = -1; // elementIndex in ScreenplayElement class
 
     // clang-format off
     Q_PROPERTY(int endIndex
                MEMBER endIndex)
     // clang-format on
-    int endIndex = -1; // elementIndex in Screenplay class
+    int endIndex = -1; // elementIndex in ScreenplayElement class
 
     // clang-format off
     Q_PROPERTY(QString name

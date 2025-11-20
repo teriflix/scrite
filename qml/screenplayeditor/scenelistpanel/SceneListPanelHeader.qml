@@ -49,6 +49,7 @@ Rectangle {
             Layout.fillWidth: true
 
             elide: Text.ElideRight
+            color: Color.textColorFor(root.color)
             text: Scrite.document.screenplay.title === "" ? "[#] TITLE PAGE" : Scrite.document.screenplay.title
 
             font.bold: true
@@ -68,13 +69,18 @@ Rectangle {
             }
         }
 
-        VclToolButton {
+        ToolButton {
+            id: _menuButton
+
             down: _menu.visible
-            toolTipText: "Scene List Options"
 
             icon.source: "qrc:/icons/content/view_options.png"
 
             onClicked: _menu.open()
+
+            ToolTipPopup {
+                text: "Scene List Options"
+            }
 
             Item {
                 anchors.bottom: parent.bottom

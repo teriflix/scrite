@@ -1552,9 +1552,13 @@ ScreenplayElement *Screenplay::elementAt(int index) const
 
 ScreenplayElement *Screenplay::elementWithIndex(int index) const
 {
-    for (ScreenplayElement *ret : qAsConst(m_elements)) {
-        if (ret->elementIndex() == index)
-            return ret;
+    int sceneIndex = -1;
+    for (ScreenplayElement *element : qAsConst(m_elements)) {
+        if (element->elementType() == ScreenplayElement::SceneElementType) {
+            ++sceneIndex;
+            if (sceneIndex == index)
+                return element;
+        }
     }
 
     return nullptr;

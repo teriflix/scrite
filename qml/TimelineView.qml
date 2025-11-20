@@ -89,6 +89,7 @@ Item {
         id: _screenplayTracksView
 
         listView: _screenplayElementList
+        screenplay: _screenplayElementList.model
         visible: Runtime.screenplayTracksSettings.displayTracks
 
         anchors.left: _screenplayElementList.left
