@@ -121,6 +121,8 @@ Flickable {
                         height: listView.orientation === Qt.Horizontal ? parent.height-4 : extents.to - extents.from
 
                         color: parent.border.color
+                        visible: GMath.doRectanglesIntersect(Qt.rect(x,y,width,height), _private.viewportRect)
+
                         border.color: Color.translucent(Color.textColorFor(color), 0.25)
                         border.width: 0.5
 
@@ -229,6 +231,11 @@ Flickable {
         id: _private
 
         property bool displayTracks: true
+
+        property rect viewportRect: Qt.rect( visibleArea.xPosition * contentWidth,
+                                            visibleArea.yPosition * contentHeight,
+                                            visibleArea.widthRatio * contentWidth,
+                                            visibleArea.heightRatio * contentHeight )
 
         property ScreenplayTracks model: root.enabled && displayTracks ? Runtime.screenplayTracks : null
 
