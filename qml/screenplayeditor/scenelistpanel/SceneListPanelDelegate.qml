@@ -161,12 +161,14 @@ Rectangle {
                         fillMode: Image.PreserveAspectFit
 
                         MouseArea {
-                            ToolTip.text: "" + root.scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + ").\nRefer Settings > Screenplay > Options tab."
-                            ToolTip.visible: containsMouse
-
                             anchors.fill: parent
 
                             hoverEnabled: enabled
+
+                            ToolTipPopup {
+                                text: "" + root.scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + ").\nRefer Settings > Screenplay > Options tab."
+                                visible: parent.containsMouse
+                            }
                         }
                     }
                 }
@@ -190,17 +192,15 @@ Rectangle {
                     // font.pointSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize*(delegateItem.elementIsBreak ? 1.2 : 1))
                     font.capitalization: _private.isBreak || _private.isSceneTextModeHeading ? Font.AllUppercase : Font.MixedCase
 
-                    Loader {
+                    MouseArea {
                         anchors.fill: parent
 
-                        active: _label.truncated && Runtime.sceneListPanelSettings.showTooltip
+                        enabled: _label.truncated && Runtime.sceneListPanelSettings.showTooltip
+                        hoverEnabled: true
 
-                        sourceComponent: MouseArea {
-                            ToolTip.text: _label.text
-                            ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-                            ToolTip.visible: containsMouse
-
-                            hoverEnabled: true
+                        ToolTipPopup {
+                            text: _label.text
+                            visible: parent.containsMouse
                         }
                     }
                 }
