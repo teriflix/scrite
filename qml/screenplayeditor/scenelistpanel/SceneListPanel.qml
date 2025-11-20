@@ -173,8 +173,13 @@ ListView {
     QtObject {
         id: _private
 
+        readonly property FontMetrics fontMetrics: FontMetrics {
+            font.family: Runtime.sceneEditorFontMetrics.font.family
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+        }
+
         readonly property string dragDropMimeType: "sceneListView/sceneID"
-        readonly property real sceneIconSize: (Runtime.sceneEditorFontMetrics.xHeight + Runtime.sceneEditorFontMetrics.lineSpacing)/2
+        readonly property real sceneIconSize: fontMetrics.height
         readonly property real sceneIconPadding: 8
 
         property int delegateCount: 0
