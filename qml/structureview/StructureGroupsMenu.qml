@@ -168,6 +168,7 @@ VclMenu {
                         }
 
                         delegate: Rectangle {
+                            required property int index
                             required property var arrayItem
 
                             property bool doesNotBelongToAnyAct: arrayItem.act === ""
