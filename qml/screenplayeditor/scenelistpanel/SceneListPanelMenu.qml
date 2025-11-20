@@ -31,7 +31,7 @@ VclMenu {
         title: "Text"
 
         VclMenuItem {
-            text: "Scene Heading"
+            text: "Heading"
 
             readonly property string option: "HEADING"
 
@@ -41,7 +41,7 @@ VclMenu {
         }
 
         VclMenuItem {
-            text: "Scene Summary"
+            text: "Summary"
 
             readonly property string option: "SUMMARY"
 
