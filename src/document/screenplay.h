@@ -299,6 +299,7 @@ public:
     Q_SIGNAL void sceneElementChanged(SceneElement *sceneElement);
     Q_SIGNAL void evaluateSceneNumberRequest();
     Q_SIGNAL void sceneTypeChanged();
+    Q_SIGNAL void sceneTagsChanged(ScreenplayElement *ptr);
     Q_SIGNAL void sceneGroupsChanged(ScreenplayElement *ptr);
 
     QString delegateKind() const;
@@ -347,6 +348,7 @@ protected:
     void setBreakTitle(const QString &val);
 
 private:
+    void onSceneTagsChanged() { emit sceneTagsChanged(this); }
     void onSceneGroupsChanged() { emit sceneGroupsChanged(this); }
     void setNotes(Notes *val);
     void setAttachments(Attachments *val);
@@ -707,6 +709,7 @@ public:
                                              SceneElement *sceneElement);
     Q_SIGNAL void aboutToMoveElements(int at);
 
+    Q_SIGNAL void elementTagsChanged(ScreenplayElement *ptr);
     Q_SIGNAL void elementSceneGroupsChanged(ScreenplayElement *ptr);
 
     Q_INVOKABLE void gatherSelectedScenes(SceneGroup *into);
@@ -1032,7 +1035,7 @@ public:
     Q_PROPERTY(QString name
                MEMBER name)
     // clang-format on
-    QString name; // Eg. Save The Cat, Heroes Journey etc..
+    QString name; // Eg. Save The Cat, Heroes Journey etc, empty in case of keywords/open-tags
 
     // clang-format off
     Q_PROPERTY(QList<ScreenplayTrackItem> items
@@ -1085,6 +1088,36 @@ public:
     Q_SIGNAL void screenplayChanged();
 
     // clang-format off
+    Q_PROPERTY(bool includeStructureTags
+               READ isIncludeStructureTags
+               WRITE setIncludeStructureTags
+               NOTIFY includeStructureTagsChanged)
+    // clang-format on
+    void setIncludeStructureTags(bool val);
+    bool isIncludeStructureTags() const { return m_includeStructureTags; }
+    Q_SIGNAL void includeStructureTagsChanged();
+
+    // clang-format off
+    Q_PROPERTY(bool includeOpenTags
+               READ isIncludeOpenTags
+               WRITE setIncludeOpenTags
+               NOTIFY includeOpenTagsChanged)
+    // clang-format on
+    void setIncludeOpenTags(bool val);
+    bool isIncludeOpenTags() const { return m_includeOpenTags; }
+    Q_SIGNAL void includeOpenTagsChanged();
+
+    // clang-format off
+    Q_PROPERTY(QStringList allowedOpenTags
+               READ allowedOpenTags
+               WRITE setAllowedOpenTags
+               NOTIFY allowedOpenTagsChanged)
+    // clang-format on
+    void setAllowedOpenTags(const QStringList &val);
+    QStringList allowedOpenTags() const { return m_allowedOpenTags; }
+    Q_SIGNAL void allowedOpenTagsChanged();
+
+    // clang-format off
     Q_PROPERTY(int trackCount
                READ trackCount
                NOTIFY trackCountChanged)
@@ -1106,12 +1139,15 @@ protected:
 private:
     void refresh();
     void refreshLater();
-    void onElementSceneGroupsChanged(ScreenplayElement *) { this->refreshLater(); }
 
 private:
-    QObjectProperty<Screenplay> m_screenplay;
-    QList<ScreenplayTrack> m_tracks;
+    bool m_includeOpenTags = true;
+    bool m_includeStructureTags = true;
+    QStringList m_allowedOpenTags;
+
     ExecLaterTimer m_refreshTimer;
+    QList<ScreenplayTrack> m_tracks;
+    QObjectProperty<Screenplay> m_screenplay;
 };
 
 #endif // SCREENPLAY_H

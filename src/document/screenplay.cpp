@@ -228,6 +228,7 @@ void ScreenplayElement::setScene(Scene *val)
     connect(m_scene, &Scene::sceneAboutToReset, this, &ScreenplayElement::sceneAboutToReset);
     connect(m_scene, &Scene::sceneReset, this, &ScreenplayElement::sceneReset);
     connect(m_scene, &Scene::typeChanged, this, &ScreenplayElement::sceneTypeChanged);
+    connect(m_scene, &Scene::tagsChanged, this, &ScreenplayElement::onSceneTagsChanged);
     connect(m_scene, &Scene::groupsChanged, this, &ScreenplayElement::onSceneGroupsChanged);
     connect(m_scene, &Scene::wordCountChanged, this, &ScreenplayElement::wordCountChanged);
     connect(m_scene, &Scene::elementCountChanged, this, &ScreenplayElement::sceneContentChanged);
@@ -2290,6 +2291,8 @@ void Screenplay::connectToScreenplayElementSignals(ScreenplayElement *ptr)
             Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::sceneGroupsChanged, this,
             &Screenplay::elementSceneGroupsChanged, Qt::UniqueConnection);
+    connect(ptr, &ScreenplayElement::sceneTagsChanged, this, &Screenplay::elementTagsChanged,
+            Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitlesLater,
             Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitlesLater,
@@ -3576,12 +3579,50 @@ void ScreenplayTracks::setScreenplay(Screenplay *val)
     if (!m_screenplay.isNull()) {
         connect(m_screenplay, &Screenplay::elementsChanged, this, &ScreenplayTracks::refreshLater);
         connect(m_screenplay, &Screenplay::elementSceneGroupsChanged, this,
-                &ScreenplayTracks::onElementSceneGroupsChanged);
+                &ScreenplayTracks::refreshLater);
+        connect(m_screenplay, &Screenplay::elementTagsChanged, this,
+                &ScreenplayTracks::refreshLater);
     }
 
     this->refreshLater();
 
     emit screenplayChanged();
+}
+
+void ScreenplayTracks::setIncludeStructureTags(bool val)
+{
+    if (m_includeStructureTags == val)
+        return;
+
+    m_includeStructureTags = val;
+
+    this->refreshLater();
+
+    emit includeStructureTagsChanged();
+}
+
+void ScreenplayTracks::setIncludeOpenTags(bool val)
+{
+    if (m_includeOpenTags == val)
+        return;
+
+    m_includeOpenTags = val;
+
+    this->refreshLater();
+
+    emit includeOpenTagsChanged();
+}
+
+void ScreenplayTracks::setAllowedOpenTags(const QStringList &val)
+{
+    if (m_allowedOpenTags == val)
+        return;
+
+    m_allowedOpenTags = val;
+
+    this->refreshLater();
+
+    emit allowedOpenTagsChanged();
 }
 
 ScreenplayTrack ScreenplayTracks::trackAt(int index) const
@@ -3618,7 +3659,7 @@ void ScreenplayTracks::timerEvent(QTimerEvent *te)
 
 void ScreenplayTracks::refresh()
 {
-    if (m_screenplay.isNull()) {
+    if (m_screenplay.isNull() || (!m_includeOpenTags && !m_includeStructureTags)) {
         if (m_tracks.isEmpty())
             return;
 
@@ -3643,14 +3684,26 @@ void ScreenplayTracks::refresh()
         if (element->elementType() != ScreenplayElement::SceneElementType)
             continue;
 
-        const QStringList sceneGroups = element->scene()->groups();
-        if (sceneGroups.isEmpty())
-            continue;
+        if (m_includeStructureTags) {
+            const QStringList sceneGroups = element->scene()->groups();
+            if (!sceneGroups.isEmpty()) {
+                for (const QString &sceneGroup : sceneGroups) {
+                    const QString structureGroup = sceneGroup.section(slash, 0, 0);
+                    const QString tagName = sceneGroup.section(slash, 1);
+                    structureTagsMap[structureGroup][tagName].append(element);
+                }
+            }
+        }
 
-        for (const QString &sceneGroup : sceneGroups) {
-            const QString structureGroup = sceneGroup.section(slash, 0, 0);
-            const QString tagName = sceneGroup.section(slash, 1);
-            structureTagsMap[structureGroup][tagName].append(element);
+        if (m_includeOpenTags) {
+            const QStringList tags = element->scene()->tags();
+            if (!tags.isEmpty()) {
+                for (const QString &tag : qAsConst(tags)) {
+                    if (m_allowedOpenTags.isEmpty()
+                        || m_allowedOpenTags.contains(tag, Qt::CaseInsensitive))
+                        structureTagsMap[QString()][tag].append(element);
+                }
+            }
         }
     }
 
@@ -3661,7 +3714,7 @@ void ScreenplayTracks::refresh()
     StructureTagsMap::iterator it = structureTagsMap.begin();
     StructureTagsMap::iterator end = structureTagsMap.end();
     while (it != end) {
-        const QString structureGroup = Utils::SMath::titleCased(it.key());
+        const QString trackName = Utils::SMath::titleCased(it.key());
         const TagElementsMap tagElementsMap = it.value();
 
         QList<ScreenplayTrackItem> trackItems;
@@ -3669,7 +3722,8 @@ void ScreenplayTracks::refresh()
         TagElementsMap::const_iterator it2 = tagElementsMap.begin();
         TagElementsMap::const_iterator end2 = tagElementsMap.end();
         while (it2 != end2) {
-            const QString tagName = Utils::SMath::titleCased(it2.key());
+            const QString trackItemName =
+                    trackName.isEmpty() ? it2.key() : Utils::SMath::titleCased(it2.key());
 
             QList<ScreenplayElement *> elements = it2.value();
             std::sort(elements.begin(), elements.end(),
@@ -3681,7 +3735,7 @@ void ScreenplayTracks::refresh()
 
             for (ScreenplayElement *element : qAsConst(elements)) {
                 const ScreenplayTrackItem trackItem(element->elementIndex(),
-                                                    element->elementIndex(), tagName);
+                                                    element->elementIndex(), trackItemName);
 
                 if (!currentTrackItem.isValid())
                     currentTrackItem = trackItem;
@@ -3711,8 +3765,7 @@ void ScreenplayTracks::refresh()
 
         QList<ScreenplayTrack> distinctTracks;
 
-        auto includeTrackItem = [&distinctTracks,
-                                 structureGroup](const ScreenplayTrackItem &trackItem) {
+        auto includeTrackItem = [&distinctTracks, trackName](const ScreenplayTrackItem &trackItem) {
             for (ScreenplayTrack &distinctTrack : distinctTracks) {
                 bool intersectionFound = false;
                 for (const ScreenplayTrackItem &distinctTrackItem : qAsConst(distinctTrack.items)) {
@@ -3734,7 +3787,7 @@ void ScreenplayTracks::refresh()
             }
 
             ScreenplayTrack newDistinctTrack;
-            newDistinctTrack.name = structureGroup;
+            newDistinctTrack.name = trackName;
             newDistinctTrack.items.append(trackItem);
 
             distinctTracks.append(newDistinctTrack);
@@ -3748,6 +3801,16 @@ void ScreenplayTracks::refresh()
 
         ++it;
     }
+
+    std::sort(m_tracks.begin(), m_tracks.end(),
+              [](const ScreenplayTrack &a, const ScreenplayTrack &b) {
+                  if (a.name.isEmpty() || b.name.isEmpty()) {
+                      if (a.name.isEmpty() && b.name.isEmpty())
+                          return 0;
+                      return a.name.isEmpty() ? -1 : 1;
+                  }
+                  return 0;
+              });
 
     this->endResetModel();
 }

@@ -665,6 +665,9 @@ Item {
         ObjectRegister.name: "screenplayTracks"
 
         screenplay: Scrite.document.screenplay
+
+        includeOpenTags: true
+        includeStructureTags: true
     }
 
     // Announcement IDs

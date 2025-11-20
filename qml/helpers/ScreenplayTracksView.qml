@@ -63,6 +63,7 @@ Flickable {
                                             // struct ScreenplayTrack { QString name; QList<ScreenplayTrackItem> items; }
 
                 property var items: track.items
+                property bool keywordsTrack: track.name === ""
                 property string name: track.name
 
                 property real offset: index * (Runtime.minimumFontMetrics.height + 10)
@@ -74,7 +75,7 @@ Flickable {
                 height: listView.orientation === Qt.Horizontal ? Runtime.minimumFontMetrics.height + 8 : _content.height
 
                 color: Color.translucent( border.color, 0.1 )
-                border.color: Runtime.colors.accent.c900.background
+                border.color: keywordsTrack ? Runtime.colors.accent.c400.background : Runtime.colors.accent.c900.background
                 border.width: 0.5
 
                 MouseArea {
@@ -162,7 +163,7 @@ Flickable {
                             }
 
                             function toolTipText() {
-                                let ret = "<b>" + _track.name + " &gt; " + _trackItem.name + "</b>, "
+                                let ret = "<b>" + (_track.keywordsTrack ? "" : _track.name + " &gt; ") + _trackItem.name + "</b>, "
                                 if(_trackItem.endIndex === _trackItem.startIndex)
                                     ret += "1 Scene"
                                 else
