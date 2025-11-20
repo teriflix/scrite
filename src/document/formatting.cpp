@@ -1683,6 +1683,9 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
             &SceneDocumentBinder::selectedElementsChanged);
     connect(this, &SceneDocumentBinder::selectionEndPositionChanged, this,
             &SceneDocumentBinder::selectedElementsChanged);
+
+    connect(LanguageEngine::instance(), &LanguageEngine::scriptFontFamilyChanged, this,
+            &SceneDocumentBinder::rehighlightLater);
 }
 
 SceneDocumentBinder::~SceneDocumentBinder() { }
