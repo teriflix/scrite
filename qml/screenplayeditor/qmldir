@@ -1,6 +1,9 @@
+PageBreakItem 1.0 PageBreakItem.qml
 ScreenplayBreakElementsContextMenu 1.0 ScreenplayBreakElementsContextMenu.qml
 ScreenplayEditorCharacterMenu 1.0 ScreenplayEditorCharacterMenu.qml
+ScreenplayEditorDropArea 1.0 ScreenplayEditorDropArea.qml
 ScreenplayEditorSearchBar 1.0 ScreenplayEditorSearchBar.qml
+ScreenplayEditorSidePanel 1.0 ScreenplayEditorSidePanel.qml
 ScreenplayEditorStatusBar 1.0 ScreenplayEditorStatusBar.qml
 ScreenplayElementListView 1.0 ScreenplayElementListView.qml
 ScreenplaySceneElementsContextMenu 1.0 ScreenplaySceneElementsContextMenu.qml

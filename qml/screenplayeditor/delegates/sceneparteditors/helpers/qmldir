@@ -1,4 +1,6 @@
-PageNumberBubble 1.0 PageNumberBubble.qml
+SceneMenu 1.0 SceneMenu.qml
 SceneTextEditorBackground 1.0 SceneTextEditorBackground.qml
 SceneTextEditorCompletionPopup 1.0 SceneTextEditorCompletionPopup.qml
+SceneTextEditorContextMenu 1.0 SceneTextEditorContextMenu.qml
+SceneTextEditorPageNumbers 1.0 SceneTextEditorPageNumbers.qml
 SceneTextEditorSpellingSuggestionsMenu 1.0 SceneTextEditorSpellingSuggestionsMenu.qml

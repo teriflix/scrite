@@ -1,6 +1,6 @@
-TimelineTools 1.0 TimelineTools.qml
 TimelineListView 1.0 TimelineListView.qml
-TimelineViewFooter 1.0 TimelineViewFooter.qml
+TimelineTools 1.0 TimelineTools.qml
 TimelineTracksView 1.0 TimelineTracksView.qml
 TimelineViewDelegate 1.0 TimelineViewDelegate.qml
+TimelineViewFooter 1.0 TimelineViewFooter.qml
 TimelineViewHighlightedItemAnimation 1.0 TimelineViewHighlightedItemAnimation.qml

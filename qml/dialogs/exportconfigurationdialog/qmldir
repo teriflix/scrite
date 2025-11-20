@@ -1,0 +1,5 @@
+editor_CheckBox 1.0 editor_CheckBox.qml
+editor_IntegerSpinBox 1.0 editor_IntegerSpinBox.qml
+editor_TextBox 1.0 editor_TextBox.qml
+editor_Unknown 1.0 editor_Unknown.qml
+impl_ExportConfigurationDialog 1.0 impl_ExportConfigurationDialog.qml

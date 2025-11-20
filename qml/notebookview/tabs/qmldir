@@ -1,0 +1,11 @@
+AllCharactersRelationshipsTab 1.0 AllCharactersRelationshipsTab.qml
+AllCharactersTab 1.0 AllCharactersTab.qml
+CharacterInformationTab 1.0 CharacterInformationTab.qml
+CharacterRelationshipsTab 1.0 CharacterRelationshipsTab.qml
+NotesTab 1.0 NotesTab.qml
+SceneCharacterRelationshipsTab 1.0 SceneCharacterRelationshipsTab.qml
+SceneCommentsTab 1.0 SceneCommentsTab.qml
+SceneSynopsisTab 1.0 SceneSynopsisTab.qml
+ScreenplayLoglineTab 1.0 ScreenplayLoglineTab.qml
+ScreenplayStatsTab 1.0 ScreenplayStatsTab.qml
+ScreenplayTitlePageTab 1.0 ScreenplayTitlePageTab.qml

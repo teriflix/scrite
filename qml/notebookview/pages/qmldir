@@ -1,0 +1,14 @@
+AbstractNotebookPage 1.0 AbstractNotebookPage.qml
+AbstractNotePage 1.0 AbstractNotePage.qml
+BookmarksNotebookPage 1.0 BookmarksNotebookPage.qml
+BreakSummaryPage 1.0 BreakSummaryPage.qml
+CharacterPage 1.0 CharacterPage.qml
+CharactersPage 1.0 CharactersPage.qml
+CheckListNotePage 1.0 CheckListNotePage.qml
+FormNotePage 1.0 FormNotePage.qml
+GenericNotebookPage 1.0 GenericNotebookPage.qml
+NotesPage 1.0 NotesPage.qml
+SceneNotesPage 1.0 SceneNotesPage.qml
+ScreenplayPage 1.0 ScreenplayPage.qml
+TextNotePage 1.0 TextNotePage.qml
+UnusedScenesPage 1.0 UnusedScenesPage.qml

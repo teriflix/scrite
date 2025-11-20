@@ -4,4 +4,5 @@ ReloadPromptDialog 1.0 ReloadPromptDialog.qml
 ScreenplayTab 1.0 ScreenplayTab.qml
 ScritedTab 1.0 ScritedTab.qml
 StructureTab 1.0 StructureTab.qml
+VerticalToolBar 1.0 VerticalToolBar.qml
 Workspace 1.0 Workspace.qml

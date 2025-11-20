@@ -1,0 +1,5 @@
+SceneListPanelDelegate 1.0 SceneListPanelDelegate.qml
+SceneListPanelFooter 1.0 SceneListPanelFooter.qml
+SceneListPanelHeader 1.0 SceneListPanelHeader.qml
+SceneListPanelMenu 1.0 SceneListPanelMenu.qml
+SceneListPanelMoveElementsTask 1.0 SceneListPanelMoveElementsTask.qml

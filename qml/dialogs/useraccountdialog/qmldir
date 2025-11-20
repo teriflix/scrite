@@ -1,0 +1,7 @@
+AccountEmailScreen 1.0 AccountEmailScreen.qml
+ActivationCodeScreen 1.0 ActivationCodeScreen.qml
+JunctionScreen 1.0 JunctionScreen.qml
+PlanCard 1.0 PlanCard.qml
+ReloadUserScreen 1.0 ReloadUserScreen.qml
+UserProfileScreen 1.0 UserProfileScreen.qml
+WelcomeScreen 1.0 WelcomeScreen.qml

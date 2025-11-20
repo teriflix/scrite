@@ -1,12 +1,10 @@
 AnnotationLayer 1.0 AnnotationLayer.qml
-
 IndexCardFields 1.0 IndexCardFields.qml
-
 StructureCanvas 1.0 StructureCanvas.qml
 StructureCanvasContextMenu 1.0 StructureCanvasContextMenu.qml
 StructureCanvasPreview 1.0 StructureCanvasPreview.qml
 StructureCanvasScrollArea 1.0 StructureCanvasScrollArea.qml
 StructureElementLayer 1.0 StructureElementLayer.qml
 StructureGroupsMenu 1.0 StructureGroupsMenu.qml
+StructureViewActionHandlers 1.0 StructureViewActionHandlers.qml
 StructureViewStatusBar 1.0 StructureViewStatusBar.qml
-StructureViewToolBar 1.0 StructureViewToolBar.qml
