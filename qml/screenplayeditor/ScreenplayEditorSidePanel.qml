@@ -142,7 +142,7 @@ Item {
 
                 set: _sceneListView.delegateCount
                 initial: 0
-                delay: Runtime.stdAnimationDuration
+                delay: 0
             }
         }
     }

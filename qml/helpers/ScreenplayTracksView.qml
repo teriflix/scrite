@@ -293,7 +293,7 @@ Flickable {
         readonly property SequentialAnimation reloadTask: SequentialAnimation {
             alwaysRunToEnd: false
             ScriptAction { script: _private.displayTracks = false }
-            PauseAnimation { duration: Runtime.stdAnimationDuration  }
+            PauseAnimation { duration: 0  }
             ScriptAction { script: _private.displayTracks = true }
         }
 
