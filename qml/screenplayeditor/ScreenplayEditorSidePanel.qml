@@ -94,7 +94,7 @@ Item {
                     Layout.fillHeight: true
 
                     enabled: _delegateCount.get === root.screenplayAdapter.elementCount
-                    visible: root.screenplayAdapter.isSourceScreenplay
+                    visible: Runtime.sceneListPanelSettings.displayTracks && Runtime.screenplayTracksSettings.displayTracks && root.screenplayAdapter.isSourceScreenplay
                     listView: _sceneListView
                 }
 

@@ -185,6 +185,15 @@ Item {
         property real spaceBetweenScenes: 0
     }
 
+    readonly property Settings screenplayTracksSettings: Settings {
+        category: "ScreenplayTracks"
+        fileName: Platform.settingsFile
+
+        property bool displayTracks: true
+        property bool displayKeywordsTracks: true
+        property bool displayStructureTracks: true
+    }
+
     readonly property Settings pdfExportSettings: Settings {
         property bool usePdfDriver: true
 
@@ -216,6 +225,7 @@ Item {
     readonly property Settings sceneListPanelSettings: Settings {
         property bool showTooltip: false
 
+        property bool displayTracks: true
         property string displaySceneLength: "NO" // can be PAGE, TIME
         property string sceneTextMode: "HEADING" // can be SUMMARY also
 
@@ -662,12 +672,23 @@ Item {
     }
 
     readonly property ScreenplayTracks screenplayTracks : ScreenplayTracks {
+        property bool enabled: root.screenplayTracksSettings.displayTracks && root.appFeatures.structure.enabled
+
         ObjectRegister.name: "screenplayTracks"
 
         screenplay: Scrite.document.screenplay
 
-        includeOpenTags: true
-        includeStructureTags: true
+        allowedOpenTags: {
+            if(enabled) {
+                const userData = Scrite.document.userData
+                if(userData && userData.allowedOpenTagsInTracks !== undefined && userData.allowedOpenTagsInTracks.length > 0)
+                    return userData.allowedOpenTagsInTracks
+            }
+            return []
+        }
+
+        includeOpenTags: enabled && root.screenplayTracksSettings.displayKeywordsTracks
+        includeStructureTags: enabled && root.screenplayTracksSettings.displayStructureTracks
     }
 
     // Announcement IDs

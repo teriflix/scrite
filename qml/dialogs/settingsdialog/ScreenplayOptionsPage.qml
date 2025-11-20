@@ -171,8 +171,8 @@ Item {
 
                         onValueChanged: Runtime.screenplayEditorSettings.slpSynopsisLineCount = value
 
-                        ToolTipPopup{
-                            text: "Max lines to show on the scene list panel. Range: " + from + "-" + to
+                        ToolTipPopup {
+                            text: "Max lines to show on the scene list panel. Range: " + parent.from + "-" + parent.to
                             visible: container.hovered
                         }
                     }
@@ -197,7 +197,7 @@ Item {
 
                         ToolTipPopup {
                             visible: container.hovered
-                            text: "Delay in ms after which scene content is loaded while scrolling. Range: " + from + "-" + to
+                            text: "Delay in ms after which scene content is loaded while scrolling. Range: " + parent.from + "-" + parent.to
                         }
                     }
                 }

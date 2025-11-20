@@ -110,11 +110,21 @@ Rectangle {
             onPositionScreenplayEditorAtTitlePage: _elementListView.positionViewAtBeginning()
 
             ActionHandler {
-                action: ActionHub.screenplayEditorOptions.find("sidePanelVisibility")
+                action: ActionHub.sceneListPanelOptions.find("sidePanelVisibility")
                 checked: _sceneListPanel.expanded
 
                 onToggled: (source) => {
                                _sceneListPanel.expanded = !_sceneListPanel.expanded
+                           }
+            }
+
+            ActionHandler {
+                action: ActionHub.sceneListPanelOptions.find("displayScreenplayTracks")
+                checked: Runtime.screenplayTracksSettings.displayTracks
+                enabled: Runtime.appFeatures.structure.enabled
+
+                onToggled: (source) => {
+                               Runtime.screenplayTracksSettings.displayTracks = !Runtime.screenplayTracksSettings.displayTracks
                            }
             }
         }

@@ -10,6 +10,7 @@ ScreenplayFormattingRulesPage 1.0 ScreenplayFormattingRulesPage.qml
 ScreenplayOptionsPage 1.0 ScreenplayOptionsPage.qml
 ScreenplayPageSetupPage 1.0 ScreenplayPageSetupPage.qml
 ScreenplaySettingsTab 1.0 ScreenplaySettingsTab.qml
+ScreenplayTracksPage 1.0 ScreenplayTracksPage.qml
 StructureIndexCardFieldsPage 1.0 StructureIndexCardFieldsPage.qml
 StructureOptionsPage 1.0 StructureOptionsPage.qml
 StructureSettingsTab 1.0 StructureSettingsTab.qml

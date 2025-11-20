@@ -335,5 +335,7 @@
         <file>qml/ScriteMainWindow.qml</file>
         <file>qml/StructureView.qml</file>
         <file>qml/TimelineView.qml</file>
+        <file>qml/dialogs/settingsdialog/ScreenplayTracksPage.qml</file>
+        <file>qml/dialogs/ScreenplayTracksDialog.qml</file>
     </qresource>
 </RCC>

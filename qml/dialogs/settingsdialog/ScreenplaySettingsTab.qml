@@ -26,7 +26,7 @@ import "qrc:/qml/helpers"
 PageView {
     id: root
 
-    pagesArray: ["Options", "Formatting Rules", "Page Setup"]
+    pagesArray: ["Options", "Formatting Rules", "Tracks", "Page Setup"]
     currentIndex: 0
     pageContent: Loader {
         source: {
@@ -39,6 +39,9 @@ PageView {
                 ret += "FormattingRules"
                 break
             case 2:
+                ret += "Tracks"
+                break
+            case 3:
                 ret += "PageSetup"
                 break
             }
@@ -46,7 +49,7 @@ PageView {
             return ret
         }
         onItemChanged: {
-            if(root.currentIndex == 1) {
+            if(root.currentIndex === 1 || root.currentIndex === 2) {
                 item.width = root.availablePageContentWidth
                 item.height = root.availablePageContentHeight
             }

@@ -204,7 +204,7 @@ ListView {
 
         function extents(startIndex, endIndex) {
             const screenplay = root.screenplayAdapter.screenplay
-            const extentMargin = 2.5
+            const extentMargin = 0.5
 
             let x = 0;
             let ret = { "from": 0, "to": 0 }

@@ -98,6 +98,28 @@ VclMenu {
         }
     }
 
+    VclMenu {
+        title: "Tracks"
+
+        VclMenuItem {
+            text: "Display"
+
+            enabled: Runtime.appFeatures.structure.enabled && Runtime.screenplayTracksSettings.displayTracks
+            icon.source: Runtime.sceneListPanelSettings.displayTracks ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+
+            onClicked: Runtime.sceneListPanelSettings.displayTracks = !Runtime.sceneListPanelSettings.displayTracks
+        }
+
+        VclMenuItem {
+            text: "Configure"
+
+            enabled: Runtime.appFeatures.structure.enabled
+            icon.source: "qrc:/icons/content/blank.png"
+
+            onClicked: ScreenplayTracksDialog.launch()
+        }
+    }
+
     VclMenuItem {
         text: "Title Page Fields"
 

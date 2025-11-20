@@ -462,6 +462,55 @@ Item {
             readonly property bool allowShortcut: true
             readonly property bool visible: false
 
+            text: "Configure Screenplay Tracks"
+            objectName: "configScreenplayTracks"
+
+            onTriggered: ScreenplayTracksDialog.launch()
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+
+            objectName: "displayScreenplayTracks"
+            checkable: true
+            checked: Runtime.screenplayTracksSettings.displayTracks
+            enabled: Runtime.appFeatures.structure.enabled
+            text: "Display Screenplay Tracks"
+
+            onToggled: Runtime.screenplayTracksSettings.displayTracks = !Runtime.screenplayTracksSettings.displayTracks
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+
+            objectName: "displayKeywordsTracks"
+            checkable: true
+            checked: Runtime.screenplayTracksSettings.displayKeywordsTracks
+            enabled: Runtime.appFeatures.structure.enabled
+            text: "Display Keywords Tracks"
+
+            onToggled: Runtime.screenplayTracksSettings.displayKeywordsTracks = !Runtime.screenplayTracksSettings.displayKeywordsTracks
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+
+            objectName: "displayStructureTracks"
+            checkable: true
+            checked: Runtime.screenplayTracksSettings.displayStructureTracks
+            enabled: Runtime.appFeatures.structure.enabled
+            text: "Display Keywords Tracks"
+
+            onToggled: Runtime.screenplayTracksSettings.displayStructureTracks = !Runtime.screenplayTracksSettings.displayStructureTracks
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+
             text: "Reveal Settings Folder"
             objectName: "revealSettingsFolder"
 
@@ -1135,11 +1184,10 @@ Item {
         }
     }
 
-    readonly property ActionManager screenplayEditorOptions: ActionManager {
-        readonly property string iconSource: "qrc:/icons/content/view_options.png"
+    readonly property ActionManager sceneListPanelOptions: ActionManager {
+        title: "Scene List Panel"
+        objectName: "sceneListPanelOptions"
 
-        title: "Screenplay Editor"
-        objectName: "screenplayEditorOptions"
 
         Action {
             readonly property bool visible: false
@@ -1150,8 +1198,26 @@ Item {
             checked: ActionHandler.active ? ActionHandler.active.checked : false
             enabled: ActionHandler.canHandle
             shortcut: defaultShortcut
-            text: "Toggle Scene List Panel"
+            text: "Display Panel"
         }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+
+            objectName: "displayScreenplayTracks"
+            checkable: true
+            checked: ActionHandler.active ? ActionHandler.active.checked : false
+            enabled: ActionHandler.canHandle
+            text: "Display Screenplay Tracks"
+        }
+    }
+
+    readonly property ActionManager screenplayEditorOptions: ActionManager {
+        readonly property string iconSource: "qrc:/icons/content/view_options.png"
+
+        title: "Screenplay Editor"
+        objectName: "screenplayEditorOptions"
 
         Action {
             checkable: true

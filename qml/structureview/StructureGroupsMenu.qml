@@ -168,6 +168,8 @@ VclMenu {
                         }
 
                         delegate: Rectangle {
+                            required property var arrayItem
+
                             property bool doesNotBelongToAnyAct: arrayItem.act === ""
                             property bool filtered: doesNotBelongToAnyAct || sceneGroup.sceneActs.indexOf(arrayItem.act) >= 0
 

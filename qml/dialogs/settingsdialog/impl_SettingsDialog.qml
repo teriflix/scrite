@@ -50,26 +50,35 @@ VclDialog {
         TabBar {
             id: _tabBar
 
+            Material.primary: Runtime.colors.primary.key
+            Material.accent: Runtime.colors.accent.key
+            Material.theme: Runtime.colors.theme
+
             Layout.fillWidth: true
 
             TabButton {
                 text: "Application"
+                font: Runtime.idealFontMetrics.font
             }
 
             TabButton {
                 text: "Structure"
+                font: Runtime.idealFontMetrics.font
             }
 
             TabButton {
                 text: "Screenplay"
+                font: Runtime.idealFontMetrics.font
             }
 
             TabButton {
                 text: "Notebook"
+                font: Runtime.idealFontMetrics.font
             }
 
             TabButton {
                 text: "Language"
+                font: Runtime.idealFontMetrics.font
             }
         }
 
