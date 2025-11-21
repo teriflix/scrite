@@ -108,7 +108,7 @@ AbstractScenePartEditor {
                 text: root.screenplayElement.hasUserSceneNumber ? root.screenplayElement.resolvedSceneNumber : ""
                 font: _sceneHeading.font
                 readOnly: root.readOnly
-                placeholderText: root.scene.heading.enabled ? root.screenplayElement.sceneNumber : ("#" + (root.index+1))
+                placeholderText: root.scene.heading.enabled ? root.screenplayElement.sceneNumber : "-"
 
                 background: Item { }
 
