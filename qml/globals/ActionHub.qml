@@ -32,6 +32,7 @@ Item {
 
     function setBinder(binder) { _private.setBinder(binder) }
     function resetBinder(binder) { _private.resetBinder(binder) }
+    function isOperationAllowedByUser(operation) { return _private.isOperationAllowedByUser(operation) }
 
     readonly property ActionManager mainWindowTabs: ActionManager {
         title: "Scrite Window Tabs"
@@ -2251,6 +2252,16 @@ Item {
         function resetBinder(binder) {
             if(_private.binder === binder)
                 _private.binder = null
+        }
+
+        function isOperationAllowedByUser(operation) {
+            if(Scrite.document.hasCollaborators && !Scrite.document.canModifyCollaborators) {
+                MessageBox.information("Action Prohibitted",
+                                       "This document is locked by <b>" + Scrite.document.collaborators[0] + "</b>. " +
+                                       operation + " can only be done by them.")
+                return false
+            }
+            return true
         }
 
         readonly property EnumerationModel availableParagraphFormats: EnumerationModel {

@@ -38,10 +38,10 @@ public:
 
     // clang-format off
     Q_PROPERTY(bool hasText
-               READ hasHasText
+               READ hasText
                NOTIFY textChanged)
     // clang-format on
-    bool hasHasText() const { return !this->text().isEmpty(); }
+    bool hasText() const { return !this->text().isEmpty(); }
 };
 
 #endif // CLIPBOARD_H

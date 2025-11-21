@@ -43,6 +43,10 @@ Item {
     }
 
     function saveAs(callback) {
+        if(!ActionHub.isOperationAllowedByUser("Save As operation")) {
+            return false
+        }
+
         return documentSaveAs.createObject(root, {"callback": callback})
     }
 

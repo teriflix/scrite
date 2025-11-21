@@ -40,6 +40,10 @@ Item {
             return null
         }
 
+        if(!ActionHub.isOperationAllowedByUser("Report generation")) {
+            return false
+        }
+
         var args = {
             report: null
         }

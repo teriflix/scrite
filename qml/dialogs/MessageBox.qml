@@ -132,7 +132,14 @@ Item {
                             VclButton {
                                 id: button
 
+                                required property string index
                                 required property string modelData
+
+                                Component.onCompleted: {
+                                    if(index === 0)
+                                        Qt.callLater(button.forceActiveFocus)
+                                }
+
                                 text: modelData
 
                                 onClicked: {

@@ -40,6 +40,10 @@ Item {
             return null
         }
 
+        if(!ActionHub.isOperationAllowedByUser("Exporting to another format")) {
+            return false
+        }
+
         var args = {
             exporter: null
         }

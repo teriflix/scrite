@@ -183,6 +183,10 @@ VclDialog {
                 }
 
                 VclButton {
+                    id: _exportButton
+
+                    Component.onCompleted: Qt.callLater(_exportButton.forceActiveFocus)
+
                     enabled: exporter.fileName !== "" && _private.exportEnabled
                     text: _private.isPdfExport ? "Generate PDF" : "Export"
                     onClicked: {
