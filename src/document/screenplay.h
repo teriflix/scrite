@@ -1118,6 +1118,26 @@ public:
     Q_SIGNAL void allowedOpenTagsChanged();
 
     // clang-format off
+    Q_PROPERTY(bool includeStacks
+               READ isIncludeStacks
+               WRITE setIncludeStacks
+               NOTIFY includeStacksChanged)
+    // clang-format on
+    void setIncludeStacks(bool val);
+    bool isIncludeStacks() const { return m_includeStacks; }
+    Q_SIGNAL void includeStacksChanged();
+
+    // clang-format off
+    Q_PROPERTY(QString stackTrackName
+               READ stackTrackName
+               WRITE setStackTrackName
+               NOTIFY stackTrackNameChanged)
+    // clang-format on
+    void setStackTrackName(const QString &val);
+    QString stackTrackName() const { return m_stackTrackName; }
+    Q_SIGNAL void stackTrackNameChanged();
+
+    // clang-format off
     Q_PROPERTY(int trackCount
                READ trackCount
                NOTIFY trackCountChanged)
@@ -1141,9 +1161,11 @@ private:
     void refreshLater();
 
 private:
+    bool m_includeStacks = true;
     bool m_includeOpenTags = true;
     bool m_includeStructureTags = true;
     QStringList m_allowedOpenTags;
+    QString m_stackTrackName = QStringLiteral("Sequences");
 
     ExecLaterTimer m_refreshTimer;
     QList<ScreenplayTrack> m_tracks;

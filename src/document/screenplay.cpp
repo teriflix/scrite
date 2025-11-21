@@ -3629,6 +3629,30 @@ void ScreenplayTracks::setAllowedOpenTags(const QStringList &val)
     emit allowedOpenTagsChanged();
 }
 
+void ScreenplayTracks::setIncludeStacks(bool val)
+{
+    if (m_includeStacks == val)
+        return;
+
+    m_includeStacks = val;
+
+    this->refreshLater();
+
+    emit includeStacksChanged();
+}
+
+void ScreenplayTracks::setStackTrackName(const QString &val)
+{
+    if (m_stackTrackName == val)
+        return;
+
+    m_stackTrackName = val;
+
+    this->refreshLater();
+
+    emit stackTrackNameChanged();
+}
+
 ScreenplayTrack ScreenplayTracks::trackAt(int index) const
 {
     return index < 0 || index >= m_tracks.size() ? ScreenplayTrack() : m_tracks.at(index);
@@ -3675,6 +3699,9 @@ void ScreenplayTracks::refresh()
     }
 
     const QString slash = QStringLiteral("/");
+    const QString stackTrackId = QStringLiteral("f6b212e7-c94e-42b9-9a44-11a2fc1d2320");
+
+    QMap<QString, QString> stackIdNameMap;
 
     // Structure tag -> list of elements. Here tag could be Opening Image, Catalyst, B Story etc.
     typedef QMap<QString, QList<ScreenplayElement *>> TagElementsMap;
@@ -3709,6 +3736,19 @@ void ScreenplayTracks::refresh()
                 }
             }
         }
+
+        if (m_includeStacks) {
+            StructureElement *structureElement = element->scene()->structureElement();
+            if (structureElement) {
+                const QString stackId = structureElement->stackId();
+                if (!stackId.isEmpty()) {
+                    if (!stackIdNameMap.contains(stackId))
+                        stackIdNameMap[stackId] =
+                                QStringLiteral("#%1").arg(stackIdNameMap.size() + 1);
+                    structureTagsMap[stackTrackId][stackIdNameMap.value(stackId)].append(element);
+                }
+            }
+        }
     }
 
     this->beginResetModel();
@@ -3718,7 +3758,8 @@ void ScreenplayTracks::refresh()
     StructureTagsMap::iterator it = structureTagsMap.begin();
     StructureTagsMap::iterator end = structureTagsMap.end();
     while (it != end) {
-        const QString trackName = Utils::SMath::titleCased(it.key());
+        const QString trackName =
+                it.key() == stackTrackId ? it.key() : Utils::SMath::titleCased(it.key());
         const TagElementsMap tagElementsMap = it.value();
 
         QList<ScreenplayTrackItem> trackItems;
@@ -3815,6 +3856,15 @@ void ScreenplayTracks::refresh()
                   }
                   return 0;
               });
+
+    for (int i = 0; i < m_tracks.size(); i++) {
+        if (m_tracks[i].name == stackTrackId) {
+            ScreenplayTrack track = m_tracks.takeAt(i);
+            track.name = m_stackTrackName;
+            m_tracks.append(track);
+            break;
+        }
+    }
 
     this->endResetModel();
 }
