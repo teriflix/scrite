@@ -944,7 +944,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Ctrl+Alt+," : Gui.shortcut(Qt.AltModifier+Qt.Key_Home)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.ControlModifier+Qt.AltModifier+Qt.Key_Up)
 
             enabled: ActionHandler.canHandle
             objectName: "jumpFirstScene"
@@ -954,7 +954,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Ctrl+Alt+." : Gui.shortcut(Qt.AltModifier+Qt.Key_End)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.ControlModifier+Qt.AltModifier+Qt.Key_Down)
 
             enabled: ActionHandler.canHandle
             objectName: "jumpLastScene"
@@ -964,7 +964,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut:Platform.isMacOSDesktop ?  "Alt+," : Gui.shortcut(Qt.AltModifier+Qt.Key_PageUp)
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? Gui.shortcut(Qt.AltModifier+Qt.Key_Up) : Gui.shortcut(Qt.ControlModifier+Qt.Key_Up)
 
             enabled: ActionHandler.canHandle
             objectName: "jumpPreviousScene"
@@ -974,7 +974,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Alt+." : Gui.shortcut(Qt.AltModifier+Qt.Key_PageDown)
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? Gui.shortcut(Qt.AltModifier+Qt.Key_Down) : Gui.shortcut(Qt.ControlModifier+Qt.Key_Down)
 
             enabled: ActionHandler.canHandle
             objectName: "jumpNextScene"
