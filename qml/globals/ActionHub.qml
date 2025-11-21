@@ -2205,7 +2205,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property var keywords: ["plan", "purchase", "buy", "license", "pricing", "price", "discount"]
+            readonly property var keywords: ["plan", "paid", "pay", "purchase", "buy", "license", "pricing", "price", "discount"]
             readonly property string defaultShortcut: "F10"
 
             enabled: ActionHandler.canHandle
