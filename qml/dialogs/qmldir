@@ -5,6 +5,7 @@ singleton ExportConfigurationDialog 1.0 ExportConfigurationDialog.qml
 singleton FontSelectionDialog 1.0 FontSelectionDialog.qml
 singleton HomeScreen 1.0 HomeScreen.qml
 singleton JoinDiscordCommunity 1.0 JoinDiscordCommunity.qml
+singleton JumpToSceneNumberDialog 1.0 JumpToSceneNumberDialog.qml
 singleton LanguageOptionsDialog 1.0 LanguageOptionsDialog.qml
 singleton MessageBox 1.0 MessageBox.qml
 singleton PdfDialog 1.0 PdfDialog.qml

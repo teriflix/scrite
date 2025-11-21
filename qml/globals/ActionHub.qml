@@ -996,6 +996,33 @@ Item {
             objectName: "scrollNextScene"
         }
 
+        // This is the main jump-to-scene handler components in the app
+        // can hook to and handle. If nobody is hooking up to this handle, then
+        // we offer a global one below.
+        Action {
+            id: _jumpToSceneNumber
+
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+G"
+
+            enabled: ActionHandler.canHandle
+            objectName: "jumpToSceneNumber"
+            shortcut: defaultShortcut
+            text: "Jump to Scene Number"
+        }
+
+        // This is the global jump-to-scene handler
+        Action {
+            readonly property bool visible: false
+
+            enabled: !_jumpToSceneNumber.enabled
+            shortcut: _jumpToSceneNumber.shortcut
+
+            onTriggered: (source) => {
+                JumpToSceneNumberDialog.launch(Runtime.screenplayAdapter)
+            }
+        }
+
         Action {
             readonly property bool visible: false
 

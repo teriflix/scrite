@@ -337,5 +337,6 @@
         <file>qml/TimelineView.qml</file>
         <file>qml/dialogs/settingsdialog/ScreenplayTracksPage.qml</file>
         <file>qml/dialogs/ScreenplayTracksDialog.qml</file>
+        <file>qml/dialogs/JumpToSceneNumberDialog.qml</file>
     </qresource>
 </RCC>

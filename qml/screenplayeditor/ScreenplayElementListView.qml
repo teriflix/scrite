@@ -182,6 +182,15 @@ ListView {
         }
     }
 
+    ActionHandler {
+        action: ActionHub.editOptions.find("jumpToSceneNumber")
+        enabled: _private.firstSceneElementIndex !== _private.lastSceneElementIndex
+
+        onTriggered: (source) => {
+                         JumpToSceneNumberDialog.launch(root.screenplayAdapter)
+                     }
+    }
+
     QtObject {
         id: _private
 
