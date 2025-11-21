@@ -86,6 +86,8 @@ Item {
             ColumnLayout {
                 anchors.fill: parent
 
+                spacing: 0
+
                 SceneListPanelHeader {
                     Layout.fillWidth: true
 
@@ -103,37 +105,11 @@ Item {
                     }
                 }
 
-                RowLayout {
+                Loader {
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
 
-                    spacing: 0
-
-                    ScreenplayTracksView {
-                        id: _screenplayTracksView
-
-                        Layout.fillHeight: true
-
-                        enabled: _delegateCount.get === root.screenplayAdapter.elementCount && (isSceneTextModeHeading ? 1 : maximumLineCount) === 1
-                        visible: Runtime.sceneListPanelSettings.displayTracks && Runtime.screenplayTracksSettings.displayTracks && root.screenplayAdapter.isSourceScreenplay
-                        listView: _sceneListView
-                        screenplay: root.screenplayAdapter.screenplay
-
-                        property int maximumLineCount: Runtime.bounded(1,Runtime.screenplayEditorSettings.slpSynopsisLineCount,5)
-                        property bool isSceneTextModeHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
-                        onMaximumLineCountChanged: reload()
-                        onIsSceneTextModeHeadingChanged: reload()
-                    }
-
-                    SceneListPanel {
-                        id: _sceneListView
-
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-
-                        readOnly: root.readOnly
-                        screenplayAdapter: root.screenplayAdapter
-                        tracksVisible: _screenplayTracksView.visible
-                    }
+                    sourceComponent: _sceneListPanel
                 }
             }
 
@@ -144,6 +120,49 @@ Item {
                 initial: 0
                 delay: 0
             }
+        }
+    }
+
+    Component {
+        id: _sceneListPanel
+
+        RowLayout {
+            spacing: 0
+
+            ScreenplayTracksView {
+                id: _screenplayTracksView
+
+                Layout.fillHeight: true
+
+                enabled: _delegateCount.get === root.screenplayAdapter.elementCount && (isSceneTextModeHeading ? 1 : maximumLineCount) === 1
+                visible: Runtime.sceneListPanelSettings.displayTracks && Runtime.screenplayTracksSettings.displayTracks && root.screenplayAdapter.isSourceScreenplay
+                listView: _sceneListView
+                screenplay: root.screenplayAdapter.screenplay
+
+                property int maximumLineCount: Runtime.bounded(1,Runtime.screenplayEditorSettings.slpSynopsisLineCount,5)
+                property bool isSceneTextModeHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
+                onMaximumLineCountChanged: reload()
+                onIsSceneTextModeHeadingChanged: reload()
+            }
+
+            SceneListPanel {
+                id: _sceneListView
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                readOnly: root.readOnly
+                screenplayAdapter: root.screenplayAdapter
+                tracksVisible: _screenplayTracksView.visible
+            }
+        }
+    }
+
+    Component {
+        id: _sceneTreePanel
+
+        Item {
+            // TODO:
         }
     }
 }

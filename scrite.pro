@@ -60,6 +60,7 @@ HEADERS += \
     src/core/utils.h \
     src/document/screenplaypaginator.h \
     src/document/screenplaypaginatorworker.h \
+    src/document/screenplaytreeadapter.h \
     src/network/networkstatus.h \
     src/core/pdfexportablegraphicsscene.h \
     src/core/peerapplookup.h \
@@ -195,6 +196,7 @@ SOURCES += \
     src/core/utils.cpp \
     src/document/screenplaypaginator.cpp \
     src/document/screenplaypaginatorworker.cpp \
+    src/document/screenplaytreeadapter.cpp \
     src/network/networkstatus.cpp \
     src/core/pdfexportablegraphicsscene.cpp \
     src/core/peerapplookup.cpp \
