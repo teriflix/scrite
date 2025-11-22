@@ -28,6 +28,9 @@ Flickable {
     required property ListView listView
     required property Screenplay screenplay
 
+    readonly property alias model: _private.model
+    readonly property alias trackCount: _trackRepeater.count
+
     function reload() { _private.reload() }
 
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
@@ -52,10 +55,12 @@ Flickable {
     Item {
         id: _content
 
-        width: listView.orientation === Qt.Horizontal ? listView.contentWidth : Runtime.screenplayTracks.trackCount * (Runtime.minimumFontMetrics.height + 10)
-        height: listView.orientation === Qt.Horizontal ? Runtime.screenplayTracks.trackCount * (Runtime.minimumFontMetrics.height + 10) : listView.contentHeight
+        width: listView.orientation === Qt.Horizontal ? listView.contentWidth : _trackRepeater.count * (Runtime.minimumFontMetrics.height + 10)
+        height: listView.orientation === Qt.Horizontal ? _trackRepeater.count * (Runtime.minimumFontMetrics.height + 10) : listView.contentHeight
 
         Repeater {
+            id: _trackRepeater
+
             model: _private.model
 
             Rectangle {
@@ -66,8 +71,7 @@ Flickable {
                                             // struct ScreenplayTrack { QString name; QList<ScreenplayTrackItem> items; }
 
                 property var items: track.items
-                property bool keywordsTrack: track.name === ""
-                property bool stackTrack: track.name === _private.model.stackTrackName
+                property bool isKeywordsTrack: track.name === ""
                 property string name: track.name
 
                 property real offset: index * (Runtime.minimumFontMetrics.height + 10)
@@ -141,9 +145,9 @@ Flickable {
 
                         function lookupItems() {
                             if(!startItem)
-                                startItem = listView.itemAtIndex(startIndex)
+                                startItem = root.listView.itemAtIndex(startIndex)
                             if(!endItem)
-                                endItem = listView.itemAtIndex(endIndex)
+                                endItem = root.listView.itemAtIndex(endIndex)
                             if(!startItem || !endItem)
                                 Qt.callLater(lookupItems)
                         }
@@ -198,7 +202,7 @@ Flickable {
                             }
 
                             function toolTipText() {
-                                let ret = "<b>" + (_track.keywordsTrack ? "" : _track.name + " &gt; ") + _trackItem.name + "</b>, "
+                                let ret = "<b>" + (_track.isKeywordsTrack ? "" : _track.name + " &gt; ") + _trackItem.name + "</b>, "
                                 if(_trackItem.modelData.endIndex === _trackItem.modelData.startIndex)
                                     ret += "1 Scene"
                                 else
@@ -289,7 +293,23 @@ Flickable {
                                             visibleArea.widthRatio * contentWidth,
                                             visibleArea.heightRatio * contentHeight )
 
-        property ScreenplayTracks model: root.enabled && displayTracks ? Runtime.screenplayTracks : null
+        property ScreenplayTracks model: ScreenplayTracks {
+            property bool enabled: Runtime.screenplayTracksSettings.displayTracks && Runtime.appFeatures.structure.enabled
+
+            screenplay: Scrite.document.screenplay
+            includeStacks: enabled && Runtime.screenplayTracksSettings.displayStacks
+            includeOpenTags: enabled && Runtime.screenplayTracksSettings.displayKeywordsTracks
+            includeStructureTags: enabled && Runtime.screenplayTracksSettings.displayStructureTracks
+
+            allowedOpenTags: {
+                if(enabled) {
+                    const userData = Scrite.document.userData
+                    if(userData && userData.allowedOpenTagsInTracks !== undefined && userData.allowedOpenTagsInTracks.length > 0)
+                        return userData.allowedOpenTagsInTracks
+                }
+                return []
+            }
+        }
 
         readonly property SequentialAnimation reloadTask: SequentialAnimation {
             alwaysRunToEnd: false

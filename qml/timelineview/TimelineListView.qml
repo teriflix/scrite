@@ -170,7 +170,7 @@ ListView {
         }
 
         function updateCacheBuffer() {
-            if(Runtime.screenplayTracks.trackCount > 0)
+            if(_screenplayTracksView.trackCount > 0)
                 cacheBuffer = contentWidth
             else
                 cacheBuffer = 0

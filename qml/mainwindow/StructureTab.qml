@@ -134,7 +134,7 @@ Item {
 
         property int currentTab: Runtime.mainWindowTab === Runtime.MainWindowTab.NotebookTab ? Runtime.MainWindowTab.NotebookTab : Runtime.MainWindowTab.StructureTab
 
-        property real preferredTimelineHeight: 140 + Runtime.minimumFontMetrics.height*Runtime.screenplayTracks.trackCount
+        property real preferredTimelineHeight: 140 + _timeline.tracksHeight
         property color splitViewBackgroundColor: Qt.darker(Runtime.colors.primary.windowColor, 1.1)
 
         readonly property Component structureCanvas: Item {

@@ -116,18 +116,18 @@ Item {
 
                     onEditorRequest: _private.requestEditorLater()
                     onDropSceneAtRequest: (source, index) => { _private.dropSceneAt(source, index) }
+
+                    Loader {
+                        anchors.fill: parent
+
+                        active: Runtime.applicationSettings.enableAnimations && !_screenplayElementList.FocusTracker.hasFocus
+
+                        sourceComponent: TimelineViewHighlightedItemAnimation {
+                            screenplayElementList: _screenplayElementList
+                        }
+                    }
                 }
             }
-        }
-    }
-
-    Loader {
-        anchors.fill: _screenplayElementList
-
-        active: Runtime.applicationSettings.enableAnimations && !_screenplayElementList.FocusTracker.hasFocus
-
-        sourceComponent: TimelineViewHighlightedItemAnimation {
-            screenplayElementList: _screenplayElementList
         }
     }
 

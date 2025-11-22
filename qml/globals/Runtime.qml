@@ -190,6 +190,7 @@ Item {
         fileName: Platform.settingsFile
 
         property bool displayTracks: true
+        property bool displayStacks: true
         property bool displayKeywordsTracks: true
         property bool displayStructureTracks: true
     }
@@ -669,26 +670,6 @@ Item {
         function toggle() { paused = !paused }
         function pause() { paused = true }
         function resume() { paused = false }
-    }
-
-    readonly property ScreenplayTracks screenplayTracks : ScreenplayTracks {
-        property bool enabled: root.screenplayTracksSettings.displayTracks && root.appFeatures.structure.enabled
-
-        ObjectRegister.name: "screenplayTracks"
-
-        screenplay: Scrite.document.screenplay
-
-        allowedOpenTags: {
-            if(enabled) {
-                const userData = Scrite.document.userData
-                if(userData && userData.allowedOpenTagsInTracks !== undefined && userData.allowedOpenTagsInTracks.length > 0)
-                    return userData.allowedOpenTagsInTracks
-            }
-            return []
-        }
-
-        includeOpenTags: enabled && root.screenplayTracksSettings.displayKeywordsTracks
-        includeStructureTags: enabled && root.screenplayTracksSettings.displayStructureTracks
     }
 
     // Announcement IDs

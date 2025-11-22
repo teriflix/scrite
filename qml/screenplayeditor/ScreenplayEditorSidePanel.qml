@@ -112,14 +112,6 @@ Item {
                     sourceComponent: _sceneListPanel
                 }
             }
-
-            DelayedPropertyBinder {
-                id: _delegateCount
-
-                set: _sceneListView.delegateCount
-                initial: 0
-                delay: 0
-            }
         }
     }
 
@@ -138,6 +130,14 @@ Item {
                 visible: Runtime.sceneListPanelSettings.displayTracks && Runtime.screenplayTracksSettings.displayTracks && root.screenplayAdapter.isSourceScreenplay
                 listView: _sceneListView
                 screenplay: root.screenplayAdapter.screenplay
+
+                DelayedPropertyBinder {
+                    id: _delegateCount
+
+                    set: _sceneListView.delegateCount
+                    initial: 0
+                    delay: 0
+                }
 
                 property int maximumLineCount: Runtime.bounded(1,Runtime.screenplayEditorSettings.slpSynopsisLineCount,5)
                 property bool isSceneTextModeHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"

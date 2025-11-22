@@ -34,7 +34,7 @@ Rectangle {
     signal clearRequest()
 
     z: 1
-    width: _screenplayToolsLayout.width+4
+    implicitWidth: _screenplayToolsLayout.width+4
 
     color: Runtime.colors.accent.c100.background
 

@@ -3719,7 +3719,8 @@ void ScreenplayTracks::timerEvent(QTimerEvent *te)
 
 void ScreenplayTracks::refresh()
 {
-    if (m_screenplay.isNull() || (!m_includeOpenTags && !m_includeStructureTags)) {
+    if (m_screenplay.isNull()
+        || (!m_includeOpenTags && !m_includeStructureTags && !m_includeStacks)) {
         if (m_tracks.isEmpty())
             return;
 
