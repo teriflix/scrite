@@ -242,7 +242,7 @@ public:
     Q_CLASSINFO("tags_FieldGroup", "Tags")
     Q_CLASSINFO("tags_FieldLabel", "Groups/Tags to include in the report")
     Q_CLASSINFO("tags_FieldEditor", "MultipleTagGroupSelector")
-    Q_CLASSINFO( "tags_FieldNote", "If no tags are selected, then the report is generated for all tags in the screenplay.")
+    Q_CLASSINFO("tags_FieldNote", "If no tags are selected, then the report is generated for all tags in the screenplay.")
     Q_CLASSINFO("tags_IsPersistent", "false")
     Q_PROPERTY(QStringList tags
                READ tags
@@ -252,6 +252,21 @@ public:
     void setTags(const QStringList &val);
     QStringList tags() const { return m_tags; }
     Q_SIGNAL void tagsChanged();
+
+    // clang-format off
+    Q_CLASSINFO("keywords_FieldGroup", "Keywords")
+    Q_CLASSINFO("keywords_FieldLabel", "Keywords to include in the report")
+    Q_CLASSINFO("keywords_FieldEditor", "MultipleKeywordsSelector")
+    Q_CLASSINFO("keywords_FieldNote", "Scenes with keywords selected below will be included.")
+    Q_CLASSINFO("keywords_IsPersistent", "false")
+    Q_PROPERTY(QStringList keywords
+               READ keywords
+               WRITE setKeywords
+               NOTIFY keywordsChanged)
+    // clang-format on
+    void setKeywords(const QStringList &val);
+    QStringList keywords() const { return m_keywords; }
+    Q_SIGNAL void keywordsChanged();
 
     virtual QString screenplaySubtitle() const { return QStringLiteral("Screenplay Subset"); }
     virtual bool includeScreenplayElement(const ScreenplayElement *) const { return true; }
@@ -275,6 +290,7 @@ protected:
 
 private:
     QStringList m_tags;
+    QStringList m_keywords;
     bool m_generateTitlePage = true;
     bool m_includeLogline = false;
     bool m_printSceneContent = true;

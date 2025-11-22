@@ -325,15 +325,16 @@ VclDialog {
         id: delegateChooser
 
         readonly property var knownEditors: [
-            "MultipleCharacterNameSelector",
-            "MultipleLocationSelector",
-            "MultipleSceneSelector",
-            "MultipleEpisodeSelector",
-            "MultipleTagGroupSelector",
             "CheckBox",
             "EnumSelector",
-            "TextBox",
             "IntegerSpinBox",
+            "MultipleCharacterNameSelector",
+            "MultipleEpisodeSelector",
+            "MultipleKeywordsSelector",
+            "MultipleLocationSelector",
+            "MultipleSceneSelector",
+            "MultipleTagGroupSelector",
+            "TextBox",
             "TwoColumnLayoutSelector",
             "TwoColumnWidthDistributionEditor"
         ]

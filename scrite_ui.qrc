@@ -339,5 +339,6 @@
         <file>qml/timelineview/TimelineViewFooter.qml</file>
         <file>qml/timelineview/TimelineViewHighlightedItemAnimation.qml</file>
         <file>qml/timelineview/qmldir</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleKeywordsSelector.qml</file>
     </qresource>
 </RCC>

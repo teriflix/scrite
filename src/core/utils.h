@@ -814,6 +814,9 @@ public:
 
     Q_INVOKABLE static QString createUniqueId();
 
+    Q_INVOKABLE static bool doListsIntersect(const QStringList &a, const QStringList &b,
+                                             Qt::CaseSensitivity cs = Qt::CaseInsensitive);
+
     static QString painterPathToString(const QPainterPath &val);
 
     static QPainterPath stringToPainterPath(const QString &val);

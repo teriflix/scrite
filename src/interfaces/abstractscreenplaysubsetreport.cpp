@@ -177,6 +177,15 @@ void AbstractScreenplaySubsetReport::setTags(const QStringList &val)
     emit tagsChanged();
 }
 
+void AbstractScreenplaySubsetReport::setKeywords(const QStringList &val)
+{
+    if (m_keywords == val)
+        return;
+
+    m_keywords = val;
+    emit keywordsChanged();
+}
+
 bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
 {
     ScriteDocument *document = this->document();
@@ -248,19 +257,13 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
 
         if (!m_tags.isEmpty() && element->elementType() == ScreenplayElement::SceneElementType
             && element->scene() != nullptr) {
-            Scene *scene = element->scene();
-
-            const QStringList sceneTags = scene->groups();
-            if (sceneTags.isEmpty())
+            if (!Utils::SMath::doListsIntersect(element->scene()->groups(), m_tags))
                 continue;
+        }
 
-            QStringList tags;
-            std::copy_if(sceneTags.begin(), sceneTags.end(), std::back_inserter(tags),
-                         [=](const QString &sceneTag) {
-                             return tags.isEmpty() ? m_tags.contains(sceneTag) : false;
-                         });
-
-            if (tags.isEmpty())
+        if (!m_keywords.isEmpty() && element->elementType() == ScreenplayElement::SceneElementType
+            && element->scene() != nullptr) {
+            if (!Utils::SMath::doListsIntersect(element->scene()->tags(), m_keywords))
                 continue;
         }
 

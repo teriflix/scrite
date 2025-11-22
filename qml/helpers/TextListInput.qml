@@ -29,6 +29,7 @@ Flow {
     required property string labelIconSource
     required property string addTextButtonTooltip
 
+    property int maxTextLength: 30
     property var highlightedTextColors: Runtime.colors.accent.c900
     property var textColors: Runtime.colors.accent.c10
     property bool readOnly: false
@@ -159,6 +160,7 @@ Flow {
             }
 
             readOnly: false
+            maximumLength: root.maxTextLength
             completionStrings: root.completionStrings
 
             font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
@@ -196,7 +198,7 @@ Flow {
             hoverEnabled: true
 
             ToolTipPopup {
-                text: root.addTextButtonTooltip
+                text: root.addTextButtonTooltip + " (Max " + root.maxTextLength + " letters)"
                 visible: container.containsMouse
             }
 
