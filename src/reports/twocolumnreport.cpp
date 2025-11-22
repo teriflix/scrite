@@ -168,6 +168,15 @@ void TwoColumnReport::setTags(const QStringList &val)
     emit tagsChanged();
 }
 
+void TwoColumnReport::setKeywords(const QStringList &val)
+{
+    if (m_keywords == val)
+        return;
+
+    m_keywords = val;
+    emit keywordsChanged();
+}
+
 bool TwoColumnReport::doGenerate(QTextDocument *document)
 {
     QFont defaultFont = document->defaultFont();
@@ -288,6 +297,9 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
             return false;
 
         if (!this->includeElementByTag(element))
+            return false;
+
+        if (!this->includeElementByKeyword(element))
             return false;
 
         if (!this->includeElementBySceneIndex(element))
@@ -605,18 +617,15 @@ bool TwoColumnReport::includeElementByTag(const ScreenplayElement *element) cons
     if (m_tags.isEmpty())
         return true;
 
-    const Scene *scene = element->scene();
-    const QStringList sceneTags = scene->groups();
-    if (sceneTags.isEmpty())
-        return false;
+    return Utils::SMath::doListsIntersect(element->scene()->groups(), m_tags);
+}
 
-    QStringList tags;
-    std::copy_if(sceneTags.begin(), sceneTags.end(), std::back_inserter(tags),
-                 [=](const QString &sceneTag) {
-                     return tags.isEmpty() ? m_tags.contains(sceneTag) : false;
-                 });
+bool TwoColumnReport::includeElementByKeyword(const ScreenplayElement *element) const
+{
+    if (m_keywords.isEmpty())
+        return true;
 
-    return !tags.isEmpty();
+    return Utils::SMath::doListsIntersect(element->scene()->tags(), m_keywords);
 }
 
 bool TwoColumnReport::includeElementByCharacter(const ScreenplayElement *element) const

@@ -69,11 +69,10 @@ Rectangle {
 
                     Item {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 60
+                        Layout.preferredHeight: pageLabel.height*1.25
 
                         Rectangle {
-                            width: parent.width
-                            height: parent.height - 15
+                            anchors.fill: parent
 
                             color: Runtime.colors.primary.c100.background
                             opacity: 0.8
@@ -84,29 +83,39 @@ Rectangle {
                         }
 
                         VclLabel {
+                            id: pageLabel
+
                             anchors.left: parent.left
-                            anchors.leftMargin: 5
                             anchors.right: parent.right
+                            anchors.leftMargin: 5
                             anchors.rightMargin: 24
                             anchors.verticalCenter: parent.verticalCenter
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                            font.bold: pageList.currentIndex === index
+
                             text: pageTitleRole === "" ? modelData : modelData[pageTitleRole]
                             color: pageList.currentIndex === index ? Runtime.colors.primary.c50.text : Runtime.colors.accent.c600.text
                             elide: Text.ElideMiddle
                             horizontalAlignment: Text.AlignRight
+                            topPadding: 6
+                            bottomPadding: 6
+
+                            font.bold: pageList.currentIndex === index
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         }
 
                         Image {
-                            width: 24; height: 24
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            width: 24
+                            height: 24
+
                             source: "qrc:/icons/navigation/arrow_right.png"
                             visible: pageList.currentIndex === index
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.right: parent.right
                         }
 
                         MouseArea {
                             anchors.fill: parent
+
                             onClicked: pageList.currentIndex = index
                         }
                     }

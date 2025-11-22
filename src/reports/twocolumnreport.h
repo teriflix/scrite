@@ -238,6 +238,21 @@ public:
     QStringList tags() const { return m_tags; }
     Q_SIGNAL void tagsChanged();
 
+    // clang-format off
+    Q_CLASSINFO("keywords_FieldGroup", "Keywords")
+    Q_CLASSINFO("keywords_FieldLabel", "Keywords to include in the report")
+    Q_CLASSINFO("keywords_FieldEditor", "MultipleKeywordsSelector")
+    Q_CLASSINFO("keywords_FieldNote", "Scenes with keywords selected below will be included.")
+    Q_CLASSINFO("keywords_IsPersistent", "false")
+    Q_PROPERTY(QStringList keywords
+               READ keywords
+               WRITE setKeywords
+               NOTIFY keywordsChanged)
+    // clang-format on
+    void setKeywords(const QStringList &val);
+    QStringList keywords() const { return m_keywords; }
+    Q_SIGNAL void keywordsChanged();
+
 protected:
     bool doGenerate(QTextDocument *document);
     bool requiresOdtContentPolish() const;
@@ -246,6 +261,7 @@ protected:
     // These functions must return true if element should be included in the
     // final report.
     bool includeElementByTag(const ScreenplayElement *element) const;
+    bool includeElementByKeyword(const ScreenplayElement *element) const;
     bool includeElementByCharacter(const ScreenplayElement *element) const;
     bool includeElementBySceneIndex(const ScreenplayElement *element) const;
     bool includeElementByEpisodeNumber(const ScreenplayElement *element) const;
@@ -253,6 +269,7 @@ protected:
 private:
     Layout m_layout = VideoAudioLayout;
     QStringList m_tags;
+    QStringList m_keywords;
     bool m_useSingleFont = false;
     bool m_includeLogline = true;
     qreal m_leftColumnWidth = 0.5;
