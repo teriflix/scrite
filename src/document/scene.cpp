@@ -3225,6 +3225,41 @@ void SceneGroup::toggle(int row)
     emit toggled(row);
 }
 
+bool SceneGroup::addOpenTag(const QString &tag)
+{
+    if (tag.isEmpty() || this->hasOpenTag(tag))
+        return false;
+
+    for (Scene *scene : qAsConst(m_scenes)) {
+        scene->addTag(tag);
+    }
+
+    m_openTags.append(tag);
+    emit openTagsChanged();
+
+    return true;
+}
+
+bool SceneGroup::removeOpenTag(const QString &tag)
+{
+    if (tag.isEmpty() || !this->hasOpenTag(tag))
+        return false;
+
+    for (Scene *scene : qAsConst(m_scenes)) {
+        scene->removeTag(tag);
+    }
+
+    m_openTags.removeOne(tag);
+    emit openTagsChanged();
+
+    return true;
+}
+
+bool SceneGroup::hasOpenTag(const QString &tag) const
+{
+    return m_openTags.contains(tag, Qt::CaseInsensitive);
+}
+
 void SceneGroup::setStructure(Structure *val)
 {
     if (m_structure == val)
@@ -3286,6 +3321,14 @@ void SceneGroup::clearScenes()
         this->removeScene(m_scenes.first());
 }
 
+SceneGroup *SceneGroup::clone(QObject *parent) const
+{
+    SceneGroup *newSceneGroup = new SceneGroup(parent);
+    newSceneGroup->m_scenes = this->m_scenes;
+    newSceneGroup->reevalLater();
+    return newSceneGroup;
+}
+
 void SceneGroup::timerEvent(QTimerEvent *te)
 {
     if (te->timerId() == m_reevalTimer.timerId()) {
@@ -3293,6 +3336,15 @@ void SceneGroup::timerEvent(QTimerEvent *te)
         this->reeval();
     } else
         GenericArrayModel::timerEvent(te);
+}
+
+void SceneGroup::setOpenTags(const QStringList &val)
+{
+    if (m_openTags == val)
+        return;
+
+    m_openTags = val;
+    emit openTagsChanged();
 }
 
 void SceneGroup::setSceneActs(const QStringList &val)
@@ -3352,14 +3404,23 @@ void SceneGroup::reload()
 
 void SceneGroup::reeval()
 {
-    QMap<QString, int> groupCounter;
     QStringList acts;
     QSet<QString> stackIds;
+    QMap<QString, int> groupCounter;
+    QMap<QString, int> openTagsCounter;
 
     for (Scene *scene : qAsConst(m_scenes)) {
         const QStringList groups = scene->groups();
         for (const QString &group : groups)
             groupCounter[group] = groupCounter.value(group, 0) + 1;
+
+        const QStringList tags = scene->tags();
+        if (m_scenes.size() == 1)
+            this->setOpenTags(tags);
+        else {
+            for (const QString &tag : tags)
+                openTagsCounter[tag] = openTagsCounter.value(tag, 0) + 1;
+        }
 
         const QString sceneAct = scene->act();
         if (!sceneAct.isEmpty() && m_groupActs.contains(sceneAct) && !acts.contains(sceneAct))
@@ -3403,6 +3464,19 @@ void SceneGroup::reeval()
 
     this->setSceneActs(acts);
     this->setSceneStackIds(stackIds.values());
+
+    // Determine open-tags that are present in all the selected scenes
+    if (!openTagsCounter.isEmpty()) {
+        QStringList openTags;
+        auto it = openTagsCounter.constBegin();
+        auto end = openTagsCounter.constEnd();
+        while (it != end) {
+            if (it.value() == m_scenes.size())
+                openTags << it.key();
+            ++it;
+        }
+        this->setOpenTags(openTags);
+    }
 }
 
 void SceneGroup::reevalLater()

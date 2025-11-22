@@ -28,39 +28,20 @@ VclMenu {
 
     property ScreenplayElement element
 
-    SceneGroup {
-        id: sceneGroup
-        structure: Scrite.document.structure
-    }
-
-    onAboutToShow: {
-        if(element.selected) {
-            Scrite.document.screenplay.gatherSelectedScenes(sceneGroup)
-        } else {
-            Scrite.document.screenplay.clearSelection()
-            element.selected = true
-            sceneGroup.addScene(element.scene)
-        }
-    }
-
-    onClosed: {
-        element = null
-        sceneGroup.clearScenes()
-    }
-
     VclMenuItem {
-        enabled: sceneGroup.sceneCount === 1 && root.element && root.element.scene
+        enabled: _sceneGroup.sceneCount === 1 && root.element && root.element.scene
 
         action: Action {
             text: "Scene Heading"
             checkable: true
             checked: root.element && root.element.scene && root.element.scene.heading.enabled
         }
+
         onTriggered: root.element.scene.heading.enabled = action.checked
     }
 
     VclMenu {
-        enabled: sceneGroup.sceneCount === 1
+        enabled: _sceneGroup.sceneCount === 1
 
         title: "Page Breaks"
 
@@ -70,6 +51,7 @@ VclMenu {
                 checkable: true
                 checked: root.element && root.element.pageBreakBefore
             }
+
             onTriggered: root.element.pageBreakBefore = action.checked
         }
 
@@ -79,6 +61,7 @@ VclMenu {
                 checkable: true
                 checked: root.element && root.element.pageBreakAfter
             }
+
             onTriggered: root.element.pageBreakAfter = action.checked
         }
     }
@@ -86,9 +69,10 @@ VclMenu {
     ColorMenu {
         title: "Color"
         enabled: !Scrite.document.readOnly && root.element
+
         onMenuItemClicked: {
-            for(var i=0; i<sceneGroup.sceneCount; i++) {
-                sceneGroup.sceneAt(i).color = color
+            for(var i=0; i<_sceneGroup.sceneCount; i++) {
+                _sceneGroup.sceneAt(i).color = color
             }
             root.close()
         }
@@ -98,17 +82,25 @@ VclMenu {
         title: "Mark Scene As"
         scene: root.element ? root.element.scene : null
         enabled: !Scrite.document.readOnly && !omitIncludeMenuItem.omitted
+
         onTriggered: {
-            for(var i=0; i<sceneGroup.sceneCount; i++) {
-                sceneGroup.sceneAt(i).type = scene.type
+            for(var i=0; i<_sceneGroup.sceneCount; i++) {
+                _sceneGroup.sceneAt(i).type = scene.type
             }
             root.close()
         }
     }
 
     StructureGroupsMenu {
-        sceneGroup: sceneGroup
+        sceneGroup: _sceneGroup
         enabled: !Scrite.document.readOnly
+    }
+
+    VclMenuItem {
+        text: "Keywords"
+        enabled: !Scrite.document.readOnly
+
+        onClicked: SceneGroupKeywordsDialog.launch(_sceneGroup)
     }
 
     VclMenu {
@@ -136,12 +128,14 @@ VclMenu {
 
     VclMenuItem {
         text: "Copy"
+
         onClicked: Scrite.document.screenplay.copySelection()
     }
 
     VclMenuItem {
         text: "Paste After"
         enabled: Scrite.document.screenplay.canPaste
+
         onClicked: Scrite.document.screenplay.pasteAfter( Scrite.document.screenplay.indexOfElement(element) )
     }
 
@@ -149,8 +143,11 @@ VclMenu {
 
     VclMenuItem {
         id: omitIncludeMenuItem
+
         property bool omitted: Scrite.document.screenplay.selectedElementsOmitStatus !== Screenplay.NotOmitted
+
         text: omitted ? "Include" : "Omit"
+
         onClicked: {
             root.close()
             if(omitted)
@@ -163,12 +160,34 @@ VclMenu {
     VclMenuItem {
         text: "Remove"
         enabled: !Scrite.document.readOnly
+
         onClicked: {
-            if(sceneGroup.sceneCount <= 1)
+            if(_sceneGroup.sceneCount <= 1)
                 Scrite.document.screenplay.removeElement(root.element)
             else
                 Scrite.document.screenplay.removeSelectedElements();
             root.close()
         }
+    }
+
+    SceneGroup {
+        id: _sceneGroup
+
+        structure: Scrite.document.structure
+    }
+
+    onAboutToShow: {
+        if(element.selected) {
+            Scrite.document.screenplay.gatherSelectedScenes(_sceneGroup)
+        } else {
+            Scrite.document.screenplay.clearSelection()
+            element.selected = true
+            _sceneGroup.addScene(element.scene)
+        }
+    }
+
+    onClosed: {
+        element = null
+        _sceneGroup.clearScenes()
     }
 }

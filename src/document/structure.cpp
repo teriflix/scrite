@@ -4887,6 +4887,11 @@ void Structure::timerEvent(QTimerEvent *event)
         return;
     }
 
+    if (m_updateSceneTagsTimer.timerId() == event->timerId()) {
+        m_updateSceneTagsTimer.stop();
+        this->updateSceneTags();
+    }
+
     QObject::timerEvent(event);
 }
 

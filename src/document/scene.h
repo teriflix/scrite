@@ -1062,6 +1062,25 @@ public:
     // clang-format on
     bool hasSceneActs() const { return !m_sceneActs.isEmpty(); }
 
+    // clang-format off
+    Q_PROPERTY(QStringList openTags
+               READ openTags
+               NOTIFY openTagsChanged)
+    // clang-format on
+    QStringList openTags() const { return m_openTags; }
+    Q_SIGNAL void openTagsChanged();
+
+    // clang-format off
+    Q_PROPERTY(bool hasOpenTags
+               READ hasOpenTags
+               NOTIFY openTagsChanged)
+    // clang-format on
+    bool hasOpenTags() const { return !m_openTags.isEmpty(); }
+
+    Q_INVOKABLE bool addOpenTag(const QString &tag);
+    Q_INVOKABLE bool removeOpenTag(const QString &tag);
+    Q_INVOKABLE bool hasOpenTag(const QString &tag) const;
+
     // Custom properties
     // clang-format off
     Q_PROPERTY(Structure *structure
@@ -1082,6 +1101,7 @@ public:
     Q_INVOKABLE void addScene(Scene *ptr);
     Q_INVOKABLE void removeScene(Scene *ptr);
     Q_INVOKABLE Scene *sceneAt(int index) const;
+
     // clang-format off
     Q_PROPERTY(int sceneCount
                READ sceneCount
@@ -1091,10 +1111,13 @@ public:
     Q_INVOKABLE void clearScenes();
     Q_SIGNAL void sceneCountChanged();
 
+    Q_INVOKABLE SceneGroup *clone(QObject *parent = nullptr) const;
+
 protected:
     void timerEvent(QTimerEvent *te);
 
 private:
+    void setOpenTags(const QStringList &val);
     void setSceneActs(const QStringList &val);
     void setGroupActs(const QStringList &val);
     void setSceneStackIds(const QStringList &val);
@@ -1107,6 +1130,7 @@ private:
     static void staticClearScenes(QQmlListProperty<Scene> *list);
     static Scene *staticSceneAt(QQmlListProperty<Scene> *list, int index);
     static int staticSceneCount(QQmlListProperty<Scene> *list);
+    QStringList m_openTags;
     QStringList m_sceneActs;
     QStringList m_groupActs;
     QStringList m_sceneStackIds;

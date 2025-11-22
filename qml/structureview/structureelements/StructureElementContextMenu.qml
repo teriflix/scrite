@@ -94,16 +94,17 @@ VclMenu {
     }
 
     StructureGroupsMenu {
-        sceneGroup: SceneGroup {
-            structure: Scrite.document.structure
-        }
+        sceneGroup: _sceneGroup
+        enabled: !Scrite.document.readOnly
 
-        onClosed: sceneGroup.clearScenes()
         onToggled: root.refitSelectionRequest()
-        onAboutToShow: {
-            sceneGroup.clearScenes()
-            sceneGroup.addScene(root.element.scene)
-        }
+    }
+
+    VclMenuItem {
+        text: "Keywords"
+        enabled: !Scrite.document.readOnly
+
+        onClicked: SceneGroupKeywordsDialog.launch(_sceneGroup)
     }
 
     VclMenuItem {
@@ -127,6 +128,18 @@ VclMenu {
             else
                 root.deleteElementRequest(element)
         }
+    }
+
+    SceneGroup {
+        id: _sceneGroup
+
+        structure: Scrite.document.structure
+    }
+
+    onClosed: _sceneGroup.clearScenes()
+    onAboutToShow: {
+        _sceneGroup.clearScenes()
+        _sceneGroup.addScene(root.element.scene)
     }
 
     onElementChanged: {
