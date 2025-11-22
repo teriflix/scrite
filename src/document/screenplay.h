@@ -1000,9 +1000,16 @@ public:
     // clang-format on
     QString name; // Eg. Opening Image, Catalyst, B Story etc..
 
+    // clang-format off
+    Q_PROPERTY(QColor color
+               MEMBER color)
+    // clang-format on
+    QColor color;
+
     ScreenplayTrackItem() { }
-    ScreenplayTrackItem(int _startIndex, int _endIndex, const QString &_name)
-        : startIndex(_startIndex), endIndex(_endIndex), name(_name)
+    ScreenplayTrackItem(int _startIndex, int _endIndex, const QString &_name,
+                        const QColor &_color = Qt::transparent)
+        : startIndex(_startIndex), endIndex(_endIndex), name(_name), color(_color)
     {
     }
     ScreenplayTrackItem(const ScreenplayTrackItem &other) { *this = other; }
@@ -1012,12 +1019,13 @@ public:
         this->startIndex = other.startIndex;
         this->endIndex = other.endIndex;
         this->name = other.name;
+        this->color = other.color;
         return *this;
     }
     bool operator==(const ScreenplayTrackItem &other) const
     {
         return this->startIndex == other.startIndex && this->endIndex == other.endIndex
-                && this->name == other.name;
+                && this->name == other.name && this->color == other.color;
     }
 };
 Q_DECLARE_METATYPE(ScreenplayTrackItem)
@@ -1038,14 +1046,21 @@ public:
     QString name; // Eg. Save The Cat, Heroes Journey etc, empty in case of keywords/open-tags
 
     // clang-format off
+    Q_PROPERTY(QColor color
+               MEMBER color)
+    // clang-format on
+    QColor color;
+
+    // clang-format off
     Q_PROPERTY(QList<ScreenplayTrackItem> items
                MEMBER items)
     // clang-format on
     QList<ScreenplayTrackItem> items;
 
     ScreenplayTrack() { }
-    ScreenplayTrack(const QString &_name, const QList<ScreenplayTrackItem> &_items)
-        : name(_name), items(_items)
+    ScreenplayTrack(const QString &_name, const QColor &_color,
+                    const QList<ScreenplayTrackItem> &_items)
+        : name(_name), color(_color), items(_items)
     {
     }
     ScreenplayTrack(const ScreenplayTrack &other) { *this = other; }
@@ -1053,12 +1068,13 @@ public:
     ScreenplayTrack &operator=(const ScreenplayTrack &other)
     {
         this->name = other.name;
+        this->color = other.color;
         this->items = other.items;
         return *this;
     }
     bool operator==(const ScreenplayTrack &other) const
     {
-        return this->name == other.name && this->items == other.items;
+        return this->name == other.name && this->color == other.color && this->items == other.items;
     }
 };
 Q_DECLARE_METATYPE(ScreenplayTrack)
@@ -1145,6 +1161,16 @@ public:
     int trackCount() const { return m_tracks.size(); }
     Q_SIGNAL void trackCountChanged();
 
+    // clang-format off
+    Q_PROPERTY(QList<QColor> colors
+               READ colors
+               WRITE setColors
+               NOTIFY colorsChanged)
+    // clang-format on
+    void setColors(const QList<QColor> &val);
+    QList<QColor> colors() const { return m_colors; }
+    Q_SIGNAL void colorsChanged();
+
     Q_INVOKABLE ScreenplayTrack trackAt(int index) const;
 
     // QAbstractItemModel interface
@@ -1167,6 +1193,7 @@ private:
     QStringList m_allowedOpenTags;
     QString m_stackTrackName = QStringLiteral("Sequences");
 
+    QList<QColor> m_colors;
     ExecLaterTimer m_refreshTimer;
     QList<ScreenplayTrack> m_tracks;
     QObjectProperty<Screenplay> m_screenplay;

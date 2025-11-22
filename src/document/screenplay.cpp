@@ -3566,6 +3566,29 @@ ScreenplayTracks::ScreenplayTracks(QObject *parent)
     connect(this, &ScreenplayTracks::modelReset, this, &ScreenplayTracks::trackCountChanged);
     connect(this, &ScreenplayTracks::rowsInserted, this, &ScreenplayTracks::trackCountChanged);
     connect(this, &ScreenplayTracks::rowsRemoved, this, &ScreenplayTracks::trackCountChanged);
+
+    m_colors = {
+        QColor(47, 79, 79), // #2F4F4F - Dark Slate Gray
+        QColor(0, 100, 0), // #006400 - Dark Green
+        QColor(72, 61, 139), // #483D8B - Dark Slate Blue
+        QColor(139, 0, 0), // #8B0000 - Dark Red
+        QColor(75, 0, 130), // #4B0082 - Indigo
+        QColor(85, 107, 47), // #556B2F - Dark Olive Green
+        QColor(0, 128, 128), // #008080 - Teal
+        QColor(139, 69, 19), // #8B4513 - Saddle Brown
+        QColor(148, 0, 211), // #9400D3 - Dark Violet
+        QColor(25, 25, 112), // #191970 - Midnight Blue
+        QColor(139, 0, 139), // #8B008B - Dark Magenta
+        QColor(107, 142, 35), // #6B8E23 - Olive Drab
+        QColor(95, 158, 160), // #5F9EA0 - Cadet Blue
+        QColor(178, 34, 34), // #B22222 - Firebrick
+        QColor(70, 130, 180), // #4682B4 - Steel Blue
+        QColor(0, 0, 128), // #000080 - Navy
+        QColor(128, 0, 0), // #800000 - Maroon
+        QColor(34, 139, 34), // #228B22 - Forest Green
+        QColor(105, 105, 105), // #696969 - Dim Gray
+        QColor(112, 128, 144) // #708090 - Slate Gray
+    };
 }
 
 ScreenplayTracks::~ScreenplayTracks() { }
@@ -3651,6 +3674,15 @@ void ScreenplayTracks::setStackTrackName(const QString &val)
     this->refreshLater();
 
     emit stackTrackNameChanged();
+}
+
+void ScreenplayTracks::setColors(const QList<QColor> &val)
+{
+    if (m_colors == val)
+        return;
+
+    m_colors = val;
+    emit colorsChanged();
 }
 
 ScreenplayTrack ScreenplayTracks::trackAt(int index) const
@@ -3863,6 +3895,25 @@ void ScreenplayTracks::refresh()
             track.name = m_stackTrackName;
             m_tracks.append(track);
             break;
+        }
+    }
+
+    // Assign track and item colors
+    QColor trackColor = Qt::darkGray;
+    for (int trackIndex = 0; trackIndex < m_tracks.size(); trackIndex++) {
+        ScreenplayTrack &track = m_tracks[trackIndex];
+        track.color = trackColor;
+        trackColor = trackColor.lighter(120);
+        if (trackColor == Qt::white)
+            trackColor = Qt::darkGray;
+
+        int colorIndex = 0;
+        for (ScreenplayTrackItem &item : track.items) {
+            const int lightFactor = 100 + 35 * (trackIndex % 4);
+            item.color = m_colors.at(colorIndex);
+            if (lightFactor > 100)
+                item.color = item.color.lighter(lightFactor);
+            colorIndex = (colorIndex + 1) % m_colors.size();
         }
     }
 

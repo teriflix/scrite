@@ -75,11 +75,11 @@ Flickable {
                 x: listView.orientation === Qt.Vertical ? offset : 0
                 y: listView.orientation === Qt.Horizontal ? offset : 0
 
-                width: listView.orientation === Qt.Horizontal ? _content.width : Runtime.minimumFontMetrics.height + 8
-                height: listView.orientation === Qt.Horizontal ? Runtime.minimumFontMetrics.height + 8 : _content.height
+                width: listView.orientation === Qt.Horizontal ? _content.width : Runtime.minimumFontMetrics.lineSpacing + 8
+                height: listView.orientation === Qt.Horizontal ? Runtime.minimumFontMetrics.lineSpacing + 8 : _content.height
 
                 color: Color.translucent( border.color, 0.1 )
-                border.color: keywordsTrack ? Runtime.colors.accent.c400.background : (stackTrack ? Runtime.colors.primary.c600.background : Runtime.colors.accent.c900.background)
+                border.color: track.color
                 border.width: 0.5
 
                 MouseArea {
@@ -110,7 +110,7 @@ Flickable {
 
                         required property int index
                         required property var modelData // of type ScreenplayTrackItem, a Q_GADGET declared in screenplay.h
-                                                        // struct ScreenplayTrackItem { int startIndex, endIndex; QString name; }
+                                                        // struct ScreenplayTrackItem { int startIndex, endIndex; QString name; QColor color; }
 
                         property QtObject extents: QtObject {
                             property real from: {
@@ -156,7 +156,7 @@ Flickable {
                         width: listView.orientation === Qt.Horizontal ? extents.to - extents.from : parent.width-4
                         height: listView.orientation === Qt.Horizontal ? parent.height-4 : extents.to - extents.from
 
-                        color: parent.border.color
+                        color: modelData.color
                         visible: GMath.doRectanglesIntersect(itemRect, _private.viewportRect)
 
                         border.color: Color.translucent(Color.textColorFor(color), 0.25)

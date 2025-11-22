@@ -1461,10 +1461,18 @@ QList<QColor> Utils::SceneColors::paletteForVersion(const QVersionNumber &versio
                                << QColor(Qt::white);
 
     // New set of colors
-    return QList<QColor>() << QColor(33, 150, 243) << QColor(233, 30, 99) << QColor(0, 150, 136)
-                           << QColor(156, 39, 176) << QColor(255, 235, 59) << QColor(255, 152, 0)
-                           << QColor(244, 67, 54) << QColor(121, 85, 72) << QColor(158, 158, 158)
-                           << QColor(250, 250, 250) << QColor(63, 81, 181) << QColor(205, 220, 57);
+    return QList<QColor>() << QColor(33, 150, 243)   // #2196F3 - Blue
+                           << QColor(233, 30, 99)    // #E91E63 - Pink
+                           << QColor(0, 150, 136)   // #009688 - Teal
+                           << QColor(156, 39, 176)  // #9C27B0 - Purple
+                           << QColor(255, 235, 59)  // #FFEB3B - Yellow
+                           << QColor(255, 152, 0)   // #FF9800 - Orange
+                           << QColor(244, 67, 54)   // #F44336 - Red
+                           << QColor(121, 85, 72)   // #795548 - Brown
+                           << QColor(158, 158, 158) // #9E9E9E - Grey
+                           << QColor(250, 250, 250) // #FAFAFA - Off-white
+                           << QColor(63, 81, 181)   // #3F51B5 - Indigo
+                           << QColor(205, 220, 57); // #CDDC39 - Lime
 }
 
 /**
