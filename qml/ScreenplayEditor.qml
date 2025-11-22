@@ -46,9 +46,14 @@ Rectangle {
 
     EventFilter.events: [EventFilter.Wheel]
     EventFilter.onFilter: (object,event,result) => {
-                              EventFilter.forwardEventTo(_elementListView)
-                              result.filter = true
-                              result.accepted = true
+                              if(MouseCursor.isOverItem(_workspace)) {
+                                  EventFilter.forwardEventTo(_elementListView)
+                                  result.filter = true
+                                  result.accepted = true
+                              } else {
+                                  result.filter = false
+                                  result.accepted = false
+                              }
                           }
 
     color: Runtime.colors.primary.windowColor
