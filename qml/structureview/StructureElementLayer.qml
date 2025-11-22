@@ -121,8 +121,8 @@ Item {
 
         currentElementItem: _private.currentElementItem
 
-        enabled: !Scrite.document.readOnly /*&& !_createItemMouseHandler.enabled*/
-        visible: currentElementItem !== null && currentElementItem.visible /* && !_annotationGripLoader.active */
+        enabled: !Scrite.document.readOnly
+        visible: currentElementItem !== null && currentElementItem.visible
         opacity: root.canvasHasActiveFocus && !_selection.hasItems ? 1 : 0.25
     }
 

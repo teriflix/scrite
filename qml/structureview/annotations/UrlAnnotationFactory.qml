@@ -18,7 +18,6 @@ import QtQuick 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
@@ -180,7 +179,7 @@ QtObject {
             anchors.fill: parent
             anchors.margins: 10
 
-            text: Platform.isMacOSDesktop && _annotationGripLoader.annotationItem !== _d ? "Set a URL to get a clickable link here." : "Set a URL to preview it here."
+            text: Platform.isMacOSDesktop ? "Set a URL to get a clickable link here." : "Set a URL to preview it here."
             visible: _d.annotation.attributes.url === ""
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
             verticalAlignment: Text.AlignVCenter
