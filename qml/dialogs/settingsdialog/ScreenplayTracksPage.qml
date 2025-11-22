@@ -27,9 +27,7 @@ Item {
 
     clip: true
 
-    ColumnLayout {
-        id: layout
-
+    VclGroupBox {
         anchors.fill: parent
         anchors.margins: 10
         anchors.leftMargin: 0
@@ -39,71 +37,101 @@ Item {
         enabled: Runtime.appFeatures.structure.enabled
         opacity: enabled ? 1 : 0.5
 
-        RowLayout {
-            Layout.fillWidth: true
+        label: VclCheckBox {
+            text: "Display tracks"
 
-            VclCheckBox {
-                Layout.fillWidth: true
+            checked: Runtime.screenplayTracksSettings.displayTracks
 
-                text: "Display tracks"
-
-                checked: Runtime.screenplayTracksSettings.displayTracks
-
-                onToggled: Runtime.screenplayTracksSettings.displayTracks = !Runtime.screenplayTracksSettings.displayTracks
-            }
-
-            VclCheckBox {
-                Layout.fillWidth: true
-
-                text: "Display structure tracks"
-
-                enabled: Runtime.screenplayTracksSettings.displayTracks
-                checked: enabled ? Runtime.screenplayTracksSettings.displayStructureTracks : false
-
-                onToggled: Runtime.screenplayTracksSettings.displayStructureTracks = !Runtime.screenplayTracksSettings.displayStructureTracks
-            }
+            onToggled: Runtime.screenplayTracksSettings.displayTracks = !Runtime.screenplayTracksSettings.displayTracks
         }
 
-        VclCheckBox {
-            id: _chkKeywordsTracks
-
-            Layout.fillWidth: true
-
-            text: "Display " + (checked && _private.keywords.length > 0 ? "following" : "all") + " keywords tracks"
+        ColumnLayout {
+            anchors.fill: parent
 
             enabled: Runtime.screenplayTracksSettings.displayTracks
-            checked: enabled ? Runtime.screenplayTracksSettings.displayKeywordsTracks : false
-
-            onToggled: Runtime.screenplayTracksSettings.displayKeywordsTracks = !Runtime.screenplayTracksSettings.displayKeywordsTracks
-        }
-
-        TextListInput {
-            Layout.fillWidth: true
-
-            enabled: _chkKeywordsTracks.checked
             opacity: enabled ? 1 : 0.5
 
-            textList: _private.keywords
-            completionStrings: Scrite.document.structure.sceneTags
-            addTextButtonTooltip: "Click here to include a keyword to allowed list, and eliminate others."
-            font: Runtime.idealFontMetrics.font
-            labelText: "Keywords"
-            labelIconSource:  "qrc:/icons/action/keyword.png"
-            labelIconVisible: true
+            RowLayout {
+                VclCheckBox {
+                    Layout.fillWidth: true
 
-            readOnly: Scrite.document.readOnly
+                    text: "Display structure tracks"
+                    checked: enabled ? Runtime.screenplayTracksSettings.displayStructureTracks : false
 
-            onEnsureVisible: (item, area) => {  }
-            onTextClicked: (text, source) => {  }
-            onTextCloseRequest: (text, source) => { _private.removeKeyword(text) }
-            onConfigureTextRequest: (text, tag) => { tag.closable = true }
-            onNewTextRequest: (text) => { _private.addKeyword(text) }
-            onNewTextCancelled: () => { }
-        }
+                    onToggled: Runtime.screenplayTracksSettings.displayStructureTracks = !Runtime.screenplayTracksSettings.displayStructureTracks
+                }
 
-        Item {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+                VclCheckBox {
+                    Layout.fillWidth: true
+
+                    text: "Display stack/sequence tracks"
+                    checked: enabled ? Runtime.screenplayTracksSettings.displayStacks : false
+
+                    onToggled: Runtime.screenplayTracksSettings.displayStacks = !Runtime.screenplayTracksSettings.displayStacks
+                }
+            }
+
+            VclGroupBox {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                label: VclCheckBox {
+                    id: _chkKeywordsTracks
+
+                    text: "Display keywords tracks"
+                    checked: enabled ? Runtime.screenplayTracksSettings.displayKeywordsTracks : false
+
+                    onToggled: Runtime.screenplayTracksSettings.displayKeywordsTracks = !Runtime.screenplayTracksSettings.displayKeywordsTracks
+                }
+
+                ColumnLayout {
+                    anchors.fill: parent
+
+                    VclLabel {
+                        Layout.fillWidth: true
+                        Layout.bottomMargin: 10
+
+                        wrapMode: Text.WordWrap
+                        text: _private.keywords.length === 0 ? "All keywords are captured." : "Only the following keywords are captured in this document."
+                    }
+
+                    Flickable {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        ScrollBar.vertical: VclScrollBar { }
+
+                        contentWidth: width
+                        contentHeight: _keywordsList.height
+
+                        TextListInput {
+                            id: _keywordsList
+
+                            width: parent.width - 20
+
+                            enabled: _chkKeywordsTracks.checked
+                            opacity: enabled ? 1 : 0.5
+
+                            textList: _private.keywords
+                            completionStrings: Scrite.document.structure.sceneTags
+                            addTextButtonTooltip: "Click here to include a keyword to allowed list, and eliminate others."
+                            font: Runtime.idealFontMetrics.font
+                            labelText: "Keywords"
+                            labelIconSource:  "qrc:/icons/action/keyword.png"
+                            labelIconVisible: true
+
+                            readOnly: Scrite.document.readOnly
+
+                            onEnsureVisible: (item, area) => {  }
+                            onTextClicked: (text, source) => {  }
+                            onTextCloseRequest: (text, source) => { _private.removeKeyword(text) }
+                            onConfigureTextRequest: (text, tag) => { tag.closable = true }
+                            onNewTextRequest: (text) => { _private.addKeyword(text) }
+                            onNewTextCancelled: () => { }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -123,10 +151,6 @@ Item {
                 keywords = userData.allowedOpenTagsInTracks
         }
 
-        Component.onDestruction: {
-            saveKeywords()
-        }
-
         property var keywords: []
 
         function addKeyword(keyword) {
@@ -140,6 +164,7 @@ Item {
             let k = keywords
             k.push(keyword)
             keywords = k
+            saveKeywords()
         }
 
         function removeKeyword(keyword) {
@@ -155,6 +180,7 @@ Item {
             let k = keywords
             k.splice(idx, 1)
             keywords = k
+            saveKeywords()
         }
 
         function saveKeywords() {

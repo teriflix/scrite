@@ -47,7 +47,7 @@ DialogLauncher {
         content: Item {
             ScreenplayTracksPage {
                 anchors.fill: parent
-                anchors.margins: 20
+                anchors.leftMargin: 10
             }
         }
     }
