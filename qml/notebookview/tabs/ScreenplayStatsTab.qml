@@ -51,6 +51,7 @@ Item {
         closable: false
         displayRefreshButton: true
         pagesPerRow: 1
+        allowFileSave: !Scrite.document.hasCollaborators || Scrite.document.canModifyCollaborators
 
         onRefreshRequest: {
             _busyMessage.visible = true
