@@ -340,5 +340,6 @@
         <file>qml/timelineview/TimelineViewHighlightedItemAnimation.qml</file>
         <file>qml/timelineview/qmldir</file>
         <file>qml/dialogs/reportconfigurationdialog/editor_MultipleKeywordsSelector.qml</file>
+        <file>qml/dialogs/RequestVersionTypeAccess.qml</file>
     </qresource>
 </RCC>

@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-#include "application.h"
+#include "utils.h"
 #include "simplecrypt.h"
 #include "localstorage.h"
 
@@ -71,7 +71,7 @@ void EncryptedDataStore::save()
 
     const QByteArray decryptedBytes = [=]() {
         QVariantMap copy = this->data;
-        copy.remove("sessionToken");
+        copy.remove(LocalStorage::sessionToken);
 
         QByteArray ret;
         QDataStream ds(&ret, QIODevice::WriteOnly);
@@ -87,22 +87,51 @@ void EncryptedDataStore::save()
 }
 
 Q_GLOBAL_STATIC(EncryptedDataStore, DataStore)
+static const QString timestampSuffix = QStringLiteral("$timestamp");
+
+QString LocalStorage::accessRequest = QStringLiteral("accessRequest");
+QString LocalStorage::email = QStringLiteral("email");
+QString LocalStorage::loginToken = QStringLiteral("loginToken");
+QString LocalStorage::sessionToken = QStringLiteral("sessionToken");
+QString LocalStorage::user = QStringLiteral("user");
+QString LocalStorage::userId = QStringLiteral("userId");
+QString LocalStorage::userInfo = QStringLiteral("userInfo");
+QString LocalStorage::userMessages = QStringLiteral("userMessages");
 
 void LocalStorage::store(const QString &key, const QVariant &value)
 {
     QVariantMap &data = ::DataStore->data;
-    if (value.isValid())
+    if (value.isValid()) {
         data.insert(key, value);
-    else
+        if (!key.endsWith(timestampSuffix))
+            data.insert(key + timestampSuffix, QDateTime::currentMSecsSinceEpoch());
+    } else {
         data.remove(key);
+        if (!key.endsWith(timestampSuffix))
+            data.remove(key + timestampSuffix);
+    }
 
     ::DataStore->save();
 }
 
 QVariant LocalStorage::load(const QString &key, const QVariant &defaultValue)
 {
-    QVariantMap &data = ::DataStore->data;
+    const QVariantMap &data = ::DataStore->data;
     return data.value(key, defaultValue);
+}
+
+QDateTime LocalStorage::timestamp(const QString &key)
+{
+    if (key.endsWith(timestampSuffix))
+        return QDateTime();
+
+    const QVariantMap &data = ::DataStore->data;
+    const QVariant value = data.value(key + timestampSuffix);
+    if (value.isValid()) {
+        return QDateTime::fromMSecsSinceEpoch(value.value<qint64>());
+    }
+
+    return QDateTime();
 }
 
 void LocalStorage::reset()

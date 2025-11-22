@@ -22,8 +22,18 @@
 class LocalStorage
 {
 public:
+    static QString accessRequest;
+    static QString email;
+    static QString loginToken;
+    static QString sessionToken;
+    static QString user;
+    static QString userId;
+    static QString userInfo;
+    static QString userMessages;
+
     static void store(const QString &key, const QVariant &value);
     static QVariant load(const QString &key, const QVariant &defaultValue = QVariant());
+    static QDateTime timestamp(const QString &key);
     static void reset();
 
     static QJsonObject compile(const QJsonObject &object);

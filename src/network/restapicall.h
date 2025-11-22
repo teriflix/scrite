@@ -37,6 +37,11 @@ class RestApi : public QObject
     QML_UNCREATABLE("Access it via Scrite.restApi")
 
 public:
+    static const QString E_API_KEY;
+    static const QString E_SESSION;
+    static const QString E_NO_SESSION;
+    static const QString E_NETWORK;
+
     static RestApi *instance();
     ~RestApi();
 
@@ -671,6 +676,26 @@ protected:
 
 private:
     QJsonObject m_updatedFields;
+};
+
+class UserRequestVersionTypeApiCall : public RestApiCall
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    UserRequestVersionTypeApiCall(QObject *parent = nullptr);
+    ~UserRequestVersionTypeApiCall();
+
+    Type type() const { return POST; }
+    bool useSessionToken() const { return true; }
+    QString api() const { return "user/requestVersionType"; }
+    QJsonObject data() const;
+
+    bool call();
+
+protected:
+    void setResponse(const QJsonObject &val);
 };
 
 class UserMessagesRestApiCall : public RestApiCall

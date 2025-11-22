@@ -2495,7 +2495,7 @@ bool ScriteDocument::load(const QString &fileName, bool anonymousLoad)
             }
 
             const QString infoEmail = User::instance()->info().email;
-            const QString lsEmail = LocalStorage::load("email").toString();
+            const QString lsEmail = LocalStorage::load(LocalStorage::email).toString();
             if (infoEmail.isEmpty() || lsEmail.isEmpty() || infoEmail != lsEmail
                 || !m_collaborators.contains(lsEmail, Qt::CaseInsensitive)) {
                 m_collaborators.clear();

@@ -240,6 +240,19 @@ UserInfo::UserInfo(const QJsonObject &object)
     this->city = object.value("city").toString();
     this->country = object.value("country").toString();
     this->wdyhas = object.value("wdyhas").toString();
+    this->allowedVersionTypes = [object]() -> QStringList {
+        const QJsonArray array = object.value("tags").toArray();
+        const QString prefix("$va:");
+        QStringList ret;
+        for (const QJsonValue &item : array) {
+            QString tag = item.toString();
+            if (tag.startsWith(prefix)) {
+                tag = tag.mid(prefix.size());
+                ret.append(tag);
+            }
+        }
+        return ret;
+    }();
     this->consentToActivityLog = object.value("consentToActivityLog").toBool();
     this->consentToEmail = object.value("consentToEmail").toBool();
 
@@ -447,7 +460,7 @@ User *User::instance()
         const int stargPos = appArgs.indexOf(starg);
         if (stargPos >= 0 && appArgs.size() >= stargPos + 2) {
             const QString stok = appArgs.at(stargPos + 1);
-            LocalStorage::store("sessionToken", stok);
+            LocalStorage::store(LocalStorage::sessionToken, stok);
             refreshSessionToken = false;
         }
     }
@@ -455,12 +468,12 @@ User *User::instance()
     static User *theUser = new User(qApp);
 
     if (firstTime) {
-        if (refreshSessionToken && LocalStorage::load("loginToken").isValid()) {
+        if (refreshSessionToken && LocalStorage::load(LocalStorage::loginToken).isValid()) {
             SessionNewRestApiCall *api = new SessionNewRestApiCall(theUser);
             if (!api->queue(RestApi::instance()->sessionApiQueue())) {
                 api->deleteLater();
             }
-        } else if (LocalStorage::load("sessionToken").isValid()) {
+        } else if (LocalStorage::load(LocalStorage::sessionToken).isValid()) {
             QTimer::singleShot(0, theUser, &User::loadInfoUsingRestApiCall);
         }
 
@@ -484,6 +497,12 @@ User::~User() { }
 bool User::isLoggedIn() const
 {
     return m_info.isValid();
+}
+
+bool User::canUseAppVersionType() const
+{
+    return Application::versionType.isEmpty() || !m_info.isValid()
+            || m_info.allowedVersionTypes.contains(Application::versionType, Qt::CaseInsensitive);
 }
 
 void User::logActivity2(const QString &activity, const QJsonValue &data)
@@ -623,6 +642,16 @@ void User::checkIfInstallationInfoNeedsUpdate()
     }
 }
 
+void User::checkIfVersionTypeUseIsAllowed()
+{
+    if (Application::versionType.isEmpty() || !m_info.isValid()
+        || m_info.allowedVersionTypes.contains(Application::versionType)) {
+        return;
+    }
+
+    emit requestVersionTypeAccess();
+}
+
 void User::checkForMessagesNow()
 {
     if (!this->isLoggedIn())
@@ -675,7 +704,7 @@ void User::storeMessages()
         QDataStream ds(&messageBytes, QIODevice::WriteOnly);
         ds << m_info.id << this->m_messages;
     }
-    LocalStorage::store("userMessages", messageBytes);
+    LocalStorage::store(LocalStorage::userMessages, messageBytes);
 }
 
 void User::loadStoredMessages()
@@ -685,7 +714,8 @@ void User::loadStoredMessages()
 
     m_messages.clear();
 
-    const QByteArray messageBytes = LocalStorage::load("userMessages", QByteArray()).toByteArray();
+    const QByteArray messageBytes =
+            LocalStorage::load(LocalStorage::userMessages, QByteArray()).toByteArray();
     if (!messageBytes.isEmpty()) {
         QString userId;
 
@@ -693,7 +723,7 @@ void User::loadStoredMessages()
         ds >> userId;
 
         if (userId != m_info.id) {
-            LocalStorage::store("userMessages", QVariant());
+            LocalStorage::store(LocalStorage::userMessages, QVariant());
         } else {
             ds >> m_messages;
 
@@ -720,9 +750,9 @@ void User::loadStoredMessages()
 
 void User::loadInfoFromStorage()
 {
-    const QString token = LocalStorage::load("loginToken").toString();
+    const QString token = LocalStorage::load(LocalStorage::loginToken).toString();
     if (!token.isEmpty()) {
-        const QByteArray userJson = LocalStorage::load("user").toByteArray();
+        const QByteArray userJson = LocalStorage::load(LocalStorage::user).toByteArray();
 
         QJsonParseError error;
         const QJsonObject user = QJsonDocument::fromJson(userJson, &error).object();

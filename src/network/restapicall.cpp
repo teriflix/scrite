@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "restapicall.h"
+#include "application.h"
 
 #include "user.h"
 #include "utils.h"
@@ -31,6 +32,11 @@
 #include <QNetworkReply>
 #include <QOperatingSystemVersion>
 
+const QString RestApi::E_API_KEY = QStringLiteral("E_API_KEY");
+const QString RestApi::E_SESSION = QStringLiteral("E_SESSION");
+const QString RestApi::E_NO_SESSION = QStringLiteral("E_NO_SESSION");
+const QString RestApi::E_NETWORK = QStringLiteral("E_NETWORK_");
+
 RestApi *RestApi::instance()
 {
     static RestApi *theInstance = new RestApi(qApp);
@@ -46,8 +52,8 @@ QObject *RestApi::sessionApiQueueObject() const
 
 bool RestApi::isSessionTokenAvailable()
 {
-    const QByteArray sessionToken = LocalStorage::load("sessionToken").toByteArray();
-    const QByteArray userId = LocalStorage::load("userId").toByteArray();
+    const QByteArray sessionToken = LocalStorage::load(LocalStorage::sessionToken).toByteArray();
+    const QByteArray userId = LocalStorage::load(LocalStorage::userId).toByteArray();
     if (sessionToken.isEmpty() || userId.isEmpty())
         return false;
 
@@ -71,10 +77,10 @@ void RestApi::requestFreshActivation()
     if (m_sessionTokenTimer)
         m_sessionTokenTimer->stop();
 
-    LocalStorage::store("user", QVariant());
-    LocalStorage::store("userId", QVariant());
-    LocalStorage::store("loginToken", QVariant());
-    LocalStorage::store("sessionToken", QVariant());
+    LocalStorage::store(LocalStorage::user, QVariant());
+    LocalStorage::store(LocalStorage::userId, QVariant());
+    LocalStorage::store(LocalStorage::loginToken, QVariant());
+    LocalStorage::store(LocalStorage::sessionToken, QVariant());
     User::instance()->loadInfoFromStorage();
 
     emit freshActivationRequired();
@@ -97,7 +103,7 @@ void RestApi::requestNewSessionTokenNow()
     } else
         m_lastSessionTokenRequestTimestamp = now;
 
-    LocalStorage::store("sessionToken", QVariant());
+    LocalStorage::store(LocalStorage::sessionToken, QVariant());
     emit newSessionTokenRequired();
 }
 
@@ -249,8 +255,9 @@ bool RestApiCall::call()
     QNetworkRequest req(url);
     req.setRawHeader(QByteArrayLiteral("key"), QByteArrayLiteral(REST_API_KEY));
     if (this->useSessionToken()) {
-        const QByteArray sessionToken = LocalStorage::load("sessionToken").toByteArray();
-        const QByteArray userId = LocalStorage::load("userId").toByteArray();
+        const QByteArray sessionToken =
+                LocalStorage::load(LocalStorage::sessionToken).toByteArray();
+        const QByteArray userId = LocalStorage::load(LocalStorage::userId).toByteArray();
 
         if (sessionToken.isEmpty()) {
             QTimer::singleShot(0, RestApi::instance(), &RestApi::requestNewSessionToken);
@@ -343,24 +350,41 @@ void RestApiCall::setError(const QJsonObject &val)
 
     const QString errorCode = val.value("code").toString();
 
-    const bool noApiKey = errorCode == "E_API_KEY";
-    const bool noSession = this->useSessionToken() && errorCode == "E_NO_SESSION"
-            && m_sessionTokenUsed == LocalStorage::load("sessionToken").toByteArray();
+    const bool noApiKey = errorCode == RestApi::E_API_KEY;
+    const bool noSession = this->useSessionToken() && errorCode == RestApi::E_NO_SESSION
+            && m_sessionTokenUsed == LocalStorage::load(LocalStorage::sessionToken).toByteArray();
+    const bool networkIssue = errorCode.startsWith(RestApi::E_NETWORK);
 
-    if (noSession || noApiKey) {
-        LocalStorage::store("sessionToken", QVariant());
+    if (networkIssue) {
+        if (!Application::versionType.isEmpty()) {
+            QTimer::singleShot(0, RestApi::instance(), &RestApi::requestFreshActivation);
+            return;
+        }
+
+        const QDateTime lastSessionTokenTimestamp =
+                LocalStorage::timestamp(LocalStorage::sessionToken);
+        if (!lastSessionTokenTimestamp.isValid())
+            QTimer::singleShot(0, RestApi::instance(), &RestApi::requestNewSessionToken);
+        else {
+            const int daysSinceLastSessionToken =
+                    lastSessionTokenTimestamp.daysTo(QDateTime::currentDateTime());
+            if (daysSinceLastSessionToken < 0 || daysSinceLastSessionToken > 28)
+                QTimer::singleShot(0, RestApi::instance(), &RestApi::requestFreshActivation);
+        }
+    } else if (noSession || noApiKey) {
+        LocalStorage::store(LocalStorage::sessionToken, QVariant());
 
         if (noApiKey) {
-            LocalStorage::store("userId", QVariant());
-            LocalStorage::store("userInfo", QVariant());
-            LocalStorage::store("loginToken", QVariant());
+            LocalStorage::store(LocalStorage::userId, QVariant());
+            LocalStorage::store(LocalStorage::userInfo, QVariant());
+            LocalStorage::store(LocalStorage::loginToken, QVariant());
         }
 
         QTimer::singleShot(0, User::instance(), &User::loadInfoFromStorage);
 
         if (noSession) {
-            if (LocalStorage::load("loginToken").isValid()
-                && LocalStorage::load("userId").isValid()) {
+            if (LocalStorage::load(LocalStorage::loginToken).isValid()
+                && LocalStorage::load(LocalStorage::userId).isValid()) {
                 QTimer::singleShot(0, RestApi::instance(), &RestApi::requestNewSessionToken);
             } else
                 QTimer::singleShot(0, RestApi::instance(), &RestApi::requestFreshActivation);
@@ -387,7 +411,7 @@ void RestApiCall::onNetworkReplyError()
 
     disconnect(m_reply, &QNetworkReply::finished, this, &RestApiCall::onNetworkReplyFinished);
 
-    const QString code = "E_NETWORK_"
+    const QString code = RestApi::E_NETWORK
             + Utils::Object::enumKey(m_reply, "NetworkError", m_reply->error()).toUpper();
     const QString msg = m_reply->errorString();
 
@@ -676,7 +700,7 @@ bool AppMinimumVersionRestApiCall::isVersionSupported() const
 
 AppCheckUserRestApiCall::AppCheckUserRestApiCall(QObject *parent) : RestApiCall(parent)
 {
-    m_email = LocalStorage::load("email").toString();
+    m_email = LocalStorage::load(LocalStorage::email).toString();
 }
 
 AppCheckUserRestApiCall::~AppCheckUserRestApiCall() { }
@@ -686,7 +710,7 @@ void AppCheckUserRestApiCall::setEmail(const QString &val)
     if (m_email == val)
         return;
 
-    LocalStorage::store("email", val);
+    LocalStorage::store(LocalStorage::email, val);
 
     m_email = val;
     emit emailChanged();
@@ -868,13 +892,43 @@ void UserMeRestApiCall::setUpdatedFields(const QJsonObject &val)
 void UserMeRestApiCall::setResponse(const QJsonObject &val)
 {
     const QJsonObject data = val.value("data").toObject();
-    LocalStorage::store("user", QJsonDocument(data).toJson());
-    LocalStorage::store("userId", data.value("_id").toString());
+    LocalStorage::store(LocalStorage::user, QJsonDocument(data).toJson());
+    LocalStorage::store(LocalStorage::userId, data.value("_id").toString());
 
     QTimer::singleShot(100, User::instance(), &User::checkForMessages);
     QTimer::singleShot(0, User::instance(), &User::loadInfoFromStorage);
     QTimer::singleShot(0, RestApi::instance(), &RestApi::sessionTokenAvailable);
+    QTimer::singleShot(100, User::instance(), &User::checkIfVersionTypeUseIsAllowed);
 
+    RestApiCall::setResponse(val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+UserRequestVersionTypeApiCall::UserRequestVersionTypeApiCall(QObject *parent) : RestApiCall(parent)
+{
+}
+
+UserRequestVersionTypeApiCall::~UserRequestVersionTypeApiCall() { }
+
+QJsonObject UserRequestVersionTypeApiCall::data() const
+{
+    return { { "versionType", Application::versionType },
+             { "appVersion", Application::applicationVersion() } };
+}
+
+bool UserRequestVersionTypeApiCall::call()
+{
+    const QDateTime lastSent = LocalStorage::timestamp(LocalStorage::accessRequest);
+    if (lastSent.isValid() && lastSent.daysTo(QDateTime::currentDateTime()) <= 1)
+        return false;
+
+    return RestApiCall::call();
+}
+
+void UserRequestVersionTypeApiCall::setResponse(const QJsonObject &val)
+{
+    LocalStorage::store(LocalStorage::accessRequest, Application::versionType);
     RestApiCall::setResponse(val);
 }
 
@@ -994,10 +1048,10 @@ bool InstallationDeactivateRestApiCall::call()
 
 void InstallationDeactivateRestApiCall::resetEverything()
 {
-    LocalStorage::store("user", QVariant());
-    LocalStorage::store("userId", QVariant());
-    LocalStorage::store("loginToken", QVariant());
-    LocalStorage::store("sessionToken", QVariant());
+    LocalStorage::store(LocalStorage::user, QVariant());
+    LocalStorage::store(LocalStorage::userId, QVariant());
+    LocalStorage::store(LocalStorage::loginToken, QVariant());
+    LocalStorage::store(LocalStorage::sessionToken, QVariant());
     User::instance()->loadInfoFromStorage();
     QTimer::singleShot(0, RestApi::instance(), &RestApi::freshActivationRequired);
 }
@@ -1095,11 +1149,12 @@ void SessionCurrentRestApiCall::setResponse(const QJsonObject &val)
 {
     const QJsonObject data = val.value("data").toObject();
 
-    LocalStorage::store("user", QJsonDocument(data).toJson());
-    LocalStorage::store("userId", data.value("_id").toString());
+    LocalStorage::store(LocalStorage::user, QJsonDocument(data).toJson());
+    LocalStorage::store(LocalStorage::userId, data.value("_id").toString());
 
     QTimer::singleShot(0, User::instance(), &User::loadInfoFromStorage);
     QTimer::singleShot(100, User::instance(), &User::checkForMessages);
+    QTimer::singleShot(100, User::instance(), &User::checkIfVersionTypeUseIsAllowed);
 
     RestApiCall::setResponse(val);
 }
@@ -1164,7 +1219,7 @@ bool SessionNewRestApiCall::call()
 void SessionNewRestApiCall::setError(const QJsonObject &val)
 {
     const QString code = val.value("code").toString();
-    if (code == "E_SESSION") {
+    if (code == RestApi::E_SESSION || code.startsWith(RestApi::E_NETWORK)) {
         QTimer::singleShot(0, RestApi::instance(), &RestApi::requestFreshActivation);
     }
 

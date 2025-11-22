@@ -132,6 +132,13 @@ public:
     QString versionAsString() const { return m_versionNumber.toString(); }
 
     // clang-format off
+    Q_PROPERTY(QString versionType
+               MEMBER versionType
+               CONSTANT)
+    // clang-format on
+    static const QString versionType;
+
+    // clang-format off
     Q_PROPERTY(QStringList availableThemes
                READ availableThemes
                CONSTANT )

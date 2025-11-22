@@ -426,6 +426,12 @@ public:
     bool consentToEmail = false;
 
     // clang-format off
+    Q_PROPERTY(QStringList allowedVersionTypes
+               MEMBER allowedVersionTypes)
+    // clang-format on
+    QStringList allowedVersionTypes;
+
+    // clang-format off
     Q_PROPERTY(QList<UserInstallationInfo> installations
                MEMBER installations)
     // clang-format on
@@ -686,6 +692,13 @@ public:
     UserInfo info() const { return m_info; }
     Q_SIGNAL void infoChanged();
 
+    // clang-format off
+    Q_PROPERTY(bool canUseAppVersionType
+               READ canUseAppVersionType
+               NOTIFY infoChanged)
+    // clang-format on
+    bool canUseAppVersionType() const;
+
     Q_SLOT void logActivity1(const QString &activity)
     {
         this->logActivity2(activity, QJsonValue());
@@ -726,9 +739,12 @@ public:
     Q_INVOKABLE void checkForMessages();
     Q_INVOKABLE void markMessagesAsRead();
 
+    void checkIfVersionTypeUseIsAllowed();
+
 signals:
     void subscriptionAboutToExpire(int days);
     void notifyImportantMessages(const QList<UserMessage> &messages);
+    void requestVersionTypeAccess();
 
 private:
     User(QObject *parent = nullptr);

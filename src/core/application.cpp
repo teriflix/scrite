@@ -145,10 +145,10 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
             m_settings->setValue(QStringLiteral("Installation/path"), this->applicationFilePath());
     }
 
-    if (LocalStorage::load("email").isNull()) {
+    if (LocalStorage::load(LocalStorage::email).isNull()) {
         const QString email = m_settings->value("Registration/email").toString();
         if (!email.isEmpty())
-            LocalStorage::store("email", email);
+            LocalStorage::store(LocalStorage::email, email);
     }
 
 #ifndef QT_NO_DEBUG_OUTPUT
@@ -287,7 +287,13 @@ QVersionNumber Application::prepare()
             ret.last() += field;
         }
 
-        return ret.join('.');
+        QString verStr = ret.join('.');
+
+        const QString verType = QStringLiteral(SCRITE_VERSION_TYPE);
+        if (!verType.isEmpty())
+            verStr += "-" + verType;
+
+        return verStr;
     }();
 
     if (qApp != nullptr)
@@ -441,6 +447,8 @@ void Application::setCustomFontPointSize(int val)
 
     this->computeIdealFontPointSize();
 }
+
+const QString Application::versionType = QStringLiteral(SCRITE_VERSION_TYPE);
 
 QStringList Application::availableThemes()
 {
@@ -895,7 +903,7 @@ void Application::startNewInstance(QWindow *window, const QString &filePath, boo
     } else
         args += { QStringLiteral("--geodelta"), QStringLiteral("30") };
 
-    const QString sessionToken = LocalStorage::load("sessionToken").toString();
+    const QString sessionToken = LocalStorage::load(LocalStorage::sessionToken).toString();
     if (!sessionToken.isEmpty())
         args += { QStringLiteral("--sessionToken"), sessionToken };
 

@@ -84,6 +84,14 @@ Item {
             Notification.onDismissed: helpTip.destroy()
         }
 
+        readonly property Connections userConnections: Connections {
+            target: Scrite.user
+
+            function onRequestVersionTypeAccess() {
+                RequestVersionTypeAccess.launch()
+            }
+        }
+
         property bool handleCloseEvent: true
         property bool hasDocumentErrors: documentErrors.hasError
         property bool hasApplicationErrors: applicationErrors.hasError
@@ -135,6 +143,11 @@ Item {
         function handleWindowClosing(close) {
             if(!Scrite.window.closeButtonVisible) {
                 close.accepted = false
+                return
+            }
+
+            if(!Scrite.user.canUseAppVersionType) {
+                close.accepted = true
                 return
             }
 
