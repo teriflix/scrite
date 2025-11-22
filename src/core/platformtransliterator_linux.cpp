@@ -26,6 +26,11 @@ PlatformTransliterationEngine::PlatformTransliterationEngine(QObject *parent)
 
 PlatformTransliterationEngine::~PlatformTransliterationEngine() { }
 
+int PlatformTransliterationEngine::defaultLanguage() const
+{
+    return QLocale::English;
+}
+
 QString PlatformTransliterationEngine::name() const
 {
     return QStringLiteral("Linux");
