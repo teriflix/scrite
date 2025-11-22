@@ -14,6 +14,7 @@
 import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Shapes 1.5
+import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
@@ -33,85 +34,91 @@ Item {
     property bool showNotesIcon: false
     property bool enableDragDrop: !Scrite.document.readOnly
 
+    property alias tracksHeight: _screenplayTracksView.implicitHeight
+
     signal requestEditor()
 
     clip: true
 
-    TimelineTools {
-        id: _screenplayTools
-
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.bottom: parent.bottom
-
-        onClearRequest: {
-            MessageBox.question("Clear Confirmation",
-                "Are you sure you want to clear the screenplay?",
-                ["Yes", "No"],
-                (buttonText) => {
-                    if(buttonText === "Yes") {
-                        _screenplayElementList.forceActiveFocus()
-                        Scrite.document.screenplay.clearElements()
-                    }
-                }
-            )
-        }
-
-        onZoomInRequest: {
-            root.zoomLevel = Math.min(zoomLevel * 1.1, 4.0)
-            _screenplayElementList.updateCacheBuffer()
-        }
-
-        onZoomOutRequest: {
-            root.zoomLevel = Math.max(zoomLevel * 0.9, _screenplayElementList.perElementWidth/_screenplayElementList.minimumDelegateWidth)
-            _screenplayElementList.updateCacheBuffer()
-        }
-    }
-
-    DropArea {
-        id: _mainDropArea
+    RowLayout {
         anchors.fill: parent
-        keys: [Runtime.timelineViewSettings.dropAreaKey]
-        enabled: _screenplayElementList.count === 0 && enableDragDrop
 
-        onEntered: (drag) => {
-                       _screenplayElementList.forceActiveFocus()
-                       drag.acceptProposedAction()
-                   }
+        TimelineTools {
+            id: _screenplayTools
 
-        onDropped: (drop) => {
-                       _private.dropSceneAt(drop.source, Scrite.document.screenplay.elementCount)
-                       drop.acceptProposedAction()
-                   }
-    }
+            Layout.fillHeight: true
 
-    ScreenplayTracksView {
-        id: _screenplayTracksView
+            onClearRequest: {
+                MessageBox.question("Clear Confirmation",
+                    "Are you sure you want to clear the screenplay?",
+                    ["Yes", "No"],
+                    (buttonText) => {
+                        if(buttonText === "Yes") {
+                            _screenplayElementList.forceActiveFocus()
+                            Scrite.document.screenplay.clearElements()
+                        }
+                    }
+                )
+            }
 
-        listView: _screenplayElementList
-        screenplay: _screenplayElementList.model
-        visible: Runtime.screenplayTracksSettings.displayTracks
+            onZoomInRequest: {
+                root.zoomLevel = Math.min(zoomLevel * 1.1, 4.0)
+                _screenplayElementList.updateCacheBuffer()
+            }
 
-        anchors.left: _screenplayElementList.left
-        anchors.top: parent.top
-        anchors.topMargin: Runtime.screenplayTracks.trackCount > 0 ? 2 : 0
-        anchors.right: _screenplayElementList.right
-    }
+            onZoomOutRequest: {
+                root.zoomLevel = Math.max(zoomLevel * 0.9, _screenplayElementList.perElementWidth/_screenplayElementList.minimumDelegateWidth)
+                _screenplayElementList.updateCacheBuffer()
+            }
+        }
 
-    TimelineListView {
-        id: _screenplayElementList
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-        anchors.left: _screenplayTools.right
-        anchors.right: parent.right
-        anchors.top: _screenplayTracksView.bottom
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 0
-        anchors.topMargin: Runtime.screenplayTracks.trackCount > 0 ? 0 : 3
+            DropArea {
+                id: _mainDropArea
+                anchors.fill: parent
+                keys: [Runtime.timelineViewSettings.dropAreaKey]
+                enabled: _screenplayElementList.count === 0 && enableDragDrop
 
-        mainDropArea: _mainDropArea
+                onEntered: (drag) => {
+                               _screenplayElementList.forceActiveFocus()
+                               drag.acceptProposedAction()
+                           }
 
-        onEditorRequest: _private.requestEditorLater()
-        onDropSceneAtRequest: (source, index) => { _private.dropSceneAt(source, index) }
+                onDropped: (drop) => {
+                               _private.dropSceneAt(drop.source, Scrite.document.screenplay.elementCount)
+                               drop.acceptProposedAction()
+                           }
+            }
+
+            ColumnLayout {
+                anchors.fill: parent
+
+                ScreenplayTracksView {
+                    id: _screenplayTracksView
+
+                    Layout.fillWidth: true
+
+                    listView: _screenplayElementList
+                    screenplay: _screenplayElementList.model
+                    visible: Runtime.screenplayTracksSettings.displayTracks
+                }
+
+                TimelineListView {
+                    id: _screenplayElementList
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    mainDropArea: _mainDropArea
+
+                    onEditorRequest: _private.requestEditorLater()
+                    onDropSceneAtRequest: (source, index) => { _private.dropSceneAt(source, index) }
+                }
+            }
+        }
     }
 
     Loader {
@@ -203,7 +210,7 @@ Item {
         readonly property TrackerPack trackerForUpdateCacheBuffer: TrackerPack {
 
             TrackSignal {
-                target: Runtime.screenplayTracks
+                target: _screenplayTracksView
                 signal: "trackCountChanged()"
             }
 
