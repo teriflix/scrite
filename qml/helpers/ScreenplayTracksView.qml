@@ -71,7 +71,6 @@ Flickable {
                                             // struct ScreenplayTrack { QString name; QList<ScreenplayTrackItem> items; }
 
                 property var items: track.items
-                property bool isKeywordsTrack: track.name === ""
                 property string name: track.name
 
                 property real offset: index * (Runtime.minimumFontMetrics.height + 10)
@@ -202,7 +201,8 @@ Flickable {
                             }
 
                             function toolTipText() {
-                                let ret = "<b>" + (_track.isKeywordsTrack ? "" : _track.name + " &gt; ") + _trackItem.name + "</b>, "
+                                const isKeywordsTrack = _track.name === ""
+                                let ret = "<b>" + (isKeywordsTrack ? "" : _track.name + " &gt; ") + _trackItem.name + "</b>, "
                                 if(_trackItem.modelData.endIndex === _trackItem.modelData.startIndex)
                                     ret += "1 Scene"
                                 else
@@ -294,7 +294,7 @@ Flickable {
                                             visibleArea.heightRatio * contentHeight )
 
         property ScreenplayTracks model: ScreenplayTracks {
-            property bool enabled: Runtime.screenplayTracksSettings.displayTracks && Runtime.appFeatures.structure.enabled
+            property bool enabled: root.enabled && Runtime.screenplayTracksSettings.displayTracks && Runtime.appFeatures.structure.enabled
 
             screenplay: Scrite.document.screenplay
             includeStacks: enabled && Runtime.screenplayTracksSettings.displayStacks
@@ -319,7 +319,8 @@ Flickable {
         }
 
         function reload() {
-            reloadTask.start()
+            if(root.enabled)
+                reloadTask.start()
         }
     }
 }

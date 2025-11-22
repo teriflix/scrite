@@ -126,18 +126,10 @@ Item {
 
                 Layout.fillHeight: true
 
-                enabled: _delegateCount.get === root.screenplayAdapter.elementCount && (isSceneTextModeHeading ? 1 : maximumLineCount) === 1
+                enabled: _delegateCount.get === root.screenplayAdapter.elementCount && (isSceneTextModeHeading || maximumLineCount === 1)
                 visible: Runtime.sceneListPanelSettings.displayTracks && Runtime.screenplayTracksSettings.displayTracks && root.screenplayAdapter.isSourceScreenplay
                 listView: _sceneListView
                 screenplay: root.screenplayAdapter.screenplay
-
-                DelayedPropertyBinder {
-                    id: _delegateCount
-
-                    set: _sceneListView.delegateCount
-                    initial: 0
-                    delay: 0
-                }
 
                 property int maximumLineCount: Runtime.bounded(1,Runtime.screenplayEditorSettings.slpSynopsisLineCount,5)
                 property bool isSceneTextModeHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
@@ -154,6 +146,14 @@ Item {
                 readOnly: root.readOnly
                 screenplayAdapter: root.screenplayAdapter
                 tracksVisible: _screenplayTracksView.visible
+
+                DelayedPropertyBinder {
+                    id: _delegateCount
+
+                    set: _sceneListView.delegateCount
+                    initial: 0
+                    delay: 10
+                }
             }
         }
     }
