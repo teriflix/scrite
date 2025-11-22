@@ -120,6 +120,13 @@ DialogLauncher {
                                         ret.push( SMath.titleCased(groups[g]) + " - " + elementDesc + suffix)
                                     }
                                 }
+
+                                const keywords = element.scene.tags
+                                if(keywords.length > 0) {
+                                    for(let k=0; k<keywords.length; k++) {
+                                        ret.push(keywords[k] + " - " + elementDesc + suffix)
+                                    }
+                                }
                             } else {
                                 if(element.breakType !== Screenplay.Episode && lastEpisodeDesc !== "")
                                     elementDesc = lastEpisodeDesc + ", "
