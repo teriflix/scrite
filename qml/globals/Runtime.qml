@@ -146,6 +146,7 @@ Item {
         property int placeholderInterval: 250 // ms after which placeholder is swapped to content in delegates
         property int sceneSidePanelActiveTab: 0
         property int slpSynopsisLineCount: 2
+        property int jumpToSceneFilterMode: 0
 
         property bool allowTaggingOfScenes: false
         property bool applyUserDefinedLanguageFonts: true

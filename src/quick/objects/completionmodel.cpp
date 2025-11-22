@@ -133,6 +133,28 @@ void CompletionModel::setCompletionPrefix(const QString &val)
     this->filterStrings();
 }
 
+void CompletionModel::setFilterMode(FilterMode val)
+{
+    if (m_filterMode == val)
+        return;
+
+    m_filterMode = val;
+    emit filterModeChanged();
+
+    this->filterStrings();
+}
+
+void CompletionModel::setIgnoreSuffixAfter(const QString &val)
+{
+    if (m_ignoreSuffixAfter == val)
+        return;
+
+    m_ignoreSuffixAfter = val;
+    emit ignoreSuffixAfterChanged();
+
+    this->filterStrings();
+}
+
 QString CompletionModel::currentCompletion() const
 {
     return m_currentRow < 0 || m_currentRow >= m_filteredStrings.size()
@@ -260,8 +282,16 @@ void CompletionModel::filterStrings()
         else
             std::copy_if(m_strings2.begin(), m_strings2.end(), std::back_inserter(fstrings),
                          [&](const QString &item) {
-                             const bool ret =
-                                     item.startsWith(m_completionPrefix, Qt::CaseInsensitive);
+                             bool ret = false;
+                             if (m_filterMode == StartsWithPrefix)
+                                 ret = item.startsWith(m_completionPrefix, Qt::CaseInsensitive);
+                             else {
+                                 QString item2 = item;
+                                 int suffixIndex = item2.lastIndexOf(m_ignoreSuffixAfter);
+                                 if (suffixIndex >= 0)
+                                     item2 = item2.left(suffixIndex);
+                                 ret = item2.contains(m_completionPrefix, Qt::CaseInsensitive);
+                             }
                              someFilteringHappened |= !ret;
                              return ret;
                          });

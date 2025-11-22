@@ -48,7 +48,7 @@ DialogLauncher {
 
         required property ScreenplayAdapter screenplayAdapter
 
-        width: 480
+        width: Math.max(640, Scrite.window.width*0.5)
         height: 320
 
         title: "Quick Jump"
@@ -77,17 +77,49 @@ DialogLauncher {
                     readonly property var availableTargets: {
                         const screenplay = _dialog.screenplayAdapter.screenplay
                         const nrElements = screenplay.elementCount
+                        const suffixMarker = completionIgnoreSuffixAfter
                         let ret = []
                         let lastEpisodeDesc = ""
+                        let lastBreakDesc = ""
                         for(let i=0; i<nrElements; i++) {
-                            let elementDesc = ""
                             const element = screenplay.elementAt(i)
+                            let elementDesc = ""
+                            let suffix = suffixMarker + element.serialNumber
+
                             if(element.elementType === ScreenplayElement.SceneElementType) {
                                 const sceneHeading = element.scene.heading
-                                if(sceneHeading.enabled)
-                                    elementDesc = element.resolvedSceneNumber + ": " + sceneHeading.displayText
-                                else
-                                    elementDesc = "#" + (i+1) + ": NO SCENE HEADING"
+                                const summary = element.scene.structureElement.hasNativeTitle ? element.scene.structureElement.nativeTitle : element.scene.summary
+                                if(Runtime.sceneListPanelSettings.sceneTextMode === "HEADING") {
+                                    if(sceneHeading.enabled) {
+                                        elementDesc = element.resolvedSceneNumber + ": " + sceneHeading.displayText
+                                    } else {
+                                        if(summary !== "") {
+                                            elementDesc = summary.length > 55 ? summary.substring(0, 50) + "..." : summary
+                                        } else {
+                                            elementDesc = "NO SCENE HEADING"
+                                        }
+                                    }
+                                } else {
+                                    if(summary !== "") {
+                                        elementDesc = element.resolvedSceneNumber + ": " + summary
+                                    } else {
+                                        if(sceneHeading.enabled) {
+                                            elementDesc = element.resolvedSceneNumber + ": " + sceneHeading.displayText
+                                        } else {
+                                            elementDesc = "NO SCENE HEADING"
+                                        }
+                                    }
+                                }
+
+                                if(lastBreakDesc !== "")
+                                    ret.push(lastBreakDesc + " - " + elementDesc + suffix)
+
+                                const groups = element.scene.groups
+                                if(groups.length > 0) {
+                                    for(let g=0; g<groups.length; g++) {
+                                        ret.push( SMath.titleCased(groups[g]) + " - " + elementDesc + suffix)
+                                    }
+                                }
                             } else {
                                 if(element.breakType !== Screenplay.Episode && lastEpisodeDesc !== "")
                                     elementDesc = lastEpisodeDesc + ", "
@@ -96,30 +128,88 @@ DialogLauncher {
                                     elementDesc += ": " + element.breakSubtitle
                                 if(element.breakType === Screenplay.Episode)
                                     lastEpisodeDesc = elementDesc
+                                lastBreakDesc = elementDesc
                             }
-                            ret.push(elementDesc)
+                            ret.push(elementDesc + suffix)
                         }
 
                         return ret
                     }
 
                     completionStrings: availableTargets
+                    completionFilterMode: Runtime.screenplayEditorSettings.jumpToSceneFilterMode
+                    maxCompletionItems: -1
+                    completionIgnoreSuffixAfter: " %"
+                    completionAcceptsEnglishStringsOnly: false
+
                     placeholderText: length > 0 ? "" : "1, 2, 2A, ACT 1"
 
-                    onEditingComplete: {
-                        const index = availableTargets.indexOf(text)
-                        if(index >= 0)
-                            _dialog.screenplayAdapter.currentIndex = index
+                    includeSuggestion: (suggestion) => {
+                        Qt.callLater(jumpToScene)
+                        return suggestion
+                    }
+
+                    polishCompletionText: (text) => {
+                        let str = text
+                        const suffixIndex = str.lastIndexOf(completionIgnoreSuffixAfter);
+                        return text.substring(0, suffixIndex)
+                    }
+
+                    onReturnPressed: Qt.callLater(jumpToScene)
+
+                    function getSerialNumberFromText() {
+                        const str = text
+                        const suffixMarker = completionIgnoreSuffixAfter
+                        const suffixIndex = str.lastIndexOf(suffixMarker);
+                        if (suffixIndex === -1) {
+                            return -1; // No '#' found
+                        }
+                        const substring = str.substring(suffixIndex + suffixMarker.length);
+                        const match = substring.match(/^\d+/);
+                        return match ? parseInt(match[0], 10) : -1;
+                    }
+
+                    function jumpToScene() {
+                        const serialNumber = getSerialNumberFromText()
+                        const elementIndex = _dialog.screenplayAdapter.screenplay.indexOfSerialNumber(serialNumber)
+                        if(elementIndex >= 0) {
+                            _dialog.screenplayAdapter.currentIndex = elementIndex
+                            ActionHub.triggerLater(ActionHub.editOptions.find("editSceneContent"))
+                        }
                         _dialog.close()
                     }
                 }
 
-                VclButton {
-                    Layout.alignment: Qt.AlignRight
+                RowLayout {
+                    Layout.fillWidth: true
 
-                    text: "Ok"
+                    VclLabel {
+                        text: "Filter Mode: "
+                    }
 
-                    onClicked: _sceneNumberField.editingComplete()
+                    VclRadioButton {
+                        text: "Starts With"
+
+                        checked: _sceneNumberField.completionFilterMode == CompletionModel.StartsWithPrefix
+                        onClicked: Runtime.screenplayEditorSettings.jumpToSceneFilterMode = CompletionModel.StartsWithPrefix
+                    }
+
+                    VclRadioButton {
+                        text: "Contains"
+
+                        checked: _sceneNumberField.completionFilterMode == CompletionModel.ContainsPrefix
+                        onClicked: Runtime.screenplayEditorSettings.jumpToSceneFilterMode = CompletionModel.ContainsPrefix
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                    }
+
+                    VclButton {
+                        text: "Ok"
+
+                        onClicked: _sceneNumberField.editingComplete()
+                    }
                 }
             }
         }

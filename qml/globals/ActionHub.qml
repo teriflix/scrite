@@ -34,6 +34,22 @@ Item {
     function resetBinder(binder) { _private.resetBinder(binder) }
     function isOperationAllowedByUser(operation) { return _private.isOperationAllowedByUser(operation) }
 
+    function triggerLater(action, delay) {
+        if(action)
+            Runtime.execLater(action, delay, () => {
+                                  if(action && action.enabled)
+                                    action.trigger()
+                              })
+    }
+
+    function toggleLater(action, delay) {
+        if(action)
+            Runtime.execLater(action, delay, () => {
+                                  if(action && action.enabled)
+                                    action.toggle()
+                              })
+    }
+
     readonly property ActionManager mainWindowTabs: ActionManager {
         title: "Scrite Window Tabs"
         objectName: "mainWindowTabs"

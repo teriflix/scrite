@@ -2025,6 +2025,22 @@ int Screenplay::indexOfElement(ScreenplayElement *element) const
     return m_elements.indexOf(element);
 }
 
+int Screenplay::indexOfSerialNumber(int serialNumber) const
+{
+    if (serialNumber < 0)
+        return -1;
+
+    auto it = std::find_if(m_elements.constBegin(), m_elements.constEnd(),
+                           [serialNumber](ScreenplayElement *element) {
+                               return serialNumber == element->serialNumber();
+                           });
+
+    if (it != m_elements.constEnd())
+        return std::distance(m_elements.constBegin(), it);
+
+    return -1;
+}
+
 QList<int> Screenplay::sceneElementIndexes(Scene *scene, int max) const
 {
     QList<int> ret;

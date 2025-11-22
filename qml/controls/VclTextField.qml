@@ -44,6 +44,7 @@ TextField {
     signal requestCompletion(string string)
 
     property var includeSuggestion: function(suggestion) { return suggestion }
+    property var polishCompletionText: function(text) { return text }
 
     property int maxVisibleItems: maxCompletionItems
     property int minimumCompletionPrefixLength: 1
@@ -60,10 +61,13 @@ TextField {
     property alias labelColor: _label.color
     property alias labelTextAlign: _label.horizontalAlignment
     property alias showingSymbols: _specialSymbolSupport.showingSymbols
+    property alias completionRow: _completionModel.currentRow
     property alias completionPrefix: _completionModel.completionPrefix
     property alias completionStrings: _completionModel.strings
     property alias maxCompletionItems: _completionModel.maxVisibleItems
     property alias completionSortMode: _completionModel.sortMode
+    property alias completionFilterMode: _completionModel.filterMode
+    property alias completionIgnoreSuffixAfter: _completionModel.ignoreSuffixAfter
     property alias completionAcceptsEnglishStringsOnly: _completionModel.acceptEnglishStringsOnly
 
     property Item tabItem
@@ -216,7 +220,7 @@ TextField {
 
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-            height: Math.min(contentHeight, maxVisibleItems > 0 ? delegateHeight*maxVisibleItems : contentHeight)
+            height: Math.min( Scrite.window.height*0.3, Math.min(contentHeight, maxVisibleItems > 0 ? delegateHeight*maxVisibleItems : contentHeight) )
 
             clip: true
             model: _completionModel
@@ -232,10 +236,11 @@ TextField {
                 width: _completionView.width - (_completionView.contentHeight > _completionView.height ? 20 : 1)
                 height: _completionView.delegateHeight
 
-                text: completionString
+                text: root.polishCompletionText(completionString)
                 font: root.font
                 color: index === _completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
                 padding: 5
+                elide: Text.ElideRight
 
                 MouseArea {
                     id: _textMouseArea

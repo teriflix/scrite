@@ -107,10 +107,7 @@ VclMenu {
 
         enabled: !Scrite.document.readOnly && _sceneGroup.canBeStacked
 
-        onTriggered: {
-            const success = _sceneGroup.stack()
-            Gui.log("Stack was " + success)
-        }
+        onTriggered: _sceneGroup.stack()
     }
 
     VclMenuItem {

@@ -109,6 +109,29 @@ public:
     QString completionPrefix() const { return m_completionPrefix; }
     Q_SIGNAL void completionPrefixChanged();
 
+    enum FilterMode { StartsWithPrefix, ContainsPrefix };
+    Q_ENUM(FilterMode)
+
+    // clang-format off
+    Q_PROPERTY(FilterMode filterMode
+               READ filterMode
+               WRITE setFilterMode
+               NOTIFY filterModeChanged)
+    // clang-format on
+    void setFilterMode(FilterMode val);
+    FilterMode filterMode() const { return m_filterMode; }
+    Q_SIGNAL void filterModeChanged();
+
+    // clang-format off
+    Q_PROPERTY(QString ignoreSuffixAfter
+               READ ignoreSuffixAfter
+               WRITE setIgnoreSuffixAfter
+               NOTIFY ignoreSuffixAfterChanged)
+    // clang-format on
+    void setIgnoreSuffixAfter(const QString &val);
+    QString ignoreSuffixAfter() const { return m_ignoreSuffixAfter; }
+    Q_SIGNAL void ignoreSuffixAfterChanged();
+
     // clang-format off
     Q_PROPERTY(int currentRow
                READ currentRow
@@ -179,6 +202,8 @@ private:
     bool m_sortStrings = true;
     int m_maxVisibleItems = 7;
     QString m_completionPrefix;
+    FilterMode m_filterMode = StartsWithPrefix;
+    QString m_ignoreSuffixAfter;
     QStringList m_strings2;
     QStringList m_priorityStrings2;
     QStringList m_filteredStrings;

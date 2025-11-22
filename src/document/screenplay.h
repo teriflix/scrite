@@ -721,6 +721,7 @@ public:
     Q_INVOKABLE void removeSceneElements(Scene *scene);
     Q_INVOKABLE int firstIndexOfScene(Scene *scene) const;
     Q_INVOKABLE int indexOfElement(ScreenplayElement *element) const;
+    Q_INVOKABLE int indexOfSerialNumber(int serialNumber) const;
     Q_INVOKABLE QList<int> sceneElementIndexes(Scene *scene, int max = -1) const;
     QList<ScreenplayElement *> sceneElements(Scene *scene, int max = -1) const;
     Q_INVOKABLE int firstSceneElementIndex() const;
