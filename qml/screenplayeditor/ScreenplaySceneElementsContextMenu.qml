@@ -91,6 +91,32 @@ VclMenu {
         }
     }
 
+    VclMenuItem {
+        text: "Make Sequence"
+
+        enabled: !Scrite.document.readOnly && _sceneGroup.canBeStacked
+
+        onTriggered: {
+            if(!_sceneGroup.stack()) {
+                MessageBox.information("Make Sequence Error",
+                                       "Couldn't stack these scenes to make a sequence. Please try doing this on the Structure Tab.")
+            }
+        }
+    }
+
+    VclMenuItem {
+        text: "Break Sequence"
+
+        enabled: !Scrite.document.readOnly && _sceneGroup.canBeUnstacked
+
+        onTriggered: {
+            if(!_sceneGroup.unstack()) {
+                MessageBox.information("Break Sequence Error",
+                                       "Couldn't unstack these scenes to make a sequence. Please try doing this on the Structure Tab.")
+            }
+        }
+    }
+
     StructureGroupsMenu {
         sceneGroup: _sceneGroup
         enabled: !Scrite.document.readOnly

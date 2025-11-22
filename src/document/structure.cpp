@@ -2980,6 +2980,7 @@ void Structure::removeElement(StructureElement *ptr)
                &QObjectListModel<StructureElement *>::objectDestroyed);
     disconnect(ptr, &StructureElement::stackIdChanged, &m_elementStacks,
                &StructureElementStacks::evaluateStacksLater);
+    disconnect(ptr, &StructureElement::stackIdChanged, this, &Structure::elementStackingChanged);
     this->updateLocationHeadingMapLater();
 
     emit elementCountChanged();
@@ -3038,6 +3039,7 @@ void Structure::insertElement(StructureElement *ptr, int index)
             &QObjectListModel<StructureElement *>::objectDestroyed);
     connect(ptr, &StructureElement::stackIdChanged, &m_elementStacks,
             &StructureElementStacks::evaluateStacksLater);
+    connect(ptr, &StructureElement::stackIdChanged, this, &Structure::elementStackingChanged);
     this->updateLocationHeadingMapLater();
 
     this->onStructureElementSceneChanged(ptr);

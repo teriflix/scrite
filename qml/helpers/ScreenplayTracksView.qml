@@ -296,6 +296,7 @@ Flickable {
         property ScreenplayTracks model: ScreenplayTracks {
             property bool enabled: root.enabled && Runtime.screenplayTracksSettings.displayTracks && Runtime.appFeatures.structure.enabled
 
+            structure: Scrite.document.structure
             screenplay: Scrite.document.screenplay
             includeStacks: enabled && Runtime.screenplayTracksSettings.displayStacks
             includeOpenTags: enabled && Runtime.screenplayTracksSettings.displayKeywordsTracks

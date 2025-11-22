@@ -1104,6 +1104,16 @@ public:
     Q_SIGNAL void screenplayChanged();
 
     // clang-format off
+    Q_PROPERTY(Structure* structure
+               READ structure
+               WRITE setStructure
+               NOTIFY structureChanged)
+    // clang-format on
+    void setStructure(Structure *val);
+    Structure *structure() const { return m_structure; }
+    Q_SIGNAL void structureChanged();
+
+    // clang-format off
     Q_PROPERTY(bool includeStructureTags
                READ isIncludeStructureTags
                WRITE setIncludeStructureTags
@@ -1173,6 +1183,8 @@ public:
 
     Q_INVOKABLE ScreenplayTrack trackAt(int index) const;
 
+    Q_INVOKABLE void reload() { this->refreshLater(); }
+
     // QAbstractItemModel interface
     enum { TrackRole = Qt::UserRole };
     int rowCount(const QModelIndex &parent) const;
@@ -1196,6 +1208,7 @@ private:
     QList<QColor> m_colors;
     ExecLaterTimer m_refreshTimer;
     QList<ScreenplayTrack> m_tracks;
+    QObjectProperty<Structure> m_structure;
     QObjectProperty<Screenplay> m_screenplay;
 };
 

@@ -173,6 +173,37 @@ Rectangle {
                     }
                 }
 
+                Item {
+                    Layout.preferredWidth: _label.height
+                    Layout.preferredHeight: _label.height
+
+                    z: 1
+                    visible: !_private.isBreak && !root.scene.structureElement.stackLeader && root.scene.structureElement.stackId !== ""
+
+                    Image {
+                        anchors.fill: parent
+
+                        source: "qrc:/icons/navigation/arrow_right.png"
+                        fillMode: Image.PreserveAspectFit
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+
+                        hoverEnabled: true
+
+                        ToolTipPopup {
+                            text: {
+                                let ret = "This scene is part of a sequence and will be displayed as part of a stack on the structure canvas."
+                                if(!Runtime.screenplayTracksSettings.displayStacks)
+                                    ret += " Toggle 'Display Stacks' option ON to see them in the scene list panel."
+                                return ret
+                            }
+                            visible: parent.containsMouse
+                        }
+                    }
+                }
+
                 VclLabel {
                     id: _label
 

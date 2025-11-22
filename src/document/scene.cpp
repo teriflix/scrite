@@ -3225,6 +3225,36 @@ void SceneGroup::toggle(int row)
     emit toggled(row);
 }
 
+bool SceneGroup::stack()
+{
+    if (m_structure != nullptr && m_canBeStacked) {
+        const QString stackId = Utils::SMath::createUniqueId();
+
+        for (Scene *scene : qAsConst(m_scenes)) {
+            StructureElement *structureElement = scene->structureElement();
+            structureElement->setStackId(stackId);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool SceneGroup::unstack()
+{
+    if (m_structure != nullptr && this->canBeUnstacked()) {
+        for (Scene *scene : qAsConst(m_scenes)) {
+            StructureElement *structureElement = scene->structureElement();
+            structureElement->setStackId(QString());
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
 bool SceneGroup::addOpenTag(const QString &tag)
 {
     if (tag.isEmpty() || this->hasOpenTag(tag))
@@ -3374,6 +3404,15 @@ void SceneGroup::setSceneStackIds(const QStringList &val)
     emit sceneStackIdsChanged();
 }
 
+void SceneGroup::setCanBeStacked(bool val)
+{
+    if (m_canBeStacked == val)
+        return;
+
+    m_canBeStacked = val;
+    emit canBeStackedChanged();
+}
+
 void SceneGroup::reload()
 {
     this->beginResetModel();
@@ -3405,6 +3444,7 @@ void SceneGroup::reload()
 void SceneGroup::reeval()
 {
     QStringList acts;
+    QSet<QString> episodes;
     QSet<QString> stackIds;
     QMap<QString, int> groupCounter;
     QMap<QString, int> openTagsCounter;
@@ -3425,6 +3465,8 @@ void SceneGroup::reeval()
         const QString sceneAct = scene->act();
         if (!sceneAct.isEmpty() && m_groupActs.contains(sceneAct) && !acts.contains(sceneAct))
             acts.append(sceneAct);
+
+        episodes |= scene->episode();
 
         if (m_structure != nullptr) {
             const int eindex = m_structure->indexOfScene(scene);
@@ -3477,6 +3519,10 @@ void SceneGroup::reeval()
         }
         this->setOpenTags(openTags);
     }
+
+    this->setCanBeStacked(m_structure != nullptr
+                          && m_structure->canvasUIMode() == Structure::IndexCardUI
+                          && !m_scenes.isEmpty() && acts.size() <= 1 && episodes.size() <= 1);
 }
 
 void SceneGroup::reevalLater()

@@ -3561,7 +3561,7 @@ int Screenplay::staticElementCount(QQmlListProperty<ScreenplayElement> *list)
 ///////////////////////////////////////////////////////////////////////////////
 
 ScreenplayTracks::ScreenplayTracks(QObject *parent)
-    : QAbstractListModel(parent), m_screenplay(this, "screenplay")
+    : QAbstractListModel(parent), m_structure(this, "structure"), m_screenplay(this, "screenplay")
 {
     connect(this, &ScreenplayTracks::modelReset, this, &ScreenplayTracks::trackCountChanged);
     connect(this, &ScreenplayTracks::rowsInserted, this, &ScreenplayTracks::trackCountChanged);
@@ -3616,6 +3616,25 @@ void ScreenplayTracks::setScreenplay(Screenplay *val)
     emit screenplayChanged();
 }
 
+void ScreenplayTracks::setStructure(Structure *val)
+{
+    if (m_structure == val)
+        return;
+
+    if (!m_structure.isNull())
+        m_structure->disconnect(this);
+
+    m_structure = val;
+
+    if (!m_structure.isNull()) {
+        if (m_includeStacks)
+            connect(m_structure, &Structure::elementStackingChanged, this,
+                    &ScreenplayTracks::refreshLater, Qt::UniqueConnection);
+    }
+
+    emit structureChanged();
+}
+
 void ScreenplayTracks::setIncludeStructureTags(bool val)
 {
     if (m_includeStructureTags == val)
@@ -3658,6 +3677,13 @@ void ScreenplayTracks::setIncludeStacks(bool val)
         return;
 
     m_includeStacks = val;
+
+    if (m_includeStacks)
+        connect(m_structure, &Structure::elementStackingChanged, this,
+                &ScreenplayTracks::refreshLater, Qt::UniqueConnection);
+    else
+        disconnect(m_structure, &Structure::elementStackingChanged, this,
+                   &ScreenplayTracks::refreshLater);
 
     this->refreshLater();
 
@@ -3710,15 +3736,16 @@ QHash<int, QByteArray> ScreenplayTracks::roleNames() const
 
 void ScreenplayTracks::timerEvent(QTimerEvent *te)
 {
-    if (te->timerId() == m_refreshTimer.timerId()) {
-        m_refreshTimer.stop();
+    if (te->timerId() == m_refreshTimer.timerId())
         this->refresh();
-    } else
+    else
         QAbstractListModel::timerEvent(te);
 }
 
 void ScreenplayTracks::refresh()
 {
+    m_refreshTimer.stop();
+
     if (m_screenplay.isNull()
         || (!m_includeOpenTags && !m_includeStructureTags && !m_includeStacks)) {
         if (m_tracks.isEmpty())

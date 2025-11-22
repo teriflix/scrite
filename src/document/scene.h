@@ -1048,6 +1048,24 @@ public:
     bool hasSceneStackIds() const { return !m_sceneStackIds.isEmpty(); }
 
     // clang-format off
+    Q_PROPERTY(bool canBeStacked
+               READ canBeStacked
+               NOTIFY canBeStackedChanged)
+    // clang-format on
+    bool canBeStacked() const { return m_canBeStacked; }
+    Q_SIGNAL void canBeStackedChanged();
+
+    // clang-format off
+    Q_PROPERTY(bool canBeUnstacked
+               READ canBeUnstacked
+               NOTIFY sceneStackIdsChanged)
+    // clang-format on
+    bool canBeUnstacked() const { return m_sceneStackIds.size() == 1; }
+
+    Q_INVOKABLE bool stack();
+    Q_INVOKABLE bool unstack();
+
+    // clang-format off
     Q_PROPERTY(QStringList sceneActs
                READ sceneActs
                NOTIFY sceneActsChanged)
@@ -1121,6 +1139,7 @@ private:
     void setSceneActs(const QStringList &val);
     void setGroupActs(const QStringList &val);
     void setSceneStackIds(const QStringList &val);
+    void setCanBeStacked(bool val);
     void reload();
     void reeval();
     void reevalLater();
@@ -1134,6 +1153,7 @@ private:
     QStringList m_sceneActs;
     QStringList m_groupActs;
     QStringList m_sceneStackIds;
+    bool m_canBeStacked = false;
     QList<Scene *> m_scenes;
     QJsonArray &m_groups;
     QObjectProperty<Structure> m_structure;

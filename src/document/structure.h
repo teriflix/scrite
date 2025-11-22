@@ -1293,6 +1293,7 @@ public:
     Q_INVOKABLE void clearElements();
     Q_SIGNAL void elementCountChanged();
     Q_SIGNAL void elementsChanged();
+    Q_SIGNAL void elementStackingChanged();
 
     Q_INVOKABLE int indexOfScene(Scene *scene) const;
     Q_INVOKABLE int indexOfElement(StructureElement *element) const;

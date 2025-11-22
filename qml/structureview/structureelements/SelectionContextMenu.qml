@@ -16,8 +16,8 @@ import QtQuick 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
+import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 import "qrc:/qml/structureview"
@@ -105,36 +105,11 @@ VclMenu {
     VclMenuItem {
         text: "Stack"
 
-        enabled: {
-            if(Scrite.document.structure.canvasUIMode !== Structure.IndexCardUI)
-                return false
-
-            let items = selection.items
-            let actIndex = -1
-            for(let i=0; i<items.length; i++) {
-                let item = items[i]
-                if(item.element.stackId !== "")
-                    return false
-
-                if(i === 0)
-                    actIndex = item.element.scene.actIndex
-                else if(actIndex !== item.element.scene.actIndex)
-                    return false
-            }
-
-            if(actIndex < 0)
-                return false
-
-            return true
-        }
+        enabled: !Scrite.document.readOnly && _sceneGroup.canBeStacked
 
         onTriggered: {
-            let items = selection.items
-            let id = SMath.createUniqueId()
-            items.forEach( function(item) {
-                item.element.stackId = id
-            })
-            selection.clear()
+            const success = _sceneGroup.stack()
+            Gui.log("Stack was " + success)
         }
     }
 
@@ -176,21 +151,34 @@ VclMenu {
     }
 
     StructureGroupsMenu {
-        sceneGroup: SceneGroup {
-            structure: Scrite.document.structure
-        }
+        id: _structureGroupsMenu
 
-        onClosed: sceneGroup.clearScenes()
+        sceneGroup: _sceneGroup
 
         onToggled: Runtime.execLater(selection, 250, function() { selection.refit() })
+    }
 
-        onAboutToShow: {
-            sceneGroup.clearScenes()
+    VclMenuItem {
+        text: "Keywords"
+        enabled: !Scrite.document.readOnly
 
-            let items = selection.items
-            items.forEach( function(item) {
-                sceneGroup.addScene(item.element.scene)
-            })
-        }
+        onClicked: SceneGroupKeywordsDialog.launch(_sceneGroup)
+    }
+
+    SceneGroup {
+        id: _sceneGroup
+
+        structure: Scrite.document.structure
+    }
+
+    onClosed: _sceneGroup.clear()
+
+    onAboutToShow: {
+        _sceneGroup.clearScenes()
+
+        let items = selection.items
+        items.forEach( function(item) {
+            _sceneGroup.addScene(item.element.scene)
+        })
     }
 }
