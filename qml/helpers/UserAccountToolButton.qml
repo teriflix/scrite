@@ -115,16 +115,8 @@ Item {
 
                 color: Scrite.user.info.badgeTextColor
                 text: {
-                    if(Scrite.user.loggedIn) {
-                        const firstName = Scrite.user.info.firstName
-                        if(firstName !== "")
-                            return firstName.charAt(0).toUpperCase()
-                        const lastName = Scrite.user.info.lastName
-                        if(lastName !== "")
-                            return lastName.charAt(0).toUpperCase()
-                        const email = Scrite.user.info.email
-                        return email.charAt(0).toUpperCase()
-                    }
+                    if(Scrite.user.loggedIn)
+                        return Scrite.user.info.initials()
                     return "S"
                 }
             }

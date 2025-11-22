@@ -26,6 +26,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QMetaClassInfo>
+#include <QTextBoundaryFinder>
 
 inline QStringList JsonArrayToStringList(const QJsonArray &array)
 {
@@ -305,6 +306,28 @@ bool UserInfo::isFeatureEnabled(int feature) const
 bool UserInfo::isFeatureNameEnabled(const QString &featureName) const
 {
     return Scrite::isFeatureNameEnabled(featureName, this->availableFeatures);
+}
+
+QString UserInfo::initials() const
+{
+    if (this->firstName.isEmpty() && this->lastName.isEmpty())
+        return "S";
+
+    const QString name = !this->firstName.isEmpty() ? this->firstName : this->lastName;
+
+    // We need to pick the first Grapheme, and not just the first character
+    // This is because non-Latin names could take more than one character to
+    // construct a full Grapheme.
+    QTextBoundaryFinder finder(QTextBoundaryFinder::Grapheme, name);
+    finder.toStart();
+
+    const int start = finder.position();
+    if (finder.toNextBoundary() != -1) {
+        const int end = finder.position();
+        return name.mid(start, end - start);
+    }
+
+    return QString(name.at(0).toUpper());
 }
 
 UserMessageButton::UserMessageButton(const QJsonObject &object)

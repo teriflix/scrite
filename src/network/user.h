@@ -506,6 +506,7 @@ public:
     Q_INVOKABLE int daysToSubscribedUntil() const;
     Q_INVOKABLE bool isFeatureEnabled(int feature) const;
     Q_INVOKABLE bool isFeatureNameEnabled(const QString &featureName) const;
+    Q_INVOKABLE QString initials() const;
 };
 Q_DECLARE_METATYPE(UserInfo)
 
