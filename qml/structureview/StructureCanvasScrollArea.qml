@@ -255,9 +255,9 @@ ScrollArea {
 
         function zoomSanityCheck() {
             if( !GMath.doRectanglesIntersect(_canvas.itemsBoundingBox.boundingBox, root.viewportRect) ) {
-                let item = _currentElementItemBinder.get
+                let item = _canvas.currentElementItem
                 if(item === null)
-                    item = _elementItems.itemAt(0)
+                    item = _canvas.elementItemAt(0)
                 root.ensureItemVisible(item)
             }
         }
