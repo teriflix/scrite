@@ -64,26 +64,20 @@ Flickable {
         if (!area || area.width <= 0 || area.height <= 0)
             return;
 
-        // Disable the interactive zoom logic in onZoomScaleChanged
         zoomScaleBehavior.allow = false;
 
-        // Calculate the best scale to fit the area, respecting min/max scale.
         const newScale = Math.min(width / area.width, height / area.height);
         zoomScale = Math.max(pinchHandler.minimumScale, Math.min(newScale, pinchHandler.maximumScale));
 
-        // Update content size based on new scale
         contentWidth = initialContentWidth * zoomScale;
         contentHeight = initialContentHeight * zoomScale;
 
-        // Calculate contentX/Y to center the area in the viewport at the new scale.
         const newContentX = area.x * zoomScale - (width - area.width * zoomScale) / 2;
         const newContentY = area.y * zoomScale - (height - area.height * zoomScale) / 2;
 
-        // Clamp values to be within the flickable's bounds.
         contentX = Math.max(0, Math.min(newContentX, contentWidth - width));
         contentY = Math.max(0, Math.min(newContentY, contentHeight - height));
 
-        // Re-enable the interactive zoom logic
         zoomScaleBehavior.allow = true;
     }
 
@@ -95,56 +89,42 @@ Flickable {
 
         let currentScale = root.zoomScale;
 
-        // Required viewport size in pixels to contain the item
         const requiredWidth = item.width * currentScale + 2 * leaveMargin;
         const requiredHeight = item.height * currentScale + 2 * leaveMargin;
 
-        // 1. SCALE: Check if the item is larger than the viewport and scale down if needed.
         if (requiredWidth > width || requiredHeight > height) {
             const scaleX = width / (item.width + 2 * leaveMargin);
             const scaleY = height / (item.height + 2 * leaveMargin);
             const newScale = Math.min(scaleX, scaleY);
 
-            // Only zoom out, don't zoom in. Respect minimum scale.
             if (newScale < currentScale) {
                 currentScale = Math.max(pinchHandler.minimumScale, newScale);
-                zoomScale = currentScale; // This will trigger onZoomScaleChanged
+                zoomScale = currentScale;
             }
         }
 
-        // 2. PAN: Calculate the minimum pan required to make the item visible.
-
-        // The item's bounding box in the scaled content coordinate system.
         const itemScaledRect = Qt.rect(item.x * currentScale,
                                        item.y * currentScale,
                                        item.width * currentScale,
                                        item.height * currentScale);
 
-        // The viewport's bounding box in the scaled content coordinate system.
         const viewRect = Qt.rect(contentX, contentY, width, height);
 
         let newContentX = contentX;
         let newContentY = contentY;
 
-        // Horizontal check: Pan only if the item is outside the view.
         if (itemScaledRect.x < viewRect.x + leaveMargin) {
-            // Item's left edge is off-screen to the left. Pan right.
             newContentX = itemScaledRect.x - leaveMargin;
         } else if (itemScaledRect.x + itemScaledRect.width > viewRect.x + viewRect.width - leaveMargin) {
-            // Item's right edge is off-screen to the right. Pan left.
             newContentX = itemScaledRect.x + itemScaledRect.width - width + leaveMargin;
         }
 
-        // Vertical check: Pan only if the item is outside the view.
         if (itemScaledRect.y < viewRect.y + leaveMargin) {
-            // Item's top edge is off-screen to the top. Pan down.
             newContentY = itemScaledRect.y - leaveMargin;
         } else if (itemScaledRect.y + itemScaledRect.height > viewRect.y + viewRect.height - leaveMargin) {
-            // Item's bottom edge is off-screen to the bottom. Pan up.
             newContentY = itemScaledRect.y + itemScaledRect.height - height + leaveMargin;
         }
 
-        // Apply the calculated pan, clamping to the valid bounds.
         contentX = Math.max(0, Math.min(newContentX, contentWidth - width));
         contentY = Math.max(0, Math.min(newContentY, contentHeight - height));
     }
@@ -154,30 +134,25 @@ Flickable {
             return;
 
         if (scaling === undefined)
-            scaling = root.zoomScale; // Use current zoomScale if not provided
+            scaling = root.zoomScale;
 
         if (leaveMargin === undefined)
-            leaveMargin = 20; // Margin in unscaled pixels
+            leaveMargin = 20;
 
-        // The area to make visible, in unscaled content coordinates.
         const targetArea = area;
 
-        // The current viewport, in unscaled content coordinates.
         const viewRect = Qt.rect(contentX / scaling, contentY / scaling, width / scaling, height / scaling);
 
-        // Check if the target area is already fully visible within the viewport (with margin).
         if (targetArea.x >= viewRect.x + leaveMargin &&
             targetArea.y >= viewRect.y + leaveMargin &&
             targetArea.x + targetArea.width <= viewRect.x + viewRect.width - leaveMargin &&
             targetArea.y + targetArea.height <= viewRect.y + viewRect.height - leaveMargin) {
-            return; // Already visible
+            return;
         }
 
-        // Calculate the new contentX and contentY to center the target area.
         let newContentX = (targetArea.x + targetArea.width / 2) * scaling - width / 2;
         let newContentY = (targetArea.y + targetArea.height / 2) * scaling - height / 2;
 
-        // Clamp the new positions to the valid bounds of the Flickable.
         contentX = Math.max(0, Math.min(newContentX, contentWidth - width));
         contentY = Math.max(0, Math.min(newContentY, contentHeight - height));
     }

@@ -117,7 +117,18 @@ Item {
                 anchors.fill: parent
 
                 enabled: Runtime.appFeatures.structure.enabled
+                visible: height > _private.minimumTimelineHeight
                 showNotesIcon: Runtime.showNotebookInStructure
+            }
+
+            VclLabel {
+                anchors.centerIn: parent
+
+                elide: Text.ElideRight
+                horizontalAlignment: Text.AlignHCenter
+                text: "Timeline hidden due to space constraint."
+                visible: !_timeline.visible
+                width: _row2.width * 0.5
             }
 
             DisabledFeatureNotice {
@@ -134,8 +145,28 @@ Item {
 
         property int currentTab: Runtime.mainWindowTab === Runtime.MainWindowTab.NotebookTab ? Runtime.MainWindowTab.NotebookTab : Runtime.MainWindowTab.StructureTab
 
+        property real minimumTimelineHeight: 70 + _timeline.tracksHeight
         property real preferredTimelineHeight: 140 + _timeline.tracksHeight
         property color splitViewBackgroundColor: Qt.darker(Runtime.colors.primary.windowColor, 1.1)
+
+        Component.onCompleted: restoreLayoutDetails()
+        Component.onDestruction: saveLayoutDetails()
+
+        property Connections documentConnections: Connections {
+            target: Scrite.document
+
+            function onJustReset() {
+
+            }
+
+            function onAboutToSave() {
+                _private.saveLayoutDetails()
+            }
+
+            function onJustLoaded() {
+                _private.restoreLayoutDetails()
+            }
+        }
 
         readonly property Component structureCanvas: Item {
             readonly property ActionManager toolbarActions: Runtime.appFeatures.structure.enabled ? ActionHub.structureCanvasOperations : null
@@ -199,13 +230,22 @@ Item {
             }
         }
 
-        Announcement.onIncoming: (type, data) => {
-                                     if(type === Runtime.announcementIds.embeddedTabRequest) {
-                                         if(data === "Notebook")
-                                            currentTab = Runtime.MainWindowTab.NotebookTab
-                                         else
-                                            currentTab = Runtime.MainWindowTab.StructureTab
-                                     }
-                                 }
+        function saveLayoutDetails() {
+            var userData = Scrite.document.userData
+            userData["structureTab"] = {
+                "version": 0,
+                "screenplayEditorWidth": _col2.width/_editorSplit.width,
+                "timelineViewHeight": _row2.height
+            }
+            Scrite.document.userData = userData
+        }
+
+        function restoreLayoutDetails() {
+            const userData = Scrite.document.userData
+            if(userData.structureTab && userData.structureTab.version === 0) {
+                _row2.SplitView.preferredHeight = userData.structureTab.timelineViewHeight
+                _col2.SplitView.preferredWidth = _editorSplit.width * userData.structureTab.screenplayEditorWidth
+            }
+        }
     }
 }

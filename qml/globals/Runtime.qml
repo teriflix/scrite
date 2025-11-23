@@ -977,4 +977,19 @@ Item {
             }
         }
     }
+
+    readonly property Connections documentConnections: Connections {
+        target: Scrite.document
+
+        function onJustReset() {
+            Runtime.firstSwitchToStructureTab = true
+            Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
+        }
+
+        function onJustLoaded() {
+            Runtime.firstSwitchToStructureTab = true
+            Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
+        }
+    }
+
 }

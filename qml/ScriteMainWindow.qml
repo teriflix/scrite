@@ -95,11 +95,6 @@ Item {
         readonly property Connections documentConnections: Connections {
             target: Scrite.document
 
-            function onJustReset() {
-                Runtime.firstSwitchToStructureTab = true
-                Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
-            }
-
             function onAboutToSave() {
                 var userData = Scrite.document.userData
                 userData["mainTabBar"] = {
@@ -110,7 +105,6 @@ Item {
             }
 
             function onJustLoaded() {
-                Runtime.firstSwitchToStructureTab = true
                 const userData = Scrite.document.userData
                 if(userData.mainTabBar) {
                     const ci = userData.mainTabBar.currentIndex
@@ -210,8 +204,6 @@ Item {
 
             if(!Scrite.app.restoreWindowGeometry(Scrite.window, "Workspace"))
                 Runtime.workspaceSettings.screenplayEditorWidth = -1
-
-            Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
 
             _workspace.reset()
         }
