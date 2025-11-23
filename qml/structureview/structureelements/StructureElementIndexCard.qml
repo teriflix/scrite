@@ -415,7 +415,7 @@ AbstractStructureElementUI {
                                 LanguageTransliterator.enabled: !readOnly
 
                                 width: _synopsisFieldFlick.scrollBarVisible ? _synopsisFieldFlick.width-20 : _synopsisFieldFlick.width
-                                height: Math.max(_synopsisFieldFlick.height, contentHeight + 100)
+                                height: Math.max(250, contentHeight + 100)
 
                                 background: Item { }
 
