@@ -13,6 +13,7 @@ singleton RenameCharacterDialog 1.0 RenameCharacterDialog.qml
 singleton ReportConfigurationDialog 1.0 ReportConfigurationDialog.qml
 singleton RequestVersionTypeAccess 1.0 RequestVersionTypeAccess.qml
 singleton SceneGroupKeywordsDialog 1.0 SceneGroupKeywordsDialog.qml
+singleton ScreenplayEditorOptionsDialog 1.0 ScreenplayEditorOptionsDialog.qml
 singleton ScreenplayPageSetupDialog 1.0 ScreenplayPageSetupDialog.qml
 singleton ScreenplayTracksDialog 1.0 ScreenplayTracksDialog.qml
 singleton SettingsDialog 1.0 SettingsDialog.qml

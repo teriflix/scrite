@@ -180,8 +180,8 @@ Rectangle {
                 action: ActionHub.editOptions.find("mergeScene")
             }
 
-            ActionManagerToolButton {
-                actionManager: ActionHub.screenplayEditorOptions
+            ActionToolButton {
+                action: ActionHub.applicationOptions.find("configureScreenplayEditorOptions")
             }
 
             Rectangle {
@@ -263,6 +263,8 @@ Rectangle {
 
         UserAccountToolButton {
             id: _userAccount
+
+            Layout.leftMargin: 10
         }
     }
 

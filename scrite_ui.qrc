@@ -341,5 +341,7 @@
         <file>qml/timelineview/qmldir</file>
         <file>qml/dialogs/reportconfigurationdialog/editor_MultipleKeywordsSelector.qml</file>
         <file>qml/dialogs/RequestVersionTypeAccess.qml</file>
+        <file>qml/dialogs/settingsdialog/ScreenplayEditorOptionsPage.qml</file>
+        <file>qml/dialogs/ScreenplayEditorOptionsDialog.qml</file>
     </qresource>
 </RCC>

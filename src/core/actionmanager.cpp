@@ -251,6 +251,24 @@ QObject *ActionManager::findByShortcut(const QString &shortcut) const
     return nullptr;
 }
 
+QList<QObject *> ActionManager::visibleActions() const
+{
+    QList<QObject *> ret;
+
+    std::copy_if(m_actions.begin(), m_actions.end(), std::back_inserter(ret), [](QObject *action) {
+        const QMetaProperty visibleProperty = action->metaObject()->property(
+                action->metaObject()->indexOfProperty(_QQuickActionVisibleProperty));
+        if (visibleProperty.isValid() && visibleProperty.userType() == QMetaType::Bool) {
+            const QVariant visibleFlag = action->property(_QQuickActionVisibleProperty);
+            if (visibleFlag.isValid() && visibleFlag.userType() == QMetaType::Bool)
+                return visibleFlag.toBool();
+        }
+        return true;
+    });
+
+    return ret;
+}
+
 QQmlListProperty<QObject> ActionManager::qmlActionsList()
 {
     return QQmlListProperty<QObject>(
@@ -1454,9 +1472,14 @@ bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &sou
     }
 
     if (accept & m_filters.testFlag(VisibleActions)) {
-        const QVariant visibleFlag = action->property(_QQuickActionVisibleProperty);
-        if (visibleFlag.isValid() && visibleFlag.userType() == QMetaType::Bool)
-            accept &= visibleFlag.toBool();
+        const QMetaProperty visibleProperty = action->metaObject()->property(
+                action->metaObject()->indexOfProperty(_QQuickActionVisibleProperty));
+        if (visibleProperty.isValid() && visibleProperty.userType() == QMetaType::Bool) {
+            const QVariant visibleFlag = action->property(_QQuickActionVisibleProperty);
+            if (visibleFlag.isValid() && visibleFlag.userType() == QMetaType::Bool)
+                accept &= visibleFlag.toBool();
+        } else
+            accept &= true;
     }
 
     if (accept & m_filters.testFlag(EnabledActions)) {

@@ -8,7 +8,7 @@ StructureCanvasGroupBox 1.0 StructureCanvasGroupBox.qml
 StructureElementConnectorDelegate 1.0 StructureElementConnectorDelegate.qml
 StructureElementContextMenu 1.0 StructureElementContextMenu.qml
 StructureElementIndexCard 1.0 StructureElementIndexCard.qml
-StructureElementsLayoutTask 1.0 StructureElementsLayoutTask.qml
-StructureElementsSelection 1.0 StructureElementsSelection.qml
 StructureElementStackTabBar 1.0 StructureElementStackTabBar.qml
 StructureElementSynopsisBox 1.0 StructureElementSynopsisBox.qml
+StructureElementsLayoutTask 1.0 StructureElementsLayoutTask.qml
+StructureElementsSelection 1.0 StructureElementsSelection.qml

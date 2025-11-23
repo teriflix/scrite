@@ -6,6 +6,7 @@ LanguageOptionsPage 1.0 LanguageOptionsPage.qml
 LanguageSettingsTab 1.0 LanguageSettingsTab.qml
 NotebookOptionsPage 1.0 NotebookOptionsPage.qml
 NotebookSettingsTab 1.0 NotebookSettingsTab.qml
+ScreenplayEditorOptionsPage 1.0 ScreenplayEditorOptionsPage.qml
 ScreenplayFormattingRulesPage 1.0 ScreenplayFormattingRulesPage.qml
 ScreenplayOptionsPage 1.0 ScreenplayOptionsPage.qml
 ScreenplayPageSetupPage 1.0 ScreenplayPageSetupPage.qml

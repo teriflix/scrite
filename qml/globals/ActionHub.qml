@@ -463,18 +463,6 @@ Item {
         objectName: "appOptions"
 
         Action {
-            readonly property bool hideInCommandCenter: true
-            readonly property string defaultShortcut: "Ctrl+/"
-
-            enabled: ActionHandler.canHandle
-            objectName: "commandCenter"
-            shortcut: defaultShortcut
-            text: "Command Center"
-
-            icon.source: "qrc:/icons/action/command_center.png"
-        }
-
-        Action {
             readonly property var keywords: ["theme", "dark mode"]
             readonly property string defaultShortcut: "Ctrl+,"
 
@@ -505,6 +493,18 @@ Item {
             }
 
             onTriggered: ShortcutEditorDialog.launch()
+        }
+
+        Action {
+            readonly property bool hideInCommandCenter: true
+            readonly property string defaultShortcut: "Ctrl+/"
+
+            enabled: ActionHandler.canHandle
+            objectName: "commandCenter"
+            shortcut: defaultShortcut
+            text: "Command Center"
+
+            icon.source: "qrc:/icons/action/command_center.png"
         }
 
         Action {
@@ -1208,8 +1208,6 @@ Item {
     }
 
     readonly property ActionManager screenplayEditorOptions: ActionManager {
-        readonly property string iconSource: "qrc:/icons/content/view_options.png"
-
         title: "Screenplay Editor"
         objectName: "screenplayEditorOptions"
 
@@ -1346,6 +1344,7 @@ Item {
         }
 
         Action {
+            readonly property bool visible: false
             readonly property bool allowShortcut: true
 
             objectName: "scanMuteCharacters"
@@ -1356,6 +1355,7 @@ Item {
         }
 
         Action {
+            readonly property bool visible: false
             readonly property bool allowShortcut: true
 
             objectName: "resetSceneNumbers"
@@ -2137,6 +2137,14 @@ Item {
             objectName: "animations"
 
             onToggled: Runtime.applicationSettings.enableAnimations = !Runtime.applicationSettings.enableAnimations
+        }
+
+        Action {
+            objectName: "configureScreenplayEditorOptions"
+            text: "Screenplay Editor Options"
+            icon.source: "qrc:/icons/content/view_options.png"
+
+            onTriggered: ScreenplayEditorOptionsDialog.launch()
         }
 
         Action {

@@ -82,7 +82,8 @@ public:
     Q_INVOKABLE QObject *find(const QString &actionName) const;
     Q_INVOKABLE QObject *findByShortcut(const QString &shortcut) const;
 
-    QList<QObject *> actions() const { return m_actions; }
+    Q_INVOKABLE QList<QObject *> actions() const { return m_actions; }
+    Q_INVOKABLE QList<QObject *> visibleActions() const;
 
     // clang-format off
     Q_PROPERTY(QQmlListProperty<QObject> actions

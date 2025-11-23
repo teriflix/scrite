@@ -11,33 +11,39 @@
 **
 ****************************************************************************/
 
+pragma Singleton
+
 import QtQuick 2.15
+import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
-import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/controls"
+import "qrc:/qml/dialogs/settingsdialog"
 
-PageView {
+DialogLauncher {
     id: root
 
-    pagesArray: ["Options", "Editor", "Formatting Rules", "Tracks", "Page Setup"]
-    currentIndex: 0
-    pageContent: Loader {
-        source: {
-            const pageNames = ["Options", "EditorOptions", "FormattingRules", "Tracks", "PageSetup"]
-            return "./Screenplay" + pageNames[root.currentIndex] + "Page.qml"
-        }
-        onItemChanged: {
-            if(root.currentIndex >= 1 && root.currentIndex <= 3) {
-                item.width = root.availablePageContentWidth
-                item.height = root.availablePageContentHeight
-            }
+    parent: Scrite.window.contentItem
+
+    function launch() { return doLaunch() }
+
+    name: "ScreenplayEditorOptionsDialog"
+    singleInstanceOnly: true
+
+    dialogComponent: VclDialog {
+        width: Math.min(Scrite.window.width-80, 640)
+        height: Math.min(Scrite.window.height-80, 540)
+
+        title: "Screenplay Editor Options"
+
+        content: ScreenplayEditorOptionsPage {
+
         }
     }
 }
