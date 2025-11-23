@@ -92,6 +92,31 @@ Item {
             }
         }
 
+        readonly property Connections documentConnections: Connections {
+            target: Scrite.document
+
+            function onJustReset() {
+                Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
+            }
+
+            function onAboutToSave() {
+                var userData = Scrite.document.userData
+                userData["mainTabBar"] = {
+                    "version": 0,
+                    "currentIndex": Runtime.mainWindowTab
+                }
+                Scrite.document.userData = userData
+            }
+
+            function onJustLoaded() {
+                const userData = Scrite.document.userData
+                if(userData.mainTabBar) {
+                    const ci = userData.mainTabBar.currentIndex
+                    Runtime.activateMainWindowTab(ci)
+                }
+            }
+        }
+
         property bool handleCloseEvent: true
         property bool hasDocumentErrors: documentErrors.hasError
         property bool hasApplicationErrors: applicationErrors.hasError
