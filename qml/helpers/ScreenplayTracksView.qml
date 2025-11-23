@@ -42,8 +42,8 @@ Flickable {
         result.accepted = true
     }
 
-    implicitWidth: _private.model ? (listView.orientation === Qt.Vertical ? contentWidth : 0) : 0
-    implicitHeight: _private.model ? (listView.orientation === Qt.Horizontal ? contentHeight : 0) : 0
+    implicitWidth: _private.model ? (_private.isHorizontalTrack ? 0 : contentWidth ) : 0
+    implicitHeight: _private.model ? (_private.isHorizontalTrack ? contentHeight : 0) : 0
 
     clip: true
     contentX: _private.isHorizontalTrack ? listView.contentX : 0
@@ -73,7 +73,7 @@ Flickable {
                 property var items: track.items
                 property string name: track.name
 
-                property real offset: index * _private.trackSize
+                property int offset: index * _private.trackSize
 
                 x: _private.isHorizontalTrack ? 0 : offset
                 y: _private.isHorizontalTrack ? offset : 0
@@ -81,7 +81,7 @@ Flickable {
                 width: _private.isHorizontalTrack ? _content.width : _private.trackSize
                 height: _private.isHorizontalTrack ? _private.trackSize : _content.height
 
-                color: Color.translucent( track.color, 0.25 )
+                color: Color.translucent( track.color, 0.5 )
 
                 MouseArea {
                     id: _trackMouseArea
@@ -141,39 +141,32 @@ Flickable {
                         property rect itemRect: Qt.rect(x, y, width, height)
 
                         function lookupItems() {
-                            if(!root.listView) {
-                                Qt.callLater(lookupItems)
-                                return
-                            }
-
                             if(!startItem)
-                                startItem = root.listView.itemAtIndex(startIndex)
+                                startItem = listView.itemAtIndex(startIndex)
                             if(!endItem)
-                                endItem = root.listView.itemAtIndex(endIndex)
+                                endItem = listView.itemAtIndex(endIndex)
                             if(!startItem || !endItem)
                                 Qt.callLater(lookupItems)
                         }
 
-                        Component.onCompleted: Qt.callLater(lookupItems)
+                        x: _private.isHorizontalTrack ? extents.from : 0
+                        y: _private.isHorizontalTrack ? 0 : extents.from
 
-                        x: listView.orientation === Qt.Horizontal ? extents.from : 0
-                        y: listView.orientation === Qt.Vertical ? extents.from : 0
-
-                        width: listView.orientation === Qt.Horizontal ? extents.to - extents.from : _private.trackSize
-                        height: listView.orientation === Qt.Horizontal ? _private.trackSize : extents.to - extents.from
+                        width: _private.isHorizontalTrack ? extents.to - extents.from : _private.trackSize
+                        height: _private.isHorizontalTrack ? _private.trackSize : extents.to - extents.from
 
                         color: modelData.color
                         visible: GMath.doRectanglesIntersect(itemRect, _private.viewportRect)
 
-                        border.color: Color.translucent(Color.textColorFor(color), 0.25)
+                        border.color: Qt.darker(modelData.color, 1.1)
                         border.width: 0.5
 
                         VclLabel {
                             anchors.centerIn: parent
 
-                            width: (listView.orientation === Qt.Vertical ? parent.height : parent.width) - 10
+                            width: (_private.isHorizontalTrack ? parent.width : parent.height) - 10
 
-                            rotation: listView.orientation === Qt.Vertical ? -90 : 0
+                            rotation: _private.isHorizontalTrack ? 0 : -90
                             transformOrigin: Item.Center
 
                             font: Runtime.minimumFontMetrics.font
@@ -228,8 +221,8 @@ Flickable {
 
             property MouseArea source: null
 
-            width: root.listView.orientation === Qt.Vertical ? root.contentWidth : 1
-            height: root.listView.orientation === Qt.Horizontal ? 1 : root.contentHeight
+            width: _private.isHorizontalTrack ? 1 : root.contentWidth
+            height: _private.isHorizontalTrack ? 1 : root.contentHeight
 
             function set(_x, _y, _text, _source) {
                 if((_text === "" || _text === undefined) && source === _source) {
@@ -237,8 +230,8 @@ Flickable {
                     return
                 }
 
-                x = root.listView.orientation === Qt.Horizontal ? _x : root.width
-                y = root.listView.orientation === Qt.Vertical ? _y : 0
+                x = _private.isHorizontalTrack ? _x : root.width
+                y = _private.isHorizontalTrack ? 0 : _y
                 source = _source
                 _tooltipPopup.text = _text
                 _tooltipPopup.visible = true
@@ -254,8 +247,8 @@ Flickable {
             ToolTipPopup {
                 id: _tooltipPopup
 
-                x: listView.orientation === Qt.Vertical ? Runtime.minimumFontMetrics.lineSpacing : 0
-                y: listView.orientation === Qt.Horizontal ? -height - 15 : 0
+                x: _private.isHorizontalTrack ? 0 : Runtime.minimumFontMetrics.lineSpacing
+                y: _private.isHorizontalTrack ? -height - 15 : 0
 
                 container: _toolTip
             }
@@ -263,7 +256,7 @@ Flickable {
     }
 
     Connections {
-        target: root.listView
+        target: listView
 
         ignoreUnknownSignals: true
 
@@ -299,9 +292,7 @@ Flickable {
 
         property int trackSize: Math.ceil(Runtime.minimumFontMetrics.lineSpacing) + 8
         property int totalTracksSize: _trackRepeater.count * _private.trackSize
-        property bool isHorizontalTrack: root.listView.orientation === Qt.Horizontal
-
-        property bool displayTracks: true
+        property bool isHorizontalTrack: listView.orientation === Qt.Horizontal
 
         property rect viewportRect: Qt.rect( visibleArea.xPosition * contentWidth,
                                             visibleArea.yPosition * contentHeight,
@@ -309,7 +300,7 @@ Flickable {
                                             visibleArea.heightRatio * contentHeight )
 
         property ScreenplayTracks model: ScreenplayTracks {
-            property bool enabled: root.enabled && Runtime.screenplayTracksSettings.displayTracks && Runtime.appFeatures.structure.enabled && _private.displayTracks
+            property bool enabled: root.enabled && Runtime.screenplayTracksSettings.displayTracks && Runtime.appFeatures.structure.enabled
 
             structure: Scrite.document.structure
             screenplay: Scrite.document.screenplay
@@ -327,16 +318,8 @@ Flickable {
             }
         }
 
-        readonly property SequentialAnimation reloadTask: SequentialAnimation {
-            alwaysRunToEnd: false
-            ScriptAction { script: _private.displayTracks = false }
-            PauseAnimation { duration: 0  }
-            ScriptAction { script: _private.displayTracks = true }
-        }
-
         function reload() {
-            if(root.enabled)
-                reloadTask.start()
+            model.reload()
         }
     }
 }
