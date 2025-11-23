@@ -192,7 +192,6 @@ void BoundingBoxEvaluator::updatePreview()
             &m_threadPool,
             [=](const QList<QJsonObject> &items, const QRectF &bbox,
                 const qreal scale) -> QPicture {
-                QMutexLocker locker(&m_previewLock);
                 return BoundingBoxEvaluator::createPreviewPicture(items, bbox, scale);
             },
             itemInfoArray, m_boundingBox, m_previewScale);
@@ -225,6 +224,9 @@ QPicture BoundingBoxEvaluator::createPreviewPicture(const QList<QJsonObject> &it
     tx.scale(scale, scale);
 
     QPainter paint(&picture);
+    if (!paint.isActive())
+        return picture;
+
     paint.setRenderHint(QPainter::Antialiasing);
     paint.setRenderHint(QPainter::SmoothPixmapTransform);
     paint.setTransform(tx);
@@ -799,8 +801,9 @@ void BoundingBoxPreview::updatePreviewImage()
     if (m_evaluator == nullptr || this->isUpdatingPreview())
         return;
 
-    auto capturePreviewAsPicture = [=]() -> QImage {
-        const QRectF pictureRect(0, 0, this->width(), this->height());
+    auto capturePreviewAsPicture = [=](QPicture preview, const QSize &itemSize,
+                                       const QColor &bgColor, qreal bgOpacity) -> QImage {
+        const QRectF pictureRect(0, 0, itemSize.width(), itemSize.height());
 
         /**
          * Why capture the preview in a QImage now? Why not QPicture?
@@ -821,13 +824,15 @@ void BoundingBoxPreview::updatePreviewImage()
         image.setDevicePixelRatio(2.0);
         image.fill(Qt::transparent);
 
-        QPicture preview = m_evaluator->preview();
         if (preview.isNull())
             return image;
 
         QPainter painter(&image);
-        painter.setOpacity(m_backgroundOpacity);
-        painter.fillRect(pictureRect, m_backgroundColor);
+        if (!painter.isActive())
+            return image;
+
+        painter.setOpacity(bgOpacity);
+        painter.fillRect(pictureRect, bgColor);
         painter.setOpacity(1.0);
 
         QSizeF previewSize = preview.boundingRect().size();
@@ -849,7 +854,9 @@ void BoundingBoxPreview::updatePreviewImage()
         return image;
     };
 
-    QFuture<QImage> future = QtConcurrent::run(&m_evaluator->m_threadPool, capturePreviewAsPicture);
+    QFuture<QImage> future = QtConcurrent::run(
+            &m_evaluator->m_threadPool, capturePreviewAsPicture, m_evaluator->preview(),
+            QSizeF(this->width(), this->height()).toSize(), m_backgroundColor, m_backgroundOpacity);
     QFutureWatcher<QImage> *futureWatcher = new QFutureWatcher<QImage>(this);
     connect(futureWatcher, &QFutureWatcher<QImage>::finished, this, [=]() {
         m_previewImage = future.result();
