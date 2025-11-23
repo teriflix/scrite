@@ -45,18 +45,18 @@ Menu {
     Repeater {
         id: _menuItems
 
-        model: _private.visibleActions.ready ? _private.visibleActions : 0
+        model: root.actionManager ? _private.visibleActions : 0
 
         delegate: MenuItem {
             id: _menuItem
 
-            required property var objectItem
+            required property var qmlAction
 
             Material.accent: Runtime.colors.accent.key
             Material.primary: Runtime.colors.primary.key
             Material.theme: Runtime.colors.theme
 
-            action: objectItem
+            action: qmlAction
             focusPolicy: Qt.NoFocus
             opacity: enabled ? 1 : 0.5
 
@@ -69,11 +69,11 @@ Menu {
                 container: _menuItem
 
                 text: {
-                    const sc = Gui.nativeShortcut(objectItem.shortcut)
+                    const sc = Gui.nativeShortcut(qmlAction.shortcut)
                     if(sc === "")
-                        return objectItem.tooltip !== undefined ? objectItem.tooltip : ""
+                        return qmlAction.tooltip !== undefined ? qmlAction.tooltip : ""
 
-                    const tt = objectItem.tooltip !== undefined ? objectItem.tooltip : objectItem.text
+                    const tt = qmlAction.tooltip !== undefined ? qmlAction.tooltip : qmlAction.text
                     return tt + " (" + sc + " )"
                 }
                 visible: text !== "" && _menuItem.hovered
@@ -83,42 +83,14 @@ Menu {
 
     onAboutToShow: _private.adjustMenuWidth()
 
-    onActionManagerChanged: { _private.visibleActions.reloadLater() }
-
     QtObject {
         id: _private
 
-        Component.onCompleted: visibleActions.reload()
-
-        readonly property ObjectListModel visibleActions: ObjectListModel {
-            property bool ready: false
-
-            function reloadLater() {
-                Runtime.execLater(_private.visibleActions, 100, _private.visibleActions.reload)
+        readonly property ActionsModelFilter visibleActions: ActionsModelFilter {
+            filters: root.actionManager ? ActionsModelFilter.VisibleActions : ActionsModelFilter.NoActions
+            sourceModel: ActionsModel {
+                actionManagers: [root.actionManager]
             }
-
-            function reload() {
-                ready = false
-
-                reset()
-
-                for(let i=0; i<root.actionManager.count; i++) {
-                    let qmlAction = root.actionManager.at(i)
-                    if(qmlAction.visible !== undefined ? qmlAction.visible : true)
-                        include(qmlAction)
-                }
-
-                ready = true
-            }
-        }
-
-        readonly property Connections actionManagerConnections : Connections {
-            target: root.actionManager
-
-            function onModelReset() { _private.visibleActions.reloadLater() }
-            function onRowsRemoved() { _private.visibleActions.reloadLater() }
-            function onDataChanged() { _private.visibleActions.reloadLater() }
-            function onRowsInserted() { _private.visibleActions.reloadLater() }
         }
 
         function adjustMenuWidth() {
