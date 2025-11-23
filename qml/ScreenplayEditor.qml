@@ -192,7 +192,7 @@ Rectangle {
 
             ScrollBar.vertical: _scrollBar
 
-            anchors.top: _ruler.bottom
+            anchors.top: _ruler.visible ? _ruler.bottom : parent.top
             anchors.left: _ruler.left
             anchors.right: _ruler.right
             anchors.bottom: parent.bottom
