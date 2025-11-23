@@ -46,11 +46,6 @@ AbstractScenePartEditor {
         }
         readOnly: Scrite.document.readOnly
 
-        ToolTipPopup {
-            text: "Please consider capturing long comments as scene notes in the notebook tab."
-            visible: container.height < container.contentHeight
-        }
-
         SpecialSymbolsSupport {
             anchors.top: parent.bottom
             anchors.left: parent.left
