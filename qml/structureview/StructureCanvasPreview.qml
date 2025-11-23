@@ -163,8 +163,9 @@ Item {
 
         function evaluatePreviewSize() {
             const maxSize = Math.min( Math.min(root.canvasScroll.width-60, root.canvasScroll.height-60), previewSize)
-            const w = root.canvasScroll.itemsBoundingBox.width
-            const h = root.canvasScroll.itemsBoundingBox.height
+            const itemsRect = root.canvasScroll.itemsBoundingBox
+            const w = Math.max(100, itemsRect.width)
+            const h = Math.max(100, itemsRect.height)
             const scale = Math.min(maxSize/w, maxSize/h)
             return Qt.size(w*scale+10, h*scale+10)
         }

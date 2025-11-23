@@ -801,8 +801,11 @@ void BoundingBoxPreview::updatePreviewImage()
     if (m_evaluator == nullptr || this->isUpdatingPreview())
         return;
 
-    auto capturePreviewAsPicture = [=](QPicture preview, const QSize &itemSize,
-                                       const QColor &bgColor, qreal bgOpacity) -> QImage {
+    auto capturePreviewAsImage = [=](QPicture preview, const QSize &itemSize, const QColor &bgColor,
+                                     qreal bgOpacity) -> QImage {
+        if (itemSize.isEmpty())
+            return QImage();
+
         const QRectF pictureRect(0, 0, itemSize.width(), itemSize.height());
 
         /**
@@ -855,7 +858,7 @@ void BoundingBoxPreview::updatePreviewImage()
     };
 
     QFuture<QImage> future = QtConcurrent::run(
-            &m_evaluator->m_threadPool, capturePreviewAsPicture, m_evaluator->preview(),
+            &m_evaluator->m_threadPool, capturePreviewAsImage, m_evaluator->preview(),
             QSizeF(this->width(), this->height()).toSize(), m_backgroundColor, m_backgroundOpacity);
     QFutureWatcher<QImage> *futureWatcher = new QFutureWatcher<QImage>(this);
     connect(futureWatcher, &QFutureWatcher<QImage>::finished, this, [=]() {
