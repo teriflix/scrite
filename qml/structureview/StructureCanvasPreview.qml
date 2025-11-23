@@ -19,7 +19,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -162,10 +161,10 @@ Item {
         }
 
         function evaluatePreviewSize() {
-            const maxSize = Math.min( Math.min(root.canvasScroll.width-60, root.canvasScroll.height-60), previewSize)
+            const maxSize = Math.min( Math.min(root.canvasScroll.width-60, root.canvasScroll.height-60), previewSize )
             const itemsRect = root.canvasScroll.itemsBoundingBox
-            const w = Math.max(100, itemsRect.width)
-            const h = Math.max(100, itemsRect.height)
+            const w = itemsRect.width
+            const h = itemsRect.height
             const scale = Math.min(maxSize/w, maxSize/h)
             return Qt.size(w*scale+10, h*scale+10)
         }
