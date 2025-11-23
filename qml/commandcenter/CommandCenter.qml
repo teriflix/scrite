@@ -237,7 +237,7 @@ Popup {
     }
 
     ActionHandler {
-        action: ActionHub.applicationOptions.find("commandCenter")
+        action: ActionHub.appOptions.find("commandCenter")
 
         onTriggered: (source) => {
             root.open()

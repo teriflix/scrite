@@ -463,6 +463,18 @@ Item {
         objectName: "appOptions"
 
         Action {
+            readonly property bool hideInCommandCenter: true
+            readonly property string defaultShortcut: "Ctrl+/"
+
+            enabled: ActionHandler.canHandle
+            objectName: "commandCenter"
+            shortcut: defaultShortcut
+            text: "Command Center"
+
+            icon.source: "qrc:/icons/action/command_center.png"
+        }
+
+        Action {
             readonly property var keywords: ["theme", "dark mode"]
             readonly property string defaultShortcut: "Ctrl+,"
 
@@ -473,68 +485,6 @@ Item {
             icon.source: "qrc:/icons/action/settings_applications.png"
 
             onTriggered: SettingsDialog.launch()
-        }
-
-        Action {
-            readonly property bool allowShortcut: true
-            readonly property bool visible: false
-
-            text: "Configure Screenplay Tracks"
-            objectName: "configScreenplayTracks"
-
-            onTriggered: ScreenplayTracksDialog.launch()
-        }
-
-        Action {
-            readonly property bool allowShortcut: true
-            readonly property bool visible: false
-
-            objectName: "displayScreenplayTracks"
-            checkable: true
-            checked: Runtime.screenplayTracksSettings.displayTracks
-            enabled: Runtime.appFeatures.structure.enabled
-            text: "Display Screenplay Tracks"
-
-            onToggled: Runtime.screenplayTracksSettings.displayTracks = !Runtime.screenplayTracksSettings.displayTracks
-        }
-
-        Action {
-            readonly property bool allowShortcut: true
-            readonly property bool visible: false
-
-            objectName: "displayKeywordsTracks"
-            checkable: true
-            checked: Runtime.screenplayTracksSettings.displayKeywordsTracks
-            enabled: Runtime.appFeatures.structure.enabled
-            text: "Display Keywords Tracks"
-
-            onToggled: Runtime.screenplayTracksSettings.displayKeywordsTracks = !Runtime.screenplayTracksSettings.displayKeywordsTracks
-        }
-
-        Action {
-            readonly property bool allowShortcut: true
-            readonly property bool visible: false
-
-            objectName: "displayStructureTracks"
-            checkable: true
-            checked: Runtime.screenplayTracksSettings.displayStructureTracks
-            enabled: Runtime.appFeatures.structure.enabled
-            text: "Display Structure Tracks"
-
-            onToggled: Runtime.screenplayTracksSettings.displayStructureTracks = !Runtime.screenplayTracksSettings.displayStructureTracks
-        }
-
-        Action {
-            readonly property bool allowShortcut: true
-            readonly property bool visible: false
-
-            text: "Reveal Settings Folder"
-            objectName: "revealSettingsFolder"
-
-            onTriggered: {
-                const fileInfo = File.info(Platform.settingsPath)
-                File.revealOnDesktop(fileInfo.absolutePath)
-            }
         }
 
         Action {
@@ -1396,13 +1346,19 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
+            objectName: "scanMuteCharacters"
             text: "Scan Mute Characters"
-            enabled: !Scrite.document.readOnly && Runtime.screenplayEditorSettings.displaySceneCharacters
+            enabled: !Scrite.document.readOnly
 
             onTriggered: Scrite.document.structure.scanForMuteCharacters()
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
+            objectName: "resetSceneNumbers"
             text: "Reset Scene Numbers"
             enabled: !Scrite.document.readOnly
 
@@ -2172,17 +2128,6 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property bool hideInCommandCenter: true
-            readonly property string defaultShortcut: "Ctrl+/"
-
-            enabled: ActionHandler.canHandle
-            objectName: "commandCenter"
-            shortcut: defaultShortcut
-            text: "Command Center"
-        }
-
-        Action {
-            readonly property bool visible: false
             readonly property string defaultShortcut: "Ctrl+Alt+A"
 
             checkable: true
@@ -2192,6 +2137,68 @@ Item {
             objectName: "animations"
 
             onToggled: Runtime.applicationSettings.enableAnimations = !Runtime.applicationSettings.enableAnimations
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+
+            text: "Configure Screenplay Tracks"
+            objectName: "configScreenplayTracks"
+
+            onTriggered: ScreenplayTracksDialog.launch()
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+
+            objectName: "displayScreenplayTracks"
+            checkable: true
+            checked: Runtime.screenplayTracksSettings.displayTracks
+            enabled: Runtime.appFeatures.structure.enabled
+            text: "Display Screenplay Tracks"
+
+            onToggled: Runtime.screenplayTracksSettings.displayTracks = !Runtime.screenplayTracksSettings.displayTracks
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+
+            objectName: "displayKeywordsTracks"
+            checkable: true
+            checked: Runtime.screenplayTracksSettings.displayKeywordsTracks
+            enabled: Runtime.appFeatures.structure.enabled
+            text: "Display Keywords Tracks"
+
+            onToggled: Runtime.screenplayTracksSettings.displayKeywordsTracks = !Runtime.screenplayTracksSettings.displayKeywordsTracks
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+
+            objectName: "displayStructureTracks"
+            checkable: true
+            checked: Runtime.screenplayTracksSettings.displayStructureTracks
+            enabled: Runtime.appFeatures.structure.enabled
+            text: "Display Structure Tracks"
+
+            onToggled: Runtime.screenplayTracksSettings.displayStructureTracks = !Runtime.screenplayTracksSettings.displayStructureTracks
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+
+            text: "Reveal Settings Folder"
+            objectName: "revealSettingsFolder"
+
+            onTriggered: {
+                const fileInfo = File.info(Platform.settingsPath)
+                File.revealOnDesktop(fileInfo.absolutePath)
+            }
         }
     }
 

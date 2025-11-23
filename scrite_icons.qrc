@@ -333,5 +333,7 @@
         <file>icons/screenplay/transition_inverted.png</file>
         <file>icons/action/keyword_inverted.png</file>
         <file>icons/action/keyword.png</file>
+        <file>icons/action/command_center_inverted.png</file>
+        <file>icons/action/command_center.png</file>
     </qresource>
 </RCC>
