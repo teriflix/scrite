@@ -365,6 +365,16 @@ public:
     int count() const { return m_items.size(); }
     Q_SIGNAL void countChanged();
 
+    // clang-format off
+    Q_PROPERTY(QList<ActionManager*> actionManagers
+               READ actionManagers
+               WRITE setActionManagers
+               NOTIFY actionManagersChanged)
+    // clang-format on
+    void setActionManagers(const QList<ActionManager *> &val);
+    QList<ActionManager *> actionManagers() const { return m_actionManagers; }
+    Q_SIGNAL void actionManagersChanged();
+
     Q_INVOKABLE QString groupNameAt(int row) const;
     Q_INVOKABLE ActionManager *actionManagerAt(int row) const;
     Q_INVOKABLE QObject *actionAt(int row) const;
@@ -402,6 +412,8 @@ private:
         QPointer<QObject> action;
     };
     QList<Item> m_items;
+
+    QList<ActionManager *> m_actionManagers;
 };
 
 class ActionsModelFilter : public QSortFilterProxyModel, public QQmlParserStatus
@@ -417,6 +429,7 @@ public:
     void setSourceModel(QAbstractItemModel *model);
 
     enum Filter {
+        NoActions = -1,
         AllActions = 0,
         ActionsWithText = 1,
         ActionsWithShortcut = 2,

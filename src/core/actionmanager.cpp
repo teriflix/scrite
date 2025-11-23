@@ -935,6 +935,17 @@ ActionsModel::ActionsModel(QObject *parent) : QAbstractListModel(parent)
 
 ActionsModel::~ActionsModel() { }
 
+void ActionsModel::setActionManagers(const QList<ActionManager *> &val)
+{
+    if (m_actionManagers == val)
+        return;
+
+    m_actionManagers = val;
+    emit actionManagersChanged();
+
+    this->reload();
+}
+
 QString ActionsModel::groupNameAt(int row) const
 {
     const QVariant data = this->data(this->index(row, 0), GroupNameRole);
@@ -1023,8 +1034,9 @@ void ActionsModel::reload()
     }
     m_items.clear();
 
-    const QList<ActionManager *> sortedManagers =
-            ::ActionManagerModel->sortedList(::ActionManagerModelSortFunction);
+    const QList<ActionManager *> sortedManagers = m_actionManagers.isEmpty()
+            ? ::ActionManagerModel->sortedList(::ActionManagerModelSortFunction)
+            : m_actionManagers;
 
     for (ActionManager *actionManager : sortedManagers) {
         connect(actionManager, &ActionManager::modelReset, this,
@@ -1381,7 +1393,7 @@ void ActionsModelFilter::componentComplete()
 
 bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
-    if (source_parent.isValid())
+    if (source_parent.isValid() || m_filters == NoActions)
         return false;
 
     if (m_filters == AllActions)
