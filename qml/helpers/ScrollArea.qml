@@ -31,7 +31,7 @@ Flickable {
     property bool animatingPanOrZoom: contentXAnimation.running || contentYAnimation.running || zoomScaleAnimation.running
 
     property real zoomScale: 1
-    property real suggestedScale: zoomScale
+    readonly property alias suggestedScale: root.zoomScale
     property rect visibleContentRect: Qt.rect(contentX, contentY, width/zoomScale, height/zoomScale)
     property real initialContentWidth: 100
     property real initialContentHeight: 100
@@ -196,43 +196,29 @@ Flickable {
 
     Timer {
         id: returnToBoundsTimer
-        objectName: "ScrollArea.returnToBoundsTimer"
 
         repeat: false
         running: false
-        interval: 500
+        interval: Runtime.stdAnimationDuration
 
         onTriggered: parent.returnToBounds()
     }
 
-    TrackerPack {
-        delay: 250
+    Timer {
+        id: changingTimer
 
-        TrackProperty {
-            target: root
-            property: "contentX"
-            onTracked: root.changing = true
+        property var dependencies: [root.contentX, root.contentY, root.moving, root.flicking]
+
+        repeat: false
+        running: false
+        interval: Runtime.stdAnimationDuration
+
+        onTriggered: root.changing = false
+
+        onDependenciesChanged: {
+            root.changing = true
+            start()
         }
-
-        TrackProperty {
-            target: root
-            property: "contentY"
-            onTracked: root.changing = true
-        }
-
-        TrackProperty {
-            target: root
-            property: "moving"
-            onTracked: root.changing = true
-        }
-
-        TrackProperty {
-            target: root
-            property: "flicking"
-            onTracked: root.changing = true
-        }
-
-        onTracked: root.changing = false
     }
 
     PinchHandler {
@@ -247,35 +233,36 @@ Flickable {
         minimumPointCount: 2
 
         onScaleChanged: {
-            zoomScaleBehavior.allow = false
-            zoomScale = activeScale
-            zoomScaleChangedInteractively()
-            zoomScaleBehavior.allow = true
+            zoomScaleBehavior.allow = false;
+
+            const newScale = Math.max(minimumScale, Math.min(pinchHandler.activeScale, maximumScale));
+            if (zoomScale !== newScale) {
+                const pinchCenter = pinchHandler.centroid.position;
+                resizeContent(initialContentWidth * newScale, initialContentHeight * newScale, pinchCenter);
+                zoomScale = newScale;
+                zoomScaleChangedInteractively();
+            }
+
+            zoomScaleBehavior.allow = true;
         }
 
         onTargetChanged: target = null
     }
 
     onZoomScaleChanged: {
-        if (!zoomScaleBehavior.allow) {
-            // If allow is false, it means a programmatic change is happening.
-            // Just update content size and exit.
-            contentWidth = initialContentWidth * zoomScale;
-            contentHeight = initialContentHeight * zoomScale;
+        if (!zoomScaleBehavior.allow || pinchHandler.active)
             return;
-        }
 
         // This logic zooms towards the mouse cursor. It can interfere with programmatic
         // zoom/pan like zoomFit. It's kept for interactive use, but be aware of its effects.
-        let cursorPos = MouseCursor.position()
-        let fCursorPos = MouseCursor.itemPosition(root, cursorPos)
-        let fContainsCursor = fCursorPos.x >= 0 && fCursorPos.y >= 0 && fCursorPos.x <= width && fCursorPos.y <= height
-        let visibleArea = Qt.rect(contentX, contentY, width, height)
-        let mousePoint = fContainsCursor ?
+        const cursorPos = MouseCursor.position()
+        const fCursorPos = MouseCursor.itemPosition(root, cursorPos)
+        const fContainsCursor = fCursorPos.x >= 0 && fCursorPos.y >= 0 && fCursorPos.x <= width && fCursorPos.y <= height
+        const mousePoint = fContainsCursor ?
                 MouseCursor.itemPosition(contentItem, MouseCursor.position()) :
                 Qt.point(contentX+width/2, contentY+height/2)
-        let newWidth = initialContentWidth * zoomScale
-        let newHeight = initialContentHeight * zoomScale
+        const newWidth = initialContentWidth * zoomScale
+        const newHeight = initialContentHeight * zoomScale
 
         resizeContent(newWidth, newHeight, mousePoint)
         returnToBoundsTimer.start()

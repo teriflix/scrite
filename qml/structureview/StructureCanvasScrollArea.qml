@@ -19,7 +19,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -215,15 +214,19 @@ ScrollArea {
         function updateFromScriteDocumentUserData() {
             root.enablePanAndZoomAnimation(500);
 
+            if(Scrite.document.structure.forceBeatBoardLayout)
+                Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
+
+            _canvas.itemsBoundingBox.markPreviewDirty();
+            _canvas.itemsBoundingBox.recomputeBoundingBox()
+
             const userData = Scrite.document.userData
             const csData = userData["StructureView.canvasScroll"] ?? userData["StructureCanvasScrollArea"];
             if(csData && csData.version === 0) {
                 root.isZoomFit = csData.isZoomFit === true
                 if(root.isZoomFit) {
-                    Runtime.execLater(root, 500, function() {
-                        const area = _canvas.itemsBoundingBox.tightBoundingBox
-                        root.zoomFit(area)
-                    })
+                    const area = _canvas.itemsBoundingBox.tightBoundingBox
+                    root.zoomFit(area)
                 } else {
                     root.zoomScale = csData.zoomScale
                     root.contentX = csData.contentX
@@ -242,8 +245,7 @@ ScrollArea {
                     root.zoomOneMiddleArea()
             }
 
-            if(Scrite.document.structure.forceBeatBoardLayout)
-                Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
+            root.returnToBounds()
 
             updateScriteDocumentUserDataEnabled = true
             Runtime.firstSwitchToStructureTab = false
