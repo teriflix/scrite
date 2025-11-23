@@ -61,76 +61,125 @@ Flickable {
     }
 
     function zoomFit(area) {
-        if(!area)
-            return
+        if (!area || area.width <= 0 || area.height <= 0)
+            return;
 
-        if(area.width <= 0 || area.height <= 0)
-            return
+        // Disable the interactive zoom logic in onZoomScaleChanged
+        zoomScaleBehavior.allow = false;
 
-        const s = Math.min(width/area.width, height/area.height)
-        const center = Qt.point(area.x + area.width/2, area.y + area.height/2)
-        const w = width/s
-        const h = height/s
+        // Calculate the best scale to fit the area, respecting min/max scale.
+        const newScale = Math.min(width / area.width, height / area.height);
+        zoomScale = Math.max(pinchHandler.minimumScale, Math.min(newScale, pinchHandler.maximumScale));
 
-        const area2 = Qt.rect(Math.max(center.x-w/2,0), Math.max(center.y-h/2,0), w, h)
+        // Update content size based on new scale
+        contentWidth = initialContentWidth * zoomScale;
+        contentHeight = initialContentHeight * zoomScale;
 
-        zoomScale = s
-        ensureVisible(area2, s)
+        // Calculate contentX/Y to center the area in the viewport at the new scale.
+        const newContentX = area.x * zoomScale - (width - area.width * zoomScale) / 2;
+        const newContentY = area.y * zoomScale - (height - area.height * zoomScale) / 2;
+
+        // Clamp values to be within the flickable's bounds.
+        contentX = Math.max(0, Math.min(newContentX, contentWidth - width));
+        contentY = Math.max(0, Math.min(newContentY, contentHeight - height));
+
+        // Re-enable the interactive zoom logic
+        zoomScaleBehavior.allow = true;
     }
 
-    function ensureItemVisible(item, scaling, leaveMargin) {
-        if(item === null)
-            return
+    function ensureItemVisible(item) {
+        if (item === null)
+            return;
 
-        const area = Qt.rect(item.x, item.y, item.width, item.height)
-        ensureVisible(area,
-                      scaling === undefined ? root.zoomScale : scaling,
-                      leaveMargin === undefined ? 20 : leaveMargin)
-    }
+        const leaveMargin = 20
 
-    function ensureVisible(area, scaling, leaveMargin) {
-        if(scaling === undefined)
-            scaling = 1
-        if(leaveMargin === undefined)
-            leaveMargin = 20 * scaling
-        else
-            leaveMargin *= scaling
+        let currentScale = root.zoomScale;
 
-        area = Qt.rect( area.x*scaling, area.y*scaling, area.width*scaling, area.height*scaling )
+        // Required viewport size in pixels to contain the item
+        const requiredWidth = item.width * currentScale + 2 * leaveMargin;
+        const requiredHeight = item.height * currentScale + 2 * leaveMargin;
 
-        // Check if the area can be contained within the viewport
-        if(area.width > visibleContentRect.width || area.height > visibleContentRect.height) {
-            // We are here if area cannot fit into the space of the flickable.
-            // In this case, we just try and fit the center point of area into the
-            // view.
-            const w = width*0.2
-            const h = height*0.2
-            area = Qt.rect( (area.left+area.right)/2-w/2,
-                            (area.top+area.bottom)/2-h/2,
-                            w, h )
+        // 1. SCALE: Check if the item is larger than the viewport and scale down if needed.
+        if (requiredWidth > width || requiredHeight > height) {
+            const scaleX = width / (item.width + 2 * leaveMargin);
+            const scaleY = height / (item.height + 2 * leaveMargin);
+            const newScale = Math.min(scaleX, scaleY);
+
+            // Only zoom out, don't zoom in. Respect minimum scale.
+            if (newScale < currentScale) {
+                currentScale = Math.max(pinchHandler.minimumScale, newScale);
+                zoomScale = currentScale; // This will trigger onZoomScaleChanged
+            }
         }
 
-        // Check if item is already visible
-        if(area.left >= visibleContentRect.left && area.top >= visibleContentRect.top &&
-           area.right <= visibleContentRect.right && area.bottom <= visibleContentRect.bottom)
-            return; // already visible
+        // 2. PAN: Calculate the minimum pan required to make the item visible.
 
-        let cx = undefined
-        let cy = undefined
-        if(area.left >= visibleContentRect.right || area.right >= visibleContentRect.right)
-            cx = (area.right + leaveMargin) - width
-        else if(area.right <= visibleArea.left || area.left <= visibleContentRect.left)
-            cx = area.left - leaveMargin
+        // The item's bounding box in the scaled content coordinate system.
+        const itemScaledRect = Qt.rect(item.x * currentScale,
+                                       item.y * currentScale,
+                                       item.width * currentScale,
+                                       item.height * currentScale);
 
-        if(area.top >= visibleContentRect.bottom || area.bottom >= visibleContentRect.bottom)
-            cy = (area.bottom + leaveMargin) - height
-        else if(area.bottom <= visibleContentRect.top || area.top <= visibleContentRect.top)
-            cy = area.top - leaveMargin
+        // The viewport's bounding box in the scaled content coordinate system.
+        const viewRect = Qt.rect(contentX, contentY, width, height);
 
-        if(cx !== undefined)
-            contentX = Math.max(Math.min(cx, contentWidth-width-1),0)
-        if(cy !== undefined)
-            contentY = Math.max(Math.min(cy, contentHeight-height-1),0)
+        let newContentX = contentX;
+        let newContentY = contentY;
+
+        // Horizontal check: Pan only if the item is outside the view.
+        if (itemScaledRect.x < viewRect.x + leaveMargin) {
+            // Item's left edge is off-screen to the left. Pan right.
+            newContentX = itemScaledRect.x - leaveMargin;
+        } else if (itemScaledRect.x + itemScaledRect.width > viewRect.x + viewRect.width - leaveMargin) {
+            // Item's right edge is off-screen to the right. Pan left.
+            newContentX = itemScaledRect.x + itemScaledRect.width - width + leaveMargin;
+        }
+
+        // Vertical check: Pan only if the item is outside the view.
+        if (itemScaledRect.y < viewRect.y + leaveMargin) {
+            // Item's top edge is off-screen to the top. Pan down.
+            newContentY = itemScaledRect.y - leaveMargin;
+        } else if (itemScaledRect.y + itemScaledRect.height > viewRect.y + viewRect.height - leaveMargin) {
+            // Item's bottom edge is off-screen to the bottom. Pan up.
+            newContentY = itemScaledRect.y + itemScaledRect.height - height + leaveMargin;
+        }
+
+        // Apply the calculated pan, clamping to the valid bounds.
+        contentX = Math.max(0, Math.min(newContentX, contentWidth - width));
+        contentY = Math.max(0, Math.min(newContentY, contentHeight - height));
+    }
+
+    function ensureAreaVisible(area, scaling, leaveMargin) {
+        if (!area || area.width <= 0 || area.height <= 0)
+            return;
+
+        if (scaling === undefined)
+            scaling = root.zoomScale; // Use current zoomScale if not provided
+
+        if (leaveMargin === undefined)
+            leaveMargin = 20; // Margin in unscaled pixels
+
+        // The area to make visible, in unscaled content coordinates.
+        const targetArea = area;
+
+        // The current viewport, in unscaled content coordinates.
+        const viewRect = Qt.rect(contentX / scaling, contentY / scaling, width / scaling, height / scaling);
+
+        // Check if the target area is already fully visible within the viewport (with margin).
+        if (targetArea.x >= viewRect.x + leaveMargin &&
+            targetArea.y >= viewRect.y + leaveMargin &&
+            targetArea.x + targetArea.width <= viewRect.x + viewRect.width - leaveMargin &&
+            targetArea.y + targetArea.height <= viewRect.y + viewRect.height - leaveMargin) {
+            return; // Already visible
+        }
+
+        // Calculate the new contentX and contentY to center the target area.
+        let newContentX = (targetArea.x + targetArea.width / 2) * scaling - width / 2;
+        let newContentY = (targetArea.y + targetArea.height / 2) * scaling - height / 2;
+
+        // Clamp the new positions to the valid bounds of the Flickable.
+        contentX = Math.max(0, Math.min(newContentX, contentWidth - width));
+        contentY = Math.max(0, Math.min(newContentY, contentHeight - height));
     }
 
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
@@ -233,6 +282,16 @@ Flickable {
     }
 
     onZoomScaleChanged: {
+        if (!zoomScaleBehavior.allow) {
+            // If allow is false, it means a programmatic change is happening.
+            // Just update content size and exit.
+            contentWidth = initialContentWidth * zoomScale;
+            contentHeight = initialContentHeight * zoomScale;
+            return;
+        }
+
+        // This logic zooms towards the mouse cursor. It can interfere with programmatic
+        // zoom/pan like zoomFit. It's kept for interactive use, but be aware of its effects.
         let cursorPos = MouseCursor.position()
         let fCursorPos = MouseCursor.itemPosition(root, cursorPos)
         let fContainsCursor = fCursorPos.x >= 0 && fCursorPos.y >= 0 && fCursorPos.x <= width && fCursorPos.y <= height

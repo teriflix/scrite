@@ -71,7 +71,7 @@ Item {
                 let area = Qt.rect(x,y,root.canvasScroll.width,root.canvasScroll.height)
 
                 root.canvasScroll.zoomOne()
-                root.canvasScroll.ensureVisible(area)
+                root.canvasScroll.ensureAreaVisible(area)
             }
         }
 

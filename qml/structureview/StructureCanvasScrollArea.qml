@@ -150,7 +150,7 @@ ScrollArea {
         onDenyCanvasPreviewRequest: () => { root.denyCanvasPreviewRequest() }
         onAllowCanvasPreviewRequest: () => { root.allowCanvasPreviewRequest() }
         onEnsureItemVisibleRequest: (item) => { root.ensureItemVisible(item) }
-        onEnsureAreaVisibleRequest: (area) => { root.ensureVisible(area, suggestedScale, 0) }
+        onEnsureAreaVisibleRequest: (area) => { root.ensureAreaVisible(area, suggestedScale, 0) }
     }
 
     Connections {
@@ -201,7 +201,7 @@ ScrollArea {
                 return
 
             let userData = Scrite.document.userData
-            userData["StructureView.canvasScroll"] = {
+            userData["StructureCanvasScrollArea"] = {
                 "version": 0,
                 "contentX": root.contentX,
                 "contentY": root.contentY,
@@ -213,19 +213,21 @@ ScrollArea {
         }
 
         function updateFromScriteDocumentUserData() {
-            let userData = Scrite.document.userData
-            let csData = userData["StructureView.canvasScroll"];
+            root.enablePanAndZoomAnimation(500);
+
+            const userData = Scrite.document.userData
+            const csData = userData["StructureView.canvasScroll"] ?? userData["StructureCanvasScrollArea"];
             if(csData && csData.version === 0) {
-                root.zoomScale = csData.zoomScale
-                root.contentX = csData.contentX
-                root.contentY = csData.contentY
                 root.isZoomFit = csData.isZoomFit === true
                 if(root.isZoomFit) {
                     Runtime.execLater(root, 500, function() {
-                        var area = _canvas.itemsBoundingBox.boundingBox
+                        const area = _canvas.itemsBoundingBox.tightBoundingBox
                         root.zoomFit(area)
-                        root.enablePanAndZoomAnimation(2000)
                     })
+                } else {
+                    root.zoomScale = csData.zoomScale
+                    root.contentX = csData.contentX
+                    root.contentY = csData.contentY
                 }
             } else {
                 if(Scrite.document.structure.elementCount > 0) {
@@ -235,10 +237,9 @@ ScrollArea {
                     if(Runtime.firstSwitchToStructureTab)
                         root.zoomOneToItem(item)
                     else
-                        root.ensureItemVisible(item, _canvas.scale)
+                        root.ensureItemVisible(item)
                 } else
                     root.zoomOneMiddleArea()
-                root.enablePanAndZoomAnimation(2000)
             }
 
             if(Scrite.document.structure.forceBeatBoardLayout)
@@ -257,7 +258,7 @@ ScrollArea {
                 let item = _currentElementItemBinder.get
                 if(item === null)
                     item = _elementItems.itemAt(0)
-                root.ensureItemVisible(item, _canvas.scale)
+                root.ensureItemVisible(item)
             }
         }
 
@@ -281,19 +282,19 @@ ScrollArea {
             if(_canvas.itemsBoundingBox.itemCount > 0) {
                 const bbox = _canvas.itemsBoundingBox.boundingBox
                 if(bbox.width < root.width && bbox.height < root.height) {
-                    root.ensureVisible(bbox)
+                    root.ensureAreaVisible(bbox)
                 } else {
                     const areaSize = Qt.size(root.width*0.5, root.height*0.5)
                     const bboxCenter = Qt.point(bbox.x + bbox.width/2, bbox.y + bbox.height/2)
                     const middleArea = Qt.rect(bboxCenter.x - areaSize.width/2, bboxCenter.y - areaSize.height/2, areaSize.width, areaSize.height)
-                    root.ensureVisible(middleArea)
+                    root.ensureAreaVisible(middleArea)
                 }
             } else {
                 const middleArea = Qt.rect((_canvas.width-root.width)/2,
                                          (_canvas.height-root.height)/2,
                                          root.width,
                                          root.height)
-                root.ensureVisible(middleArea)
+                root.ensureAreaVisible(middleArea)
             }
         }
 

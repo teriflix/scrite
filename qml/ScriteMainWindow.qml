@@ -96,6 +96,7 @@ Item {
             target: Scrite.document
 
             function onJustReset() {
+                Runtime.firstSwitchToStructureTab = true
                 Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
             }
 
@@ -109,6 +110,7 @@ Item {
             }
 
             function onJustLoaded() {
+                Runtime.firstSwitchToStructureTab = true
                 const userData = Scrite.document.userData
                 if(userData.mainTabBar) {
                     const ci = userData.mainTabBar.currentIndex

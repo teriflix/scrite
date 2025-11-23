@@ -79,7 +79,7 @@ Rectangle {
                                      _canvasScroll.width,
                                      _canvasScroll.height)
             _canvasScroll.zoomOne()
-            _canvasScroll.ensureVisible(middleArea)
+            _canvasScroll.ensureAreaVisible(middleArea)
         }
 
         function zoomOneToItem(item) {
@@ -294,7 +294,7 @@ Rectangle {
 
                             function zoom() {
                                 var area = mapToItem(_canvas, 0, 0, width, height)
-                                _canvasScroll.ensureVisible(area)
+                                _canvasScroll.ensureAreaVisible(area)
                                 forceActiveFocus()
                                 initialized = true
                             }
