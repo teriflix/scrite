@@ -117,7 +117,6 @@ void Note::setForm(Form *val)
 
             m_summary = QStringLiteral("Form with ") + QString::number(questions.size())
                     + QStringLiteral(" question(s). ");
-            m_summary += questions.join(QStringLiteral(", "));
             m_autoSummaryText = true;
             emit summaryChanged();
         }
