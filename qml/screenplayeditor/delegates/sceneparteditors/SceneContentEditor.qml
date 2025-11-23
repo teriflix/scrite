@@ -452,7 +452,7 @@ AbstractScenePartEditor {
             }
         }
 
-        property bool focusCursorIsOnMe: focusCursorPosition.sceneElementIndex === sceneDelegate.index
+        property bool focusCursorIsOnMe: focusCursorPosition.sceneElementIndex === root.index
         onFocusCursorIsOnMeChanged: {
             if(firstInitializationDone) {
                 Qt.callLater(placeFocusCursor)
@@ -460,7 +460,7 @@ AbstractScenePartEditor {
         }
 
         function placeFocusCursor() {
-            const cursorPosition = focusCursorPosition.get(sceneDelegate.index)
+            const cursorPosition = focusCursorPosition.get(root.index)
             if(cursorPosition >= -1)
                 root.assumeFocusAt(cursorPosition)
         }

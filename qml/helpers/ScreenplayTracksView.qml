@@ -46,8 +46,8 @@ Flickable {
     implicitHeight: _private.model ? (listView.orientation === Qt.Horizontal ? contentHeight : 0) : 0
 
     clip: true
-    contentX: listView.orientation === Qt.Horizontal ? listView.contentX : 0
-    contentY: listView.orientation === Qt.Vertical ? listView.contentY : 0
+    contentX: _private.isHorizontalTrack ? listView.contentX : 0
+    contentY: _private.isHorizontalTrack ? 0 : listView.contentY
     interactive: false
     contentWidth: _content.width
     contentHeight: _content.height
@@ -55,8 +55,8 @@ Flickable {
     Item {
         id: _content
 
-        width: listView.orientation === Qt.Horizontal ? listView.contentWidth : _trackRepeater.count * (Runtime.minimumFontMetrics.height + 10)
-        height: listView.orientation === Qt.Horizontal ? _trackRepeater.count * (Runtime.minimumFontMetrics.height + 10) : listView.contentHeight
+        width: _private.isHorizontalTrack ? listView.contentWidth : _private.totalTracksSize
+        height: _private.isHorizontalTrack ? _private.totalTracksSize : listView.contentHeight
 
         Repeater {
             id: _trackRepeater
@@ -73,17 +73,15 @@ Flickable {
                 property var items: track.items
                 property string name: track.name
 
-                property real offset: index * (Runtime.minimumFontMetrics.height + 10)
+                property real offset: index * _private.trackSize
 
-                x: listView.orientation === Qt.Vertical ? offset : 0
-                y: listView.orientation === Qt.Horizontal ? offset : 0
+                x: _private.isHorizontalTrack ? 0 : offset
+                y: _private.isHorizontalTrack ? offset : 0
 
-                width: listView.orientation === Qt.Horizontal ? _content.width : Runtime.minimumFontMetrics.lineSpacing + 8
-                height: listView.orientation === Qt.Horizontal ? Runtime.minimumFontMetrics.lineSpacing + 8 : _content.height
+                width: _private.isHorizontalTrack ? _content.width : _private.trackSize
+                height: _private.isHorizontalTrack ? _private.trackSize : _content.height
 
-                color: Color.translucent( border.color, 0.1 )
-                border.color: track.color
-                border.width: 0.5
+                color: Color.translucent( track.color, 0.25 )
 
                 MouseArea {
                     id: _trackMouseArea
@@ -121,14 +119,14 @@ Flickable {
                                     return 0
 
                                 const pos = listView.contentItem.mapFromItem(_trackItem.startItem, 0, 0)
-                                return listView.orientation === Qt.Horizontal ? pos.x : pos.y
+                                return (_private.isHorizontalTrack ? pos.x : pos.y)
                             }
                             property real to: {
                                 if(_trackItem.startItem === null || _trackItem.endItem === null)
                                     return 0
 
-                                const pos = listView.contentItem.mapFromItem(_trackItem.endItem, 0, 0)
-                                return (listView.orientation === Qt.Horizontal ? pos.x + _trackItem.endItem.width : pos.y + _trackItem.endItem.height) + _private.trackMargin
+                                const pos = listView.contentItem.mapFromItem(_trackItem.endItem, _trackItem.endItem.width, _trackItem.endItem.height)
+                                return (_private.isHorizontalTrack ? pos.x : pos.y)
                             }
                         }
 
@@ -143,6 +141,11 @@ Flickable {
                         property rect itemRect: Qt.rect(x, y, width, height)
 
                         function lookupItems() {
+                            if(!root.listView) {
+                                Qt.callLater(lookupItems)
+                                return
+                            }
+
                             if(!startItem)
                                 startItem = root.listView.itemAtIndex(startIndex)
                             if(!endItem)
@@ -153,11 +156,11 @@ Flickable {
 
                         Component.onCompleted: Qt.callLater(lookupItems)
 
-                        x: listView.orientation === Qt.Horizontal ? extents.from : 2
-                        y: listView.orientation === Qt.Vertical ? extents.from : 2
+                        x: listView.orientation === Qt.Horizontal ? extents.from : 0
+                        y: listView.orientation === Qt.Vertical ? extents.from : 0
 
-                        width: listView.orientation === Qt.Horizontal ? extents.to - extents.from : parent.width-4
-                        height: listView.orientation === Qt.Horizontal ? parent.height-4 : extents.to - extents.from
+                        width: listView.orientation === Qt.Horizontal ? extents.to - extents.from : _private.trackSize
+                        height: listView.orientation === Qt.Horizontal ? _private.trackSize : extents.to - extents.from
 
                         color: modelData.color
                         visible: GMath.doRectanglesIntersect(itemRect, _private.viewportRect)
@@ -279,13 +282,25 @@ Flickable {
         function onCacheBufferChanged() {
             Qt.callLater(_private.reload)
         }
+
+        function onContentWidthChanged() {
+            if(_private.isHorizontalTrack)
+                Qt.callLater(_private.reload)
+        }
+
+        function onContentHeightChanged() {
+            if(!_private.isHorizontalTrack)
+                Qt.callLater(_private.reload)
+        }
     }
 
     QtObject {
         id: _private
 
-        property real trackMargin: 0.5
-        property real headerSize: root.listView.headerItem ? (root.listView.orientation === Qt.Horizontal ? root.listView.headerItem.width : root.listView.headerItem.height) : 0
+        property int trackSize: Math.ceil(Runtime.minimumFontMetrics.lineSpacing) + 8
+        property int totalTracksSize: _trackRepeater.count * _private.trackSize
+        property bool isHorizontalTrack: root.listView.orientation === Qt.Horizontal
+
         property bool displayTracks: true
 
         property rect viewportRect: Qt.rect( visibleArea.xPosition * contentWidth,
@@ -294,7 +309,7 @@ Flickable {
                                             visibleArea.heightRatio * contentHeight )
 
         property ScreenplayTracks model: ScreenplayTracks {
-            property bool enabled: root.enabled && Runtime.screenplayTracksSettings.displayTracks && Runtime.appFeatures.structure.enabled
+            property bool enabled: root.enabled && Runtime.screenplayTracksSettings.displayTracks && Runtime.appFeatures.structure.enabled && _private.displayTracks
 
             structure: Scrite.document.structure
             screenplay: Scrite.document.screenplay
