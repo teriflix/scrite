@@ -122,10 +122,6 @@ Item {
                                            })
             }
 
-            function onRequestVersionTypeAccess() {
-
-            }
-
             function onInvalidApiKey() {
                 MessageBox.discardMessageBoxes()
 
