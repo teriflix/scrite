@@ -18,8 +18,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
-
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -45,8 +43,6 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        anchors.leftMargin: 7.5
-        anchors.rightMargin: 2.5
         anchors.bottomMargin: root.screenplayElementList.scrollBarRequired ? 20 : 0
 
         color: Runtime.colors.primary.button.background

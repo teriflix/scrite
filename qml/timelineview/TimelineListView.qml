@@ -28,7 +28,7 @@ ListView {
     required property DropArea mainDropArea
 
     readonly property real omittedDelegateWidth: 34
-    readonly property real breakDelegateWidth: 70
+    readonly property real breakDelegateWidth: minimumDelegateWidthForTextVisibility
     readonly property real perElementWidth: 2.5
     readonly property real minimumDelegateWidthForTextVisibility: 50
 
@@ -115,19 +115,6 @@ ListView {
         dropAreaHighlightColor: root.dropAreaHighlightColor
 
         onDropSceneAtRequest: (source, index) => { root.dropSceneAtRequest(source,index) }
-    }
-
-    highlight: Item {
-        Item {
-            anchors.leftMargin: 7.5
-            anchors.rightMargin: 2.5
-            anchors.bottomMargin: root.scrollBarRequired ? 20 : 10
-            anchors.fill: parent
-
-            BoxShadow {
-                anchors.fill: parent
-            }
-        }
     }
 
     delegate: TimelineViewDelegate {

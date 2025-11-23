@@ -78,7 +78,7 @@ Rectangle {
     height: _mainLayout.height
 
     color: _private.color
-    border.width: _private.isCurrent && root.viewHasFocus
+    border.width: _private.isCurrent && root.viewHasFocus ? 1 : 0
     border.color: Qt.darker(_private.color, 120)
 
     ColumnLayout {
@@ -212,7 +212,7 @@ Rectangle {
 
                     text: _private.text
                     elide: _private.isSceneTextModeHeading ? Text.ElideMiddle : Text.ElideRight
-                    color: Runtime.colors.primary.c10.text
+                    color: Color.textColorFor(_private.color)
                     wrapMode: _private.isSceneTextModeHeading ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere
                     maximumLineCount: _private.isSceneTextModeHeading ? 1 : Runtime.bounded(1,Runtime.screenplayEditorSettings.slpSynopsisLineCount,5)
                     verticalAlignment: Qt.AlignVCenter
@@ -266,7 +266,7 @@ Rectangle {
                     Layout.alignment: Qt.AlignVCenter
 
                     text: _private.sceneLengthWatcher.sceneLength
-                    color: Runtime.colors.primary.c10.text
+                    color: Color.textColorFor(_private.color)
                     opacity: _private.isBreak ? 0.75 : 0.5
 
                     font.bold: _private.isBreak
@@ -400,19 +400,17 @@ Rectangle {
         property bool isEpisodeBreak: root.screenplayElementType === ScreenplayElement.BreakElementType && root.breakType === Screenplay.Episode
         property bool isSceneTextModeHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
 
-        property color color: {
+        property color color: isSelection ? selectedColor : normalColor
+        property color normalColor: root.scene ? Qt.tint(delegateColor, Runtime.colors.sceneHeadingTint) : Qt.lighter(delegateColor, 1.25)
+        property color selectedColor: root.scene ? Qt.tint(delegateColor, Runtime.colors.selectedSceneHeadingTint) : delegateColor
+
+        property color delegateColor: {
             if(root.scene)
-                return isSelection ? selectedColor :
-                                           (root.screenplayAdapter.isSourceScreenplay && multiSelection ?
-                                                Qt.tint(normalColor, "#40FFFFFF") : normalColor)
-            return isCurrent ? Color.translucent(Runtime.colors.accent.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
+                return root.scene.color
+            if(isEpisodeBreak)
+                return Runtime.colors.accent.c300.background
+            return Runtime.colors.accent.c200.background
         }
-        property color normalColor: root.scene ? Qt.tint(root.scene.color, Runtime.colors.sceneHeadingTint) : Runtime.colors.primary.c200.background
-        property color selectedColor: root.scene ?
-                                          (Color.isVeryLight(root.scene.color) ?
-                                               Qt.tint(Runtime.colors.primary.highlight.background, Runtime.colors.selectedSceneHeadingTint) :
-                                               Qt.tint(root.scene.color, Runtime.colors.selectedSceneHeadingTint)) :
-                                          Runtime.colors.primary.c300.background
 
         property var dragMimeData: {
             let ret = {}

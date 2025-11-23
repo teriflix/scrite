@@ -91,8 +91,6 @@ Item {
                 SceneListPanelHeader {
                     Layout.fillWidth: true
 
-                    color: Runtime.colors.primary.c400.background
-
                     leftPadding: 10
                     rightPadding: 10
 

@@ -98,6 +98,8 @@ Item {
             ColumnLayout {
                 anchors.fill: parent
 
+                spacing: 0
+
                 ScreenplayTracksView {
                     id: _screenplayTracksView
 

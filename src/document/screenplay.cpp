@@ -3583,6 +3583,8 @@ ScreenplayTracks::ScreenplayTracks(QObject *parent)
     connect(this, &ScreenplayTracks::rowsInserted, this, &ScreenplayTracks::trackCountChanged);
     connect(this, &ScreenplayTracks::rowsRemoved, this, &ScreenplayTracks::trackCountChanged);
 
+#if 0
+// Option 0
     m_colors = {
         QColor(47, 79, 79), // #2F4F4F - Dark Slate Gray
         QColor(0, 100, 0), // #006400 - Dark Green
@@ -3605,6 +3607,57 @@ ScreenplayTracks::ScreenplayTracks(QObject *parent)
         QColor(105, 105, 105), // #696969 - Dim Gray
         QColor(112, 128, 144) // #708090 - Slate Gray
     };
+#endif
+
+    // Option 1
+    m_colors = {
+        QColor(115, 147, 153), // #739399  (blue-teal)
+        QColor(129, 103, 140), // #7f678c  (purple)
+        QColor(150, 148, 129), // #969481  (olive-neutral)
+        QColor(138, 125, 140), // #8a7d8c  (dusty mauve)
+        QColor(100, 125, 143), // #647d8f  (blue-grey)
+        QColor(142, 149, 122), // #8e957a  (sage green)
+        QColor(173, 136, 147), // #ad8893  (rose)
+        QColor(95, 121, 119), // #5f7977  (desaturated teal)
+        QColor(157, 145, 145), // #9d9191  (warm grey)
+        QColor(115, 108, 129), // #736c81  (violet-grey)
+        QColor(118, 134, 109), // #76866d  (green-brown)
+        QColor(138, 151, 169), // #8a97a9  (cool blue-grey)
+        QColor(133, 112, 112), // #857070  (brownish mauve)
+        QColor(113, 117, 140), // #71758c  (indigo-grey)
+        QColor(129, 120, 110), // #81786e  (taupe)
+        QColor(146, 120, 140), // #92788c  (violet-rose)
+        QColor(104, 135, 121), // #688779  (soft teal-green)
+        QColor(173, 136, 136), // #ad8888  (muted clay pink)
+        QColor(157, 112, 112), // #957070  (dusty brick)
+        QColor(138, 151, 169), // #8a97a9  (cool steel blue)
+    };
+
+#if 0
+// Option 2
+    m_colors = {
+        QColor(89, 145, 145),  // #599191  - Deep Teal
+        QColor(179, 116, 116), // #b37474  - Muted Rose Clay
+        QColor(89, 89, 145),   // #595991  - Indigo Blue
+        QColor(110, 156, 110), // #6e9c6e  - Sage Green
+        QColor(165, 100, 193), // #a564c1  - Amethyst Purple
+        QColor(129, 139, 113), // #818b71  - Moss Olive
+        QColor(137, 163, 185), // #89a3b9  - Misty Steel Blue
+        QColor(145, 89, 89),   // #915959  - Dusty Maroon
+        QColor(149, 176, 177), // #95b0b1  - Pale Aqua Grey
+        QColor(151, 90, 151),  // #975a97  - Plum Violet
+        QColor(147, 147, 147), // #939393  - Neutral Grey
+        QColor(85, 129, 85),   // #558155  - Forest Green
+        QColor(131, 126, 160), // #837ea0  - Lavender Grey
+        QColor(154, 123, 101), // #9a7b65  - Soft Brown Clay
+        QColor(109, 123, 123), // #6d7b7b  - Slate Dust
+        QColor(156, 163, 170), // #9ca3aa  - Cool Grey Blue
+        QColor(151, 90, 90),   // #975a5a  - Muted Brick Red
+        QColor(143, 158, 111), // #8f9e6f  - Olive Green
+        QColor(101, 101, 140), // #65658c  - Dusty Violet Blue
+        QColor(122, 89, 147),  // #7a5993  - Royal Purple
+    };
+#endif
 }
 
 ScreenplayTracks::~ScreenplayTracks() { }

@@ -19,7 +19,6 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
@@ -34,6 +33,8 @@ Rectangle {
     signal clicked()
 
     height: _layout.height
+
+    color: Runtime.colors.accent.c500.background
 
     RowLayout {
         id: _layout
@@ -51,6 +52,7 @@ Rectangle {
             elide: Text.ElideRight
             color: Color.textColorFor(root.color)
             text: Scrite.document.screenplay.title === "" ? "[#] TITLE PAGE" : Scrite.document.screenplay.title
+            padding: 10
 
             font.bold: true
             font.family: Runtime.sceneEditorFontMetrics.font.family
@@ -69,17 +71,26 @@ Rectangle {
             }
         }
 
-        ToolButton {
+        Image {
             id: _menuButton
 
-            down: _menu.visible
+            Layout.preferredWidth: _headingText.height * 0.6
+            Layout.preferredHeight: _headingText.height * 0.6
 
-            icon.source: "qrc:/icons/content/view_options.png"
+            source: Color.isLight(root.color) ? "qrc:/icons/content/view_options.png" : "qrc:/icons/content/view_options_inverted.png"
+            fillMode: Image.PreserveAspectFit
 
-            onClicked: _menu.open()
+            MouseArea {
+                anchors.fill: parent
 
-            ToolTipPopup {
-                text: "Scene List Options"
+                hoverEnabled: true
+
+                ToolTipPopup {
+                    text: "Scene List Options"
+                    visible: parent.containsMouse
+                }
+
+                onClicked: _menu.open()
             }
 
             Item {

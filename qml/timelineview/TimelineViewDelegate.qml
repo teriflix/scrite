@@ -40,7 +40,7 @@ Item {
 
     width: _private.isBreakElement ? screenplayElementList.breakDelegateWidth :
             (root.screenplayElement.omitted ? screenplayElementList.omittedDelegateWidth
-                             : Math.max(screenplayElementList.minimumDelegateWidth, _private.sceneElementCount*screenplayElementList.perElementWidth*zoomLevel))
+                             : Math.max(screenplayElementList.minimumDelegateWidth, _private.sceneLength*screenplayElementList.perElementWidth*zoomLevel))
     height: screenplayElementList.height
 
     Rectangle {
@@ -55,22 +55,28 @@ Item {
     Item {
         id: _elementItemBoxArea
 
+        property real minimumMargin: root.screenplayElement.selected ? 5 : 0
+
         anchors.fill: parent
-        anchors.leftMargin: 7.5
-        anchors.rightMargin: 2.5
-        anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 17 : 3
+        anchors.topMargin: minimumMargin
+        anchors.leftMargin: minimumMargin
+        anchors.rightMargin: minimumMargin
+        anchors.bottomMargin: minimumMargin + (screenplayElementList.scrollBarRequired ? screenplayElementList.ScrollBar.horizontal.height : 0)
 
         enabled: !_delegateDropArea.containsDrag
 
         Rectangle {
             id: _elementItemBox
 
-            property color sceneColor2 : Qt.tint(_private.sceneColor, (root.screenplayElement.selected || _private.active) ? "#9CFFFFFF" : Runtime.colors.sceneControlTint)
-
             anchors.fill: parent
 
-            color: root.scene ? (root.screenplayElement.omitted ? Qt.tint(sceneColor2, Runtime.colors.sceneControlTint) : sceneColor2) : _private.sceneColor
-            border.color: color === Qt.rgba(1,1,1,1) ? "black" : _private.sceneColor
+            color: {
+                if(_private.isBreakElement) {
+                    return _private.active ? _private.delegateColor : Qt.lighter(_private.delegateColor, 1.5)
+                }
+                return Qt.tint(_private.delegateColor, _private.active ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneHeadingTint)
+            }
+            border.color: Color.isLight(color) ? Qt.darker(color, 1.1) : Qt.lighter(color, 1.1)
             border.width: _private.active ? 2 : 1
 
             Behavior on border.width {
@@ -114,7 +120,7 @@ Item {
 
                         text: _private.sceneTitle
 
-                        color: root.scene ? Color.textColorFor(_elementItemBox.color) : _private.colorPalette.text
+                        color: Color.textColorFor(_elementItemBox.color)
                         elide: Text.ElideRight
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         font.bold: _private.isBreakElement || _private.active
@@ -363,10 +369,10 @@ Item {
     QtObject {
         id: _private
 
+        property int sceneLength: root.scene ? (sceneLengthWatcher.hasValidRecord ? sceneLengthWatcher.pageLength * 12 : root.scene.elementCount) : 1
+        property bool active: root.scene ? Scrite.document.screenplay.activeScene === root.scene : (root.screenplayElement.selected || root.screenplayElement.screenplay.currentElementIndex === root.index)
         property bool isBreakElement: root.screenplayElementType === ScreenplayElement.BreakElementType
         property bool isEpisodeBreak: isBreakElement && root.breakType === Screenplay.Episode
-        property bool active: root.scene ? Scrite.document.screenplay.activeScene === root.scene : false
-        property int sceneElementCount: root.scene ? root.scene.elementCount : 1
 
         property string sceneTitle: {
             var ret = ""
@@ -397,21 +403,16 @@ Item {
             return ret;
         }
 
-        property var colorPalette: {
-            if(root.scene) {
-                if(Color.isLight(root.scene.color))
-                    return { "background": root.scene.color, "text": "black" }
-                return { "background": root.scene.color, "text": "white" }
-            }
+        property color delegateColor: {
+            if(root.scene)
+                return root.scene.color
             if(root.breakType === Screenplay.Episode)
-                return Runtime.colors.accent.c700
-            return Runtime.colors.accent.c500
+                return Runtime.colors.accent.c800.background
+            return Runtime.colors.accent.c500.background
         }
 
-        property color sceneColor: colorPalette.background
-
         readonly property ScreenplayPaginatorWatcher sceneLengthWatcher: ScreenplayPaginatorWatcher {
-            paginator: Runtime.paginator.paused ? null : Runtime.paginator
+            paginator: Runtime.paginator
             element: root.screenplayElement
         }
 
@@ -437,11 +438,9 @@ Item {
             if(root.screenplayElement.omitted)
                 return "Omitted Scene"
 
-            let pc = root.scene.elementCount
-            ret += pc + " " + (pc > 1 ? "Paragraphs" : "Paragraph")
-
-            if(_private.sceneLengthWatcher.hasValidRecord)
-                ret += ", Duration: " + TMath.timeLengthString(_private.sceneLengthWatcher.timeLength)
+            if(_private.sceneLengthWatcher.hasValidRecord) {
+                ret += "Duration: " + TMath.timeLengthString(_private.sceneLengthWatcher.timeLength)
+            }
 
             if(root.width < screenplayElementList.minimumDelegateWidthForTextVisibility) {
                 let str = _private.sceneTitle

@@ -3522,7 +3522,7 @@ void SceneGroup::reeval()
 
     this->setCanBeStacked(m_structure != nullptr
                           && m_structure->canvasUIMode() == Structure::IndexCardUI
-                          && !m_scenes.isEmpty() && acts.size() <= 1 && episodes.size() <= 1);
+                          && m_scenes.size() >= 2 && acts.size() <= 1 && episodes.size() <= 1);
 }
 
 void SceneGroup::reevalLater()
