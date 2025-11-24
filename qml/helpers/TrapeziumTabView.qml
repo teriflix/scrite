@@ -24,13 +24,14 @@ Item {
     id: tabView
 
     property var tabNames: ["Default"]
+    property real cornerItemSpace: cornerLoader.width
     property color tabColor: Runtime.colors.primary.windowColor
     property alias currentTabIndex: tabBar.currentIndex
     property alias currentTabContent: tabContentLoader.sourceComponent
     property alias tabBarVisible: tabBar.visible
     property alias cornerItem: cornerLoader.sourceComponent
-    property real cornerItemSpace: cornerLoader.width
     property alias currentTabItem: tabContentLoader.item
+    property alias tabContentBorderVisible: tabContentLoaderBorder.visible
 
     Row {
         id: tabBar
@@ -73,7 +74,8 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        color: Qt.rgba(1,1,1,0.25)
+
+        color: tabContentLoaderBorder.visible ? Qt.rgba(1,1,1,0.25) : Qt.rgba(0,0,0,0)
         border.width: 0
 
         Loader {
@@ -82,10 +84,14 @@ Item {
         }
 
         Rectangle {
+            id: tabContentLoaderBorder
+
             anchors.fill: tabContentLoader
+
+            color: Qt.rgba(0,0,0,0)
+
             border.width: 1
             border.color: Color.isVeryLight(tabColor) ? Runtime.colors.primary.windowColor : tabColor
-            color: Qt.rgba(0,0,0,0)
         }
     }
 

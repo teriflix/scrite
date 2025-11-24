@@ -508,7 +508,8 @@ Item {
         readonly property color sceneControlTint: Qt.rgba(1,1,1,0.725)
         readonly property color sceneHeadingTint: Qt.rgba(1,1,1,0.825)
         readonly property color currentNoteTint: Qt.rgba(1,1,1,0.625)
-        readonly property color selectedSceneHeadingTint: Qt.rgba(1,1,1,0.55)
+        readonly property color selectedSceneHeadingTint: Qt.rgba(1,1,1,0.775)
+        readonly property color currentLineHightlightTint: Qt.rgba(1,1,1,0.9)
         readonly property color transparent: "transparent"
 
         readonly property Colors primary: Colors {

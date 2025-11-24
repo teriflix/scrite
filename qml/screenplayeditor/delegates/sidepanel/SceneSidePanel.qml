@@ -41,9 +41,9 @@ AbstractScenePartEditor {
         height: parent.height
 
         clip: true
-        buttonColor: Qt.tint(scene.color, expanded ? Runtime.colors.highlightedSceneControlTint : Runtime.colors.sceneControlTint)
-        borderColor: Runtime.colors.primary.c400.background
-        borderWidth: 1
+        buttonColor: _private.indicatorColor
+        borderColor: buttonColor
+        borderWidth: 0
         backgroundColor: buttonColor
 
         expanded: Runtime.screenplayEditorSettings.sceneSidePanelOpen
@@ -54,6 +54,7 @@ AbstractScenePartEditor {
             tabBarVisible: false
             currentTabIndex: Runtime.screenplayEditorSettings.sceneSidePanelActiveTab
             currentTabContent: _private.tabComponentsArray[currentTabIndex % _private.tabComponentsArray.length]
+            tabContentBorderVisible: false
         }
 
         onExpandedChanged: Runtime.screenplayEditorSettings.sceneSidePanelOpen = expanded
@@ -66,7 +67,10 @@ AbstractScenePartEditor {
 
         property var tabComponentsArray: [_private.commentsTab,_private.featuredImageTab,_private.indexCardFieldsTab,_private.sceneMetaDataTab]
 
-        property color indicatorColor: Color.isLight(root.scene.color) ? Runtime.colors.primary.c500.background : root.scene.color
+        property color indicatorColor: {
+            const ideally = Qt.tint(scene.color, expanded && root.isCurrent ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneControlTint)
+            return Color.isLight(scene.color) ? Runtime.colors.primary.c500.background : ideally
+        }
 
         readonly property Component collapsedCorner: CollapsedCorner {
             scene: root.scene
