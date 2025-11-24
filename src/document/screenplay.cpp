@@ -3991,12 +3991,11 @@ void ScreenplayTracks::refresh()
     if (!m_tracks.isEmpty()) {
         std::sort(m_tracks.begin(), m_tracks.end(),
                   [](const ScreenplayTrack &a, const ScreenplayTrack &b) {
-                      if (a.name.isEmpty() || b.name.isEmpty()) {
-                          if (a.name.isEmpty() && b.name.isEmpty())
-                              return 0;
-                          return a.name.isEmpty() ? -1 : 1;
-                      }
-                      return 0;
+                      if (a.name.isEmpty() && !b.name.isEmpty())
+                          return true; // a comes first
+                      if (!a.name.isEmpty() && b.name.isEmpty())
+                          return false; // b comes first
+                      return false;
                   });
 
         for (int i = 0; i < m_tracks.size(); i++) {
@@ -4017,13 +4016,15 @@ void ScreenplayTracks::refresh()
             if (trackColor == Qt::white)
                 trackColor = Qt::darkGray;
 
-            int colorIndex = 0;
             for (ScreenplayTrackItem &item : track.items) {
                 const int lightFactor = 100 + 35 * (trackIndex % 4);
-                item.color = m_colors.at(colorIndex);
+                const QString lookupKind =
+                        track.name.isEmpty() ? QStringLiteral("keywords") : track.name;
+                const int colorIndex =
+                        ScriteDocument::instance()->insertLookupValue(lookupKind, item.name, 0);
+                item.color = m_colors.at(colorIndex % m_colors.size());
                 if (lightFactor > 100)
                     item.color = item.color.lighter(lightFactor);
-                colorIndex = (colorIndex + 1) % m_colors.size();
             }
         }
     }

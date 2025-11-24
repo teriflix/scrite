@@ -32,6 +32,7 @@ class FileLocker;
 class ScriteDocument;
 class AbstractExporter;
 class QFileSystemWatcher;
+class ValueIndexLookup;
 class AbstractReportGenerator;
 class FileModificationTracker;
 
@@ -723,6 +724,16 @@ public:
     QJsonObject userData() const { return m_userData; }
     Q_SIGNAL void userDataChanged();
 
+    Q_INVOKABLE int insertLookupValue(const QString &kind, const QString &key,
+                                      int defaultValue = -1);
+    Q_INVOKABLE int removeLookupValue(const QString &kind, const QString &key,
+                                      int defaultValue = -1);
+    Q_INVOKABLE int lookupValue(const QString &kind, const QString &key,
+                                int defaultValue = -1) const;
+    Q_INVOKABLE void pruneLookupValues(const QString &kind, const QStringList &keys);
+    Q_INVOKABLE ValueIndexLookup *fetchLookupDictionary(const QString &kind);
+    ValueIndexLookup *fetchLookupDictionary(const QString &kind) const;
+
     // clang-format off
     Q_PROPERTY(QJsonArray bookmarkedNotes
                READ bookmarkedNotes
@@ -940,6 +951,8 @@ private:
     QObjectProperty<ScreenplayFormat> m_printFormat;
     QObjectProperty<Forms> m_forms;
     QObjectProperty<PageSetup> m_pageSetup;
+    QList<ValueIndexLookup *> m_valueIndexLookups;
+
     ExecLaterTimer m_evaluateStructureElementSequenceTimer;
     bool m_syncingStructureScreenplayCurrentIndex = false;
 

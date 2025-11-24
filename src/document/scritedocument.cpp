@@ -40,6 +40,7 @@
 #include "statisticsreport.h"
 #include "fountainimporter.h"
 #include "fountainexporter.h"
+#include "valueindexlookup.h"
 #include "qobjectserializer.h"
 #include "finaldraftimporter.h"
 #include "finaldraftexporter.h"
@@ -1147,6 +1148,67 @@ void ScriteDocument::setUserData(const QJsonObject &val)
     emit userDataChanged();
 }
 
+int ScriteDocument::insertLookupValue(const QString &kind, const QString &key, int defaultValue)
+{
+    ValueIndexLookup *lookup = fetchLookupDictionary(kind);
+    return lookup == nullptr ? defaultValue : lookup->insert(key, defaultValue);
+}
+
+int ScriteDocument::removeLookupValue(const QString &kind, const QString &key, int defaultValue)
+{
+    ValueIndexLookup *lookup = fetchLookupDictionary(kind);
+    return lookup == nullptr ? -1 : lookup->remove(key, defaultValue);
+}
+
+int ScriteDocument::lookupValue(const QString &kind, const QString &key, int defaultValue) const
+{
+    ValueIndexLookup *lookup = fetchLookupDictionary(kind);
+    if (lookup != nullptr)
+        return lookup->lookup(key);
+    return defaultValue;
+}
+
+void ScriteDocument::pruneLookupValues(const QString &kind, const QStringList &keys)
+{
+    ValueIndexLookup *lookup = fetchLookupDictionary(kind);
+    if (lookup != nullptr)
+        lookup->prune(keys);
+}
+
+ValueIndexLookup *ScriteDocument::fetchLookupDictionary(const QString &kind)
+{
+    if (kind.isEmpty())
+        return nullptr;
+
+    ValueIndexLookup *lookup = nullptr;
+    auto it = std::find_if(
+            m_valueIndexLookups.begin(), m_valueIndexLookups.end(),
+            [kind](ValueIndexLookup *lookup) { return (lookup->objectName() == kind); });
+    if (it != m_valueIndexLookups.end())
+        lookup = *it;
+    else {
+        lookup = new ValueIndexLookup(this);
+        lookup->setObjectName(kind);
+        m_valueIndexLookups.append(lookup);
+    }
+
+    return lookup;
+}
+
+ValueIndexLookup *ScriteDocument::fetchLookupDictionary(const QString &kind) const
+{
+    if (kind.isEmpty())
+        return nullptr;
+
+    auto it = std::find_if(
+            m_valueIndexLookups.begin(), m_valueIndexLookups.end(),
+            [kind](ValueIndexLookup *lookup) { return (lookup->objectName() == kind); });
+    if (it != m_valueIndexLookups.end())
+        return *it;
+
+    return nullptr;
+}
+
 void ScriteDocument::setBookmarkedNotes(const QJsonArray &val)
 {
     if (m_bookmarkedNotes == val)
@@ -1260,6 +1322,9 @@ void ScriteDocument::reset()
         this->setPrintFormat(new ScreenplayFormat(this));
     else
         m_printFormat->resetToUserDefaults();
+
+    qDeleteAll(m_valueIndexLookups);
+    m_valueIndexLookups.clear();
 
     this->setPageSetup(new PageSetup(this));
     this->setForms(new Forms(this));
@@ -2758,6 +2823,17 @@ void ScriteDocument::serializeToJson(QJsonObject &json) const
     metaInfo.insert(QStringLiteral("installation"), installationInfo);
 
     json.insert(QStringLiteral("meta"), metaInfo);
+
+    QJsonArray valueIndexLookups;
+    for (ValueIndexLookup *lookup : qAsConst(m_valueIndexLookups)) {
+        if (!lookup->isEmpty()) {
+            QJsonObject lookupJson;
+            lookup->serializeToJson(lookupJson);
+            valueIndexLookups.append(lookupJson);
+        }
+    }
+    if (!valueIndexLookups.isEmpty())
+        json.insert("#valueIndexLookups", valueIndexLookups);
 }
 
 void ScriteDocument::deserializeFromJson(const QJsonObject &json)
@@ -2944,6 +3020,16 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
     // by default.
     if (version <= QVersionNumber(0, 5, 2))
         m_structure->setCanvasUIMode(Structure::SynopsisEditorUI);
+
+    const QJsonArray valueIndexLookups = json.value("#valueIndexLookups").toArray();
+    for (const QJsonValue &item : valueIndexLookups) {
+        QJsonObject lookupJson = item.toObject();
+        if (!lookupJson.isEmpty()) {
+            ValueIndexLookup *lookup = new ValueIndexLookup(this);
+            lookup->deserializeFromJson(lookupJson);
+            m_valueIndexLookups.append(lookup);
+        }
+    }
 }
 
 QString ScriteDocument::polishFileName(const QString &givenFileName) const

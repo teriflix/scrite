@@ -59,6 +59,7 @@ HEADERS += \
     src/core/localstorage.h \
     src/core/systemrequirements.h \
     src/core/utils.h \
+    src/core/valueindexlookup.h \
     src/document/screenplaypaginator.h \
     src/document/screenplaypaginatorworker.h \
     src/document/screenplaytreeadapter.h \
@@ -195,6 +196,7 @@ SOURCES += \
     src/core/localstorage.cpp \
     src/core/systemrequirements.cpp \
     src/core/utils.cpp \
+    src/core/valueindexlookup.cpp \
     src/document/screenplaypaginator.cpp \
     src/document/screenplaypaginatorworker.cpp \
     src/document/screenplaytreeadapter.cpp \

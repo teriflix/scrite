@@ -1068,7 +1068,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createLocationPresenceGraph(
     };
 
     int locationIndex = 0;
-    auto evalColorFunc = [&locationIndex](const QString &loc) {
+    auto evalColorFunc = [&locationIndex](const QString &) {
         return StatisticsReport::pickColor(locationIndex++, false, StatisticsReport::Location);
     };
 
