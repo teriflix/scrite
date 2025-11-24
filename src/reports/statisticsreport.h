@@ -39,9 +39,10 @@ public:
     Q_INVOKABLE explicit StatisticsReport(QObject *parent = nullptr);
     ~StatisticsReport();
 
-    enum ColorGroup { Character, Location, Beat };
+    enum ColorGroup { Character, Location, Beat, Act, Episode };
     static const QVector<QColor> colors(ColorGroup group = Character);
     static const QColor pickColor(int index, bool cycleAround = true, ColorGroup group = Character);
+    static const QColor pickRandomColor(ColorGroup group);
 
     bool requiresConfiguration() const { return true; }
     bool isSinglePageReport() const { return true; }
@@ -237,6 +238,7 @@ private:
     }
 
     void polish(Distribution &distribution) const;
+    void normalizeRatios(QList<Distribution> &distributions) const;
 
 private:
     QTextDocument m_textDocument;

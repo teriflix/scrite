@@ -988,9 +988,14 @@ QGraphicsRectItem *StatisticsReportTimeline::createCharacterPresenceGraph(
 {
     const Structure *structure = report->document()->structure();
     const QList<QPair<QString, QList<int>>> characterPresence = this->evalCharacterPresence(report);
-    auto evalCharacterColor = [structure](const QString &name) -> QColor {
+
+    int characterIndex = 0;
+    auto evalCharacterColor = [structure, &characterIndex](const QString &name) -> QColor {
         const Character *character = structure->findCharacter(name);
-        return character ? character->color() : Qt::white;
+        QColor color = character ? character->color() : Qt::transparent;
+        if (color == Qt::transparent || color == Qt::white)
+            color = StatisticsReport::pickColor(characterIndex++, false);
+        return color;
     };
 
     const Screenplay *screenplay = report->document()->screenplay();
@@ -1063,8 +1068,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createLocationPresenceGraph(
     };
 
     int locationIndex = 0;
-    auto evalColorFunc = [&locationIndex](const QString &) {
-        return StatisticsReport::pickColor(locationIndex++ % 2, true, StatisticsReport::Location);
+    auto evalColorFunc = [&locationIndex](const QString &loc) {
+        return StatisticsReport::pickColor(locationIndex++, false, StatisticsReport::Location);
     };
 
     return this->createPresenceGraph(locationPresence, evalColorFunc, evalLocationLabel, report,
@@ -1165,13 +1170,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(
         QPainterPath fillPath = path;
         fillPath.closeSubpath();
 
-        auto polishColor = [&uncoloredCount](const QColor &color) {
-            if (color == Qt::white)
-                return StatisticsReport::pickColor(uncoloredCount++);
-            return color.darker();
-        };
-        const Character *character = structure->findCharacter(presenceItem.first);
-        const QColor evaledColor = evalColorFunc ? polishColor(evalColorFunc(presenceItem.first))
+        const QColor evaledColor = evalColorFunc ? evalColorFunc(presenceItem.first)
                                                  : StatisticsReport::pickColor(uncoloredCount++);
 
         QPen chartPen(evaledColor);
@@ -1203,10 +1202,9 @@ QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(
 
         QGraphicsRectItem *textItemBg = new QGraphicsRectItem(chartOutline);
         textItemBg->setZValue(-1);
-        textItemBg->setBrush(character ? character->color() : Qt::white);
-        textItemBg->setPen(evaledColor);
+        textItemBg->setBrush(evaledColor);
         textItemBg->setRect(textItem->boundingRect().adjusted(-4, -4, 4, 4));
-        textItemBg->setOpacity(0.5);
+        textItemBg->setOpacity(0.2);
         textItemBg->setPos(textItem->pos());
 
         graphs.append(chartOutline);
@@ -1511,7 +1509,7 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
     locationSeries->setLabelsPosition(QtCharts::QStackedBarSeries::LabelsCenter);
 
     QtCharts::QBarSet *locationBarSet = new QtCharts::QBarSet(QString(), locationSeries);
-    locationBarSet->setColor(QColor("#864879"));
+    locationBarSet->setColor(StatisticsReport::pickRandomColor(StatisticsReport::Location));
     locationSeries->append(locationBarSet);
     locationBarSet->setLabelFont(tinyFont);
     locationBarSet->setLabelColor(Utils::Color::textColorFor(locationBarSet->color()));

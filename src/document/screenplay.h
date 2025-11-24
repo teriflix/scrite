@@ -1182,6 +1182,8 @@ public:
     QList<QColor> colors() const { return m_colors; }
     Q_SIGNAL void colorsChanged();
 
+    static QVector<QColor> defaultColors();
+
     Q_INVOKABLE ScreenplayTrack trackAt(int index) const;
 
     Q_INVOKABLE void reload() { this->refreshLater(); }

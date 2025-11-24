@@ -23,6 +23,7 @@
 #include "scritedocument.h"
 
 #include <QPdfWriter>
+#include <QRandomGenerator>
 #include <QScopeGuard>
 #include <QStandardPaths>
 #include <QTextCursor>
@@ -36,27 +37,51 @@ StatisticsReport::~StatisticsReport() { }
 
 const QVector<QColor> StatisticsReport::colors(ColorGroup group)
 {
-    if (group == Character)
-        return QVector<QColor>({ QColor(94, 54, 138), QColor(232, 191, 90) });
-    if (group == Beat)
-        return QVector<QColor>(
-                { QColor(206, 229, 208), QColor(243, 240, 215), QColor(254, 210, 170),
-                  QColor(255, 191, 134), QColor(219, 208, 192), QColor(250, 238, 224),
-                  QColor(249, 228, 200), QColor(249, 207, 147), QColor(121, 180, 183),
-                  QColor(254, 251, 243), QColor(248, 240, 223), QColor(157, 157, 157),
-                  QColor(255, 230, 153), QColor(255, 249, 182), QColor(255, 146, 146),
-                  QColor(255, 204, 210), QColor(233, 148, 151), QColor(243, 197, 131),
-                  QColor(232, 228, 110), QColor(179, 226, 131), QColor(134, 122, 233),
-                  QColor(255, 245, 171), QColor(255, 206, 173), QColor(196, 73, 194) });
-
-    return QVector<QColor>({ QColor(134, 72, 121), QColor(63, 51, 81) });
+    switch (group) {
+    case Character:
+    case Episode:
+        return { QColor(94, 54, 138), // #5E368A - Cyber Grape
+                 QColor(232, 191, 90) }; // #E8BF5A - Saffron
+    case Beat:
+        return ScreenplayTracks::defaultColors();
+    case Act:
+        return {
+            QColor(0, 90, 158), // #005A9E - Strong Blue
+            QColor(218, 56, 49), // #DA3831 - Bright Red
+            QColor(0, 120, 100), // #007864 - Teal Green
+            QColor(106, 76, 156), // #6A4C9C - Royal Purple
+            QColor(242, 148, 0), // #F29400 - Bright Orange
+            QColor(128, 130, 133), // #808285 - Medium Gray
+            QColor(139, 69, 19), // #8B4513 - Saddle Brown
+            QColor(23, 143, 173), // #178FAD - Cerulean Blue
+            QColor(255, 105, 180), // #FF69B4 - Hot Pink
+            QColor(60, 179, 113), // #3CB371 - Medium Sea Green
+            QColor(70, 130, 180), // #4682B4 - Steel Blue
+            QColor(210, 105, 30), // #D2691E - Chocolate
+            QColor(255, 215, 0), // #FFD700 - Gold
+            QColor(176, 48, 96), // #B03060 - Maroon
+            QColor(0, 191, 255), // #00BFFF - Deep Sky Blue
+            QColor(154, 205, 50), // #9ACD32 - Yellow Green
+            QColor(255, 69, 0), // #FF4500 - Orange Red
+            QColor(32, 178, 170), // #20B2AA - Light Sea Green
+            QColor(147, 112, 219), // #9370DB - Medium Purple
+            QColor(218, 165, 32), // #DAA520 - Goldenrod
+        };
+    default:
+        return {
+            QColor(134, 72, 121), // #864879 - Fuchsia Purple
+            QColor(255, 193, 7), // #FFC107 - Amber
+            QColor(76, 175, 80), // #4CAF50 - Green
+            QColor(3, 169, 244), // #03A9F4 - Light Blue
+            QColor(255, 87, 34), // #FF5722 - Deep Orange
+        };
+    }
 }
 
 const QColor StatisticsReport::pickColor(int index, bool cycleAround, ColorGroup group)
 {
     const QVector<QColor> colors = StatisticsReport::colors(group);
-    const QColor baseColor = colors.at(index % (colors.length()));
-    index = qAbs(index);
+    const QColor baseColor = colors.at(qAbs(index) % (colors.length()));
 
     if (cycleAround || index < colors.size())
         return baseColor;
@@ -65,6 +90,13 @@ const QColor StatisticsReport::pickColor(int index, bool cycleAround, ColorGroup
     const bool lighter = batch % 2;
     const int factor = 100 + batch * 50;
     return lighter ? baseColor.lighter(factor) : baseColor.darker(factor);
+}
+
+const QColor StatisticsReport::pickRandomColor(ColorGroup group)
+{
+    const QVector<QColor> list = colors(group);
+    int index = QRandomGenerator::system()->bounded(list.size());
+    return list.at(qBound(0, index, list.size() - 1));
 }
 
 void StatisticsReport::setIncludeCharacterPresenceGraphs(bool val)
@@ -194,6 +226,8 @@ QList<StatisticsReport::Distribution> StatisticsReport::textDistribution(bool co
         ret.append(dist);
         ++it;
     }
+
+    this->normalizeRatios(ret);
 
     return ret;
 }
@@ -334,10 +368,16 @@ QList<StatisticsReport::Distribution> StatisticsReport::actDistribution() const
         item.key = actScenes.first;
 
         if (baseColor == Qt::transparent)
-            item.color = StatisticsReport::pickColor(actIndex++);
+            item.color = StatisticsReport::pickColor(actIndex++, true,
+                                                     screenplay->episodeCount() > 0
+                                                             ? StatisticsReport::Act
+                                                             : StatisticsReport::Episode);
         else {
             if (actIndex > 0 && item.key == actName(0))
-                baseColor = StatisticsReport::pickColor(++episodeIndex);
+                baseColor = StatisticsReport::pickColor(++episodeIndex, true,
+                                                        screenplay->episodeCount() > 0
+                                                                ? StatisticsReport::Act
+                                                                : StatisticsReport::Episode);
 
             const bool baseColorIsLight = Utils::Color::isLight(baseColor);
             item.color = (actIndex++ % 2) ? baseColor.lighter(baseColorIsLight ? 150 : 240)
@@ -396,7 +436,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::episodeDistribution() co
     for (auto episodeScenes : qAsConst(episodeScenesList)) {
         StatisticsReport::Distribution item;
         item.key = episodeScenes.first;
-        item.color = StatisticsReport::pickColor(epIndex++);
+        item.color = StatisticsReport::pickColor(epIndex++, true, StatisticsReport::Episode);
 
         for (Scene *scene : qAsConst(episodeScenes.second))
             item.pixelLength += this->pixelLength(scene);
@@ -473,8 +513,8 @@ bool StatisticsReport::doGenerate(QTextDocument *textDocument)
     cursor = table->cellAt(0, 1).firstCursorPosition();
     cursor.insertText(QString::number(this->pageCount()));
     cursor = table->cellAt(0, 2).firstCursorPosition();
-    cursor.insertHtml(QStringLiteral(
-            "<font size=\"-2\">Page count may change in generated PDFs of the screenplay.</font>"));
+    cursor.insertHtml(QStringLiteral("<font size=\"-2\">Page count may change in generated "
+                                     "PDFs of the screenplay.</font>"));
 
     // Number of scenes
     cursor = table->cellAt(1, 0).firstCursorPosition();
@@ -595,3 +635,20 @@ void StatisticsReport::polish(Distribution &distribution) const
     distribution.pageLength = this->pageLength(distribution.pixelLength);
     distribution.timeLength = this->pixelLengthToTime(distribution.pixelLength);
 }
+
+void StatisticsReport::normalizeRatios(QList<Distribution> &distributions) const
+{
+    // NOTE: This assumes that each of the Distributions in the list are already
+    // polished.
+    const qreal totalRatio =
+            std::accumulate(distributions.begin(), distributions.end(), qreal(0),
+                            [](qreal sum, const Distribution &d) { return sum += d.ratio; });
+    if (qFuzzyIsNull(totalRatio) || totalRatio < 0)
+        return;
+
+    for (Distribution &d : distributions) {
+        d.ratio = d.ratio / totalRatio;
+        const int cent = qRound(d.ratio * 100);
+        d.percent = QString::number(cent) + QStringLiteral("%");
+    }
+};

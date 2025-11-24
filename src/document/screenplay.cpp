@@ -3583,81 +3583,7 @@ ScreenplayTracks::ScreenplayTracks(QObject *parent)
     connect(this, &ScreenplayTracks::rowsInserted, this, &ScreenplayTracks::trackCountChanged);
     connect(this, &ScreenplayTracks::rowsRemoved, this, &ScreenplayTracks::trackCountChanged);
 
-#if 0
-// Option 0
-    m_colors = {
-        QColor(47, 79, 79), // #2F4F4F - Dark Slate Gray
-        QColor(0, 100, 0), // #006400 - Dark Green
-        QColor(72, 61, 139), // #483D8B - Dark Slate Blue
-        QColor(139, 0, 0), // #8B0000 - Dark Red
-        QColor(75, 0, 130), // #4B0082 - Indigo
-        QColor(85, 107, 47), // #556B2F - Dark Olive Green
-        QColor(0, 128, 128), // #008080 - Teal
-        QColor(139, 69, 19), // #8B4513 - Saddle Brown
-        QColor(148, 0, 211), // #9400D3 - Dark Violet
-        QColor(25, 25, 112), // #191970 - Midnight Blue
-        QColor(139, 0, 139), // #8B008B - Dark Magenta
-        QColor(107, 142, 35), // #6B8E23 - Olive Drab
-        QColor(95, 158, 160), // #5F9EA0 - Cadet Blue
-        QColor(178, 34, 34), // #B22222 - Firebrick
-        QColor(70, 130, 180), // #4682B4 - Steel Blue
-        QColor(0, 0, 128), // #000080 - Navy
-        QColor(128, 0, 0), // #800000 - Maroon
-        QColor(34, 139, 34), // #228B22 - Forest Green
-        QColor(105, 105, 105), // #696969 - Dim Gray
-        QColor(112, 128, 144) // #708090 - Slate Gray
-    };
-#endif
-
-    // Option 1
-    m_colors = {
-        QColor(115, 147, 153), // #739399  (blue-teal)
-        QColor(129, 103, 140), // #7f678c  (purple)
-        QColor(150, 148, 129), // #969481  (olive-neutral)
-        QColor(138, 125, 140), // #8a7d8c  (dusty mauve)
-        QColor(100, 125, 143), // #647d8f  (blue-grey)
-        QColor(142, 149, 122), // #8e957a  (sage green)
-        QColor(173, 136, 147), // #ad8893  (rose)
-        QColor(95, 121, 119), // #5f7977  (desaturated teal)
-        QColor(157, 145, 145), // #9d9191  (warm grey)
-        QColor(115, 108, 129), // #736c81  (violet-grey)
-        QColor(118, 134, 109), // #76866d  (green-brown)
-        QColor(138, 151, 169), // #8a97a9  (cool blue-grey)
-        QColor(133, 112, 112), // #857070  (brownish mauve)
-        QColor(113, 117, 140), // #71758c  (indigo-grey)
-        QColor(129, 120, 110), // #81786e  (taupe)
-        QColor(146, 120, 140), // #92788c  (violet-rose)
-        QColor(104, 135, 121), // #688779  (soft teal-green)
-        QColor(173, 136, 136), // #ad8888  (muted clay pink)
-        QColor(157, 112, 112), // #957070  (dusty brick)
-        QColor(138, 151, 169), // #8a97a9  (cool steel blue)
-    };
-
-#if 0
-// Option 2
-    m_colors = {
-        QColor(89, 145, 145),  // #599191  - Deep Teal
-        QColor(179, 116, 116), // #b37474  - Muted Rose Clay
-        QColor(89, 89, 145),   // #595991  - Indigo Blue
-        QColor(110, 156, 110), // #6e9c6e  - Sage Green
-        QColor(165, 100, 193), // #a564c1  - Amethyst Purple
-        QColor(129, 139, 113), // #818b71  - Moss Olive
-        QColor(137, 163, 185), // #89a3b9  - Misty Steel Blue
-        QColor(145, 89, 89),   // #915959  - Dusty Maroon
-        QColor(149, 176, 177), // #95b0b1  - Pale Aqua Grey
-        QColor(151, 90, 151),  // #975a97  - Plum Violet
-        QColor(147, 147, 147), // #939393  - Neutral Grey
-        QColor(85, 129, 85),   // #558155  - Forest Green
-        QColor(131, 126, 160), // #837ea0  - Lavender Grey
-        QColor(154, 123, 101), // #9a7b65  - Soft Brown Clay
-        QColor(109, 123, 123), // #6d7b7b  - Slate Dust
-        QColor(156, 163, 170), // #9ca3aa  - Cool Grey Blue
-        QColor(151, 90, 90),   // #975a5a  - Muted Brick Red
-        QColor(143, 158, 111), // #8f9e6f  - Olive Green
-        QColor(101, 101, 140), // #65658c  - Dusty Violet Blue
-        QColor(122, 89, 147),  // #7a5993  - Royal Purple
-    };
-#endif
+    m_colors = QList<QColor>::fromVector(defaultColors());
 }
 
 ScreenplayTracks::~ScreenplayTracks() { }
@@ -3780,6 +3706,85 @@ void ScreenplayTracks::setColors(const QList<QColor> &val)
     emit colorsChanged();
 }
 
+QVector<QColor> ScreenplayTracks::defaultColors()
+{
+#if 0
+    // Option 0
+    return {
+        QColor(47, 79, 79), // #2F4F4F - Dark Slate Gray
+        QColor(0, 100, 0), // #006400 - Dark Green
+        QColor(72, 61, 139), // #483D8B - Dark Slate Blue
+        QColor(139, 0, 0), // #8B0000 - Dark Red
+        QColor(75, 0, 130), // #4B0082 - Indigo
+        QColor(85, 107, 47), // #556B2F - Dark Olive Green
+        QColor(0, 128, 128), // #008080 - Teal
+        QColor(139, 69, 19), // #8B4513 - Saddle Brown
+        QColor(148, 0, 211), // #9400D3 - Dark Violet
+        QColor(25, 25, 112), // #191970 - Midnight Blue
+        QColor(139, 0, 139), // #8B008B - Dark Magenta
+        QColor(107, 142, 35), // #6B8E23 - Olive Drab
+        QColor(95, 158, 160), // #5F9EA0 - Cadet Blue
+        QColor(178, 34, 34), // #B22222 - Firebrick
+        QColor(70, 130, 180), // #4682B4 - Steel Blue
+        QColor(0, 0, 128), // #000080 - Navy
+        QColor(128, 0, 0), // #800000 - Maroon
+        QColor(34, 139, 34), // #228B22 - Forest Green
+        QColor(105, 105, 105), // #696969 - Dim Gray
+        QColor(112, 128, 144) // #708090 - Slate Gray
+    };
+#endif
+
+    // Option 1
+    return {
+        QColor(115, 147, 153), // #739399  (blue-teal)
+        QColor(129, 103, 140), // #7f678c  (purple)
+        QColor(150, 148, 129), // #969481  (olive-neutral)
+        QColor(138, 125, 140), // #8a7d8c  (dusty mauve)
+        QColor(100, 125, 143), // #647d8f  (blue-grey)
+        QColor(142, 149, 122), // #8e957a  (sage green)
+        QColor(173, 136, 147), // #ad8893  (rose)
+        QColor(95, 121, 119), // #5f7977  (desaturated teal)
+        QColor(157, 145, 145), // #9d9191  (warm grey)
+        QColor(115, 108, 129), // #736c81  (violet-grey)
+        QColor(118, 134, 109), // #76866d  (green-brown)
+        QColor(138, 151, 169), // #8a97a9  (cool blue-grey)
+        QColor(133, 112, 112), // #857070  (brownish mauve)
+        QColor(113, 117, 140), // #71758c  (indigo-grey)
+        QColor(129, 120, 110), // #81786e  (taupe)
+        QColor(146, 120, 140), // #92788c  (violet-rose)
+        QColor(104, 135, 121), // #688779  (soft teal-green)
+        QColor(173, 136, 136), // #ad8888  (muted clay pink)
+        QColor(157, 112, 112), // #957070  (dusty brick)
+        QColor(138, 151, 169), // #8a97a9  (cool steel blue)
+    };
+
+#if 0
+    // Option 2
+    return {
+        QColor(89, 145, 145),  // #599191  - Deep Teal
+        QColor(179, 116, 116), // #b37474  - Muted Rose Clay
+        QColor(89, 89, 145),   // #595991  - Indigo Blue
+        QColor(110, 156, 110), // #6e9c6e  - Sage Green
+        QColor(165, 100, 193), // #a564c1  - Amethyst Purple
+        QColor(129, 139, 113), // #818b71  - Moss Olive
+        QColor(137, 163, 185), // #89a3b9  - Misty Steel Blue
+        QColor(145, 89, 89),   // #915959  - Dusty Maroon
+        QColor(149, 176, 177), // #95b0b1  - Pale Aqua Grey
+        QColor(151, 90, 151),  // #975a97  - Plum Violet
+        QColor(147, 147, 147), // #939393  - Neutral Grey
+        QColor(85, 129, 85),   // #558155  - Forest Green
+        QColor(131, 126, 160), // #837ea0  - Lavender Grey
+        QColor(154, 123, 101), // #9a7b65  - Soft Brown Clay
+        QColor(109, 123, 123), // #6d7b7b  - Slate Dust
+        QColor(156, 163, 170), // #9ca3aa  - Cool Grey Blue
+        QColor(151, 90, 90),   // #975a5a  - Muted Brick Red
+        QColor(143, 158, 111), // #8f9e6f  - Olive Green
+        QColor(101, 101, 140), // #65658c  - Dusty Violet Blue
+        QColor(122, 89, 147),  // #7a5993  - Royal Purple
+    };
+#endif
+}
+
 ScreenplayTrack ScreenplayTracks::trackAt(int index) const
 {
     return index < 0 || index >= m_tracks.size() ? ScreenplayTrack() : m_tracks.at(index);
@@ -3880,6 +3885,13 @@ void ScreenplayTracks::refresh()
         }
     }
 
+    if (structureTagsMap.isEmpty()) {
+        this->beginResetModel();
+        m_tracks.clear();
+        this->endResetModel();
+        return;
+    }
+
     this->beginResetModel();
 
     m_tracks.clear();
@@ -3976,41 +3988,43 @@ void ScreenplayTracks::refresh()
         ++it;
     }
 
-    std::sort(m_tracks.begin(), m_tracks.end(),
-              [](const ScreenplayTrack &a, const ScreenplayTrack &b) {
-                  if (a.name.isEmpty() || b.name.isEmpty()) {
-                      if (a.name.isEmpty() && b.name.isEmpty())
-                          return 0;
-                      return a.name.isEmpty() ? -1 : 1;
-                  }
-                  return 0;
-              });
+    if (!m_tracks.isEmpty()) {
+        std::sort(m_tracks.begin(), m_tracks.end(),
+                  [](const ScreenplayTrack &a, const ScreenplayTrack &b) {
+                      if (a.name.isEmpty() || b.name.isEmpty()) {
+                          if (a.name.isEmpty() && b.name.isEmpty())
+                              return 0;
+                          return a.name.isEmpty() ? -1 : 1;
+                      }
+                      return 0;
+                  });
 
-    for (int i = 0; i < m_tracks.size(); i++) {
-        if (m_tracks[i].name == stackTrackId) {
-            ScreenplayTrack track = m_tracks.takeAt(i);
-            track.name = m_stackTrackName;
-            m_tracks.append(track);
-            break;
+        for (int i = 0; i < m_tracks.size(); i++) {
+            if (m_tracks[i].name == stackTrackId) {
+                ScreenplayTrack track = m_tracks.takeAt(i);
+                track.name = m_stackTrackName;
+                m_tracks.append(track);
+                break;
+            }
         }
-    }
 
-    // Assign track and item colors
-    QColor trackColor = Qt::darkGray;
-    for (int trackIndex = 0; trackIndex < m_tracks.size(); trackIndex++) {
-        ScreenplayTrack &track = m_tracks[trackIndex];
-        track.color = trackColor;
-        trackColor = trackColor.lighter(120);
-        if (trackColor == Qt::white)
-            trackColor = Qt::darkGray;
+        // Assign track and item colors
+        QColor trackColor = Qt::darkGray;
+        for (int trackIndex = 0; trackIndex < m_tracks.size(); trackIndex++) {
+            ScreenplayTrack &track = m_tracks[trackIndex];
+            track.color = trackColor;
+            trackColor = trackColor.lighter(120);
+            if (trackColor == Qt::white)
+                trackColor = Qt::darkGray;
 
-        int colorIndex = 0;
-        for (ScreenplayTrackItem &item : track.items) {
-            const int lightFactor = 100 + 35 * (trackIndex % 4);
-            item.color = m_colors.at(colorIndex);
-            if (lightFactor > 100)
-                item.color = item.color.lighter(lightFactor);
-            colorIndex = (colorIndex + 1) % m_colors.size();
+            int colorIndex = 0;
+            for (ScreenplayTrackItem &item : track.items) {
+                const int lightFactor = 100 + 35 * (trackIndex % 4);
+                item.color = m_colors.at(colorIndex);
+                if (lightFactor > 100)
+                    item.color = item.color.lighter(lightFactor);
+                colorIndex = (colorIndex + 1) % m_colors.size();
+            }
         }
     }
 

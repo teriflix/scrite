@@ -873,7 +873,7 @@ private:
 private:
     QString m_age;
     QString m_name;
-    QColor m_color = Qt::white;
+    QColor m_color = Qt::transparent;
     QString m_type = QStringLiteral("Human");
     QString m_weight;
     QString m_height;
