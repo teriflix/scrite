@@ -33,19 +33,12 @@ ToolBar {
     Material.primary: Runtime.colors.primary.key
     Material.theme: Runtime.colors.theme
 
-    GridLayout {
+    Flow {
         id: _layout
 
-        readonly property size buttonSize: Runtime.estimateTypeSize("ToolButton { icon.source: \"qrc:/icons/content/blank.png\"; display: ToolButton.IconOnly; }")
-        property int buttonCount: (actions ? actions.count : 0) + 1
-
-        anchors.fill: parent
+        height: parent.height
 
         flow: Flow.TopToBottom
-        rows: Math.floor(root.height/buttonSize.height)
-        columns: Math.ceil( (buttonCount * buttonSize.height)/root.height )
-        rowSpacing: 0
-        columnSpacing: 0
 
         Repeater {
             model: root.actions
@@ -55,15 +48,6 @@ ToolBar {
 
                 action: qmlAction
             }
-        }
-
-        Item {
-            Layout.row: _layout.rows-1
-            Layout.column: _layout.columns-1
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.minimumWidth: _layout.buttonSize.width
-            Layout.minimumHeight: _layout.buttonSize.height
         }
     }
 }
