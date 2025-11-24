@@ -312,7 +312,13 @@ Loader {
                         font.pointSize: _private.fontMetrics.font.pointSize
                         font.underline: containsMouse
 
-                        onClicked: Qt.openUrlExternally("mailto:" + text)
+                        onClicked: {
+                            if(SMath.isValidEmail(text)) {
+                                _private.launchTitlePageEditorDialog()
+                            } else {
+                                Qt.openUrlExternally("mailto:" + text)
+                            }
+                        }
                     }
 
                     Link {
@@ -328,7 +334,13 @@ Loader {
                         font.pointSize: _private.fontMetrics.font.pointSize
                         font.underline: containsMouse
 
-                        onClicked: Qt.openUrlExternally(text)
+                        onClicked: {
+                            if(SMath.isValidUrl(text)) {
+                                Qt.openUrlExternally(text)
+                            } else {
+                                _private.launchTitlePageEditorDialog()
+                            }
+                        }
                     }
                 }
 

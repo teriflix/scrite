@@ -2001,6 +2001,27 @@ bool Utils::SMath::doListsIntersect(const QStringList &a, const QStringList &b,
     return false;
 }
 
+bool Utils::SMath::isValidUrl(const QString &url)
+{
+    if (!url.isEmpty()) {
+        const QUrl qurl(url);
+        return qurl.isValid() && !qurl.isRelative();
+    }
+
+    return false;
+}
+
+bool Utils::SMath::isValidEmail(const QString &email)
+{
+    if (!email.isEmpty()) {
+        const QRegularExpression emailRegex(
+                R"((^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$))");
+        return emailRegex.match(email).hasMatch();
+    }
+
+    return false;
+}
+
 /**
  * \brief Converts a QPainterPath to a string.
  * \param val The painter path.

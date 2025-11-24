@@ -817,6 +817,9 @@ public:
     Q_INVOKABLE static bool doListsIntersect(const QStringList &a, const QStringList &b,
                                              Qt::CaseSensitivity cs = Qt::CaseInsensitive);
 
+    Q_INVOKABLE static bool isValidUrl(const QString &url);
+    Q_INVOKABLE static bool isValidEmail(const QString &email);
+
     static QString painterPathToString(const QPainterPath &val);
 
     static QPainterPath stringToPainterPath(const QString &val);
