@@ -6,7 +6,7 @@ TARGET = Scrite
 CONFIG += c++17
 DEFINES += PHTRANSLATE_STATICLIB
 
-VERSION = 1.9.6
+VERSION = 1.9.7
 DEFINES += SCRITE_VERSION=\\\"$$VERSION\\\"
 DEFINES += SCRITE_VERSION_TYPE=\\\"beta\\\"
 
@@ -95,7 +95,6 @@ HEADERS += \
     src/quick/objects/basicfileiconprovider.h \
     src/quick/objects/basicfileinfo.h \
     src/quick/objects/batchchange.h \
-    src/quick/objects/clipboard.h \
     src/quick/objects/colorimageprovider.h \
     src/quick/objects/completionmodel.h \
     src/quick/objects/contextmenuevent.h \
@@ -231,7 +230,6 @@ SOURCES += \
     src/quick/objects/basicfileiconprovider.cpp \
     src/quick/objects/basicfileinfo.cpp \
     src/quick/objects/batchchange.cpp \
-    src/quick/objects/clipboard.cpp \
     src/quick/objects/colorimageprovider.cpp \
     src/quick/objects/completionmodel.cpp \
     src/quick/objects/contextmenuevent.cpp \
@@ -343,7 +341,7 @@ QTQUICK_COMPILER_SKIPPED_RESOURCES += scrite_misc.qrc
 macx {
     ICON = appicon.icns
     QMAKE_INFO_PLIST = Info.plist
-    VERSION_INFO = "1.9.6-macos"
+    VERSION_INFO = "1.9.7-macos"
 
     HEADERS += src/core/platformtransliterator_macos.h
     OBJECTIVE_SOURCES += src/core/platformtransliterator_macos.mm
@@ -355,9 +353,9 @@ macx {
 
 win32 {
     contains(QT_ARCH, i386) {
-        VERSION_INFO = "1.9.6-windows-x86"
+        VERSION_INFO = "1.9.7-windows-x86"
     } else {
-        VERSION_INFO = "1.9.6-windows-x64"
+        VERSION_INFO = "1.9.7-windows-x64"
     }
 
     RC_ICONS = appicon.ico
@@ -369,7 +367,7 @@ win32 {
 
 linux {
     CONFIG+=use_gold_linker
-    VERSION_INFO = "1.9.6-linux"
+    VERSION_INFO = "1.9.7-linux"
 
     SOURCES += src/core/platformtransliterator_linux.cpp
 }

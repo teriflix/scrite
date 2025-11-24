@@ -108,13 +108,13 @@ Item {
                     VclButton {
                         anchors.centerIn: parent
 
-                        visible: Clipboard.text.length === 20
+                        visible: clipboard.text.length === 20
 
                         text: "Paste"
 
                         onClicked: {
-                            activationCodeField.text = Clipboard.text
-                            Clipboard.text = ""
+                            activationCodeField.text = clipboard.text
+                            clipboard.text = ""
                         }
                     }
                 }
@@ -133,6 +133,10 @@ Item {
             anchors.centerIn: parent
             running: activateCall.busy || sendActivationCodeCall.busy
         }
+    }
+
+    SystemClipboard {
+        id: clipboard
     }
 
     AppActivateDeviceRestApiCall {

@@ -831,6 +831,36 @@ public:
                                         int *nrReplacements = nullptr);
 };
 
+class SystemClipboard : public QObject
+{
+    Q_OBJECT
+    QML_NAMED_ELEMENT(SystemClipboard)
+
+public:
+    explicit SystemClipboard(QObject *parent = nullptr);
+    virtual ~SystemClipboard();
+
+    // clang-format off
+    Q_PROPERTY(bool valid
+               READ isValid
+               CONSTANT)
+    // clang-format on
+    bool isValid() const { return m_clipboard != nullptr; }
+
+    // clang-format off
+    Q_PROPERTY(QString text
+               READ text
+               WRITE setText
+               NOTIFY textChanged)
+    // clang-format on
+    void setText(const QString &val);
+    QString text() const;
+    Q_SIGNAL void textChanged();
+
+private:
+    QClipboard *m_clipboard = nullptr;
+};
+
 }
 
 #endif // UTILS_H

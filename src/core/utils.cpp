@@ -2156,3 +2156,28 @@ QString Utils::SMath::replaceCharacterName(const QString &from, const QString &t
 
     return in;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+Utils::SystemClipboard::SystemClipboard(QObject *parent) : QObject(parent)
+{
+    m_clipboard = qApp->clipboard();
+    if (m_clipboard != nullptr)
+        connect(m_clipboard, &QClipboard::changed, this, &SystemClipboard::textChanged);
+}
+
+Utils::SystemClipboard::~SystemClipboard() { }
+
+void Utils::SystemClipboard::setText(const QString &val)
+{
+    if (m_clipboard != nullptr)
+        m_clipboard->setText(val);
+}
+
+QString Utils::SystemClipboard::text() const
+{
+    if (m_clipboard != nullptr)
+        return m_clipboard->text();
+
+    return QString();
+}

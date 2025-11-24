@@ -97,11 +97,14 @@ DialogLauncher {
                     ToolButton {
                         icon.source: "qrc:/icons/content/content_copy.png"
                         onClicked: {
-                            if(Clipboard.set(root.inviteUrl)) {
-                                MessageBox.information("Copy Successful",
-                                                       "The invite link was copied to clipboard",
-                                                       () => { })
-                            }
+                            clipboard.text = root.inviteUrl
+                            MessageBox.information("Copy Successful",
+                                                   "The invite link was copied to clipboard",
+                                                   () => { })
+                        }
+
+                        SystemClipboard {
+                            id: clipboard
                         }
                     }
                 }
