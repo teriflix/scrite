@@ -184,6 +184,8 @@ Flickable {
 
                             hoverEnabled: true
 
+                            onClicked: root.screenplay.currentElementIndex = _trackItem.startItem.index
+
                             onMouseXChanged: maybeTooltip()
                             onMouseYChanged: maybeTooltip()
                             onContainsMouseChanged: maybeTooltip()

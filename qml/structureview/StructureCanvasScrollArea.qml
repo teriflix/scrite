@@ -155,7 +155,7 @@ ScrollArea {
     Connections {
         target: Scrite.document
 
-        function onJustLoaded() { _private.updateFromScriteDocumentUserDataLater() }
+        function onJustLoaded() { _private.updateFromScriteDocumentUserData() }
     }
 
     onContentXChanged: Qt.callLater(_private.updateScriteDocumentUserData)
@@ -212,8 +212,6 @@ ScrollArea {
         }
 
         function updateFromScriteDocumentUserData() {
-            root.enablePanAndZoomAnimation(500);
-
             if(Scrite.document.structure.forceBeatBoardLayout)
                 Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
 
@@ -247,6 +245,7 @@ ScrollArea {
 
             root.returnToBounds()
 
+            root.enablePanAndZoomAnimation();
             updateScriteDocumentUserDataEnabled = true
             Runtime.firstSwitchToStructureTab = false
         }
