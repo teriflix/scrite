@@ -193,6 +193,12 @@ VclDialog {
                         exportJob.copyToClipboard = false
                         exportJob.start()
                     }
+
+                    ActionHandler {
+                        action: root.acceptAction
+
+                        onTriggered: _exportButton.clicked()
+                    }
                 }
             }
 

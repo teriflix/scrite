@@ -267,6 +267,12 @@ VclDialog {
                     enabled: report.fileName !== "" && _private.reportEnabled
                     text: "Generate"
                     onClicked: generateReportJob.start()
+
+                    ActionHandler {
+                        action: root.acceptAction
+
+                        onTriggered: generateReportJob.start()
+                    }
                 }
             }
 

@@ -146,6 +146,13 @@ Item {
                                     dialog.buttonClicked(text)
                                     Qt.callLater(dialog.close)
                                 }
+
+                                ActionHandler {
+                                    action: dialog.acceptAction
+                                    enabled: dialog.buttons.length === 1 && button.index === 0
+
+                                    onTriggered: button.clicked()
+                                }
                             }
                         }
                     }
