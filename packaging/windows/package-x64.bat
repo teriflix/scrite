@@ -1,6 +1,6 @@
 copy ..\..\..\Release\scrite.exe .
 %CodeSignTool% sign /tr http://timestamp.sectigo.com /td sha256 /fd sha256 /a scrite.exe
-copy C:\Qt\vcredist\vcredist_msvc2019_x64.exe vcredist_x64.exe
+copy C:\Qt\vcredist\vcredist_msvc2022_x64.exe vcredist_x64.exe
 copy %SCRITE_OPENSSL_LIBS%\openssl-1.1\x64\bin\libcrypto-1_1-x64.dll .
 copy %SCRITE_OPENSSL_LIBS%\openssl-1.1\x64\bin\libssl-1_1-x64.dll .
 windeployqt --qmldir ..\..\qml --no-compiler-runtime --no-translations . --list relative > files.txt
