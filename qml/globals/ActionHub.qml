@@ -1648,6 +1648,55 @@ Item {
         }
     }
 
+    readonly property ActionManager storyStructureOptions: ActionManager {
+        title: "Story Structure"
+        objectName: "storyStructureOptions"
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+
+            objectName: "customizeGrouping"
+            text: "Customize Beats"
+
+            onTriggered: StructureStoryBeatsDialog.launch()
+        }
+
+        Action {
+            enabled: Runtime.mainWindowTab === Runtime.MainWindowTab.StructureTab
+            checkable: true
+            checked: Scrite.document.structure.preferredGroupCategory === ""
+            text: "Acts"
+
+            onToggled: {
+                if(checked)
+                    Scrite.document.structure.preferredGroupCategory = ""
+            }
+        }
+    }
+
+    Repeater {
+        model: Scrite.document.structure.groupCategories
+
+        Item {
+            required property string modelData
+
+            Action {
+                ActionManager.target: root.storyStructureOptions
+
+                enabled: Runtime.mainWindowTab === Runtime.MainWindowTab.StructureTab
+                checkable: true
+                checked: Scrite.document.structure.preferredGroupCategory === modelData
+                text: SMath.titleCased(modelData)
+
+                onToggled: {
+                    if(checked)
+                    Scrite.document.structure.preferredGroupCategory = modelData
+                }
+            }
+        }
+    }
+
     readonly property ActionManager notebookOperations: ActionManager {
         title: "Notebook"
         objectName: "notebookOperations"

@@ -44,7 +44,7 @@ GridBackground {
 
     required property rect canvasScrollViewportRect
 
-    property alias groupCategory: _elementLayer.groupCategory
+    readonly property alias groupCategory: _elementLayer.groupCategory
     property alias createItemMode: _createItemHandler.mode
     property alias rubberbandSelectionMode: _elementLayer.rubberbandSelectionMode
 

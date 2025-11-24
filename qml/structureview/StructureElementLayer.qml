@@ -282,7 +282,7 @@ Item {
     }
 
     onGroupCategoryChanged: {
-        Scrite.document.structure.preferredGroupCategory = groupCategory
+        // Scrite.document.structure.preferredGroupCategory = groupCategory
         Runtime.execLater(root, 250, _private.reevaluateEpisodeAndGroupBoxes)
     }
 

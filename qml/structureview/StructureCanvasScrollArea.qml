@@ -76,7 +76,7 @@ ScrollArea {
     }
 
     function switchGroupCategory(groupCategory) {
-        _canvas.groupCategory = groupCategory
+        Scrite.document.structure.preferredGroupCategory = groupCategory
     }
 
     function selectAllElements() {

@@ -171,7 +171,7 @@ Item {
                                 }
 
         onGroupCategoryRequest: (groupCategory) => {
-                                    _canvasScroll.canvas.groupCategory = groupCategory
+                                    Scrite.document.structure.preferredGroupCategory = groupCategory
                                 }
 
         onNewColoredSceneRequest: (sceneColor) => {
