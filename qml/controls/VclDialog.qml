@@ -73,7 +73,7 @@ Dialog {
     property alias contentInstance: _contentItemLoader.item
 
     readonly property Action acceptAction: Action {
-        enabled: ActionHandler.enabled
+        enabled: ActionHandler.canHandle
     }
 
     // Customise the buttons to show on the tilebar on the right side.
@@ -128,6 +128,9 @@ Dialog {
         EventFilter.active: root.acceptAction.enabled && _contentItemLoader.item && root.visible
         EventFilter.events: [EventFilter.KeyPress]
         EventFilter.onFilter: (object, event, result) => {
+                                  result.filter = false
+                                  result.accepted = false
+
                                   if(event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                                       result.filter = true
                                       result.accepted = true
