@@ -157,6 +157,9 @@ Item {
             Layout.fillHeight: true
 
             color: Runtime.colors.primary.c100.background
+            enabled: _private.language !== undefined
+            opacity: enabled ? 1 : 0.5
+
             border.color: Runtime.colors.primary.borderColor
             border.width: 1
 
@@ -172,8 +175,8 @@ Item {
                     VclLabel {
                         Layout.alignment: Qt.AlignHCenter
 
-                        text: _private.language.nativeName
-                        font.family: _private.language.font().family
+                        text: _private.language !== undefined ? _private.language.nativeName : "- NA -"
+                        font.family: _private.language !== undefined ? _private.language.font().family : Runtime.idealFontMetrics.font.family
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 5
                     }
 
@@ -192,9 +195,9 @@ Item {
                                 Layout.fillWidth: true
 
                                 opacity: enabled ? 1 : 0.5
-                                description: "Shortcut for switching to <b>" + _private.language.nativeName + "</b> language"
-                                enabled: !DefaultTransliteration.supportsLanguageCode(_private.language.code) && _private.language.code !== QtLocale.English
-                                portableShortcut: _private.language.shortcut()
+                                description: _private.language !== undefined ? "Shortcut for switching to <b>" + _private.language.nativeName + "</b> language" : "Shortcut"
+                                enabled: _private.language !== undefined ? (!DefaultTransliteration.supportsLanguageCode(_private.language.code) && _private.language.code !== QtLocale.English) : false
+                                portableShortcut: _private.language !== undefined ? _private.language.shortcut() : ""
 
                                 onShortcutEdited: (newShortcut) => {
                                                       const conflictingAction = _private.actionsModel.findActionForShortcut(newShortcut)
@@ -218,23 +221,24 @@ Item {
                                 width: parent.width
 
                                 VclComboBox {
-                                    property var languageFonts: _private.language.fontFamilies()
+                                    property var languageFonts: _private.language !== undefined ? _private.language.fontFamilies() : []
 
                                     Layout.fillWidth: true
 
                                     model: languageFonts
                                     padding: 0
-                                    currentIndex: languageFonts.indexOf(_private.language.font().family)
+                                    currentIndex: _private.language !== undefined ? languageFonts.indexOf(_private.language.font().family) : -1
 
                                     onActivated: (index) => {
-                                                     Runtime.language.supported.assignLanguageFontFamily(_private.language.code, languageFonts[index])
+                                                     if(_private.language)
+                                                        Runtime.language.supported.assignLanguageFontFamily(_private.language.code, languageFonts[index])
                                                  }
                                 }
 
                                 VclText {
                                     Layout.fillWidth: true
 
-                                    text: "<b>NOTE:</b> Languages with " + _private.language.charScriptName() + " script, will share the same font."
+                                    text: _private.language !== undefined ? "<b>NOTE:</b> Languages with " + _private.language.charScriptName() + " script, will share the same font." : ""
                                     wrapMode: Text.WordWrap
                                 }
                             }
@@ -250,13 +254,15 @@ Item {
 
                                 VclCheckBox {
                                     text: "Auto Select"
-                                    checked: _private.language.preferredTransliterationOptionId === ""
+                                    checked: _private.language !== undefined ? _private.language.preferredTransliterationOptionId === "" : ""
 
                                     onToggled: {
-                                        if(checked) {
-                                            Runtime.language.supported.resetLanguageTranslator(_private.language.code);
-                                        } else {
-                                            Runtime.language.supported.useLanguageTransliteratorId(_private.language.code, _private.language.preferredTransliterationOption().id)
+                                        if(_private.language) {
+                                            if(checked) {
+                                                Runtime.language.supported.resetLanguageTranslator(_private.language.code);
+                                            } else {
+                                                Runtime.language.supported.useLanguageTransliteratorId(_private.language.code, _private.language.preferredTransliterationOption().id)
+                                            }
                                         }
                                     }
                                 }
@@ -265,12 +271,14 @@ Item {
                                     Layout.fillWidth: true
 
                                     model: _private.transliterationOptionsModel
-                                    enabled: _private.language.preferredTransliterationOptionId !== ""
+                                    enabled: _private.language !== undefined && _private.language.preferredTransliterationOptionId !== ""
                                     textRole: "display"
                                     valueRole: "id"
-                                    currentIndex: indexOfValue(_private.language.preferredTransliterationOption().id)
+                                    currentIndex: _private.language !== undefined ? indexOfValue(_private.language.preferredTransliterationOption().id) : -1
                                     onActivated: (index) => {
-                                                     Runtime.language.supported.useLanguageTransliteratorId( _private.language.code, _private.transliterationOptionsModel.get(index).id )
+                                                     if(_private.language) {
+                                                        Runtime.language.supported.useLanguageTransliteratorId( _private.language.code, _private.transliterationOptionsModel.get(index).id )
+                                                     }
                                                  }
                                 }
                             }
@@ -368,7 +376,7 @@ Item {
 
         property int previouslyActiveLanguage: -1
 
-        property var language: _listView.currentItem.language
+        property var language: _listView.currentItem ? _listView.currentItem.language : undefined
 
         property ListModel transliterationOptionsModel: ListModel { }
 
@@ -383,6 +391,8 @@ Item {
 
         function populateTransliterationOptionsModel() {
             transliterationOptionsModel.clear()
+            if(language === undefined)
+                return
 
             const options = language.transliterationOptions()
             for(let i=0; i<options.length; i++) {
