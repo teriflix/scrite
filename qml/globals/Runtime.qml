@@ -991,6 +991,7 @@ Item {
 
         function onJustReset() {
             Runtime.firstSwitchToStructureTab = true
+            Runtime.screenplayEditorSettings.sceneSidePanelOpen = false
             Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
         }
 

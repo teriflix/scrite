@@ -30,6 +30,8 @@ Item {
 
     property alias currentTab: _private.currentTab
 
+    function cycleTab() { _private.cycleTab() }
+
     height: _layout.height
 
     Column {
@@ -103,5 +105,17 @@ Item {
                 "tabWhenNotVisible": ExpandedCorner.Tab.CommentsTab
             }
         ]
+
+        function cycleTab() {
+            const buttons = buttonsModel
+            let tab = (currentTab+1)%buttons.length
+            while(1) {
+                if(buttons[tab].isVisible) {
+                    currentTab = buttons[tab].tab
+                    return
+                }
+                tab = (tab+1)%buttons.length
+            }
+        }
     }
 }

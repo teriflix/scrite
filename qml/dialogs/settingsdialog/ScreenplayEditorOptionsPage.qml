@@ -70,6 +70,8 @@ Item {
                 title: "Toggleable Options"
 
                 Grid {
+                    id: _grid
+
                     width: parent.width
 
                     columns: 2
@@ -83,7 +85,7 @@ Item {
 
                             property var qmlAction: modelData
 
-                            width: (_layout.width-_layout.columnSpacing)/_layout.columns
+                            width: (_grid.width-_grid.columnSpacing)/_grid.columns
 
                             action: qmlAction
 

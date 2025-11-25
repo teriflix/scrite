@@ -191,6 +191,14 @@ ListView {
                      }
     }
 
+    ActionHandler {
+        action: ActionHub.editOptions.find("toggleCommentsPanel")
+
+        onTriggered: (source) => {
+
+                     }
+    }
+
     QtObject {
         id: _private
 

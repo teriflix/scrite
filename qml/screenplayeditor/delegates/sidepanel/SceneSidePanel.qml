@@ -16,7 +16,6 @@ import QtQuick 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/screenplayeditor/delegates/sceneparteditors/"
@@ -60,6 +59,16 @@ AbstractScenePartEditor {
         onExpandedChanged: Runtime.screenplayEditorSettings.sceneSidePanelOpen = expanded
     }
 
+    ActionHandler {
+        action: ActionHub.editOptions.find("toggleCommentsPanel")
+
+        enabled: root.isCurrent
+        checked: Runtime.screenplayEditorSettings.sceneSidePanelOpen
+        onTriggered: (source) => {
+                        Runtime.screenplayEditorSettings.sceneSidePanelOpen = !Runtime.screenplayEditorSettings.sceneSidePanelOpen
+                     }
+    }
+
     QtObject {
         id: _private
 
@@ -74,6 +83,13 @@ AbstractScenePartEditor {
 
         readonly property Component collapsedCorner: CollapsedCorner {
             scene: root.scene
+
+            ActionHandler {
+                action: ActionHub.editOptions.find("cycleCommandPanelTab")
+
+                enabled: root.isCurrent
+                onTriggered: (source) => { Runtime.screenplayEditorSettings.sceneSidePanelOpen = true }
+            }
         }
 
         readonly property Component expandedCorner: ExpandedCorner {
@@ -82,6 +98,13 @@ AbstractScenePartEditor {
             downIndicatorColor: Qt.rgba(0,0,0,0.5)
 
             onCurrentTabChanged: Runtime.screenplayEditorSettings.sceneSidePanelActiveTab = currentTab
+
+            ActionHandler {
+                action: ActionHub.editOptions.find("cycleCommandPanelTab")
+
+                enabled: root.isCurrent
+                onTriggered: (source) => { parent.cycleTab() }
+            }
         }
 
         readonly property Component commentsTab: CommentsTab {

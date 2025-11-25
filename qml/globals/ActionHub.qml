@@ -716,7 +716,7 @@ Item {
     }
 
     readonly property ActionManager editOptions: ActionManager {
-        title: "Edit"
+        title: "Scene Editor"
         objectName: "editOptions"
 
         Action {
@@ -857,6 +857,28 @@ Item {
             text: "Join Previous Scene"
 
             icon.source: "qrc:/icons/action/merge_scene.png"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Alt+-"
+
+            enabled: ActionHandler.canHandle
+            checkable: true
+            checked: ActionHandler.active ? ActionHandler.active.checked : false
+            objectName: "toggleCommentsPanel"
+            shortcut: defaultShortcut
+            text: "Show/Hide Comments Panel"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Alt+="
+
+            enabled: ActionHandler.canHandle
+            objectName: "cycleCommandPanelTab"
+            shortcut: defaultShortcut
+            text: "Cycle Command Panel Tab"
         }
 
         Action {
@@ -1182,7 +1204,6 @@ Item {
         title: "Scene List Panel"
         objectName: "sceneListPanelOptions"
 
-
         Action {
             readonly property bool visible: false
             readonly property string defaultShortcut: "Alt+0"
@@ -1214,7 +1235,7 @@ Item {
         Action {
             checkable: true
             checked: Runtime.screenplayEditorSettings.displayRuler
-            text: "Ruler"
+            text: "Show Ruler"
 
             onToggled: Runtime.screenplayEditorSettings.displayRuler = !Runtime.screenplayEditorSettings.displayRuler
         }
@@ -1222,7 +1243,7 @@ Item {
         Action {
             checkable: true
             checked: Runtime.screenplayEditorSettings.showLoglineEditor
-            text: "Logline Editor"
+            text: "Show Logline Editor"
 
             onToggled: Runtime.screenplayEditorSettings.showLoglineEditor = !Runtime.screenplayEditorSettings.showLoglineEditor
         }
@@ -1230,7 +1251,7 @@ Item {
         Action {
             checkable: true
             checked: Runtime.screenplayEditorSettings.displayEmptyTitleCard
-            text: "Empty Title Card"
+            text: "Display Empty Title Card"
 
             onToggled: Runtime.screenplayEditorSettings.displayEmptyTitleCard = !Runtime.screenplayEditorSettings.displayEmptyTitleCard
         }
@@ -1238,7 +1259,7 @@ Item {
         Action {
             checkable: true
             checked: Runtime.screenplayEditorSettings.displayAddSceneBreakButtons
-            text: "Act, Episode, Scene Controls"
+            text: "Show Act, Episode, Scene Controls"
 
             onToggled: Runtime.screenplayEditorSettings.displayAddSceneBreakButtons = !Runtime.screenplayEditorSettings.displayAddSceneBreakButtons
         }
@@ -1248,7 +1269,7 @@ Item {
 
             checkable: true
             checked: __sceneBlocksVisible
-            text: "Scene Blocks"
+            text: "Show Scene Blocks"
 
             onToggled: Runtime.screenplayEditorSettings.spaceBetweenScenes = __sceneBlocksVisible ? 0 : 40
         }
@@ -1256,7 +1277,7 @@ Item {
         Action {
             checkable: true
             checked: Runtime.screenplayEditorSettings.markupToolsDockVisible
-            text: "Markup Tools"
+            text: "Show Markup Tools"
 
             onToggled: Runtime.screenplayEditorSettings.markupToolsDockVisible = !Runtime.screenplayEditorSettings.markupToolsDockVisible
         }
@@ -1268,7 +1289,7 @@ Item {
             checked: Runtime.screenplayEditorSettings.displaySceneSynopsis
             shortcut: defaultShortcut
             objectName: "synopsis"
-            text: "Synopsis"
+            text: "Show Synopsis in Editor"
 
             onToggled: Runtime.screenplayEditorSettings.displaySceneSynopsis = !Runtime.screenplayEditorSettings.displaySceneSynopsis
         }
@@ -1280,7 +1301,7 @@ Item {
             checked: Runtime.screenplayEditorSettings.displaySceneComments
             shortcut: defaultShortcut
             objectName: "comments"
-            text: "Comments"
+            text: "Show Comments Panel"
 
             onToggled: Runtime.screenplayEditorSettings.displaySceneComments = !Runtime.screenplayEditorSettings.displaySceneComments
         }
@@ -1290,7 +1311,7 @@ Item {
             checkable: true
             checked: Runtime.screenplayEditorSettings.displayIndexCardFields
             enabled: Runtime.screenplayEditorSettings.displaySceneComments
-            text: "Index Card Fields"
+            text: "Show Index Card Fields in Comments Panel"
 
             onToggled: Runtime.screenplayEditorSettings.displayIndexCardFields = !Runtime.screenplayEditorSettings.displayIndexCardFields
         }
@@ -1302,7 +1323,7 @@ Item {
             checked: Runtime.screenplayEditorSettings.displaySceneCharacters
             shortcut: defaultShortcut
             objectName: "charactersAndTags"
-            text: "Characters and Tags"
+            text: "Show Characters and Tags in Editor"
 
             onToggled: Runtime.screenplayEditorSettings.displaySceneCharacters = !Runtime.screenplayEditorSettings.displaySceneCharacters
         }
@@ -1314,7 +1335,7 @@ Item {
             checked: Runtime.screenplayEditorSettings.allowTaggingOfScenes
             shortcut: defaultShortcut
             objectName: "tagging"
-            text: "Tagging"
+            text: "Allow Structure Tags"
 
             onToggled: Runtime.screenplayEditorSettings.allowTaggingOfScenes = !Runtime.screenplayEditorSettings.allowTaggingOfScenes
         }
@@ -1326,7 +1347,7 @@ Item {
             checked: Runtime.screenplayEditorSettings.enableSpellCheck
             shortcut: defaultShortcut
             objectName: "spellCheck"
-            text: "Spell Check"
+            text: "Enable Spell Check"
 
             onToggled: Runtime.screenplayEditorSettings.enableSpellCheck = !Runtime.screenplayEditorSettings.enableSpellCheck
         }
@@ -1338,7 +1359,7 @@ Item {
             checked: Runtime.screenplayEditorSettings.highlightCurrentLine
             shortcut: defaultShortcut
             objectName: "lineHighlight"
-            text: "Line Highlight"
+            text: "Show Current Line Highlight"
 
             onToggled: Runtime.screenplayEditorSettings.highlightCurrentLine = !Runtime.screenplayEditorSettings.highlightCurrentLine
         }
