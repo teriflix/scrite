@@ -38,13 +38,11 @@ Item {
 
     property alias hovered: _mouseArea.containsMouse
     property alias margins: _icon.anchorMargins
-    property alias shortcut: _shortcut.sequence
     property alias toolButtonImage: _icon
     property alias downIndicatorColor: _downIndicator.color
 
     property string text
     property string iconSource: ""
-    property string shortcutText: _shortcut.portableText
     property string toolTipText: shortcutText === "" ? text : (text + "\t(" + Gui.nativeShortcut(shortcutText) + ")")
 
     property bool down: _mouseArea.pressed
@@ -72,32 +70,8 @@ Item {
 
         anchors.fill: parent
 
-        color: Qt.rgba(0,0,0,0.15)
-        visible: parent.checkable && parent.checked || parent.down
-    }
-
-    Image {
-        id: _icon
-
-        property real anchorMargins: {
-            const am = _mouseArea.containsMouse ? 8 : 10
-            return parent.width-2*am < 16 ? (parent.width*0.15) : am
-        }
-
-        anchors.fill: parent
-        anchors.margins: anchorMargins
-
-        z: 1
-        source: parent.iconSource
-        smooth: true
-        mipmap: true
-        opacity: enabled ? (_mouseArea.containsMouse ? 1 : 0.9) : 0.45
-        fillMode: Image.PreserveAspectFit
-
-        Behavior on anchorMargins {
-            enabled: _icon.anchorMargins > 0 && Runtime.applicationSettings.enableAnimations
-            NumberAnimation { duration: Runtime.stdAnimationDuration }
-        }
+        color: Qt.rgba(0,0,0,0.5)
+        visible: (parent.checkable && parent.checked) || parent.down
     }
 
     Image {
@@ -119,13 +93,27 @@ Item {
         fillMode: Image.PreserveAspectFit
     }
 
-    Shortcut {
-        id: _shortcut
+    Image {
+        id: _icon
 
-        context: Qt.ApplicationShortcut
-        enabled: Runtime.allowAppUsage
+        property real anchorMargins: {
+            const am = _mouseArea.containsMouse ? 8 : 10
+            return parent.width-2*am < 16 ? (parent.width*0.15) : am
+        }
 
-        onActivated: root.click()
+        anchors.fill: parent
+        anchors.margins: anchorMargins
+
+        source: parent.iconSource
+        smooth: true
+        mipmap: true
+        opacity: enabled ? (_mouseArea.containsMouse ? 1 : 0.9) : 0.45
+        fillMode: Image.PreserveAspectFit
+
+        Behavior on anchorMargins {
+            enabled: _icon.anchorMargins > 0 && Runtime.applicationSettings.enableAnimations
+            NumberAnimation { duration: Runtime.stdAnimationDuration }
+        }
     }
 
     MouseArea {

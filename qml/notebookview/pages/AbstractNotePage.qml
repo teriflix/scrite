@@ -32,7 +32,7 @@ AbstractNotebookPage {
 
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
 
-    backgroundColor: Qt.tint(_private.note.color, Runtime.colors.sceneHeadingTint)
+    backgroundColor: Runtime.colors.tint(_private.note.color, Runtime.colors.sceneHeadingTint)
 
     ActionHandler {
         action: ActionHub.notebookOperations.find("report")

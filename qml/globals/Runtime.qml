@@ -338,8 +338,10 @@ Item {
         id: _applicationSettings
 
         property int accentColor: colors.defaultAccentColor
-        property int joinDiscordPromptCounter: 0
         property int primaryColor: colors.defaultPrimaryColor
+        property int joinDiscordPromptCounter: 0
+
+        property real colorIntensity: 1
 
         property bool enableAnimations: true
         property bool notifyMissingRecentFiles: true
@@ -350,6 +352,7 @@ Item {
         property string theme: "Material"
 
         Component.onCompleted: {
+            colorIntensity = bounded(0, colorIntensity, 1)
             Qt.callLater( () => {
                              Runtime.currentTheme = theme
                              Runtime.currentUseSoftwareRenderer = useSoftwareRenderer
@@ -495,7 +498,7 @@ Item {
     }
 
     readonly property QtObject colors: Item {
-        objectName: "RuntimeColors"
+        ObjectRegister.name: "runtimeColors"
 
         readonly property int   defaultAccentColor: Material.DeepPurple
         readonly property int   defaultPrimaryColor: Material.Grey
@@ -504,18 +507,20 @@ Item {
         readonly property var   forDocument: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
         readonly property var   forScene: SceneColors.palette
 
-        readonly property color highlightedSceneControlTint: Qt.rgba(1,1,1,0.55)
-        readonly property color sceneControlTint: Qt.rgba(1,1,1,0.725)
-        readonly property color sceneHeadingTint: Qt.rgba(1,1,1,0.825)
-        readonly property color currentNoteTint: Qt.rgba(1,1,1,0.625)
-        readonly property color selectedSceneHeadingTint: Qt.rgba(1,1,1,0.775)
-        readonly property color currentLineHightlightTint: Qt.rgba(1,1,1,0.9)
+        property real sceneControlTint: _applicationSettings.colorIntensity*0.4
+        property real sceneHeadingTint: _applicationSettings.colorIntensity*0.4
+        property real currentNoteTint: _applicationSettings.colorIntensity*0.4
+        property real currentLineHightlightTint: _applicationSettings.colorIntensity*0.2
+        property real screenplayTracksTint: root.bounded(0.4, _applicationSettings.colorIntensity, 1)
+        property color selectedSceneControlTint: Color.translucent(primary.c100.background, root.bounded(0.2,1-_applicationSettings.colorIntensity,0.8))
+        property color selectedSceneHeadingTint:  Color.translucent(primary.c100.background, root.bounded(0.2,1-_applicationSettings.colorIntensity,0.8))
+
         readonly property color transparent: "transparent"
 
         readonly property Colors primary: Colors {
-            key: Material.Grey // applicationSettings.primaryColor
-
             ObjectRegister.name: "primaryColors"
+
+            key: Material.Grey // applicationSettings.primaryColor
 
             property QtObject editor: QtObject {
                 readonly property color background: colors.theme === Material.Light ? "white" : "black"
@@ -524,12 +529,14 @@ Item {
         }
 
         readonly property Colors accent: Colors {
-            key: _applicationSettings.accentColor
-
             ObjectRegister.name: "accentColors"
+
+            key: _applicationSettings.accentColor
         }
 
-        ObjectRegister.name: "runtimeColors"
+        function tint(a, b) {
+            return Color.stacked( Color.tint(a, b), theme === Material.Light ? "white" : "black" )
+        }
     }
 
     // All the app-features

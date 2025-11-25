@@ -1142,6 +1142,52 @@ QColor Utils::Color::mix(const QColor &a, const QColor &b)
     return mixImpl(_a, _b, factor);
 }
 
+QColor Utils::Color::tint(const QColor &baseColor, const QVariant &tintValue)
+{
+    if (tintValue.canConvert<QColor>()) {
+        QColor tintColor = tintValue.value<QColor>();
+
+        int tintAlpha = tintColor.alpha();
+        if (tintAlpha == 255)
+            return tintColor;
+        if (tintAlpha == 0)
+            return baseColor;
+
+        qreal a = tintColor.alphaF();
+        qreal inv_a = 1.0 - a;
+
+        qreal r = tintColor.redF() * a + baseColor.redF() * inv_a;
+        qreal g = tintColor.greenF() * a + baseColor.greenF() * inv_a;
+        qreal b = tintColor.blueF() * a + baseColor.blueF() * inv_a;
+
+        return QColor::fromRgbF(r, g, b, a + inv_a * baseColor.alphaF());
+    }
+
+    if (tintValue.canConvert<qreal>()) {
+        return translucent(baseColor, tintValue.toReal());
+    }
+
+    return baseColor;
+}
+
+QColor Utils::Color::stacked(const QColor &foreground, const QColor &background)
+{
+    const qreal fgAlpha = foreground.alphaF();
+
+    if (qFuzzyCompare(fgAlpha, 0.0))
+        return background;
+
+    if (qFuzzyCompare(fgAlpha, 1.0))
+        return foreground;
+
+    const qreal bgAlpha = 1.0 - fgAlpha;
+    const qreal r = foreground.redF() * fgAlpha + background.redF() * bgAlpha;
+    const qreal g = foreground.greenF() * fgAlpha + background.greenF() * bgAlpha;
+    const qreal b = foreground.blueF() * fgAlpha + background.blueF() * bgAlpha;
+
+    return QColor::fromRgbF(r, g, b, 1.0);
+}
+
 /**
  * \brief Makes a color more translucent.
  * \param input The input color.
@@ -1155,8 +1201,17 @@ QColor Utils::Color::translucent(const QColor &input, qreal alpha)
     return ret;
 }
 
-inline qreal evaluateLuminance(const QColor &color)
+// We'll come back to this function when we implement dark mode
+inline qreal evaluateLuminance(const QColor &color, const QColor &background = Qt::white)
 {
+    const qreal alpha = color.alphaF();
+    if (alpha < 1.0) {
+        const qreal r = color.redF() * alpha + background.redF() * (1.0 - alpha);
+        const qreal g = color.greenF() * alpha + background.greenF() * (1.0 - alpha);
+        const qreal b = color.blueF() * alpha + background.blueF() * (1.0 - alpha);
+        return (0.299 * r) + (0.587 * g) + (0.114 * b);
+    }
+
     return ((0.299 * color.redF()) + (0.587 * color.greenF()) + (0.114 * color.blueF()));
 }
 

@@ -665,6 +665,8 @@ public:
     Q_INVOKABLE static QColor pick(const QColor &initial);
     Q_INVOKABLE static QColor whitewash(const QColor &c, qreal factor);
     Q_INVOKABLE static QColor mix(const QColor &a, const QColor &b);
+    Q_INVOKABLE static QColor tint(const QColor &input, const QVariant &alpha);
+    Q_INVOKABLE static QColor stacked(const QColor &foreground, const QColor &background);
     Q_INVOKABLE static QColor translucent(const QColor &input, qreal alpha = 0.5);
     Q_INVOKABLE static bool isLight(const QColor &color);
     Q_INVOKABLE static bool isVeryLight(const QColor &color);

@@ -68,8 +68,8 @@ AbstractScenePartEditor {
         property var tabComponentsArray: [_private.commentsTab,_private.featuredImageTab,_private.indexCardFieldsTab,_private.sceneMetaDataTab]
 
         property color indicatorColor: {
-            const ideally = Qt.tint(scene.color, expanded && root.isCurrent ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneControlTint)
-            return Color.isLight(scene.color) ? Runtime.colors.primary.c500.background : ideally
+            const ideally = Runtime.colors.tint(scene.color, root.isCurrent ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneControlTint)
+            return Color.isLight(scene.color) ? (root.isCurrent ? Runtime.colors.primary.c200.background : Runtime.colors.primary.c50.background) : ideally
         }
 
         readonly property Component collapsedCorner: CollapsedCorner {
@@ -79,7 +79,7 @@ AbstractScenePartEditor {
         readonly property Component expandedCorner: ExpandedCorner {
             scene: root.scene
             currentTab: Runtime.screenplayEditorSettings.sceneSidePanelActiveTab
-            downIndicatorColor: _private.indicatorColor
+            downIndicatorColor: Qt.rgba(0,0,0,0.5)
 
             onCurrentTabChanged: Runtime.screenplayEditorSettings.sceneSidePanelActiveTab = currentTab
         }

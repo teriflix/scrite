@@ -74,9 +74,9 @@ Item {
                 if(_private.isBreakElement) {
                     return _private.active ? _private.delegateColor : Qt.lighter(_private.delegateColor, 1.5)
                 }
-                return Qt.tint(_private.delegateColor, _private.active ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneHeadingTint)
+                return Runtime.colors.tint(_private.delegateColor, _private.active ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneHeadingTint)
             }
-            border.color: Color.isLight(color) ? Qt.darker(color, 1.1) : Qt.lighter(color, 1.1)
+            border.color: Color.isLight(color) ? Qt.rgba(0,0,0,0.25) : Qt.rgba(1,1,1,0.25)
             border.width: _private.active ? 2 : 1
 
             Behavior on border.width {

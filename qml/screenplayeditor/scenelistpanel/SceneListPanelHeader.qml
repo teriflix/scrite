@@ -34,7 +34,7 @@ Rectangle {
 
     height: _layout.height
 
-    color: Runtime.colors.accent.c500.background
+    color: Runtime.colors.accent.c100.background
 
     RowLayout {
         id: _layout

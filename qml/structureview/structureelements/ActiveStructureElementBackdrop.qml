@@ -37,19 +37,15 @@ BoxShadow {
     EventFilter.events: [EventFilter.KeyPress]
     EventFilter.onFilter: (object, event, result) => { _private.eventFilter(object, event, result) }
 
-    x: currentElementItem ? currentElementItem.x : 0
-    y: currentElementItem ? currentElementItem.y : 0
-    width: currentElementItem ? currentElementItem.width : 0
-    height: currentElementItem ? currentElementItem.height : 0
-
-    Behavior on opacity {
-        enabled: Runtime.applicationSettings.enableAnimations
-
-        NumberAnimation { duration: Runtime.stdAnimationDuration }
-    }
+    x: currentElementItem ? _private.currentElementRect.x : 0
+    y: currentElementItem ? _private.currentElementRect.y : 0
+    width: currentElementItem ? _private.currentElementRect.width : 0
+    height: currentElementItem ? _private.currentElementRect.height : 0
 
     QtObject {
         id: _private
+
+        property rect currentElementRect: root.currentElementItem ? root.currentElementItem.mapFromItem(root.parent, 0, 0, root.currentElementItem.width, root.currentElementItem.height) : Qt.rect(0,0,0,0)
 
         function eventFilter(object, event, result) {
             if(root.currentElementItem === null || root.currentElement === null)

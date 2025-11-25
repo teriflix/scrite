@@ -52,7 +52,7 @@ StructureElementConnector {
         height: width
         radius: width/2
 
-        color: Qt.tint(root.outlineColor, "#E0FFFFFF")
+        color: Runtime.colors.tint(root.outlineColor, Runtime.colors.sceneControlTint)
         border.width: 1
         border.color: Runtime.colors.primary.borderColor
 
@@ -62,6 +62,7 @@ StructureElementConnector {
             anchors.centerIn: parent
 
             text: root.labelText
+            color: Color.textColorFor(parent.color)
             font.pixelSize: 12
         }
     }

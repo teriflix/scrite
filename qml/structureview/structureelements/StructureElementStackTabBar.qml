@@ -75,7 +75,7 @@ Item {
                 activeTabBorderWidth: (root.elementStack.hasCurrentElement ? 2 : 1)
 
                 activeTabIndex: root.elementStack.topmostElementIndex
-                activeTabColor: Qt.tint(root.elementStack.topmostElement.scene.color, (root.elementStack.hasCurrentElement ? Runtime.colors.sceneControlTint : "#F0FFFFFF"))
+                activeTabColor: Runtime.colors.tint(root.elementStack.topmostElement.scene.color, (root.elementStack.hasCurrentElement ? Runtime.colors.sceneControlTint : Runtime.colors.selectedSceneControlTint))
                 activeTabFont.bold: true
                 activeTabTextColor: Color.textColorFor(activeTabColor)
                 activeTabBorderColor: Color.isLight(root.elementStack.topmostElement.scene.color) ? "black" : root.elementStack.topmostElement.scene.color
@@ -108,10 +108,10 @@ Item {
                     const element = root.elementStack.objectAt(index)
                     switch(attr) {
                     case SimpleTabBarItem.TabColor:
-                        requestedAttributeValue = Qt.tint(element.scene.color, "#D0FFFFFF")
+                        requestedAttributeValue = Runtime.colors.tint(element.scene.color, Runtime.colors.selectedSceneControlTint)
                         break
                     case SimpleTabBarItem.TabBorderColor:
-                        requestedAttributeValue = Color.isLight(element.scene.color) ? "gray" : element.scene.color
+                        requestedAttributeValue = Color.isLight(element.scene.color) ? Runtime.colors.primary.borderColor : element.scene.color
                         break
                     default:
                         break

@@ -73,7 +73,7 @@ Item {
                 baseColor = itemData.value.notebookItemObject.color
 
             if(baseColor)
-                return Qt.tint(baseColor, Runtime.colors.sceneHeadingTint)
+                return Runtime.colors.tint(baseColor, Runtime.colors.sceneHeadingTint)
 
             return Runtime.colors.primary.c10.background
         }

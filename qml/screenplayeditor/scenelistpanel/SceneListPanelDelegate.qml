@@ -401,8 +401,8 @@ Rectangle {
         property bool isSceneTextModeHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
 
         property color color: isSelection ? selectedColor : normalColor
-        property color normalColor: root.scene ? Qt.tint(delegateColor, Runtime.colors.sceneHeadingTint) : Qt.lighter(delegateColor, 1.25)
-        property color selectedColor: root.scene ? Qt.tint(delegateColor, Runtime.colors.selectedSceneHeadingTint) : delegateColor
+        property color normalColor: root.scene ? Runtime.colors.tint(delegateColor, Runtime.colors.sceneHeadingTint) : Qt.lighter(delegateColor, 1.25)
+        property color selectedColor: root.scene ? Runtime.colors.tint(delegateColor, Runtime.colors.selectedSceneHeadingTint) : delegateColor
 
         property color delegateColor: {
             if(root.scene)

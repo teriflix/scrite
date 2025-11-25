@@ -81,7 +81,7 @@ Flickable {
                 width: _private.isHorizontalTrack ? _content.width : _private.trackSize
                 height: _private.isHorizontalTrack ? _private.trackSize : _content.height
 
-                color: Color.translucent( track.color, 0.5 )
+                color: Runtime.colors.tint(track.color, Runtime.colors.screenplayTracksTint)
 
                 MouseArea {
                     id: _trackMouseArea
@@ -155,7 +155,7 @@ Flickable {
                         width: _private.isHorizontalTrack ? extents.to - extents.from : _private.trackSize
                         height: _private.isHorizontalTrack ? _private.trackSize : extents.to - extents.from
 
-                        color: modelData.color
+                        color: Runtime.colors.tint(modelData.color, Runtime.colors.screenplayTracksTint)
                         visible: GMath.doRectanglesIntersect(itemRect, _private.viewportRect)
 
                         border.color: Qt.darker(modelData.color, 1.1)
@@ -171,7 +171,7 @@ Flickable {
 
                             font: Runtime.minimumFontMetrics.font
                             elide: Text.ElideMiddle
-                            color: Color.textColorFor(parent.color)
+                            color: Color.textColorFor(Color.mix(_track.color, _trackItem.color))
                             horizontalAlignment: Text.AlignHCenter
 
                             text: _trackItem.name

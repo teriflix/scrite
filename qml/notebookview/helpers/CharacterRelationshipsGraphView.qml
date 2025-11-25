@@ -531,7 +531,7 @@ Rectangle {
             width: node.rect.width
             height: node.rect.height
 
-            color: character.photos.length === 0 ? Qt.tint(character.color, Runtime.colors.sceneControlTint) : Qt.rgba(0,0,0,0)
+            color: character.photos.length === 0 ? Runtime.colors.tint(character.color, Runtime.colors.sceneControlTint) : Qt.rgba(0,0,0,0)
 
             Rectangle {
                 anchors.fill: parent
@@ -564,7 +564,7 @@ Rectangle {
                     anchors.fill: _infoLabel
                     anchors.margins: -4
 
-                    color: node.marked ? Runtime.colors.accent.a700.background : Qt.tint(character.color, Runtime.colors.sceneControlTint)
+                    color: node.marked ? Runtime.colors.accent.a700.background : Runtime.colors.tint(character.color, Runtime.colors.sceneControlTint)
                     opacity: character.photos.length === 0 ? 1 : 0.8
                     radius: 4
 

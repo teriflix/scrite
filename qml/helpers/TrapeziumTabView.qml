@@ -45,7 +45,7 @@ Item {
             model: tabBar.visible ? tabNames : 0
 
             TrapeziumTab {
-                tabFillColor: active ? tabColor : Qt.tint(tabColor, Runtime.colors.sceneControlTint)
+                tabFillColor: active ? tabColor : Runtime.colors.tint(tabColor, Runtime.colors.sceneControlTint)
                 tabBorderColor: Color.isVeryLight(tabColor) ? "gray" : tabColor
                 tabBorderWidth: 1
                 text: modelData

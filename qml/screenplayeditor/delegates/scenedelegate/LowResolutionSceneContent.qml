@@ -40,7 +40,7 @@ Rectangle {
                                                       : sceneDelegate.screenplayElement.heightHint * sceneDelegate.zoomLevel),
                               (showSceneComments && sceneDelegate.spaceAvailableForScenePanel >= Runtime.minSceneSidePanelWidth ? 300 : 0) )
 
-    color: sceneDelegate.scene ? Qt.tint(sceneDelegate.scene.color, Runtime.colors.sceneHeadingTint) : Runtime.colors.primary.c300.background
+    color: sceneDelegate.scene ? Runtime.colors.tint(sceneDelegate.scene.color, Runtime.colors.sceneHeadingTint) : Runtime.colors.primary.c300.background
 
     Column {
         id: _headerLayout

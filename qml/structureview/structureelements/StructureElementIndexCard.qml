@@ -117,7 +117,7 @@ AbstractStructureElementUI {
 
         anchors.fill: parent
 
-        color: Qt.tint(root.element.scene.color, _private.isSelected ? Runtime.colors.sceneControlTint : "#F0FFFFFF")
+        color: Runtime.colors.tint(root.element.scene.color, _private.isSelected ? Runtime.colors.selectedSceneControlTint : Runtime.colors.sceneControlTint)
         border.width: _private.isSelected ? 2 : 1
         border.color: _private.isSelected ? borderColor : Qt.lighter(borderColor)
 
@@ -595,7 +595,7 @@ AbstractStructureElementUI {
                 anchors.fill: parent
                 anchors.margins: -5
 
-                color: Qt.tint(baseColor, _private.isSelected ? "#70FFFFFF" : Runtime.colors.currentNoteTint)
+                color: Runtime.colors.tint(baseColor, _private.isSelected ? Runtime.colors.selectedSceneControlTint : Runtime.colors.currentNoteTint)
             }
 
             RowLayout {

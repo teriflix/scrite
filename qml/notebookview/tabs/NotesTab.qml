@@ -82,7 +82,7 @@ Item {
                         anchors.fill: parent
                         anchors.margins: 10
 
-                        color: _flickable.currentIndex === index ? Qt.tint(_noteItem.note.color, Runtime.colors.currentNoteTint) : Qt.tint(_noteItem.note.color, Runtime.colors.sceneHeadingTint)
+                        color: _flickable.currentIndex === index ? Runtime.colors.tint(_noteItem.note.color, Runtime.colors.currentNoteTint) : Runtime.colors.tint(_noteItem.note.color, Runtime.colors.sceneHeadingTint)
 
                         Column {
                             anchors.fill: parent

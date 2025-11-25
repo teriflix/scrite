@@ -56,7 +56,7 @@ AbstractScenePartEditor {
                     visible: sceneType !== Scene.Standard
                     sceneType: root.scene ? root.scene.type : Scene.Standard
                     showTooltip: false
-                    lightBackground: Color.isLight(Qt.tint(root.scene.color, Runtime.colors.sceneHeadingTint))
+                    lightBackground: Color.isLight(Runtime.colors.tint(root.scene.color, Runtime.colors.sceneHeadingTint))
 
                     onClicked: _private.popupMarkSceneAsMenu(_sceneTypeIcon)
                 }

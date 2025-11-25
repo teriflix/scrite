@@ -37,6 +37,7 @@ Item {
         anchors.fill: _canvasScroll
 
         color: Runtime.structureCanvasSettings.canvasColor
+        opacity: Runtime.bounded(0.1, Runtime.applicationSettings.colorIntensity, 1)
     }
 
     StructureCanvasScrollArea {

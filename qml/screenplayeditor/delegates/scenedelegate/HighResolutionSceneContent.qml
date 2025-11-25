@@ -54,7 +54,7 @@ Item {
             width: parent.width
             height: _headingLayout.height
 
-            color: Qt.tint(sceneDelegate.scene.color, sceneDelegate.isCurrent ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneHeadingTint)
+            color: Runtime.colors.tint(sceneDelegate.scene.color, sceneDelegate.isCurrent ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneHeadingTint)
 
             Column {
                 id: _headingLayout

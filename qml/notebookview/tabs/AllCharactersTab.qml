@@ -79,7 +79,7 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 5
 
-                color: Qt.tint(_delegate.character.color, _charactersView.currentIndex === index ? Runtime.colors.currentNoteTint : Runtime.colors.sceneHeadingTint)
+                color: Runtime.colors.tint(_delegate.character.color, _charactersView.currentIndex === index ? Runtime.colors.currentNoteTint : Runtime.colors.sceneHeadingTint)
                 border.width: 1
                 border.color: Color.isLight(_delegate.character.color) ? (_charactersView.currentIndex === index ? "darkgray" : Runtime.colors.primary.borderColor) : _delegate.character.color
 
