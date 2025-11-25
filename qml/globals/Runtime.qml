@@ -158,7 +158,7 @@ Item {
         property bool displayAddSceneBreakButtons: true
         property bool displayEmptyTitleCard: true
         property bool displayIndexCardFields: true
-        property bool displayRuler: true
+        property bool displayRuler: false
         property bool displaySceneCharacters: true
         property bool displaySceneComments: false
         property bool displaySceneSynopsis: true
