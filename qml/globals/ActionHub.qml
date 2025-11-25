@@ -463,7 +463,7 @@ Item {
         objectName: "appOptions"
 
         Action {
-            readonly property var keywords: ["theme", "dark mode"]
+            readonly property var keywords: ["theme", "dark mode", "colors"]
             readonly property string defaultShortcut: "Ctrl+,"
 
             text: "Settings"
@@ -2189,6 +2189,8 @@ Item {
         }
 
         Action {
+            readonly property var keywords: ["colors", "color intensity"]
+
             objectName: "configureScreenplayEditorOptions"
             text: "Screenplay Editor Options"
             icon.source: "qrc:/icons/content/view_options.png"

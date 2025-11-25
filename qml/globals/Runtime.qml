@@ -341,7 +341,7 @@ Item {
         property int primaryColor: colors.defaultPrimaryColor
         property int joinDiscordPromptCounter: 0
 
-        property real colorIntensity: 1
+        property real colorIntensity: 0.5
 
         property bool enableAnimations: true
         property bool notifyMissingRecentFiles: true
