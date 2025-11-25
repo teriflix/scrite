@@ -226,9 +226,13 @@ ScrollArea {
                     const area = _canvas.itemsBoundingBox.tightBoundingBox
                     root.zoomFit(area)
                 } else {
-                    root.zoomScale = csData.zoomScale
-                    root.contentX = csData.contentX
-                    root.contentY = csData.contentY
+                    let item = _canvas.currentElementItem
+                    if(item === null)
+                        item = _canvas.elementLayer.elementItemAt(Scrite.document.structure.currentElementIndex)
+                    if(item)
+                        root.zoomOneToItem(item)
+                    else
+                        root.zoomOneMiddleArea()
                 }
             } else {
                 if(Scrite.document.structure.elementCount > 0) {
