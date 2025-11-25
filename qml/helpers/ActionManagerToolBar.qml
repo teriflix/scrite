@@ -45,10 +45,12 @@ ToolBar {
         spacing: 0
 
         Repeater {
-            model: root.actionManager
+            model: root.actionManager.visibleActions
 
             ActionToolButton {
-                required property var qmlAction
+                required property var modelData
+
+                property var qmlAction: modelData
 
                 flat: root.flat
                 action: qmlAction

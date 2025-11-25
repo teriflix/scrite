@@ -50,7 +50,9 @@ Menu {
         delegate: MenuItem {
             id: _menuItem
 
-            required property var qmlAction
+            required property var modelData
+
+            property var qmlAction: modelData
 
             Material.accent: Runtime.colors.accent.key
             Material.primary: Runtime.colors.primary.key
@@ -86,12 +88,7 @@ Menu {
     QtObject {
         id: _private
 
-        readonly property ActionsModelFilter visibleActions: ActionsModelFilter {
-            filters: root.actionManager ? ActionsModelFilter.VisibleActions : ActionsModelFilter.NoActions
-            sourceModel: ActionsModel {
-                actionManagers: [root.actionManager]
-            }
-        }
+        readonly property var visibleActions: root.actionManager.visibleActions
 
         function adjustMenuWidth() {
             let width = 200
