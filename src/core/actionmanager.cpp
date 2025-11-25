@@ -15,6 +15,7 @@
 #include "utils.h"
 #include "application.h"
 #include "qobjectlistmodel.h"
+#include "timeprofiler.h"
 
 #include <QDir>
 #include <QTimer>
@@ -72,6 +73,7 @@ ActionManager::ActionManager(QObject *parent) : QAbstractListModel(parent)
     connect(this, &ActionManager::modelReset, this, &ActionManager::countChanged);
     connect(this, &ActionManager::rowsRemoved, this, &ActionManager::countChanged);
     connect(this, &ActionManager::rowsInserted, this, &ActionManager::countChanged);
+    connect(this, &ActionManager::countChanged, this, &ActionManager::visibleActionsChanged);
 
     connect(this, &QObject::objectNameChanged, this, &ActionManager::scheduleApplySavedShortcuts);
 }
@@ -339,8 +341,11 @@ bool ActionManager::addInternal(QObject *action)
                 action->metaObject()->indexOfProperty(_QQuickActionVisibleProperty));
         if (visibleProperty.isValid()) {
             if (visibleProperty.isWritable() && !visibleProperty.isConstant()
-                && visibleProperty.hasNotifySignal())
+                && visibleProperty.hasNotifySignal()) {
                 connect(action, _QQuickActionVisibilityChanged, this, SLOT(onActionDataChanged()));
+                connect(action, _QQuickActionVisibilityChanged, this,
+                        SIGNAL(visibleActionsChanged()));
+            }
         }
 
         const QMetaProperty tooltipProperty = action->metaObject()->property(
@@ -944,11 +949,11 @@ ActionsModel::ActionsModel(QObject *parent) : QAbstractListModel(parent)
     this->reload();
 
     connect(::ActionManagerModel, &QAbstractListModel::modelReset, this,
-            &ActionsModel::onActionManagerModelReset);
+            &ActionsModel::reloadLater);
     connect(::ActionManagerModel, &QAbstractListModel::rowsRemoved, this,
-            &ActionsModel::onActionManagerModelRowsRemoved);
+            &ActionsModel::reloadLater);
     connect(::ActionManagerModel, &QAbstractListModel::rowsInserted, this,
-            &ActionsModel::onActionManagerModelRowsInserted);
+            &ActionsModel::reloadLater);
 }
 
 ActionsModel::~ActionsModel() { }
@@ -958,10 +963,27 @@ void ActionsModel::setActionManagers(const QList<ActionManager *> &val)
     if (m_actionManagers == val)
         return;
 
+    disconnect(::ActionManagerModel, &QAbstractListModel::modelReset, this,
+               &ActionsModel::reloadLater);
+    disconnect(::ActionManagerModel, &QAbstractListModel::rowsRemoved, this,
+               &ActionsModel::reloadLater);
+    disconnect(::ActionManagerModel, &QAbstractListModel::rowsInserted, this,
+               &ActionsModel::reloadLater);
+
     m_actionManagers = val;
+
+    if (m_actionManagers.isEmpty()) {
+        connect(::ActionManagerModel, &QAbstractListModel::modelReset, this,
+                &ActionsModel::reloadLater);
+        connect(::ActionManagerModel, &QAbstractListModel::rowsRemoved, this,
+                &ActionsModel::reloadLater);
+        connect(::ActionManagerModel, &QAbstractListModel::rowsInserted, this,
+                &ActionsModel::reloadLater);
+    }
+
     emit actionManagersChanged();
 
-    this->reload();
+    this->reloadLater();
 }
 
 QString ActionsModel::groupNameAt(int row) const
@@ -1042,33 +1064,50 @@ QHash<int, QByteArray> ActionsModel::roleNames() const
              { ShortcutIsEditableRole, QByteArray("shortcutIsEditable") } };
 }
 
-void ActionsModel::reload()
+void ActionsModel::clear()
 {
+    if (m_items.isEmpty())
+        return;
+
     this->beginResetModel();
+
+    QSet<QObject *> actionManagers;
 
     for (const Item &item : qAsConst(m_items)) {
         if (!item.actionManager.isNull())
-            disconnect(item.actionManager, nullptr, this, nullptr);
+            actionManagers.insert(item.actionManager);
     }
+
+    for (QObject *actionManager : actionManagers)
+        actionManager->disconnect(this);
+
     m_items.clear();
+
+    this->endResetModel();
+}
+
+void ActionsModel::reload()
+{
+    this->clear();
+
+    this->beginResetModel();
 
     const QList<ActionManager *> sortedManagers = m_actionManagers.isEmpty()
             ? ::ActionManagerModel->sortedList(::ActionManagerModelSortFunction)
             : m_actionManagers;
 
     for (ActionManager *actionManager : sortedManagers) {
-        connect(actionManager, &ActionManager::modelReset, this,
-                &ActionsModel::onActionManagerReset);
         connect(actionManager, &ActionManager::objectNameChanged, this,
                 &ActionsModel::onActionManagerNameChanged);
         connect(actionManager, &ActionManager::titleChanged, this,
                 &ActionsModel::onActionManagerNameChanged);
-        connect(actionManager, &ActionManager::rowsAboutToBeRemoved, this,
-                &ActionsModel::onActionManagerRowsRemoved);
-        connect(actionManager, &ActionManager::rowsInserted, this,
-                &ActionsModel::onActionManagerRowsInserted);
         connect(actionManager, &ActionManager::dataChanged, this,
                 &ActionsModel::onActionManagerDataChanged);
+
+        connect(actionManager, &ActionManager::modelReset, this, &ActionsModel::reloadLater);
+        connect(actionManager, &ActionManager::rowsAboutToBeRemoved, this,
+                &ActionsModel::reloadLater);
+        connect(actionManager, &ActionManager::rowsInserted, this, &ActionsModel::reloadLater);
 
         const QList<QObject *> actions = actionManager->actions();
         for (QObject *action : actions) {
@@ -1079,36 +1118,16 @@ void ActionsModel::reload()
     this->endResetModel();
 }
 
-void ActionsModel::onActionManagerReset()
+void ActionsModel::reloadLater()
 {
-    ActionManager *actionManager = qobject_cast<ActionManager *>(this->sender());
-    if (actionManager == nullptr)
-        return;
-
-    const QPair<int, int> rowRange = this->findRowRange(actionManager);
-    const int removeStart = rowRange.first, removeEnd = rowRange.second;
-    if (removeStart < 0 || removeEnd < 0) {
-        /** we could have inserted actions from this action-manager at the end, but then
-         *  we would have a hard time figuring out the insert indexes based on the sort
-         *  order. Its better off to simply reload the whole thing in such a case */
-        this->reload();
-        return;
+    if (m_reloadTimer == nullptr) {
+        m_reloadTimer = new QTimer(this);
+        m_reloadTimer->setInterval(500);
+        m_reloadTimer->setSingleShot(true);
+        connect(m_reloadTimer, &QTimer::timeout, this, &ActionsModel::reload);
     }
 
-    this->beginRemoveRows(QModelIndex(), removeStart, removeEnd);
-    for (int i = removeEnd; i >= removeStart; i--)
-        m_items.removeAt(i);
-    this->endRemoveRows();
-
-    const QList<QObject *> actions = actionManager->actions();
-    if (actions.isEmpty())
-        return;
-
-    const int insertStart = removeStart, insertEnd = removeStart + actions.size() - 1;
-    this->beginInsertRows(QModelIndex(), insertStart, insertEnd);
-    for (int i = 0; i < actions.size(); i++)
-        m_items.insert(insertStart + i, Item({ actionManager, actions.at(i) }));
-    this->endInsertRows();
+    m_reloadTimer->start();
 }
 
 void ActionsModel::onActionManagerNameChanged()
@@ -1145,7 +1164,7 @@ void ActionsModel::onActionManagerDataChanged(const QModelIndex &start, const QM
                                                && item.action == changedAction;
                                    });
             if (it == m_items.end()) {
-                this->reload();
+                this->reloadLater();
                 return;
             }
         }
@@ -1159,7 +1178,7 @@ void ActionsModel::onActionManagerDataChanged(const QModelIndex &start, const QM
         /** we could have inserted actions from this action-manager at the end, but then
          *  we would have a hard time figuring out the insert indexes based on the sort
          *  order. Its better off to simply reload the whole thing in such a case */
-        this->reload();
+        this->reloadLater();
         return;
     }
 
@@ -1167,115 +1186,6 @@ void ActionsModel::onActionManagerDataChanged(const QModelIndex &start, const QM
     const QModelIndex start2 = this->index(start.row() + offset);
     const QModelIndex end2 = this->index(end.row() + offset);
     emit dataChanged(start2, end2);
-}
-
-void ActionsModel::onActionManagerRowsRemoved(const QModelIndex &index, int start, int end)
-{
-    if (!index.isValid())
-        return;
-
-    ActionManager *actionManager = qobject_cast<ActionManager *>(this->sender());
-    if (actionManager == nullptr)
-        return;
-
-    auto it = std::find_if(m_items.begin(), m_items.end(), [actionManager](const Item &item) {
-        return item.actionManager == actionManager;
-    });
-
-    if (it == m_items.end())
-        return;
-
-    const int offset = std::distance(m_items.begin(), it);
-    this->beginRemoveRows(QModelIndex(), start + offset, end + offset);
-    for (int i = end + offset; i >= start + offset; i--)
-        m_items.removeAt(i);
-    this->endRemoveRows();
-}
-
-void ActionsModel::onActionManagerRowsInserted(const QModelIndex &index, int start, int end)
-{
-    if (!index.isValid())
-        return;
-
-    ActionManager *actionManager = qobject_cast<ActionManager *>(this->sender());
-    if (actionManager == nullptr)
-        return;
-
-    auto it = std::find_if(m_items.begin(), m_items.end(), [actionManager](const Item &item) {
-        return item.actionManager == actionManager;
-    });
-
-    if (it == m_items.end()) {
-        /** we could have inserted actions from this action-manager at the end, but then
-         *  we would have a hard time figuring out the insert indexes based on the sort
-         *  order. Its better off to simply reload the whole thing in such a case */
-        this->reload();
-        return;
-    }
-
-    const int offset = std::distance(m_items.begin(), it);
-    this->beginInsertRows(QModelIndex(), start + offset, end + offset);
-    for (int i = start + offset; i <= end + offset; i--) {
-        QObject *action = actionManager->at(i - offset);
-        m_items.insert(i, Item({ actionManager, action }));
-    }
-    this->endInsertRows();
-}
-
-void ActionsModel::onActionManagerModelReset()
-{
-    this->reload();
-}
-
-void ActionsModel::onActionManagerModelRowsRemoved(const QModelIndex &index, int start, int end)
-{
-    if (!index.isValid())
-        return;
-
-    for (int i = start; i <= end; i++) {
-        QObject *actionManager = ::ActionManagerModel->objectAt(i);
-
-        const QPair<int, int> rowRange = this->findRowRange(actionManager);
-        if (rowRange.first < 0 || rowRange.second < 0)
-            continue;
-
-        this->beginRemoveRows(QModelIndex(), rowRange.first, rowRange.second);
-        for (int r = rowRange.second; r >= rowRange.first; r--)
-            m_items.removeAt(i);
-        this->endRemoveRows();
-    }
-}
-
-void ActionsModel::onActionManagerModelRowsInserted(const QModelIndex &index, int start, int end)
-{
-    if (!index.isValid())
-        return;
-
-    const QList<ActionManager *> sortedManagers =
-            ::ActionManagerModel->sortedList(::ActionManagerModelSortFunction);
-
-    for (int i = start; i <= end; i++) {
-        ActionManager *actionManager = ::ActionManagerModel->at(i);
-
-        const QList<QObject *> actions = actionManager->actions();
-        const int managerIndex = sortedManagers.indexOf(actionManager);
-
-        const int insertStart = managerIndex == 0
-                ? 0
-                : this->findRowRange(sortedManagers.at(managerIndex - 1)).second + 1;
-        if (insertStart < 0) {
-            this->reload();
-            return;
-        }
-
-        const int insertEnd = insertStart + actions.size() - 1;
-
-        this->beginInsertRows(QModelIndex(), insertStart, insertEnd);
-        for (int i = insertStart; i <= insertEnd; i++) {
-            m_items.insert(i, Item({ actionManager, actions.at(i - insertStart) }));
-        }
-        this->endInsertRows();
-    }
 }
 
 QPair<int, int> ActionsModel::findRowRange(QObject *actionManager) const

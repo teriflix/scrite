@@ -75,6 +75,14 @@ public:
     int count() const { return m_actions.size(); }
     Q_SIGNAL void countChanged();
 
+    // clang-format off
+    Q_PROPERTY(QList<QObject*> visibleActions
+               READ visibleActions
+               NOTIFY visibleActionsChanged)
+    // clang-format on
+    QList<QObject *> visibleActions() const;
+    Q_SIGNAL void visibleActionsChanged();
+
     Q_INVOKABLE bool add(QObject *action);
     Q_INVOKABLE bool remove(QObject *action);
     Q_INVOKABLE bool contains(QObject *action) const;
@@ -83,7 +91,6 @@ public:
     Q_INVOKABLE QObject *findByShortcut(const QString &shortcut) const;
 
     Q_INVOKABLE QList<QObject *> actions() const { return m_actions; }
-    Q_INVOKABLE QList<QObject *> visibleActions() const;
 
     // clang-format off
     Q_PROPERTY(QQmlListProperty<QObject> actions
@@ -392,17 +399,13 @@ public:
     QHash<int, QByteArray> roleNames() const;
 
 private:
+    void clear();
     void reload();
+    void reloadLater();
 
     void onActionManagerReset();
     void onActionManagerNameChanged();
     void onActionManagerDataChanged(const QModelIndex &start, const QModelIndex &end);
-    void onActionManagerRowsRemoved(const QModelIndex &index, int start, int end);
-    void onActionManagerRowsInserted(const QModelIndex &index, int start, int end);
-
-    void onActionManagerModelReset();
-    void onActionManagerModelRowsRemoved(const QModelIndex &index, int start, int end);
-    void onActionManagerModelRowsInserted(const QModelIndex &index, int start, int end);
 
 private:
     QPair<int, int> findRowRange(QObject *actionManager) const;
@@ -414,6 +417,7 @@ private:
     };
     QList<Item> m_items;
 
+    QTimer *m_reloadTimer = nullptr;
     QList<ActionManager *> m_actionManagers;
 };
 
