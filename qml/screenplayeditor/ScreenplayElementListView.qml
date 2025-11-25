@@ -213,6 +213,16 @@ ListView {
         property bool scrollBarActive: root.ScrollBar.vertical ? root.ScrollBar.vertical.pressed : false
         property bool modelCurrentIndexChangedInternally: false
 
+        readonly property Connections screenplaySignals: Connections {
+            target: Scrite.document
+
+            enabled: _private.hasFocus && root.screenplayAdapter.screenplay === Scrite.document.screenplay
+
+            function onNewSceneCreated(scene, elementIndex) {
+                _private.focusCursorPosition.set(elementIndex, 0)
+            }
+        }
+
         readonly property Component header: ScreenplayElementListViewHeader {
             width: root.width
 
