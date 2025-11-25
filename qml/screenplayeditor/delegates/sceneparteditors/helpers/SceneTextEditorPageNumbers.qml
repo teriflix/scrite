@@ -64,13 +64,14 @@ Loader {
                         anchors.centerIn: parent
 
                         font: root.fontMetrics.font
+                        scale: root.zoomLevel
                         text: "Pg " + _pageBreakItem.pageNumber
                         color: root.isCurrent ? Color.textColorFor(root.screenplayElement.scene.highlightColor) : Runtime.colors.primary.c600.text
                         padding: 3
                     }
 
-                    width: Math.max(_sceneNumberText.contentWidth * 1.5, 30)
-                    height: _sceneNumberText.height
+                    width: Math.max(_sceneNumberText.contentWidth * _sceneNumberText.scale * 1.5, 30)
+                    height: _sceneNumberText.height * _sceneNumberText.scale
 
                     fillColor: root.isCurrent ? root.screenplayElement.scene.highlightColor : Runtime.colors.primary.c600.background
                     renderType: PainterPathItem.OutlineAndFill
