@@ -95,7 +95,11 @@ Item {
                 active: _private.isBreakElement
 
                 sourceComponent: Image {
-                    source: _private.isEpisodeBreak ? "qrc:/icons/content/episode_inverted.png" : "qrc:/icons/content/act_inverted.png"
+                    source: {
+                        if(_private.isEpisodeBreak)
+                            return Color.isLight(_elementItemBox.color) ? "qrc:/icons/content/episode.png" : "qrc:/icons/content/episode_inverted.png"
+                        return Color.isLight(_elementItemBox.color) ? "qrc:/icons/content/act.png" : "qrc:/icons/content/act_inverted.png"
+                    }
                 }
             }
 
