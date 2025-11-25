@@ -498,6 +498,15 @@ public:
     Q_SIGNAL void fromScriptalayChanged();
 
     // clang-format off
+    Q_PROPERTY(bool fromTemplate
+               READ isFromTemplate
+               NOTIFY fromTemplateChanged)
+    // clang-format on
+    void setFromTemplate(bool val);
+    bool isFromTemplate() const { return m_fromTemplate; }
+    Q_SIGNAL void fromTemplateChanged();
+
+    // clang-format off
     Q_PROPERTY(QString sessionId
                READ sessionId
                NOTIFY sessionIdChanged)
@@ -926,6 +935,7 @@ private:
     int m_maxBackupCount = 20;
     QString m_sessionId;
     bool m_fromScriptalay = false;
+    bool m_fromTemplate = false;
     QString m_documentId;
     QJsonObject m_userData;
     QString m_fileName;

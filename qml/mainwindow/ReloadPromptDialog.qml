@@ -120,16 +120,11 @@ VclDialog {
         target: Scrite.document
 
         function onJustReset() {
-            Runtime.firstSwitchToStructureTab = true
             if(_private.reloadTimer)
                 _private.reloadTimer.stop()
             Runtime.execLater(Runtime.screenplayAdapter, 250, () => {
                                   Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
                               })
-        }
-
-        function onJustLoaded() {
-            Runtime.firstSwitchToStructureTab = true
         }
 
         function onOpenedAnonymously(filePath) {

@@ -835,6 +835,15 @@ void ScriteDocument::setFromScriptalay(bool val)
     emit fromScriptalayChanged();
 }
 
+void ScriteDocument::setFromTemplate(bool val)
+{
+    if (m_fromTemplate == val)
+        return;
+
+    m_fromTemplate = val;
+    emit fromTemplateChanged();
+}
+
 void ScriteDocument::setCollaborators(const QStringList &val)
 {
     if (m_collaborators == val || !User::instance()->isLoggedIn()
@@ -1307,6 +1316,7 @@ void ScriteDocument::reset()
     this->setSessionId(QUuid::createUuid().toString());
     this->setDocumentId(QUuid::createUuid().toString());
     this->setFromScriptalay(false);
+    this->setFromTemplate(false);
     this->setReadOnly(false);
     this->setLocked(false);
 

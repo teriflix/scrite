@@ -175,16 +175,8 @@ Item {
     Connections {
         target: Scrite.document
 
-        function onJustReset() {
-
-        }
-
         function onAboutToSave() {
             _private.saveZoomLevel()
-        }
-
-        function onJustLoaded() {
-            _private.restoreZoomLevel()
         }
     }
 

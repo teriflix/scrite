@@ -108,8 +108,7 @@ ScrollArea {
         _private.zoomOneToItem(item)
     }
 
-    Component.onCompleted: _private.updateFromScriteDocumentUserDataLater()
-    Component.onDestruction: _private.updateScriteDocumentUserData()
+    Component.onCompleted: Runtime.execLater(_private, Runtime.stdAnimationDuration, _private.initialize)
 
     clip: true
 
@@ -141,7 +140,7 @@ ScrollArea {
             }
         }
 
-        onZoomOneRequest: () => { _private.zoomOne() }
+        onZoomOneRequest: () => { _private.zoomOneToCurrentItem() }
         onZoomOneToItemRequest: (item) => { _private.zoomOneToItem(item) }
         onEditorRequest: () => { root.editorRequest() }
         onDeleteElementRequest: (element) => { _private.deleteElement(element) }
@@ -152,26 +151,8 @@ ScrollArea {
         onEnsureAreaVisibleRequest: (area) => { root.ensureAreaVisible(area, suggestedScale, 0) }
     }
 
-    Connections {
-        target: Scrite.document
-
-        function onJustLoaded() { _private.updateFromScriteDocumentUserData() }
-    }
-
-    onContentXChanged: Qt.callLater(_private.updateScriteDocumentUserData)
-
-    onContentYChanged: Qt.callLater(_private.updateScriteDocumentUserData)
-
-    onZoomScaleChanged: isZoomFit = false
-
-    onAnimatePanAndZoomChanged: Qt.callLater(_private.updateScriteDocumentUserData)
-
-    onZoomScaleChangedInteractively: Qt.callLater(_private.updateScriteDocumentUserData)
-
     QtObject {
         id: _private
-
-        property bool updateScriteDocumentUserDataEnabled: false
 
         property bool interactive: {
             const canvasInteractionGoingOn =  (_canvas.rubberband.active ||
@@ -190,72 +171,19 @@ ScrollArea {
                 return
 
             if(delay === undefined || delay === null)
-                animatePanAndZoom = true;
+                animatePanAndZoom = true
             else
                 Runtime.execLater(root, delay, () => { root.animatePanAndZoom = true })
         }
 
-        function updateScriteDocumentUserData() {
-            if(!updateScriteDocumentUserDataEnabled || Scrite.document.readOnly || animatingPanOrZoom)
-                return
-
-            let userData = Scrite.document.userData
-            userData["StructureCanvasScrollArea"] = {
-                "version": 0,
-                "contentX": root.contentX,
-                "contentY": root.contentY,
-                "zoomScale": root.zoomScale,
-                "isZoomFit": root.isZoomFit
-            }
-
-            Scrite.document.userData = userData
-        }
-
-        function updateFromScriteDocumentUserData() {
+        function initialize() {
             if(Scrite.document.structure.forceBeatBoardLayout)
                 Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
-
-            _canvas.itemsBoundingBox.markPreviewDirty();
+            _canvas.itemsBoundingBox.markPreviewDirty()
             _canvas.itemsBoundingBox.recomputeBoundingBox()
 
-            const userData = Scrite.document.userData
-            const csData = userData["StructureView.canvasScroll"] ?? userData["StructureCanvasScrollArea"];
-            if(csData && csData.version === 0) {
-                root.isZoomFit = csData.isZoomFit === true
-                if(root.isZoomFit) {
-                    const area = _canvas.itemsBoundingBox.tightBoundingBox
-                    root.zoomFit(area)
-                } else {
-                    let item = _canvas.currentElementItem
-                    if(item === null)
-                        item = _canvas.elementLayer.elementItemAt(Scrite.document.structure.currentElementIndex)
-                    if(item)
-                        root.zoomOneToItem(item)
-                    else
-                        root.zoomOneMiddleArea()
-                }
-            } else {
-                if(Scrite.document.structure.elementCount > 0) {
-                    let item = _canvas.currentElementItem
-                    if(item === null)
-                        item = _canvas.elementLayer.elementItemAt(0)
-                    if(Runtime.firstSwitchToStructureTab)
-                        root.zoomOneToItem(item)
-                    else
-                        root.ensureItemVisible(item)
-                } else
-                    root.zoomOneMiddleArea()
-            }
-
-            root.returnToBounds()
-
-            root.enablePanAndZoomAnimation();
-            updateScriteDocumentUserDataEnabled = true
-            Runtime.firstSwitchToStructureTab = false
-        }
-
-        function updateFromScriteDocumentUserDataLater() {
-            Runtime.execLater(root, 500, updateFromScriteDocumentUserData)
+            _private.zoomOneToCurrentItem()
+            animatePanAndZoom = true
         }
 
         function zoomSanityCheck() {
@@ -267,10 +195,10 @@ ScrollArea {
             }
         }
 
-        function zoomOne() {
+        function zoomOneToCurrentItem() {
             const item = _canvas.currentElementItem
             if(item === null) {
-                item = _canvas.elementItemAt(0)
+                item = _canvas.elementItemAt(Scrite.document.structure.currentElementIndex)
             }
 
             if(item) {
@@ -278,12 +206,9 @@ ScrollArea {
             } else {
                 zoomOneMiddleArea()
             }
-
-            updateScriteDocumentUserData()
         }
 
         function zoomOneMiddleArea() {
-
             if(_canvas.itemsBoundingBox.itemCount > 0) {
                 const bbox = _canvas.itemsBoundingBox.boundingBox
                 if(bbox.width < root.width && bbox.height < root.height) {
@@ -363,11 +288,6 @@ ScrollArea {
                     Scrite.document.screenplay.currentElementIndex = Scrite.document.screenplay.firstIndexOfScene(scene)
                 }
             }, nextScene)
-        }
-
-        onUpdateScriteDocumentUserDataEnabledChanged: {
-            if(updateScriteDocumentUserDataEnabled)
-                Runtime.execLater(root, 500, zoomSanityCheck)
         }
     }
 }

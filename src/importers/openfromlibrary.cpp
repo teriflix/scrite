@@ -87,6 +87,8 @@ private:
 
     void recordFetched(const QString &name, const QByteArray &bytes);
 
+    void onDocumentAboutToOpen();
+
 private:
     int m_index = -1;
     Library *m_library = nullptr;
@@ -300,7 +302,14 @@ void LibraryServiceOpenRecordTask::recordFetched(const QString &name, const QByt
     tmpFile.write(bytes);
     tmpFile.close();
 
+    connect(ScriteDocument::instance(), &ScriteDocument::justReset, this,
+            &LibraryServiceOpenRecordTask::onDocumentAboutToOpen);
+
     ScriteDocument::instance()->openAnonymously(tmpFile.fileName());
+
+    disconnect(ScriteDocument::instance(), &ScriteDocument::justReset, this,
+               &LibraryServiceOpenRecordTask::onDocumentAboutToOpen);
+
     ScriteDocument::instance()->screenplay()->setCurrentElementIndex(-1);
 
     if (m_library->type() == Library::Templates) {
@@ -313,8 +322,11 @@ void LibraryServiceOpenRecordTask::recordFetched(const QString &name, const QByt
         ScriteDocument::instance()->formatting()->resetToUserDefaults();
     }
 
-    if (m_library->type() == Library::Screenplays)
-        ScriteDocument::instance()->setFromScriptalay(true);
-
     QTimer::singleShot(100, this, &LibraryServiceOpenRecordTask::complete);
+}
+
+void LibraryServiceOpenRecordTask::onDocumentAboutToOpen()
+{
+    ScriteDocument::instance()->setFromTemplate(m_library->type() == Library::Templates);
+    ScriteDocument::instance()->setFromScriptalay(m_library->type() == Library::Screenplays);
 }

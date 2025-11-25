@@ -54,6 +54,7 @@ Item {
     readonly property alias groupBoxCount: _private.groupBoxCount
     readonly property alias episodeBoxCount: _private.episodeBoxCount
     readonly property alias editElementItem: _private.editElementItem
+    readonly property alias elementItemCount: _elementItems.count
     readonly property alias currentElementItem: _private.currentElementItem
     readonly property alias draggedElementItem: _private.draggedElementItem
 

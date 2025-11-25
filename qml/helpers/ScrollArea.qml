@@ -44,12 +44,12 @@ Flickable {
 
     function zoomIn() {
         const zf = 1+Runtime.scrollAreaSettings.zoomFactor
-        zoomScale = Math.min(zoomScale*zf, pinchHandler.maximumScale)
+        zoomTo(zoomScale*zf)
     }
 
     function zoomOut() {
         const zf = 1-Runtime.scrollAreaSettings.zoomFactor
-        zoomScale = Math.max(zoomScale*zf, pinchHandler.minimumScale)
+        zoomTo(zoomScale*zf);
     }
 
     function zoomOne() {
@@ -57,7 +57,7 @@ Flickable {
     }
 
     function zoomTo(val) {
-        zoomScale = val
+        zoomScale = Runtime.bounded(minimumScale, val, maximumScale)
     }
 
     function zoomFit(area) {
@@ -67,7 +67,7 @@ Flickable {
         zoomScaleBehavior.allow = false;
 
         const newScale = Math.min(width / area.width, height / area.height);
-        zoomScale = Math.max(pinchHandler.minimumScale, Math.min(newScale, pinchHandler.maximumScale));
+        zoomTo(newScale)
 
         contentWidth = initialContentWidth * zoomScale;
         contentHeight = initialContentHeight * zoomScale;
@@ -97,10 +97,8 @@ Flickable {
             const scaleY = height / (item.height + 2 * leaveMargin);
             const newScale = Math.min(scaleX, scaleY);
 
-            if (newScale < currentScale) {
-                currentScale = Math.max(pinchHandler.minimumScale, newScale);
-                zoomScale = currentScale;
-            }
+            if (newScale !== currentScale)
+                zoomTo(Math.max(pinchHandler.minimumScale, newScale))
         }
 
         const itemScaledRect = Qt.rect(item.x * currentScale,

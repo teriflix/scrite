@@ -47,7 +47,6 @@ Item {
     property bool allowAppUsage: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
     property bool canShowNotebookInStructure: width > minWindowWidthForShowingNotebookInStructure
     property bool currentUseSoftwareRenderer
-    property bool firstSwitchToStructureTab: true // This is different from screenplayEditorSettings.firstSwitchToStructureTab
     property bool loadMainUiContent: true
     property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
 
@@ -990,13 +989,11 @@ Item {
         target: Scrite.document
 
         function onJustReset() {
-            Runtime.firstSwitchToStructureTab = true
             Runtime.screenplayEditorSettings.sceneSidePanelOpen = false
             Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
         }
 
         function onJustLoaded() {
-            Runtime.firstSwitchToStructureTab = true
             Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
         }
     }
