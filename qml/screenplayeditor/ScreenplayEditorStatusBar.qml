@@ -392,7 +392,6 @@ Rectangle {
         to: zoomLevels.length-1
         from: 0
         stepSize: 1
-        zoomSliderVisible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
 
         ActionHandler {
             enabled: _zoomSlider.value < _zoomSlider.to

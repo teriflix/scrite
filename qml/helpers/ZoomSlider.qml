@@ -29,7 +29,6 @@ Item {
     property alias pressed: _slider.pressed
     property alias stepSize: _slider.stepSize
     property alias zoomLevel: _slider.zoomLevel
-    property alias zoomSliderVisible: _slider.visible
 
     signal sliderMoved()
     signal zoomInRequest()
@@ -61,25 +60,51 @@ Item {
             }
         }
 
-        Slider {
-            id: _slider
+        VclLabel {
+            Layout.preferredWidth: Runtime.minimumFontMetrics.advanceWidth("999%") + leftPadding + rightPadding
 
-            property real zoomLevel: value
+            text: Math.round(_slider.zoomLevel * 100) + "%"
+            leftPadding: 5
+            rightPadding: 5
+            horizontalAlignment: Text.AlignRight
 
-            to: 2
-            from: 0.4
-            value: 1
-            stepSize: 0.1
-            orientation: Qt.Horizontal
+            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
-            topPadding: 0
-            bottomPadding: 0
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
 
-            onMoved: sliderMoved()
+                onClicked: _sliderPopup.open()
+            }
+
+            VclMenu {
+                id: _sliderPopup
+
+                VclMenuItem {
+                    height: 40
+                    background: Item { }
+                    contentItem: Slider {
+                        id: _slider
+
+                        property real zoomLevel: value
+
+                        to: 2
+                        from: 0.4
+                        value: 1
+                        padding: 0
+                        stepSize: 0.1
+                        orientation: Qt.Horizontal
+
+                        onMoved: sliderMoved()
+                    }
+                }
+            }
         }
 
         IconButton {
             id: _zoomInButton
+
+            Layout.rightMargin: 10
 
             source: "qrc:/icons/navigation/zoom_in.png"
             enabled: _slider.value < _slider.to
@@ -92,46 +117,35 @@ Item {
                     zoomInRequest()
             }
         }
+    }
 
-        VclLabel {
-            Layout.preferredWidth: Runtime.minimumFontMetrics.advanceWidth("999%") + leftPadding + rightPadding
+    component IconButton : Image {
+        property alias containsMouse: _iconButtonMouseArea.containsMouse
 
-            text: Math.round(_slider.zoomLevel * 100) + "%"
-            leftPadding: 5
-            rightPadding: 5
-            horizontalAlignment: Text.AlignRight
+        property string tooltipText
 
-            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-        }
+        signal clicked()
 
-        component IconButton : Image {
-            property alias containsMouse: _iconButtonMouseArea.containsMouse
+        Layout.preferredWidth: Runtime.idealFontMetrics.height
+        Layout.preferredHeight: Runtime.idealFontMetrics.height
 
-            property string tooltipText
+        scale: _iconButtonMouseArea.containsMouse ? (_iconButtonMouseArea.pressed ? 1 : 1.5) : 1
+        mipmap: true
 
-            signal clicked()
+        Behavior on scale { NumberAnimation { duration: Runtime.stdAnimationDuration } }
 
-            Layout.preferredWidth: Runtime.idealFontMetrics.height
-            Layout.preferredHeight: Runtime.idealFontMetrics.height
+        MouseArea {
+            id: _iconButtonMouseArea
 
-            scale: _iconButtonMouseArea.containsMouse ? (_iconButtonMouseArea.pressed ? 1 : 1.5) : 1
-            mipmap: true
+            ToolTip.text: parent.tooltipText
+            ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+            ToolTip.visible: containsMouse && !pressed
 
-            Behavior on scale { NumberAnimation { duration: Runtime.stdAnimationDuration } }
+            anchors.fill: parent
 
-            MouseArea {
-                id: _iconButtonMouseArea
+            hoverEnabled: true
 
-                ToolTip.text: parent.tooltipText
-                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-                ToolTip.visible: containsMouse && !pressed
-
-                anchors.fill: parent
-
-                hoverEnabled: true
-
-                onClicked: parent.clicked()
-            }
+            onClicked: parent.clicked()
         }
     }
 }
