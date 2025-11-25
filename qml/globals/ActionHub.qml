@@ -330,6 +330,7 @@ Item {
 
             Action {
                 readonly property bool visible: true
+                property var keywords: index === 0 ? ["new", "close", "file", "document", "screenplay"] : []
                 property string tooltip: record.description
 
                 ActionManager.target: root.templateOperations
