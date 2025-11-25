@@ -64,12 +64,12 @@ Item {
             }
 
             onZoomInRequest: {
-                root.zoomLevel = Math.min(zoomLevel * 1.1, 4.0)
+                root.zoomLevel = Math.min(zoomLevel * 1.1, _private.maximumZoomLevel)
                 _screenplayElementList.updateCacheBuffer()
             }
 
             onZoomOutRequest: {
-                root.zoomLevel = Math.max(zoomLevel * 0.9, _screenplayElementList.perElementWidth/_screenplayElementList.minimumDelegateWidth)
+                root.zoomLevel = Math.max(zoomLevel * 0.9, _private.minimumZoomLevel)
                 _screenplayElementList.updateCacheBuffer()
             }
         }
@@ -153,6 +153,7 @@ Item {
 
     Connections {
         target: Scrite.document.screenplay
+
         function onCurrentElementIndexChanged(val) {
             if(!Scrite.document.loading) {
                 Runtime.execLater(_screenplayElementList, 150, function() {
@@ -171,8 +172,27 @@ Item {
         }
     }
 
+    Connections {
+        target: Scrite.document
+
+        function onJustReset() {
+
+        }
+
+        function onAboutToSave() {
+            _private.saveZoomLevel()
+        }
+
+        function onJustLoaded() {
+            _private.restoreZoomLevel()
+        }
+    }
+
     QtObject {
         id: _private
+
+        readonly property real maximumZoomLevel: 4
+        property real minimumZoomLevel: _screenplayElementList.perElementWidth/_screenplayElementList.minimumDelegateWidth
 
         property SequentialAnimation dropSceneTask : SequentialAnimation {
             property var dropSource // must be a QObject subclass
@@ -258,6 +278,26 @@ Item {
         function requestEditorLater() {
             Runtime.execLater(root, 100, root.requestEditor)
         }
-    }
 
+        function saveZoomLevel() {
+            let userData = Scrite.document.userData
+            userData["timelineView"] = {
+                "version": 0,
+                "zoomLevel": root.zoomLevel
+            }
+            Scrite.document.userData = userData
+        }
+
+        function restoreZoomLevel() {
+            const userData = Scrite.document.userData
+            if(userData.timelineView && userData.timelineView.version === 0) {
+                const zl = userData.timelineView.zoomLevel
+                if(typeof zl === "number")
+                    root.zoomLevel = Runtime.bounded(_private.minimumZoomLevel, zl, _private.maximumZoomLevel);
+            }
+        }
+
+        Component.onCompleted: restoreZoomLevel()
+        Component.onDestruction: saveZoomLevel()
+    }
 }
