@@ -16,7 +16,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
@@ -56,7 +55,7 @@ Loader {
 
                 PainterPathItem {
                     anchors.right: parent.left
-                    anchors.rightMargin: 20
+                    anchors.rightMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
 
                     VclLabel {
@@ -65,12 +64,9 @@ Loader {
                         anchors.centerIn: parent
 
                         font: root.fontMetrics.font
-                        text: _pageBreakItem.pageNumber
+                        text: "Pg " + _pageBreakItem.pageNumber
                         color: root.isCurrent ? Color.textColorFor(root.screenplayElement.scene.highlightColor) : Runtime.colors.primary.c600.text
-                        topPadding: 3
-                        leftPadding: 4
-                        rightPadding: 4
-                        bottomPadding: 1
+                        padding: 3
                     }
 
                     width: Math.max(_sceneNumberText.contentWidth * 1.5, 30)

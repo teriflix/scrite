@@ -213,7 +213,7 @@ Item {
 
                 isCurrent: sceneDelegate.isCurrent
                 zoomLevel: sceneDelegate.zoomLevel
-                fontMetrics: sceneDelegate.fontMetrics
+                fontMetrics: Runtime.minimumFontMetrics
                 sceneTextEditor: _sceneContentEditor.editor
                 screenplayElement: sceneDelegate.screenplayElement
             }
