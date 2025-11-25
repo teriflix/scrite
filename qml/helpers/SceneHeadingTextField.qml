@@ -56,7 +56,7 @@ VclTextField {
                            return _private.includeSuggestion(suggestion)
                        }
 
-    onEditingComplete: (text) => {
+    onEditingComplete: () => {
                            _private.updateText(text)
                        }
 
@@ -114,7 +114,7 @@ VclTextField {
         }
 
         function updateText(text) {
-            if(!readOnly)
+            if(readOnly)
                 return
 
             sceneHeading.parseFrom(text)

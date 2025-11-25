@@ -404,6 +404,8 @@ Rectangle {
         property color normalColor: root.scene ? Runtime.colors.tint(delegateColor, Runtime.colors.sceneHeadingTint) : Qt.lighter(delegateColor, 1.25)
         property color selectedColor: root.scene ? Runtime.colors.tint(delegateColor, Runtime.colors.selectedSceneHeadingTint) : delegateColor
 
+        property SceneHeading sceneHeading: root.scene ? root.scene.heading : null
+
         property color delegateColor: {
             if(root.scene)
                 return root.scene.color
@@ -422,14 +424,13 @@ Rectangle {
             let ret = "UNKNOWN"
 
             if(root.scene) {
-                const sceneHeading = root.scene.heading
                 if(isSceneTextModeHeading) {
                     if(sceneHeading.enabled) {
                         ret = root.screenplayElement.resolvedSceneNumber + ". "
                         if(root.screenplayElement.omitted)
                             ret += "[OMITTED] <font color=\"gray\">" + root.scene.heading.text + "</font>"
                         else
-                            ret += sceneHeading.text
+                            ret += sceneHeading.displayText
                     } else if(screenplayElement.omitted)
                         ret = "[OMITTED]"
                     else
