@@ -78,7 +78,10 @@ Popup {
 
                 font: Runtime.idealFontMetrics.font
 
-                onTextEdited: _actionsModel.filter()
+                onTextEdited: {
+                    if(_private.actionsModel)
+                        _private.actionsModel.filter()
+                }
             }
 
             ListView {
@@ -95,7 +98,7 @@ Popup {
                     }
                 }
 
-                model: _actionsModel
+                model: _private.actionsModel
                 clip: true
                 currentIndex: 0
 
@@ -202,40 +205,6 @@ Popup {
         }
     }
 
-    ActionsModelFilter {
-        id: _actionsModel
-
-        filters: ActionsModelFilter.CommandCenterFilters
-        customFilterMode: true
-
-        onFilterRequest: (qmlAction, actionManager, result) => {
-            if(_commandText.length === 0)
-                result.value = true
-            else {
-                const givenText = _commandText.text.toLowerCase()
-
-                let text = (actionManager.title + ": " + qmlAction.text)
-                if(qmlAction.keywords !== undefined) {
-                    if(typeof qmlAction.keywords === "string")
-                        text += ", " + qmlAction.keywords
-                    else if(qmlAction.keywords.length > 0)
-                        text += ", " + qmlAction.keywords.join(", ")
-                }
-                if(qmlAction.tooltip !== undefined) {
-                    text += ", " + qmlAction.tooltip
-                }
-
-                text = text.toLowerCase()
-
-                result.value = (text.indexOf(givenText) >= 0)
-            }
-        }
-
-        onModelReset: Qt.callLater(_private.resetCurrentActionViewItem)
-        onRowsRemoved: Qt.callLater(_private.resetCurrentActionViewItem)
-        onRowsInserted: Qt.callLater(_private.resetCurrentActionViewItem)
-    }
-
     ActionHandler {
         action: ActionHub.appOptions.find("commandCenter")
 
@@ -249,7 +218,6 @@ Popup {
         Runtime.language.setActiveCode(QtLocale.English)
 
         _commandText.text = ""
-        _actionsModel.filter()
         contentItem.forceActiveFocus()
     }
 
@@ -260,9 +228,48 @@ Popup {
         _private.beforeLanguage = -1
     }
 
+    Loader {
+        id: _actionsModelInstantiator
+
+        active: root.visible
+
+        sourceComponent: ActionsModelFilter {
+            filters: ActionsModelFilter.CommandCenterFilters
+            customFilterMode: true
+
+            onFilterRequest: (qmlAction, actionManager, result) => {
+                if(_commandText.length === 0)
+                result.value = true
+                else {
+                    const givenText = _commandText.text.toLowerCase()
+
+                    let text = (actionManager.title + ": " + qmlAction.text)
+                    if(qmlAction.keywords !== undefined) {
+                        if(typeof qmlAction.keywords === "string")
+                        text += ", " + qmlAction.keywords
+                        else if(qmlAction.keywords.length > 0)
+                        text += ", " + qmlAction.keywords.join(", ")
+                    }
+                    if(qmlAction.tooltip !== undefined) {
+                        text += ", " + qmlAction.tooltip
+                    }
+
+                    text = text.toLowerCase()
+
+                    result.value = (text.indexOf(givenText) >= 0)
+                }
+            }
+
+            onModelReset: Qt.callLater(_private.resetCurrentActionViewItem)
+            onRowsRemoved: Qt.callLater(_private.resetCurrentActionViewItem)
+            onRowsInserted: Qt.callLater(_private.resetCurrentActionViewItem)
+        }
+    }
+
     QtObject {
         id: _private
 
+        property QtObject actionsModel: _actionsModelInstantiator.item
         property int beforeLanguage: -1
 
         function trigger(qmlAction) {
