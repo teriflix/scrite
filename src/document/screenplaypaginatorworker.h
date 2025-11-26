@@ -151,8 +151,8 @@ public slots:
     void queryCursor(int cursorPosition, int currentSerialNumber);
 
 signals:
-    void cursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber,
-                             const QTime &time);
+    void cursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber, qreal page,
+                             const QTime &time, const ScreenplayPaginatorRecord &cursorRecord);
     void paginationComplete(const QList<ScreenplayPaginatorRecord> &items, qreal pixelLength,
                             int pageCount, const QTime &totalTime);
 
@@ -166,6 +166,7 @@ private:
 
     qreal cursorPixelOffset(int cursorPosition, int currentSerialNumber) const;
     qreal cursorPixelOffset(const QTextCursor &cursor) const;
+    ScreenplayPaginatorRecord cursorRecord(int currentSerialNumber) const;
     QList<ScenePageBreak>
     evaluateScenePageBreaks(const PaginatorDocumentInsights::BlockRange &blockRange,
                             int &lastPageNumber) const;
@@ -174,6 +175,7 @@ private:
     friend class ScreenplayPaginator;
     QJsonObject m_formatJson;
     QList<SceneContent> m_screenplayContent;
+    QList<ScreenplayPaginatorRecord> m_records;
     QTextDocument *m_document = nullptr;
     QTimer *m_syncDocumentTimer = nullptr;
     ScreenplayFormat *m_defaultFormat = nullptr;
@@ -206,8 +208,8 @@ signals:
     void updateParagraph(const SceneParagraph &paragraph);
     void queryCursor(int cursorPosition, int currentSerialNumber);
 
-    void cursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber,
-                             const QTime &time);
+    void cursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber, qreal page,
+                             const QTime &time, const ScreenplayPaginatorRecord &cursorRecord);
     void paginationComplete(const QList<ScreenplayPaginatorRecord> &items, qreal pixelLength,
                             int pageCount, const QTime &totalTime);
 

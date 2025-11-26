@@ -54,8 +54,12 @@ bool ScreenplayPaginatorRecord::operator==(const ScreenplayPaginatorRecord &othe
 {
     return this->serialNumber == other.serialNumber
             && qFuzzyCompare(this->pixelLength, other.pixelLength)
+            && this->firstCursorPosition == other.firstCursorPosition
+            && this->firstParagraphCursorPosition == other.firstParagraphCursorPosition
+            && this->lastCursorPosition == other.lastCursorPosition
             && this->pageLength == other.pageLength && this->timeLength == other.timeLength
-            && this->pageBreaks == other.pageBreaks
+            && this->pixelOffset == other.pixelOffset && this->pageOffset == other.pageOffset
+            && this->timeOffset == other.timeOffset && this->pageBreaks == other.pageBreaks
             && this->screenplayElement == other.screenplayElement;
 }
 
@@ -68,9 +72,15 @@ ScreenplayPaginatorRecord &
 ScreenplayPaginatorRecord::operator=(const ScreenplayPaginatorRecord &other)
 {
     this->serialNumber = other.serialNumber;
+    this->firstCursorPosition = other.firstCursorPosition;
+    this->firstParagraphCursorPosition = other.firstParagraphCursorPosition;
+    this->lastCursorPosition = other.lastCursorPosition;
     this->pixelLength = other.pixelLength;
     this->pageLength = other.pageLength;
     this->timeLength = other.timeLength;
+    this->pixelOffset = other.pixelOffset;
+    this->pageOffset = other.pageOffset;
+    this->timeOffset = other.timeOffset;
     this->pageBreaks = other.pageBreaks;
     this->screenplayElement = other.screenplayElement;
     return *this;
@@ -657,14 +667,19 @@ void ScreenplayPaginator::onCursorPositionChanged()
     m_workerNode->queryCursor(m_cursorPosition, currentSerialNumber);
 }
 
-void ScreenplayPaginator::onCursorQueryResponse(int cursorPosition, qreal pixelOffset,
-                                                int pageNumber, const QTime &time)
+void ScreenplayPaginator::onCursorQueryResponse(int cursorPosition, qreal cursorPixel,
+                                                int cursorPageNumber, qreal cursorPage,
+                                                const QTime &cursorTime,
+                                                const ScreenplayPaginatorRecord &cursorRecord)
 {
     if (m_cursorPosition == cursorPosition) {
-        m_cursorPage = pageNumber;
-        m_cursorTime = time;
-        m_cursorPixelOffset = pixelOffset;
+        m_cursorPage = cursorPageNumber;
+        m_cursorTime = cursorTime;
+        m_cursorPixelOffset = cursorPixel;
+        m_cursorRecord = cursorRecord;
         emit cursorUpdated();
+        emit cursorQueryResponse(cursorPosition, cursorPixel, cursorPageNumber, cursorPage,
+                                 cursorTime, cursorRecord);
     }
 }
 
@@ -760,6 +775,8 @@ void ScreenplayPaginatorWatcher::setPaginator(ScreenplayPaginator *val)
     if (m_paginator != nullptr) {
         connect(m_paginator, &ScreenplayPaginator::paginationUpdated, this,
                 &ScreenplayPaginatorWatcher::onPaginationUpdated);
+        connect(m_paginator, &ScreenplayPaginator::cursorQueryResponse, this,
+                &ScreenplayPaginatorWatcher::onCursorQueryResponse);
     }
 
     emit paginatorChanged();
@@ -805,4 +822,33 @@ void ScreenplayPaginatorWatcher::setRecord(const ScreenplayPaginatorRecord &val)
 
     m_record = val;
     emit recordChanged();
+}
+
+void ScreenplayPaginatorWatcher::onCursorQueryResponse(
+        int cursorPosition, qreal cursorPixel, int cursorPageNumber, qreal cursorPage,
+        const QTime &cursorTime, const ScreenplayPaginatorRecord &cursorRecord)
+{
+    Q_UNUSED(cursorPageNumber);
+
+    bool hasCursor = cursorRecord.isValid() && m_record.isValid()
+            && m_record.serialNumber == cursorRecord.serialNumber;
+    if (!hasCursor && !m_hasCursor) {
+        return;
+    }
+
+    m_hasCursor = hasCursor;
+    if (!m_hasCursor) {
+        m_relativeCursorPosition = -1;
+        m_relativeCursorPixel = 0;
+        m_relativeCursorPage = 0;
+        m_relativeCursorTime = QTime();
+        emit cursorInfoChanged();
+        return;
+    }
+
+    m_relativeCursorPosition = cursorPosition - m_record.firstCursorPosition;
+    m_relativeCursorPixel = cursorPixel - m_record.pixelOffset;
+    m_relativeCursorPage = cursorPage - m_record.pageOffset;
+    m_relativeCursorTime = QTime(0, 0, 0).addSecs(m_record.timeOffset.secsTo(cursorTime));
+    emit cursorInfoChanged();
 }

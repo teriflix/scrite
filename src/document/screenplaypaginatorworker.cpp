@@ -459,9 +459,11 @@ void ScreenplayPaginatorWorker::queryCursor(int cursorPosition, int currentSeria
 {
     qreal pixelOffset = this->cursorPixelOffset(cursorPosition, currentSerialNumber);
     QTime time = ScreenplayPaginator::pixelToTimeLength(pixelOffset, m_format, m_document);
-    int pageNr = qMax(qCeil(ScreenplayPaginator::pixelToPageLength(pixelOffset, m_document)), 1);
+    qreal page = ScreenplayPaginator::pixelToPageLength(pixelOffset, m_document);
+    int pageNr = qMax(qCeil(page), 1);
+    ScreenplayPaginatorRecord cursorRecord = this->cursorRecord(currentSerialNumber);
 
-    emit cursorQueryResponse(cursorPosition, pixelOffset, pageNr, time);
+    emit cursorQueryResponse(cursorPosition, pixelOffset, pageNr, page, time, cursorRecord);
 }
 
 void ScreenplayPaginatorWorker::syncDocument()
@@ -654,6 +656,21 @@ void ScreenplayPaginatorWorker::syncDocument()
             continue;
         }
 
+        record.firstCursorPosition = range.from.position();
+        record.firstParagraphCursorPosition = record.firstCursorPosition;
+
+        ScreenplayPaginatorBlockData *fromBlockData = ScreenplayPaginatorBlockData::get(range.from);
+        if (fromBlockData && fromBlockData->paragraphType == SceneElement::Heading) {
+            QTextBlock block = range.from.next();
+            if (block.isValid()) {
+                record.firstParagraphCursorPosition = block.position();
+            }
+        }
+
+        QTextCursor cursor(range.until);
+        cursor.movePosition(QTextCursor::EndOfBlock);
+        record.lastCursorPosition = cursor.position();
+
         record.pixelLength = ScreenplayPaginator::pixelLength(range.from, range.until, m_document);
         record.pageLength = ScreenplayPaginator::pixelToPageLength(record.pixelLength, m_document);
         record.timeLength =
@@ -682,6 +699,19 @@ void ScreenplayPaginatorWorker::syncDocument()
                 ScreenplayPaginator::pageToTimeLength(record.pageLength, m_format, m_document);
     }
 
+    // Calculate offsets
+    qreal pixelOffset = 0, pageOffset = 0;
+    QTime timeOffset;
+    for (ScreenplayPaginatorRecord &record : records) {
+        record.pixelOffset = pixelOffset;
+        record.pageOffset = pageOffset;
+        record.timeOffset = timeOffset;
+
+        pixelOffset += record.pixelLength;
+        pageOffset += record.pageLength;
+        timeOffset.addSecs(QTime(0, 0, 0).secsTo(record.timeLength));
+    }
+
     m_document->setProperty(PaginatorDocumentInsights::property,
                             QVariant::fromValue<PaginatorDocumentInsights>(insights));
 
@@ -693,6 +723,7 @@ void ScreenplayPaginatorWorker::syncDocument()
             ScreenplayPaginator::pixelToTimeLength(pixelLength, m_format, m_document);
 
     // All done, emit result.
+    m_records = records;
     emit paginationComplete(records, pixelLength, pageCount, totalTime);
 
     // Adjust the sync-interval based on the time taken.
@@ -799,6 +830,22 @@ qreal ScreenplayPaginatorWorker::cursorPixelOffset(const QTextCursor &cursor) co
         return layout->position().y();
 
     return layout->position().y() + line.y() + line.height() / 2;
+}
+
+ScreenplayPaginatorRecord ScreenplayPaginatorWorker::cursorRecord(int serialNumber) const
+{
+#ifdef ENABLE_FUNCTION_PROFILER
+    PROFILE_THIS_FUNCTION;
+#endif
+
+    auto it = std::find_if(m_records.constBegin(), m_records.constEnd(),
+                           [serialNumber](const ScreenplayPaginatorRecord &record) {
+                               return record.isValid() && record.serialNumber == serialNumber;
+                           });
+    if (it != m_records.constEnd())
+        return *it;
+
+    return ScreenplayPaginatorRecord();
 }
 
 QList<ScenePageBreak> ScreenplayPaginatorWorker::evaluateScenePageBreaks(

@@ -80,6 +80,24 @@ public:
     int serialNumber = -1;
 
     // clang-format off
+    Q_PROPERTY(int firstCursorPosition
+               MEMBER firstCursorPosition)
+    // clang-format on
+    int firstCursorPosition = -1;
+
+    // clang-format off
+    Q_PROPERTY(int firstParagraphCursorPosition
+               MEMBER firstParagraphCursorPosition)
+    // clang-format on
+    int firstParagraphCursorPosition = -1;
+
+    // clang-format off
+    Q_PROPERTY(int lastCursorPosition
+               MEMBER firstCursorPosition)
+    // clang-format on
+    int lastCursorPosition = -1;
+
+    // clang-format off
     Q_PROPERTY(qreal pixelLength
                MEMBER pixelLength)
     // clang-format on
@@ -96,6 +114,24 @@ public:
                MEMBER timeLength)
     // clang-format on
     QTime timeLength;
+
+    // clang-format off
+    Q_PROPERTY(qreal pixelOffset
+               MEMBER pixelOffset)
+    // clang-format on
+    qreal pixelOffset = 0;
+
+    // clang-format off
+    Q_PROPERTY(qreal pageOffset
+               MEMBER pageOffset)
+    // clang-format on
+    qreal pageOffset = 0;
+
+    // clang-format off
+    Q_PROPERTY(QTime timeOffset
+               MEMBER timeOffset)
+    // clang-format on
+    QTime timeOffset;
 
     // clang-format off
     Q_PROPERTY(QList<ScenePageBreak> pageBreaks
@@ -239,6 +275,13 @@ public:
     // clang-format on
     qreal cursorPixelOffset() const { return m_cursorPixelOffset; }
 
+    // clang-format off
+    Q_PROPERTY(ScreenplayPaginatorRecord cursorRecord
+               READ cursorRecord
+               NOTIFY cursorUpdated)
+    // clang-format on
+    ScreenplayPaginatorRecord cursorRecord() const { return m_cursorRecord; }
+
     Q_INVOKABLE int indexOf(ScreenplayElement *element) const;
     Q_INVOKABLE ScreenplayPaginatorRecord recordAt(int row) const;
 
@@ -254,6 +297,8 @@ public:
 signals:
     void cursorUpdated();
     void paginationUpdated();
+    void cursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber, qreal page,
+                             const QTime &time, const ScreenplayPaginatorRecord &cursorRecord);
 
 private:
     void clear();
@@ -276,8 +321,9 @@ private:
 
     void onCursorPositionChanged();
 
-    void onCursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber,
-                               const QTime &time);
+    void onCursorQueryResponse(int cursorPosition, qreal cursorPixel, int cursorPageNumber,
+                               qreal cursorPage, const QTime &cursorTime,
+                               const ScreenplayPaginatorRecord &cursorRecord);
     void onPaginationComplete(const QList<ScreenplayPaginatorRecord> &items, qreal pixelLength,
                               int pageCount, const QTime &totalTime);
 
@@ -292,6 +338,7 @@ private:
     int m_cursorPage = 0;
     qreal m_cursorPixelOffset = 0;
     QTime m_cursorTime;
+    ScreenplayPaginatorRecord m_cursorRecord;
 
     int m_pageCount = 0;
     qreal m_totalPixelLength = 0;
@@ -379,15 +426,62 @@ public:
     // clang-format on
     QList<ScenePageBreak> pageBreaks() const { return m_record.pageBreaks; }
 
+    // clang-format off
+    Q_PROPERTY(bool hasCursor
+               READ hasCursor
+               NOTIFY cursorInfoChanged)
+    // clang-format on
+    bool hasCursor() const { return m_hasCursor; }
+
+    // clang-format off
+    Q_PROPERTY(int relativeCursorPosition
+               READ relativeCursorPosition
+               NOTIFY cursorInfoChanged)
+    // clang-format on
+    int relativeCursorPosition() const { return m_relativeCursorPosition; }
+
+    // clang-format off
+    Q_PROPERTY(qreal relativeCursorPixel
+               READ relativeCursorPixel
+               NOTIFY cursorInfoChanged)
+    // clang-format on
+    qreal relativeCursorPixel() const { return m_relativeCursorPixel; }
+
+    // clang-format off
+    Q_PROPERTY(qreal relativeCursorPage
+               READ relativeCursorPage
+               NOTIFY cursorInfoChanged)
+    // clang-format on
+    qreal relativeCursorPage() const { return m_relativeCursorPage; }
+
+    // clang-format off
+    Q_PROPERTY(QTime relativeCursorTime
+               READ relativeCursorTime
+               NOTIFY cursorInfoChanged)
+    // clang-format on
+    QTime relativeCursorTime() const { return m_relativeCursorTime; }
+
+signals:
+    Q_SIGNAL void cursorInfoChanged();
+
 private:
     void lookupRecord();
     void onPaginationUpdated();
     void setRecord(const ScreenplayPaginatorRecord &val);
+    void onCursorQueryResponse(int cursorPosition, qreal cursorPixel, int cursorPageNumber,
+                               qreal cursorPage, const QTime &cursorTime,
+                               const ScreenplayPaginatorRecord &cursorRecord);
 
 private:
     ScreenplayElement *m_element = nullptr;
     ScreenplayPaginator *m_paginator = nullptr;
     ScreenplayPaginatorRecord m_record;
+
+    bool m_hasCursor = false;
+    int m_relativeCursorPosition = -1;
+    qreal m_relativeCursorPixel = 0;
+    qreal m_relativeCursorPage = 0;
+    QTime m_relativeCursorTime;
 };
 
 #endif // SCREENPLAYPAGINATOR_H
