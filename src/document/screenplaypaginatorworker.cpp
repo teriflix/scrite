@@ -577,11 +577,20 @@ void ScreenplayPaginatorWorker::syncDocument()
 
     int currentActSerialNumber = -1;
     int currentEpisodeSerialNumber = -1;
-    QMap<int, QList<int>> breakSerialNumbers;
+
+    struct BreakBlockExtent
+    {
+        bool isValid() const { return from.isValid() && until.isValid(); }
+        QTextBlock before, from, until;
+    };
+    QMap<int, BreakBlockExtent> breakBlockExtents;
+    QTextBlock lastBlock;
 
     for (const SceneContent &content : qAsConst(m_screenplayContent)) {
-        if (maybeAbort())
-            break;
+        if (maybeAbort()) {
+            paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime());
+            return;
+        }
 
         if (!content.isValid() || content.omitted)
             continue;
@@ -602,14 +611,11 @@ void ScreenplayPaginatorWorker::syncDocument()
         range.until = QTextBlock();
         range.sceneId = content.id;
 
-        if (currentActSerialNumber >= 0)
-            breakSerialNumbers[currentActSerialNumber].append(content.serialNumber);
-        if (currentEpisodeSerialNumber >= 0)
-            breakSerialNumbers[currentEpisodeSerialNumber].append(content.serialNumber);
-
         for (const SceneParagraph &paragraph : qAsConst(content.paragraphs)) {
-            if (maybeAbort())
-                break;
+            if (maybeAbort()) {
+                paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime());
+                return;
+            }
 
             if (cursor.position() > 0)
                 cursor.insertBlock();
@@ -630,6 +636,22 @@ void ScreenplayPaginatorWorker::syncDocument()
             if (!range.from.isValid())
                 range.from = block;
             range.until = block;
+
+            if (currentActSerialNumber >= 0) {
+                if (!breakBlockExtents.contains(currentActSerialNumber)) {
+                    breakBlockExtents[currentActSerialNumber] = { lastBlock, range.from,
+                                                                  range.until };
+                }
+                breakBlockExtents[currentActSerialNumber].until = range.until;
+            }
+            if (currentEpisodeSerialNumber >= 0) {
+                if (!breakBlockExtents.contains(currentEpisodeSerialNumber))
+                    breakBlockExtents[currentEpisodeSerialNumber] = { lastBlock, range.from,
+                                                                      range.until };
+                breakBlockExtents[currentEpisodeSerialNumber].until = range.until;
+            }
+
+            lastBlock = block;
         }
 
         insights.contentRangeMap.insert(range.serialNumber, range);
@@ -640,11 +662,14 @@ void ScreenplayPaginatorWorker::syncDocument()
     int lastPageNr = -1;
 
     QList<ScreenplayPaginatorRecord> records;
+    PaginatorDocumentInsights::BlockRange lastRecordBlockRange;
     records.reserve(m_screenplayContent.size());
 
     for (const SceneContent &sceneContent : qAsConst(m_screenplayContent)) {
-        if (maybeAbort())
-            break;
+        if (maybeAbort()) {
+            paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime());
+            return;
+        }
 
         ScreenplayPaginatorRecord record;
         record.serialNumber = sceneContent.serialNumber;
@@ -677,39 +702,47 @@ void ScreenplayPaginatorWorker::syncDocument()
                 ScreenplayPaginator::pixelToTimeLength(record.pixelLength, m_format, m_document);
         record.pageBreaks = this->evaluateScenePageBreaks(range, lastPageNr);
 
+        if (!m_records.isEmpty()) {
+            record.pixelOffset = ScreenplayPaginator::pixelLength(
+                    m_document->firstBlock(), lastRecordBlockRange.until, m_document);
+            record.pageOffset =
+                    ScreenplayPaginator::pixelToPageLength(record.pixelOffset, m_document);
+            record.timeOffset = ScreenplayPaginator::pixelToTimeLength(record.pixelOffset, m_format,
+                                                                       m_document);
+        }
+
         serialNumberMap[sceneContent.serialNumber] = records.size();
 
         records.append(record);
+        lastRecordBlockRange = range;
     }
 
     // Reconcile lengths for break elements.
     for (ScreenplayPaginatorRecord &record : records) {
-        if (!breakSerialNumbers.contains(record.serialNumber))
+        if (maybeAbort()) {
+            paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime());
+            return;
+        }
+
+        if (!breakBlockExtents.contains(record.serialNumber))
             continue;
 
-        const QList<int> elementSerialNumbers = breakSerialNumbers.value(record.serialNumber);
-        for (int elementSerialNumber : elementSerialNumbers) {
-            int recordIndex = serialNumberMap.value(elementSerialNumber, -1);
-            if (recordIndex >= 0 && recordIndex < records.size()) {
-                record.pixelLength += records[recordIndex].pixelLength;
-                record.pageLength += records[recordIndex].pageLength;
-            }
-        }
+        const BreakBlockExtent breakBlockExtent = breakBlockExtents.value(record.serialNumber);
+        if (!breakBlockExtent.isValid())
+            continue;
+
+        record.pixelLength = ScreenplayPaginator::pixelLength(breakBlockExtent.from,
+                                                              breakBlockExtent.until, m_document);
+        record.pageLength = ScreenplayPaginator::pixelToPageLength(record.pixelLength, m_document);
         record.timeLength =
-                ScreenplayPaginator::pageToTimeLength(record.pageLength, m_format, m_document);
-    }
+                ScreenplayPaginator::pixelToTimeLength(record.pixelLength, m_format, m_document);
 
-    // Calculate offsets
-    qreal pixelOffset = 0, pageOffset = 0;
-    QTime timeOffset;
-    for (ScreenplayPaginatorRecord &record : records) {
-        record.pixelOffset = pixelOffset;
-        record.pageOffset = pageOffset;
-        record.timeOffset = timeOffset;
-
-        pixelOffset += record.pixelLength;
-        pageOffset += record.pageLength;
-        timeOffset.addSecs(QTime(0, 0, 0).secsTo(record.timeLength));
+        record.pixelOffset = breakBlockExtent.before.isValid() ? ScreenplayPaginator::pixelLength(
+                                     m_document->firstBlock(), breakBlockExtent.before, m_document)
+                                                               : 0;
+        record.pageOffset = ScreenplayPaginator::pixelToPageLength(record.pixelOffset, m_document);
+        record.timeOffset =
+                ScreenplayPaginator::pixelToTimeLength(record.pixelOffset, m_format, m_document);
     }
 
     m_document->setProperty(PaginatorDocumentInsights::property,

@@ -124,6 +124,7 @@ Item {
     readonly property Settings timelineViewSettings: Settings {
         readonly property string dropAreaKey: "scrite/sceneID"
 
+        property bool showCursor: true
         property string textMode: "HeadingOrTitle"
 
         category: "Timeline View"

@@ -1875,21 +1875,34 @@ QString Utils::TMath::relativeTime(const QDateTime &dt)
  */
 QString Utils::TMath::timeLengthString(const QTime &time)
 {
-    QStringList fields;
+    const int h = time.hour();
+    const int m = time.minute();
+    const int s = time.second();
 
-    if (time.hour() > 0)
-        fields += QStringLiteral("%1h").arg(time.hour());
+    if (h > 0) {
+        if (m == 0 && s == 0)
+            return QStringLiteral("%1h").arg(h); // 1h
+        if (s == 0)
+            return QStringLiteral("%1:%2h").arg(h).arg(m, 2, 10, QChar('0')); // 1:02h
+        return QStringLiteral("%1:%2:%3")
+                .arg(h)
+                .arg(m, 2, 10, QChar('0'))
+                .arg(s, 2, 10, QChar('0')); // 1:02:25 or 1:00:25
+    }
 
-    if (time.minute() > 0)
-        fields += QStringLiteral("%1m").arg(time.minute());
+    if (m > 0) {
+        if (s == 0)
+            return QStringLiteral("%1m").arg(m); // 1m
+        return QStringLiteral("%1:%2m").arg(m).arg(s, 2, 10, QChar('0')); // 1:20m
+    }
 
-    if (time.second() > 0)
-        fields += QStringLiteral("%1s").arg(time.second());
+    if (s > 0)
+        return QStringLiteral("%1s").arg(s); // 20s
 
-    if (fields.isEmpty())
+    if (time.isNull())
         return QString();
 
-    return fields.join(QStringLiteral(" "));
+    return QStringLiteral("0s");
 }
 
 /**
@@ -2075,6 +2088,36 @@ bool Utils::SMath::isValidEmail(const QString &email)
     }
 
     return false;
+}
+
+QString Utils::SMath::formatAsBulletPoints(const QVariantList &items)
+{
+    QString ret;
+    QTextStream ts(&ret, QIODevice::WriteOnly);
+
+    bool listStarted = false;
+    for (const QVariant &item : items) {
+        if (!item.isValid())
+            continue;
+
+        const QString text = item.toString();
+        if (text.isEmpty())
+            continue;
+
+        if (!listStarted) {
+            ts << "<ul>";
+            listStarted = true;
+        }
+
+        ts << "<li>" << text << "</li>";
+    }
+
+    if (listStarted)
+        ts << "</ul>";
+
+    ts.flush();
+
+    return ret;
 }
 
 /**

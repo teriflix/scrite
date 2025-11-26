@@ -224,6 +224,13 @@ public:
                                   const QTextDocument *document);
 
     // clang-format off
+    Q_PROPERTY(int recordCount
+               READ recordCount
+               NOTIFY paginationUpdated)
+    // clang-format on
+    int recordCount() const { return m_records.size(); }
+
+    // clang-format off
     Q_PROPERTY(int pageCount
                READ pageCount
                NOTIFY paginationUpdated)
@@ -425,6 +432,27 @@ public:
                NOTIFY recordChanged)
     // clang-format on
     QList<ScenePageBreak> pageBreaks() const { return m_record.pageBreaks; }
+
+    // clang-format off
+    Q_PROPERTY(qreal pixelOffset
+               READ pixelOffset
+               NOTIFY recordChanged)
+    // clang-format on
+    qreal pixelOffset() const { return m_record.pixelOffset; }
+
+    // clang-format off
+    Q_PROPERTY(qreal pageOffset
+               READ pageOffset
+               NOTIFY pageOffset)
+    // clang-format on
+    qreal pageOffset() const { return m_record.pageOffset; }
+
+    // clang-format off
+    Q_PROPERTY(QTime timeOffset
+               READ timeOffset
+               NOTIFY recordChanged)
+    // clang-format on
+    QTime timeOffset() const { return m_record.timeOffset; }
 
     // clang-format off
     Q_PROPERTY(bool hasCursor

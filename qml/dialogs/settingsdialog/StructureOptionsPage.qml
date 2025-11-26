@@ -146,12 +146,20 @@ Item {
                     }
                 }
 
-                VclCheckBox {
+                /*VclCheckBox {
                     Layout.fillWidth: true
 
                     text: "Show Pull Handle Animation"
                     checked: Runtime.structureCanvasSettings.showPullHandleAnimation
                     onToggled: Runtime.structureCanvasSettings.showPullHandleAnimation = checked
+                }*/
+
+                VclCheckBox {
+                    Layout.fillWidth: true
+
+                    text: "Show Cursor on Timeline"
+                    checked: Runtime.timelineViewSettings.showCursor
+                    onToggled: Runtime.timelineViewSettings.showCursor = checked
                 }
             }
         }

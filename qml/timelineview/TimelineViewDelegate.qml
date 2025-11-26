@@ -336,6 +336,22 @@ Item {
                 }
             }
         }
+
+        TimelineCursorItem {
+            id: _cursorLine
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+
+            x: visible ? (_private.sceneLengthWatcher.normalizedRelativeCursorPosition * parent.width) - width/2 : 0
+            width: 8
+
+            color: Color.textColorFor(_elementItemBox.color)
+            lineWidth: 2
+            opacity: 0.5
+
+            visible: Runtime.timelineViewSettings.showCursor && !_private.isBreakElement && _private.sceneLengthWatcher.hasCursor
+        }
     }
 
     DropArea {
@@ -384,7 +400,7 @@ Item {
             if(escene) {
                 var sheading = escene.heading
                 if(sheading.enabled)
-                    ret += "[" + root.screenplayElement.resolvedSceneNumber + "]: "
+                    ret += root.screenplayElement.resolvedSceneNumber + ". "
 
                 if(Runtime.timelineViewSettings.textMode === "HeadingOrTitle") {
                     var selement = escene.structureElement
@@ -416,12 +432,22 @@ Item {
         }
 
         readonly property ScreenplayPaginatorWatcher sceneLengthWatcher: ScreenplayPaginatorWatcher {
+            property real normalizedRelativeCursorPosition: hasCursor ? Runtime.bounded(0.01, relativeCursorPixel/pixelLength, 0.99) : 0
+
             paginator: Runtime.paginator
             element: root.screenplayElement
         }
 
         function evalToolTipText() {
-            let ret = ""
+            let fields = []
+
+            const addWatcherFields = () => {
+                if(_private.sceneLengthWatcher.hasValidRecord) {
+                    fields.push("Starts: " + TMath.timeLengthString(_private.sceneLengthWatcher.timeOffset))
+                    fields.push("Duration: " + TMath.timeLengthString(_private.sceneLengthWatcher.timeLength))
+                    fields.push(_private.sceneLengthWatcher.pageLength.toFixed(2) + " Pages")
+                }
+            };
 
             if(_private.isBreakElement) {
                 const idxList = Scrite.document.screenplay.sceneElementsInBreak(root.screenplayElement)
@@ -429,32 +455,28 @@ Item {
                     return "No Scenes"
 
                 if(idxList.length === 1)
-                    ret = "1 Scene"
+                    fields.push("1 Scene")
                 else
-                    ret = idxList.length + " Scenes"
+                    fields.push(idxList.length + " Scenes")
 
-                if(_private.sceneLengthWatcher.hasValidRecord)
-                    ret += ", Duration: " + TMath.timeLengthString(_private.sceneLengthWatcher.timeLength)
-
-                return ret
-            }
-
-            if(root.screenplayElement.omitted)
+                addWatcherFields()
+            } else if(root.screenplayElement.omitted) {
                 return "Omitted Scene"
-
-            if(_private.sceneLengthWatcher.hasValidRecord) {
-                ret += "Duration: " + TMath.timeLengthString(_private.sceneLengthWatcher.timeLength)
+            } else {
+                addWatcherFields()
             }
 
-            if(root.width < screenplayElementList.minimumDelegateWidthForTextVisibility) {
-                let str = _private.sceneTitle
+            let ret = ""
 
-                if(str.length > 140)
-                    str = str.substring(0, 130) + "..."
+            let str = _private.sceneTitle
+            if(str.length > 140)
+                str = str.substring(0, 130) + "..."
+            if(str.length > 0)
+                ret = "<p>" + str + "</p>"
+            ret += SMath.formatAsBulletPoints(fields)
 
-                if(str.length > 0)
-                    ret = "(" + ret + ") " + str
-            }
+            if(ret.length > 0)
+                ret = "&nbsp;" + ret
 
             return ret
         }

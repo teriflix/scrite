@@ -846,7 +846,8 @@ void ScreenplayPaginatorWatcher::onCursorQueryResponse(
         return;
     }
 
-    m_relativeCursorPosition = cursorPosition - m_record.firstCursorPosition;
+    m_relativeCursorPosition =
+            cursorPosition + (m_record.firstParagraphCursorPosition - m_record.firstCursorPosition);
     m_relativeCursorPixel = cursorPixel - m_record.pixelOffset;
     m_relativeCursorPage = cursorPage - m_record.pageOffset;
     m_relativeCursorTime = QTime(0, 0, 0).addSecs(m_record.timeOffset.secsTo(cursorTime));

@@ -226,11 +226,11 @@ Rectangle {
                     MouseArea {
                         anchors.fill: parent
 
-                        enabled: _label.truncated && Runtime.sceneListPanelSettings.showTooltip
+                        enabled: Runtime.sceneListPanelSettings.showTooltip
                         hoverEnabled: true
 
                         ToolTipPopup {
-                            text: _label.text
+                            text: _private.tooltipText
                             visible: parent.containsMouse
                         }
                     }
@@ -403,6 +403,24 @@ Rectangle {
         property color color: isSelection ? selectedColor : normalColor
         property color normalColor: root.scene ? Runtime.colors.tint(delegateColor, Runtime.colors.sceneHeadingTint) : Qt.lighter(delegateColor, 1.25)
         property color selectedColor: root.scene ? Runtime.colors.tint(delegateColor, Runtime.colors.selectedSceneHeadingTint) : delegateColor
+
+        property string tooltipText: {
+            const lengthMode = Runtime.sceneListPanelSettings.displaySceneLength
+            const starts = "Starts: " + TMath.timeLengthString(sceneLengthWatcher.timeOffset)
+            const pgCount = sceneLengthWatcher.pageLength.toFixed(2) + " pages"
+            const duration = "Duration: " + TMath.timeLengthString(sceneLengthWatcher.timeLength)
+            let fields = []
+            fields.push(starts)
+            if(lengthMode === "PAGE" || lengthMode === "")
+                fields.push(duration)
+            if(lengthMode === "TIME" || lengthMode === "")
+                fields.push(pgCount)
+
+            const bullets = SMath.formatAsBulletPoints(fields)
+            if(_label.truncated)
+                return "&nbsp;" + "<p>" + _label.text + "</p>" + bullets;
+            return "&nbsp;" + bullets
+        }
 
         property SceneHeading sceneHeading: root.scene ? root.scene.heading : null
 

@@ -91,6 +91,7 @@ HEADERS += \
     src/quick/items/qimageitem.h \
     src/quick/items/simpletabbaritem.h \
     src/quick/items/textdocumentitem.h \
+    src/quick/items/timelinecursoritem.h \
     src/quick/objects/announcement.h \
     src/quick/objects/basicfileiconprovider.h \
     src/quick/objects/basicfileinfo.h \
@@ -226,6 +227,7 @@ SOURCES += \
     src/quick/items/qimageitem.cpp \
     src/quick/items/simpletabbaritem.cpp \
     src/quick/items/textdocumentitem.cpp \
+    src/quick/items/timelinecursoritem.cpp \
     src/quick/objects/announcement.cpp \
     src/quick/objects/basicfileiconprovider.cpp \
     src/quick/objects/basicfileinfo.cpp \
