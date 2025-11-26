@@ -116,7 +116,7 @@ Item {
 
                 anchors.fill: parent
 
-                enabled: Runtime.appFeatures.structure.enabled
+                enabled: Runtime.appFeatures.structure.enabled && visible
                 visible: height > _private.minimumTimelineHeight
                 showNotesIcon: Runtime.showNotebookInStructure
             }

@@ -63,6 +63,18 @@ Rectangle {
             toolTipText: "Increase size of blocks in this view."
 
             onClicked: root.zoomInRequest()
+
+            ActionHandler {
+                action: ActionHub.timelineOperations.find("zoomIn")
+
+                onTriggered: root.zoomInRequest()
+            }
+
+            ActionHandler {
+                action: ActionHub.timelineOperations.find("zoomOut")
+
+                onTriggered: root.zoomOutRequest()
+            }
         }
 
         FlatToolButton {

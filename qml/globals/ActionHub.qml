@@ -836,7 +836,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: "Alt+-"
+            readonly property string defaultShortcut: "Alt+,"
 
             enabled: ActionHandler.canHandle
             checkable: true
@@ -848,7 +848,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: "Alt+="
+            readonly property string defaultShortcut: "Alt+."
 
             enabled: ActionHandler.canHandle
             objectName: "cycleCommandPanelTab"
@@ -1636,6 +1636,31 @@ Item {
         Action {
             readonly property bool visible: false
             readonly property string defaultShortcut: "Alt+-"
+
+            enabled: ActionHandler.canHandle
+            objectName: "zoomOut"
+            shortcut: defaultShortcut
+            text: "Zoom Out"
+        }
+    }
+
+    readonly property ActionManager timelineOperations: ActionManager {
+        title: "Timeline"
+        objectName: "timelineOperations"
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+Alt+="
+
+            enabled: ActionHandler.canHandle
+            objectName: "zoomIn"
+            shortcut: defaultShortcut
+            text: "Zoom In"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+Alt+-"
 
             enabled: ActionHandler.canHandle
             objectName: "zoomOut"
