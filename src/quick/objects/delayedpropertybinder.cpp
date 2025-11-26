@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "delayedpropertybinder.h"
+#include "utils.h"
 
 DelayedPropertyBinder::DelayedPropertyBinder(QQuickItem *parent) : QQuickItem(parent)
 {
@@ -126,4 +127,82 @@ void DelayedPropertyBinder::parentHasChanged()
         m_timer.setName("DelayedPropertyBinder.m_timer[" + name + "]");
     }
 #endif
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+DelayedProperty::DelayedProperty(QObject *parent) : QObject(parent) { }
+
+DelayedProperty::~DelayedProperty() { }
+
+DelayedProperty *DelayedProperty::qmlAttachedProperties(QObject *parent)
+{
+    return new DelayedProperty(parent);
+}
+
+void DelayedProperty::setName(const QString &val)
+{
+    if (m_name == val)
+        return;
+
+    m_name = val;
+    emit nameChanged();
+}
+
+void DelayedProperty::setWatch(const QVariant &val)
+{
+    if (m_watch == val)
+        return;
+
+    m_watch = val;
+    emit watchChanged();
+
+    if (m_initial.isValid()) {
+        this->setValue(m_initial);
+    }
+
+    m_timer.start(m_delay, this);
+}
+
+void DelayedProperty::setDelay(int val)
+{
+    if (m_delay == val)
+        return;
+
+    m_delay = val;
+    emit delayChanged();
+}
+
+void DelayedProperty::setInitial(const QVariant &val)
+{
+    if (m_initial == val)
+        return;
+
+    m_initial = val;
+    emit initialChanged();
+}
+
+void DelayedProperty::setValue(const QVariant &val)
+{
+    if (m_value == val)
+        return;
+
+    m_value = val;
+    emit valueChanged();
+}
+
+void DelayedProperty::timerEvent(QTimerEvent *te)
+{
+    if (te->timerId() == m_timer.timerId()) {
+#ifndef QT_NO_DEBUG_OUTPUT
+        if (!m_name.isEmpty()) {
+            qDebug("DelayedProperty[%s]: Timer", qPrintable(m_name));
+        }
+#endif
+        m_timer.stop();
+        this->setValue(m_watch);
+        return;
+    }
+
+    QObject::timerEvent(te);
 }

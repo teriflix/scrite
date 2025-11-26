@@ -90,4 +90,77 @@ private:
     ExecLaterTimer m_timer;
 };
 
+class DelayedProperty : public QObject
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_ATTACHED(DelayedProperty)
+
+public:
+    virtual ~DelayedProperty();
+
+    static DelayedProperty *qmlAttachedProperties(QObject *parent);
+
+    // clang-format off
+    Q_PROPERTY(QString name
+               READ name
+               WRITE setName
+               NOTIFY nameChanged)
+    // clang-format on
+    void setName(const QString &val);
+    QString name() const { return m_name; }
+    Q_SIGNAL void nameChanged();
+
+    // clang-format off
+    Q_PROPERTY(QVariant watch
+               READ watch
+               WRITE setWatch
+               NOTIFY watchChanged)
+    // clang-format on
+    void setWatch(const QVariant &val);
+    QVariant watch() const { return m_watch; }
+    Q_SIGNAL void watchChanged();
+
+    // clang-format off
+    Q_PROPERTY(int delay
+               READ delay
+               WRITE setDelay
+               NOTIFY delayChanged)
+    // clang-format on
+    void setDelay(int val);
+    int delay() const { return m_delay; }
+    Q_SIGNAL void delayChanged();
+
+    // clang-format off
+    Q_PROPERTY(QVariant initial
+               READ initial
+               WRITE setInitial
+               NOTIFY initialChanged)
+    // clang-format on
+    void setInitial(const QVariant &val);
+    QVariant initial() const { return m_initial; }
+    Q_SIGNAL void initialChanged();
+
+    // clang-format off
+    Q_PROPERTY(QVariant value
+               READ value
+               NOTIFY valueChanged)
+    // clang-format on
+    QVariant value() const { return m_value; }
+    Q_SIGNAL void valueChanged();
+
+protected:
+    explicit DelayedProperty(QObject *parent = nullptr);
+    void timerEvent(QTimerEvent *te);
+    void setValue(const QVariant &val);
+
+private:
+    QString m_name;
+    int m_delay = 100;
+    QVariant m_watch;
+    QVariant m_value;
+    QVariant m_initial;
+    QBasicTimer m_timer;
+};
+
 #endif // DELAYEDPROPERTYBINDER_H
