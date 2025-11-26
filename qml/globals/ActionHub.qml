@@ -254,45 +254,38 @@ Item {
         objectName: "recentFileOperations"
     }
 
-    Repeater {
+    Instantiator {
         model: Runtime.recentFiles
 
-        // Repeater delegates can only be Item {}, they cannot be QObject types.
-        // So, that rules out creating just Action {} as delegate. It has to be
-        // nested in an Item.
-        delegate: Item {
+        delegate: Action {
             required property int index
             required property var fileInfo
 
-            visible: false
+            readonly property bool visible: true
+            property var keywords: [fileInfo.subtitle, fileInfo.author, fileInfo.logline]
+            property string tooltip: fileInfo.filePath
 
-            Action {
-                readonly property bool visible: true
-                property var keywords: [fileInfo.subtitle, fileInfo.author, fileInfo.logline]
-                property string tooltip: fileInfo.filePath
+            ActionManager.target: root.recentFileOperations
 
-                ActionManager.target: root.recentFileOperations
+            ImageIcon.image: fileInfo.hasCoverPage ? fileInfo.coverPageImage : Gui.emptyQImage
 
-                ImageIcon.image: fileInfo.hasCoverPage ? fileInfo.coverPageImage : Gui.emptyQImage
+            text: {
+                let ret = ""
+                if(fileInfo.title !== "") {
+                    ret += fileInfo.title
 
-                text: {
-                    let ret = ""
-                    if(fileInfo.title !== "") {
-                        ret += fileInfo.title
-
-                        if(fileInfo.version !== "")
-                            ret += " (" + fileInfo.version + ")"
-                    } else
-                        ret = fileInfo.baseFileName
-                    return ret
-                }
-                enabled: true
-
-                icon.color: "transparent"
-                icon.source: fileInfo.hasCoverPage ? ImageIcon.url : "qrc:/icons/filetype/document.png"
-
-                onTriggered: OpenFileTask.open(fileInfo.filePath)
+                    if(fileInfo.version !== "")
+                    ret += " (" + fileInfo.version + ")"
+                } else
+                ret = fileInfo.baseFileName
+                return ret
             }
+            enabled: true
+
+            icon.color: "transparent"
+            icon.source: fileInfo.hasCoverPage ? ImageIcon.url : "qrc:/icons/filetype/document.png"
+
+            onTriggered: OpenFileTask.open(fileInfo.filePath)
         }
     }
 
@@ -316,34 +309,36 @@ Item {
         }
     }
 
-    Repeater {
-        model: Runtime.appFeatures.templates.enabled ? Runtime.libraryService.templates : []
+    Instantiator {
+        model: DelayedProperty.value ? Runtime.libraryService.templates : []
 
-        // Repeater delegates can only be Item {}, they cannot be QObject types.
-        // So, that rules out creating just Action {} as delegate. It has to be
-        // nested in an Item.
-        delegate: Item {
+        /*
+          During application start, the appFeatures and libraryService may change their enabled
+          and busy status several times in a short span. Instead of reacting to each change
+          and creating/destroying actions, we delay responding to those changes by 100ms (which
+          is the default delay of DelayedProperty), and handle all changes at once.
+          */
+        DelayedProperty.watch: Runtime.appFeatures.templates.enabled && !Runtime.libraryService.busy
+        DelayedProperty.initial: false
+
+        delegate: Action {
             required property int index
             required property var record
 
-            visible: false
+            readonly property bool visible: true
+            property var keywords: index === 0 ? ["new", "close", "file", "document", "screenplay"] : []
+            property string tooltip: record.description
 
-            Action {
-                readonly property bool visible: true
-                property var keywords: index === 0 ? ["new", "close", "file", "document", "screenplay"] : []
-                property string tooltip: record.description
+            ActionManager.target: root.templateOperations
 
-                ActionManager.target: root.templateOperations
+            text: record.name
+            enabled: true
 
-                text: record.name
-                enabled: true
+            icon.color: "transparent"
+            icon.source: index === 0 ? record.poster : Runtime.libraryService.templates.baseUrl + "/" + record.poster
 
-                icon.color: "transparent"
-                icon.source: index === 0 ? record.poster : Runtime.libraryService.templates.baseUrl + "/" + record.poster
-
-                onTriggered: {
-                    OpenFromLibraryTask.openTemplateAt(Runtime.libraryService, index)
-                }
+            onTriggered: {
+                OpenFromLibraryTask.openTemplateAt(Runtime.libraryService, index)
             }
         }
     }
@@ -353,34 +348,36 @@ Item {
         objectName: "scriptalayOperations"
     }
 
-    Repeater {
-        model: Runtime.appFeatures.scriptalay.enabled ? Runtime.libraryService.screenplays : []
+    Instantiator {
+        model: DelayedProperty.value ? Runtime.libraryService.screenplays : []
 
-        // Repeater delegates can only be Item {}, they cannot be QObject types.
-        // So, that rules out creating just Action {} as delegate. It has to be
-        // nested in an Item.
-        delegate: Item {
+        /*
+          During application start, the appFeatures and libraryService may change their enabled
+          and busy status several times in a short span. Instead of reacting to each change
+          and creating/destroying actions, we delay responding to those changes by 100ms (which
+          is the default delay of DelayedProperty), and handle all changes at once.
+          */
+        DelayedProperty.watch: Runtime.appFeatures.scriptalay.enabled && !Runtime.libraryService.busy
+        DelayedProperty.initial: false
+
+        delegate: Action {
             required property int index
             required property var record
 
-            visible: false
+            readonly property bool visible: true
+            property string tooltip: record.authors
+            property var keywords: [record.logline]
 
-            Action {
-                readonly property bool visible: true
-                property string tooltip: record.authors
-                property var keywords: [record.logline]
+            ActionManager.target: root.scriptalayOperations
 
-                ActionManager.target: root.scriptalayOperations
+            text: record.name
+            enabled: true
 
-                text: record.name
-                enabled: true
+            icon.color: "transparent"
+            icon.source: Runtime.libraryService.screenplays.baseUrl + "/" + record.poster
 
-                icon.color: "transparent"
-                icon.source: Runtime.libraryService.screenplays.baseUrl + "/" + record.poster
-
-                onTriggered: {
-                    OpenFromLibraryTask.openScreenplayAt(Runtime.libraryService, index)
-                }
+            onTriggered: {
+                OpenFromLibraryTask.openScreenplayAt(Runtime.libraryService, index)
             }
         }
     }
@@ -392,32 +389,25 @@ Item {
         objectName: "exportOptions"
     }
 
-    Repeater {
+    Instantiator {
         model: Scrite.document.supportedExportFormats
 
-        // Repeater delegates can only be Item {}, they cannot be QObject types.
-        // So, that rules out creating just Action {} as delegate. It has to be
-        // nested in an Item.
-        delegate: Item {
+        delegate: Action {
             required property var modelData // { className, name, icon, key, description, category, keywords }
 
-            visible: false
+            readonly property bool allowShortcut: true
+            readonly property string tooltip: modelData.description
+            readonly property string keywords: modelData.keywords
 
-            Action {
-                readonly property bool allowShortcut: true
-                readonly property string tooltip: modelData.description
-                readonly property string keywords: modelData.keywords
+            ActionManager.target: root.exportOptions
 
-                ActionManager.target: root.exportOptions
+            text: modelData.name
+            enabled: Runtime.allowAppUsage
+            objectName: "export" + modelData.className
 
-                text: modelData.name
-                enabled: Runtime.allowAppUsage
-                objectName: "export" + modelData.className
+            icon.source: "qrc" + modelData.icon
 
-                icon.source: "qrc" + modelData.icon
-
-                onTriggered: ExportConfigurationDialog.launch(modelData.key)
-            }
+            onTriggered: ExportConfigurationDialog.launch(modelData.key)
         }
     }
 
@@ -428,32 +418,25 @@ Item {
         objectName: "reportOptions"
     }
 
-    Repeater {
+    Instantiator {
         model: Scrite.document.supportedReports
 
-        // Repeater delegates can only be Item {}, they cannot be QObject types.
-        // So, that rules out creating just Action {} as delegate. It has to be
-        // nested in an Item.
-        delegate: Item {
+        delegate: Action {
             required property var modelData // { className, name, icon, description }
 
-            visible: false
+            readonly property bool allowShortcut: true
+            readonly property string tooltip: modelData.description
+            readonly property string keywords: modelData.keywords
 
-            Action {
-                readonly property bool allowShortcut: true
-                readonly property string tooltip: modelData.description
-                readonly property string keywords: modelData.keywords
+            ActionManager.target: root.reportOptions
 
-                ActionManager.target: root.reportOptions
+            text: modelData.name
+            enabled: Runtime.allowAppUsage
+            objectName: "report" + modelData.className
 
-                text: modelData.name
-                enabled: Runtime.allowAppUsage
-                objectName: "report" + modelData.className
+            icon.source: "qrc" + modelData.icon
 
-                icon.source: "qrc" + modelData.icon
-
-                onTriggered: ReportConfigurationDialog.launch(modelData.name)
-            }
+            onTriggered: ReportConfigurationDialog.launch(modelData.name)
         }
     }
 
@@ -612,29 +595,27 @@ Item {
         }
     }
 
-    Repeater {
+    Instantiator {
         model: LanguageEngine.supportedLanguages
 
-        delegate: Item {
+        delegate: Action {
             required property int index
             required property var language // This is of type Language, but we have to use var here.
             // You cannot use Q_GADGET struct names as type names in QML
             // that privilege is only reserved for QObject types.
 
-            Action {
-                property int sortOrder: index
+            property int sortOrder: index
 
-                ActionManager.target: root.languageOptions
+            ActionManager.target: root.languageOptions
 
-                checkable: true
-                checked: Runtime.language.activeCode === language.code
-                shortcut: language.shortcut()
-                text: language.name
+            checkable: true
+            checked: Runtime.language.activeCode === language.code
+            shortcut: language.shortcut()
+            text: language.name
 
-                icon.source: language.iconSource
+            icon.source: language.iconSource
 
-                onTriggered: Runtime.language.setActiveCode(language.code)
-            }
+            onTriggered: Runtime.language.setActiveCode(language.code)
         }
     }
 
@@ -676,42 +657,35 @@ Item {
         }
     }
 
-    Repeater {
+    Instantiator {
         id: _paragraphFormatActions
 
         model: _private.availableParagraphFormats
 
-        // Repeater delegates can only be Item {}, they cannot be QObject types.
-        // So, that rules out creating just Action {} as delegate. It has to be
-        // nested in an Item.
-        delegate: Item {
+        delegate: Action {
             required property int index
             required property int enumValue
             required property string enumKey
             required property string enumIcon
 
-            visible: false
+            property int sortOrder: enumValue === SceneElement.Heading ? 0 : (index+1)
+            property string defaultShortcut: "Ctrl+" + sortOrder
 
-            Action {
-                property int sortOrder: enumValue === SceneElement.Heading ? 0 : (index+1)
-                property string defaultShortcut: "Ctrl+" + sortOrder
+            ActionManager.target: root.paragraphFormats
 
-                ActionManager.target: root.paragraphFormats
+            checkable: true
+            checked: (_private.binder !== null ? (_private.binder.currentElement ? _private.binder.currentElement.type === enumValue : false) : false)
+            enabled: Runtime.allowAppUsage && (enumValue === SceneElement.Heading ? ActionHandler.canHandle : _private.binder !== null)
+            objectName: enumKey.toLowerCase() + "Paragraph"
+            shortcut: defaultShortcut
+            text: enumKey
 
-                checkable: true
-                checked: (_private.binder !== null ? (_private.binder.currentElement ? _private.binder.currentElement.type === enumValue : false) : false)
-                enabled: Runtime.allowAppUsage && (enumValue === SceneElement.Heading ? ActionHandler.canHandle : _private.binder !== null)
-                objectName: enumKey.toLowerCase() + "Paragraph"
-                shortcut: defaultShortcut
-                text: enumKey
+            icon.source: enumIcon
 
-                icon.source: enumIcon
-
-                onTriggered: {
-                    // When index=0, its scene heading and that's handled separately.
-                    if(enumValue !== SceneElement.Heading)
-                        _private.binder.currentElement.type = enumValue
-                }
+            onTriggered: {
+                // When index=0, its scene heading and that's handled separately.
+                if(enumValue !== SceneElement.Heading)
+                _private.binder.currentElement.type = enumValue
             }
         }
     }
@@ -1697,22 +1671,20 @@ Item {
         }
     }
 
-    Repeater {
+    Instantiator {
         model: Scrite.document.structure.groupCategories
 
-        Item {
+        delegate: Action {
             required property string modelData
 
-            Action {
-                ActionManager.target: root.storyStructureOptions
+            ActionManager.target: root.storyStructureOptions
 
-                enabled: Runtime.mainWindowTab === Runtime.MainWindowTab.StructureTab
-                checkable: true
-                checked: Scrite.document.structure.preferredGroupCategory === modelData
-                text: SMath.titleCased(modelData)
+            checkable: true
+            checked: Scrite.document.structure.preferredGroupCategory === modelData
+            text: SMath.titleCased(modelData)
 
-                onToggled: {
-                    if(checked)
+            onToggled: {
+                if(checked) {
                     Scrite.document.structure.preferredGroupCategory = modelData
                 }
             }
