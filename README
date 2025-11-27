@@ -41,7 +41,7 @@ IMPORTANT
 To build Scrite with Hunspell support on Linux, please install hunspell-dev
 On Ubuntu, you can do this by executing the following command
 
-sudo apt-get install libhunspell-dev
+> sudo apt-get install libhunspell-dev
 
 Depending on the version number of hunspell installed on your computer, you
 will have to update config-hunspell.h. Comments in this file should help you
@@ -50,3 +50,17 @@ understand what changes you should be making.
 For more information about this package, please visit
 https://packages.debian.org/sid/libhunspell-dev
 
+Make sure that you have cursor, xinerama installed
+
+> sudo apt install libxcb-cursor0 libxcb-xinerama0
+
+You will also need OpenSSL version 1.1.1
+
+> sudo add-apt-repository ppa:nrbrtx/libssl1 -y
+> sudo apt update
+> sudo apt install libssl1.1 libssl-dev=1.1.1*
+
+For running the package scripts, you will need imagemagick and linuxdeployqt
+
+> sudo apt install imagemagick
+> wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
