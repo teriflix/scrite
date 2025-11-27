@@ -405,11 +405,22 @@ Rectangle {
         property color selectedColor: root.scene ? Runtime.colors.tint(delegateColor, Runtime.colors.selectedSceneHeadingTint) : delegateColor
 
         property string tooltipText: {
+            if(root.screenplayElement.breakType === Screenplay.Interval)
+                return "Interval Break"
+
             const lengthMode = Runtime.sceneListPanelSettings.displaySceneLength
-            const starts = "Starts: " + TMath.timeLengthString(sceneLengthWatcher.timeOffset)
-            const pgCount = sceneLengthWatcher.pageLength.toFixed(2) + " pages"
-            const duration = "Duration: " + TMath.timeLengthString(sceneLengthWatcher.timeLength)
+            const starts = "<b>Starts</b> " + TMath.timeLengthString(sceneLengthWatcher.timeOffset) +
+                           " on Pg. " + Math.floor(_private.sceneLengthWatcher.pageOffset)
+            const pgCount = "<b>Length</b> " + sceneLengthWatcher.pageLength.toFixed(2) + " pages"
+            const duration = "<b>Duration</b> " + TMath.timeLengthString(sceneLengthWatcher.timeLength)
             let fields = []
+            if(isBreak) {
+                const idxList = Scrite.document.screenplay.sceneElementsInBreak(root.screenplayElement)
+                if(idxList.length === 1)
+                    fields.push("Has 1 scene")
+                else
+                    fields.push("Has " + idxList.length + " scenes")
+            }
             fields.push(starts)
             if(lengthMode === "PAGE" || lengthMode === "")
                 fields.push(duration)

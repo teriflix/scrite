@@ -402,7 +402,7 @@ Item {
             if(escene) {
                 var sheading = escene.heading
                 if(sheading.enabled)
-                    ret += root.screenplayElement.resolvedSceneNumber + ". "
+                    ret += "[" + root.screenplayElement.resolvedSceneNumber + "]. "
 
                 if(Runtime.timelineViewSettings.textMode === "HeadingOrTitle") {
                     var selement = escene.structureElement
@@ -441,13 +441,17 @@ Item {
         }
 
         function evalToolTipText() {
+            if(isBreakElement && root.screenplayElement.breakType === Screenplay.Interval)
+                return "Interval Break"
+
             let fields = []
 
             const addWatcherFields = () => {
                 if(_private.sceneLengthWatcher.hasValidRecord) {
-                    fields.push("Starts: " + TMath.timeLengthString(_private.sceneLengthWatcher.timeOffset))
-                    fields.push("Duration: " + TMath.timeLengthString(_private.sceneLengthWatcher.timeLength))
-                    fields.push(_private.sceneLengthWatcher.pageLength.toFixed(2) + " Pages")
+                    fields.push("<b>Starts</b> " + TMath.timeLengthString(_private.sceneLengthWatcher.timeOffset) +
+                                " on Pg. " + Math.floor(_private.sceneLengthWatcher.pageOffset))
+                    fields.push("<b>Duration</b> " + TMath.timeLengthString(_private.sceneLengthWatcher.timeLength) +
+                                ", " + _private.sceneLengthWatcher.pageLength.toFixed(2) + " pages")
                 }
             };
 
@@ -457,9 +461,9 @@ Item {
                     return "No Scenes"
 
                 if(idxList.length === 1)
-                    fields.push("1 Scene")
+                    fields.push("Has 1 scene")
                 else
-                    fields.push(idxList.length + " Scenes")
+                    fields.push("Has " + idxList.length + " scenes")
 
                 addWatcherFields()
             } else if(root.screenplayElement.omitted) {
