@@ -1404,7 +1404,7 @@ Item {
 
             enabled: !Scrite.document.readOnly
             shortcut: defaultShortcut
-            text: "New Scene"
+            text: "Add/Insert New Scene"
             objectName: "newScene"
 
             icon.source: "qrc:/icons/action/add_scene.png"
@@ -1417,7 +1417,7 @@ Item {
 
             enabled: !Scrite.document.readOnly
             shortcut: defaultShortcut
-            text: "Act Break"
+            text: "Add/Insert Act Break"
             objectName: "actBreak"
 
             icon.source: "qrc:/icons/action/add_act.png"
@@ -1430,7 +1430,7 @@ Item {
 
             enabled: !Scrite.document.readOnly
             shortcut: defaultShortcut
-            text: "Episode Break"
+            text: "Add/Insert Episode Break"
             objectName: "episodeBreak"
 
             icon.source: "qrc:/icons/action/add_episode.png"
@@ -1444,7 +1444,7 @@ Item {
 
             enabled: !Scrite.document.readOnly
             shortcut: defaultShortcut
-            text: "Interval Break"
+            text: "Add/Insert Interval Break"
             objectName: "intervalBreak"
 
             onTriggered: _private.addInterval()
