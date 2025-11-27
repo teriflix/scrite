@@ -17,7 +17,7 @@ import io.scrite.components 1.0
 
 import "qrc:/qml/structureview"
 
-Item {
+FocusScope {
     id: root
 
     required property int elementIndex

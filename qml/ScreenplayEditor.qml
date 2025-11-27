@@ -351,7 +351,7 @@ Rectangle {
             target: Scrite.document
 
             function onJustLoaded() { _private.restoreLayoutDetails() }
-            function onAboutToSave() { _private.saveLayoutDetails() }
+            function onAboutToSave() { _private.saveLayoutDetails() }            
         }
 
         function initZoomLevelModifier() {

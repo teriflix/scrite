@@ -96,6 +96,12 @@ GridBackground {
 
     Component.onCompleted: AnnotationPropertyEditorDock.canvasItemsBoundingBox = _private.itemsBoundingBox
 
+    FocusTracker.window: Scrite.window
+    FocusTracker.objectName: "StructureCanvas"
+    FocusTracker.evaluationMethod: FocusTracker.StandardFocusEvaluation
+    FocusTracker.indicator.target: _private
+    FocusTracker.indicator.property: "hasFocus"
+
     width: _private.widthBinder.get
     height: _private.heightBinder.get
 
@@ -268,13 +274,27 @@ GridBackground {
                                    }
     }
 
+    ActionHandler {
+        action: ActionHub.screenplayOperations.find("newScene")
+
+        enabled: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI && _private.hasFocus
+
+        onTriggered: (source) => {
+                         const cardIndex = Scrite.document.structure.currentElementIndex
+                         const card = _elementLayer.elementItemAt(cardIndex)
+                         if(card)
+                            card.forceActiveFocus()
+                     }
+    }
+
     QtObject {
         id: _private
+
+        property bool hasFocus: false
 
         readonly property TabSequenceManager tabSequence: TabSequenceManager {
             wrapAround: true
             releaseFocusEnabled: true
-            onFocusWasReleased: root.forceActiveFocus()
         }
 
         readonly property BoundingBoxEvaluator itemsBoundingBox : BoundingBoxEvaluator {

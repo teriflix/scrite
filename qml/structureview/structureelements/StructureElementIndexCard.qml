@@ -18,7 +18,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
@@ -52,6 +51,12 @@ AbstractStructureElementUI {
         md[Runtime.timelineViewSettings.dropAreaKey] = root.element.scene.id
         return md
     }
+
+    FocusTracker.window: Scrite.window
+    FocusTracker.objectName: "StructureElementIndexCard"
+    FocusTracker.evaluationMethod: FocusTracker.StandardFocusEvaluation
+    FocusTracker.indicator.target: _private
+    FocusTracker.indicator.property: "isEditing"
 
     BoundingBoxItem.evaluator: root.canvasItemsBoundingBox
     BoundingBoxItem.stackOrder: 3.0 + (root.elementIndex/Scrite.document.structure.elementCount)
@@ -181,8 +186,6 @@ AbstractStructureElementUI {
         LodLoader {
             id: _headingFieldLoader
 
-            property bool hasFocus: false
-
             Layout.fillWidth: true
 
             TabSequenceItem.enabled: _private.isStackedOnTop
@@ -203,8 +206,6 @@ AbstractStructureElementUI {
 
             lowDetailComponent: TextEdit {
                 id: _basicHeadingField
-
-                Component.onCompleted: _headingFieldLoader.hasFocus = false
 
                 SyntaxHighlighter.delegates: [
                     LanguageFontSyntaxHighlighterDelegate {
@@ -237,8 +238,6 @@ AbstractStructureElementUI {
             highDetailComponent: VclTextField {
                 id: _headingField
 
-                Component.onCompleted: _headingFieldLoader.hasFocus = activeFocus
-
                 Keys.onEscapePressed: root.canvasTabSequence.releaseFocus()
 
                 width: parent.width
@@ -266,7 +265,6 @@ AbstractStructureElementUI {
                 onActiveFocusChanged: {
                     if(activeFocus)
                         root.select()
-                    _headingFieldLoader.hasFocus = activeFocus
                 }
             }
 
@@ -311,9 +309,8 @@ AbstractStructureElementUI {
                         Qt.callLater(maybeAssumeFocus)
                     }
 
-                    property bool hasFocus: false
-
                     lod: _private.isSelected && !root.canvasScaleIsLessForEdit ? LodLoader.LOD.High : LodLoader.LOD.Low
+                    focus: true
                     sanctioned: parent.visible
                     resetWidthBeforeLodChange: false
                     resetHeightBeforeLodChange: false
@@ -360,8 +357,6 @@ AbstractStructureElementUI {
 
                             TextAreaSpellingSuggestionsMenu { }
                         }
-
-                        Component.onCompleted: _synopsisFieldLoader.hasFocus = false
                     }
 
                     highDetailComponent: Item {
@@ -392,8 +387,6 @@ AbstractStructureElementUI {
 
                             TextArea {
                                 id: _synopsisField
-
-                                Component.onCompleted: _synopsisFieldLoader.hasFocus = activeFocus
 
                                 Keys.onEscapePressed: root.canvasTabSequence.releaseFocus()
 
@@ -440,7 +433,6 @@ AbstractStructureElementUI {
                                         root.select()
                                     else
                                         root.element.scene.trimSynopsis()
-                                    _synopsisFieldLoader.hasFocus = activeFocus
                                 }
 
                                 onCursorRectangleChanged: {
@@ -914,7 +906,7 @@ AbstractStructureElementUI {
             return Qt.size( root.width*s, root.height*s )
         }
 
-        property bool isEditing: _headingFieldLoader.hasFocus | _synopsisFieldLoader.hasFocus
+        property bool isEditing: false
         property bool isSelected: Scrite.document.structure.currentElementIndex === root.elementIndex
         property bool isStackedOnTop: (elementStack === null || elementStack.topmostElement === root.element)
         property bool isBeingDragged: false
