@@ -35,6 +35,7 @@ import "qrc:/qml/floatingdockpanels"
 Rectangle {
     id: root
 
+    property alias hasFocus: _elementListView.hasFocus
     property alias minSidePanelWidth: _private.minSidePanelWidth
     property alias maxSidePanelWidth: _private.maxSidePanelWidth
     property alias searchBarVisible: _searchBarArea.visible

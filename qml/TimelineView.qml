@@ -33,6 +33,7 @@ Item {
     property real preferredHeight: _screenplayTools.preferredHeight
     property bool showNotesIcon: false
     property bool enableDragDrop: !Scrite.document.readOnly
+    property bool showCursor: Runtime.timelineViewSettings.showCursor
 
     property alias tracksHeight: _screenplayTracksView.implicitHeight
 
@@ -116,6 +117,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
+                    showCursor: root.showCursor
                     mainDropArea: _mainDropArea
 
                     onEditorRequest: _private.requestEditorLater()

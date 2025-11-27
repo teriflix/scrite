@@ -118,6 +118,7 @@ Item {
 
                 enabled: Runtime.appFeatures.structure.enabled && visible
                 visible: height > _private.minimumTimelineHeight
+                showCursor: Runtime.timelineViewSettings.showCursor && _screenplayEditor.hasFocus
                 showNotesIcon: Runtime.showNotebookInStructure
             }
 

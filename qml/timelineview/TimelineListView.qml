@@ -32,6 +32,7 @@ ListView {
     readonly property real perElementWidth: 2.5
     readonly property real minimumDelegateWidthForTextVisibility: 50
 
+    property bool showCursor: true
     property bool moveMode: false
     property bool mutiSelectionMode: false
     property bool scrollBarRequired: root.width < root.contentWidth
@@ -118,6 +119,7 @@ ListView {
     }
 
     delegate: TimelineViewDelegate {
+        showCursor: root.showCursor
         screenplayElementList: root
 
         onEditorRequest: root.editorRequest()

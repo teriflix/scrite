@@ -35,6 +35,8 @@ Item {
     required property int breakType
     required property Scene scene
 
+    property bool showCursor: Runtime.timelineViewSettings.showCursor
+
     signal editorRequest()
     signal dropSceneAtRequest(QtObject source, int index)
 
@@ -350,7 +352,7 @@ Item {
             lineWidth: 2
             opacity: 0.5
 
-            visible: Runtime.timelineViewSettings.showCursor && !_private.isBreakElement && _private.sceneLengthWatcher.hasCursor
+            visible: root.showCursor && !_private.isBreakElement && _private.sceneLengthWatcher.hasCursor
         }
     }
 

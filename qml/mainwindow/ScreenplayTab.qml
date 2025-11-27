@@ -27,7 +27,13 @@ import "qrc:/qml/notifications"
 Item {
     id: root
 
+    readonly property alias hasFocus: _screenplayEditorLoader.hasFocus
+
     Loader {
+        id: _screenplayEditorLoader
+
+        property bool hasFocus: active && item ? item.hasFocus : false
+
         anchors.fill: parent
 
         /**
