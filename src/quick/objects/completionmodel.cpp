@@ -235,6 +235,7 @@ bool CompletionModel::eventFilter(QObject *target, QEvent *event)
         case Qt::Key_Escape:
             this->clearFilterStrings();
             return true;
+        case Qt::Key_Tab:
         case Qt::Key_Enter:
         case Qt::Key_Return: {
             const QString cc = this->currentCompletion();
@@ -279,22 +280,25 @@ void CompletionModel::filterStrings()
         // even if there is another potential match possible.
         else if (m_strings2.contains(m_completionPrefix, Qt::CaseInsensitive))
             fstrings.clear();
-        else
-            std::copy_if(m_strings2.begin(), m_strings2.end(), std::back_inserter(fstrings),
-                         [&](const QString &item) {
-                             bool ret = false;
-                             if (m_filterMode == StartsWithPrefix)
-                                 ret = item.startsWith(m_completionPrefix, Qt::CaseInsensitive);
-                             else {
-                                 QString item2 = item;
-                                 int suffixIndex = item2.lastIndexOf(m_ignoreSuffixAfter);
-                                 if (suffixIndex >= 0)
-                                     item2 = item2.left(suffixIndex);
-                                 ret = item2.contains(m_completionPrefix, Qt::CaseInsensitive);
-                             }
-                             someFilteringHappened |= !ret;
-                             return ret;
-                         });
+        else {
+            for (const QString &item : qAsConst(m_strings2)) {
+                if (m_filterMode == StartsWithPrefix) {
+                    if (item.startsWith(m_completionPrefix, Qt::CaseInsensitive))
+                        fstrings.append(item);
+                } else {
+                    QString item2 = item;
+                    if (!m_ignoreSuffixAfter.isEmpty()) {
+                        int suffixIndex = item2.lastIndexOf(m_ignoreSuffixAfter);
+                        if (suffixIndex >= 0)
+                            item2 = item2.left(suffixIndex);
+                    }
+                    if (item2.contains(m_completionPrefix, Qt::CaseInsensitive))
+                        fstrings.append(item);
+                }
+            }
+
+            someFilteringHappened = !fstrings.isEmpty();
+        }
     }
 
     this->beginResetModel();

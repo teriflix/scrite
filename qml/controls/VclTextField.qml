@@ -67,6 +67,7 @@ TextField {
     property alias maxCompletionItems: _completionModel.maxVisibleItems
     property alias completionSortMode: _completionModel.sortMode
     property alias completionFilterMode: _completionModel.filterMode
+    property alias completionHasSuggestions: _completionModel.hasSuggestion
     property alias completionIgnoreSuffixAfter: _completionModel.ignoreSuffixAfter
     property alias completionAcceptsEnglishStringsOnly: _completionModel.acceptEnglishStringsOnly
 
@@ -132,7 +133,6 @@ TextField {
     CompletionModel {
         id: _completionModel
 
-        property bool hasItems: count > 0
         property bool allowEnable: true
         property bool hasSuggestion: count > 0
 
@@ -147,8 +147,8 @@ TextField {
             autoCompleteOrFocusNext(tabItemUponReturn)
         }
 
-        onHasItemsChanged: {
-            if(hasItems)
+        onHasSuggestionChanged: {
+            if(hasSuggestion)
                 _completionPopup.open()
             else
                 _completionPopup.close()

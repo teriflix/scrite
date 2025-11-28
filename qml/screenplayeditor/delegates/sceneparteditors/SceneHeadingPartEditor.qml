@@ -135,6 +135,8 @@ AbstractScenePartEditor {
 
             Layout.fillWidth: true
 
+            DelayedProperty.watch: completionHasSuggestions
+
             Keys.onPressed: (event) => {
                                 event.accepted = false
 
@@ -158,14 +160,8 @@ AbstractScenePartEditor {
                              }
             }
 
-            onEditingFinished: {
-                if(root.isCurrent) {
-                    _private.editSceneContent.trigger()
-                }
-            }
-
-            onReturnPressed: {
-                if(root.isCurrent) {
+            onEditingComplete: {
+                if(!DelayedProperty.value && root.isCurrent) {
                     _private.editSceneContent.trigger()
                 }
             }
