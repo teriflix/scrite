@@ -1468,6 +1468,7 @@ Item {
 
         Action {
             readonly property bool allowShortcut: true
+            readonly property bool hideInCommandCenter: true
 
             property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
 
@@ -1480,6 +1481,7 @@ Item {
 
         Action {
             readonly property bool allowShortcut: true
+            readonly property bool hideInCommandCenter: true
 
             property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
 
@@ -1514,6 +1516,7 @@ Item {
 
         Action {
             readonly property bool allowShortcut: true
+            readonly property bool hideInCommandCenter: true
 
             enabled: ActionHandler.canHandle
             objectName: "layout"
@@ -1536,6 +1539,7 @@ Item {
 
         Action {
             readonly property bool allowShortcut: true
+            readonly property bool hideInCommandCenter: true
 
             property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
 
@@ -1548,6 +1552,7 @@ Item {
 
         Action {
             readonly property bool allowShortcut: true
+            readonly property bool hideInCommandCenter: true
 
             property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
 
@@ -1560,6 +1565,7 @@ Item {
 
         Action {
             readonly property bool allowShortcut: true
+            readonly property bool hideInCommandCenter: true
 
             property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
 
@@ -1572,6 +1578,7 @@ Item {
 
         Action {
             readonly property bool allowShortcut: true
+            readonly property bool hideInCommandCenter: true
             readonly property string tooltip: "Scene Type (Action/Montage/Song)"
             property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
 
