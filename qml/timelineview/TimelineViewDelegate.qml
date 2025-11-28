@@ -397,26 +397,23 @@ Item {
         property bool isEpisodeBreak: isBreakElement && root.breakType === Screenplay.Episode
 
         property string sceneTitle: {
-            var ret = ""
-            var escene = root.scene
-            if(escene) {
-                var sheading = escene.heading
-                if(sheading.enabled)
+            let ret = ""
+            if(root.scene) {
+                const sceneHeading = root.scene.heading
+                if(sceneHeading.enabled)
                     ret += "[" + root.screenplayElement.resolvedSceneNumber + "]. "
 
                 if(Runtime.timelineViewSettings.textMode === "HeadingOrTitle") {
-                    var selement = escene.structureElement
-                    var ntitle = selement.nativeTitle
-                    if(ntitle !== "")
-                        ret += ntitle
-                    else if(selement.stackId === "" || selement.stackLeader) {
-                        if(sheading.enabled)
-                            ret += sheading.text
-                        else
-                            ret += "NO SCENE HEADING"
-                    }
+                    const structureElement = root.scene.structureElement
+                    const nativeTitle = structureElement.nativeTitle
+                    if(nativeTitle !== "")
+                        ret += nativeTitle
+                    else if(sceneHeading.enabled)
+                        ret += sceneHeading.text
+                    else
+                        ret += "-"
                 } else
-                    ret += escene.synopsis
+                    ret += root.scene.synopsis
             } else if(isEpisodeBreak)
                 ret = "EP " + (root.screenplayElement.episodeIndex+1)
             else
