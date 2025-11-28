@@ -443,7 +443,7 @@ public:
     // clang-format off
     Q_PROPERTY(qreal pageOffset
                READ pageOffset
-               NOTIFY pageOffset)
+               NOTIFY recordChanged)
     // clang-format on
     qreal pageOffset() const { return m_record.pageOffset; }
 
