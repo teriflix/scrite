@@ -875,7 +875,7 @@ AbstractStructureElementUI {
         onTracked: root.determineElementStack()
     }
 
-    DelayedPropertyBinder {
+    DelayedProperty {
         id: _positionBinder
 
         set: root.element.position

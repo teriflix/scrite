@@ -54,7 +54,7 @@ DialogLauncher {
         onOpened: Scrite.window.closeButtonVisible = false
         onClosed: Scrite.window.closeButtonVisible = true
 
-        DelayedPropertyBinder {
+        DelayedProperty {
             set: Scrite.user.info.hasTrialSubscription || Scrite.user.info.hasActiveSubscription
             onGetChanged: {
                 if(get)

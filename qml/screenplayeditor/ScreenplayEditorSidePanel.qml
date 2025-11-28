@@ -124,7 +124,11 @@ Item {
 
                 Layout.fillHeight: true
 
-                enabled: _delegateCount.get === root.screenplayAdapter.elementCount && (isSceneTextModeHeading || maximumLineCount === 1)
+                DelayedProperty.initial: 0
+                DelayedProperty.delay: 10
+                DelayedProperty.set: _sceneListView.delegateCount
+
+                enabled: DelayedProperty.get === root.screenplayAdapter.elementCount && (isSceneTextModeHeading || maximumLineCount === 1)
                 visible: Runtime.sceneListPanelSettings.displayTracks && Runtime.screenplayTracksSettings.displayTracks && root.screenplayAdapter.isSourceScreenplay
                 listView: _sceneListView
                 screenplay: root.screenplayAdapter.screenplay
@@ -144,14 +148,6 @@ Item {
                 readOnly: root.readOnly
                 screenplayAdapter: root.screenplayAdapter
                 tracksVisible: _screenplayTracksView.visible
-
-                DelayedPropertyBinder {
-                    id: _delegateCount
-
-                    set: _sceneListView.delegateCount
-                    initial: 0
-                    delay: 10
-                }
             }
         }
     }

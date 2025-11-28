@@ -303,14 +303,14 @@ GridBackground {
                                                root.canvasScrollViewportRect)
         }
 
-        readonly property DelayedPropertyBinder widthBinder: DelayedPropertyBinder {
+        readonly property DelayedProperty widthBinder: DelayedProperty {
             set: Math.max( Math.ceil(_private.itemsBoundingBox.right / 100) * 100, 120000 )
             initial: 1000
 
             onGetChanged: Scrite.document.structure.canvasWidth = get
         }
 
-        readonly property DelayedPropertyBinder heightBinder : DelayedPropertyBinder {
+        readonly property DelayedProperty heightBinder : DelayedProperty {
             set: Math.max( Math.ceil(_private.itemsBoundingBox.bottom / 100) * 100, 120000 )
             initial: 1000
 

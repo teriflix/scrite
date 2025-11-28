@@ -232,11 +232,12 @@ AbstractStructureElementUI {
         }
     }
 
-    DelayedPropertyBinder {
+    DelayedProperty {
         id: _positionBinder
 
         set: root.element.position
         initial: Qt.point(root.element.x, root.element.y)
+
         onGetChanged: {
             root.x = get.x
             root.y = get.y

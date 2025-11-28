@@ -99,6 +99,7 @@ HEADERS += \
     src/quick/objects/colorimageprovider.h \
     src/quick/objects/completionmodel.h \
     src/quick/objects/contextmenuevent.h \
+    src/quick/objects/delayedproperty.h \
     src/quick/objects/deltadocument.h \
     src/quick/objects/filemanager.h \
     src/quick/objects/flickscrollspeedcontrol.h \
@@ -107,7 +108,6 @@ HEADERS += \
     src/quick/objects/propertyalias.h \
     src/quick/objects/syntaxhighlighter.h \
     src/quick/objects/tabsequencemanager.h \
-    src/quick/objects/delayedpropertybinder.h \
     src/quick/objects/notification.h \
     src/quick/objects/searchengine.h \
     src/quick/objects/eventfilter.h \
@@ -235,6 +235,7 @@ SOURCES += \
     src/quick/objects/colorimageprovider.cpp \
     src/quick/objects/completionmodel.cpp \
     src/quick/objects/contextmenuevent.cpp \
+    src/quick/objects/delayedproperty.cpp \
     src/quick/objects/deltadocument.cpp \
     src/quick/objects/filemanager.cpp \
     src/quick/objects/flickscrollspeedcontrol.cpp \
@@ -244,7 +245,6 @@ SOURCES += \
     src/quick/objects/syntaxhighlighter.cpp \
     src/quick/objects/tabsequencemanager.cpp \
     src/quick/objects/focustracker.cpp \
-    src/quick/objects/delayedpropertybinder.cpp \
     src/quick/objects/notificationmanager.cpp \
     src/quick/objects/notification.cpp \
     src/quick/objects/resetonchange.cpp \

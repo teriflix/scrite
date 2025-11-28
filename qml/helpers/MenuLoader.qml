@@ -71,7 +71,7 @@ Loader {
         }
     }
 
-    DelayedPropertyBinder {
+    DelayedProperty {
         set: parent.item ? true : false
         delay: 100
         initial: false

@@ -77,17 +77,17 @@ Item {
         Rectangle {
             id: _viewportIndicator
 
-            x: _geometryBinder.get.x
-            y: _geometryBinder.get.y
-            width: _geometryBinder.get.width
-            height: _geometryBinder.get.height
+            x: _geometry.get.x
+            y: _geometry.get.y
+            width: _geometry.get.width
+            height: _geometry.get.height
 
             color: Color.translucent(Runtime.colors.accent.highlight.background, 0.25)
             border.width: 2
             border.color: Runtime.colors.accent.borderColor
 
-            DelayedPropertyBinder {
-                id: _geometryBinder
+            DelayedProperty {
+                id: _geometry
 
                 set: {
                     let visibleRect = root.canvasScroll.viewportRect

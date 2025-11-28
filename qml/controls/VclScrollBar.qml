@@ -22,14 +22,20 @@ import "qrc:/qml/globals"
 ScrollBar {
     id: root
 
+    property bool needed: DelayedProperty.get
+    property Flickable flickable
+
     Material.primary: Runtime.colors.primary.key
     Material.accent: Runtime.colors.accent.key
     Material.theme: Runtime.colors.theme
 
-    property Flickable flickable
-    property int contentSize: flickable ? (orientation === Qt.Vertical ? flickable.contentHeight : flickable.contentWidth) : 0
-    property int actualSize: flickable ? (orientation === Qt.Vertical ? flickable.height : flickable.width) : 0
-    property bool needed: false
+    DelayedProperty.initial: false
+    DelayedProperty.set: (flickable ? (orientation === Qt.Vertical ? flickable.contentHeight : flickable.contentWidth) : 0) > (flickable ? (orientation === Qt.Vertical ? flickable.height : flickable.width) : 0)
+
+    Component.onCompleted: {
+        if(flickable === null)
+            flickable = Object.firstParentByType(root, "QQuickFlickable")
+    }
 
     policy: needed ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
     minimumSize: 0.1
@@ -42,16 +48,5 @@ ScrollBar {
     Behavior on opacity {
         enabled: Runtime.applicationSettings.enableAnimations
         NumberAnimation { duration: Runtime.stdAnimationDuration }
-    }
-
-    Component.onCompleted: {
-        if(flickable === null)
-            flickable = Object.firstParentByType(root, "QQuickFlickable")
-    }
-
-    DelayedPropertyBinder {
-        initial: false
-        set: parent.contentSize > parent.actualSize
-        onGetChanged: parent.needed = get
     }
 }

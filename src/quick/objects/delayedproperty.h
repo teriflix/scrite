@@ -11,21 +11,25 @@
 **
 ****************************************************************************/
 
-#ifndef DELAYEDPROPERTYBINDER_H
-#define DELAYEDPROPERTYBINDER_H
+#ifndef DELAYEDPROPERTY_H
+#define DELAYEDPROPERTY_H
 
 #include <QQuickItem>
 
 #include "execlatertimer.h"
 
-class DelayedPropertyBinder : public QQuickItem
+class DelayedPropertyAttached;
+class DelayedProperty : public QQuickItem
 {
     Q_OBJECT
     QML_ELEMENT
 
 public:
-    explicit DelayedPropertyBinder(QQuickItem *parent = nullptr);
-    ~DelayedPropertyBinder();
+    explicit DelayedProperty(QQuickItem *parent = nullptr);
+    ~DelayedProperty();
+
+    QML_ATTACHED(DelayedPropertyAttached)
+    static DelayedPropertyAttached *qmlAttachedProperties(QObject *parent);
 
     // clang-format off
     Q_PROPERTY(QString name
@@ -90,16 +94,14 @@ private:
     ExecLaterTimer m_timer;
 };
 
-class DelayedProperty : public QObject
+class DelayedPropertyAttached : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
-    QML_ATTACHED(DelayedProperty)
+    QML_ANONYMOUS
 
 public:
-    virtual ~DelayedProperty();
-
-    static DelayedProperty *qmlAttachedProperties(QObject *parent);
+    virtual ~DelayedPropertyAttached();
 
     // clang-format off
     Q_PROPERTY(QString name
@@ -112,6 +114,10 @@ public:
     Q_SIGNAL void nameChanged();
 
     // clang-format off
+    Q_PROPERTY(QVariant set
+               READ watch
+               WRITE setWatch
+               NOTIFY watchChanged)
     Q_PROPERTY(QVariant watch
                READ watch
                WRITE setWatch
@@ -145,16 +151,22 @@ public:
     Q_PROPERTY(QVariant value
                READ value
                NOTIFY valueChanged)
+    Q_PROPERTY(QVariant get
+               READ value
+               NOTIFY valueChanged)
     // clang-format on
     QVariant value() const { return m_value; }
     Q_SIGNAL void valueChanged();
 
 protected:
-    explicit DelayedProperty(QObject *parent = nullptr);
+    explicit DelayedPropertyAttached(QObject *parent = nullptr);
+
     void timerEvent(QTimerEvent *te);
     void setValue(const QVariant &val);
 
 private:
+    friend class DelayedProperty;
+
     QString m_name;
     int m_delay = 100;
     QVariant m_watch;
@@ -163,4 +175,4 @@ private:
     QBasicTimer m_timer;
 };
 
-#endif // DELAYEDPROPERTYBINDER_H
+#endif // DELAYEDPROPERTY_H

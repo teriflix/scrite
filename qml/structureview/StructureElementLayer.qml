@@ -422,7 +422,7 @@ Item {
                                         }
         }
 
-        readonly property DelayedPropertyBinder currentElementItemBinder: DelayedPropertyBinder {
+        readonly property DelayedProperty currentElementItemBinder: DelayedProperty {
             initial: null
             set: _elementItems.count > Scrite.document.structure.currentElementIndex ? _elementItems.itemAt(Scrite.document.structure.currentElementIndex) : null
             onGetChanged: { if(get) root.ensureItemVisibleRequest(get) }
