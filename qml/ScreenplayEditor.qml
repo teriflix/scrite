@@ -101,7 +101,7 @@ Rectangle {
 
         anchors.top: _searchBarArea.visible ? _searchBarArea.bottom : parent.top
         anchors.left: parent.left
-        anchors.bottom: parent.bottom
+        anchors.bottom: _statusBar.top
         anchors.topMargin: 5
         anchors.bottomMargin: 5
 
