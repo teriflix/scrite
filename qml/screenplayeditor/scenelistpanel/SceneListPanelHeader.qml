@@ -36,6 +36,9 @@ Rectangle {
 
     color: Runtime.colors.accent.c100.background
 
+    border.color: Runtime.colors.accent.borderColor
+    border.width: 0.5
+
     RowLayout {
         id: _layout
 

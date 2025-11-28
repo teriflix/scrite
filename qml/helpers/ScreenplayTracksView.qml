@@ -81,7 +81,10 @@ Flickable {
                 width: _private.isHorizontalTrack ? _content.width : _private.trackSize
                 height: _private.isHorizontalTrack ? _private.trackSize : _content.height
 
-                color: Runtime.colors.tint(track.color, Runtime.colors.screenplayTracksTint)
+                color: Runtime.colors.primary.c100.background
+
+                border.color: Runtime.colors.primary.borderColor
+                border.width: 0.5
 
                 MouseArea {
                     id: _trackMouseArea

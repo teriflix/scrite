@@ -224,6 +224,8 @@ Rectangle {
                     font.capitalization: _private.isBreak || _private.isSceneTextModeHeading ? Font.AllUppercase : Font.MixedCase
 
                     MouseArea {
+                        id: _labelMouseArea
+
                         anchors.fill: parent
 
                         enabled: Runtime.sceneListPanelSettings.showTooltip
