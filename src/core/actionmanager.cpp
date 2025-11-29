@@ -24,25 +24,38 @@
 #include <QDynamicPropertyChangeEvent>
 
 static const char *_QQuickAction = "QQuickAction";
+
 static const QByteArray _QQuickActionSortOrderProperty = QByteArrayLiteral("sortOrder");
 static const char *_QQuickActionSortOrderChanged = SIGNAL(sortOrderChanged());
+
 static const QByteArray _QQuickActionTextProperty = QByteArrayLiteral("text");
 static const char *_QQuickActionTextChanged = SIGNAL(textChanged(QString));
+
 static const QByteArray _QQuickActionIconProperty = QByteArrayLiteral("icon");
 static const char *_QQuickActionIconChanged = SIGNAL(iconChanged(QQuickIcon));
+
 static const QByteArray _QQuickActionTooltipProperty = QByteArrayLiteral("tooltip");
 static const char *_QQuickActionTooltipChanged = SIGNAL(tooltipChanged());
+
 static const QByteArray _QQuickActionKeywordsProperty = QByteArrayLiteral("keywords");
 static const char *_QQuickActionKeywordsChanged = SIGNAL(keywordsChanged());
+
 static const QByteArray _QQuickActionVisibleProperty = QByteArrayLiteral("visible");
 static const char *_QQuickActionVisibilityChanged = SIGNAL(visibleChanged());
+
 static const QByteArray _QQuickActionShortcutProperty = QByteArrayLiteral("shortcut");
 static const char *_QQuickActionShortcutChanged = SIGNAL(shortcutChanged(QKeySequence));
+
 static const QByteArray _QQuickActionDefaultShortcutProperty = QByteArrayLiteral("defaultShortcut");
+
 static const QByteArray _QQuickActionAllowShortcutProperty = QByteArrayLiteral("allowShortcut");
+
 static const QByteArray _QQuickActionEnabledProperty = QByteArrayLiteral("enabled");
+
 static const QByteArray _QQuickActionTriggerCount = QByteArrayLiteral("triggerCount");
 static const char *_QQuickActionTriggerCountChanged = SIGNAL(triggerCountChanged());
+
+static const QByteArray _QQuickActionTriggerMethod = QByteArrayLiteral("triggerMethod");
 
 Q_GLOBAL_STATIC(QObjectListModel<ActionManager *>, ActionManagerModel)
 
@@ -701,14 +714,36 @@ void ActionHandler::componentComplete()
 
 void ActionHandler::onToggled(QObject *source)
 {
-    if (this->isEnabled())
+    if (this->isEnabled()) {
+        switch (triggerMethod(m_action)) {
+        case TriggerNone:
+            return;
+        case TriggerFirst:
+            if (ActionHandlers::instance()->findFirst(m_action) != this)
+                return;
+        default:
+            break;
+        }
+
         emit toggled(source);
+    }
 }
 
 void ActionHandler::onTriggered(QObject *source)
 {
-    if (this->isEnabled())
+    if (this->isEnabled()) {
+        switch (triggerMethod(m_action)) {
+        case TriggerNone:
+            return;
+        case TriggerFirst:
+            if (ActionHandlers::instance()->findFirst(m_action) != this)
+                return;
+        default:
+            break;
+        }
+
         emit triggered(source);
+    }
 }
 
 void ActionHandler::onObjectDestroyed(QObject *ptr)
@@ -729,6 +764,24 @@ void ActionHandler::checkTriggerCount()
             m_action->setProperty(_QQuickActionTriggerCount, QVariant::fromValue<int>(0));
         }
     }
+}
+
+ActionHandler::TriggerMethod ActionHandler::triggerMethod(QObject *action)
+{
+    if (action == nullptr /* || !action->inherits(_QQuickAction)*/)
+        return TriggerAll;
+
+    const QMetaProperty triggerMethodProp = action->metaObject()->property(
+            action->metaObject()->indexOfProperty(_QQuickActionTriggerMethod));
+    if (triggerMethodProp.isValid() && triggerMethodProp.userType() == QMetaType::Int) {
+        const int propValue = triggerMethodProp.read(action).toInt();
+        static const QMetaEnum triggerMethodEnum =
+                QMetaEnum::fromType<ActionHandler::TriggerMethod>();
+        if (triggerMethodEnum.value(propValue))
+            return TriggerMethod(propValue);
+    }
+
+    return TriggerAll;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

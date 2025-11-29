@@ -98,6 +98,7 @@ Item {
 
             ActionHandler {
                 action: ActionHub.notebookOperations.find("reload")
+                priority: 2
 
                 onTriggered: _graph.resetGraph()
             }
@@ -105,6 +106,7 @@ Item {
             ActionHandler {
                 action: ActionHub.notebookOperations.find("report")
                 enabled: _graph.pdfExportPossible
+                priority: 2
 
                 onTriggered: (source) => { _graph.exportToPdf(source) }
             }

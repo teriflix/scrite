@@ -189,6 +189,13 @@ public:
 
     static ActionHandlerAttached *qmlAttachedProperties(QObject *parent);
 
+    enum TriggerMethod {
+        TriggerNone, // if Action wants to show a dialog box and explicitly call a handler
+        TriggerAll, // Default, all handlers trigger when an action is Triggered or Toggled
+        TriggerFirst // Only the first, higher priority handler will be triggered.
+    };
+    Q_ENUM(TriggerMethod)
+
     // clang-format off
     Q_PROPERTY(int priority
                READ priority
@@ -264,6 +271,7 @@ private:
     Q_SLOT void onTriggered(QObject *source = nullptr);
     void onObjectDestroyed(QObject *ptr);
     Q_SLOT void checkTriggerCount();
+    static TriggerMethod triggerMethod(QObject *action);
 
 private:
     int m_priority = 0;

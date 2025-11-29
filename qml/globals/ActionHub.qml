@@ -1755,6 +1755,7 @@ Item {
             // to handle editOptions.refresh which already has F5 mapped to it.
             readonly property bool allowShortcut: true
             readonly property string tooltip: "Reloads the notebook tree."
+            readonly property int triggerMethod: ActionHandler.TriggerFirst
 
             enabled: ActionHandler.canHandle
             objectName: "reload"
@@ -1768,6 +1769,9 @@ Item {
             // export of the screenplay itself. This is specifically for
             // generating PDF export of the Notebook report.
             readonly property bool allowShortcut: true
+            readonly property var keywords: ["pdf"]
+            readonly property int triggerMethod: ActionHandler.TriggerFirst
+
             property string tooltip: ActionHandler.active ? ActionHandler.active.tooltip : text
 
             enabled: ActionHandler.canHandle
