@@ -204,12 +204,29 @@ AbstractScenePartEditor {
         splitSceneEnabled: _private.canSplitScene
         mergeWithPreviousSceneEnabled: _private.canJoinToPreviousScene
 
-        onCutRequest: () => { _private.cut() }
-        onCopyRequest: () => { _private.copy() }
-        onPasteRequest: () => { _private.paste() }
-        onReloadSceneContentRequest: () => { _private.reload() }
-        onSplitSceneAtPositionRequest: (position) => { _private.splitSceneAt(position) }
-        onMergeWithPreviousSceneRequest: () => { _private.mergeWithPreviousScene(0) }
+        onCutRequest: () => {
+                          _sceneTextEditor.forceActiveFocus()
+                          _private.cut()
+                      }
+        onCopyRequest: () => {
+                           _sceneContentEditor.forceActiveFocus()
+                           _private.copy()
+                       }
+        onPasteRequest: () => {
+                            _sceneContentEditor.forceActiveFocus()
+                            _private.paste()
+                        }
+        onReloadSceneContentRequest: () => {
+                                         _private.reload()
+                                     }
+        onSplitSceneAtPositionRequest: (position) => {
+                                           _sceneContentEditor.forceActiveFocus()
+                                           _private.splitSceneAt(position)
+                                       }
+        onMergeWithPreviousSceneRequest: () => {
+                                             _sceneContentEditor.forceActiveFocus()
+                                             _private.mergeWithPreviousScene(0)
+                                         }
     }
 
     SceneDocumentBinder {
