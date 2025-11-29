@@ -368,12 +368,12 @@ win32 {
 }
 
 linux {
-    QT += dbus
+    QMAKE_CXXFLAGS += $$SYSTEM_INCLUDE_BUS
+    LIBS += $$SYSTEM_LIBS_BUS
 
     CONFIG+=use_gold_linker
     VERSION_INFO = "1.9.9-linux"
 
-    HEADERS += src/core/platformtransliterator_linux.h
     SOURCES += src/core/platformtransliterator_linux.cpp
 }
 
