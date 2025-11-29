@@ -96,6 +96,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: _statusBar.top
+        anchors.margins: 1
 
         contentWidth: _canvas.width * _canvas.scale
         contentHeight: _canvas.height * _canvas.scale
