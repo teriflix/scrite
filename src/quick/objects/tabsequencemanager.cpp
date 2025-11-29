@@ -221,10 +221,6 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
 {
     if (m_enabled && event->type() == QEvent::KeyPress) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(event);
-        if (m_releaseFocusEnabled && m_releaseFocusKey == ke->key()) {
-            this->releaseFocus();
-            return true;
-        }
 
         auto isWatched = [watched](TabSequenceItem *item) {
             QObject *itemParent = item->parent();
@@ -237,7 +233,7 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
             return false;
         };
 
-        if (ke->key() == m_tabKey || ke->key() == m_backtabKey) {
+        if (ke->key() == m_tabKey || ke->key() == m_backtabKey || ke->key() == m_releaseFocusKey) {
             int itemIndex = -1;
             for (int i = 0; i < m_tabSequenceItems.size(); i++) {
                 TabSequenceItem *item = m_tabSequenceItems.at(i);
@@ -249,6 +245,11 @@ bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
 
             if (itemIndex < 0)
                 return false;
+
+            if (m_releaseFocusEnabled && m_releaseFocusKey == ke->key()) {
+                this->releaseFocus();
+                return true;
+            }
 
             const Qt::KeyboardModifiers kemods = ke->modifiers();
             auto compareModifiers = [kemods](int val) {

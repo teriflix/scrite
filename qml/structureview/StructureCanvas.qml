@@ -294,7 +294,6 @@ GridBackground {
 
         readonly property TabSequenceManager tabSequence: TabSequenceManager {
             wrapAround: true
-            releaseFocusEnabled: true
         }
 
         readonly property BoundingBoxEvaluator itemsBoundingBox : BoundingBoxEvaluator {

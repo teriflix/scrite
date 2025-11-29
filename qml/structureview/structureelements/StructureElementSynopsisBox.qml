@@ -74,11 +74,14 @@ AbstractStructureElementUI {
     Rectangle {
         id: _background
 
-        anchors.fill: parent
+        property color borderColor: Color.isLight(root.element.scene.color) ? Qt.rgba(0.75,0.75,0.75,1.0) : root.element.scene.color
 
-        color: Runtime.colors.tint(root.element.scene.color, Runtime.colors.sceneControlTint)
+        anchors.fill: parent
+        anchors.margins: -border.width
+
+        color: Runtime.colors.tint(root.element.scene.color, _private.isSelected ? Runtime.colors.selectedSceneControlTint : Runtime.colors.sceneControlTint)
         border.width: _private.selected ? 2 : 1
-        border.color: (root.element.scene.color === Qt.rgba(1,1,1,1) ? "gray" : root.element.scene.color)
+        border.color: _private.isSelected ? borderColor : Qt.lighter(borderColor)
 
         Behavior on border.width {
             enabled: Runtime.applicationSettings.enableAnimations

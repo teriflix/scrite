@@ -238,8 +238,6 @@ AbstractStructureElementUI {
             highDetailComponent: VclTextField {
                 id: _headingField
 
-                Keys.onEscapePressed: root.canvasTabSequence.releaseFocus()
-
                 width: parent.width
 
                 text: root.element.title
@@ -387,8 +385,6 @@ AbstractStructureElementUI {
 
                             TextArea {
                                 id: _synopsisField
-
-                                Keys.onEscapePressed: root.canvasTabSequence.releaseFocus()
 
                                 SyntaxHighlighter.delegates: [
                                     LanguageFontSyntaxHighlighterDelegate {

@@ -50,12 +50,12 @@ ScrollArea {
     readonly property alias annotationGrip: _canvas.annotationGrip
     readonly property alias annotationLayer: _canvas.annotationLayer
     readonly property alias editElementItem: _canvas.editElementItem
-    readonly property alias canvasGroupBoxCount: _canvas.groupBoxCount
     readonly property alias itemsBoundingBox: _canvas.itemsBoundingBox
     readonly property alias currentAnnotation: _canvas.currentAnnotation
-    readonly property alias canvasEpisodeBoxCount: _canvas.episodeBoxCount
     readonly property alias currentElementItem: _canvas.currentElementItem
     readonly property alias draggedElementItem: _canvas.draggedElementItem
+    readonly property alias canvasGroupBoxCount: _canvas.groupBoxCount
+    readonly property alias canvasEpisodeBoxCount: _canvas.episodeBoxCount
     readonly property alias interactiveCreationMode: _canvas.interactiveCreationMode
     readonly property alias availableAnnotationKeys: _canvas.availableAnnotationKeys
 
@@ -154,6 +154,15 @@ ScrollArea {
     QtObject {
         id: _private
 
+        readonly property Action releaseFocusAction: Action {
+            shortcut: Gui.shortcut(Qt.Key_Escape)
+            enabled: _canvas.editElementItem !== null
+
+            onTriggered: (source) => {
+                             _canvas.editElementItem.focus = false
+                         }
+        }
+
         property bool interactive: {
             const canvasInteractionGoingOn =  (_canvas.rubberband.active ||
                                                _canvas.selection.active ||
@@ -184,6 +193,10 @@ ScrollArea {
 
             _private.zoomOneToCurrentItem()
             animatePanAndZoom = true
+
+            if(FocusInspector.hasFocus(root)) {
+                Scrite.window.activeFocusItem.focus = false
+            }
         }
 
         function zoomSanityCheck() {
