@@ -3576,6 +3576,9 @@ void SceneGroup::evaluateLengths()
     }
 
     if (m_paginator == nullptr) {
+        if (m_scenes.size() < 2)
+            return;
+
         m_paginator = new ScreenplayPaginator(this);
         m_paginator->setFormat(ScriteDocument::instance()->printFormat());
         connect(m_paginator, &ScreenplayPaginator::paginationUpdated, this,
@@ -3585,12 +3588,17 @@ void SceneGroup::evaluateLengths()
     }
 
     Screenplay *screenplay = m_paginator->screenplay();
-    screenplay->deleteLater();
+    if (screenplay != nullptr && screenplay->parent() == m_paginator)
+        screenplay->deleteLater();
 
-    screenplay = new Screenplay(m_paginator);
-    for (Scene *scene : qAsConst(m_scenes))
-        screenplay->addScene(scene);
-    m_paginator->setScreenplay(screenplay);
+    if (m_scenes.size() >= 2) {
+        screenplay = new Screenplay(m_paginator);
+        for (Scene *scene : qAsConst(m_scenes))
+            screenplay->addScene(scene);
+        m_paginator->setScreenplay(screenplay);
+    } else {
+        m_paginator->setScreenplay(nullptr);
+    }
 }
 
 void SceneGroup::staticAppendScene(QQmlListProperty<Scene> *list, Scene *ptr)

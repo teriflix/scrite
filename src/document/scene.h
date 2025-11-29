@@ -1130,6 +1130,11 @@ public:
     Q_INVOKABLE void clearScenes();
     Q_SIGNAL void sceneCountChanged();
 
+    /**
+     * NOTE: Scene Lengths are evaluated only if the number
+     * of scenes in the group are two or more.
+     */
+
     // clang-format off
     Q_PROPERTY(bool evaluateLengths
                READ isEvaluateLengths
