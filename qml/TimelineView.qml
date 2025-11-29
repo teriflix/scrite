@@ -29,7 +29,7 @@ import "qrc:/qml/timelineview"
 Item {
     id: root
 
-    property real zoomLevel: 1
+    property real zoomLevel: 2
     property real preferredHeight: _screenplayTools.preferredHeight
     property bool showNotesIcon: false
     property bool enableDragDrop: !Scrite.document.readOnly
