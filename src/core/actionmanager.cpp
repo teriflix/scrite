@@ -675,6 +675,7 @@ void ActionHandler::setAction(QObject *val)
         disconnect(m_action, nullptr, this, nullptr);
     }
 
+    m_actionTriggerMethodProperty = QMetaProperty();
     m_action = val && val->inherits(_QQuickAction) ? val : nullptr;
 
     if (m_action != nullptr) {
@@ -688,6 +689,12 @@ void ActionHandler::setAction(QObject *val)
                 mo->property(mo->indexOfProperty(_QQuickActionTriggerCount));
         if (triggerCountProp.isValid() && triggerCountProp.userType() == QMetaType::Int)
             connect(m_action, _QQuickActionTriggerCountChanged, this, SLOT(checkTriggerCount()));
+
+        const QMetaProperty triggerMethodProp =
+                mo->property(mo->indexOfProperty(_QQuickActionTriggerMethod));
+        if (triggerMethodProp.isValid() && triggerMethodProp.userType() == QMetaType::Int) {
+            m_actionTriggerMethodProperty = triggerMethodProp;
+        }
     }
 
     emit actionChanged();
@@ -715,7 +722,7 @@ void ActionHandler::componentComplete()
 void ActionHandler::onToggled(QObject *source)
 {
     if (this->isEnabled()) {
-        switch (triggerMethod(m_action)) {
+        switch (triggerMethod()) {
         case TriggerNone:
             return;
         case TriggerFirst:
@@ -732,7 +739,7 @@ void ActionHandler::onToggled(QObject *source)
 void ActionHandler::onTriggered(QObject *source)
 {
     if (this->isEnabled()) {
-        switch (triggerMethod(m_action)) {
+        switch (triggerMethod()) {
         case TriggerNone:
             return;
         case TriggerFirst:
@@ -766,15 +773,10 @@ void ActionHandler::checkTriggerCount()
     }
 }
 
-ActionHandler::TriggerMethod ActionHandler::triggerMethod(QObject *action)
+ActionHandler::TriggerMethod ActionHandler::triggerMethod() const
 {
-    if (action == nullptr /* || !action->inherits(_QQuickAction)*/)
-        return TriggerAll;
-
-    const QMetaProperty triggerMethodProp = action->metaObject()->property(
-            action->metaObject()->indexOfProperty(_QQuickActionTriggerMethod));
-    if (triggerMethodProp.isValid() && triggerMethodProp.userType() == QMetaType::Int) {
-        const int propValue = triggerMethodProp.read(action).toInt();
+    if (m_action != nullptr && m_actionTriggerMethodProperty.isValid()) {
+        const int propValue = m_actionTriggerMethodProperty.read(m_action).toInt();
         static const QMetaEnum triggerMethodEnum =
                 QMetaEnum::fromType<ActionHandler::TriggerMethod>();
         if (triggerMethodEnum.value(propValue))

@@ -271,7 +271,7 @@ private:
     Q_SLOT void onTriggered(QObject *source = nullptr);
     void onObjectDestroyed(QObject *ptr);
     Q_SLOT void checkTriggerCount();
-    static TriggerMethod triggerMethod(QObject *action);
+    TriggerMethod triggerMethod() const;
 
 private:
     int m_priority = 0;
@@ -280,6 +280,7 @@ private:
     QString m_iconSource;
     QString m_tooltip;
     QObject *m_action = nullptr;
+    QMetaProperty m_actionTriggerMethodProperty;
 };
 
 class ActionHandlerAttached : public QObject
