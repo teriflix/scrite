@@ -1691,6 +1691,16 @@ Item {
         }
 
         Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+
+            objectName: "customizeIndexCardFields"
+            text: "Customize Index Card Fields"
+
+            onTriggered: StructureIndexCardFieldsDialog.launch()
+        }
+
+        Action {
             enabled: Runtime.mainWindowTab === Runtime.MainWindowTab.StructureTab
             checkable: true
             checked: Scrite.document.structure.preferredGroupCategory === ""
