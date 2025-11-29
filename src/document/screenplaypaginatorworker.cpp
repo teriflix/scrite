@@ -488,6 +488,11 @@ void ScreenplayPaginatorWorker::syncDocument()
 
     if (m_screenplayContent.isEmpty()) {
         m_syncInterval = minimumSyncInterval;
+
+        if (m_document != nullptr)
+            m_document->clear();
+        m_records.clear();
+
         paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime());
         return;
     }

@@ -141,29 +141,32 @@ void ScreenplayPaginator::setScreenplay(Screenplay *val)
     if (m_screenplay != nullptr)
         disconnect(m_screenplay, nullptr, this, nullptr);
 
+    this->clear();
+
     m_screenplay = val;
 
-    connect(m_screenplay, &Screenplay::aboutToDelete, this,
-            &ScreenplayPaginator::onScreenplayDestroyed);
-    connect(m_screenplay, &Screenplay::modelReset, this, &ScreenplayPaginator::onScreenplayReset);
-    connect(m_screenplay, &Screenplay::elementInserted, this,
-            &ScreenplayPaginator::onScreenplayElementInserted);
-    connect(m_screenplay, &Screenplay::elementRemoved, this,
-            &ScreenplayPaginator::onScreenplayElementRemoved);
-    connect(m_screenplay, &Screenplay::elementOmitted, this,
-            &ScreenplayPaginator::onScreenplayElementOmitted);
-    connect(m_screenplay, &Screenplay::elementIncluded, this,
-            &ScreenplayPaginator::onScreenplayElementIncluded);
-    connect(m_screenplay, &Screenplay::elementSceneContentChanged, this,
-            &ScreenplayPaginator::onScreenplayElementSceneReset);
-    connect(m_screenplay, &Screenplay::elementSceneHeadingChanged, this,
-            &ScreenplayPaginator::onScreenplayElementSceneHeadingChanged);
-    connect(m_screenplay, &Screenplay::elementSceneElementChanged, this,
-            &ScreenplayPaginator::onScreenplayElementSceneElementChanged);
-    connect(m_screenplay, &Screenplay::currentElementIndexChanged, this,
-            &ScreenplayPaginator::onCursorPositionChanged);
-
-    this->clear();
+    if (m_screenplay != nullptr) {
+        connect(m_screenplay, &Screenplay::aboutToDelete, this,
+                &ScreenplayPaginator::onScreenplayDestroyed);
+        connect(m_screenplay, &Screenplay::modelReset, this,
+                &ScreenplayPaginator::onScreenplayReset);
+        connect(m_screenplay, &Screenplay::elementInserted, this,
+                &ScreenplayPaginator::onScreenplayElementInserted);
+        connect(m_screenplay, &Screenplay::elementRemoved, this,
+                &ScreenplayPaginator::onScreenplayElementRemoved);
+        connect(m_screenplay, &Screenplay::elementOmitted, this,
+                &ScreenplayPaginator::onScreenplayElementOmitted);
+        connect(m_screenplay, &Screenplay::elementIncluded, this,
+                &ScreenplayPaginator::onScreenplayElementIncluded);
+        connect(m_screenplay, &Screenplay::elementSceneContentChanged, this,
+                &ScreenplayPaginator::onScreenplayElementSceneReset);
+        connect(m_screenplay, &Screenplay::elementSceneHeadingChanged, this,
+                &ScreenplayPaginator::onScreenplayElementSceneHeadingChanged);
+        connect(m_screenplay, &Screenplay::elementSceneElementChanged, this,
+                &ScreenplayPaginator::onScreenplayElementSceneElementChanged);
+        connect(m_screenplay, &Screenplay::currentElementIndexChanged, this,
+                &ScreenplayPaginator::onCursorPositionChanged);
+    }
 
     emit screenplayChanged();
 }
