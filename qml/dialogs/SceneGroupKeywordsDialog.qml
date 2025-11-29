@@ -53,8 +53,13 @@ DialogLauncher {
         height: Math.min(Scrite.window.height-80, 480)
 
         title: sceneGroup.sceneCount > 1 ? "Scene Group Keywords" : "Scene Keywords"
+        titleBarCloseButtonVisible: contentInstance ? !contentInstance.acceptingNewText : true
 
         content: Item {
+            property alias acceptingNewText: _keywordsList.acceptingNewText
+
+            Component.onCompleted: Qt.callLater(_keywordsList.acceptNewText)
+
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 20
