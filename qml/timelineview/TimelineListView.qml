@@ -51,7 +51,6 @@ ListView {
     property color dropAreaHighlightColor: Runtime.colors.accent.highlight.background
 
     function updateCacheBuffer() { _private.updateCacheBuffer() }
-    function extents(startIndex, endIndex) { return _private.extents(startIndex, endIndex) }
 
     signal editorRequest()
     signal dropSceneAtRequest(QtObject source, int index)
@@ -139,17 +138,6 @@ ListView {
     QtObject {
         id: _private
 
-        EventFilter.target: Scrite.app
-        EventFilter.active: Scrite.document.screenplay.hasSelectedElements
-        EventFilter.events: [EventFilter.KeyPress]
-        EventFilter.onFilter: (object,event,result) => {
-                                  if(event.key === Qt.Key_Escape) {
-                                      Scrite.document.screenplay.clearSelection()
-                                      result.acceptEvent = true
-                                      result.filter = true
-                                  }
-                              }
-
         function removeCurrentElement() {
             if(Scrite.document.loading)
                 return
@@ -167,6 +155,19 @@ ListView {
             else
                 cacheBuffer = 0
         }
+
+        property real contentOffset: 0
+
+        EventFilter.target: Scrite.app
+        EventFilter.active: Scrite.document.screenplay.hasSelectedElements
+        EventFilter.events: [EventFilter.KeyPress]
+        EventFilter.onFilter: (object,event,result) => {
+                                  if(event.key === Qt.Key_Escape) {
+                                      Scrite.document.screenplay.clearSelection()
+                                      result.acceptEvent = true
+                                      result.filter = true
+                                  }
+                              }
     }
 }
 

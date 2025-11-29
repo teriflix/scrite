@@ -85,11 +85,13 @@ Item {
             onZoomInRequest: {
                 root.zoomLevel = Math.min(zoomLevel * 1.1, _private.maximumZoomLevel)
                 _screenplayElementList.updateCacheBuffer()
+                _screenplayElementList.positionViewAtIndex(Scrite.document.screenplay.currentElementIndex, ListView.Center)
             }
 
             onZoomOutRequest: {
                 root.zoomLevel = Math.max(zoomLevel * 0.9, _private.minimumZoomLevel)
                 _screenplayElementList.updateCacheBuffer()
+                _screenplayElementList.positionViewAtIndex(Scrite.document.screenplay.currentElementIndex, ListView.Center)
             }
         }
 
