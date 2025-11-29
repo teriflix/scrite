@@ -26,10 +26,12 @@ import "qrc:/qml/dialogs"
 VclMenu {
     id: root
 
+    required property SceneGroup sceneGroup
+
     property ScreenplayElement element
 
     VclMenuItem {
-        enabled: _sceneGroup.sceneCount === 1 && root.element && root.element.scene
+        enabled: root.sceneGroup.sceneCount === 1 && root.element && root.element.scene
 
         action: Action {
             text: "Scene Heading"
@@ -41,7 +43,7 @@ VclMenu {
     }
 
     VclMenu {
-        enabled: _sceneGroup.sceneCount === 1
+        enabled: root.sceneGroup.sceneCount === 1
 
         title: "Page Breaks"
 
@@ -71,8 +73,8 @@ VclMenu {
         enabled: !Scrite.document.readOnly && root.element
 
         onMenuItemClicked: {
-            for(var i=0; i<_sceneGroup.sceneCount; i++) {
-                _sceneGroup.sceneAt(i).color = color
+            for(var i=0; i<root.sceneGroup.sceneCount; i++) {
+                root.sceneGroup.sceneAt(i).color = color
             }
             root.close()
         }
@@ -84,8 +86,8 @@ VclMenu {
         enabled: !Scrite.document.readOnly && !omitIncludeMenuItem.omitted
 
         onTriggered: {
-            for(var i=0; i<_sceneGroup.sceneCount; i++) {
-                _sceneGroup.sceneAt(i).type = scene.type
+            for(var i=0; i<root.sceneGroup.sceneCount; i++) {
+                root.sceneGroup.sceneAt(i).type = scene.type
             }
             root.close()
         }
@@ -94,10 +96,10 @@ VclMenu {
     VclMenuItem {
         text: "Make Sequence"
 
-        enabled: !Scrite.document.readOnly && _sceneGroup.canBeStacked
+        enabled: !Scrite.document.readOnly && root.sceneGroup.canBeStacked
 
         onTriggered: {
-            if(!_sceneGroup.stack()) {
+            if(!root.sceneGroup.stack()) {
                 MessageBox.information("Make Sequence Error",
                                        "Couldn't stack these scenes to make a sequence. Please try doing this on the Structure Tab.")
             }
@@ -107,10 +109,10 @@ VclMenu {
     VclMenuItem {
         text: "Break Sequence"
 
-        enabled: !Scrite.document.readOnly && _sceneGroup.canBeUnstacked
+        enabled: !Scrite.document.readOnly && root.sceneGroup.canBeUnstacked
 
         onTriggered: {
-            if(!_sceneGroup.unstack()) {
+            if(!root.sceneGroup.unstack()) {
                 MessageBox.information("Break Sequence Error",
                                        "Couldn't unstack these scenes to make a sequence. Please try doing this on the Structure Tab.")
             }
@@ -118,7 +120,7 @@ VclMenu {
     }
 
     StructureGroupsMenu {
-        sceneGroup: _sceneGroup
+        sceneGroup: root.sceneGroup
         enabled: !Scrite.document.readOnly
     }
 
@@ -126,7 +128,7 @@ VclMenu {
         text: "Keywords"
         enabled: !Scrite.document.readOnly
 
-        onClicked: SceneGroupKeywordsDialog.launch(_sceneGroup)
+        onClicked: SceneGroupKeywordsDialog.launch(root.sceneGroup)
     }
 
     VclMenu {
@@ -188,7 +190,7 @@ VclMenu {
         enabled: !Scrite.document.readOnly
 
         onClicked: {
-            if(_sceneGroup.sceneCount <= 1)
+            if(root.sceneGroup.sceneCount <= 1)
                 Scrite.document.screenplay.removeElement(root.element)
             else
                 Scrite.document.screenplay.removeSelectedElements();
@@ -196,24 +198,18 @@ VclMenu {
         }
     }
 
-    SceneGroup {
-        id: _sceneGroup
-
-        structure: Scrite.document.structure
-    }
-
     onAboutToShow: {
         if(element.selected) {
-            Scrite.document.screenplay.gatherSelectedScenes(_sceneGroup)
+            Scrite.document.screenplay.gatherSelectedScenes(root.sceneGroup)
         } else {
             Scrite.document.screenplay.clearSelection()
             element.selected = true
-            _sceneGroup.addScene(element.scene)
+            root.sceneGroup.addScene(element.scene)
         }
     }
 
     onClosed: {
         element = null
-        _sceneGroup.clearScenes()
+        root.sceneGroup.clearScenes()
     }
 }

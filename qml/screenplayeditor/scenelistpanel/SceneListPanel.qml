@@ -32,6 +32,7 @@ ListView {
     required property bool tracksVisible
     required property ScreenplayAdapter screenplayAdapter
 
+    readonly property alias sceneGroup: _private.sceneGroup
     readonly property alias delegateCount: _private.delegateCount
 
     function updateCacheBuffer() { _private.updateCacheBuffer() }
@@ -145,6 +146,7 @@ ListView {
         id: _sceneElementsContextMenu
 
         enabled: !root.readOnly
+        sceneGroup: _private.sceneGroup
     }
 
     SceneListPanelMoveElementsTask {
@@ -173,6 +175,25 @@ ListView {
     QtObject {
         id: _private
 
+        readonly property Connections screenplayConnections: Connections {
+            target: root.screenplayAdapter.screenplay
+
+            function onSelectionChanged() {
+                Qt.callLater(_private.sceneGroup.refresh)
+            }
+        }
+
+        readonly property SceneGroup sceneGroup: SceneGroup {
+            id: _sceneGroup
+
+            structure: Scrite.document.structure
+            evaluateLengths: true
+
+            function refresh() {
+                root.screenplayAdapter.screenplay.gatherSelectedScenes(_sceneGroup)
+            }
+        }
+
         readonly property FontMetrics fontMetrics: FontMetrics {
             font.family: Runtime.sceneEditorFontMetrics.font.family
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -190,6 +211,8 @@ ListView {
             else
                 cacheBuffer = 0
         }
+
+        Component.onCompleted: sceneGroup.refresh()
     }
 }
 

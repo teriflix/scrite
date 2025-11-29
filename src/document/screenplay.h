@@ -640,18 +640,17 @@ public:
     // clang-format off
     Q_PROPERTY(bool hasSelectedElements
                READ hasSelectedElements
-               NOTIFY hasSelectedElementsChanged)
+               NOTIFY selectionChanged)
     // clang-format on
     bool hasSelectedElements() const;
-    Q_SIGNAL void hasSelectedElementsChanged();
 
     // clang-format off
     Q_PROPERTY(int selectedElementsCount
                READ selectedElementsCount
-               NOTIFY selectedElementsCountChanged)
+               NOTIFY selectionChanged)
     // clang-format on
     int selectedElementsCount() const;
-    Q_SIGNAL void selectedElementsCountChanged();
+    Q_SIGNAL void selectionChanged();
 
     enum OmitStatus { Omitted, NotOmitted, PartiallyOmitted };
     Q_ENUM(OmitStatus)

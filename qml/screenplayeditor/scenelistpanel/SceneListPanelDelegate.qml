@@ -78,6 +78,7 @@ Rectangle {
     height: _mainLayout.height
 
     color: _private.color
+    opacity: _private.multiSelection ? (_private.isSelection ? 1 : 0.85) : 1
     border.width: _private.isCurrent && root.viewHasFocus ? 1 : 0
     border.color: Qt.darker(_private.color, 120)
 

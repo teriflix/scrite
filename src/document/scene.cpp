@@ -23,6 +23,7 @@
 #include "languageengine.h"
 #include "garbagecollector.h"
 #include "qobjectserializer.h"
+#include "screenplaypaginator.h"
 #include "screenplaytextdocument.h"
 
 #include <QUuid>
@@ -3351,6 +3352,37 @@ void SceneGroup::clearScenes()
         this->removeScene(m_scenes.first());
 }
 
+void SceneGroup::setEvaluateLengths(bool val)
+{
+    if (m_evaluateLengths == val)
+        return;
+
+    m_evaluateLengths = val;
+    emit evaluateLengthsChanged();
+
+    this->evaluateLengths();
+}
+
+bool SceneGroup::isEvaluatingLengths() const
+{
+    return m_paginator == nullptr ? false : m_paginator->isSyncing();
+}
+
+int SceneGroup::pageCount() const
+{
+    return m_paginator == nullptr ? 0 : m_paginator->pageCount();
+}
+
+QTime SceneGroup::timeLength() const
+{
+    return m_paginator == nullptr ? QTime() : m_paginator->totalTime();
+}
+
+int SceneGroup::pixelLength() const
+{
+    return m_paginator == nullptr ? 0 : m_paginator->totalPixelLength();
+}
+
 SceneGroup *SceneGroup::clone(QObject *parent) const
 {
     SceneGroup *newSceneGroup = new SceneGroup(parent);
@@ -3523,11 +3555,42 @@ void SceneGroup::reeval()
     this->setCanBeStacked(m_structure != nullptr
                           && m_structure->canvasUIMode() == Structure::IndexCardUI
                           && m_scenes.size() >= 2 && acts.size() <= 1 && episodes.size() <= 1);
+
+    this->evaluateLengths();
 }
 
 void SceneGroup::reevalLater()
 {
     m_reevalTimer.start(0, this);
+}
+
+void SceneGroup::evaluateLengths()
+{
+    if (!m_evaluateLengths) {
+        if (m_paginator != nullptr) {
+            delete m_paginator;
+            m_paginator = nullptr;
+            emit lengthsUpdated();
+        }
+        return;
+    }
+
+    if (m_paginator == nullptr) {
+        m_paginator = new ScreenplayPaginator(this);
+        m_paginator->setFormat(ScriteDocument::instance()->printFormat());
+        connect(m_paginator, &ScreenplayPaginator::paginationUpdated, this,
+                &SceneGroup::lengthsUpdated);
+        connect(m_paginator, &ScreenplayPaginator::syncingChanged, this,
+                &SceneGroup::evaluatingLengthsChanged);
+    }
+
+    Screenplay *screenplay = m_paginator->screenplay();
+    screenplay->deleteLater();
+
+    screenplay = new Screenplay(m_paginator);
+    for (Scene *scene : qAsConst(m_scenes))
+        screenplay->addScene(scene);
+    m_paginator->setScreenplay(screenplay);
 }
 
 void SceneGroup::staticAppendScene(QQmlListProperty<Scene> *list, Scene *ptr)

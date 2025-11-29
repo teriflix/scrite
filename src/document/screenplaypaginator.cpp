@@ -548,6 +548,21 @@ void ScreenplayPaginator::clearCursor()
     }
 }
 
+void ScreenplayPaginator::incrementSyncCounter()
+{
+    ++m_syncCounter;
+    if (m_syncCounter == 1)
+        emit syncingChanged();
+}
+
+void ScreenplayPaginator::resetSyncCounter()
+{
+    if (m_syncCounter > 0) {
+        m_syncCounter = 0;
+        emit syncingChanged();
+    }
+}
+
 void ScreenplayPaginator::onFormatChanged()
 {
     if (!m_enabled)
@@ -557,6 +572,7 @@ void ScreenplayPaginator::onFormatChanged()
             m_format == nullptr ? ScriteDocument::instance()->printFormat() : m_format;
 
     const QJsonObject formatJson = QObjectSerializer::toJson(format);
+    this->incrementSyncCounter();
     m_workerNode->useFormat(formatJson);
 }
 
@@ -566,6 +582,7 @@ void ScreenplayPaginator::onScreenplayReset()
         return;
 
     QList<SceneContent> screenplayContent = SceneContent::fromScreenplay(m_screenplay);
+    this->incrementSyncCounter();
     m_workerNode->reset(screenplayContent);
 }
 
@@ -583,6 +600,7 @@ void ScreenplayPaginator::onScreenplayElementInserted(ScreenplayElement *element
         return;
 
     SceneContent sceneContent = SceneContent::fromScreenplayElement(element);
+    this->incrementSyncCounter();
     m_workerNode->insertElement(index, sceneContent);
 }
 
@@ -592,6 +610,7 @@ void ScreenplayPaginator::onScreenplayElementRemoved(ScreenplayElement *element,
         return;
 
     Q_UNUSED(element)
+    this->incrementSyncCounter();
     m_workerNode->removeElement(index);
 }
 
@@ -601,6 +620,7 @@ void ScreenplayPaginator::onScreenplayElementOmitted(ScreenplayElement *element,
         return;
 
     Q_UNUSED(element)
+    this->incrementSyncCounter();
     m_workerNode->omitElement(index);
 }
 
@@ -610,6 +630,7 @@ void ScreenplayPaginator::onScreenplayElementIncluded(ScreenplayElement *element
         return;
 
     Q_UNUSED(element)
+    this->incrementSyncCounter();
     m_workerNode->includeElement(index);
 }
 
@@ -620,6 +641,7 @@ void ScreenplayPaginator::onScreenplayElementSceneReset(ScreenplayElement *eleme
 
     Q_UNUSED(scene)
     SceneContent sceneContent = SceneContent::fromScreenplayElement(element);
+    this->incrementSyncCounter();
     m_workerNode->updateScene(sceneContent);
 }
 
@@ -631,6 +653,7 @@ void ScreenplayPaginator::onScreenplayElementSceneHeadingChanged(ScreenplayEleme
 
     Q_UNUSED(element)
     SceneParagraph paragraph = SceneParagraph::fromSceneHeading(sceneHeading);
+    this->incrementSyncCounter();
     m_workerNode->updateParagraph(paragraph);
 }
 
@@ -642,6 +665,7 @@ void ScreenplayPaginator::onScreenplayElementSceneElementChanged(ScreenplayEleme
 
     Q_UNUSED(element)
     SceneParagraph paragraph = SceneParagraph::fromSceneElement(sceneElement);
+    this->incrementSyncCounter();
     m_workerNode->updateParagraph(paragraph);
 }
 
@@ -707,6 +731,8 @@ void ScreenplayPaginator::onPaginationComplete(const QList<ScreenplayPaginatorRe
     }
 
     emit paginationUpdated();
+
+    this->resetSyncCounter();
 }
 
 bool ScreenplayPaginator::aggregate(ScreenplayElement *from, ScreenplayElement *until,

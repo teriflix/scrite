@@ -199,6 +199,14 @@ public:
     bool enabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
+    // clang-format off
+    Q_PROPERTY(bool syncing
+               READ isSyncing
+               NOTIFY syncingChanged)
+    // clang-format on
+    bool isSyncing() const { return m_syncCounter > 0; }
+    Q_SIGNAL void syncingChanged();
+
     Q_INVOKABLE void reset();
 
     // These static functions assume that the document supplied as parameter
@@ -312,6 +320,9 @@ private:
     void clearRecords();
     void clearCursor();
 
+    void incrementSyncCounter();
+    void resetSyncCounter();
+
     void onFormatChanged();
 
     void onScreenplayReset();
@@ -340,6 +351,7 @@ private:
 private:
     bool m_componentComplete = true;
     bool m_enabled = true;
+    int m_syncCounter = 0;
 
     int m_cursorPosition = -1;
     int m_cursorPage = 0;

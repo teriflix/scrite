@@ -148,6 +148,24 @@ Item {
                 readOnly: root.readOnly
                 screenplayAdapter: root.screenplayAdapter
                 tracksVisible: _screenplayTracksView.visible
+
+                ToolTipPopup {
+                    background: Rectangle {
+                        color: Runtime.colors.accent.c500.background
+                        opacity: 0.9
+                    }
+
+                    text: {
+                        const sceneGroup = _sceneListView.sceneGroup
+                        const fields = [
+                                         sceneGroup.sceneCount + " scene(s)",
+                                         "<b>Duration</b> " + (sceneGroup.evaluatingLengths ? "...." : TMath.timeLengthString(sceneGroup.timeLength)),
+                                         "<b>Page Count</b> " + (sceneGroup.evaluatingLengths ? "...." : sceneGroup.pageCount + " page(s)")
+                                     ]
+                        return "<p>Scene Selection:</p>" + SMath.formatAsBulletPoints(fields)
+                    }
+                    visible: Runtime.sceneListPanelSettings.showTooltip && _sceneListView.sceneGroup.evaluateLengths && _sceneListView.sceneGroup.sceneCount >= 2
+                }
             }
         }
     }

@@ -1005,6 +1005,7 @@ private:
 };
 
 // Used only for querying and applying tagging to a bunch of scenes
+class ScreenplayPaginator;
 class SceneGroup : public GenericArrayModel
 {
     Q_OBJECT
@@ -1129,7 +1130,49 @@ public:
     Q_INVOKABLE void clearScenes();
     Q_SIGNAL void sceneCountChanged();
 
+    // clang-format off
+    Q_PROPERTY(bool evaluateLengths
+               READ isEvaluateLengths
+               WRITE setEvaluateLengths
+               NOTIFY evaluateLengthsChanged)
+    // clang-format on
+    void setEvaluateLengths(bool val);
+    bool isEvaluateLengths() const { return m_evaluateLengths; }
+    Q_SIGNAL void evaluateLengthsChanged();
+
+    // clang-format off
+    Q_PROPERTY(bool evaluatingLengths
+               READ isEvaluatingLengths
+               NOTIFY evaluatingLengthsChanged)
+    // clang-format on
+    bool isEvaluatingLengths() const;
+    Q_SIGNAL void evaluatingLengthsChanged();
+
+    // clang-format off
+    Q_PROPERTY(int pageCount
+               READ pageCount
+               NOTIFY lengthsUpdated)
+    // clang-format on
+    int pageCount() const;
+
+    // clang-format off
+    Q_PROPERTY(QTime timeLength
+               READ timeLength
+               NOTIFY lengthsUpdated)
+    // clang-format on
+    QTime timeLength() const;
+
+    // clang-format off
+    Q_PROPERTY(qreal pixelLength
+               READ pixelLength
+               NOTIFY lengthsUpdated)
+    // clang-format on
+    int pixelLength() const;
+
     Q_INVOKABLE SceneGroup *clone(QObject *parent = nullptr) const;
+
+signals:
+    void lengthsUpdated();
 
 protected:
     void timerEvent(QTimerEvent *te);
@@ -1143,21 +1186,29 @@ private:
     void reload();
     void reeval();
     void reevalLater();
+    void evaluateLengths();
 
 private:
     static void staticAppendScene(QQmlListProperty<Scene> *list, Scene *ptr);
     static void staticClearScenes(QQmlListProperty<Scene> *list);
     static Scene *staticSceneAt(QQmlListProperty<Scene> *list, int index);
     static int staticSceneCount(QQmlListProperty<Scene> *list);
+
+    bool m_canBeStacked = false;
+    bool m_evaluateLengths = false;
+
     QStringList m_openTags;
     QStringList m_sceneActs;
     QStringList m_groupActs;
     QStringList m_sceneStackIds;
-    bool m_canBeStacked = false;
+
     QList<Scene *> m_scenes;
+
     QJsonArray &m_groups;
-    QObjectProperty<Structure> m_structure;
+
     ExecLaterTimer m_reevalTimer;
+    ScreenplayPaginator *m_paginator = nullptr;
+    QObjectProperty<Structure> m_structure;
 };
 
 #endif // SCENE_H

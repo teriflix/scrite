@@ -51,6 +51,24 @@ Item {
 
             Layout.fillHeight: true
 
+            ToolTipPopup {
+                background: Rectangle {
+                    color: Runtime.colors.accent.c500.background
+                    opacity: 0.9
+                }
+
+                text: {
+                    const sceneGroup = _private.sceneGroup
+                    const fields = [
+                                     sceneGroup.sceneCount + " scene(s)",
+                                     "<b>Duration</b> " + (sceneGroup.evaluatingLengths ? "...." : TMath.timeLengthString(sceneGroup.timeLength)),
+                                     "<b>Page Count</b> " + (sceneGroup.evaluatingLengths ? "...." : sceneGroup.pageCount + " page(s)")
+                                 ]
+                    return "<p>Scene Selection:</p>" + SMath.formatAsBulletPoints(fields)
+                }
+                visible: _private.sceneGroup.evaluateLengths && _private.sceneGroup.sceneCount >= 2
+            }
+
             onClearRequest: {
                 MessageBox.question("Clear Confirmation",
                     "Are you sure you want to clear the screenplay?",
@@ -143,6 +161,8 @@ Item {
 
     ScreenplaySceneElementsContextMenu {
         id: _sceneElementsContextMenu
+
+        sceneGroup: _private.sceneGroup
     }
 
     Component {
@@ -187,6 +207,25 @@ Item {
 
         readonly property real maximumZoomLevel: 4
         property real minimumZoomLevel: _screenplayElementList.perElementWidth/_screenplayElementList.minimumDelegateWidth
+
+        readonly property Connections screenplayConnections: Connections {
+            target: Scrite.document.screenplay
+
+            function onSelectionChanged() {
+                Qt.callLater(_private.sceneGroup.refresh)
+            }
+        }
+
+        readonly property SceneGroup sceneGroup: SceneGroup {
+            id: _sceneGroup
+
+            structure: Scrite.document.structure
+            evaluateLengths: true
+
+            function refresh() {
+                Scrite.document.screenplay.gatherSelectedScenes(_sceneGroup)
+            }
+        }
 
         property SequentialAnimation dropSceneTask : SequentialAnimation {
             property var dropSource // must be a QObject subclass
@@ -291,7 +330,10 @@ Item {
             }
         }
 
-        Component.onCompleted: restoreZoomLevel()
+        Component.onCompleted: {
+            restoreZoomLevel()
+            sceneGroup.refresh()
+        }
         Component.onDestruction: saveZoomLevel()
     }
 }

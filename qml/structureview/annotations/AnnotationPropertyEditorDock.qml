@@ -31,7 +31,7 @@ FloatingDock {
     property Annotation annotation
     property BoundingBoxEvaluator canvasItemsBoundingBox
 
-    DelayedProperty.set: Runtime.structureCanvasSettings.displayAnnotationProperties && root.annotation
+    DelayedProperty.set: Runtime.structureCanvasSettings.displayAnnotationProperties && root.annotation !== null
 
     x: 80
     y: Scrite.window.height * 0.15

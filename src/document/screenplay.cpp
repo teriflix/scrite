@@ -2319,10 +2319,8 @@ void Screenplay::connectToScreenplayElementSignals(ScreenplayElement *ptr)
             Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged,
             Qt::UniqueConnection);
-    connect(ptr, &ScreenplayElement::selectedChanged, this, &Screenplay::hasSelectedElementsChanged,
+    connect(ptr, &ScreenplayElement::selectedChanged, this, &Screenplay::selectionChanged,
             Qt::UniqueConnection);
-    connect(ptr, &ScreenplayElement::selectedChanged, this,
-            &Screenplay::selectedElementsCountChanged, Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::heightHintChanged, this,
             &Screenplay::evaluateIfHeightHintsAreAvailableLater, Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::omittedChanged, this,
@@ -2358,10 +2356,7 @@ void Screenplay::disconnectFromScreenplayElementSignals(ScreenplayElement *ptr)
     disconnect(ptr, &ScreenplayElement::breakTypeChanged, this,
                &Screenplay::updateBreakTitlesLater);
     disconnect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
-    disconnect(ptr, &ScreenplayElement::selectedChanged, this,
-               &Screenplay::hasSelectedElementsChanged);
-    disconnect(ptr, &ScreenplayElement::selectedChanged, this,
-               &Screenplay::selectedElementsCountChanged);
+    disconnect(ptr, &ScreenplayElement::selectedChanged, this, &Screenplay::selectionChanged);
     disconnect(ptr, &ScreenplayElement::heightHintChanged, this,
                &Screenplay::evaluateIfHeightHintsAreAvailableLater);
     disconnect(ptr, &ScreenplayElement::omittedChanged, this,
