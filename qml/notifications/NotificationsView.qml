@@ -24,28 +24,32 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 Rectangle {
+    id: root
+
     function init() { }
 
-    parent: NotificationsLayer.item
     anchors.fill: parent
 
-    visible: NotificationsLayer.valid && Scrite.notifications.count > 0
-    color: Color.translucent(Runtime.colors.primary.borderColor, 0.6)
+    parent: NotificationsLayer.item
 
+    color: Color.translucent(Runtime.colors.primary.borderColor, 0.6)
+    visible: NotificationsLayer.valid && Scrite.notifications.count > 0
     focus: visible
 
     MouseArea {
         anchors.fill: parent
+
+        enabled: parent.visible
         hoverEnabled: true
         propagateComposedEvents: false
-        enabled: parent.visible
     }
 
     Flickable {
-        id: notificationsFlick
+        id: _flickable
+
         anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
         anchors.topMargin: -1
+        anchors.horizontalCenter: parent.horizontalCenter
 
         width: parent.width * 0.7
         height: Math.min( contentHeight, parent.height*0.25 )
@@ -53,110 +57,130 @@ Rectangle {
         visible: height > 0
 
         contentWidth: width
-        contentHeight: notificationsLayout.implicitHeight
+        contentHeight: _layout.implicitHeight
 
         Column {
-            id: notificationsLayout
+            id: _layout
+
+            width: _flickable.width
 
             spacing: 10
-            width: notificationsFlick.width
 
             Repeater {
                 model: Scrite.notifications.count
 
                 Rectangle {
+                    id: _delegate
+
                     required property int index
                     property Notification notification: Scrite.notifications.notificationAt(index)
 
-                    width: notificationsFlick.width-1
-                    height: Math.max(100, nLayout.implicitHeight+44)
+                    width: _flickable.width-1
+                    height: Math.max(100, _delegateLayout.implicitHeight+44)
+
                     color: notification.color
                     border { width: 1; color: Runtime.colors.primary.borderColor }
 
                     RowLayout {
-                        id: nLayout
-                        width: parent.width-44
+                        id: _delegateLayout
+
                         anchors.centerIn: parent
+
+                        width: parent.width-44
+
                         spacing: 30
 
                         Rectangle {
-                            visible: notification.hasImage
                             Layout.preferredWidth: parent.width*0.25
                             Layout.preferredHeight: {
-                                if(nimage.status === Image.Ready)
-                                return nimage.sourceSize.height * (Layout.preferredWidth/nimage.sourceSize.width)
+                                if(_delegateImage.status === Image.Ready) {
+                                    return _delegateImage.sourceSize.height * (Layout.preferredWidth/_delegateImage.sourceSize.width)
+                                }
+
                                 return Layout.preferredWidth*9/16
                             }
+
+                            visible: notification.hasImage
                             border.width: 1
                             border.color: Runtime.colors.primary.borderColor
 
                             Image {
-                                id: nimage
-                                source: notification.image
-                                fillMode: Image.PreserveAspectFit
+                                id: _delegateImage
+
                                 anchors.fill: parent
                                 anchors.margins: 1
+
+                                fillMode: Image.PreserveAspectFit
                                 mipmap: true
+                                source: notification.image
 
                                 MouseArea {
                                     anchors.fill: parent
-                                    onClicked: notification.notifyImageClick()
+
+                                    onClicked: _delegate.notification.notifyImageClick()
                                 }
                             }
 
                             BusyIndicator {
                                 anchors.centerIn: parent
-                                running: nimage.status !== Image.Ready
+
+                                running: _delegateImage.status !== Image.Ready
                             }
                         }
 
                         ColumnLayout {
                             Layout.fillWidth: true
+
                             spacing: 20
 
                             VclLabel {
                                 Layout.fillWidth: true
-                                text: notification.title
-                                wrapMode: Text.WordWrap
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
+
+                                color: _delegate.notification.textColor
                                 font.bold: true
+                                text: _delegate.notification.title
                                 visible: text !== ""
-                                color: notification.textColor
+                                wrapMode: Text.WordWrap
+
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
                             }
 
                             VclLabel {
                                 Layout.fillWidth: true
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                                text: notification.text
+
+                                color: _delegate.notification.textColor
+                                text: _delegate.notification.text
                                 wrapMode: Text.WordWrap
-                                color: notification.textColor
+
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             }
 
                             RowLayout {
                                 Layout.fillWidth: true
+
                                 spacing: 20
 
                                 Repeater {
-                                    model: notification.buttons
+                                    model: _delegate.notification.buttons
 
                                     VclButton {
-                                        required property string modelData
                                         required property int index
+                                        required property string modelData
 
-                                        id: button
-                                        anchors.verticalCenter: parent.verticalCenter
                                         width: Math.max(75, implicitWidth)
+
                                         text: modelData
-                                        onClicked: notification.notifyButtonClick(index)
+
+                                        onClicked: _delegate.notification.notifyButtonClick(index)
                                     }
                                 }
                             }
                         }
 
                         VclButton {
-                            id: dismissButton
-                            visible: !notification.autoClose && !notification.hasButtons
+                            visible: !_delegate.notification.autoClose && !_delegate.notification.hasButtons
                             text: "Dismiss"
+
                             onClicked: Scrite.notifications.dismissNotification(index)
                         }
                     }

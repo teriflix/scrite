@@ -20,10 +20,10 @@ import "qrc:/qml/globals"
 QtObject {
     id: root
 
-    property string tipName
     property var helpTip: Runtime.helpTips === undefined || tipName === "" ? undefined : Runtime.helpTips[tipName]
     property bool tipShown: Runtime.helpNotificationSettings.isTipShown(tipName)
     property bool enabled: helpTip !== undefined
+    property string tipName
 
     Notification.title: helpTip ? helpTip.title : ""
     Notification.image: helpTip ? helpTip.image.url : ""
