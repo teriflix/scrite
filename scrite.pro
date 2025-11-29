@@ -368,9 +368,12 @@ win32 {
 }
 
 linux {
+    QT += dbus
+
     CONFIG+=use_gold_linker
     VERSION_INFO = "1.9.9-linux"
 
+    HEADERS += src/core/platformtransliterator_linux.h
     SOURCES += src/core/platformtransliterator_linux.cpp
 }
 

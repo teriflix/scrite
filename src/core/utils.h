@@ -69,6 +69,38 @@ public:
 
     Q_INVOKABLE QString toShortcut() const;
     Q_INVOKABLE QKeySequence toKeySequence() const;
+
+    KeyCombinations() { }
+    KeyCombinations(bool _controlModifier, bool _shiftModifier, bool _altModifier,
+                    bool _metaModifier, const QList<int> &_keyCodes, const QStringList &_keys)
+        : controlModifier(_controlModifier)
+        , shiftModifier(_shiftModifier)
+        , altModifier(_altModifier)
+        , metaModifier(_metaModifier)
+        , keyCodes(_keyCodes)
+        , keys(_keys)
+    {
+    }
+    KeyCombinations(const KeyCombinations &other) { *this = other; }
+    KeyCombinations &operator=(const KeyCombinations &other)
+    {
+        this->controlModifier = other.controlModifier;
+        this->shiftModifier = other.shiftModifier;
+        this->altModifier = other.altModifier;
+        this->metaModifier = other.metaModifier;
+        this->keyCodes = other.keyCodes;
+        this->keys = other.keys;
+        return *this;
+    }
+    bool operator==(const KeyCombinations &other) const
+    {
+        return this->controlModifier == other.controlModifier
+                && this->shiftModifier == other.shiftModifier
+                && this->altModifier == other.altModifier
+                && this->metaModifier == other.metaModifier
+                && this->keyCodes == other.keyCodes && this->keys == other.keys;
+    }
+    bool operator!=(const KeyCombinations &other) const { return !(*this == other); }
 };
 
 struct FileInfo
@@ -134,6 +166,9 @@ public:
     // clang-format on
     QString fileName() const { return info.fileName(); }
 
+    FileInfo() { }
+    FileInfo(const FileInfo &other) { *this = other; }
+    FileInfo(const QFileInfo &_fileInfo) : info(_fileInfo) { }
     FileInfo &operator=(const FileInfo &other)
     {
         this->info = other.info;
@@ -162,6 +197,12 @@ public:
     // clang-format on
     QString value;
 
+    ObjectConfigFieldChoice() { }
+    ObjectConfigFieldChoice(const QString &_key, const QString &_value)
+        : key(_key), value(_value)
+    {
+    } 
+    ObjectConfigFieldChoice(const ObjectConfigFieldChoice &other) { *this = other; }
     ObjectConfigFieldChoice &operator=(const ObjectConfigFieldChoice &other)
     {
         this->key = other.key;
@@ -242,6 +283,24 @@ public:
     // clang-format on
     QList<Utils::ObjectConfigFieldChoice> choices;
 
+    ObjectConfigField() { }
+    ObjectConfigField(const ObjectConfigField &other) { *this = other; }
+    ObjectConfigField(const QString &_name, const QString &_label, const QString &_note,
+                      const QString &_editor, const QVariant &_min, const QVariant &_max,
+                      const QVariant &_ideal, const QString &_group, const QString &_feature,
+                      const QList<Utils::ObjectConfigFieldChoice> &_choices)
+        : name(_name)
+        , label(_label)
+        , note(_note)
+        , editor(_editor)
+        , min(_min)
+        , max(_max)
+        , ideal(_ideal)
+        , group(_group)
+        , feature(_feature)
+        , choices(_choices)
+    {
+    }
     ObjectConfigField &operator=(const ObjectConfigField &other)
     {
         this->name = other.name;
@@ -291,6 +350,13 @@ public:
     // clang-format on
     QList<Utils::ObjectConfigField> fields;
 
+    ObjectConfigFieldGroup() { }
+    ObjectConfigFieldGroup(const ObjectConfigFieldGroup &other) { *this = other; }
+    ObjectConfigFieldGroup(const QString &_name, const QString &_description,
+                           const QList<Utils::ObjectConfigField> &_fields)
+        : name(_name), description(_description), fields(_fields)
+    {
+    }
     ObjectConfigFieldGroup &operator=(const ObjectConfigFieldGroup &other)
     {
         this->name = other.name;
@@ -343,6 +409,14 @@ public:
     // clang-format on
     QList<Utils::ObjectConfigFieldGroup> groups;
 
+    ObjectConfig() { }
+    ObjectConfig(const ObjectConfig &other) { *this = other; }
+    ObjectConfig(const QString &_title, const QString &_description,
+                 const QList<Utils::ObjectConfigField> &_fields,
+                 const QList<Utils::ObjectConfigFieldGroup> &_groups)
+        : title(_title), description(_description), fields(_fields), groups(_groups)
+    {
+    }
     ObjectConfig &operator=(const ObjectConfig &other)
     {
         this->title = other.title;

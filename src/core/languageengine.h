@@ -81,6 +81,18 @@ public:
 
     AbstractTransliterationEngine *transliterator() const;
 
+    TransliterationOption() { }
+    TransliterationOption(QObject *_transliteratorObject, int _languageCode, const QString &_id,
+                          const QString &_name, bool _inApp)
+        : transliteratorObject(_transliteratorObject),
+          languageCode(_languageCode),
+          id(_id),
+          name(_name),
+          inApp(_inApp)
+    {
+    }
+    TransliterationOption(const TransliterationOption &other) { *this = other; }
+    ~TransliterationOption() { }
     TransliterationOption &operator=(const TransliterationOption &other)
     {
         this->transliteratorObject = other.transliteratorObject;
@@ -168,6 +180,16 @@ public:
     Q_INVOKABLE TransliterationOption preferredTransliterationOption() const;
     Q_INVOKABLE QList<TransliterationOption> transliterationOptions() const;
 
+    Language() { }
+    Language(int _code, const QKeySequence &_keySequence,
+             const QString &_preferredTransliterationOptionId)
+        : code(_code),
+          keySequence(_keySequence),
+          preferredTransliterationOptionId(_preferredTransliterationOptionId)
+    {
+    }
+    Language(const Language &other) { *this = other; }
+    ~Language() { }
     Language &operator=(const Language &other)
     {
         this->code = other.code;
