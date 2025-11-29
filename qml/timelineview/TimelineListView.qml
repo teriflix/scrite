@@ -102,6 +102,9 @@ ListView {
     move: _moveAndDisplace
     moveDisplaced: _moveAndDisplace
 
+    boundsBehavior: Flickable.StopAtBounds
+    boundsMovement: Flickable.StopAtBounds
+
     preferredHighlightEnd: width*0.6
     preferredHighlightBegin: width*0.2
 
