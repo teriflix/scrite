@@ -303,6 +303,10 @@ Item {
         function on__SearchBarSaysReplaceCurrent(replacementText, searchAgent) {
             _sceneContentEditor.__searchBarSaysReplaceCurrent(replacementText, searchAgent)
         }
+
+        function onZoomLevelChanged() {
+            _sidePanelLoader.__evaluateScreenY()
+        }
     }
 
     onHeightChanged: Qt.callLater(__updateHeightHint)
