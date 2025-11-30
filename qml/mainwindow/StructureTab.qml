@@ -108,16 +108,22 @@ Item {
             id: _row2
 
             SplitView.minimumHeight: 16
-            SplitView.maximumHeight: _private.preferredTimelineHeight * 2
-            SplitView.preferredHeight: _private.preferredTimelineHeight
+            SplitView.maximumHeight: DelayedProperty.value * 2
+            SplitView.preferredHeight: DelayedProperty.value
+
+            DelayedProperty.delay: 1000
+            DelayedProperty.watch: _private.preferredTimelineHeight
 
             TimelineView {
                 id: _timeline
 
+                DelayedProperty.delay: 1000
+                DelayedProperty.watch: _private.minimumTimelineHeight
+
                 anchors.fill: parent
 
                 enabled: Runtime.appFeatures.structure.enabled && visible
-                visible: height > _private.minimumTimelineHeight
+                visible: height > DelayedProperty.value
                 showCursor: Runtime.timelineViewSettings.showCursor && _screenplayEditor.hasFocus
                 showNotesIcon: Runtime.showNotebookInStructure
             }
@@ -146,8 +152,8 @@ Item {
 
         property int currentTab: Runtime.mainWindowTab === Runtime.MainWindowTab.NotebookTab ? Runtime.MainWindowTab.NotebookTab : Runtime.MainWindowTab.StructureTab
 
-        property real minimumTimelineHeight: 70 + _timeline.tracksHeight
-        property real preferredTimelineHeight: 140 + _timeline.tracksHeight
+        property int minimumTimelineHeight: 70 + Math.ceil(_timeline.tracksHeight)
+        property int preferredTimelineHeight: 140 + Math.ceil(_timeline.tracksHeight)
         property color splitViewBackgroundColor: Qt.darker(Runtime.colors.primary.windowColor, 1.1)
 
         Component.onCompleted: restoreLayoutDetails()

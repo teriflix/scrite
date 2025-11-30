@@ -42,8 +42,6 @@ Flickable {
         result.accepted = true
     }
 
-    implicitWidth: _private.model ? (_private.isHorizontalTrack ? 0 : contentWidth ) : 0
-    implicitHeight: _private.model ? (_private.isHorizontalTrack ? contentHeight : 0) : 0
 
     clip: true
     contentX: _private.isHorizontalTrack ? listView.contentX : 0
@@ -296,7 +294,7 @@ Flickable {
         id: _private
 
         property int trackSize: Math.ceil(Runtime.minimumFontMetrics.lineSpacing) + 8
-        property int totalTracksSize: _trackRepeater.count * _private.trackSize
+        property int totalTracksSize: model.trackCount * trackSize
         property bool isHorizontalTrack: listView.orientation === Qt.Horizontal
 
         property rect viewportRect: Qt.rect( visibleArea.xPosition * contentWidth,
@@ -320,6 +318,11 @@ Flickable {
                         return userData.allowedOpenTagsInTracks
                 }
                 return []
+            }
+
+            onModelReset: {
+                root.implicitWidth = _private.isHorizontalTrack ? 0 : trackCount * _private.trackSize
+                root.implicitHeight = _private.isHorizontalTrack ? trackCount * _private.trackSize : 0
             }
         }
 
