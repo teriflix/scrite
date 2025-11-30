@@ -204,6 +204,8 @@ Rectangle {
                     ActionManager {
                         id: _floatingToolBarActions
 
+                        title: "Character Relationship Graph"
+
                         Action {
                             property bool visible: enabled
 
