@@ -99,11 +99,53 @@ Item {
             height: layout.implicitHeight + 40 + header.height
 
             titleBarButtons: null
+            titleBarCloseButtonVisible: false
 
             Connections {
                 target: root
 
                 function onDiscardMessageBoxes() {
+                    Qt.callLater(dialog.close)
+                }
+            }
+
+            ActionHandler {
+                action: dialog.acceptAction
+                enabled: dialog.buttons.length === 1 || (dialog.buttons.indexOf("Yes") >= 0)
+
+                onTriggered: {
+                    const buttonIndex = dialog.buttons.length > 1 ? dialog.buttons.indexOf("Yes") : 0
+                    dialog.buttonClicked(buttons[buttonIndex])
+                    Qt.callLater(dialog.close)
+                }
+            }
+
+            ActionHandler {
+                action: Action {
+                    enabled: ActionHandler.canHandle
+                    shortcut: Gui.shortcut(Qt.Key_N)
+                }
+
+                enabled: dialog.buttons.length > 1 && dialog.buttons.indexOf("No") >= 0
+
+                onTriggered: {
+                    const buttonIndex = dialog.buttons.indexOf("No")
+                    dialog.buttonClicked(buttons[buttonIndex])
+                    Qt.callLater(dialog.close)
+                }
+            }
+
+            ActionHandler {
+                action: Action {
+                    enabled: ActionHandler.canHandle
+                    shortcut: Gui.shortcut(Qt.Key_Escape)
+                }
+
+                enabled: dialog.buttons.length > 1 && dialog.buttons.indexOf("Cancel") >= 0
+
+                onTriggered: {
+                    const buttonIndex = dialog.buttons.indexOf("Cancel")
+                    dialog.buttonClicked(buttons[buttonIndex])
                     Qt.callLater(dialog.close)
                 }
             }
@@ -135,23 +177,11 @@ Item {
                                 required property string index
                                 required property string modelData
 
-                                Component.onCompleted: {
-                                    if(index === 0)
-                                        Qt.callLater(button.forceActiveFocus)
-                                }
-
                                 text: modelData
 
                                 onClicked: {
                                     dialog.buttonClicked(text)
                                     Qt.callLater(dialog.close)
-                                }
-
-                                ActionHandler {
-                                    action: dialog.acceptAction
-                                    enabled: dialog.buttons.length === 1 && button.index === 0
-
-                                    onTriggered: button.clicked()
                                 }
                             }
                         }

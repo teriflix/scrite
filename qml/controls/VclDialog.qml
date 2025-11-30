@@ -74,6 +74,7 @@ Dialog {
 
     readonly property Action acceptAction: Action {
         enabled: ActionHandler.canHandle
+        shortcut: Gui.shortcut(Qt.Key_Return)
     }
 
     // Customise the buttons to show on the tilebar on the right side.
@@ -124,20 +125,6 @@ Dialog {
     bottomInset: 0
 
     contentItem: Item {
-        EventFilter.target: Scrite.app
-        EventFilter.active: root.acceptAction.enabled && _contentItemLoader.item && root.visible
-        EventFilter.events: [EventFilter.KeyPress]
-        EventFilter.onFilter: (object, event, result) => {
-                                  result.filter = false
-                                  result.accepted = false
-
-                                  if(event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                      result.filter = true
-                                      result.accepted = true
-                                      root.acceptAction.trigger()
-                                  }
-                              }
-
         width: root.width
         height: root.height - root.header.height
 
