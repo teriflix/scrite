@@ -280,12 +280,16 @@ Item {
                 ret = fileInfo.baseFileName
                 return ret
             }
-            enabled: true
+            enabled: Scrite.document.fileName !== fileInfo.filePath
 
             icon.color: "transparent"
             icon.source: fileInfo.hasCoverPage ? ImageIcon.url : "qrc:/icons/filetype/document.png"
 
-            onTriggered: OpenFileTask.open(fileInfo.filePath)
+            onTriggered: {
+                SaveFileTask.save( () => {
+                                        OpenFileTask.open(fileInfo.filePath)
+                                    } )
+            }
         }
     }
 
@@ -338,7 +342,9 @@ Item {
             icon.source: index === 0 ? record.poster : Runtime.libraryService.templates.baseUrl + "/" + record.poster
 
             onTriggered: {
-                OpenFromLibraryTask.openTemplateAt(Runtime.libraryService, index)
+                SaveFileTask.save( () => {
+                                      OpenFromLibraryTask.openTemplateAt(Runtime.libraryService, index)
+                                  })
             }
         }
     }
@@ -377,7 +383,9 @@ Item {
             icon.source: Runtime.libraryService.screenplays.baseUrl + "/" + record.poster
 
             onTriggered: {
-                OpenFromLibraryTask.openScreenplayAt(Runtime.libraryService, index)
+                SaveFileTask.save( () => {
+                                      OpenFromLibraryTask.openScreenplayAt(Runtime.libraryService, index)
+                                  })
             }
         }
     }
