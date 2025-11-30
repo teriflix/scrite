@@ -51,6 +51,9 @@ Item {
 
             Layout.fillHeight: true
 
+            canZoomIn: zoomLevel < _private.maximumZoomLevel
+            canZoomOut: zoomLevel > _private.minimumZoomLevel
+
             ToolTipPopup {
                 background: Rectangle {
                     color: Runtime.colors.accent.c500.background

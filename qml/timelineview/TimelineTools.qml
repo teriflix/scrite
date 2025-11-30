@@ -28,6 +28,8 @@ Rectangle {
     id: root
 
     readonly property real preferredHeight: _screenplayTools.height
+    property alias canZoomIn: _zoomIn.enabled
+    property alias canZoomOut: _zoomOut.enabled
 
     signal zoomInRequest()
     signal zoomOutRequest()
@@ -58,6 +60,7 @@ Rectangle {
         }
 
         FlatToolButton {
+            id: _zoomIn
             autoRepeat: true
             iconSource: "qrc:/icons/navigation/zoom_in.png"
             toolTipText: "Increase size of blocks in this view."
@@ -69,20 +72,21 @@ Rectangle {
 
                 onTriggered: root.zoomInRequest()
             }
+        }
+
+        FlatToolButton {
+            id: _zoomOut
+            autoRepeat: true
+            iconSource: "qrc:/icons/navigation/zoom_out.png"
+            toolTipText: "Decrease size of blocks in this view."
+
+            onClicked: root.zoomOutRequest()
 
             ActionHandler {
                 action: ActionHub.timelineOperations.find("zoomOut")
 
                 onTriggered: root.zoomOutRequest()
             }
-        }
-
-        FlatToolButton {
-            autoRepeat: true
-            iconSource: "qrc:/icons/navigation/zoom_out.png"
-            toolTipText: "Decrease size of blocks in this view."
-
-            onClicked: root.zoomOutRequest()
         }
     }
 
