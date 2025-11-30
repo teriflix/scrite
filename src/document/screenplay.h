@@ -979,6 +979,16 @@ struct ScreenplayTrackItem
     Q_GADGET
 
 public:
+    // Must be in the same order as ScreenplayTrack::Kind
+    enum Kind { StoryBeat, SceneKeyword, ScreenplaySequence, Generic };
+    Q_ENUM(Kind)
+
+    // clang-format off
+    Q_PROPERTY(Kind kind
+               MEMBER kind)
+    // clang-format on
+    Kind kind = Generic;
+
     Q_PROPERTY(bool valid READ isValid)
     bool isValid() const { return startIndex >= 0 && endIndex >= startIndex && !name.isEmpty(); }
 
@@ -1007,15 +1017,16 @@ public:
     QColor color;
 
     ScreenplayTrackItem() { }
-    ScreenplayTrackItem(int _startIndex, int _endIndex, const QString &_name,
+    ScreenplayTrackItem(Kind _kind, int _startIndex, int _endIndex, const QString &_name,
                         const QColor &_color = Qt::transparent)
-        : startIndex(_startIndex), endIndex(_endIndex), name(_name), color(_color)
+        : kind(_kind), startIndex(_startIndex), endIndex(_endIndex), name(_name), color(_color)
     {
     }
     ScreenplayTrackItem(const ScreenplayTrackItem &other) { *this = other; }
     bool operator!=(const ScreenplayTrackItem &other) const { return !(*this == other); }
     ScreenplayTrackItem &operator=(const ScreenplayTrackItem &other)
     {
+        this->kind = other.kind;
         this->startIndex = other.startIndex;
         this->endIndex = other.endIndex;
         this->name = other.name;
@@ -1024,8 +1035,9 @@ public:
     }
     bool operator==(const ScreenplayTrackItem &other) const
     {
-        return this->startIndex == other.startIndex && this->endIndex == other.endIndex
-                && this->name == other.name && this->color == other.color;
+        return this->kind == other.kind && this->startIndex == other.startIndex
+                && this->endIndex == other.endIndex && this->name == other.name
+                && this->color == other.color;
     }
 };
 Q_DECLARE_METATYPE(ScreenplayTrackItem)
@@ -1036,8 +1048,18 @@ struct ScreenplayTrack
     Q_GADGET
 
 public:
+    // Must be in the same order as ScreenplayTrackItem::Kind
+    enum Kind { StoryBeats, SceneKeywords, ScreenplaySequences, Generic };
+    Q_ENUM(Kind)
+
     Q_PROPERTY(bool valid READ isValid)
     bool isValid() const { return !name.isEmpty() && !items.isEmpty(); }
+
+    // clang-format off
+    Q_PROPERTY(Kind kind
+               MEMBER kind)
+    // clang-format on
+    Kind kind = Generic;
 
     // clang-format off
     Q_PROPERTY(QString name
@@ -1058,15 +1080,16 @@ public:
     QList<ScreenplayTrackItem> items;
 
     ScreenplayTrack() { }
-    ScreenplayTrack(const QString &_name, const QColor &_color,
+    ScreenplayTrack(Kind _kind, const QString &_name, const QColor &_color,
                     const QList<ScreenplayTrackItem> &_items)
-        : name(_name), color(_color), items(_items)
+        : kind(_kind), name(_name), color(_color), items(_items)
     {
     }
     ScreenplayTrack(const ScreenplayTrack &other) { *this = other; }
     bool operator!=(const ScreenplayTrack &other) const { return !(*this == other); }
     ScreenplayTrack &operator=(const ScreenplayTrack &other)
     {
+        this->kind = other.kind;
         this->name = other.name;
         this->color = other.color;
         this->items = other.items;
@@ -1074,7 +1097,8 @@ public:
     }
     bool operator==(const ScreenplayTrack &other) const
     {
-        return this->name == other.name && this->color == other.color && this->items == other.items;
+        return this->kind == other.kind && this->name == other.name && this->color == other.color
+                && this->items == other.items;
     }
 };
 Q_DECLARE_METATYPE(ScreenplayTrack)
@@ -1164,6 +1188,16 @@ public:
     Q_SIGNAL void stackTrackNameChanged();
 
     // clang-format off
+    Q_PROPERTY(QString keywordsTrackName
+               READ keywordsTrackName
+               WRITE setKeywordsTrackName
+               NOTIFY keywordsTrackNameChanged)
+    // clang-format on
+    void setKeywordsTrackName(const QString &val);
+    QString keywordsTrackName() const { return m_keywordsTrackName; }
+    Q_SIGNAL void keywordsTrackNameChanged();
+
+    // clang-format off
     Q_PROPERTY(int trackCount
                READ trackCount
                NOTIFY trackCountChanged)
@@ -1206,6 +1240,7 @@ private:
     bool m_includeStructureTags = true;
     QStringList m_allowedOpenTags;
     QString m_stackTrackName = QStringLiteral("Sequences");
+    QString m_keywordsTrackName = QStringLiteral("Keywords");
 
     QList<QColor> m_colors;
     ExecLaterTimer m_refreshTimer;

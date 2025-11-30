@@ -3099,7 +3099,7 @@ QHash<int, QByteArray> Screenplay::roleNames() const
 void Screenplay::write(QTextCursor &cursor, const WriteOptions &options) const
 {
     if (options.includeTextNotes || options.includeFormNotes) {
-        auto addSection = [&cursor, options](const QString &sectionName) {
+        auto addSection = [&cursor](const QString &sectionName) {
             QTextBlockFormat sectionBlockFormat;
             sectionBlockFormat.setHeadingLevel(3);
 
@@ -3692,6 +3692,18 @@ void ScreenplayTracks::setStackTrackName(const QString &val)
     emit stackTrackNameChanged();
 }
 
+void ScreenplayTracks::setKeywordsTrackName(const QString &val)
+{
+    if (m_keywordsTrackName == val)
+        return;
+
+    m_keywordsTrackName = val;
+
+    this->refreshLater();
+
+    emit keywordsTrackNameChanged();
+}
+
 void ScreenplayTracks::setColors(const QList<QColor> &val)
 {
     if (m_colors == val)
@@ -3828,7 +3840,7 @@ void ScreenplayTracks::refresh()
     }
 
     const QString slash = QStringLiteral("/");
-    const QString stackTrackId = QStringLiteral("f6b212e7-c94e-42b9-9a44-11a2fc1d2320");
+    const QString sequenceTrackId = QStringLiteral("f6b212e7-c94e-42b9-9a44-11a2fc1d2320");
 
     QMap<QString, QString> stackIdNameMap;
 
@@ -3874,7 +3886,8 @@ void ScreenplayTracks::refresh()
                     if (!stackIdNameMap.contains(stackId))
                         stackIdNameMap[stackId] =
                                 QStringLiteral("#%1").arg(stackIdNameMap.size() + 1);
-                    structureTagsMap[stackTrackId][stackIdNameMap.value(stackId)].append(element);
+                    structureTagsMap[sequenceTrackId][stackIdNameMap.value(stackId)].append(
+                            element);
                 }
             }
         }
@@ -3894,28 +3907,31 @@ void ScreenplayTracks::refresh()
     StructureTagsMap::iterator it = structureTagsMap.begin();
     StructureTagsMap::iterator end = structureTagsMap.end();
     while (it != end) {
-        const QString trackName =
-                it.key() == stackTrackId ? it.key() : Utils::SMath::titleCased(it.key());
+        ScreenplayTrack::Kind trackKind = it.key().isEmpty()
+                ? ScreenplayTrack::SceneKeywords
+                : (it.key() == sequenceTrackId ? ScreenplayTrack::ScreenplaySequences
+                                               : ScreenplayTrack::StoryBeats);
         const TagElementsMap tagElementsMap = it.value();
+        const QString trackName = trackKind == ScreenplayTrack::StoryBeats
+                ? Utils::SMath::titleCased(it.key())
+                : (trackKind == ScreenplayTrack::ScreenplaySequences ? m_stackTrackName
+                                                                     : m_keywordsTrackName);
 
         QList<ScreenplayTrackItem> trackItems;
 
         TagElementsMap::const_iterator it2 = tagElementsMap.begin();
         TagElementsMap::const_iterator end2 = tagElementsMap.end();
         while (it2 != end2) {
-            const QString trackItemName =
-                    trackName.isEmpty() ? it2.key() : Utils::SMath::titleCased(it2.key());
+            const QString trackItemName = trackKind == ScreenplayTrack::SceneKeywords
+                    ? it2.key()
+                    : Utils::SMath::titleCased(it2.key());
 
-            QList<ScreenplayElement *> elements = it2.value();
-            std::sort(elements.begin(), elements.end(),
-                      [](ScreenplayElement *a, ScreenplayElement *b) {
-                          return a->elementIndex() < b->elementIndex();
-                      });
-
+            const QList<ScreenplayElement *> elements = it2.value();
             ScreenplayTrackItem currentTrackItem;
 
-            for (ScreenplayElement *element : qAsConst(elements)) {
-                const ScreenplayTrackItem trackItem(element->elementIndex(),
+            for (ScreenplayElement *element : elements) {
+                const ScreenplayTrackItem trackItem(ScreenplayTrackItem::Kind((int)trackKind),
+                                                    element->elementIndex(),
                                                     element->elementIndex(), trackItemName);
 
                 if (!currentTrackItem.isValid())
@@ -3946,30 +3962,27 @@ void ScreenplayTracks::refresh()
 
         QList<ScreenplayTrack> distinctTracks;
 
-        auto includeTrackItem = [&distinctTracks, trackName](const ScreenplayTrackItem &trackItem) {
+        auto includeTrackItem = [&distinctTracks, trackName,
+                                 trackKind](const ScreenplayTrackItem &newTrackItem) {
             for (ScreenplayTrack &distinctTrack : distinctTracks) {
                 bool intersectionFound = false;
-                for (const ScreenplayTrackItem &distinctTrackItem : qAsConst(distinctTrack.items)) {
-                    const bool trackItemStartsInTheMiddle =
-                            (distinctTrackItem.startIndex <= trackItem.startIndex)
-                            && (trackItem.startIndex <= distinctTrackItem.endIndex);
-                    const bool trackItemEndsInTheMiddle =
-                            (distinctTrackItem.endIndex <= trackItem.endIndex
-                             && trackItem.endIndex <= distinctTrackItem.endIndex);
-                    intersectionFound = (trackItemStartsInTheMiddle || trackItemEndsInTheMiddle);
+                for (const ScreenplayTrackItem &existingTrackItem : qAsConst(distinctTrack.items)) {
+                    intersectionFound = (existingTrackItem.startIndex <= newTrackItem.endIndex)
+                            && (newTrackItem.startIndex <= existingTrackItem.endIndex);
                     if (intersectionFound)
                         break;
                 }
 
                 if (!intersectionFound) {
-                    distinctTrack.items.append(trackItem);
+                    distinctTrack.items.append(newTrackItem);
                     return;
                 }
             }
 
             ScreenplayTrack newDistinctTrack;
+            newDistinctTrack.kind = trackKind;
             newDistinctTrack.name = trackName;
-            newDistinctTrack.items.append(trackItem);
+            newDistinctTrack.items.append(newTrackItem);
 
             distinctTracks.append(newDistinctTrack);
         };
@@ -3984,23 +3997,13 @@ void ScreenplayTracks::refresh()
     }
 
     if (!m_tracks.isEmpty()) {
-        std::sort(m_tracks.begin(), m_tracks.end(),
-                  [](const ScreenplayTrack &a, const ScreenplayTrack &b) {
-                      if (a.name.isEmpty() && !b.name.isEmpty())
-                          return true; // a comes first
-                      if (!a.name.isEmpty() && b.name.isEmpty())
-                          return false; // b comes first
-                      return false;
-                  });
+        std::sort(
+                m_tracks.begin(), m_tracks.end(),
+                [](const ScreenplayTrack &a, const ScreenplayTrack &b) { return a.kind < b.kind; });
 
-        for (int i = 0; i < m_tracks.size(); i++) {
-            if (m_tracks[i].name == stackTrackId) {
-                ScreenplayTrack track = m_tracks.takeAt(i);
-                track.name = m_stackTrackName;
-                m_tracks.append(track);
-                break;
-            }
-        }
+        QMap<QString, QSet<QString>> activeLookupKeys;
+
+        const QMetaEnum trackKindEnum = QMetaEnum::fromType<ScreenplayTrack::Kind>();
 
         // Assign track and item colors
         QColor trackColor = Qt::darkGray;
@@ -4013,14 +4016,21 @@ void ScreenplayTracks::refresh()
 
             for (ScreenplayTrackItem &item : track.items) {
                 const int lightFactor = 100 + 35 * (trackIndex % 4);
-                const QString lookupKind =
-                        track.name.isEmpty() ? QStringLiteral("keywords") : track.name;
+                const QString lookupKind = trackKindEnum.valueToKey(item.kind);
                 const int colorIndex =
                         ScriteDocument::instance()->insertLookupValue(lookupKind, item.name, 0);
+                activeLookupKeys[lookupKind] += item.name;
                 item.color = m_colors.at(colorIndex % m_colors.size());
                 if (lightFactor > 100)
                     item.color = item.color.lighter(lightFactor);
             }
+        }
+
+        auto it = activeLookupKeys.constBegin();
+        auto end = activeLookupKeys.constEnd();
+        while (it != end) {
+            ScriteDocument::instance()->pruneLookupValues(it.key(), it.value().values());
+            ++it;
         }
     }
 

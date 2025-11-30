@@ -99,7 +99,7 @@ Flickable {
 
                     function maybeTooltip() {
                         if(containsMouse) {
-                            _toolTip.set(mouseX, mouseY, _track.name, _trackMouseArea)
+                            _toolTip.set(mouseX, mouseY, _track.name + " Track", _trackMouseArea)
                         } else if(_toolTip.source === _trackMouseArea) {
                             _toolTip.unset(_trackMouseArea)
                         }
@@ -161,7 +161,7 @@ Flickable {
                         color: Runtime.colors.tint(modelData.color, Runtime.colors.screenplayTracksTint)
                         visible: GMath.doRectanglesIntersect(itemRect, _private.viewportRect)
 
-                        border.color: Qt.darker(modelData.color, 1.1)
+                        border.color: Qt.darker(modelData.color, 1.2)
                         border.width: 0.5
 
                         VclLabel {
