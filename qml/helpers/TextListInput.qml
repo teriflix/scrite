@@ -131,8 +131,10 @@ Flow {
             onClicked: root.textClicked(modelData, _text)
 
             onCloseRequest: {
-                if(!root.readOnly)
+                if(!root.readOnly) {
+                    _newInputLoader.active = false
                     root.textCloseRequest(modelData, _text)
+                }
             }
 
             function configure() {
