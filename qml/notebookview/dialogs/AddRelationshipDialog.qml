@@ -174,8 +174,16 @@ DialogLauncher {
 
                 VclButton {
                     Layout.alignment: Qt.AlignRight
+
                     text: "Create Relationships"
+
                     onClicked: createRelationshipsJob.start()
+
+                    ActionHandler {
+                        action: dialog.acceptAction
+
+                        onTriggered: parent.clicked()
+                    }
                 }
             }
 
