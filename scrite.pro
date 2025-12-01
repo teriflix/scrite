@@ -368,9 +368,6 @@ win32 {
 }
 
 linux {
-    QMAKE_CXXFLAGS += $$SYSTEM_INCLUDE_BUS
-    LIBS += $$SYSTEM_LIBS_BUS
-
     CONFIG+=use_gold_linker
     VERSION_INFO = "1.9.10-linux"
 
