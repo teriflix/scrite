@@ -1497,6 +1497,7 @@ Item {
                         highlightMoveDuration: 0
                         highlightResizeDuration: 0
 
+                        clip: true
                         currentIndex: -1
 
                         delegate: VclText {
