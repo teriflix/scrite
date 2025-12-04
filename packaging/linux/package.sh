@@ -8,6 +8,10 @@ cp ../../../../Release/Scrite ./bin/
 mkdir lib
 cp /usr/lib/x86_64-linux-gnu/libssl.so.1.1 ./lib
 cp /usr/lib/x86_64-linux-gnu/libcrypto.so.1.1 ./lib
+cp -L /usr/lib/x86_64-linux-gnu/libibus-1.0.so ./lib
+cp -L /usr/lib/x86_64-linux-gnu/libgio-2.0.so ./lib
+cp -L /usr/lib/x86_64-linux-gnu/libgobject-2.0.so ./lib
+cp -L /usr/lib/x86_64-linux-gnu/libglib-2.0.so ./lib
 chmod a-x ./lib/*.so*
 mkdir -p share/applications
 cp ../Scrite.desktop share/applications/Scrite.desktop

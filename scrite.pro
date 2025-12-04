@@ -368,12 +368,13 @@ win32 {
 }
 
 linux {
-    QMAKE_CXXFLAGS += $$SYSTEM_INCLUDE_BUS
-    LIBS += $$SYSTEM_LIBS_BUS
+    CONFIG += link_pkgconfig
+    PKGCONFIG += ibus-1.0
 
     CONFIG+=use_gold_linker
     VERSION_INFO = "1.9.10-linux"
 
+    HEADERS += src/core/platformtransliterator_linux.h
     SOURCES += src/core/platformtransliterator_linux.cpp
 }
 

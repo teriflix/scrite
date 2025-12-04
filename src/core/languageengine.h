@@ -321,6 +321,9 @@ signals:
     void languageShortcutChanged(int code);
     void languageTransliteratorChanged(int code);
 
+protected:
+    bool eventFilter(QObject *object, QEvent *event);
+
 private:
     explicit SupportedLanguages(QObject *parent = nullptr);
 
@@ -334,6 +337,7 @@ private:
 
     void onDataChanged(const QModelIndex &start, const QModelIndex &end);
     void verifyActiveLanguage();
+    void ensureActiveLanguage();
 
 private:
     friend class LanguageEngine;
