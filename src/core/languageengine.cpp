@@ -566,6 +566,8 @@ SupportedLanguages::SupportedLanguages(QObject *parent) : AbstractLanguagesModel
     connect(this, &SupportedLanguages::rowsMoved, this, &SupportedLanguages::verifyActiveLanguage);
     connect(this, &SupportedLanguages::modelReset, this, &SupportedLanguages::verifyActiveLanguage);
     connect(this, &SupportedLanguages::dataChanged, this, &SupportedLanguages::onDataChanged);
+
+    qApp->installEventFilter(this);
 }
 
 SupportedLanguages::~SupportedLanguages() { }
@@ -746,6 +748,16 @@ bool SupportedLanguages::resetLanguageTranslator(int code)
     emit languageTransliteratorChanged(code);
 
     return true;
+}
+
+bool SupportedLanguages::eventFilter(QObject *object, QEvent *event)
+{
+    if (object == qApp && event->type() == QEvent::ApplicationStateChange) {
+        if (qApp->applicationState() == Qt::ApplicationActive)
+            QTimer::singleShot(500, this, &SupportedLanguages::ensureActiveLanguage);
+    }
+
+    return false;
 }
 
 void SupportedLanguages::loadBuiltInLanguages()
@@ -948,6 +960,20 @@ void SupportedLanguages::verifyActiveLanguage()
     }
 
     emit activeLanguageRowChanged(); // even if its not required, its safe to emit this.
+}
+
+void SupportedLanguages::ensureActiveLanguage()
+{
+    Language language = this->findLanguage(m_activeLanguageCode);
+    if (language.isValid()) {
+        const TransliterationOption option = language.preferredTransliterationOption();
+        if (option.isValid()) {
+            AbstractTransliterationEngine *engine =
+                    qobject_cast<AbstractTransliterationEngine *>(option.transliteratorObject);
+            if (engine)
+                engine->activate(option);
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

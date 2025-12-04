@@ -64,3 +64,19 @@ For running the package scripts, you will need imagemagick and linuxdeployqt
 
 > sudo apt install imagemagick
 > wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+
+Language support on Linux requirres IBUS.
+
+> sudo apt install ibus ibus-m17n libibus-1.0-dev
+
+Additionally, ensure that ibus daemon is running and that you setup languages using
+
+> ibus-setup
+
+You may also need to include the following lines into environment variables.
+
+export GTK_IM_MODULE=ibus
+export XMODIFIERS=@im=ibus
+export QT_IM_MODULE=ibus
+export XIM_PROGRAM="/usr/bin/ibus-daemon -drx"
+
