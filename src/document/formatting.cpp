@@ -2739,14 +2739,16 @@ int SceneDocumentBinder::paste(int fromPosition)
         if (i > 0)
             cursor.insertBlock(QTextBlockFormat(), QTextCharFormat());
 
-        const int bstart = cursor.position();
+        const int pasteStart = cursor.position();
         cursor.insertText(paragraph.text);
+        const int pasteEnd = cursor.position();
 
         if (!paragraph.formats.isEmpty()) {
-            cursor.setPosition(bstart);
+            cursor.setPosition(pasteStart);
             for (const QTextLayout::FormatRange &format : paragraph.formats) {
-                cursor.setPosition(bstart + format.start);
-                cursor.setPosition(bstart + format.start + format.length, QTextCursor::KeepAnchor);
+                cursor.setPosition(pasteStart + format.start);
+                cursor.setPosition(pasteStart + format.start + format.length,
+                                   QTextCursor::KeepAnchor);
                 cursor.setCharFormat(format.format);
                 cursor.clearSelection();
             }
@@ -2775,7 +2777,7 @@ int SceneDocumentBinder::paste(int fromPosition)
             }
         }
 
-        cursor.movePosition(QTextCursor::EndOfBlock);
+        cursor.setPosition(pasteEnd);
     }
 
     m_sceneElementTaskTimer.stop();
