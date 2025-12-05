@@ -373,7 +373,7 @@ Item {
 
     // App-wide font-metrics
     readonly property FontMetrics minimumFontMetrics: FontMetrics {
-        font.pointSize: Math.min(Scrite.app.idealFontPointSize-2, 12)
+        font.pointSize: idealFontMetrics.font.pointSize-2
     }
 
     readonly property FontMetrics idealFontMetrics: FontMetrics {
@@ -381,7 +381,7 @@ Item {
     }
 
     readonly property FontMetrics shortcutFontMetrics: FontMetrics {
-        font.pointSize: Scrite.app.idealFontPointSize
+        font.pointSize: idealFontMetrics.font.pointSize
         font.family: {
             // We need ZERO and the letter O to be rendered distinctly
             // We also need small-L and capital-I and digit-1 to look disctinct.

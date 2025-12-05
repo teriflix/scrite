@@ -342,7 +342,7 @@ Item {
 
             text: propertyValue
             font.family: propertyValue
-            font.pointSize: Scrite.app.idealFontPointSize
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
             contentItem: VclLabel {
                 text: fontFamilyButton.text

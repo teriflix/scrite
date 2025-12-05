@@ -268,7 +268,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                         font.family: _private.pageSetupSettings.watermarkFont
-                        font.pointSize: Scrite.app.idealFontPointSize
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     }
 
                     onClicked: FontSelectionDialog.launchWithTitle("Select watermark font", (family) => {
