@@ -455,7 +455,6 @@ AbstractScenePartEditor {
     QtObject {
         id: _private
 
-        readonly property Action showCursor: ActionHub.editOptions.find("showCursor")
         readonly property Action scrollNextScene: ActionHub.editOptions.find("scrollNextScene")
         readonly property Action scrollPreviousScene: ActionHub.editOptions.find("scrollPreviousScene")
         readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition")
@@ -573,7 +572,7 @@ AbstractScenePartEditor {
         function ensureSceneTextEditorCursorIsCentered() {
             if(_sceneTextEditor.activeFocus) {
                 root.ensureCentered(_sceneTextEditor, _sceneTextEditor.cursorRectangle)
-                Qt.callLater(showCursor.trigger)
+                _sceneTextEditor.highlightCursor()
             }
         }
 
@@ -584,7 +583,7 @@ AbstractScenePartEditor {
             if(_sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus) {
                 _sceneDocumentBinder.copy(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
                 _sceneTextEditor.remove(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
-                _sceneTextEditor.highlightCursor()
+                Qt.callLater(_private.ensureSceneTextEditorCursorIsCentered)
             }
         }
 
@@ -607,11 +606,12 @@ AbstractScenePartEditor {
                 const cursorPositionAfterPaste = _sceneDocumentBinder.paste(_sceneTextEditor.cursorPosition)
                 if(cursorPositionAfterPaste < 0) {
                     _sceneTextEditor.paste()
-                    _sceneTextEditor.highlightCursor()
                 } else {
                     _sceneTextEditor.cursorPosition = 0
                     placeCursorAt(cursorPositionAfterPaste)
                 }
+
+                Qt.callLater(_private.ensureSceneTextEditorCursorIsCentered)
             }
         }
 
