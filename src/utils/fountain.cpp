@@ -1030,6 +1030,7 @@ QString Fountain::Writer::toString() const
 
     static const QRegularExpression multipleNewlines("\\n{3,}");
     ret = ret.replace(multipleNewlines, "\n\n");
+    ret = ret.trimmed();
 
     return ret;
 }
