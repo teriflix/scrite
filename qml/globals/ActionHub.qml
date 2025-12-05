@@ -141,6 +141,59 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool allowShortcut: true
+            readonly property var keywords: ["protect", "lock", "unlock", "collaborat"]
+            property string tooltip: {
+                if(Scrite.document.readOnly)
+                    return "Cannot lock/unlock for editing on this computer."
+                if(Scrite.user.loggedIn)
+                    return Scrite.document.hasCollaborators ? "Add/Remove collaborators who can view & edit this document." : "Protect this document so that you and select collaborators can view/edit it."
+                return Scrite.document.locked ? "Unlock to allow editing on this and other computers." : "Lock to allow editing of this document only on this computer."
+            }
+
+            objectName: "shield"
+            text: {
+                if(Scrite.document.readOnly)
+                    return "Lock/Unlock"
+                if(Scrite.user.loggedIn)
+                    return Scrite.document.hasCollaborators ? "Add/Remove Collaborators" : "Protect Document"
+                return Scrite.document.locked ? "Unlock" : "Lock"
+            }
+
+            enabled: Runtime.allowAppUsage && !Scrite.document.readOnly
+
+            icon.source: {
+                if(Scrite.document.readOnly)
+                    return "qrc:/icons/action/lock_outline.png"
+                if(Scrite.user.loggedIn)
+                    return Scrite.document.hasCollaborators ? "qrc:/icons/file/protected.png" : "qrc:/icons/file/unprotected.png"
+                return Scrite.document.locked ? "qrc:/icons/action/lock_outline.png" : "qrc:/icons/action/lock_open.png"
+            }
+
+            onTriggered: (source) => {
+                if(Scrite.user.loggedIn) {
+                    CollaboratorsDialog.launch()
+                } else {
+                    toggleLock()
+                }
+            }
+
+            function toggleLock() {
+                const locked = !Scrite.document.locked
+                Scrite.document.locked = locked
+
+                let message = ""
+                if(locked)
+                    message = "Document LOCKED. You will be able to edit it only on this computer."
+                else
+                    message = "Document unlocked. You will be able to edit it on this and any other computer."
+
+                MessageBox.information("Document Lock Status", message)
+            }
+        }
+
+        Action {
+            readonly property bool visible: false
             readonly property string defaultShortcut: "Ctrl+Shift+O"
 
             enabled: Runtime.allowAppUsage

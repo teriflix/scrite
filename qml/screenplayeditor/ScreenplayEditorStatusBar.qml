@@ -87,44 +87,13 @@ Rectangle {
         spacing: 6
 
         IconButton {
+            readonly property Action shieldAction: ActionHub.fileOperations.find("shield")
+
             enabled: !Scrite.document.readOnly
-            visible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
+            tooltipText: shieldAction.tooltip
+            source: shieldAction.icon.source
 
-            tooltipText: {
-                if(Scrite.document.readOnly)
-                    return "Cannot lock/unlock for editing on this computer."
-                if(Scrite.user.loggedIn)
-                    return Scrite.document.hasCollaborators ? "Add/Remove collaborators who can view & edit this document." : "Protect this document so that you and select collaborators can view/edit it."
-                return Scrite.document.locked ? "Unlock to allow editing on this and other computers." : "Lock to allow editing of this document only on this computer."
-            }
-
-            source: {
-                if(Scrite.document.readOnly)
-                    return "qrc:/icons/action/lock_outline.png"
-                if(Scrite.user.loggedIn)
-                    return Scrite.document.hasCollaborators ? "qrc:/icons/file/protected.png" : "qrc:/icons/file/unprotected.png"
-                return Scrite.document.locked ? "qrc:/icons/action/lock_outline.png" : "qrc:/icons/action/lock_open.png"
-            }
-
-            onClicked: {
-                if(Scrite.user.loggedIn)
-                    CollaboratorsDialog.launch()
-                else
-                    toggleLock()
-            }
-
-            function toggleLock() {
-                var locked = !Scrite.document.locked
-                Scrite.document.locked = locked
-
-                var message = ""
-                if(locked)
-                    message = "Document LOCKED. You will be able to edit it only on this computer."
-                else
-                    message = "Document unlocked. You will be able to edit it on this and any other computer."
-
-                MessageBox.information("Document Lock Status", message)
-            }
+            onClicked: shieldAction.trigger()
         }
 
         IconButton {
