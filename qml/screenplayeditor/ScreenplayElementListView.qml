@@ -395,6 +395,12 @@ ListView {
                                     _private.ensureVisible(item, area)
                              }
 
+            onEnsureCentered: (item, area) => {
+                                  if(!_private.scrolling && !_private.modelCurrentIndexChangedInternally && _private.currentIndex === index) {
+                                      _private.ensureCentered(item, area)
+                                  }
+                              }
+
             onSplitSceneRequest: (paragraph, cursorPosition) => {
                                      if(root.screenplayAdapter.isSourceScreenplay) {
                                          root.screenplayAdapter.splitElement(screenplayElement, paragraph, cursorPosition)
@@ -577,6 +583,14 @@ ListView {
                 root.contentY = Math.round(pt.y)
             else
                 root.contentY = Math.round((pt.y + 2*rect.height) - root.height)
+        }
+
+        function ensureCentered(item, rect) {
+            if (item === null || rect === undefined)
+                return;
+
+            const pt = item.mapToItem(root.contentItem, rect.x, rect.y);
+            root.contentY = Math.round(pt.y - (root.height - rect.height) / 2);
         }
 
         function jumpToNextScene() {

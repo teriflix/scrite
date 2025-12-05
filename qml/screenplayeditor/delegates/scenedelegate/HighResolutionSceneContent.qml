@@ -201,6 +201,7 @@ Item {
                 }
 
                 onEnsureVisible: (item, area) => { sceneDelegate.ensureVisible(item, area) }
+                onEnsureCentered: (item, area) => { sceneDelegate.ensureCentered(item, area) }
 
                 onSplitSceneRequest: (paragraph, cursorPosition) => { sceneDelegate.splitSceneRequest(paragraph, cursorPosition) }
                 onMergeWithPreviousSceneRequest: () => { sceneDelegate.mergeWithPreviousSceneRequest() }

@@ -37,6 +37,7 @@ AbstractScenePartEditor {
 
     signal splitSceneRequest(SceneElement paragraph, int cursorPosition)
     signal mergeWithPreviousSceneRequest()
+    signal ensureCentered(Item item, rect area)
 
     height: _sceneTextEditor.height
 
@@ -113,6 +114,13 @@ AbstractScenePartEditor {
             id: _cursor
 
             textEdit: _sceneTextEditor
+
+            ActionHandler {
+                action: ActionHub.editOptions.find("showCursor")
+                enabled: _sceneTextEditor.activeFocus
+
+                onTriggered: (source) => { _cursor.highlight() }
+            }
 
             SpecialSymbolsSupport {
                 anchors.top: parent.bottom
@@ -432,6 +440,10 @@ AbstractScenePartEditor {
                 _private.cursorPositionBeforeSceneReset = -1
             }
         }
+
+        function onSceneReset() {
+            Runtime.execLater(_private, Runtime.stdAnimationDuration, _private.ensureSceneTextEditorCursorIsCentered)
+        }
     }
 
     // Signal handlers
@@ -443,6 +455,7 @@ AbstractScenePartEditor {
     QtObject {
         id: _private
 
+        readonly property Action showCursor: ActionHub.editOptions.find("showCursor")
         readonly property Action scrollNextScene: ActionHub.editOptions.find("scrollNextScene")
         readonly property Action scrollPreviousScene: ActionHub.editOptions.find("scrollPreviousScene")
         readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition")
@@ -553,7 +566,15 @@ AbstractScenePartEditor {
         }
 
         function ensureSceneTextEditorCursorIsVisible() {
-            root.ensureVisible(_sceneTextEditor, _sceneTextEditor.cursorRectangle)
+            if(_sceneTextEditor.activeFocus)
+                root.ensureVisible(_sceneTextEditor, _sceneTextEditor.cursorRectangle)
+        }
+
+        function ensureSceneTextEditorCursorIsCentered() {
+            if(_sceneTextEditor.activeFocus) {
+                root.ensureCentered(_sceneTextEditor, _sceneTextEditor.cursorRectangle)
+                Qt.callLater(showCursor.trigger)
+            }
         }
 
         function cut() {

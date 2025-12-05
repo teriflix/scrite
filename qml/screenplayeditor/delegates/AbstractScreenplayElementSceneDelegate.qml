@@ -28,4 +28,5 @@ AbstractScreenplayElementDelegate {
 
     signal splitSceneRequest(SceneElement paragraph, int cursorPosition)
     signal mergeWithPreviousSceneRequest()
+    signal ensureCentered(Item item, rect area)
 }

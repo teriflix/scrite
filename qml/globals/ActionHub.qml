@@ -811,6 +811,13 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
+            enabled: ActionHandler.canHandle
+            objectName: "showCursor"
+        }
+
+        Action {
             readonly property bool visible: false
             readonly property string defaultShortcut: "F3"
 
