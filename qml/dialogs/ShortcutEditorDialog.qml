@@ -31,17 +31,23 @@ DialogLauncher {
 
     parent: Scrite.window.contentItem
 
-    function launch() { return doLaunch() }
+    function launch(lookup) { return doLaunch({"lookup": lookup}) }
 
     name: "ShortcutEditorDialog"
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
+        id: _dialog
+
+        property string lookup
+
         width: Math.min(Scrite.window.width-80, 800)
         height: Math.min(Scrite.window.height-80, 750)
 
         title: "Shortcuts"
 
-        content: ApplicationShortcutsPage { }
+        content: ApplicationShortcutsPage {
+            lookup: _dialog.lookup
+        }
     }
 }

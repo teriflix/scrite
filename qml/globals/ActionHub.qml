@@ -147,7 +147,7 @@ Item {
                 if(Scrite.document.readOnly)
                     return "Cannot lock/unlock for editing on this computer."
                 if(Scrite.user.loggedIn)
-                    return Scrite.document.hasCollaborators ? "Add/Remove collaborators who can view & edit this document." : "Protect this document so that you and select collaborators can view/edit it."
+                    return Scrite.document.hasCollaborators ? "Add/Remove collaborators who can view & edit this document." : "Protect this document so that you and select collaborators who can view/edit it."
                 return Scrite.document.locked ? "Unlock to allow editing on this and other computers." : "Lock to allow editing of this document only on this computer."
             }
 

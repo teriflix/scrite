@@ -27,8 +27,17 @@ FocusScope {
     id: root
 
     property real availableHeight: 500
+    property alias lookup: _filterText.text
 
-    Component.onCompleted: forceActiveFocus()
+    Component.onCompleted: {
+        forceActiveFocus()
+        if(_filterText.text !== "") {
+            _actionsModel.filter()
+            if(_actionsView.count === 1) {
+                _actionsView.itemAtIndex(0).editShortcut()
+            }
+        }
+    }
 
     height: availableHeight
 
@@ -164,27 +173,56 @@ FocusScope {
                         width: parent.width
 
                         Image {
+                            Layout.alignment: _descriptionLabel.visible ? Qt.AlignTop : Qt.AlignVCenter
+                            Layout.topMargin: _descriptionLabel.visible ? 10 : 0
                             Layout.leftMargin: 12
-                            Layout.preferredHeight: _name.height * 0.55
-                            Layout.preferredWidth: _name.height * 0.55
+                            Layout.preferredHeight: _nameLabel.height * 0.5
+                            Layout.preferredWidth: _nameLabel.height * 0.5
 
                             fillMode: Image.PreserveAspectFit
                             source: qmlAction.icon.source !== "" ? qmlAction.icon.source : "qrc:/icons/content/blank.png"
                         }
 
-                        VclLabel {
-                            id: _name
-
+                        ColumnLayout {
+                            Layout.alignment: _descriptionLabel.visible ? Qt.AlignTop : Qt.AlignVCenter
                             Layout.fillWidth: true
 
-                            text: qmlAction.text
-                            elide: Text.ElideRight
-                            padding: 10
+                            spacing: 0
+
+                            VclLabel {
+                                id: _nameLabel
+
+                                Layout.fillWidth: true
+
+                                elide: Text.ElideRight
+                                font: Runtime.idealFontMetrics.font
+                                padding: 10
+                                bottomPadding: _descriptionLabel.visible ? 2 : 10
+                                text: qmlAction.text + (qmlAction.checkable & qmlAction.checked ? " ✔" : "")
+                            }
+
+                            VclLabel {
+                                id: _descriptionLabel
+
+                                Layout.fillWidth: true
+                                Layout.leftMargin: 10
+                                Layout.rightMargin: 10
+                                Layout.bottomMargin: 10
+
+                                elide: Text.ElideRight
+                                maximumLineCount: 3
+                                wrapMode: Text.WordWrap
+                                font: Runtime.minimumFontMetrics.font
+                                text: qmlAction.tooltip !== undefined ? qmlAction.tooltip.trim() : ""
+                                visible: text !== ""
+                            }
                         }
 
                         ShortcutField {
                             id: _shortcutField
 
+                            Layout.alignment: Qt.AlignTop
+                            Layout.topMargin: 10
                             Layout.preferredWidth: _delegateLayout.width * 0.3
 
                             enabled: shortcutIsEditable
@@ -238,13 +276,27 @@ FocusScope {
         customFilterMode: true
 
         onFilterRequest: (qmlAction, actionManager, result) => {
-            if(_filterText.length === 0)
-                result.value = true
-            else {
-                const text = (actionManager.title + ": " + qmlAction.text).toLowerCase()
-                result.value = (text.indexOf(_filterText.text.toLowerCase()) >= 0)
-            }
-        }
+                             if(_filterText.length === 0) {
+                                 result.value = true
+                             } else {
+                                 const givenText = _filterText.text.toLowerCase()
+
+                                 let text = (actionManager.title + ": " + qmlAction.text)
+                                 if(qmlAction.keywords !== undefined) {
+                                     if(typeof qmlAction.keywords === "string")
+                                     text += ", " + qmlAction.keywords
+                                     else if(qmlAction.keywords.length > 0)
+                                     text += ", " + qmlAction.keywords.join(", ")
+                                 }
+                                 if(qmlAction.tooltip !== undefined) {
+                                     text += ", " + qmlAction.tooltip
+                                 }
+
+                                 text = text.toLowerCase()
+
+                                 result.value = (text.indexOf(givenText) >= 0)
+                             }
+                         }
 
         onModelReset: Qt.callLater(_actionsView.resetCurrentItem)
         onRowsRemoved: Qt.callLater(_actionsView.resetCurrentItem)

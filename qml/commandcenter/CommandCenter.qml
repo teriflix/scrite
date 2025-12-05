@@ -151,7 +151,7 @@ Popup {
                         }
 
                         ColumnLayout {
-                            Layout.alignment: Qt.AlignTop
+                            Layout.alignment: _descriptionLabel.visible ? Qt.AlignTop : Qt.AlignVCenter
                             Layout.fillWidth: true
 
                             spacing: 0
@@ -186,17 +186,19 @@ Popup {
                         }
 
                         Link {
+                            property string nativeShortcut: Gui.nativeShortcut(qmlAction.shortcut)
+
                             Layout.alignment: Qt.AlignTop
                             Layout.topMargin: 10
                             Layout.preferredWidth: _delegateLayout.width * 0.2
 
                             enabled: shortcutIsEditable
                             font: Runtime.idealFontMetrics.font
-                            text: Gui.nativeShortcut(qmlAction.shortcut)
+                            text: nativeShortcut === "" ? "Set Shortcut" : nativeShortcut
                             elide: Text.ElideMiddle
 
                             onClicked: {
-                                ShortcutEditorDialog.launch()
+                                ShortcutEditorDialog.launch(actionManager.title + ": " + qmlAction.text)
                             }
                         }
                     }
@@ -238,9 +240,9 @@ Popup {
             customFilterMode: true
 
             onFilterRequest: (qmlAction, actionManager, result) => {
-                if(_commandText.length === 0)
-                result.value = true
-                else {
+                if(_commandText.length === 0) {
+                    result.value = true
+                } else {
                     const givenText = _commandText.text.toLowerCase()
 
                     let text = (actionManager.title + ": " + qmlAction.text)
