@@ -13,6 +13,7 @@
 
 import QtQml 2.15
 import QtQuick 2.15
+import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
@@ -24,6 +25,7 @@ AbstractScreenplayElementDelegate {
 
     required property bool showSceneComments
     required property real spaceAvailableForScenePanel
+    required property Action ensureCursorCenteredAction
     required property ListView listView // This must be the list-view in which the delegate is placed.
 
     signal splitSceneRequest(SceneElement paragraph, int cursorPosition)

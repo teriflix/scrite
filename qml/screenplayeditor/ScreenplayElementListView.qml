@@ -203,6 +203,7 @@ ListView {
         id: _private
 
         readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition")
+        readonly property Action ensureCursorCentered: Action { }
 
         property int currentIndex: root.screenplayAdapter ? root.screenplayAdapter.currentIndex : -1
         property int currentParagraphType: currentDelegate ? currentDelegate.currentParagraphType : -1
@@ -375,6 +376,7 @@ ListView {
             pageMargins: root.pageMargins
             screenplayAdapter: root.screenplayAdapter
             showSceneComments: root.showSceneComments
+            ensureCursorCenteredAction: _private.ensureCursorCentered
             spaceAvailableForScenePanel: root.spaceAvailableOnTheRight + root.spaceAvailableOnTheLeft
 
             index: delegateLoader.index
@@ -402,19 +404,11 @@ ListView {
                               }
 
             onSplitSceneRequest: (paragraph, cursorPosition) => {
-                                     if(root.screenplayAdapter.isSourceScreenplay) {
-                                         root.screenplayAdapter.splitElement(screenplayElement, paragraph, cursorPosition)
-                                     } else {
-                                         MessageBox.information("Split Scene", "Scenes can be split only while editing the entire screenplay.")
-                                     }
+                                     Qt.callLater(_private.splitScene, screenplayElement, paragraph, cursorPosition)
                                  }
 
             onMergeWithPreviousSceneRequest: () => {
-                                                 if(root.screenplayAdapter.isSourceScreenplay) {
-                                                     root.screenplayAdapter.mergeElementWithPrevious(screenplayElement)
-                                                 } else {
-                                                     MessageBox.information("Merge Scene", "Scenes can be merged only while editing the entire screenplay.")
-                                                 }
+                                                 Qt.callLater(_private.mergeWithPreviousScene, screenplayElement)
                                              }
         }
 
@@ -480,6 +474,25 @@ ListView {
             case "invervalBreak": return intervalBreakDelegate;
             }
             return null
+        }
+
+        function splitScene(screenplayElement, paragraph, cursorPosition) {
+            if(root.screenplayAdapter.isSourceScreenplay) {
+                root.screenplayAdapter.splitElement(screenplayElement, paragraph, cursorPosition)
+                Qt.callLater(_private.ensureCursorCentered.trigger)
+            } else {
+                MessageBox.information("Split Scene", "Scenes can be split only while editing the entire screenplay.")
+            }
+        }
+
+        function mergeWithPreviousScene(screenplayElement) {
+            if(root.screenplayAdapter.isSourceScreenplay) {
+                const newElement = root.screenplayAdapter.mergeElementWithPrevious(screenplayElement)
+                _private.focusCursorPosition.set(root.screenplayAdapter.currentIndex, newElement.scene.cursorPosition)
+                Runtime.execLater(_private, Runtime.stdAnimationDuration/2, _private.ensureCursorCentered.trigger)
+            } else {
+                MessageBox.information("Merge Scene", "Scenes can be merged only while editing the entire screenplay.")
+            }
         }
 
         function isVisible(index) {

@@ -194,6 +194,7 @@ Item {
                 fontMetrics: sceneDelegate.fontMetrics
                 pageMargins: sceneDelegate.pageMargins
                 screenplayAdapter: sceneDelegate.screenplayAdapter
+                ensureCursorCenteredAction: sceneDelegate.ensureCursorCenteredAction
 
                 onHasFocusChanged: {
                     if(hasFocus)

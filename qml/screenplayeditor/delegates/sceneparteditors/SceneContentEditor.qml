@@ -31,6 +31,7 @@ import "qrc:/qml/screenplayeditor/delegates/sceneparteditors/helpers"
 AbstractScenePartEditor {
     id: root
 
+    required property Action ensureCursorCenteredAction
     readonly property TextArea editor: _sceneTextEditor
 
     readonly property alias currentParagraphType: _private.currentParagraphType
@@ -120,6 +121,13 @@ AbstractScenePartEditor {
                 enabled: _sceneTextEditor.activeFocus
 
                 onTriggered: (source) => { _cursor.highlight() }
+            }
+
+            ActionHandler {
+                action: root.ensureCursorCenteredAction
+                enabled: _sceneTextEditor.activeFocus
+
+                onTriggered: (source) => { root.ensureCentered(_sceneTextEditor, _sceneTextEditor.cursorRectangle) }
             }
 
             SpecialSymbolsSupport {
