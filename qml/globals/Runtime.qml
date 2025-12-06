@@ -225,10 +225,10 @@ Item {
     }
 
     readonly property Settings sceneListPanelSettings: Settings {
-        property bool showTooltip: false
+        property bool showTooltip: true
 
         property bool displayTracks: true
-        property string displaySceneLength: "NO" // can be PAGE, TIME
+        property string displaySceneLength: "TIME" // can be NO, PAGE, TIME
         property string sceneTextMode: "HEADING" // can be SUMMARY also
 
         category: "Scene List Panel"
