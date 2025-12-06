@@ -168,7 +168,7 @@ Item {
         property bool highlightCurrentLine: true
         property bool includeTitlePageInPreview: true
         property bool longSceneWarningEnabled: true
-        property bool markupToolsDockVisible: true
+        property bool markupToolsDockVisible: false
         property bool optimiseScrolling: false
         property bool pasteAfterResolvingEmphasis: true
         property bool pasteAsFountain: true
