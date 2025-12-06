@@ -156,19 +156,21 @@ Popup {
 
                             spacing: 0
 
-                            VclLabel {
+                            VclText {
                                 id: _nameLabel
 
                                 Layout.fillWidth: true
 
+                                bottomPadding: _descriptionLabel.visible ? 2 : 10
+                                padding: 10
+
+                                color: Runtime.colors.primary.regular.text
                                 elide: Text.ElideRight
                                 font: Runtime.idealFontMetrics.font
-                                padding: 10
-                                bottomPadding: _descriptionLabel.visible ? 2 : 10
                                 text: "<b>" + actionManager.title + "</b>: " + qmlAction.text + (qmlAction.checkable & qmlAction.checked ? " ✔" : "")
                             }
 
-                            VclLabel {
+                            VclText {
                                 id: _descriptionLabel
 
                                 Layout.fillWidth: true
@@ -176,12 +178,15 @@ Popup {
                                 Layout.rightMargin: 10
                                 Layout.bottomMargin: 10
 
+                                color: Runtime.colors.primary.regular.text
+                                opacity: 0.6
+
                                 elide: Text.ElideRight
-                                maximumLineCount: 3
-                                wrapMode: Text.WordWrap
                                 font: Runtime.minimumFontMetrics.font
+                                maximumLineCount: 3
                                 text: qmlAction.tooltip !== undefined ? qmlAction.tooltip : ""
                                 visible: text !== ""
+                                wrapMode: Text.WordWrap
                             }
                         }
 

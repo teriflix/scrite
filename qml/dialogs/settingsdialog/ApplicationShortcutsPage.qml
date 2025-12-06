@@ -69,7 +69,7 @@ FocusScope {
             ToolButton {
                 flat: true
 
-                ToolTip.text: "Restore default shortcuts to all"
+                ToolTip.text: _filterText.text === "" ? "Restore default shortcuts to all" : "Restore default shortcuts to the filtered list displayed below"
                 ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
                 ToolTip.visible: hovered
 
@@ -189,15 +189,17 @@ FocusScope {
 
                             spacing: 0
 
-                            VclLabel {
+                            VclText {
                                 id: _nameLabel
 
                                 Layout.fillWidth: true
 
+                                bottomPadding: _descriptionLabel.visible ? 2 : 10
+                                padding: 10
+
+                                color: Runtime.colors.primary.regular.text
                                 elide: Text.ElideRight
                                 font: Runtime.idealFontMetrics.font
-                                padding: 10
-                                bottomPadding: _descriptionLabel.visible ? 2 : 10
                                 text: qmlAction.text + (qmlAction.checkable & qmlAction.checked ? " ✔" : "")
                             }
 
@@ -209,12 +211,15 @@ FocusScope {
                                 Layout.rightMargin: 10
                                 Layout.bottomMargin: 10
 
+                                color: Runtime.colors.primary.regular.text
+                                opacity: 0.6
+
                                 elide: Text.ElideRight
-                                maximumLineCount: 3
-                                wrapMode: Text.WordWrap
                                 font: Runtime.minimumFontMetrics.font
+                                maximumLineCount: 3
                                 text: qmlAction.tooltip !== undefined ? qmlAction.tooltip.trim() : ""
                                 visible: text !== ""
+                                wrapMode: Text.WordWrap
                             }
                         }
 
