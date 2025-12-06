@@ -488,11 +488,17 @@ ListView {
         function mergeWithPreviousScene(screenplayElement) {
             if(root.screenplayAdapter.isSourceScreenplay) {
                 const newElement = root.screenplayAdapter.mergeElementWithPrevious(screenplayElement)
-                _private.focusCursorPosition.set(root.screenplayAdapter.currentIndex, newElement.scene.cursorPosition)
-                Runtime.execLater(_private, Runtime.stdAnimationDuration/2, _private.ensureCursorCentered.trigger)
+                Runtime.execLater(_private, Runtime.stdAnimationDuration/2, _private.postMergeWithPreviousScene, newElement)
             } else {
                 MessageBox.information("Merge Scene", "Scenes can be merged only while editing the entire screenplay.")
             }
+        }
+
+        function postMergeWithPreviousScene(newElement) {
+            scrollIntoView(root.screenplayAdapter.currentIndex)
+            _private.focusCursorPosition.set(root.screenplayAdapter.currentIndex, newElement.scene.cursorPosition)
+            _private.focusCursorPosition.trigger()
+            Qt.callLater(_private.ensureCursorCentered.trigger)
         }
 
         function isVisible(index) {
