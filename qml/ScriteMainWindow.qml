@@ -60,8 +60,12 @@ Item {
 
                 checked: _header.visible
                 onToggled: (source) => {
-                               _header.visible = !_header.visible
+                               Qt.callLater(_header.toggleVisibility)
                            }
+            }
+
+            function toggleVisibility() {
+                visible = !visible
             }
         }
 
