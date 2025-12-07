@@ -51,7 +51,8 @@ Rectangle {
                 id: _scriteMenu
 
                 action: ActionHub.applicationOptions.find("scriteMenu")
-                enabled: parent.visible
+                enabled: _mainMenuButton.visible
+                visible: enabled
 
                 onTriggered: _mainMenu.open()
             }

@@ -2261,10 +2261,10 @@ Item {
         objectName: "applicationOptions"
 
         Action {
-            readonly property bool visible: false
-            readonly property string defaultShortcut: "Alt+S"
+            readonly property string defaultShortcut: "Alt+`"
+            property bool visible: ActionHandler.canHandle
 
-            enabled: ActionHandler.enabled
+            enabled: ActionHandler.canHandle
             objectName: "scriteMenu"
             shortcut: defaultShortcut
             text: "Scrite Menu"
