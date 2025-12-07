@@ -339,6 +339,7 @@ Item {
 
                     Layout.fillWidth: true
 
+                    label: ""
                     placeholderText: "Language name"
                     completionStrings: _newLanguageDialogContent.availableLanguages.names
 
