@@ -4,11 +4,11 @@ cp -vaRf ../../../Release/Scrite.app .
 codesign -s "$SCRITE_IDENT" ./Scrite.app/Contents/MacOS/crashpad_handler
 cp -vaf ../../Info.plist Scrite.app/Contents
 ~/Qt/5.15.19/clang_64/bin/macdeployqt Scrite.app -qmldir=../../qml -verbose=1 -appstore-compliant -hardened-runtime -codesign="$SCRITE_IDENT"
-mkdir Scrite-1.9.11
-mv Scrite.app Scrite-1.9.11
+mkdir Scrite-1.9.12
+mv Scrite.app Scrite-1.9.12
 cp ../../images/dmgbackdrop.png dmgbackdrop.png
 cp ../../appicon.icns Scrite.icns
-sed "s/{{VERSION}}/Version 1.9.11/" dmgbackdrop.qml > dmgbackdropgen.qml
+sed "s/{{VERSION}}/Version 1.9.12/" dmgbackdrop.qml > dmgbackdropgen.qml
 ~/Qt/5.15.19/clang_64/bin/qmlscene dmgbackdropgen.qml
 rm -f dmgbackdropgen.qml
 
@@ -18,7 +18,7 @@ sips -s dpiWidth 144 -s dpiHeight 144 background.png
 # https://github.com/create-dmg/create-dmg
 ~/Utils/create-dmg/create-dmg \
   --volicon "Scrite.icns" \
-  --volname "Scrite-1.9.11" \
+  --volname "Scrite-1.9.12" \
   --background "background.png" \
   --window-pos 272 136 \
   --window-size 896 660 \
@@ -27,12 +27,12 @@ sips -s dpiWidth 144 -s dpiHeight 144 background.png
   --hide-extension "Scrite.app" \
   --app-drop-link 620 300 \
   --hdiutil-verbose \
-  "Scrite-1.9.11.dmg" \
-  "Scrite-1.9.11/"
+  "Scrite-1.9.12.dmg" \
+  "Scrite-1.9.12/"
 rm -f background.png
 rm -f dmgbackdrop.png
 rm -f Scrite.icns
-mv Scrite-1.9.11/Scrite.app .
-rm -fr Scrite-1.9.11
+mv Scrite-1.9.12/Scrite.app .
+rm -fr Scrite-1.9.12
 
-mv ../../../Release/Scrite.app.sym Scrite-1.9.11.app.sym
+mv ../../../Release/Scrite.app.sym Scrite-1.9.12.app.sym
