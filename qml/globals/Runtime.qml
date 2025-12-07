@@ -394,6 +394,11 @@ Item {
         }
     }
 
+    readonly property FontMetrics minimumShortcutFontMetrics: FontMetrics {
+        font.pointSize: minimumFontMetrics.font.pointSize
+        font.family: shortcutFontMetrics.font.family
+    }
+
     readonly property FontMetrics sceneEditorFontMetrics: FontMetrics {
         readonly property int lettersPerLine: 70
         readonly property int marginLetters: 5

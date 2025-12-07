@@ -44,16 +44,6 @@ DialogLauncher {
         id: _dialog
 
         readonly property string delimiter: " + "
-        readonly property string fontFamily: {
-            // We need ZERO and the letter O to be rendered distinctly
-            // We also need small-L and capital-I and digit-1 to look disctinct.
-            switch(Platform.type) {
-            case Platform.WindowsDesktop: return "Consolas"
-            case Platform.MacOSDesktop: return "Monaco"
-            case Platform.LinuxDesktop: return "DejaVu Sans Mono"
-            }
-            return "Courier Prime"
-        }
 
         required property string shortcut
         required property string description

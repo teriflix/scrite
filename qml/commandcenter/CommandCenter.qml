@@ -44,7 +44,7 @@ Popup {
 
     parent: Scrite.window.contentItem
 
-    width: Math.min(720, Scrite.window.width * 0.75)
+    width: Runtime.bounded(600, Scrite.window.width * 0.75, 800)
 
     modal: false
     closePolicy: Popup.CloseOnPressOutside|Popup.CloseOnEscape
@@ -102,6 +102,8 @@ Popup {
                 clip: true
                 currentIndex: 0
 
+                boundsBehavior: Flickable.StopAtBounds
+                boundsMovement: Flickable.StopAtBounds
                 highlightFollowsCurrentItem: true
                 highlightMoveDuration: 0
                 highlightResizeDuration: 0
@@ -190,21 +192,16 @@ Popup {
                             }
                         }
 
-                        Link {
-                            property string nativeShortcut: Gui.nativeShortcut(qmlAction.shortcut)
-
+                        ShortcutField {
                             Layout.alignment: Qt.AlignTop
                             Layout.topMargin: 10
-                            Layout.preferredWidth: _delegateLayout.width * 0.2
+                            Layout.preferredWidth: _delegateLayout.width * 0.25
 
+                            fontMetrics: Runtime.minimumShortcutFontMetrics
+                            description: actionManager.title + ": " + qmlAction.text
                             enabled: shortcutIsEditable
-                            font: Runtime.idealFontMetrics.font
-                            text: shortcutIsEditable && nativeShortcut === "" ? "Set Shortcut" : nativeShortcut
-                            elide: Text.ElideMiddle
-
-                            onClicked: {
-                                ShortcutEditorDialog.launch(actionManager.title + ": " + qmlAction.text)
-                            }
+                            placeholderText: shortcutIsEditable ? "Assign" : ""
+                            portableShortcut: qmlAction.shortcut !== undefined ? qmlAction.shortcut : ""
                         }
                     }
                 }

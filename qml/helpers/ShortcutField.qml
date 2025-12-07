@@ -22,7 +22,7 @@ import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 
-Link {
+Item {
     id: root
 
     required property string description
@@ -31,6 +31,13 @@ Link {
     property string placeholderText: "None Set"
     property string nativeShortcut: Gui.nativeShortcut(portableShortcut)
 
+    property font font: fontMetrics.font
+    property FontMetrics fontMetrics: Runtime.shortcutFontMetrics
+
+    property var keyCombinations: Gui.keyCombinations(portableShortcut)
+
+    readonly property string delimiter: " + "
+
     function editShortcut() {
         if(enabled)
             ShortcutInputDialog.launch(portableShortcut, description, shortcutEdited)
@@ -38,14 +45,89 @@ Link {
 
     signal shortcutEdited(string newShortcut)
 
-    defaultColor: Runtime.colors.primary.c10.text
+    implicitWidth: _layout.width
+    implicitHeight: _layout.height
 
-    padding: 8
-    text: root.nativeShortcut === "" ? placeholderText : root.nativeShortcut
+    clip: width < _layout.width
 
-    font.family: Runtime.shortcutFontMetrics.font.family
-    font.pointSize: Runtime.shortcutFontMetrics.font.pointSize
-    font.underline: containsMouse
+    RowLayout {
+        id: _layout
 
-    onClicked: editShortcut()
+        spacing: fontMetrics.averageCharacterWidth * 0.4
+
+        opacity: enabled ? 1 : 0.5
+
+        Repeater {
+            id: _modifiers
+
+            model: keyCombinations.modifiers
+
+            KeyboardKey {
+                required property string modelData
+
+                Layout.minimumWidth: __minimumKeyWidth
+                Layout.minimumHeight: __minimumKeyHeight
+
+                text: modelData
+            }
+        }
+
+        Repeater {
+            model: keyCombinations.keys
+
+            KeyboardKey {
+                required property string modelData
+
+                Layout.minimumWidth: __minimumKeyWidth
+                Layout.minimumHeight: __minimumKeyHeight
+
+                text: modelData
+            }
+        }
+
+        Link {
+            text: placeholderText
+            font: root.font
+            visible: portableShortcut === ""
+        }
+    }
+
+    MouseArea {
+        id: _mouseArea
+
+        anchors.fill: _layout
+
+        cursorShape: Qt.PointingHandCursor
+        hoverEnabled: true
+
+        onClicked: editShortcut()
+    }
+
+    property real __minimumKeyWidth: fontMetrics.boundingRect("Ctrl").width + 6
+    property real __minimumKeyHeight: fontMetrics.lineSpacing
+
+    component KeyboardKey : Rectangle {
+        property string text
+
+        implicitWidth: _keyText.width
+        implicitHeight: _keyText.height
+
+        color: _mouseArea.containsMouse ? Runtime.colors.primary.c300.background : Runtime.colors.primary.c200.background
+        border.width: enabled ? 1 : 0
+        border.color: Runtime.colors.primary.c700.background
+
+        Text {
+            id: _keyText
+
+            anchors.centerIn: parent
+
+            color: Color.textColorFor(parent.color)
+            font: root.font
+            text: parent.text
+            leftPadding: 3
+            rightPadding: 3
+            topPadding: 2
+            bottomPadding: 2
+        }
+    }
 }

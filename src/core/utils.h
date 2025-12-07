@@ -56,6 +56,11 @@ public:
     bool metaModifier = false;
 
     // clang-format off
+    Q_PROPERTY(QStringList modifiers
+               READ modifiers)
+    QStringList modifiers() const;
+
+    // clang-format off
     Q_PROPERTY(QList<int> keyCodes
                MEMBER keyCodes)
     // clang-format on
@@ -73,12 +78,12 @@ public:
     KeyCombinations() { }
     KeyCombinations(bool _controlModifier, bool _shiftModifier, bool _altModifier,
                     bool _metaModifier, const QList<int> &_keyCodes, const QStringList &_keys)
-        : controlModifier(_controlModifier)
-        , shiftModifier(_shiftModifier)
-        , altModifier(_altModifier)
-        , metaModifier(_metaModifier)
-        , keyCodes(_keyCodes)
-        , keys(_keys)
+        : controlModifier(_controlModifier),
+          shiftModifier(_shiftModifier),
+          altModifier(_altModifier),
+          metaModifier(_metaModifier),
+          keyCodes(_keyCodes),
+          keys(_keys)
     {
     }
     KeyCombinations(const KeyCombinations &other) { *this = other; }
@@ -97,8 +102,8 @@ public:
         return this->controlModifier == other.controlModifier
                 && this->shiftModifier == other.shiftModifier
                 && this->altModifier == other.altModifier
-                && this->metaModifier == other.metaModifier
-                && this->keyCodes == other.keyCodes && this->keys == other.keys;
+                && this->metaModifier == other.metaModifier && this->keyCodes == other.keyCodes
+                && this->keys == other.keys;
     }
     bool operator!=(const KeyCombinations &other) const { return !(*this == other); }
 };
@@ -198,10 +203,9 @@ public:
     QString value;
 
     ObjectConfigFieldChoice() { }
-    ObjectConfigFieldChoice(const QString &_key, const QString &_value)
-        : key(_key), value(_value)
+    ObjectConfigFieldChoice(const QString &_key, const QString &_value) : key(_key), value(_value)
     {
-    } 
+    }
     ObjectConfigFieldChoice(const ObjectConfigFieldChoice &other) { *this = other; }
     ObjectConfigFieldChoice &operator=(const ObjectConfigFieldChoice &other)
     {
@@ -289,16 +293,16 @@ public:
                       const QString &_editor, const QVariant &_min, const QVariant &_max,
                       const QVariant &_ideal, const QString &_group, const QString &_feature,
                       const QList<Utils::ObjectConfigFieldChoice> &_choices)
-        : name(_name)
-        , label(_label)
-        , note(_note)
-        , editor(_editor)
-        , min(_min)
-        , max(_max)
-        , ideal(_ideal)
-        , group(_group)
-        , feature(_feature)
-        , choices(_choices)
+        : name(_name),
+          label(_label),
+          note(_note),
+          editor(_editor),
+          min(_min),
+          max(_max),
+          ideal(_ideal),
+          group(_group),
+          feature(_feature),
+          choices(_choices)
     {
     }
     ObjectConfigField &operator=(const ObjectConfigField &other)

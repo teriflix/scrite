@@ -61,6 +61,25 @@ void Utils::registerTypes()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+QStringList Utils::KeyCombinations::modifiers() const
+{
+    QStringList ret;
+
+    if (this->metaModifier)
+        ret.append(Platform::modifierDescription(Qt::MetaModifier));
+
+    if (this->controlModifier)
+        ret.append(Platform::modifierDescription(Qt::ControlModifier));
+
+    if (this->altModifier)
+        ret.append(Platform::modifierDescription(Qt::AltModifier));
+
+    if (this->shiftModifier)
+        ret.append(Platform::modifierDescription(Qt::ShiftModifier));
+
+    return ret;
+}
+
 QString Utils::KeyCombinations::toShortcut() const
 {
     const QKeySequence ks = this->toKeySequence();
