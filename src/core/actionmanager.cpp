@@ -51,13 +51,125 @@ static const QByteArray _QQuickActionDefaultShortcutProperty = QByteArrayLiteral
 static const QByteArray _QQuickActionAllowShortcutProperty = QByteArrayLiteral("allowShortcut");
 
 static const QByteArray _QQuickActionEnabledProperty = QByteArrayLiteral("enabled");
+static const QByteArray _QQuickActionCheckableProperty = QByteArrayLiteral("checkable");
 
 static const QByteArray _QQuickActionTriggerCount = QByteArrayLiteral("triggerCount");
 static const char *_QQuickActionTriggerCountChanged = SIGNAL(triggerCountChanged());
 
 static const QByteArray _QQuickActionTriggerMethod = QByteArrayLiteral("triggerMethod");
 
-Q_GLOBAL_STATIC(QObjectListModel<ActionManager *>, ActionManagerModel)
+#ifdef DEBUG_SHORTCUT_DELIVERY
+class ActionManagers : public QObjectListModel<ActionManager *>
+{
+public:
+    explicit ActionManagers(QObject *parent = nullptr) : QObjectListModel<ActionManager *>(parent)
+    {
+        qApp->installEventFilter(this);
+    }
+    virtual ~ActionManagers() { }
+
+    bool eventFilter(QObject *object, QEvent *event)
+    {
+        if (object == qApp->focusWindow() && event->type() == QEvent::ShortcutOverride) {
+            QKeyEvent *keyEvent = reinterpret_cast<QKeyEvent *>(event);
+            QKeySequence keySequence(keyEvent->modifiers() + keyEvent->key());
+            QObject *qmlAction = ActionManager::findActionForShortcut(keySequence.toString());
+            if (qmlAction)
+                this->addToPending(qmlAction, keySequence);
+        } else if (event->type() == QEvent::Shortcut) {
+            QShortcutEvent *shortcutEvent = reinterpret_cast<QShortcutEvent *>(event);
+            this->removeFromPending(object, shortcutEvent->key());
+        }
+
+        return false;
+    }
+
+    void timerEvent(QTimerEvent *te)
+    {
+        if (te->timerId() == m_processPendingShortcuts.timerId()) {
+            m_processPendingShortcuts.stop();
+
+            while (!m_pendingShortcuts.isEmpty()) {
+                auto item = m_pendingShortcuts.takeFirst();
+                if (item.first->property(_QQuickActionEnabledProperty).toBool()) {
+                    if (item.first->property(_QQuickActionCheckableProperty).toBool()) {
+                        QMetaObject::invokeMethod(item.first, "toggled", Qt::DirectConnection,
+                                                  Q_ARG(QObject *, item.first));
+                    }
+                    QMetaObject::invokeMethod(item.first, "triggered", Qt::DirectConnection,
+                                              Q_ARG(QObject *, item.first));
+                }
+            }
+        }
+    }
+
+private:
+    int findPending(QObject *object, const QKeySequence &sequence) const
+    {
+        if (m_pendingShortcuts.isEmpty() || object == nullptr || sequence.isEmpty())
+            return -1;
+
+        auto it = std::find_if(m_pendingShortcuts.begin(), m_pendingShortcuts.end(),
+                               [=](const QPair<QObject *, QKeySequence> &item) {
+                                   return (item.first == object && item.second == sequence);
+                               });
+        if (it != m_pendingShortcuts.end())
+            return std::distance(m_pendingShortcuts.begin(), it);
+
+        return -1;
+    }
+
+    void addToPending(QObject *object, const QKeySequence &sequence)
+    {
+        if (object == nullptr || sequence.isEmpty())
+            return;
+
+        if (this->findPending(object, sequence) < 0) {
+            connect(object, &QObject::destroyed, this, &ActionManagers::objectDestroyed);
+            m_pendingShortcuts.append({ object, sequence });
+            m_processPendingShortcuts.start(m_delay, this);
+        }
+    }
+
+    void removeFromPending(QObject *object, const QKeySequence &sequence)
+    {
+        if (object == nullptr || sequence.isEmpty())
+            return;
+
+        int index = this->findPending(object, sequence);
+        if (index >= 0) {
+            m_pendingShortcuts.removeAt(index);
+            disconnect(object, &QObject::destroyed, this, &ActionManagers::objectDestroyed);
+            if (m_pendingShortcuts.isEmpty())
+                m_processPendingShortcuts.stop();
+            else
+                m_processPendingShortcuts.start(m_delay, this);
+        }
+    }
+
+    void objectDestroyed(QObject *object)
+    {
+        if (object == nullptr)
+            return;
+
+        for (int i = m_pendingShortcuts.size() - 1; i >= 0; i--) {
+            if (m_pendingShortcuts.at(i).first == object) {
+                m_pendingShortcuts.removeAt(i);
+                m_processPendingShortcuts.start(m_delay, this);
+            }
+        }
+    }
+
+private:
+    const int m_delay = 100;
+    QBasicTimer m_processPendingShortcuts;
+    QList<QPair<QObject *, QKeySequence>> m_pendingShortcuts;
+};
+#else
+typedef QObjectListModel<ActionManager *> ActionManagers;
+#endif
+
+Q_GLOBAL_STATIC(ActionManagers, ActionManagerModel)
 
 static bool ActionManagerModelSortFunction(ActionManager *a, ActionManager *b)
 {
