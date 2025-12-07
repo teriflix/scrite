@@ -413,7 +413,7 @@ Rectangle {
 
             const lengthMode = Runtime.sceneListPanelSettings.displaySceneLength
             const starts = "<b>Starts</b> " + TMath.timeLengthString(sceneLengthWatcher.timeOffset) +
-                           " on Pg. " + Math.floor(_private.sceneLengthWatcher.pageOffset)
+                           " on Pg. " + (1+Math.floor(_private.sceneLengthWatcher.pageOffset))
             const pgCount = "<b>Length</b> " + sceneLengthWatcher.pageLength.toFixed(2) + " pages"
             const duration = "<b>Duration</b> " + TMath.timeLengthString(sceneLengthWatcher.timeLength)
             let fields = []

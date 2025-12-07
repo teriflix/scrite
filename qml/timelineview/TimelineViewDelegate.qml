@@ -446,7 +446,7 @@ Item {
             const addWatcherFields = () => {
                 if(_private.sceneLengthWatcher.hasValidRecord) {
                     fields.push("<b>Starts</b> " + TMath.timeLengthString(_private.sceneLengthWatcher.timeOffset) +
-                                " on Pg. " + Math.floor(_private.sceneLengthWatcher.pageOffset))
+                                " on Pg. " + (1+Math.floor(_private.sceneLengthWatcher.pageOffset)))
                     fields.push("<b>Duration</b> " + TMath.timeLengthString(_private.sceneLengthWatcher.timeLength) +
                                 ", " + _private.sceneLengthWatcher.pageLength.toFixed(2) + " pages")
                 }
