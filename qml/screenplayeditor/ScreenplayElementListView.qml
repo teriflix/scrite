@@ -81,7 +81,7 @@ ListView {
     highlightFollowsCurrentItem: false
 
     header: root.screenplayAdapter.isSourceScreenplay ? _private.header : null
-    footer: root.screenplayAdapter.isSourceScreenplay && Runtime.screenplayEditorSettings.displayAddSceneBreakButtons ? _private.footer : null
+    footer: root.screenplayAdapter.isSourceScreenplay ? _private.footer : null
 
     /**
       Why are we doing all this circus instead of using DelegateChooser?
@@ -259,6 +259,8 @@ ListView {
                 zoomLevel: root.zoomLevel
                 pageMargins: root.pageMargins
                 screenplayAdapter: root.screenplayAdapter
+
+                visible: Runtime.screenplayEditorSettings.displayAddSceneBreakButtons
             }
         }
 
