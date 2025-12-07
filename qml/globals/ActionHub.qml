@@ -1248,8 +1248,9 @@ Item {
             readonly property string defaultShortcut: "Shift+F3"
 
             enabled: _private.binder && Runtime.allowAppUsage
-            text: "AB"
             objectName: "toUppercase"
+            shortcut: defaultShortcut
+            text: "AB"
 
             onTriggered: _private.binder.changeTextCase(SceneDocumentBinder.UpperCase)
         }
@@ -1259,8 +1260,9 @@ Item {
             readonly property string defaultShortcut: "Ctrl+Shift+F3"
 
             enabled: _private.binder && Runtime.allowAppUsage
-            text: "ab"
             objectName: "toLowercase"
+            text: "ab"
+            shortcut: defaultShortcut
 
             onTriggered: _private.binder.changeTextCase(SceneDocumentBinder.LowerCase)
         }
