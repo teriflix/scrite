@@ -602,6 +602,7 @@ ListView {
                 root.contentY = Math.round(pt.y)
             else
                 root.contentY = Math.round((pt.y + 2*rect.height) - root.height)
+            root.returnToBounds()
         }
 
         function ensureCentered(item, rect) {
@@ -610,6 +611,7 @@ ListView {
 
             const pt = item.mapToItem(root.contentItem, rect.x, rect.y);
             root.contentY = Math.round(pt.y - (root.height - rect.height) / 2);
+            root.returnToBounds()
         }
 
         function jumpToNextScene() {

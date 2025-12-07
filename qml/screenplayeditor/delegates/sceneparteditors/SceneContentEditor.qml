@@ -449,8 +449,12 @@ AbstractScenePartEditor {
             }
         }
 
+        function onSceneAboutToReset() {
+            _private.captureCursorOffset()
+        }
+
         function onSceneReset() {
-            Runtime.execLater(_private, Runtime.stdAnimationDuration, _private.ensureSceneTextEditorCursorIsCentered)
+            Runtime.execLater(_private, Runtime.stdAnimationDuration, _private.restoreCursorOffset)
         }
     }
 
@@ -589,9 +593,10 @@ AbstractScenePartEditor {
                 return
 
             if(_sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus) {
+                captureCursorOffset()
                 _sceneDocumentBinder.copy(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
                 _sceneTextEditor.remove(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
-                Qt.callLater(_private.ensureSceneTextEditorCursorIsCentered)
+                Qt.callLater(_private.restoreCursorOffset)
             }
         }
 
@@ -605,6 +610,8 @@ AbstractScenePartEditor {
                 return
 
             if(_sceneTextEditor.canPaste && _sceneTextEditor.activeFocus) {
+                captureCursorOffset()
+
                 // Fix for https://github.com/teriflix/scrite/issues/195
                 // [0.5.2 All] Pasting doesnt replace the selected text #195
                 if(_sceneTextEditor.hasSelection)
@@ -614,12 +621,12 @@ AbstractScenePartEditor {
                 const cursorPositionAfterPaste = _sceneDocumentBinder.paste(_sceneTextEditor.cursorPosition)
                 if(cursorPositionAfterPaste < 0) {
                     _sceneTextEditor.paste()
+                    discardCursorOffset()
                 } else {
                     _sceneTextEditor.cursorPosition = 0
                     placeCursorAt(cursorPositionAfterPaste)
+                    Qt.callLater(_private.restoreCursorOffset)
                 }
-
-                Qt.callLater(_private.ensureSceneTextEditorCursorIsCentered)
             }
         }
 
@@ -635,6 +642,34 @@ AbstractScenePartEditor {
                                  _sceneTextEditor.highlightCursor()
                              })
             }
+        }
+
+        property real globalCursorY: 0
+        property rect localCursorRect: Qt.rect(0,0,0,0)
+
+        function captureCursorOffset() {
+            globalCursorY = listView.mapFromItem(_sceneTextEditor, _sceneTextEditor.cursorRectangle).y
+            localCursorRect = _sceneTextEditor.cursorRectangle
+        }
+
+        function restoreCursorOffset() {
+            const cursorRect = _sceneTextEditor.cursorRectangle
+            let localCursorYDelta = _sceneTextEditor.cursorRectangle.y - localCursorRect.y
+            let expectedGlobalCursorY = globalCursorY + localCursorYDelta
+
+            let expectedGlobalCursorYDiff = Math.abs(listView.mapFromItem(_sceneTextEditor, _sceneTextEditor.cursorRectangle).y - expectedGlobalCursorY)
+            if( expectedGlobalCursorYDiff < Runtime.idealFontMetrics.lineSpacing/2 ) {
+                discardCursorOffset()
+                return
+            }
+
+            ensureSceneTextEditorCursorIsCentered()
+            discardCursorOffset()
+        }
+
+        function discardCursorOffset() {
+            globalCursorY = 0
+            localCursorRect = Qt.rect(0,0,0,0)
         }
 
         property Timer reloadSceneContentTimer
