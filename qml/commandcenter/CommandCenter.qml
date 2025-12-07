@@ -202,6 +202,10 @@ Popup {
                             enabled: shortcutIsEditable
                             placeholderText: shortcutIsEditable ? "Assign" : ""
                             portableShortcut: qmlAction.shortcut !== undefined ? qmlAction.shortcut : ""
+
+                            onShortcutEdited: (newShortcut) => {
+                                ActionHub.assignShortcut(qmlAction, newShortcut)
+                            }
                         }
                     }
                 }

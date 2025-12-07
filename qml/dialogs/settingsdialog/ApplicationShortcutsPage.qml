@@ -244,13 +244,7 @@ FocusScope {
                             }
 
                             onShortcutEdited: (newShortcut) => {
-                                                  const conflictingAction = _actionsModel.findActionForShortcut(newShortcut)
-                                                  if(conflictingAction) {
-                                                      MessageBox.information("Shortcut Conflict",
-                                                                             Gui.nativeShortcut(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
-                                                  } else {
-                                                    qmlAction.shortcut = newShortcut
-                                                  }
+                                                  ActionHub.assignShortcut(qmlAction, newShortcut)
                                               }
                         }
 

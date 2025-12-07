@@ -200,10 +200,7 @@ Item {
                                 portableShortcut: _private.language !== undefined ? _private.language.shortcut() : ""
 
                                 onShortcutEdited: (newShortcut) => {
-                                                      const conflictingAction = _private.actionsModel.findActionForShortcut(newShortcut)
-                                                      if(conflictingAction) {
-                                                          MessageBox.information("Shortcut Conflict",
-                                                                                 Gui.nativeShortcut(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
+                                                      if(ActionHub.hasShortcutConflict(newShortcut)) {
                                                           return
                                                       }
 

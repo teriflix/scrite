@@ -50,6 +50,29 @@ Item {
                               })
     }
 
+    function assignShortcut(qmlAction, newShortcut) {
+        if(!qmlAction || !Object.isOfType(qmlAction, "QQuickAction"))
+            return
+
+        let conflictingAction = ActionManager.findActionForShortcut(newShortcut)
+        if(conflictingAction) {
+            MessageBox.information("Shortcut Conflict",
+                                   Gui.nativeShortcut(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
+        } else {
+            qmlAction.shortcut = newShortcut
+        }
+    }
+
+    function hasShortcutConflict(shortcut) {
+        let conflictingAction = ActionManager.findActionForShortcut(shortcut)
+        if(conflictingAction) {
+            MessageBox.information("Shortcut Conflict",
+                                   Gui.nativeShortcut(shortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
+            return true
+        }
+        return false
+    }
+
     readonly property ActionManager mainWindowTabs: ActionManager {
         title: "Scrite Window Tabs"
         objectName: "mainWindowTabs"
