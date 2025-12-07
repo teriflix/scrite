@@ -60,6 +60,7 @@ Item {
                     opacity: 0.9
                 }
 
+                delay: 0
                 text: {
                     const sceneGroup = _private.sceneGroup
                     const fields = [
