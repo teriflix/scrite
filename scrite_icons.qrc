@@ -335,5 +335,11 @@
         <file>icons/action/keyword.png</file>
         <file>icons/action/command_center_inverted.png</file>
         <file>icons/action/command_center.png</file>
+        <file>icons/editor/lowercase.png</file>
+        <file>icons/editor/lowercase_inverted.png</file>
+        <file>icons/editor/uppercase.png</file>
+        <file>icons/editor/uppercase_inverted.png</file>
+        <file>icons/editor/palette.png</file>
+        <file>icons/editor/palette_inverted.png</file>
     </qresource>
 </RCC>

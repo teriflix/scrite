@@ -1178,6 +1178,7 @@ Item {
             enabled: _private.textFormat && Runtime.allowAppUsage
             objectName: "colors"
             text: "Colors"
+            icon.source: "qrc:/icons/editor/palette.png"
 
             onTriggered: (source) => {
                 if(popup)
@@ -1252,6 +1253,8 @@ Item {
             shortcut: defaultShortcut
             text: "AB"
 
+            icon.source: "qrc:/icons/editor/uppercase.png"
+
             onTriggered: _private.binder.changeTextCase(SceneDocumentBinder.UpperCase)
         }
 
@@ -1263,6 +1266,8 @@ Item {
             objectName: "toLowercase"
             text: "ab"
             shortcut: defaultShortcut
+
+            icon.source: "qrc:/icons/editor/lowercase.png"
 
             onTriggered: _private.binder.changeTextCase(SceneDocumentBinder.LowerCase)
         }

@@ -30,8 +30,8 @@ FloatingDock {
 
     x: adjustedX(Runtime.markupToolsSettings.contentX)
     y: adjustedY(Runtime.markupToolsSettings.contentY)
-    width: 462
-    height: 36 + 8 + titleBarHeight
+    width: toolbuttonSize.width * ActionHub.markupTools.count
+    height: toolbuttonSize.height + titleBarHeight
 
     title: "Markup Tools"
     visible: Runtime.screenplayEditorSettings.markupToolsDockVisible && Runtime.screenplayEditor
@@ -77,4 +77,6 @@ FloatingDock {
             Runtime.markupToolsSettings.contentY = Math.round(root.y)
         }
     }
+
+    readonly property size toolbuttonSize: Runtime.estimateTypeSize("ToolButton { icon.source: \"qrc:/icons/content/blank.png\"; display: ToolButton.IconOnly }")
 }

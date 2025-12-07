@@ -133,9 +133,12 @@ Item {
     Loader {
         width: root.width
         height: root.height - titleBar.height
+
         y: titleBar.height
-        sourceComponent: content
+
         active: root.visible
+        clip: true
+        sourceComponent: content
     }
 
     // Private section
