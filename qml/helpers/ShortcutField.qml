@@ -53,6 +53,8 @@ Item {
     RowLayout {
         id: _layout
 
+        anchors.verticalCenter: parent.verticalCenter
+
         spacing: fontMetrics.averageCharacterWidth * 0.4
 
         opacity: enabled ? 1 : 0.5
@@ -65,6 +67,7 @@ Item {
             KeyboardKey {
                 required property string modelData
 
+                Layout.alignment: Qt.AlignVCenter
                 Layout.minimumWidth: __minimumKeyWidth
                 Layout.minimumHeight: __minimumKeyHeight
 
@@ -78,6 +81,7 @@ Item {
             KeyboardKey {
                 required property string modelData
 
+                Layout.alignment: Qt.AlignVCenter
                 Layout.minimumWidth: __minimumKeyWidth
                 Layout.minimumHeight: __minimumKeyHeight
 
@@ -86,6 +90,8 @@ Item {
         }
 
         Link {
+            Layout.alignment: Qt.AlignVCenter
+
             text: placeholderText
             font: root.font
             visible: portableShortcut === ""
