@@ -199,7 +199,7 @@ Popup {
 
                             enabled: shortcutIsEditable
                             font: Runtime.idealFontMetrics.font
-                            text: nativeShortcut === "" ? "Set Shortcut" : nativeShortcut
+                            text: shortcutIsEditable && nativeShortcut === "" ? "Set Shortcut" : nativeShortcut
                             elide: Text.ElideMiddle
 
                             onClicked: {
