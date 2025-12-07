@@ -14,6 +14,8 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
+import io.scrite.components 1.0
+
 import "qrc:/qml/globals"
 
 ToolTip {
@@ -23,11 +25,14 @@ ToolTip {
 
     property Item container: parent
 
+    DelayedProperty.watch: Runtime.visibleTooltipCount
+    DelayedProperty.delay: Runtime.stdAnimationDuration
+
     x: 20
     y: container.height + 15
 
     contentWidth: Math.min(Runtime.idealFontMetrics.advanceWidth(text), maximumContentWidth)
-    delay: 0 // Qt.styleHints.mousePressAndHoldInterval
+    delay: DelayedProperty.value > 0 ? 0 : Qt.styleHints.mousePressAndHoldInterval
 
     contentItem: Text {
         width: root.contentWidth
@@ -45,4 +50,7 @@ ToolTip {
 
     exit: null
     enter: null
+
+    onAboutToShow: Runtime.visibleTooltipCount = Runtime.visibleTooltipCount + 1
+    onAboutToHide: Runtime.visibleTooltipCount = Runtime.visibleTooltipCount - 1
 }
