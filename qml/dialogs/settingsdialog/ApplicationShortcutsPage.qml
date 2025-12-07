@@ -82,7 +82,7 @@ FocusScope {
                                                "Default shortcut was restored on " + restoreCount + " action(s).")
                     } else {
                         MessageBox.information("None Required",
-                                               "No shortcut required restoration. All are already set to defaults.")
+                                               "All actions already have default shortcuts.")
                     }
                 }
             }

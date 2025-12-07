@@ -2287,6 +2287,7 @@ Item {
 
         Action {
             readonly property string defaultShortcut: "Alt+`"
+            readonly property string tooltip: "App menu displayed when main window is small."
             property bool visible: ActionHandler.canHandle
 
             enabled: ActionHandler.canHandle
