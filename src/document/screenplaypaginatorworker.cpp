@@ -710,8 +710,9 @@ void ScreenplayPaginatorWorker::syncDocument()
         if (!m_records.isEmpty()) {
             record.pixelOffset = ScreenplayPaginator::pixelLength(
                     m_document->firstBlock(), lastRecordBlockRange.until, m_document);
-            record.pageOffset =
-                    ScreenplayPaginator::pixelToPageLength(record.pixelOffset, m_document);
+            record.pageOffset = qMax(
+                    1,
+                    qCeil(ScreenplayPaginator::pixelToPageLength(record.pixelOffset, m_document)));
             record.timeOffset = ScreenplayPaginator::pixelToTimeLength(record.pixelOffset, m_format,
                                                                        m_document);
         }
@@ -745,7 +746,8 @@ void ScreenplayPaginatorWorker::syncDocument()
         record.pixelOffset = breakBlockExtent.before.isValid() ? ScreenplayPaginator::pixelLength(
                                      m_document->firstBlock(), breakBlockExtent.before, m_document)
                                                                : 0;
-        record.pageOffset = ScreenplayPaginator::pixelToPageLength(record.pixelOffset, m_document);
+        record.pageOffset = qMax(
+                1, qCeil(ScreenplayPaginator::pixelToPageLength(record.pixelOffset, m_document)));
         record.timeOffset =
                 ScreenplayPaginator::pixelToTimeLength(record.pixelOffset, m_format, m_document);
     }
