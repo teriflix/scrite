@@ -42,31 +42,49 @@ Rectangle {
             text: "Scrite"
             visible: Runtime.mainWindowTab !== Runtime.MainWindowTab.ScritedTab && !_group1.visible
 
-            icon.source: "qrc:/icons/exporter/scrite.png"
+            icon.color: _scriteMenu.action.icon.color
+            icon.source: _scriteMenu.action.icon.source
 
-            onClicked: _mainMenu.popup()
+            onClicked: _mainMenu.open()
 
-            Menu {
-                id: _mainMenu
+            ActionHandler {
+                id: _scriteMenu
 
-                ActionManagerMenu {
-                    actionManager: ActionHub.fileOperations
-                }
+                action: ActionHub.applicationOptions.find("scriteMenu")
+                enabled: parent.visible
 
-                ActionManagerMenu {
-                    actionManager: ActionHub.languageOptions
-                }
+                onTriggered: _mainMenu.open()
+            }
 
-                ActionManagerMenu {
-                    actionManager: ActionHub.exportOptions
-                }
+            Item {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
 
-                ActionManagerMenu {
-                    actionManager: ActionHub.reportOptions
-                }
+                height: 1
 
-                ActionManagerMenu {
-                    actionManager: ActionHub.appOptions
+                Menu {
+                    id: _mainMenu
+
+                    ActionManagerMenu {
+                        actionManager: ActionHub.fileOperations
+                    }
+
+                    ActionManagerMenu {
+                        actionManager: ActionHub.languageOptions
+                    }
+
+                    ActionManagerMenu {
+                        actionManager: ActionHub.exportOptions
+                    }
+
+                    ActionManagerMenu {
+                        actionManager: ActionHub.reportOptions
+                    }
+
+                    ActionManagerMenu {
+                        actionManager: ActionHub.appOptions
+                    }
                 }
             }
         }

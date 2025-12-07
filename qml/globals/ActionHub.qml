@@ -2262,6 +2262,19 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property string defaultShortcut: "Alt+S"
+
+            enabled: ActionHandler.enabled
+            objectName: "scriteMenu"
+            shortcut: defaultShortcut
+            text: "Scrite Menu"
+
+            icon.color: "transparent"
+            icon.source: "qrc:/images/appicon.png"
+        }
+
+        Action {
+            readonly property bool visible: false
             readonly property string defaultShortcut: "Ctrl+."
 
             enabled: ActionHandler.canHandle
