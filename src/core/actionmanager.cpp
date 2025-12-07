@@ -301,8 +301,12 @@ bool ActionManager::restoreActionShortcut(QObject *action)
 
     const QKeySequence defaultShortcut = defaultActionShortcut(action);
     if (defaultShortcut.isEmpty()) {
-        action->setProperty(_QQuickActionShortcutProperty, QVariant());
-        return true;
+        const QVariant currentShortcut = action->property(_QQuickActionShortcutProperty);
+        if (currentShortcut.isValid()) {
+            action->setProperty(_QQuickActionShortcutProperty, QVariant());
+            return true;
+        }
+        return false;
     }
 
     const QString currentSequence = action->property(_QQuickActionShortcutProperty).toString();
