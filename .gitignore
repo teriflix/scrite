@@ -67,3 +67,6 @@ build/*
 /tools/codingstyle/node_modules
 /tools/codingstyle/package.json
 /tools/codingstyle/package-lock.json
+
+# Mkdocs environment
+/docs/userguide/mkdocs-env/

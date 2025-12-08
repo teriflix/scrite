@@ -12,3 +12,7 @@ markdown_extensions:
       toc_depth: 4
 plugins:
   - mkdocs-video
+nav:
+  - index.md
+  - quickstart.md
+  - powertools.md
