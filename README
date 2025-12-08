@@ -58,7 +58,7 @@ to install Python and mkdocs.
 
 Once you have python and pip installed,
 
-> pip install mkdocs mkdocs-material
+> pip install mkdocs mkdocs-material mkdocs-video
 
 Further reading: https://www.mkdocs.org/user-guide/installation/
 

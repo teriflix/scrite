@@ -1,0 +1,14 @@
+site_name: Scrite User Guide
+theme:
+  name: material
+  palette: 
+    - scheme: default
+      primary: purple
+      accent: purple
+markdown_extensions:
+  - toc:
+      permalink: true
+      separator: '_'
+      toc_depth: 4
+plugins:
+  - mkdocs-video
