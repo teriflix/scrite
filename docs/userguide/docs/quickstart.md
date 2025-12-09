@@ -112,7 +112,6 @@ Use the Synopsis field to jot a brief description of the scene. By default, syno
 to PDF—you can enable it if desired.
 
 ## Typing Scene Content
-
 Format action, character, dialogue, parenthetical, shot, and transition paragraphs using the toolbar
 buttons.
 
@@ -136,7 +135,6 @@ Below is an example scene with paragraphs properly formatted.
 < Screenshot >
 
 ## Adding More Scenes
-
 Keep creating scenes and adding content. To add a new scene, click the button at the end of the page
 or use the toolbar.
 

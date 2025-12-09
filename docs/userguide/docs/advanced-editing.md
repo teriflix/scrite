@@ -56,23 +56,97 @@ intensity slider as you see fit.
 ## Scene List Panel
 
 You can toggle the visibility of the Scene List panel by clicking on the button along the left edge
-of the app window. Using the Scene List Panel, you can rapidly jump to a scene.
+of the app window, or by using the keyboard shortcut `Alt+0`. 
+
+<img src="../images/advanced-editing/007-scene-list-panel.jpg" width=720"/>
+
+Using the Scene List Panel you can get a quick overview of all scenes in your screenplay and even
+jump to a scene.
 
 By default, clicking on a scene in the Scene List panel causes the scene to get selected. You can
-select multiple scenes using Ctrl+Click, or hold Shift to select a range.
+select multiple scenes using `Ctrl+Click`.
+
+<img src="../images/advanced-editing/008-multi-select.png" width=720"/>
+
+Or hold `Shift` to select a range.
+
+<img src="../images/advanced-editing/009-multi-select.png" width=720"/>
 
 Whether you select one scene or many, you can right‑click to change colors for all selected scenes.
-You can also copy selected scenes in Fountain format to the clipboard. If the clipboard has plain
-text or Fountain, “Paste After” lets you insert it after the current scene.
 
-< screenshot >
+<img src="../images/advanced-editing/004-scene-colors.jpg" width=640"/>
+
+### Copy/Pasting Scenes to 3rd Party Apps
+
+After selecting one or more scenes on the scene list panel, you can right click and copy selected
+scenes in Fountain format to the clipboard. If the clipboard has plain text or Fountain, "Paste
+After" lets you insert it after the current scene.
+
+This way you can copy content out of Scrite to third party apps, and back.
+
+![type:video](https://www.youtube.com/embed/GbAsuGV2lmY)
+
+### Scene Heading vs Scene Summary
+
+By default the Scene List Panel shows scene heading for each scene in a list view. You can, however,
+configure the scene list panel to show scene synopsis or summary instead.
+
+<img src="../images/advanced-editing/010-scene-list-panel-summary-text.jpg" width=640"/>
+
+You can change the number of lines from the synopsis to display in Settings.
+
+<img src="../images/advanced-editing/011-scene-list-panel-summary-text.jpg" width=640"/>
 
 ### Empty Scene Icon
 
 The Scene List panel shows an “empty‑scene” icon for scenes with only a scene‑heading but no
 content. This icon disappears as soon as some content is typed or pasted into the scene.
 
-< screenshot >
+<img src="../images/advanced-editing/012-empty-scene-icon.png" width=360"/>
+
+### Length Estimates
+
+You can toggle display of scene lengths against each scene in the scene list panel, either in terms
+of page count or screentime.
+
+<img src="../images/advanced-editing/013-scene-lengths-in-scene-list-panel.jpg" width=640"/>
+
+Notice how the scene list panel shows aggregate time for act breaks. This helps in getting a quick
+impression of pacing in your screenplay.
+
+### Tooltips
+
+You can enable tooltips and get additional information about each scene as you hover over them in
+the scene list panel. Additionally, when you select a bunch of scenes a separate tooltip shows up
+along the top with aggregate lengths of the selected scenes.
+
+<img src="../images/advanced-editing/014-scene-list-panel-tooltips.jpg" width=640"/>
+
+### Sequences
+
+As a writer you may want to bundle multiple scenes into a sequence, because they all form a logical
+group in your story. Simply select a range of scenes and bundle them together into a sequence.
+
+<img src="../images/advanced-editing/015-scene-list-panel-sequence.jpg" width=640"/>
+
+Scenes that are part of a sequence have a arrow prior to their scene number in the scene list panel.
+
+You can easily add/remove scenes to a sequence by using the context menu. Bundling scenes together
+like this allows you to capture rich detail about the way you look at elements of the story
+unfolding across scenes in the screenplay.
+
+### Story Tracks
+
+Scrite lets you tag keywords and formal story beats (from Save The Cat, or your own beat sheet)
+against each scene, or on a bunch of them at once. You can enable the display of tracks to get a
+quick overview of story elements along side the scene headings in the scene list panel.
+
+<img src="../images/advanced-editing/016-scene-list-panel-tracks.jpg" width=640"/>
+
+Notice how the tracks on the left also shows a bar for each sequence (#1, #2 etc..) in a separate
+track.
+
+More on formal story beats, and scene keywords in a later section.
 
 ## Page Number and Screen Time
 
@@ -82,38 +156,20 @@ Although Scrite isn’t page‑centric, page counts still matter:
 - Many structures are page‑centric (e.g., Save The Cat breaks into Act II at page 25).
 
 Scrite lets you keep track of current page, total page count, current time and total time on the
-status bar. This is turned off by default because estimating page count and time while working is
-computationally intensive, which can make the app feel sluggish on large screenplays. We’re working
-on faster algorithms; until then, page counting is off by default.
+status bar. In the editor area, page breaks are shown in a bubble to the left of the editing area.
 
-Whenever you open a Scrite document, you will notice a tooltip along the bottom‑left corner of the
-screenplay editor. You can toggle page counting by clicking the page icon.
+<img src="../images/advanced-editing/017-page-time-number.jpg" width=640"/>
 
-Page counting will be disabled if you close and reopen a document, even if you toggled it on. To
-preserve your preference across sessions, go to Settings → Screenplay → Options and enable “Remember
-Time & Page Count Settings”. You can toggle time and page counting anytime using the book/time icon
-at the bottom‑left of the status bar.
+> **NOTE**: When exporting to PDF, page count may change depending on MORE and CONT’D usage.
 
-When enabled, the status bar shows page at cursor, total page count, time at cursor, and total time.
-A page break marker with page number appears to the left of the page boundary in the editor. As you
-move the cursor, Scrite updates these values; as you scroll, you’ll notice page number bubbles
-indicating page breaks within your scene.
+Time values are approximate (1 page ≈ 1 minute). You can adjust 'Time Per Page' in Settings →
+Screenplay → Page Setup.
 
-Note: When exporting to PDF, page count may change depending on MORE and CONT’D usage. Time values
-are approximate (1 page ≈ 1 minute). You can adjust “Time Per Page” in Settings → Screenplay → Page
-Setup.
+<img src="../images/advanced-editing/018-time-per-page.jpg" width=640"/>
 
-Note: Page counts vary across apps. Final Draft, Scrite, and Fade In Pro may report different counts
-for the same screenplay; making them identical is rarely possible.
-
-< screenshot >
-
-### Viewing Scene Lengths on the Scene List Panel
-
-With page‑counting ON, you can toggle scene lengths in the Scene List panel to display approximate
-scene duration or page length for each scene.
-
-< screenshot >
+> **NOTE**: Page counts vary across apps. Final Draft, Scrite, and Fade In Pro may report different
+counts for the same screenplay; making them identical is rarely possible. Infact, page count
+estimates done by Scrite on Windows, macOS and Linux vary as well.
 
 ## Formatting Paragraphs
 
