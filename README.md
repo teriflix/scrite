@@ -58,7 +58,7 @@ to install Python and mkdocs.
 
 Once you have python and pip installed,
 
-> pip install mkdocs mkdocs-material mkdocs-video
+    pip install mkdocs mkdocs-material mkdocs-video
 
 Further reading: https://www.mkdocs.org/user-guide/installation/
 
@@ -89,7 +89,7 @@ first.
 To build Scrite with Hunspell support on Linux, please install hunspell-dev
 On Ubuntu, you can do this by executing the following command
 
-> sudo apt-get install libhunspell-dev
+    sudo apt-get install libhunspell-dev
 
 Depending on the version number of hunspell installed on your computer, you
 will have to update config-hunspell.h. Comments in this file should help you
@@ -101,38 +101,38 @@ https://packages.debian.org/sid/libhunspell-dev
 #### xcb and xinerama
 Make sure that you have cursor, xinerama installed
 
-> sudo apt install libxcb-cursor0 libxcb-xinerama0
+    sudo apt install libxcb-cursor0 libxcb-xinerama0
 
 #### OpenSSL
 You will also need OpenSSL version 1.1.1
 
-> sudo add-apt-repository ppa:nrbrtx/libssl1 -y
-> sudo apt update
-> sudo apt install libssl1.1 libssl-dev=1.1.1*
+    sudo add-apt-repository ppa:nrbrtx/libssl1 -y
+    sudo apt update
+    sudo apt install libssl1.1 libssl-dev=1.1.1*
 
 #### imagemagick
 For running the package scripts, you will need imagemagick and linuxdeployqt
 
-> sudo apt install imagemagick
+    sudo apt install imagemagick
 
 #### linuxdeployqt (for packaging)
-> wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+    wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
 
 #### lib-ibus-1.0 for Language support
 Language support on Linux requirres IBUS.
 
-> sudo apt install ibus ibus-m17n libibus-1.0-dev
+    sudo apt install ibus ibus-m17n libibus-1.0-dev
 
 Additionally, ensure that ibus daemon is running and that you setup languages using
 
-> ibus-setup
+    ibus-setup
 
 You may also need to include the following lines into environment variables.
 
-export GTK_IM_MODULE=ibus
-export XMODIFIERS=@im=ibus
-export QT_IM_MODULE=ibus
-export XIM_PROGRAM="/usr/bin/ibus-daemon -drx"
+    export GTK_IM_MODULE=ibus
+    export XMODIFIERS=@im=ibus
+    export QT_IM_MODULE=ibus
+    export XIM_PROGRAM="/usr/bin/ibus-daemon -drx"
 
 ## Screenshots
 

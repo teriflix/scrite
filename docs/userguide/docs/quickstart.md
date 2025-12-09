@@ -2,139 +2,123 @@
 ![type:video](https://www.youtube.com/embed/O9UusQzv58M)
 
 ## Home Screen
-The first thing you will be greeted with when you start Scrite is the Home Screen.
+When you start Scrite, you’ll see the Home Screen.
 
 <img src="../images/quickstart/007-home-screen.png" alt="Home Screen" width="720"/>
 
-From this screen you can
+From here you can:
 
-- Start a new document, either from scratch or from one of the templates provided.
-- Open a document from Scriptalay, our online mini-library of screenplays
+- Start a new document (blank or from a template)
+- Open a screenplay from Scriptalay (our online mini‑library)
 - Open a document from your local disk
-- Import from Final Draft or Fountain formats
-- Or recover unsaved screenplays from the vault.
-- Once you have worked with one or more documents, you will also be able to pick from a list of
-  recent files from here.
+- Import from Final Draft (FDX) or Fountain
+- Recover unsaved screenplays from the vault
+- Quickly access recent files
 
-In subsequent chapters of this user guide, we will show you how to write your first screenplay, and
-use professional writing tools to capture notes, plot your store, format scenes and export your
-work.
+This guide will show you how to write your first screenplay, capture notes, plot your story, format
+scenes, and export your work.
 
 ## Importing Screenplays
-Many of our users are professional writers. The first thing they do when they install Scrite is to
-import their existing screenplays from Final Draft or Fountain formats. If you would like to do the
-same, then close the Home Screen and simply drag and drop your FDX or Fountain files on to the
-Scrite window.
+Many writers start by importing existing screenplays from Final Draft or Fountain. To do this, close
+the Home Screen and drag‑and‑drop your FDX or Fountain file onto the Scrite window.
 
 <img src="../images/quickstart/008-importing-screenplays.png" alt="Importing Screenplays"
 width="720"/>
 
-Scrite supports importing from Final Draft (FDX) files created using Final Draft versions 5 through
-13. While importing, paragraphs formatted in scene heading, action, character, parenthetical, shot
-and transition are imported and identified as such. Scrite can also import from plain text and
-fountain files, although there may be import errors.
+Scrite supports Final Draft (FDX) files created with versions 5 through 13. Paragraphs formatted as
+scene heading, action, character, parenthetical, shot, and transition are imported and tagged
+accordingly. Plain text and Fountain files are also supported, with minor import differences
+possible.
 
-Once imported, you can click on the Scene list panel button to the left, or use keyboard shortcut
-`Alt+0`, to take a look at all the scenes.
+After import, open the Scene List panel (left‑side icon) or press `Alt+0` to view all scenes.
 
 <img src="../images/quickstart/009-scene-list-panel.png" alt="Scene List Panel" width="720"/>
 
-Click on any scene listed in this panel to quickly navigate to that scene in the screenplay editor.
+Click any scene in the list to jump to it in the editor.
 
-Notice how Scrite calculates page count, and also estimates screentime once you import your
-screenplay. Additionally, it shows the time taken by each scene in the scene list panel. If you
-hover any of the scenes in the scene list panel Scrite shows you additional meta-data about that
-scene. Time estimates are calculated based on the assumption that each page of the screenplay
-translates to one minute of screentime. It is possible to configure this.
+Scrite calculates page count and estimates screen time after import. The Scene List shows each
+scene’s estimated duration; hover a scene to view more metadata. By default, one page ≈ one
+minute—this can be configured.
 
 <img src="../images/quickstart/009-page-and-time-estimate.png" alt="Page Count & Time Est."
 width="540"/>
 
-## Creating a new screenplay
-To start from scratch, launch the Home Screen and select the Blank Document option.
+> **NOTE**: Scrite estimates page count and screentime in a background thread, which means that it
+> may take some time before you see final estimates on the UI.
+
+## Creating a New Screenplay
+To start from scratch, open the Home Screen and select “Blank Document”.
 
 <img src="../images/quickstart/010-blank-document.png" alt="Blank Document" width="720"/>
 
-When you launch Scrite, the first thing you will notice is that there is a blank scene, with the
-initial scene heading shown as `EXT. SOMEWHERE – DAY`.
+Your first document starts with a blank scene, using a default heading like `EXT. SOMEWHERE – DAY`.
 
 <img src="../images/quickstart/010-first-scene.png" alt="First Scene" width="720"/>
 
-As mentioned before, Scrite’s UI is scene-centric. So you will not see pages in the app, but you
-will see a text block for each scene.
+Scrite’s UI is scene‑centric: you won’t see pages; you’ll work with a text block for each scene.
 
-To create a new scene, you can click on the `New Scene` button in the toolbar, or use the keyboard
-shortcut Ctrl+Shift+N (on Windows & Linux) or ⌘+Shift+N (on macOS).
+To create a new scene, click `New Scene` on the toolbar or use `Ctrl+Shift+N` (Windows/Linux) or
+`⌘+Shift+N` (macOS).
 
 <img src="../images/quickstart/011-second-scene.png" alt="Adding a Scene" width="540"/>
 
-This will create a new empty scene after the currently selected scene (or at the end, if no scene is
-selected).
+This creates a new empty scene after the selected scene (or at the end if none is selected).
 
 <img src="../images/quickstart/012-second-scene.png" alt="Second Scene" width="720"/>
 
-You can also use the buttons at the end to append a new scene, act or episode break.
+You can also append a new scene, act, or episode break using the buttons at the end.
 
 <img src="../images/quickstart/013-adding-elements.png" alt="Adding Elements" width="320"/>
 
-Scrite will add a new scene with a default scene heading and cursor blinking in the scene content
-area of that scene.
+Scrite adds the scene with a default heading and places the cursor in the content area.
 
 ## Saving and Opening Files
-New files are unnamed and unsaved. Scrite allows you to work on your screenplay until you actually
-decide to save it.
+New files start unnamed and unsaved. You can work freely until you choose to save.
 
-While we do have auto-save, it kicks in only if enabled and after a file has been saved atleast once
-and is in a directory which can be written into.
+Autosave is available once enabled and after you’ve saved the file at least once to a writable
+location.
 
-To save a file, you simply have to click on the save icon , select a folder and provide a file name.
-Scrite files are saved with extension .scrite.
+To save, click the Save icon, choose a folder, and enter a name. Scrite files use the `.scrite`
+extension.
 
-You can open files by
+You can open files by:
 
-- Double clicking on the .scrite file in File Explorer (Windows), Finder (macOS) or
-Nautilus/Konqueror (Linux). 
-- If that doesn’t work, then go to the Home Screen and select the Open option (or simply use the
-keyboard shortcut Ctrl+O (on Windows & Linux), ⌘+O (on macOS). 
-- Alternatively, you can drag and drop your Scrite document on the app-window to open it.
+- Double‑clicking the `.scrite` file in File Explorer (Windows), Finder (macOS), or
+  Nautilus/Konqueror (Linux)
+- Using the Home Screen’s Open option or `Ctrl+O` (Windows/Linux), `⌘+O` (macOS)
+- Drag‑and‑dropping the document onto the app window
 
 ## Editing the Scene Heading
-You can click on the Scene Heading or use keyboard shortcut Ctrl+Zero (⌘+Zero) to move cursor to the
-scene heading and edit it.
+Click the scene heading or press `Ctrl+0` (`⌘+0`) to move the cursor to the heading and edit it.
 
 < Screenshot >
 
-When you are done, you can hit Enter to switch cursor to the scene content area.
+Press `Enter` to switch the cursor to the scene content area.
 
-Here is the first difference between Scrite and other apps. While other apps provide a way to mark
-any paragraph as a scene heading, Scrite requires you to create a scene explicitly and assign a
-scene heading to it. Later on in a future article, we will show you how (and why) you can create
-scenes without a scene heading.
+Unlike many apps that let you mark any paragraph as a scene heading, Scrite requires creating a
+scene and assigning its heading. In a later article, we’ll show when (and why) you can create scenes
+without a heading.
 
-Also notice how the Scene heading area has a color to it and it also shows characters list. Infact,
-you can configure Scrite to show you the scene synopsis as well.
-
-< Screenshot >
-
-Once you check the “Scene Synopsis” option, you will notice that a new area now shows up in the
-scene heading where you can type the synopsis of your scene.
+The scene heading area is color‑tinted and shows the character list. You can also show the scene
+synopsis.
 
 < Screenshot >
 
-The Synopsis field is where you can type a short description of what you think should happen in this
-scene. When you export your screenplay to PDF, the synopsis is not exported by default; although you
-can toggle that option explicitly if you want.
+Enable “Scene Synopsis” to reveal a field in the heading where you can type the scene’s synopsis.
+
+< Screenshot >
+
+Use the Synopsis field to jot a brief description of the scene. By default, synopsis isn’t exported
+to PDF—you can enable it if desired.
 
 ## Typing Scene Content
 
-While writing your scene content, you probably want to format your action, character, dialogue,
-parenthetical, shot and transition paragraphs. Scrite has a button for each paragraph type on the
-toolbar as shown below.
+Format action, character, dialogue, parenthetical, shot, and transition paragraphs using the toolbar
+buttons.
 
 < Screenshot >
 
-While editing you can also use keyboard shortcuts as outlined in the table below to switch between
-various paragraph types.
+You can also use keyboard shortcuts to switch paragraph types:
 
 | Paragraph Type | Windows, Linux | macOS | 
 |:---------------|:---------------|:------|
@@ -145,87 +129,73 @@ various paragraph types.
 | Shot | Ctrl+5 | ⌘+5 | 
 | Transition | Ctrl+6 | ⌘+6 | 
 
-Infact, in most cases you can simply use the Tab key to switch to the paragraph type, of the current
-paragraph under the cursor, to the next most appropriate paragraph type.
+In many cases, pressing `Tab` advances the current paragraph to the next appropriate type.
 
-Shown below is contents of a scene, with paragraphs properly formatted.
+Below is an example scene with paragraphs properly formatted.
 
 < Screenshot >
 
 ## Adding More Scenes
 
-As mentioned before, you can keep creating more scenes and adding content to each of the scenes. To
-add a new scene, you can either click on the new scene button at the end of the page or on the
-toolbar as shown below.
+Keep creating scenes and adding content. To add a new scene, click the button at the end of the page
+or use the toolbar.
 
 < Screenshot >
 
 > **A note on scene lengths**
 >
-> Scrite is optimized for screenplays that follow best practices in structure—featuring
-> predominantly short scenes with a few longer ones as needed.
->
->The app performs best when most scenes are under a page in length, with occasional scenes extending
->up to two pages. This not only supports smoother performance but also aligns with industry
->standards for pacing and reader engagement. While you can write longer scenes in Scrite, please
->note that if the majority of scenes exceed two pages, the app’s performance may become noticeably
->sluggish and, in some cases, difficult to use. For the best experience, we recommend keeping scene
->lengths concise as much as possible.
+> Scrite is optimized for screenplays with mostly short scenes. The app performs best when scenes
+> are under a page, with occasional scenes up to two pages. Longer scenes are supported, but if most
+> scenes exceed two pages, performance may suffer. Keeping scenes concise helps pacing and
+> readability.
 
 ## Scene List Panel
-As shown before, you can click on the icon along the left edge of the window to toggle visibility of
-the scene list panel.
+Toggle the Scene List panel using the icon along the left edge of the window.
 
 <screenshot>
 
-Clicking on a scene heading in the left causes Scrite to switch to that scene on the editor. You can
-even reorder scenes on the list by clicking on a scene and dragging it to another position in the
-screenplay.
+Click a scene heading to switch the editor to that scene. You can reorder scenes by dragging them to
+a new position.
 
 <gif>
 
-## Distraction Free Writing
-You can turn off scene character list and synopsis panels using the “Screenplay Editor Options”
-menu.
+## Distraction‑Free Writing
+Use “Screenplay Editor Options” to hide the character list and synopsis panels.
 
 <screenshot>
 
-And finally, you can collapse the scene list panel on the left. You will now have a clean and
-distraction free writing area.
+Collapse the Scene List panel to maximize your writing area.
 
-## Editing The Title Page
-You can click on the “Edit Title Page” button at the top of your screenplay.
+## Editing the Title Page
+Click “Edit Title Page” at the top of your screenplay, or by using the keyboard shortcut
+`Ctrl+Shift+T`.
 
 <Screenshot>
 
-This opens a title page editor dialog box, where you can assign a cover page image and also key
-values against title-page fields.
+This opens the Title Page editor where you can assign a cover image and fill in title‑page fields.
 
 <screenshot>
 
-Once done, you can click on the close icon on the top right of the dialog box to apply the changes.
-From then on, the title page fields along with the cover art will show up before the first scene of
-your screenplay.
+Click the close icon (top‑right) to apply changes. The title page appears before the first scene.
 
 ## Exporting to PDF
-You can select Export > Adobe PDF, or use the keyboard shortcut Ctrl+P (on Windows & Linux), ⌘+P (on
-macOS) to preview how your screenplay would look when exported to PDF.
+Select `Export → Adobe PDF`, or press `Ctrl+P` (Windows/Linux) or `⌘+P` (macOS) to preview your PDF.
 
-The “Export to Adobe PDF” configuration dialog box offers a bunch of options to customise how your
-PDF file will look. In here you can toggle title page, synopsis and more.
-
-<screenshot>
-
-Please review the options available on this dialog box and customize your PDF output the way you
-like it.
-
-Finally, click on “Generate PDF” to generate a preview of the PDF file.
+The Export dialog offers options to customize your PDF—toggle title page, include synopsis, and
+more.
 
 <screenshot>
 
-Once you are satisfied, you can click on the “Save PDF” button along the bottom edge of the dialog
-box to save the PDF file to a location of your choice.
+Review the options and customize the output to your preference.
 
-Please note that you will not be able to change or remove the default watermark while you are using
-the app in free-trial. Please purchase a plan that supports customisation of watermarks to change or
-remove the watermark.
+Click “Generate PDF” to create a preview.
+
+<screenshot>
+
+When you’re satisfied, click “Save PDF” to export to a location of your choice.
+
+> **NOTE**: During the free trial, the default watermark can’t be changed or removed. Purchase a
+plan that supports watermark customization to modify or remove it.
+
+> **NOTE**: Certain plans may just show a PDF preview, but not allow you to save it. Please review
+> plan features before subscribing.

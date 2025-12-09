@@ -1,33 +1,24 @@
 # Welcome to Scrite
-Scrite is an open-source desktop screenwriting app. It's available for  Windows, macOS and Linux
-laptops and desktops. You can write in multiple languages easily, and create professional industry
-standard PDF exports, and reports. Whether you are a beginner, or have just learned screenwriting,
-or a professional; Scrite has you covered. 
+Scrite is an open‑source desktop screenwriting app for Windows, macOS, and Linux. Write in multiple
+languages, export industry‑standard PDFs, and generate reports—all with tools that suit beginners
+and professionals alike.
 
-## Scene Centric Approach
-Most screenwriting apps treat a screenplay like a series of pages, but Scrite treats it like a
-series of scenes—because that’s how movies are made. Instead of focusing on page counts, Scrite
-helps you structure and visualize your story through its scene-centric UI.
+## Scene‑Centric Approach
+Most apps treat a screenplay as pages; Scrite treats it as scenes—because that’s how films are made.
+Instead of page counts, Scrite helps you structure and visualize your story with a structure-first
+scene‑centric UI.
 
 <img src="./images/quickstart/001-scene-centric-ui.png" alt="Photo by Tima Miroshnichenko from
 Pexels" width="320"/>
 
-## Why is Scrite Scene Centric?
-Screenwriting apps have traditionally mirrored typewriters, where each page roughly translates to
-one minute of screen time—a format deeply rooted in the industry. While page count remains
-important, Scrite shifts the focus to scenes because that’s how filmmakers think.
+## Why Scenes First?
+Traditional screenwriting apps mirror typewriters: one page ≈ one minute. Page count still matters,
+but filmmakers think in scenes. Scrite shifts the focus to building your story scene by scene—making
+structure clearer, relationships easier to see, and navigation more natural.
 
-In Scrite, you don’t write with pages in mind—you build your screenplay scene by scene. This
-approach makes it easier to structure your narrative, see relationships between different scenes,
-and navigate your story organically. Scrite incorporates familiar elements from traditional apps,
-but presents them in a way that prioritizes scene flow rather than rigid page formatting.
+Scrite supports industry formatting while encouraging a scene‑first mindset.
 
-By embracing this scene-first mindset, Scrite offers a unique writing experience that better aligns
-with the way stories are conceived, developed, and brought to life.
-
-Scrite still supports industry standards but helps writers think in scenes first.
-
-| Page-Centric Apps	| Scrite’s Scene-Centric Approach| 
+| Page‑Centric Apps	| Scrite’s Scene‑Centric Approach| 
 |:------------------|:-------------------------------|
 | Think in pages | Think in scenes | 
 | Screenplay length = page count | Screenplay length = scene flow | 
@@ -35,184 +26,165 @@ Scrite still supports industry standards but helps writers think in scenes first
 | Formatting = aligned with industry standard | Formatting = aligned with industry standard | 
 | Navigation = scroll through pages | Navigation = jump between scenes | 
 
-## What Scrite is not?
-Now, that we have made a case for scene-centric UI in Scrite, its important for us to clarify what
-Scrite is not, so that you know what to expect and what not to in the app.
+## What Scrite Is Not
+To set expectations clearly, here’s what Scrite does not aim to be.
 
-### Not Page Centric
-Scrite is not a direct replacement for traditional screenwriting apps like Final Draft, Celtx, or
-Arc Studio. It doesn’t mimic the typewriter-inspired, page-centric approach these apps follow.
-Instead, it reimagines screenplay writing by focusing on scenes as the fundamental unit of
+### Page‑Centric ✗
+Scrite isn’t a clone of Final Draft, Celtx, or Arc Studio. It doesn’t mimic the typewriter‑inspired,
+page‑centric approach. Scrite reimagines writing by using scenes as the fundamental unit of
 storytelling.
 
 <img src="./images/quickstart/002-what-scrite-is-not.jpg" alt="Photo by Min An from Pexels"
 width="320"/>
 
-### No Cloud Storage
-As an offline app, Scrite gives you full control by saving your screenplays directly to your
-computer. We don't store your work on our servers, which means the security and backup of your files
-are in your hands. Because of this, we cannot recover lost or deleted files, so we highly recommend
-using a cloud-synced folder (like Dropbox or Google Drive) to keep your work safe.
+> **NOTE**: Scrite does calculate page count, estimates screentime, and displays approxmate page
+> boundaries. However, it is not designed to be a page-centric editor.
+
+### Cloud Storage ✗
+Scrite saves files locally on your computer. We don’t store your work on our servers, so backups are
+your responsibility. We can’t recover lost or deleted files—use a cloud‑synced folder (Dropbox,
+Google Drive, etc.) to keep your work safe.
 
 > In the future, we plan to add built-in integrations for popular cloud storage services like Google
 > Drive and OneDrive. Until then, you can use the folder-sync features provided by these platforms
 > to keep your documents synced across multiple devices.
 
-### No Realtime Collaboration
-Scrite currently does not support real-time collaboration, meaning multiple writers cannot work on
-the same document at the same time. While the app tries to prevent this by detecting when a file is
-opened on multiple devices, these safeguards are not foolproof. If multiple users attempt to edit
-the same file simultaneously by overriding these safeguards, it could lead to data loss or file
-corruption.
+### Real‑Time Collaboration ✗
+Scrite doesn’t support multiple writers editing the same document simultaneously. The app warns when
+a file is opened on more than one device, but safeguards aren’t foolproof. Concurrent editing may
+cause conflicts or data loss.
 
 > Real-time collaboration is planned for a future update.
 
+### Dark Mode ✗
+Dark mode is one of our most‑requested features. We appreciate how helpful it is and plan to add it.
+For now, Scrite doesn’t include a dark theme, and we apologise if this is a deal breaker for you.
+
+### AI Copilot ✗
+Scrite doesn’t include built‑in AI features today. If you prefer an AI copilot, you can use tools
+like ChatGPT, Claude, Grok, or Gemini alongside Scrite.
+
+We’re exploring AI‑enabled workflows that respect your creative voice. When they’re ready, we’ll
+announce them on our website and in this guide. 
+
+### Production Planning Tools ✗
+Right now, Scrite focuses on writing. We’re assembling a team to build production planning features
+thoughtfully.
+
+Planned areas include:
+
+- Shot division
+- Storyboarding
+- Scheduling
+- Call sheets
+- Budgeting
+- Customizable reports
+- Production tracking
+- Companion apps for mobile and tablets
+
+We also intend to offer AI assists that support these workflows—without getting in the way of your
+creative process. 
+
 ## Supported Platforms
-Scrite is currently a desktop-only app, which means you can install and use the app on desktops and
-laptops that run Windows, macOS or Linux OS. 
+Scrite is a desktop app for Windows, macOS, and Linux.
 
 > As of writing Scrite is not available for tablets and mobile phones, though we would like to
 support them at some point in the future.
 
 ### Minimum Requirements
-- Operating System
-    - Windows 10 or later
-        - You can install and use Scrite on Windows 7 & Windows 8.1 also, however we don’t actively
-          test on these platforms. So it may not work at its best.
-        - If Scrite installation fails or after installation, it fails to start (by reporting DLL
-           errors); please ensure that you install all Windows OS Updates and then reinstall Scrite.
+- Operating System - Windows 10 or later - Scrite may run on Windows 7/8.1, but it’s not actively
+        tested. - If installation fails or the app won’t start (DLL errors), install Windows Updates
+                and then reinstall Scrite.
     - macOS High Sierra 10.13 or later
         - Intel x86_64 builds available
-        - Native Apple Silicon builds are not available yet
+        - Native Apple Silicon builds not yet available
     - GNU/Linux
         - Ubuntu 22.04 or later
         - X11 or Wayland
 - Hardware
-    - Display Resolution: 1280x768 or higher recommended
+    - Display Resolution: 1280×768 or higher recommended
     - RAM: 8 GB
     - Any Intel processor with 2 cores or more
     - Graphics Card with 16MB or more VRAM would is recommended, although not absolutely required
 
-The best way to check if Scrite works for you is to download and install it on your laptop or
-desktop, and use it with free trial for a couple of weeks.
+The best way to check if Scrite works for you is to install it and use the free trial for a couple
+of weeks.
 
 ## Installing Scrite
-Download installer for your operating system from the [downloads
-section](https://www.scrite.io/downloads) of our website.
+Download the installer for your OS from the [Downloads](https://www.scrite.io/downloads) page.
 
-> **NOTE**: Please take a moment to read installation instructions in the downloads page for
-Windows, macOS and Linux to understand the correct way to install Scrite on those platforms.
+> **Note:** Review installation instructions on the Downloads page for Windows, macOS, and Linux.
 
 ## Subscription Options
-The first time you launch Scrite, you will be asked to create a Scrite account and activate the
-30-day free trial, or sign up for a paid plan.
+On first launch, create a Scrite account and activate the 30‑day free trial—or sign up for a paid
+plan.
 
-> **NOTE:** Without an active subscription (trial or paid), you cannot use any part of the Scrite
-app.
+> **Note:** Without an active subscription (trial or paid), the app is locked.
 
-### Creating your Scrite account
-When you launch Scrite for the first time, you will be asked to setup your Scrite login by providing
-an email id.
+### Create Your Scrite Account
+On first launch, set up your login using your email address.
 
-> **NOTE**: A Scrite account is required only to manage your free-trial and paid-subscriptions. By
-creating an account you will not be able to sync your documents and settings across multiple devices
-using the same email.
+> **Note:** Your Scrite account manages trials and subscriptions. It doesn’t sync documents or
+> settings across devices.
 
 <img src="./images/quickstart/003-creating-account.png" alt="Scrite Account" width="640"/>
 
-Once you click "Continue" on this page, you will receive an activation code on your email.
+Click “Continue” and you’ll receive an activation code by email.
 
 <img src="./images/quickstart/004-activation-code-email.png" alt="Activation Code" width="480"/>
 
-Simply copy the activation code, and paste it in Scrite.
+Copy the code and paste it into Scrite.
 
 <img src="./images/quickstart/004-activation.png" alt="Activation Code" width="480"/>
 
-Once our web services verify your activation code, it will issue license activation tokens and let
-you in.
+Once verified, Scrite issues license tokens and unlocks the app.
 
-Each license token has a validity period, after which a new token must be retrieved. This process
-happens automatically as long as you are connected to the Internet and use Scrite at least once
-every 28 days. If the app cannot connect to the Internet within this time, it will lock itself and
-prompt you to reactivate by obtaining a new activation code.
+License tokens renew automatically as long as you’re online and use Scrite at least once every 28
+days. If the app can’t connect within that window, it locks and prompts you to reactivate.
 
-### Starting your 30-day free trial
-Since January 2025, you can start a 30-day free trial to try out all features of Scrite and make
-sure that the app works on your desktops and laptops. Simply click on the Start button next to Free
-Trial to activate your trial. During the free trial, you can try out all features of Scrite and
-familiarize yourself with the app. You can import your work from other formats, and even export your
-Scrite documents to third party formats. You do not have to provide us any credit card information
-to start your free trial. 
+### Start a 30‑Day Free Trial
+Try all features and ensure Scrite works on your devices. Click “Start” next to Free Trial—no credit
+card required. You can import from other formats and export Scrite documents to third‑party formats.
 
 <img src="./images/quickstart/005-trial-activation.png" alt="Free Trial" width="640"/>
 
-Following features are restricted during free trial:
+The following features are restricted during the free trial:
 
-- Watermark on PDFs cannot be configured or removed.
-- Two Column Report cannot be saved to PDF.
-- No email support will be available.
-- You can use the app on one device at a time, more on that later.
+— PDF watermarks can’t be configured or removed. — Two‑Column Report can’t be saved to PDF. — No
+email support. — Use of the app is limited to one device at a time (details later).
 
-At anytime during your trial, you can sign up for any of the paid plans and enjoy all features
-unlocked from the paid plan for the remainder of your trial and for the duration of the plan you
-have purchased.
+At any time during your trial, you can purchase a plan. Paid features unlock immediately for the
+rest of your trial and for the duration of your plan.
 
-The actual list of plans, prices and currency shown in the UI vary depending on your location and
-other parameters. For example, if you are a film-school student, you can reach out to us on
-support@scrite.io and we will enable a special discounted plan for you.
+Plans, prices, and currency vary by location. Film‑school students can email support@scrite.io for
+discounted options.
 
-### Purchasing a Plan
+### Purchase a Plan
 
-Once you start your free trial, you can either continue to explore other plans available to you, or
-close the user profile window and enter the Scrite UI.
+After starting your trial, you can explore available plans or close the profile window and start
+writing.
 
-At any time during your free trial, you can click on the `User Account` icon to the top right corner
-of the Scrite window to open the User Profile dialog box, and then switch to the subscriptions tab
-to take a look at all available plans.
+At any time, click the `User Account` icon (top‑right) to open the User Profile dialog. Switch to
+the Subscriptions tab to view available plans.
 
 <img src="./images/quickstart/006-subscription-plans.png" alt="Subscription Plans" width="640"/>
 
-You can click on the `Compare Plans` link towards the bottom right corner of Available Plans box, to
-pull out a feature comparison table.
+Click `Compare Plans` (bottom‑right) to open a feature comparison table.
 
 <screenshot>
 
-Please ensure that you review all features available against each plan before purchasing. No
-cancellation or upgrade is currently offered against any plan.
+Review features carefully before purchasing. Cancellation or upgrade isn’t currently offered.
 
-Once you have chosen the plan you want to purchase, click on the `Buy` link against that plan to
-open a browser window from where you can pay for the plan. As soon as your payment is received, you
-will notice confirmation message on the browser window, after which you can switch to the Scrite app
-and begin using the features purchased in your plan. If you have days remaining in your trial
-period, the app will continue to display TRIAL on the title bar, but you can use all features from
-your upcoming paid plan during the remaining period of your trial.
+When ready, click `Buy` on your chosen plan. Complete payment in the browser, then return to
+Scrite—the plan activates immediately. If trial days remain, the app may still show “TRIAL”, but
+paid features are available.
 
-If you run into payment or subscription activation issues, please lookup our FAQ and see if you can
-find solutions there. You can always reach out to us on email at support@scrite.io for further
-assistance.
+If you run into payment or activation issues, check the FAQ. For help, email support@scrite.io.
 
-### Building from Source
-Scrite is an open-source software. The complete source code can be found on our Github repository.
-Please lookup instructions for building from source in the README file within our repository. 
+### Build from Source
+Scrite is open source. Find the code on [GitHub](https://github.com/teriflix/scrite) and follow the
+[README](https://github.com/teriflix/scrite/blob/master/README.md) for build instructions.
 
-> **NOTE**: We do not offer support for helping you build Scrite, nor do we offer product support
-> for any build that's not officially offered by us.
-
-## Support
-### Discord Community
-
-Join our growing [Discord community](https://www.scrite.io/forum/) of users where you can post
-questions, report bugs, request for missing features and more. Please be sure to review existing
-material on Discord, because its possible that your queries have already been addressed there.
-
-Most subscription plans do not include email-support, so Discord is the best place to connect with
-us.
-
-### Tutorials and Walkthoughs
-
-- [Guided Tour of Scrite, Sep 2022](https://youtu.be/Web6WEj56wo)
-- [Generating the Statistics Report](https://youtu.be/qp8ZSYI8Z_w)
-- [Using Custom Story Beats](https://youtu.be/Ql_BjMVpjNc)
-- [Typing in Multiple Indian Languages](https://youtu.be/Ts1PFvemaIw)
+> **Note:** We don’t provide support for building Scrite or for unofficial builds.
 
 
