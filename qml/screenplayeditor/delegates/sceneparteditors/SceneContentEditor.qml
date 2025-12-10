@@ -577,8 +577,9 @@ AbstractScenePartEditor {
         }
 
         function ensureSceneTextEditorCursorIsVisible() {
-            if(_sceneTextEditor.activeFocus)
+            if(_sceneTextEditor.activeFocus) {
                 root.ensureVisible(_sceneTextEditor, _sceneTextEditor.cursorRectangle)
+            }
         }
 
         function ensureSceneTextEditorCursorIsCentered() {
@@ -596,7 +597,7 @@ AbstractScenePartEditor {
                 captureCursorOffset()
                 _sceneDocumentBinder.copy(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
                 _sceneTextEditor.remove(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
-                Qt.callLater(_private.restoreCursorOffset)
+                Runtime.execLater(_private, Runtime.stdAnimationDuration, _private.restoreCursorOffset)
             }
         }
 
@@ -625,7 +626,7 @@ AbstractScenePartEditor {
                 } else {
                     _sceneTextEditor.cursorPosition = 0
                     placeCursorAt(cursorPositionAfterPaste)
-                    Qt.callLater(_private.restoreCursorOffset)
+                    Runtime.execLater(_private, Runtime.stdAnimationDuration, _private.restoreCursorOffset)
                 }
             }
         }
@@ -653,13 +654,14 @@ AbstractScenePartEditor {
         }
 
         function restoreCursorOffset() {
-            const cursorRect = _sceneTextEditor.cursorRectangle
             let localCursorYDelta = _sceneTextEditor.cursorRectangle.y - localCursorRect.y
             let expectedGlobalCursorY = globalCursorY + localCursorYDelta
 
             let expectedGlobalCursorYDiff = Math.abs(listView.mapFromItem(_sceneTextEditor, _sceneTextEditor.cursorRectangle).y - expectedGlobalCursorY)
             if( expectedGlobalCursorYDiff < Runtime.idealFontMetrics.lineSpacing/2 ) {
                 discardCursorOffset()
+                if(expectedGlobalCursorY < Runtime.idealFontMetrics.lineSpacing || expectedGlobalCursorY > listView.height-Runtime.idealFontMetrics.lineSpacing)
+                    ensureSceneTextEditorCursorIsCentered()
                 return
             }
 
