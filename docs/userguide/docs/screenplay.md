@@ -6,7 +6,7 @@ be downloaded from
 and all rights for the screenplay rests with its owners. We are using the screenplay only for
 explaining features in the product.
 
-<img src="../images/advanced-editing/001-knives-out.jpg" width="720"/>
+<img src="../images/screenplay/001-knives-out.jpg" width="720"/>
 
 ## Capturing The Logline
 
@@ -16,12 +16,12 @@ film on IMDb.
 If you want to capture the logline of your screenplay in Scrite, you can toggle the logline editor
 in the Screenplay Editor Options Dialog.
 
-<img src="../images/advanced-editing/002-logline.jpg" width=480"/>
+<img src="../images/screenplay/002-logline.jpg" width=480"/>
 
 Once enabled, Scrite presents a logline field below the title page on the Screenplay Editor. You can
 capture the logline in this field.
 
-<img src="../images/advanced-editing/003-logline.jpg" width=640"/>
+<img src="../images/screenplay/003-logline.jpg" width=640"/>
 
 As you can see, Scrite highlights the last few words in the logline in red color. This is because
 they spill over the recommend character limit for loglines. While it is recommended that you don't
@@ -35,7 +35,7 @@ don’t. If you like color coding scenes, Scrite supports it.
 Select one or more scenes on the Scene List Panel, and right-click to view a menu. From here you can
 select a color to assign to your selected scenes.
 
-<img src="../images/advanced-editing/004-scene-colors.jpg" width=640"/>
+<img src="../images/screenplay/004-scene-colors.jpg" width=640"/>
 
 As you assign colors to different scenes, the Scene List panel uses the same color coding to display
 scene headings, as does the scene heading area in the screenplay editor.
@@ -43,7 +43,7 @@ scene headings, as does the scene heading area in the screenplay editor.
 Infact, you can also open the scene options menu in the screenplay editor to assign scene color for
 a specific scene.
 
-<img src="../images/advanced-editing/005-scene-colors.jpg" width=480"/>
+<img src="../images/screenplay/005-scene-colors.jpg" width=480"/>
 
 ## Color Intensity
 
@@ -51,14 +51,14 @@ Some writers prefer to see intense colors for their scenes, and some prefer subd
 change the color intensity by clicking on Screenplay Editor Options Dialog, and dragging to color
 intensity slider as you see fit.
 
-<img src="../images/advanced-editing/006-color-intensity.jpg" width=480"/>
+<img src="../images/screenplay/006-color-intensity.jpg" width=480"/>
 
 ## Scene List Panel
 
 You can toggle the visibility of the Scene List panel by clicking on the button along the left edge
 of the app window, or by using the keyboard shortcut `Alt+0`. 
 
-<img src="../images/advanced-editing/007-scene-list-panel.jpg" width=720"/>
+<img src="../images/screenplay/007-scene-list-panel.jpg" width=720"/>
 
 Using the Scene List Panel you can get a quick overview of all scenes in your screenplay and even
 jump to a scene.
@@ -66,15 +66,15 @@ jump to a scene.
 By default, clicking on a scene in the Scene List panel causes the scene to get selected. You can
 select multiple scenes using `Ctrl+Click`.
 
-<img src="../images/advanced-editing/008-multi-select.png" width=720"/>
+<img src="../images/screenplay/008-multi-select.png" width=720"/>
 
 Or hold `Shift` to select a range.
 
-<img src="../images/advanced-editing/009-multi-select.png" width=720"/>
+<img src="../images/screenplay/009-multi-select.png" width=720"/>
 
 Whether you select one scene or many, you can right‑click to change colors for all selected scenes.
 
-<img src="../images/advanced-editing/004-scene-colors.jpg" width=640"/>
+<img src="../images/screenplay/004-scene-colors.jpg" width=640"/>
 
 ### Copy/Pasting Scenes to 3rd Party Apps
 
@@ -91,25 +91,25 @@ This way you can copy content out of Scrite to third party apps, and back.
 By default the Scene List Panel shows scene heading for each scene in a list view. You can, however,
 configure the scene list panel to show scene synopsis or summary instead.
 
-<img src="../images/advanced-editing/010-scene-list-panel-summary-text.jpg" width=640"/>
+<img src="../images/screenplay/010-scene-list-panel-summary-text.jpg" width=640"/>
 
 You can change the number of lines from the synopsis to display in Settings.
 
-<img src="../images/advanced-editing/011-scene-list-panel-summary-text.jpg" width=640"/>
+<img src="../images/screenplay/011-scene-list-panel-summary-text.jpg" width=640"/>
 
 ### Empty Scene Icon
 
 The Scene List panel shows an “empty‑scene” icon for scenes with only a scene‑heading but no
 content. This icon disappears as soon as some content is typed or pasted into the scene.
 
-<img src="../images/advanced-editing/012-empty-scene-icon.png" width=360"/>
+<img src="../images/screenplay/012-empty-scene-icon.png" width=360"/>
 
 ### Length Estimates
 
 You can toggle display of scene lengths against each scene in the scene list panel, either in terms
 of page count or screentime.
 
-<img src="../images/advanced-editing/013-scene-lengths-in-scene-list-panel.jpg" width=640"/>
+<img src="../images/screenplay/013-scene-lengths-in-scene-list-panel.jpg" width=640"/>
 
 Notice how the scene list panel shows aggregate time for act breaks. This helps in getting a quick
 impression of pacing in your screenplay.
@@ -120,14 +120,14 @@ You can enable tooltips and get additional information about each scene as you h
 the scene list panel. Additionally, when you select a bunch of scenes a separate tooltip shows up
 along the top with aggregate lengths of the selected scenes.
 
-<img src="../images/advanced-editing/014-scene-list-panel-tooltips.jpg" width=640"/>
+<img src="../images/screenplay/014-scene-list-panel-tooltips.jpg" width=640"/>
 
 ### Sequences
 
 As a writer you may want to bundle multiple scenes into a sequence, because they all form a logical
 group in your story. Simply select a range of scenes and bundle them together into a sequence.
 
-<img src="../images/advanced-editing/015-scene-list-panel-sequence.jpg" width=640"/>
+<img src="../images/screenplay/015-scene-list-panel-sequence.jpg" width=640"/>
 
 Scenes that are part of a sequence have a arrow prior to their scene number in the scene list panel.
 
@@ -141,7 +141,7 @@ Scrite lets you tag keywords and formal story beats (from Save The Cat, or your 
 against each scene, or on a bunch of them at once. You can enable the display of tracks to get a
 quick overview of story elements along side the scene headings in the scene list panel.
 
-<img src="../images/advanced-editing/016-scene-list-panel-tracks.jpg" width=640"/>
+<img src="../images/screenplay/016-scene-list-panel-tracks.jpg" width=640"/>
 
 Notice how the tracks on the left also shows a bar for each sequence (#1, #2 etc..) in a separate
 track.
@@ -158,14 +158,14 @@ Although Scrite isn’t page‑centric, page counts still matter:
 Scrite lets you keep track of current page, total page count, current time and total time on the
 status bar. In the editor area, page breaks are shown in a bubble to the left of the editing area.
 
-<img src="../images/advanced-editing/017-page-time-number.jpg" width=640"/>
+<img src="../images/screenplay/017-page-time-number.jpg" width=640"/>
 
 > **NOTE**: When exporting to PDF, page count may change depending on MORE and CONT’D usage.
 
 Time values are approximate (1 page ≈ 1 minute). You can adjust 'Time Per Page' in Settings →
 Screenplay → Page Setup.
 
-<img src="../images/advanced-editing/018-time-per-page.jpg" width=640"/>
+<img src="../images/screenplay/018-time-per-page.jpg" width=640"/>
 
 > **NOTE**: Page counts vary across apps. Final Draft, Scrite, and Fade In Pro may report different
 counts for the same screenplay; making them identical is rarely possible. Infact, page count
@@ -176,17 +176,17 @@ estimates done by Scrite on Windows, macOS and Linux vary as well.
 You can format paragraph types and have that format applied to all paragraphs of those types. Go to
 Settings → Screenplay → Formatting Rules to view and edit the currently applied rules. 
 
-<img src="../images/advanced-editing/019-formatting.png" width=720"/>
+<img src="../images/screenplay/019-formatting.png" width=720"/>
 
 Click any paragraph in the preview and alter properties. 
 
 Close the dialog and Scrite applies your formatting rules across all scenes. 
 
-<img src="../images/advanced-editing/020-formatting.png" width=720"/>
+<img src="../images/screenplay/020-formatting.png" width=720"/>
 
 These formats are used in preview, exported PDFs, and reports.
 
-<img src="../images/advanced-editing/021-formatting.png" width=720"/>
+<img src="../images/screenplay/021-formatting.png" width=720"/>
 
 Scrite does not apply special formatting to fragments of text (bold, italic, underline, color)
 within paragraphs via Formatting Rules. Use [Markup Tools](#markup-tools) for inline formatting.
@@ -200,7 +200,7 @@ used different options. Scrite maintains two sets of formatting options:
 Click “Factory Reset” to discard document‑specific options and use defaults. Click “Make Default” to
 set current options as your defaults.
 
-<img src="../images/advanced-editing/022-formatting.png" width=720"/>
+<img src="../images/screenplay/022-formatting.png" width=720"/>
 
 ## Markup Tools
 
@@ -208,7 +208,7 @@ Markup Tools let you apply inline formatting to specific snippets of text. The M
 hidden by default; toggle it from the Screenplay Editor Options menu. You can move the dock to any
 part of the screen.
 
-<img src="../images/advanced-editing/023-markup-tools.jpg" width=640"/>
+<img src="../images/screenplay/023-markup-tools.jpg" width=640"/>
 
 Select any text snippet and use Markup Tools to apply custom formatting. Hover over buttons to see
 shortcuts:
@@ -220,20 +220,20 @@ shortcuts:
 - ALL CAPS: Shift+F3
 - small caps: Ctrl+Shift+F3
 
-<img src="../images/advanced-editing/024-markup-tools.jpg" width=640"/>
+<img src="../images/screenplay/024-markup-tools.jpg" width=640"/>
 
 ## Custom Scene Numbers
 
 By default, Scrite generates scene numbers automatically and regenerates them if you change order or
 insert scenes. 
 
-<img src="../images/advanced-editing/025-custom-scene-numbers.png" width=720"/>
+<img src="../images/screenplay/025-custom-scene-numbers.png" width=720"/>
 
 You can apply custom numbers (e.g., 1, 1A, 1B) by editing the scene number field. Automatic
 numbering resumes for scenes without custom numbers. Custom numbers appear in preview, exported
 PDFs, and reports.
 
-<img src="../images/advanced-editing/026-custom-scene-numbers.png" width=720"/>
+<img src="../images/screenplay/026-custom-scene-numbers.png" width=720"/>
 
 ## Scene Comments, Featured Image and Index Card Fields
 
@@ -245,12 +245,12 @@ Index Card Fields.
 
 Enable “Scene Comments” in Screenplay Editor Options to show a pullout for each scene. 
 
-<img src="../images/advanced-editing/027-scene-comments-panel.jpg" width=720"/>
+<img src="../images/screenplay/027-scene-comments-panel.jpg" width=720"/>
 
 Clicking it opens a comment box per scene. For long scenes, the comment box scrolls with the scene
 and shows a title bar for clarity.
 
-<img src="../images/advanced-editing/028-scene-comments-panel.jpg" width=720"/>
+<img src="../images/screenplay/028-scene-comments-panel.jpg" width=720"/>
 
 ### Featured Image
 
@@ -258,7 +258,7 @@ The comment box has multiple tabs. Click the Featured Image tab to assign a phot
 drop or click “Select Photo”. Typically this is a storyboard sketch or location photo, but you can
 choose any image.
 
-<img src="../images/advanced-editing/029-featured-image.jpg" width=720"/>
+<img src="../images/screenplay/029-featured-image.jpg" width=720"/>
 
 ### Index Card Fields
 
@@ -271,7 +271,7 @@ Use the last tab to capture structured metadata per scene. By default, Index Car
 You can edit these fields by clicking the Edit icon; configure up to five fields. These fields can
 also be edited in the Structure tab.
 
-<img src="../images/advanced-editing/030-index-card-fields.jpg" width=720"/>
+<img src="../images/screenplay/030-index-card-fields.jpg" width=720"/>
 
 ## Tagging Character Presence in Scenes
 

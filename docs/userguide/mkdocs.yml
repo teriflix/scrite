@@ -1,10 +1,13 @@
 site_name: Scrite User Guide
 theme:
   name: material
+  logo: images/scrite-appicon.png
   palette: 
     - scheme: default
       primary: purple
       accent: purple
+extra_css:
+  - styles/style.css
 markdown_extensions:
   - toc:
       permalink: true

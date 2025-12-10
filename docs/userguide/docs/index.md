@@ -3,6 +3,13 @@ Scrite is an open‑source desktop screenwriting app for Windows, macOS, and Lin
 languages, export industry‑standard PDFs, and generate reports—all with tools that suit beginners
 and professionals alike.
 
+## Quick Links
+
+- [Official Scrite Website](https://www.scrite.io/)
+- [Downloads Page](https://www.scrite.io/downloads/)
+- [Pricing](https://www.scrite.io/pricing-and-features/)
+- [Source Code](https://github.com/teriflix/scrite)
+
 ## Scene‑Centric Approach
 Most apps treat a screenplay as pages; Scrite treats it as scenes—because that’s how films are made.
 Instead of page counts, Scrite helps you structure and visualize your story with a structure-first
@@ -29,7 +36,7 @@ Scrite supports industry formatting while encouraging a scene‑first mindset.
 ## What Scrite Is Not
 To set expectations clearly, here’s what Scrite does not aim to be.
 
-### Page‑Centric ✗
+### Page‑Centric <span class="red-x">✗</span>
 Scrite isn’t a clone of Final Draft, Celtx, or Arc Studio. It doesn’t mimic the typewriter‑inspired,
 page‑centric approach. Scrite reimagines writing by using scenes as the fundamental unit of
 storytelling.
@@ -40,7 +47,7 @@ width="320"/>
 > **NOTE**: Scrite does calculate page count, estimates screentime, and displays approxmate page
 > boundaries. However, it is not designed to be a page-centric editor.
 
-### Cloud Storage ✗
+### Cloud Storage <span class="red-x">✗</span>
 Scrite saves files locally on your computer. We don’t store your work on our servers, so backups are
 your responsibility. We can’t recover lost or deleted files—use a cloud‑synced folder (Dropbox,
 Google Drive, etc.) to keep your work safe.
@@ -49,25 +56,25 @@ Google Drive, etc.) to keep your work safe.
 > Drive and OneDrive. Until then, you can use the folder-sync features provided by these platforms
 > to keep your documents synced across multiple devices.
 
-### Real‑Time Collaboration ✗
+### Real‑Time Collaboration <span class="red-x">✗</span>
 Scrite doesn’t support multiple writers editing the same document simultaneously. The app warns when
 a file is opened on more than one device, but safeguards aren’t foolproof. Concurrent editing may
 cause conflicts or data loss.
 
 > Real-time collaboration is planned for a future update.
 
-### Dark Mode ✗
+### Dark Mode <span class="red-x">✗</span>
 Dark mode is one of our most‑requested features. We appreciate how helpful it is and plan to add it.
 For now, Scrite doesn’t include a dark theme, and we apologise if this is a deal breaker for you.
 
-### AI Copilot ✗
+### AI Copilot <span class="red-x">✗</span>
 Scrite doesn’t include built‑in AI features today. If you prefer an AI copilot, you can use tools
 like ChatGPT, Claude, Grok, or Gemini alongside Scrite.
 
 We’re exploring AI‑enabled workflows that respect your creative voice. When they’re ready, we’ll
 announce them on our website and in this guide. 
 
-### Production Planning Tools ✗
+### Production Planning Tools <span class="red-x">✗</span>
 Right now, Scrite focuses on writing. We’re assembling a team to build production planning features
 thoughtfully.
 
@@ -160,7 +167,6 @@ Plans, prices, and currency vary by location. Film‑school students can email s
 discounted options.
 
 ### Purchase a Plan
-
 After starting your trial, you can explore available plans or close the profile window and start
 writing.
 
