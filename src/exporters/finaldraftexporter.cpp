@@ -20,6 +20,47 @@
 #include <QDomAttr>
 #include <QFileInfo>
 
+static QString FDX_Suffix = QStringLiteral("fdx");
+static QString FDX_RootTag = QStringLiteral("FinalDraft");
+static QString FDX_VersionAttr = QStringLiteral("Version");
+static QString FDX_DocumentTypeAttr = QStringLiteral("DocumentType");
+static QString FDX_ScriptDocumentType = QStringLiteral("Script");
+static QString FDX_ContentTag = QStringLiteral("Content");
+static QString FDX_ParagraphTag = QStringLiteral("Paragraph");
+static QString FDX_TypeAttr = QStringLiteral("Type");
+static QString FDX_FlagsAttr = QStringLiteral("Flags");
+static QString FDX_OmittedFlag = QStringLiteral("Omitted");
+static QString FDX_IgnoreFlag = QStringLiteral("Ignore");
+static QString FDX_OmittedSceneTag = QStringLiteral("OmittedScene");
+static QString FDX_SceneHeadingType = QStringLiteral("Scene Heading");
+static QString FDX_ActionType = QStringLiteral("Action");
+static QString FDX_CharacterType = QStringLiteral("Character");
+static QString FDX_DialogueType = QStringLiteral("Dialogue");
+static QString FDX_ParentheticalType = QStringLiteral("Parenthetical");
+static QString FDX_TextTag = QStringLiteral("Text");
+static QString FDX_ShotType = QStringLiteral("Shot");
+static QString FDX_TransitionType = QStringLiteral("Transition");
+static QString FDX_StyleAttr = QStringLiteral("Style");
+static QString FDX_BoldStyle = QStringLiteral("Bold");
+static QString FDX_ItalicStyle = QStringLiteral("Italic");
+static QString FDX_UnderlineStyle = QStringLiteral("Underline");
+static QString FDX_StrikeoutStyle = QStringLiteral("Strikeout");
+static QString FDX_ColorAttr = QStringLiteral("Color");
+static QString FDX_BackgroundAttr = QStringLiteral("Background");
+static QString FDX_AlignmentAttr = QStringLiteral("Alignment");
+static QString FDX_LeftAlignment = QStringLiteral("Left");
+static QString FDX_RightAlignment = QStringLiteral("Right");
+static QString FDX_CenterAlignment = QStringLiteral("Center");
+static QString FDX_SceneNumberAttr = QStringLiteral("Number");
+static QString FDX_ScenePropertiesTag = QStringLiteral("SceneProperties");
+static QString FDX_TitleProperty = QStringLiteral("Title");
+static QString FDX_ColorProperty = QStringLiteral("Color");
+static QString FDX_SummaryProperty = QStringLiteral("Summary");
+static QString FDX_FontAttr = QStringLiteral("Font");
+static QString FDX_LanguageAttr = QStringLiteral("Language");
+static QString FDX_ScriptAttr = QStringLiteral("Script");
+static QString FDX_SeparatorAttr = QStringLiteral("Separator");
+
 FinalDraftExporter::FinalDraftExporter(QObject *parent) : AbstractExporter(parent) { }
 
 FinalDraftExporter::~FinalDraftExporter() { }
@@ -70,13 +111,13 @@ bool FinalDraftExporter::doExport(QIODevice *device)
 
     QDomDocument doc;
 
-    QDomElement rootE = doc.createElement(QStringLiteral("FinalDraft"));
-    rootE.setAttribute(QStringLiteral("DocumentType"), QStringLiteral("Script"));
+    QDomElement rootE = doc.createElement(FDX_RootTag);
+    rootE.setAttribute(FDX_DocumentTypeAttr, FDX_ScriptDocumentType);
     rootE.setAttribute(QStringLiteral("Template"), QStringLiteral("No"));
-    rootE.setAttribute(QStringLiteral("Version"), QStringLiteral("2"));
+    rootE.setAttribute(FDX_VersionAttr, QStringLiteral("2"));
     doc.appendChild(rootE);
 
-    QDomElement contentE = doc.createElement(QStringLiteral("Content"));
+    QDomElement contentE = doc.createElement(FDX_ContentTag);
     rootE.appendChild(contentE);
 
     auto addTextToParagraph = [&doc, this](QDomElement &paraE, const QString &text,
@@ -84,20 +125,19 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                                            const QVector<QTextLayout::FormatRange> &textFormats =
                                                    QVector<QTextLayout::FormatRange>()) {
         if (overrideAlignment != 0) {
-            const QString alignmentAttr = QStringLiteral("Alignment");
             switch (overrideAlignment) {
             default:
             case Qt::AlignLeft:
-                paraE.setAttribute(alignmentAttr, QStringLiteral("Left"));
+                paraE.setAttribute(FDX_AlignmentAttr, FDX_LeftAlignment);
                 break;
             case Qt::AlignRight:
-                paraE.setAttribute(alignmentAttr, QStringLiteral("Right"));
+                paraE.setAttribute(FDX_AlignmentAttr, FDX_RightAlignment);
                 break;
             case Qt::AlignHCenter:
-                paraE.setAttribute(alignmentAttr, QStringLiteral("Center"));
+                paraE.setAttribute(FDX_AlignmentAttr, FDX_CenterAlignment);
                 break;
             case Qt::AlignJustify:
-                paraE.setAttribute(alignmentAttr, QStringLiteral("Justify"));
+                paraE.setAttribute(FDX_AlignmentAttr, FDX_CenterAlignment);
                 break;
             }
         }
@@ -109,9 +149,9 @@ bool FinalDraftExporter::doExport(QIODevice *device)
         }
 
         auto createTextElement = [&]() {
-            QDomElement textE = doc.createElement(QStringLiteral("Text"));
-            textE.setAttribute(QStringLiteral("Font"), QStringLiteral("Courier Final Draft"));
-            textE.setAttribute(QStringLiteral("Language"), QStringLiteral("English"));
+            QDomElement textE = doc.createElement(FDX_TextTag);
+            textE.setAttribute(FDX_FontAttr, QStringLiteral("Courier Final Draft"));
+            textE.setAttribute(FDX_LanguageAttr, QStringLiteral("English"));
             paraE.appendChild(textE);
             return textE;
         };
@@ -130,35 +170,35 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                 QStringList styles;
                 if (format.format.hasProperty(QTextFormat::FontWeight)) {
                     if (format.format.fontWeight() == QFont::Bold)
-                        styles << QStringLiteral("Bold");
+                        styles << FDX_BoldStyle;
                 }
 
                 if (format.format.hasProperty(QTextFormat::FontItalic)) {
                     if (format.format.fontItalic())
-                        styles << QStringLiteral("Italic");
+                        styles << FDX_ItalicStyle;
                 }
 
                 if (format.format.hasProperty(QTextFormat::TextUnderlineStyle)) {
                     if (format.format.fontUnderline())
-                        styles << QStringLiteral("Underline");
+                        styles << FDX_UnderlineStyle;
                 }
 
                 if (format.format.hasProperty(QTextFormat::FontStrikeOut)) {
                     if (format.format.fontStrikeOut())
-                        styles << QStringLiteral("Strikeout");
+                        styles << FDX_StrikeoutStyle;
                 }
 
                 if (!styles.isEmpty())
-                    textE.setAttribute(QStringLiteral("Style"), styles.join('+'));
+                    textE.setAttribute(FDX_StyleAttr, styles.join('+'));
 
                 if (format.format.hasProperty(QTextFormat::BackgroundBrush)) {
                     const QColor color = format.format.background().color();
-                    textE.setAttribute(QStringLiteral("Background"), fdxColorCode(color));
+                    textE.setAttribute(FDX_BackgroundAttr, fdxColorCode(color));
                 }
 
                 if (format.format.hasProperty(QTextFormat::ForegroundBrush)) {
                     const QColor color = format.format.foreground().color();
-                    textE.setAttribute(QStringLiteral("Color"), fdxColorCode(color));
+                    textE.setAttribute(FDX_ColorProperty, fdxColorCode(color));
                 }
 
                 if (m_markLanguagesExplicitly) {
@@ -167,8 +207,8 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                             (QChar::Script)format.format.property(QTextFormat::UserProperty)
                                     .toInt();
                     const QString fontFamily = LanguageEngine::instance()->scriptFontFamily(script);
-                    textE.setAttribute(QStringLiteral("Font"), fontFamily);
-                    textE.setAttribute(QStringLiteral("Script"),
+                    textE.setAttribute(FDX_FontAttr, fontFamily);
+                    textE.setAttribute(FDX_ScriptAttr,
                                        QString::fromLatin1(scriptEnum.valueToKey(script)));
                 }
 
@@ -185,18 +225,18 @@ bool FinalDraftExporter::doExport(QIODevice *device)
 
         QDomElement paragraphContainerE = contentE;
         if (element->isOmitted()) {
-            QDomElement paragraphE = doc.createElement(QStringLiteral("Paragraph"));
+            QDomElement paragraphE = doc.createElement(FDX_ParagraphTag);
             contentE.appendChild(paragraphE);
 
-            paragraphE.setAttribute(QStringLiteral("Type"), QStringLiteral("Scene Heading"));
+            paragraphE.setAttribute(FDX_TypeAttr, FDX_SceneHeadingType);
             if (element->hasUserSceneNumber())
-                paragraphE.setAttribute(QStringLiteral("Number"), element->userSceneNumber());
+                paragraphE.setAttribute(FDX_SceneNumberAttr, element->userSceneNumber());
 
-            QDomElement textE = doc.createElement(QStringLiteral("Text"));
+            QDomElement textE = doc.createElement(FDX_TextTag);
             textE.appendChild(doc.createTextNode(QStringLiteral("OMITTED")));
             paragraphE.appendChild(textE);
 
-            QDomElement omittedSceneE = doc.createElement(QStringLiteral("OmittedScene"));
+            QDomElement omittedSceneE = doc.createElement(FDX_OmittedSceneTag);
             paragraphE.appendChild(omittedSceneE);
 
             paragraphContainerE = omittedSceneE;
@@ -208,12 +248,12 @@ bool FinalDraftExporter::doExport(QIODevice *device)
 
         if (heading->isEnabled() || scene->hasSynopsis()
             || (selement && selement->hasNativeTitle())) {
-            QDomElement paragraphE = doc.createElement(QStringLiteral("Paragraph"));
+            QDomElement paragraphE = doc.createElement(FDX_ParagraphTag);
             paragraphContainerE.appendChild(paragraphE);
 
-            paragraphE.setAttribute(QStringLiteral("Type"), QStringLiteral("Scene Heading"));
+            paragraphE.setAttribute(FDX_TypeAttr, FDX_SceneHeadingType);
             if (element->hasUserSceneNumber())
-                paragraphE.setAttribute(QStringLiteral("Number"), element->userSceneNumber());
+                paragraphE.setAttribute(FDX_SceneNumberAttr, element->userSceneNumber());
 
             if (heading->isEnabled()) {
                 addTextToParagraph(paragraphE, heading->text());
@@ -228,10 +268,10 @@ bool FinalDraftExporter::doExport(QIODevice *device)
 
             if (m_includeSceneSynopsis) {
                 if (scene->hasSynopsis() || (selement && selement->hasNativeTitle())) {
-                    QDomElement scenePropsE = doc.createElement(QStringLiteral("SceneProperties"));
+                    QDomElement scenePropsE = doc.createElement(FDX_ScenePropertiesTag);
                     paragraphE.appendChild(scenePropsE);
                     if (selement && selement->hasNativeTitle())
-                        scenePropsE.setAttribute(QStringLiteral("Title"), selement->nativeTitle());
+                        scenePropsE.setAttribute(FDX_TitleProperty, selement->nativeTitle());
 
                     const QColor sceneColor = scene->color();
                     const QColor tintColor = QColor(
@@ -250,8 +290,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                         QDomElement summaryE = doc.createElement(QStringLiteral("Summary"));
                         scenePropsE.appendChild(summaryE);
 
-                        QDomElement summaryParagraphE =
-                                doc.createElement(QStringLiteral("Paragraph"));
+                        QDomElement summaryParagraphE = doc.createElement(FDX_ParagraphTag);
                         summaryE.appendChild(summaryParagraphE);
 
                         const QString synopsis = scene->synopsis();
@@ -276,7 +315,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
         const int nrSceneElements = scene->elementCount();
         for (int j = 0; j < nrSceneElements; j++) {
             const SceneElement *sceneElement = scene->elementAt(j);
-            QDomElement paragraphE = doc.createElement(QStringLiteral("Paragraph"));
+            QDomElement paragraphE = doc.createElement(FDX_ParagraphTag);
             paragraphContainerE.appendChild(paragraphE);
 
             paragraphE.setAttribute(QStringLiteral("Type"), sceneElement->typeAsString());
@@ -287,18 +326,18 @@ bool FinalDraftExporter::doExport(QIODevice *device)
         this->progress()->tick();
     }
 
-    QDomElement watermarkingE = doc.createElement(QStringLiteral("Watermarking"));
+    QDomElement watermarkingE = doc.createElement("Watermarking");
     rootE.appendChild(watermarkingE);
-    watermarkingE.setAttribute(QStringLiteral("Text"), qApp->applicationName());
+    watermarkingE.setAttribute(FDX_TextTag, qApp->applicationName());
 
     QDomElement smartTypeE = doc.createElement("SmartType");
     rootE.appendChild(smartTypeE);
 
     const QStringList characters = structure->allCharacterNames();
-    QDomElement charactersE = doc.createElement(QStringLiteral("Characters"));
+    QDomElement charactersE = doc.createElement("Characters");
     smartTypeE.appendChild(charactersE);
     for (const QString &name : qAsConst(characters)) {
-        QDomElement characterE = doc.createElement(QStringLiteral("Character"));
+        QDomElement characterE = doc.createElement("Character");
         charactersE.appendChild(characterE);
         characterE.appendChild(doc.createTextNode(name));
     }
@@ -306,22 +345,22 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     locations.removeDuplicates();
     std::sort(locations.begin(), locations.end());
 
-    QDomElement timesOfDayE = doc.createElement(QStringLiteral("TimesOfDay"));
+    QDomElement timesOfDayE = doc.createElement("TimesOfDay");
     smartTypeE.appendChild(timesOfDayE);
-    timesOfDayE.setAttribute(QStringLiteral("Separator"), QStringLiteral(" - "));
+    timesOfDayE.setAttribute(FDX_SeparatorAttr, " - ");
     std::sort(moments.begin(), moments.end());
     for (const QString &moment : qAsConst(moments)) {
-        QDomElement timeOfDayE = doc.createElement(QStringLiteral("TimeOfDay"));
+        QDomElement timeOfDayE = doc.createElement("TimeOfDay");
         timesOfDayE.appendChild(timeOfDayE);
         timeOfDayE.appendChild(doc.createTextNode(moment));
     }
 
     std::sort(locationTypes.begin(), locationTypes.end());
-    QDomElement sceneIntrosE = doc.createElement(QStringLiteral("SceneIntros"));
+    QDomElement sceneIntrosE = doc.createElement("SceneIntros");
     smartTypeE.appendChild(sceneIntrosE);
-    sceneIntrosE.setAttribute(QStringLiteral("Separator"), QStringLiteral(". "));
+    sceneIntrosE.setAttribute(FDX_SeparatorAttr, ". ");
     for (const QString &locationType : qAsConst(locationTypes)) {
-        QDomElement sceneIntroE = doc.createElement(QStringLiteral("SceneIntro"));
+        QDomElement sceneIntroE = doc.createElement("SceneIntro");
         sceneIntrosE.appendChild(sceneIntroE);
         sceneIntroE.appendChild(doc.createTextNode(locationType));
     }
