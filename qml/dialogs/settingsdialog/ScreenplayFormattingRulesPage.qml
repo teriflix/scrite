@@ -38,14 +38,16 @@ Item {
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.rightMargin: 10
 
             spacing: 5
 
             VclComboBox {
                 id: paragraphTypeComboBox
+
                 Layout.fillWidth: true
+
                 visible: layout.width >= 800
+
                 model: GenericArrayModel {
                     array: [
                         { "key": "Heading", "value": SceneElement.Heading },

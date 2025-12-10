@@ -343,5 +343,6 @@
         <file>qml/dialogs/RequestVersionTypeAccess.qml</file>
         <file>qml/dialogs/settingsdialog/ScreenplayEditorOptionsPage.qml</file>
         <file>qml/dialogs/ScreenplayEditorOptionsDialog.qml</file>
+        <file>qml/dialogs/ScreenplayFormattingRulesDialog.qml</file>
     </qresource>
 </RCC>

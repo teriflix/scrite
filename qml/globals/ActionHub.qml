@@ -2351,6 +2351,13 @@ Item {
         }
 
         Action {
+            objectName: "configureScreenplayFormattingRoles"
+            text: "Screenplay Formatting Rules"
+
+            onTriggered: ScreenplayFormattingRulesDialog.launch()
+        }
+
+        Action {
             readonly property bool allowShortcut: true
             readonly property bool visible: false
 
