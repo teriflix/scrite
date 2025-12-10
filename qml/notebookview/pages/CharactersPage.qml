@@ -44,7 +44,9 @@ AbstractNotebookPage {
 
             name: "Characters"
             tabs: ["List", "Relationships"]
-            currentTab: 0
+            currentTab: Runtime.notebookSettings.charactersPageTab
+
+            onCurrentTabChanged: Runtime.notebookSettings.charactersPageTab = currentTab
         }
 
         StackLayout {

@@ -295,7 +295,10 @@ Item {
     }
 
     readonly property Settings notebookSettings: Settings {
-        property int activeTab: 0
+        property int characterPageTab: 0
+        property int charactersPageTab: 0
+        property int screenplayPageTab: 0
+        property int sceneNotesPageTab: 0
         property int sceneSynopsisTabIndex: 0
         property int graphLayoutMaxIterations: 50000
         property int graphLayoutMaxTime: 1000
@@ -997,6 +1000,11 @@ Item {
         target: Scrite.document
 
         function onJustReset() {
+            Runtime.notebookSettings.characterPageTab = 0
+            Runtime.notebookSettings.charactersPageTab = 0
+            Runtime.notebookSettings.screenplayPageTab = 0
+            Runtime.notebookSettings.sceneNotesPageTab = 0
+            Runtime.notebookSettings.sceneSynopsisTabIndex = 0
             Runtime.screenplayEditorSettings.sceneSidePanelOpen = false
             Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
         }

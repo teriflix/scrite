@@ -48,7 +48,9 @@ AbstractNotebookPage {
 
             name: root.pageData ? root.pageData.notebookItemTitle.substr(0, root.pageData.notebookItemTitle.indexOf(']')+1) : "Scene"
             tabs: ["Synopsis", "Relationships", "Notes", "Comments"]
-            currentTab: 0
+            currentTab: Runtime.notebookSettings.sceneNotesPageTab
+
+            onCurrentTabChanged: Runtime.notebookSettings.sceneNotesPageTab = currentTab
         }
 
         StackLayout {
