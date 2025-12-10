@@ -157,8 +157,10 @@ card required. You can import from other formats and export Scrite documents to 
 
 The following features are restricted during the free trial:
 
-— PDF watermarks can’t be configured or removed. — Two‑Column Report can’t be saved to PDF. — No
-email support. — Use of the app is limited to one device at a time (details later).
+- PDF watermarks can’t be configured or removed. 
+- Two‑Column Report can’t be saved to PDF. 
+- No email support.
+- Use of the app is limited to one device at a time (details later).
 
 At any time during your trial, you can purchase a plan. Paid features unlock immediately for the
 rest of your trial and for the duration of your plan.
