@@ -8,13 +8,22 @@ theme:
 markdown_extensions:
   - toc:
       permalink: true
-      separator: '_'
+      separator: '-'
       toc_depth: 4
 plugins:
   - mkdocs-video
 nav:
   - index.md
   - quickstart.md
-  - powertools.md
-  - advanced-editing.md
+  - user-interface.md
+  - screenplay.md
+  - files.md
+  - languages.md
+  - scriptalay.md
+  - imports.md
+  - exports.md
+  - structure.md
+  - templates.md
+  - notebook.md
+  - reports.md
   - support.md

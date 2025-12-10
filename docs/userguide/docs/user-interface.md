@@ -1,4 +1,4 @@
-# Power Tools
+# User Interface
 Scrite includes customizable keyboard shortcuts and a powerful Command Center to speedup your
 writing. These tools help you work quickly without lifting your hands from the keyboard.
 

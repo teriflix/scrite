@@ -1,4 +1,4 @@
-# Advanced Editing Features
+# Screenplay Tab
 
 The screenplay shown in screenshots are from the 2019 film Knives Out. The original screenplay can
 be downloaded from
@@ -174,12 +174,22 @@ estimates done by Scrite on Windows, macOS and Linux vary as well.
 ## Formatting Paragraphs
 
 You can format paragraph types and have that format applied to all paragraphs of those types. Go to
-Settings → Screenplay → Formatting Rules to view and edit the currently applied rules. Click any
-paragraph in the preview and alter properties. Close the dialog and Scrite applies your formatting
-rules across all scenes. These formats are used in preview, exported PDFs, and reports.
+Settings → Screenplay → Formatting Rules to view and edit the currently applied rules. 
+
+<img src="../images/advanced-editing/019-formatting.png" width=720"/>
+
+Click any paragraph in the preview and alter properties. 
+
+Close the dialog and Scrite applies your formatting rules across all scenes. 
+
+<img src="../images/advanced-editing/020-formatting.png" width=720"/>
+
+These formats are used in preview, exported PDFs, and reports.
+
+<img src="../images/advanced-editing/021-formatting.png" width=720"/>
 
 Scrite does not apply special formatting to fragments of text (bold, italic, underline, color)
-within paragraphs via Formatting Rules. Use Markup Tools for inline formatting.
+within paragraphs via Formatting Rules. Use [Markup Tools](#markup-tools) for inline formatting.
 
 Formatting options are saved with the file and reused each time you open it, even if another file
 used different options. Scrite maintains two sets of formatting options:
@@ -190,13 +200,15 @@ used different options. Scrite maintains two sets of formatting options:
 Click “Factory Reset” to discard document‑specific options and use defaults. Click “Make Default” to
 set current options as your defaults.
 
-< screenshot >
+<img src="../images/advanced-editing/022-formatting.png" width=720"/>
 
 ## Markup Tools
 
 Markup Tools let you apply inline formatting to specific snippets of text. The Markup Tools dock is
 hidden by default; toggle it from the Screenplay Editor Options menu. You can move the dock to any
 part of the screen.
+
+<img src="../images/advanced-editing/023-markup-tools.jpg" width=640"/>
 
 Select any text snippet and use Markup Tools to apply custom formatting. Hover over buttons to see
 shortcuts:
@@ -208,45 +220,45 @@ shortcuts:
 - ALL CAPS: Shift+F3
 - small caps: Ctrl+Shift+F3
 
-< screenshot >
+<img src="../images/advanced-editing/024-markup-tools.jpg" width=640"/>
 
 ## Custom Scene Numbers
 
 By default, Scrite generates scene numbers automatically and regenerates them if you change order or
-insert scenes. You can apply custom numbers (e.g., 1, 1A, 1B) by editing the scene number field.
-Automatic numbering resumes for scenes without custom numbers. Custom numbers appear in preview,
-exported PDFs, and reports.
+insert scenes. 
 
-< screenshot >
+<img src="../images/advanced-editing/025-custom-scene-numbers.png" width=720"/>
+
+You can apply custom numbers (e.g., 1, 1A, 1B) by editing the scene number field. Automatic
+numbering resumes for scenes without custom numbers. Custom numbers appear in preview, exported
+PDFs, and reports.
+
+<img src="../images/advanced-editing/026-custom-scene-numbers.png" width=720"/>
 
 ## Scene Comments, Featured Image and Index Card Fields
 
-Scrite lets you capture additional information per scene:
-
-- Comments
-- Featured Image
-- Index Card Fields
-- Photos, Videos, Documents
-- Rich Text Notes
-
-The Notebook tab is best for capturing this information, but the Screenplay editor offers access to
-Comments, Featured Image, and Index Card Fields.
+Scrite lets you capture additional information per scene. While the Notebook tab is best for
+capturing this information, but the Screenplay editor offers access to Comments, Featured Image, and
+Index Card Fields.
 
 ### Comments
 
-Enable “Scene Comments” in Screenplay Editor Options to show a pullout for each scene. Clicking it
-opens a comment box per scene. For long scenes, the comment box scrolls with the scene and shows a
-title bar for clarity.
+Enable “Scene Comments” in Screenplay Editor Options to show a pullout for each scene. 
 
-< screenshot >
+<img src="../images/advanced-editing/027-scene-comments-panel.jpg" width=720"/>
+
+Clicking it opens a comment box per scene. For long scenes, the comment box scrolls with the scene
+and shows a title bar for clarity.
+
+<img src="../images/advanced-editing/028-scene-comments-panel.jpg" width=720"/>
 
 ### Featured Image
 
-The comment box has three tabs. Click the Featured Image tab to assign a photo per scene. Drag and
+The comment box has multiple tabs. Click the Featured Image tab to assign a photo per scene. Drag and
 drop or click “Select Photo”. Typically this is a storyboard sketch or location photo, but you can
 choose any image.
 
-< screenshot >
+<img src="../images/advanced-editing/029-featured-image.jpg" width=720"/>
 
 ### Index Card Fields
 
@@ -259,7 +271,7 @@ Use the last tab to capture structured metadata per scene. By default, Index Car
 You can edit these fields by clicking the Edit icon; configure up to five fields. These fields can
 also be edited in the Structure tab.
 
-< screenshot >
+<img src="../images/advanced-editing/030-index-card-fields.jpg" width=720"/>
 
 ## Tagging Character Presence in Scenes
 
