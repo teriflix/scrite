@@ -130,13 +130,10 @@ static const qreal elementXSpacing = 400;
 static const qreal elementYSpacing = 400;
 static const qreal canvasSpaceBuffer = 500;
 
-void AbstractImporter::configureCanvas(int nrScenes)
+void AbstractImporter::configureCanvas(int nrBlocks)
 {
-    if (nrScenes == 0)
-        return;
-
     Structure *structure = this->document()->structure();
-    const qreal requiredSpace = nrScenes * elementYSpacing + canvasSpaceBuffer;
+    const qreal requiredSpace = nrBlocks * elementYSpacing + canvasSpaceBuffer;
     if (structure->canvasHeight() < requiredSpace) {
         structure->setCanvasWidth(requiredSpace);
         structure->setCanvasHeight(requiredSpace);
