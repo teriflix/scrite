@@ -181,9 +181,7 @@ QtObject {
 
             text: Platform.isMacOSDesktop ? "Set a URL to get a clickable link here." : "Set a URL to preview it here."
             visible: _d.annotation.attributes.url === ""
-
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
-
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
         }

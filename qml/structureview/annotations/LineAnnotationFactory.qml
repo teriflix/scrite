@@ -56,10 +56,8 @@ QtObject {
 
         Rectangle {
             anchors.centerIn: parent
-
             width: _d.annotation.attributes.orientation === "Horizontal" ? parent.width : _d.annotation.attributes.lineWidth
             height: _d.annotation.attributes.orientation === "Vertical" ? parent.height : _d.annotation.attributes.lineWidth
-
             color: _d.annotation.attributes.lineColor
             opacity: _d.annotation.attributes.opacity
         }

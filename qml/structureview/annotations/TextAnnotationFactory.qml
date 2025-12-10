@@ -45,20 +45,7 @@ QtObject {
         id: _d
 
         VclLabel {
-            anchors.fill: parent
-            anchors.margins: 8
-
-            clip: true
-            color: _d.annotation.attributes.textColor
-            text: _d.annotation.attributes.text
-            wrapMode: Text.WordWrap
-
-            font.bold: _d.annotation.attributes.fontStyle.indexOf('bold') >= 0
-            font.italic: _d.annotation.attributes.fontStyle.indexOf('italic') >= 0
-            font.family: _d.annotation.attributes.fontFamily
-            font.underline: _d.annotation.attributes.fontStyle.indexOf('underline') >= 0
-            font.pointSize: _d.annotation.attributes.fontSize
-
+            anchors.centerIn: parent
             horizontalAlignment: {
                 switch(_d.annotation.attributes.hAlign) {
                 case "left": return Text.AlignLeft
@@ -73,6 +60,17 @@ QtObject {
                 }
                 return Text.AlignVCenter
             }
+            text: _d.annotation.attributes.text
+            color: _d.annotation.attributes.textColor
+            font.family: _d.annotation.attributes.fontFamily
+            font.pointSize: _d.annotation.attributes.fontSize
+            font.bold: _d.annotation.attributes.fontStyle.indexOf('bold') >= 0
+            font.italic: _d.annotation.attributes.fontStyle.indexOf('italic') >= 0
+            font.underline: _d.annotation.attributes.fontStyle.indexOf('underline') >= 0
+            width: parent.width - 15
+            height: parent.height - 15
+            clip: true
+            wrapMode: Text.WordWrap
         }
     }
 }
