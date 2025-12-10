@@ -16,6 +16,43 @@
 
 #include <QXmlSimpleReader>
 
+static QString FDX_Suffix = QStringLiteral("fdx");
+static QString FDX_RootTag = QStringLiteral("FinalDraft");
+static QString FDX_VersionAttr = QStringLiteral("Version");
+static QString FDX_DocumentTypeAttr = QStringLiteral("DocumentType");
+static QString FDX_ScriptDocumentType = QStringLiteral("Script");
+static QString FDX_ContentTag = QStringLiteral("Content");
+static QString FDX_ParagraphTag = QStringLiteral("Paragraph");
+static QString FDX_TypeAttr = QStringLiteral("Type");
+static QString FDX_FlagsAttr = QStringLiteral("Flags");
+static QString FDX_OmittedFlag = QStringLiteral("Omitted");
+static QString FDX_IgnoreFlag = QStringLiteral("Ignore");
+static QString FDX_OmittedSceneTag = QStringLiteral("OmittedScene");
+static QString FDX_SceneHeadingType = QStringLiteral("Scene Heading");
+static QString FDX_ActionType = QStringLiteral("Action");
+static QString FDX_CharacterType = QStringLiteral("Character");
+static QString FDX_DialogueType = QStringLiteral("Dialogue");
+static QString FDX_ParentheticalType = QStringLiteral("Parenthetical");
+static QString FDX_TextTag = QStringLiteral("Text");
+static QString FDX_ShotType = QStringLiteral("Shot");
+static QString FDX_TransitionType = QStringLiteral("Transition");
+static QString FDX_StyleAttr = QStringLiteral("Style");
+static QString FDX_BoldStyle = QStringLiteral("Bold");
+static QString FDX_ItalicStyle = QStringLiteral("Italic");
+static QString FDX_UnderlineStyle = QStringLiteral("Underline");
+static QString FDX_StrikeoutStyle = QStringLiteral("Strikeout");
+static QString FDX_ColorAttr = QStringLiteral("Color");
+static QString FDX_BackgroundAttr = QStringLiteral("Background");
+static QString FDX_AlignmentAttr = QStringLiteral("Alignment");
+static QString FDX_LeftAlignment = QStringLiteral("Left");
+static QString FDX_RightAlignment = QStringLiteral("Right");
+static QString FDX_CenterAlignment = QStringLiteral("Center");
+static QString FDX_SceneNumberAttr = QStringLiteral("Number");
+static QString FDX_ScenePropertiesTag = QStringLiteral("SceneProperties");
+static QString FDX_TitleProperty = QStringLiteral("Title");
+static QString FDX_ColorProperty = QStringLiteral("Color");
+static QString FDX_SummaryProperty = QStringLiteral("Summary");
+
 static void fixOmittedScenes(QDomElement &contentE);
 
 FinalDraftImporter::FinalDraftImporter(QObject *parent) : AbstractImporter(parent) { }
@@ -24,7 +61,7 @@ FinalDraftImporter::~FinalDraftImporter() { }
 
 bool FinalDraftImporter::canImport(const QString &fileName) const
 {
-    return QFileInfo(fileName).suffix().toLower() == QStringLiteral("fdx");
+    return QFileInfo(fileName).suffix().toLower() == FDX_Suffix;
 }
 
 static QColor fromFdxColorCode(const QString &code)
@@ -69,20 +106,20 @@ bool FinalDraftImporter::doImport(QIODevice *device)
     }
 
     QDomElement rootE = doc.documentElement();
-    if (rootE.tagName() != QStringLiteral("FinalDraft")) {
+    if (rootE.tagName() != FDX_RootTag) {
         this->error()->setErrorMessage("Not a Final-Draft file.");
         return false;
     }
 
-    const int fdxVersion = rootE.attribute("Version").toInt();
-    if (rootE.attribute("DocumentType") != QStringLiteral("Script") || fdxVersion < 1
+    const int fdxVersion = rootE.attribute(FDX_VersionAttr).toInt();
+    if (rootE.attribute(FDX_DocumentTypeAttr) != FDX_ScriptDocumentType || fdxVersion < 1
         || fdxVersion > 6) {
         this->error()->setErrorMessage("Unrecognised Final Draft file version.");
         return false;
     }
 
-    QDomElement contentE = rootE.firstChildElement(QStringLiteral("Content"));
-    QDomNodeList paragraphs = contentE.elementsByTagName(QStringLiteral("Paragraph"));
+    QDomElement contentE = rootE.firstChildElement(FDX_ContentTag);
+    QDomNodeList paragraphs = contentE.elementsByTagName(FDX_ParagraphTag);
     if (paragraphs.isEmpty()) {
         this->error()->setErrorMessage(QStringLiteral("No paragraphs to import."));
         return false;
@@ -92,7 +129,18 @@ bool FinalDraftImporter::doImport(QIODevice *device)
 
     Scene *scene = nullptr;
     this->progress()->setProgressStep(1.0 / qreal(paragraphs.size() + 1));
-    this->configureCanvas(paragraphs.size());
+
+    const int nrScenes = [paragraphs]() -> int {
+        int ret = 0;
+        for (int i = 0; i < paragraphs.size(); i++) {
+            const QDomElement paragraphE = paragraphs.at(i).toElement();
+            if (paragraphE.attribute(FDX_TypeAttr) == FDX_SceneHeadingType) {
+                ++ret;
+            }
+        }
+        return ret;
+    }();
+    this->configureCanvas(nrScenes);
 
     auto parseParagraphTexts =
             [](const QDomElement &paragraphE) -> QPair<QString, QVector<QTextLayout::FormatRange>> {
@@ -101,8 +149,7 @@ bool FinalDraftImporter::doImport(QIODevice *device)
         if (paragraphE.isNull())
             return qMakePair(text, formats);
 
-        const QString textN = QStringLiteral("Text");
-        QDomElement textE = paragraphE.firstChildElement(textN);
+        QDomElement textE = paragraphE.firstChildElement(FDX_TextTag);
         while (!textE.isNull()) {
             QTextLayout::FormatRange format;
             format.start = text.length();
@@ -112,56 +159,53 @@ bool FinalDraftImporter::doImport(QIODevice *device)
 
             format.length = text.length() - format.start;
 
-            const QStringList styles = textE.attribute(QStringLiteral("Style")).split(QChar('+'));
-            if (styles.contains(QStringLiteral("Bold")))
+            const QStringList styles = textE.attribute(FDX_StyleAttr).split(QChar('+'));
+            if (styles.contains(FDX_BoldStyle))
                 format.format.setFontWeight(QFont::Bold);
-            if (styles.contains(QStringLiteral("Italic")))
+            if (styles.contains(FDX_ItalicStyle))
                 format.format.setFontItalic(true);
-            if (styles.contains(QStringLiteral("Underline")))
+            if (styles.contains(FDX_UnderlineStyle))
                 format.format.setFontUnderline(true);
-            if (styles.contains(QStringLiteral("Strikeout")))
+            if (styles.contains(FDX_StrikeoutStyle))
                 format.format.setFontStrikeOut(true);
 
-            const QString colorAttr = QStringLiteral("Color");
-            const QString backgroundAttr = QStringLiteral("Background");
-            if (textE.hasAttribute(colorAttr))
-                format.format.setForeground(QBrush(fromFdxColorCode(textE.attribute(colorAttr))));
-            if (textE.hasAttribute(backgroundAttr))
+            if (textE.hasAttribute(FDX_ColorAttr))
+                format.format.setForeground(
+                        QBrush(fromFdxColorCode(textE.attribute(FDX_ColorAttr))));
+            if (textE.hasAttribute(FDX_BackgroundAttr))
                 format.format.setBackground(
-                        QBrush(fromFdxColorCode(textE.attribute(backgroundAttr))));
+                        QBrush(fromFdxColorCode(textE.attribute(FDX_BackgroundAttr))));
 
             if (!format.format.isEmpty())
                 formats.append(format);
 
-            textE = textE.nextSiblingElement(textN);
+            textE = textE.nextSiblingElement(FDX_TextTag);
         }
 
         return qMakePair(text, formats);
     };
 
-    const QStringList types({ QStringLiteral("Scene Heading"), QStringLiteral("Action"),
-                              QStringLiteral("Character"), QStringLiteral("Dialogue"),
-                              QStringLiteral("Parenthetical"), QStringLiteral("Shot"),
-                              QStringLiteral("Transition") });
-    const QString paragraphName = QStringLiteral("Paragraph");
-    QDomElement paragraphE = contentE.firstChildElement(paragraphName);
+    const QStringList types({ FDX_SceneHeadingType, FDX_ActionType, FDX_CharacterType,
+                              FDX_DialogueType, FDX_ParentheticalType, FDX_ShotType,
+                              FDX_TransitionType });
+    QDomElement paragraphE = contentE.firstChildElement(FDX_ParagraphTag);
     while (!paragraphE.isNull()) {
         TraverseDomElement tde(paragraphE, this->progress());
 
-        const QString flags = paragraphE.attribute(QStringLiteral("Flags"));
+        const QString flags = paragraphE.attribute(FDX_FlagsAttr);
         if (flags == "Ignore")
             continue;
 
-        const QString type = paragraphE.attribute(QStringLiteral("Type"));
+        const QString type = paragraphE.attribute(FDX_TypeAttr);
         const int typeIndex = types.indexOf(type);
         if (typeIndex < 0)
             continue;
 
-        const QString alignmentHint = paragraphE.attribute(QStringLiteral("Alignment"));
+        const QString alignmentHint = paragraphE.attribute(FDX_AlignmentAttr);
         const Qt::Alignment alignment = [alignmentHint]() {
-            return QHash<QString, Qt::Alignment>({ { QStringLiteral("Left"), Qt::AlignLeft },
-                                                   { QStringLiteral("Right"), Qt::AlignRight },
-                                                   { QStringLiteral("Center"), Qt::AlignCenter } })
+            return QHash<QString, Qt::Alignment>({ { FDX_LeftAlignment, Qt::AlignLeft },
+                                                   { FDX_RightAlignment, Qt::AlignRight },
+                                                   { FDX_CenterAlignment, Qt::AlignCenter } })
                     .value(alignmentHint, Qt::Alignment());
         }();
 
@@ -171,6 +215,10 @@ bool FinalDraftImporter::doImport(QIODevice *device)
         const QString text = paragraphText.first;
         const QVector<QTextLayout::FormatRange> formats = paragraphText.second;
 
+        if (typeIndex != 0 && scene == nullptr) {
+            scene = this->createScene(QString());
+        }
+
         SceneElement *sceneElement = nullptr;
         switch (typeIndex) {
         case 0: {
@@ -178,26 +226,23 @@ bool FinalDraftImporter::doImport(QIODevice *device)
 
             ScreenplayElement *element = this->document()->screenplay()->elementAt(
                     this->document()->screenplay()->elementCount() - 1);
-            element->setOmitted(flags == "Omitted");
+            element->setOmitted(flags == FDX_OmittedFlag);
 
-            const QString number = paragraphE.attribute(QStringLiteral("Number"));
+            const QString number = paragraphE.attribute(FDX_SceneNumberAttr);
             if (!number.isEmpty())
                 element->setUserSceneNumber(number);
 
-            const QDomElement sceneProperiesE =
-                    paragraphE.firstChildElement(QStringLiteral("SceneProperties"));
+            const QDomElement sceneProperiesE = paragraphE.firstChildElement(FDX_SceneNumberAttr);
             if (!sceneProperiesE.isNull()) {
-                const QString title = sceneProperiesE.attribute(QStringLiteral("Title"));
-                const QColor color =
-                        fromFdxColorCode(sceneProperiesE.attribute(QStringLiteral("Color")));
+                const QString title = sceneProperiesE.attribute(FDX_TitleProperty);
+                const QColor color = fromFdxColorCode(sceneProperiesE.attribute(FDX_ColorProperty));
                 scene->setColor(color);
                 scene->structureElement()->setTitle(title);
 
-                const QDomElement summaryE =
-                        sceneProperiesE.firstChildElement(QStringLiteral("Summary"));
+                const QDomElement summaryE = sceneProperiesE.firstChildElement(FDX_SummaryProperty);
                 const QDomElement summaryParagraphE = summaryE.isNull()
                         ? QDomElement()
-                        : summaryE.firstChildElement(paragraphName);
+                        : summaryE.firstChildElement(FDX_ParagraphTag);
                 const QPair<QString, QVector<QTextLayout::FormatRange>> summaryParagraphText =
                         parseParagraphTexts(summaryParagraphE);
 
@@ -298,24 +343,20 @@ void fixOmittedScenes(QDomElement &contentE)
      * So, that's what this function does!
      */
 
-    const QString paragraphName = QStringLiteral("Paragraph");
-    const QString omittedSceneName = QStringLiteral("OmittedScene");
-    const QString flagsAttr = QStringLiteral("Flags");
-
-    QDomElement paragraphE = contentE.firstChildElement(paragraphName);
+    QDomElement paragraphE = contentE.firstChildElement(FDX_ParagraphTag);
     while (!paragraphE.isNull()) {
 
-        QDomElement omittedSceneE = paragraphE.firstChildElement(omittedSceneName);
+        QDomElement omittedSceneE = paragraphE.firstChildElement(FDX_OmittedSceneTag);
         if (!omittedSceneE.isNull()) {
-            paragraphE.setAttribute(flagsAttr, QStringLiteral("Ignore"));
-            const QDomNodeList childParagraphs = omittedSceneE.elementsByTagName(paragraphName);
+            paragraphE.setAttribute(FDX_FlagsAttr, FDX_IgnoreFlag);
+            const QDomNodeList childParagraphs = omittedSceneE.elementsByTagName(FDX_ParagraphTag);
             for (int i = childParagraphs.size() - 1; i >= 0; i--) {
                 QDomElement childParagraphE = childParagraphs.at(i).toElement();
-                childParagraphE.setAttribute(flagsAttr, QStringLiteral("Omitted"));
+                childParagraphE.setAttribute(FDX_FlagsAttr, FDX_OmittedFlag);
                 contentE.insertAfter(childParagraphE, paragraphE);
             }
         }
 
-        paragraphE = paragraphE.nextSiblingElement(paragraphName);
+        paragraphE = paragraphE.nextSiblingElement(FDX_ParagraphTag);
     }
 }
