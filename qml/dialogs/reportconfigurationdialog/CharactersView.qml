@@ -97,22 +97,35 @@ Rectangle {
 
     Flickable {
         id: charactersListView
+
+        function ensureItemVisible(item) {
+            const viewportRect = Qt.rect(contentX, contentY, width, height)
+            const itemRect = Qt.rect(item.x, item.y, item.width, item.height)
+            const dp = GMath.translationRequiredToBringRectangleInRectangle(viewportRect, itemRect)
+            contentX -= dp.x
+        }
+
+        ScrollBar.horizontal: VclScrollBar { }
+
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: searchBarRow.bottom
         anchors.bottom: buttonsRow.top
         anchors.bottomMargin: 8
+
         clip: true
         contentWidth: charactersListLayout.width
         contentHeight: height
         interactive: false
-        ScrollBar.horizontal: VclScrollBar { }
 
         Flow {
             id: charactersListLayout
-            flow: Flow.TopToBottom
-            height: charactersListView.height - 4
+
             property real columnWidth: 100
+
+            height: charactersListView.height - 4
+
+            flow: Flow.TopToBottom
 
             Repeater {
                 model: charactersModel
