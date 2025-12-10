@@ -1,6 +1,6 @@
 NotebookView 1.0 NotebookView.qml
 ScreenplayEditor 1.0 ScreenplayEditor.qml
-ScriteMainWindow 1.0 ScriteMainWindow.qml
 ScritedView 1.0 ScritedView.qml
+ScriteMainWindow 1.0 ScriteMainWindow.qml
 StructureView 1.0 StructureView.qml
 TimelineView 1.0 TimelineView.qml
