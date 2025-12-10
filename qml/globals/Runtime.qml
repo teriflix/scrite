@@ -295,7 +295,8 @@ Item {
     }
 
     readonly property Settings notebookSettings: Settings {
-        property int activeTab: 0 // 0 = Relationships, 1 = Notes
+        property int activeTab: 0
+        property int sceneSynopsisTabIndex: 0
         property int graphLayoutMaxIterations: 50000
         property int graphLayoutMaxTime: 1000
 

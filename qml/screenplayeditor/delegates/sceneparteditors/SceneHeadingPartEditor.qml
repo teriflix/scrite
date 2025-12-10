@@ -28,7 +28,7 @@ import "qrc:/qml/screenplayeditor/delegates/sceneparteditors/helpers"
 AbstractScenePartEditor {
     id: root
 
-    height: _layout.height
+    implicitHeight: _layout.height
 
     RowLayout {
         id: _layout

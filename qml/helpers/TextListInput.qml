@@ -95,6 +95,7 @@ Flow {
         bottomPadding: 5
 
         font.bold: true
+        font.family: root.font.family
         font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
     }
 
@@ -165,6 +166,7 @@ Flow {
             maximumLength: root.maxTextLength
             completionStrings: root.completionStrings
 
+            font.family: root.font.family
             font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
             font.capitalization: root.font.capitalization
 
