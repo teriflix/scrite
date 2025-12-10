@@ -481,6 +481,8 @@ void ScreenplayPaginatorWorker::syncDocument()
 
     m_lastSyncDocumentTimestamp = now;
 
+    emit paginationStart();
+
 #ifdef ENABLE_GUI_LOG
     Utils::Gui::log(QStringLiteral("ScreenplayPaginatorWorker::syncDocument(): %1 scenes")
                             .arg(m_screenplayContent.size()));
@@ -988,6 +990,12 @@ void ScreenplayPaginatorWorkerNode::setWorker(ScreenplayPaginatorWorker *worker)
         connect(m_worker, &ScreenplayPaginatorWorker::paginationComplete, this,
                 &ScreenplayPaginatorWorkerNode::paginationComplete);
 
+        connect(this, &ScreenplayPaginatorWorkerNode::queryCursor, m_worker,
+                &ScreenplayPaginatorWorker::queryCursor);
+        connect(m_worker, &ScreenplayPaginatorWorker::cursorQueryResponse, this,
+                &ScreenplayPaginatorWorkerNode::cursorQueryResponse);
+
+#if 0
         connect(this, &ScreenplayPaginatorWorkerNode::useFormat, this,
                 &ScreenplayPaginatorWorkerNode::markBusy);
         connect(this, &ScreenplayPaginatorWorkerNode::reset, this,
@@ -1004,13 +1012,12 @@ void ScreenplayPaginatorWorkerNode::setWorker(ScreenplayPaginatorWorker *worker)
                 &ScreenplayPaginatorWorkerNode::markBusy);
         connect(this, &ScreenplayPaginatorWorkerNode::updateParagraph, this,
                 &ScreenplayPaginatorWorkerNode::markBusy);
-        connect(this, &ScreenplayPaginatorWorkerNode::paginationComplete, this,
+#else
+        connect(m_worker, &ScreenplayPaginatorWorker::paginationStart, this,
+                &ScreenplayPaginatorWorkerNode::markBusy);
+#endif
+        connect(m_worker, &ScreenplayPaginatorWorker::paginationComplete, this,
                 &ScreenplayPaginatorWorkerNode::markNotBusy);
-
-        connect(this, &ScreenplayPaginatorWorkerNode::queryCursor, m_worker,
-                &ScreenplayPaginatorWorker::queryCursor);
-        connect(m_worker, &ScreenplayPaginatorWorker::cursorQueryResponse, this,
-                &ScreenplayPaginatorWorkerNode::cursorQueryResponse);
     }
 }
 

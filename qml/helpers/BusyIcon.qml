@@ -29,13 +29,11 @@ Item {
     Image {
         id: _image
 
-        anchors.centerIn: parent
-
-        height: 48
-        width: 48
+        anchors.fill: parent
 
         mipmap: true
         smooth: true
+        fillMode: Image.PreserveAspectFit
         source: forDarkBackground ? "qrc:/icons/content/time_inverted.png" : "qrc:/icons/content/time.png"
 
         RotationAnimator {

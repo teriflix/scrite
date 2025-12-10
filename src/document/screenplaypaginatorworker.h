@@ -155,6 +155,7 @@ signals:
                              const QTime &time, const ScreenplayPaginatorRecord &cursorRecord);
     void paginationComplete(const QList<ScreenplayPaginatorRecord> &items, qreal pixelLength,
                             int pageCount, const QTime &totalTime);
+    void paginationStart();
 
 private:
     explicit ScreenplayPaginatorWorker(QTextDocument *document = nullptr,
