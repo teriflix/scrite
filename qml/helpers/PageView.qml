@@ -17,8 +17,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
-
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
@@ -57,6 +55,14 @@ Rectangle {
             property int currentIndex: -1
 
             color: Runtime.colors.accent.c600.background
+
+            Action {
+                shortcut: ActionHub.notebookOperations.find("nextNotebookPageTab").shortcut
+
+                onTriggered: (source) => {
+                                 pageList.currentIndex = (pageList.currentIndex+1)%pageRepeater.count
+                             }
+            }
 
             ColumnLayout {
                 id: pageRepeaterLayout
