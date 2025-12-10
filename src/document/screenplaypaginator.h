@@ -207,6 +207,14 @@ public:
     bool isSyncing() const { return m_syncCounter > 0; }
     Q_SIGNAL void syncingChanged();
 
+    // clang-format off
+    Q_PROPERTY(bool busy
+               READ isBusy
+               NOTIFY busyChanged)
+    // clang-format on
+    bool isBusy() const;
+    Q_SIGNAL void busyChanged();
+
     Q_INVOKABLE void reset();
 
     // These static functions assume that the document supplied as parameter

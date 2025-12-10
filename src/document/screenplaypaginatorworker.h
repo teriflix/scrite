@@ -197,6 +197,14 @@ public:
     void setWorker(ScreenplayPaginatorWorker *worker);
     ScreenplayPaginatorWorker *worker() const { return m_worker; }
 
+    // clang-format off
+    Q_PROPERTY(bool busy
+               READ isBusy
+               NOTIFY busyChanged)
+    // clang-format on
+    bool isBusy() const { return m_busy; }
+    Q_SIGNAL void busyChanged();
+
 signals:
     void useFormat(const QJsonObject &format);
     void reset(const QList<SceneContent> &screenplayContent);
@@ -214,6 +222,12 @@ signals:
                             int pageCount, const QTime &totalTime);
 
 private:
+    void markBusy() { this->setBusy(true); }
+    void markNotBusy() { this->setBusy(false); }
+    void setBusy(bool val);
+
+private:
+    bool m_busy = false;
     QPointer<ScreenplayPaginatorWorker> m_worker;
 };
 
