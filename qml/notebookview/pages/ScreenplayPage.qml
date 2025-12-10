@@ -46,6 +46,7 @@ AbstractNotebookPage {
             name: "Screenplay"
             tabs: ["Title Page", "Logline", "Notes", "Stats"]
             currentTab: Runtime.notebookSettings.screenplayPageTab
+            switchTabHandlerEnabled: true
 
             onCurrentTabChanged: Runtime.notebookSettings.screenplayPageTab = currentTab
         }

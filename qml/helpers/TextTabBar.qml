@@ -26,19 +26,19 @@ Item {
     property var tabs: []
     property string name: "Tabs"
     property alias spacing: _tabsRow.spacing
+    property alias switchTabHandlerAction: _switchTabActionHandler.action
+    property alias switchTabHandlerEnabled: _switchTabActionHandler.enabled
 
     height: implicitHeight
     implicitHeight: _tabsRow.height + Runtime.idealFontMetrics.descent + _currentTabUnderline.height
 
-    ActionManager {
-        title: root.name + " Tabs"
+    ActionHandler {
+        id: _switchTabActionHandler
+        property string text: "Switch to <b>" + _tabsRepeater.itemAt((root.currentTab+1)%_tabsRepeater.count).text + "</b> tab in <i>" + root.name + "</i>"
 
-        Action {
-            text: "Next Tab"
-            shortcut: Gui.shortcut(Qt.ControlModifier+Qt.Key_Tab)
-
-            onTriggered: root.currentTab = (root.currentTab+1)%_tabsRepeater.count
-        }
+        enabled: false
+        action: ActionHub.notebookOperations.find("nextNotebookPageTab")
+        onTriggered: root.currentTab = (root.currentTab+1)%_tabsRepeater.count
     }
 
     Row {

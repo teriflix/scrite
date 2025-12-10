@@ -1976,6 +1976,16 @@ Item {
                 triggerCount = triggerCount+1
             }
         }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? Gui.shortcut() : Gui.shortcut(Qt.ControlModifier+Qt.Key_Tab)
+
+            enabled: Runtime.allowAppUsage && Runtime.appFeatures.notebook.enabled
+            objectName: "nextNotebookPageTab"
+            shortcut: defaultShortcut
+            text: ActionHandler.active && ActionHandler.active.text ? ActionHandler.active.text : "Next Tab in Notebook Page"
+        }
     }
 
     readonly property ActionManager scritedOptions : ActionManager {

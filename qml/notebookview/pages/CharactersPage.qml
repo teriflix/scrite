@@ -45,6 +45,7 @@ AbstractNotebookPage {
             name: "Characters"
             tabs: ["List", "Relationships"]
             currentTab: Runtime.notebookSettings.charactersPageTab
+            switchTabHandlerEnabled: true
 
             onCurrentTabChanged: Runtime.notebookSettings.charactersPageTab = currentTab
         }
