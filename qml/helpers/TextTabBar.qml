@@ -26,7 +26,6 @@ Item {
     property var tabs: []
     property string name: "Tabs"
     property alias spacing: _tabsRow.spacing
-    property alias switchTabHandlerAction: _switchTabActionHandler.action
     property alias switchTabHandlerEnabled: _switchTabActionHandler.enabled
 
     height: implicitHeight
@@ -34,11 +33,22 @@ Item {
 
     ActionHandler {
         id: _switchTabActionHandler
-        property string text: "Switch to <b>" + _tabsRepeater.itemAt((root.currentTab+1)%_tabsRepeater.count).text + "</b> tab in <i>" + root.name + "</i>"
+
+        property int nextIndex: (root.currentTab+1)%_tabsRepeater.count
+        property string text: "Switch to <b>" + _tabsRepeater.itemAt(nextIndex).text + "</b> tab in <i>" + root.name + "</i>"
 
         enabled: false
-        action: ActionHub.notebookOperations.find("nextNotebookPageTab")
+        action: ActionHub.applicationOptions.find("tabRight")
         onTriggered: root.currentTab = (root.currentTab+1)%_tabsRepeater.count
+    }
+
+    ActionHandler {
+        property int previousIndex: (root.currentTab-1) < 0 ? _tabsRepeater.count-1 : root.currentTab-1
+        property string text: "Switch to <b>" + _tabsRepeater.itemAt(previousIndex).text + "</b> tab in <i>" + root.name + "</i>"
+
+        enabled: _switchTabActionHandler.enabled
+        action: ActionHub.applicationOptions.find("tabLeft")
+        onTriggered: root.currentTab =previousIndex
     }
 
     Row {

@@ -1969,16 +1969,6 @@ Item {
                 triggerCount = triggerCount+1
             }
         }
-
-        Action {
-            readonly property bool visible: false
-            readonly property string defaultShortcut: Platform.isMacOSDesktop ? Gui.shortcut() : Gui.shortcut(Qt.ControlModifier+Qt.Key_Tab)
-
-            enabled: Runtime.allowAppUsage && Runtime.appFeatures.notebook.enabled
-            objectName: "nextNotebookPageTab"
-            shortcut: defaultShortcut
-            text: ActionHandler.active && ActionHandler.active.text ? ActionHandler.active.text : "Next Tab in Notebook Page"
-        }
     }
 
     readonly property ActionManager scritedOptions : ActionManager {
@@ -2420,6 +2410,46 @@ Item {
                 const fileInfo = File.info(Platform.settingsPath)
                 File.revealOnDesktop(fileInfo.absolutePath)
             }
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? Gui.shortcut(Qt.ShiftModifier+Qt.AltModifier+Qt.Key_Tab) : Gui.shortcut(Qt.ShiftModifier+Qt.ControlModifier+Qt.Key_Tab)
+
+            enabled: ActionHandler.canHandle
+            objectName: "tabLeft"
+            shortcut: defaultShortcut
+            text: ActionHandler.active && ActionHandler.active.text ? ActionHandler.active.text : "Previous Tab (Left)"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? Gui.shortcut(Qt.AltModifier+Qt.Key_Tab) : Gui.shortcut(Qt.ControlModifier+Qt.Key_Tab)
+
+            enabled: ActionHandler.canHandle
+            objectName: "tabRight"
+            shortcut: defaultShortcut
+            text: ActionHandler.active && ActionHandler.active.text ? ActionHandler.active.text : "Next Tab (Right)"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? Gui.shortcut(Qt.AltModifier+Qt.Key_PageUp) : Gui.shortcut(Qt.ControlModifier+Qt.Key_PageUp)
+
+            enabled: ActionHandler.canHandle
+            objectName: "tabUp"
+            shortcut: defaultShortcut
+            text: ActionHandler.active && ActionHandler.active.text ? ActionHandler.active.text : "Previous Tab (Up)"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? Gui.shortcut(Qt.AltModifier+Qt.Key_PageDown) : Gui.shortcut(Qt.ControlModifier+Qt.Key_PageDown)
+
+            enabled: ActionHandler.canHandle
+            objectName: "tabDown"
+            shortcut: defaultShortcut
+            text: ActionHandler.active && ActionHandler.active.text ? ActionHandler.active.text : "Next Tab (Down)"
         }
     }
 

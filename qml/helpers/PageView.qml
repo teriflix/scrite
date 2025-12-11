@@ -57,10 +57,19 @@ Rectangle {
             color: Runtime.colors.accent.c600.background
 
             Action {
-                shortcut: ActionHub.notebookOperations.find("nextNotebookPageTab").shortcut
+                shortcut: ActionHub.applicationOptions.find("tabDown").shortcut
 
                 onTriggered: (source) => {
                                  pageList.currentIndex = (pageList.currentIndex+1)%pageRepeater.count
+                             }
+            }
+
+            Action {
+                shortcut: ActionHub.applicationOptions.find("tabUp").shortcut
+
+                onTriggered: (source) => {
+                                 const prevIndex = pageList.currentIndex-1
+                                 pageList.currentIndex = prevIndex < 0 ? (pageRepeater.count-1) : prevIndex
                              }
             }
 
