@@ -311,20 +311,6 @@ Item {
             onTriggered: SaveFileTask.saveAs()
         }
 
-        Action {
-            readonly property var keywords: ["print"]
-            readonly property bool visible: false
-            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Print)
-
-            text: "Export To PDF"
-            enabled: Runtime.allowAppUsage
-            shortcut: defaultShortcut
-
-            icon.source: "qrc:/icons/exporter/pdf.png"
-
-            onTriggered: ExportConfigurationDialog.launch("Screenplay/Adobe PDF")
-        }
-
         // Action to reveal vault folder
         // Action to reveal backup folder
         // Action to reveal settings folder
@@ -487,12 +473,14 @@ Item {
             readonly property bool allowShortcut: true
             readonly property string tooltip: modelData.description
             readonly property string keywords: modelData.keywords
+            readonly property string defaultShortcut: modelData.className === "PdfExporter" ? Gui.standardShortcut(StandardKey.Print) : ""
 
             ActionManager.target: root.exportOptions
 
             text: modelData.name
             enabled: Runtime.allowAppUsage
             objectName: "export" + modelData.className
+            shortcut: defaultShortcut
 
             icon.source: "qrc" + modelData.icon
 
