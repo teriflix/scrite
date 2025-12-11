@@ -1321,6 +1321,8 @@ public:
     Q_INVOKABLE QJsonObject queryBreakElements(ScreenplayElement *breakElement) const;
 
     Q_INVOKABLE void scanForMuteCharacters();
+    Q_INVOKABLE QStringList lookupMuteCharacters();
+    Q_INVOKABLE void pruneCharacters(const QStringList &characters);
 
     Q_INVOKABLE static QStringList standardLocationTypes();
     Q_INVOKABLE static QStringList standardMoments();

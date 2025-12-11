@@ -284,7 +284,7 @@ Item {
         }
 
         function markTipAsShown(val) {
-            var ts = tipsShown.length > 0 ? tipsShown.split(",") : []
+            let ts = tipsShown.length > 0 ? tipsShown.split(",") : []
             if(ts.indexOf(val) < 0)
                 ts.push(val)
             tipsShown = ts.join(",")

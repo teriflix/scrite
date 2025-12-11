@@ -85,7 +85,9 @@ Item {
         id: _private
 
         readonly property Component helpTipNotification: HelpTipNotification {
-            Notification.onDismissed: helpTip.destroy()
+            id: _helpTip
+
+            Notification.onDismissed: _helpTip.destroy()
         }
 
         readonly property Connections userConnections: Connections {

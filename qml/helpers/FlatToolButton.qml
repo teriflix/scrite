@@ -43,7 +43,7 @@ Item {
 
     property string text
     property string iconSource: ""
-    property string toolTipText: shortcutText === "" ? text : (text + "\t(" + Gui.nativeShortcut(shortcutText) + ")")
+    property string toolTipText
 
     property bool down: _mouseArea.pressed
     property bool hasMenu: false

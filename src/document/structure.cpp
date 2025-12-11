@@ -3755,6 +3755,22 @@ void Structure::scanForMuteCharacters()
     m_scriteDocument->clearBusyMessage();
 }
 
+QStringList Structure::lookupMuteCharacters()
+{
+    // We got to look for characters who don't have a dialogue anywhere
+    // in the script, and allow users to select and prune them
+    // from the character names database.
+    const QStringList characterNames = this->characterNames();
+
+    return QStringList();
+}
+
+void Structure::pruneCharacters(const QStringList &characters)
+{
+    // Remove these characters from the database, unless they have a
+    // Character instance created for them.
+}
+
 QStringList Structure::standardLocationTypes()
 {
     static const QStringList list = { QStringLiteral("INT"), QStringLiteral("EXT"),
