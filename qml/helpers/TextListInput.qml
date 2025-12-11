@@ -199,15 +199,12 @@ Flow {
         MouseArea {
             anchors.fill: parent
 
-            hoverEnabled: true
-
             ToolTipPopup {
                 text: root.addTextButtonTooltip + " (Max " + root.maxTextLength + " letters)"
                 visible: container.containsMouse
             }
 
             onClicked: _newInputLoader.active = true
-            onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
         }
     }
 }

@@ -78,6 +78,23 @@ AbstractScenePartEditor {
 
                 onClicked: _private.popupFormalTagsMenu()
             }
+
+            Image {
+                Layout.preferredWidth: _tagsInput.label.height
+                Layout.preferredHeight: _tagsInput.label.height
+
+                source: "qrc:/icons/content/add_box.png"
+
+                opacity: enabled ? 1 : 0.5
+                visible: enabled && _private.presentableGroupNames === ""
+                enabled: !Scrite.document.readOnly
+
+                MouseArea {
+                    anchors.fill: parent
+
+                    onClicked: _private.popupFormalTagsMenu()
+                }
+            }
         }
 
         TextListInput {

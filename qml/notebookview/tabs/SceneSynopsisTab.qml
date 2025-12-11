@@ -104,6 +104,8 @@ Item {
             spacing: _sceneTagsList.spacing
 
             FlatToolButton {
+                anchors.verticalCenter: parent.verticalCenter
+
                 suggestedWidth: _sceneTagsList.label.height
                 suggestedHeight: _sceneTagsList.label.height
 
@@ -116,12 +118,16 @@ Item {
             }
 
             Text {
+                anchors.verticalCenter: parent.verticalCenter
+
                 font: _sceneTagsList.label.font
                 text: "Formal Tags"
                 visible: _private.presentableGroupNames === ""
             }
 
             Link {
+                anchors.verticalCenter: parent.verticalCenter
+
                 width: Math.min(implicitWidth, root.width*0.9)
 
                 text: _private.presentableGroupNames
@@ -133,6 +139,25 @@ Item {
                 bottomPadding: 5
 
                 onClicked: _private.popupFormalTagsMenu()
+            }
+
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+
+                width: _sceneTagsList.label.height
+                height: _sceneTagsList.label.height
+
+                source: "qrc:/icons/content/add_box.png"
+
+                opacity: enabled ? 1 : 0.5
+                visible: enabled && _private.presentableGroupNames === ""
+                enabled: !Scrite.document.readOnly
+
+                MouseArea {
+                    anchors.fill: parent
+
+                    onClicked: _private.popupFormalTagsMenu()
+                }
             }
         }
 
