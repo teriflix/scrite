@@ -160,9 +160,9 @@ Item {
         property bool displayEmptyTitleCard: true
         property bool displayIndexCardFields: true
         property bool displayRuler: false
-        property bool displaySceneCharacters: true
+        property bool displaySceneCharacters: false
         property bool displaySceneComments: false
-        property bool displaySceneSynopsis: true
+        property bool displaySceneSynopsis: false
         property bool enableAutoCapitalizeSentences: true
         property bool enableAutoPolishParagraphs: true // for automatically adding/removing CONT'D where appropriate
         property bool enableSpellCheck: true // Since this is now fixed: https://github.com/teriflix/scrite/issues/138

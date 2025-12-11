@@ -52,7 +52,7 @@ DialogLauncher {
 
         signal shortcutEdited(string newShortcut)
 
-        width: 580
+        width: 640
         height: 400
 
         title: "Change Shortcut"
@@ -275,6 +275,19 @@ DialogLauncher {
                     Layout.alignment: Qt.AlignHCenter
 
                     spacing: parent.spacing
+
+                    VclButton {
+                        text: "Remove"
+                        toolTipText: "Removes shortcut for this action."
+                        visible: _dialog.shortcut !== ""
+
+                        focusPolicy: Qt.NoFocus
+
+                        onClicked: {
+                            _dialog.shortcutEdited("")
+                            _dialog.close()
+                        }
+                    }
 
                     VclButton {
                         visible: _dialog.shortcut !== ""

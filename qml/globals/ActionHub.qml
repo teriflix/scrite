@@ -54,6 +54,11 @@ Item {
         if(!qmlAction || !Object.isOfType(qmlAction, "QQuickAction"))
             return
 
+        if(newShortcut === undefined || newShortcut === "") {
+            qmlAction.shortcut = undefined
+            return
+        }
+
         let conflictingAction = ActionManager.findActionForShortcut(newShortcut)
         if(conflictingAction) {
             MessageBox.information("Shortcut Conflict",
