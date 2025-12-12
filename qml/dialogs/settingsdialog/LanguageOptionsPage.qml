@@ -286,7 +286,7 @@ Item {
 
                             visible: _private.spellCheckService.canCheckLanguage(_private.language.code)
 
-                            text: "Spellcheck is available."
+                            text: "Spell check for " + _private.language.name + " is available through dictionaries offered by the OS."
                         }
                     }
                 }

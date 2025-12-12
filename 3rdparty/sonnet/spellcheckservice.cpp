@@ -16,6 +16,7 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 #include "languageengine.h"
+#include "utils.h"
 
 #include <QFuture>
 #include <QJsonObject>
@@ -91,7 +92,7 @@ public:
 
     ~Spellers() { }
 
-    QList<int> supportedLanguages() const { return m_supportedLanguages; }
+    QList<int> supportedLanguages() const { return m_supportedLanguages.keys(); }
 
     QStringList getSuggestions(const QString &word) const
     {
@@ -140,11 +141,13 @@ public:
         if (wordScriptItems.isEmpty())
             return false;
 
+        Utils::Gui::log("For " + word + " ....");
         QMap<QLocale::Language, QStringList> languageSuggestions;
         for (const Item &item : qAsConst(wordScriptItems)) {
             if (item.speller.isMisspelled(word)) {
                 const QStringList suggestions = item.speller.suggest(word);
                 languageSuggestions[item.language] = suggestions;
+                Utils::Gui::log("    [" + item.languageName + "]: " + suggestions.join(", "));
             }
         }
 
@@ -159,15 +162,34 @@ public:
 private:
     void reloadSpellers(const QList<int> &languageCodes)
     {
+        if (m_supportedLanguages.isEmpty()) {
+            const QStringList languages = Sonnet::Loader::openLoader()->languages();
+            for (QString language : languages) {
+#ifdef Q_OS_WIN
+                language = language.replace('-', '_');
+#endif
+                m_supportedLanguages[QLocale(language).language()].append(language);
+            }
+        }
+
         m_items.clear();
 
         for (int code : languageCodes) {
             Item item;
             item.language = QLocale::Language(code);
-            item.languageName = QLocale(item.language).name();
+
+            const QStringList languageNames =
+                    m_supportedLanguages.value(item.language, QStringList());
+            if (languageNames.size() == 1) {
+                item.languageName = languageNames.first();
+            } else {
+                item.languageName = QLocale(item.language).name();
 #ifdef Q_OS_WIN
-            item.languageName = item.languageName.replace('_', '-');
+                item.languageName = item.languageName.replace('_', '-');
 #endif
+                if (!languageNames.isEmpty() && !languageNames.contains(item.languageName))
+                    item.languageName = languageNames.first();
+            }
             item.script = Language::scriptForLanguage(item.language);
             item.speller = item.language == QLocale::English ? EnglishLanguageSpeller()
                                                              : Sonnet::Speller(item.languageName);
@@ -177,15 +199,11 @@ private:
                             ? true
                             : item.speller.language() == item.languageName))
                 m_items.append(item);
-        }
-
-        if (m_supportedLanguages.isEmpty()) {
-            const QStringList languages = Sonnet::Loader::openLoader()->languages();
-            for (QString language : languages) {
-#ifdef Q_OS_WIN
-                language = language.replace('-', '_');
-#endif
-                m_supportedLanguages << QLocale(language).language();
+            else if (!languageNames.isEmpty()) {
+                item.languageName = languageNames.first();
+                item.speller = Sonnet::Speller(item.languageName);
+                if (item.speller.language() == item.languageName)
+                    m_items.append(item);
             }
         }
     }
@@ -199,7 +217,7 @@ private:
         Sonnet::Speller speller;
     };
     QList<Item> m_items;
-    QList<int> m_supportedLanguages;
+    QMap<int, QStringList> m_supportedLanguages;
 };
 
 Q_GLOBAL_STATIC(QThreadStorage<Spellers *>, ThreadSpellers)
