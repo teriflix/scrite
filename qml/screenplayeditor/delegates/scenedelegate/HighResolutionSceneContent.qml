@@ -205,7 +205,12 @@ Item {
                         sceneDelegate.currentParagraphType = Qt.binding( () => { return currentParagraphType } )
                 }
 
-                onEnsureVisible: (item, area) => { sceneDelegate.ensureVisible(item, area) }
+                onEnsureVisible: (item, area) => {
+                                     if(cursorPosition === 0) {
+                                        sceneDelegate.ensureVisible(_sceneHeadingEditor, Qt.rect(0, 0, area.width, area.height))
+                                     } else
+                                        sceneDelegate.ensureVisible(item, area)
+                                 }
                 onEnsureCentered: (item, area) => { sceneDelegate.ensureCentered(item, area) }
 
                 onSplitSceneRequest: (paragraph, cursorPosition) => { sceneDelegate.splitSceneRequest(paragraph, cursorPosition) }

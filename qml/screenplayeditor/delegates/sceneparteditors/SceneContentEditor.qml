@@ -36,6 +36,7 @@ AbstractScenePartEditor {
     required property ListView listView // This must be the list-view in which the delegate which creates this part is placed
 
     readonly property alias currentParagraphType: _private.currentParagraphType
+    readonly property alias cursorPosition: _sceneTextEditor.cursorPosition
 
     signal splitSceneRequest(SceneElement paragraph, int cursorPosition)
     signal mergeWithPreviousSceneRequest()
