@@ -104,10 +104,18 @@ Item {
                 }
 
                 Loader {
+                    id: _sceneListPanelLoader
+
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
                     sourceComponent: _sceneListPanel
+
+                    property bool displayTracks: Runtime.sceneListPanelSettings.displayTracks && Runtime.appFeatures.structure.enabled && Runtime.screenplayTracksSettings.displayTracks
+                    onDisplayTracksChanged: {
+                        active = false
+                        Qt.callLater( () => { active = true } )
+                    }
                 }
             }
         }
