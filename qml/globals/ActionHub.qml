@@ -1050,6 +1050,7 @@ Item {
 
             enabled: ActionHandler.canHandle
             objectName: "pageUp"
+            text: "Page Up"
             shortcut: defaultShortcut
         }
 
@@ -1059,6 +1060,7 @@ Item {
 
             enabled: ActionHandler.canHandle
             objectName: "pageDown"
+            text: "Page Down"
             shortcut: defaultShortcut
         }
 
