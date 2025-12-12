@@ -199,6 +199,9 @@ public:
     }
     bool operator==(const Language &other) const { return code == other.code; }
     bool operator!=(const Language &other) const { return !(*this == other); }
+
+    static QChar::Script scriptForLanguage(QLocale::Language language,
+                                           QChar::Script defaultScript = QChar::Script_Latin);
 };
 Q_DECLARE_METATYPE(Language)
 
@@ -215,6 +218,13 @@ public:
     Q_INVOKABLE bool hasLanguage(int code) const; // here code should be from QLocale::Language
     Q_INVOKABLE Language findLanguage(int code) const;
     Q_INVOKABLE Language languageAt(int index) const;
+
+    // clang-format off
+    Q_PROPERTY(QList<int> languageCodes
+               READ languageCodes
+               NOTIFY languagesCodesChanged)
+    // clang-format on
+    QList<int> languageCodes() const { return m_languageCodes; }
 
     // clang-format off
     Q_PROPERTY(int count
@@ -236,6 +246,9 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
+signals:
+    void languagesCodesChanged(const QList<int> &languageCodes);
+
 protected:
     explicit AbstractLanguagesModel(QObject *parent = nullptr);
 
@@ -251,9 +264,12 @@ protected:
     virtual void fromJson(const QJsonValue &value);
 
 private:
+    void updateLanguageCodes();
+
     friend class LanguageEngine;
 
     QList<Language> m_languages;
+    QList<int> m_languageCodes; // each int is a QLocale::Language value
 };
 
 class SupportedLanguages : public AbstractLanguagesModel

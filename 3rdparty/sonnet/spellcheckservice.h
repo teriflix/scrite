@@ -25,37 +25,58 @@
 struct TextFragment
 {
     TextFragment() { }
-    TextFragment(const TextFragment &other)
-        : m_start(other.m_start), m_length(other.m_length), m_suggestions(other.m_suggestions)
+
+    TextFragment(const TextFragment &other) { *this = other; }
+
+    TextFragment(int s, int l, const QMap<QLocale::Language, QStringList> &languageSuggestions)
+        : m_start(s), m_length(l), m_languageSuggestions(languageSuggestions)
     {
+        QSet<QString> all;
+        auto it = m_languageSuggestions.constBegin();
+        auto end = m_languageSuggestions.constEnd();
+        while (it != end) {
+            for (const QString &s : it.value()) {
+                all += s;
+            }
+            ++it;
+        }
+
+        m_suggestions = all.values();
     }
-    TextFragment(int s, int l, const QStringList &slist)
-        : m_start(s), m_length(l), m_suggestions(slist)
+
+    bool operator==(const TextFragment &other) const
     {
+        return m_start == other.m_start && m_length == other.m_length
+                && m_suggestions == other.m_suggestions
+                && m_languageSuggestions == other.m_languageSuggestions;
+    }
+
+    TextFragment &operator=(const TextFragment &other)
+    {
+        m_start = other.m_start;
+        m_length = other.m_length;
+        m_suggestions = other.m_suggestions;
+        m_languageSuggestions = other.m_languageSuggestions;
+        return *this;
     }
 
     int start() const { return m_start; }
     int length() const { return m_length; }
     int end() const { return m_start + m_length - 1; }
     bool isValid() const { return m_length > 0 && m_start >= 0; }
-    bool operator==(const TextFragment &other) const
-    {
-        return m_start == other.m_start && m_length == other.m_length
-                && m_suggestions == other.m_suggestions;
-    }
-    TextFragment &operator=(const TextFragment &other)
-    {
-        m_start = other.m_start;
-        m_length = other.m_length;
-        m_suggestions = other.m_suggestions;
-        return *this;
-    }
+
     QStringList suggestions() const { return m_suggestions; }
+    QList<QLocale::Language> languages() const { return m_languageSuggestions.keys(); }
+    QStringList languageSuggestions(QLocale::Language language) const
+    {
+        return m_languageSuggestions.value(language, QStringList());
+    }
 
 private:
     int m_start = -1;
     int m_length = 0;
     QStringList m_suggestions;
+    QMap<QLocale::Language, QStringList> m_languageSuggestions;
 };
 Q_DECLARE_METATYPE(TextFragment)
 
@@ -82,7 +103,8 @@ public:
     Method method() const { return m_method; }
     Q_SIGNAL void methodChanged();
 
-    Q_PROPERTY(QJsonArray misspelledFragments READ misspelledFragmentsJson NOTIFY misspelledFragmentsChanged)
+    Q_PROPERTY(QJsonArray misspelledFragments READ misspelledFragmentsJson NOTIFY
+                       misspelledFragmentsChanged)
     QJsonArray misspelledFragmentsJson() const
     {
         return m_misspelledFragmentsJson;
@@ -93,7 +115,8 @@ public:
     } // for C++ access
     Q_SIGNAL void misspelledFragmentsChanged();
 
-    Q_PROPERTY(bool asynchronous READ isAsynchronous WRITE setAsynchronous NOTIFY asynchronousChanged)
+    Q_PROPERTY(
+            bool asynchronous READ isAsynchronous WRITE setAsynchronous NOTIFY asynchronousChanged)
     void setAsynchronous(bool val);
     bool isAsynchronous() const { return m_asynchronous; }
     Q_SIGNAL void asynchronousChanged();
@@ -101,8 +124,9 @@ public:
     Q_INVOKABLE void scheduleUpdate();
     Q_INVOKABLE void update();
 
-    static QStringList suggestions(const QString &word);
-    static bool addToDictionary(const QString &word);
+    Q_INVOKABLE static QStringList suggestions(const QString &word);
+    Q_INVOKABLE static bool addToDictionary(const QString &word);
+    Q_INVOKABLE static bool canCheckLanguage(int language);
 
     // QQmlParserStatus interface
     void classBegin();

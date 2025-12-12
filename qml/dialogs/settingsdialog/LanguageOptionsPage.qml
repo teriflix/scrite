@@ -280,6 +280,14 @@ Item {
                                 }
                             }
                         }
+
+                        VclLabel {
+                            Layout.fillWidth: true
+
+                            visible: _private.spellCheckService.canCheckLanguage(_private.language.code)
+
+                            text: "Spellcheck is available."
+                        }
                     }
                 }
             }
@@ -377,6 +385,10 @@ Item {
         property var language: _listView.currentItem ? _listView.currentItem.language : undefined
 
         property ListModel transliterationOptionsModel: ListModel { }
+
+        property SpellCheckService spellCheckService: SpellCheckService {
+
+        }
 
         Component.onCompleted: {
             previouslyActiveLanguage = Runtime.language.activeCode
