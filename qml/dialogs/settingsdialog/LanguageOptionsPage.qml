@@ -287,6 +287,9 @@ Item {
                             visible: _private.spellCheckService.canCheckLanguage(_private.language.code)
 
                             text: "Spell check for " + _private.language.name + " is available through dictionaries offered by the OS."
+                            wrapMode: Text.WordWrap
+                            maximumLineCount: 2
+                            elide: Text.ElideRight
                         }
                     }
                 }

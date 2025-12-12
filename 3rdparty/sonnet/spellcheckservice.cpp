@@ -141,13 +141,11 @@ public:
         if (wordScriptItems.isEmpty())
             return false;
 
-        Utils::Gui::log("For " + word + " ....");
         QMap<QLocale::Language, QStringList> languageSuggestions;
         for (const Item &item : qAsConst(wordScriptItems)) {
             if (item.speller.isMisspelled(word)) {
                 const QStringList suggestions = item.speller.suggest(word);
                 languageSuggestions[item.language] = suggestions;
-                Utils::Gui::log("    [" + item.languageName + "]: " + suggestions.join(", "));
             }
         }
 
@@ -165,9 +163,6 @@ private:
         if (m_supportedLanguages.isEmpty()) {
             const QStringList languages = Sonnet::Loader::openLoader()->languages();
             for (QString language : languages) {
-#ifdef Q_OS_WIN
-                language = language.replace('-', '_');
-#endif
                 m_supportedLanguages[QLocale(language).language()].append(language);
             }
         }
