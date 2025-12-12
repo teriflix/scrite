@@ -162,7 +162,7 @@ private:
     {
         if (m_supportedLanguages.isEmpty()) {
             const QStringList languages = Sonnet::Loader::openLoader()->languages();
-            for (QString language : languages) {
+            for (const QString &language : languages) {
                 m_supportedLanguages[QLocale(language).language()].append(language);
             }
         }
