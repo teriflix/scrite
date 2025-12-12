@@ -192,6 +192,7 @@ Item {
 
                 focus: true
                 partName: "SceneContent"
+                listView: sceneDelegate.listView
                 isCurrent: sceneDelegate.isCurrent
                 zoomLevel: sceneDelegate.zoomLevel
                 fontMetrics: sceneDelegate.fontMetrics

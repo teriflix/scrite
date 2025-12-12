@@ -33,6 +33,7 @@ AbstractScenePartEditor {
 
     required property Action ensureCursorCenteredAction
     readonly property TextArea editor: _sceneTextEditor
+    required property ListView listView // This must be the list-view in which the delegate which creates this part is placed
 
     readonly property alias currentParagraphType: _private.currentParagraphType
 
@@ -365,7 +366,7 @@ AbstractScenePartEditor {
         action: ActionHub.editOptions.find("cut")
         enabled: !root.readOnly && root.isCurrent && _sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus
 
-        onTriggered: (source) => {                         
+        onTriggered: (source) => {
                          _private.cut()
                      }
     }
@@ -412,6 +413,50 @@ AbstractScenePartEditor {
 
         onTriggered: (source) => {
                          Qt.callLater(_private.mergeWithPreviousScene, _sceneTextEditor.cursorPosition)
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.editOptions.find("pageUp")
+        enabled: _sceneTextEditor.activeFocus
+
+        onTriggered: (source) => {
+                         if(_sceneTextEditor.cursorPosition > 0) {
+                             const pageHeight = root.listView.height * 0.85
+                             const cursorRect = _sceneTextEditor.cursorRectangle
+                             if(cursorRect.y < pageHeight) {
+                                 _private.placeCursorAt(0)
+                             } else {
+                                 const nextPosition = _sceneTextEditor.positionAt(cursorRect.x, cursorRect.y - pageHeight)
+                                 _private.placeCursorAt(nextPosition)
+                             }
+                         } else {
+                             if(_private.scrollPreviousScene.enabled) {
+                                 _private.scrollPreviousScene.trigger()
+                             }
+                         }
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.editOptions.find("pageDown")
+        enabled: _sceneTextEditor.activeFocus
+
+        onTriggered: (source) => {
+                         if(_sceneTextEditor.cursorPosition < _sceneTextEditor.length) {
+                             const pageHeight = root.listView.height * 0.85
+                             const cursorRect = _sceneTextEditor.cursorRectangle
+                             if(cursorRect.y + pageHeight > _sceneTextEditor.height) {
+                                 _private.placeCursorAt(_sceneTextEditor.length)
+                             } else {
+                                 const nextPosition = _sceneTextEditor.positionAt(cursorRect.x, cursorRect.y + pageHeight)
+                                 _private.placeCursorAt(nextPosition)
+                             }
+                         } else {
+                             if(_private.scrollNextScene.enabled) {
+                                _private.scrollNextScene.trigger()
+                             }
+                         }
                      }
     }
 

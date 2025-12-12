@@ -1046,6 +1046,24 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_PageUp)
+
+            enabled: ActionHandler.canHandle
+            objectName: "pageUp"
+            shortcut: defaultShortcut
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_PageDown)
+
+            enabled: ActionHandler.canHandle
+            objectName: "pageDown"
+            shortcut: defaultShortcut
+        }
+
+        Action {
+            readonly property bool visible: false
             readonly property string defaultShortcut: "Ctrl+G"
 
             enabled: true

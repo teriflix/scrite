@@ -127,6 +127,11 @@ AbstractScenePartEditor {
                         _private.editSceneContent.trigger()
                     }
                 }
+
+                onActiveFocusChanged: {
+                    if(activeFocus)
+                        root.ensureVisible(_sceneNumber, _sceneNumber.cursorRectangle)
+                }
             }
         }
 
@@ -164,6 +169,11 @@ AbstractScenePartEditor {
                 if(!DelayedProperty.value && root.isCurrent) {
                     _private.editSceneContent.trigger()
                 }
+            }
+
+            onActiveFocusChanged: {
+                if(activeFocus)
+                    root.ensureVisible(_sceneHeading, _sceneHeading.cursorRectangle)
             }
         }
 
