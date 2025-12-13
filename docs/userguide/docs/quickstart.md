@@ -10,6 +10,8 @@ Instead of text, if you would much rather watch a video then this one is for you
 
 If you prefer text descriptions, then here we go!
 
+> **NOTE**: Screenshots may not match the current UI. Scrite evolves continuously, so visuals and layout can change.
+
 ## Home Screen
 When you start Scrite, you’ll see the Home Screen.
 
