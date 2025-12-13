@@ -28,7 +28,7 @@ import "qrc:/qml/screenplayeditor/delegates/sceneparteditors/helpers"
 AbstractScenePartEditor {
     id: root
 
-    height: _layout.height
+    implicitHeight: _layout.height
 
     RowLayout {
         id: _layout
@@ -127,6 +127,11 @@ AbstractScenePartEditor {
                         _private.editSceneContent.trigger()
                     }
                 }
+
+                onActiveFocusChanged: {
+                    if(activeFocus)
+                        root.ensureVisible(_sceneNumber, _sceneNumber.cursorRectangle)
+                }
             }
         }
 
@@ -164,6 +169,11 @@ AbstractScenePartEditor {
                 if(!DelayedProperty.value && root.isCurrent) {
                     _private.editSceneContent.trigger()
                 }
+            }
+
+            onActiveFocusChanged: {
+                if(activeFocus)
+                    root.ensureVisible(_sceneHeading, _sceneHeading.cursorRectangle)
             }
         }
 

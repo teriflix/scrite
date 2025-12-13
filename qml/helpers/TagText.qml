@@ -22,11 +22,10 @@ import "qrc:/qml/controls"
 Rectangle {
     id: root
 
-    property real padding: 0
-    property real topPadding: padding
-    property real leftPadding: padding
-    property real rightPadding: padding
-    property real bottomPadding: padding
+    property alias topPadding: _text.topPadding
+    property alias leftPadding: _text.leftPadding
+    property alias rightPadding: _text.rightPadding
+    property alias bottomPadding: _text.bottomPadding
 
     property alias text: _text.text
     property alias font: _text.font
@@ -38,74 +37,75 @@ Rectangle {
     signal clicked()
     signal closeRequest()
 
-    width: _container.width + (_closeButtonLoader.active ? (height+2-rightPadding) : 0)
-    height: _container.height
+    implicitWidth: _layout.width
+    implicitHeight: _layout.height
 
     color: Runtime.colors.primary.c10.background
     radius: height/2
+
     border.width: 1
     border.color: Runtime.colors.primary.borderColor
 
-    Item {
-        id: _container
+    Row {
+        id: _layout
 
-        width: _text.width + parent.leftPadding + parent.rightPadding
-        height: _text.height + parent.topPadding + parent.bottomPadding
-
-        VclText {
+        Text {
             id: _text
 
-            x: root.leftPadding
-            y: root.topPadding
-            width: contentWidth
-            height: contentHeight
+            anchors.verticalCenter: parent.verticalCenter
+
+            padding: 4
 
             color: Runtime.colors.primary.c10.text
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
-        }
-    }
-
-    MouseArea {
-        id: _mouseArea
-
-        anchors.fill: parent
-
-        hoverEnabled: true
-
-        onClicked: parent.clicked()
-    }
-
-    Loader {
-        id: _closeButtonLoader
-
-        anchors.right: parent.right
-        anchors.rightMargin: 4
-        anchors.verticalCenter: parent.verticalCenter
-
-        width: parent.height-8
-        height: parent.height-8
-        active: false
-
-        sourceComponent: Rectangle {
-            color: _closeButtonMouseArea.pressed ? Runtime.colors.accent.c600.background : Runtime.colors.accent.c100.background
-            radius: height/2
-
-            Image {
-                anchors.centerIn: parent
-
-                width: height
-                height: parent.height * 0.85
-
-                source: _closeButtonMouseArea.pressed ? "qrc:/icons/navigation/close_inverted.png" : "qrc:/icons/navigation/close.png"
-                smooth: true
-            }
 
             MouseArea {
-                id: _closeButtonMouseArea
+                id: _mouseArea
 
                 anchors.fill: parent
 
-                onClicked: root.closeRequest()
+                hoverEnabled: true
+
+                onClicked: root.clicked()
+            }
+        }
+
+        Loader {
+            id: _closeButtonLoader
+
+            anchors.verticalCenter: parent.verticalCenter
+
+            width: _text.contentHeight * 1.25
+            height: _text.contentHeight
+            active: false
+            visible: active
+
+            sourceComponent: Item {
+                Rectangle {
+                    width: parent.height
+                    height: parent.height
+
+                    color: _closeButtonMouseArea.pressed ? Runtime.colors.accent.c600.background : Runtime.colors.accent.c100.background
+                    radius: height/2
+
+                    Image {
+                        anchors.centerIn: parent
+
+                        width: height
+                        height: parent.height * 0.8
+
+                        source: _closeButtonMouseArea.pressed ? "qrc:/icons/navigation/close_inverted.png" : "qrc:/icons/navigation/close.png"
+                        smooth: true
+                    }
+
+                    MouseArea {
+                        id: _closeButtonMouseArea
+
+                        anchors.fill: parent
+
+                        onClicked: root.closeRequest()
+                    }
+                }
             }
         }
     }

@@ -280,6 +280,17 @@ Item {
                                 }
                             }
                         }
+
+                        VclLabel {
+                            Layout.fillWidth: true
+
+                            visible: _private.spellCheckService.canCheckLanguage(_private.language.code)
+
+                            text: "Spell check for " + _private.language.name + " is available through dictionaries offered by the OS."
+                            wrapMode: Text.WordWrap
+                            maximumLineCount: 2
+                            elide: Text.ElideRight
+                        }
                     }
                 }
             }
@@ -377,6 +388,10 @@ Item {
         property var language: _listView.currentItem ? _listView.currentItem.language : undefined
 
         property ListModel transliterationOptionsModel: ListModel { }
+
+        property SpellCheckService spellCheckService: SpellCheckService {
+
+        }
 
         Component.onCompleted: {
             previouslyActiveLanguage = Runtime.language.activeCode

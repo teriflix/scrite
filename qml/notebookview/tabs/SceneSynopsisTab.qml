@@ -98,6 +98,91 @@ Item {
             onEditingComplete: root.scene.structureElement.title = text
         }
 
+        Row {
+            Layout.fillWidth: true
+
+            spacing: _sceneTagsList.spacing
+
+            FlatToolButton {
+                anchors.verticalCenter: parent.verticalCenter
+
+                suggestedWidth: _sceneTagsList.label.height
+                suggestedHeight: _sceneTagsList.label.height
+
+                enabled: Runtime.appFeatures.structure.enabled
+                opacity: enabled ? 1 : 0.5
+                iconSource: "qrc:/icons/action/tag.png"
+                toolTipText: "Formal Story Beats/Tags"
+
+                onClicked: _private.popupFormalTagsMenu()
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+
+                font: _sceneTagsList.label.font
+                text: "Formal Tags"
+                visible: _private.presentableGroupNames === ""
+            }
+
+            Link {
+                anchors.verticalCenter: parent.verticalCenter
+
+                width: Math.min(implicitWidth, root.width*0.9)
+
+                text: _private.presentableGroupNames
+                elide: Text.ElideRight
+                visible: _private.presentableGroupNames !== ""
+                enabled: Runtime.appFeatures.structure.enabled
+                opacity: enabled ? 1 : 0.5
+                topPadding: 5
+                bottomPadding: 5
+
+                onClicked: _private.popupFormalTagsMenu()
+            }
+
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+
+                width: _sceneTagsList.label.height
+                height: _sceneTagsList.label.height
+
+                source: "qrc:/icons/content/add_box.png"
+
+                opacity: enabled ? 1 : 0.5
+                visible: enabled && _private.presentableGroupNames === ""
+                enabled: !Scrite.document.readOnly
+
+                MouseArea {
+                    anchors.fill: parent
+
+                    onClicked: _private.popupFormalTagsMenu()
+                }
+            }
+        }
+
+        TextListInput {
+            id: _sceneTagsList
+
+            Layout.fillWidth: true
+
+            enabled: Runtime.appFeatures.structure.enabled
+
+            addTextButtonTooltip: "Click here to tag the scene with custom keywords."
+            completionStrings: Scrite.document.structure.sceneTags
+            labelIconSource: "qrc:/icons/action/keyword.png"
+            labelIconVisible: true
+            labelText: "Keywords"
+            readOnly: !Runtime.appFeatures.structure.enabled && Scrite.document.readOnly
+            textList: root.scene ? root.scene.tags : 0
+
+            onTextCloseRequest: (text, source) => { root.scene.removeTag(text) }
+            onConfigureTextRequest: (text, tag) => { tag.closable = true }
+            onNewTextRequest: (text) => {
+                                  root.scene.addTag(text)
+                              }
+        }
+
         TextListInput {
             id: _sceneCharactersList
 
@@ -126,58 +211,6 @@ Item {
                               }
         }
 
-        TextListInput {
-            id: _sceneTagsList
-
-            Layout.fillWidth: true
-
-            enabled: Runtime.appFeatures.structure.enabled
-
-            addTextButtonTooltip: "Click here to tag the scene with custom keywords."
-            completionStrings: Scrite.document.structure.sceneTags
-            labelIconSource: "qrc:/icons/action/keyword.png"
-            labelIconVisible: _private.presentableGroupNames !== ""
-            labelText: "Keywords"
-            readOnly: !Runtime.appFeatures.structure.enabled && Scrite.document.readOnly
-            textList: root.scene ? root.scene.tags : 0
-
-            onTextCloseRequest: (text, source) => { root.scene.removeTag(text) }
-            onConfigureTextRequest: (text, tag) => { tag.closable = true }
-            onNewTextRequest: (text) => {
-                                  root.scene.addTag(text)
-                              }
-
-            header: Row {
-                spacing: _sceneTagsList.spacing
-
-                FlatToolButton {
-                    suggestedWidth: _sceneTagsList.label.height
-                    suggestedHeight: _sceneTagsList.label.height
-
-                    enabled: Runtime.appFeatures.structure.enabled
-                    opacity: enabled ? 1 : 0.5
-                    iconSource: "qrc:/icons/action/tag.png"
-                    toolTipText: "Formal Story Beats/Tags"
-
-                    onClicked: _private.popupFormalTagsMenu()
-                }
-
-                Link {
-                    width: Math.min(implicitWidth, root.width*0.9)
-
-                    text: _private.presentableGroupNames
-                    elide: Text.ElideRight
-                    visible: _private.presentableGroupNames !== ""
-                    enabled: Runtime.appFeatures.structure.enabled
-                    opacity: enabled ? 1 : 0.5
-                    topPadding: 5
-                    bottomPadding: 5
-
-                    onClicked: _private.popupFormalTagsMenu()
-                }
-            }
-        }
-
         TrapeziumTabView {
             id: _synopsisContentTabView
 
@@ -187,9 +220,9 @@ Item {
             tabNames: ["Synopsis", "Featured Photo"]
             tabColor: root.scene.color
             currentTabContent: currentTabIndex === 0 ? _sceneSynopsisFieldComponent : _featuredPhotoComponent
-            currentTabIndex: Runtime.screenplayEditorSettings.commentsPanelTabIndex
+            currentTabIndex: Runtime.notebookSettings.sceneSynopsisTabIndex
 
-            onCurrentTabIndexChanged: Runtime.screenplayEditorSettings.commentsPanelTabIndex = currentTabIndex
+            onCurrentTabIndexChanged: Runtime.notebookSettings.sceneSynopsisTabIndex = currentTabIndex
         }
     }
 

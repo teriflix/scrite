@@ -1635,7 +1635,21 @@ public:
 
     QString word() const { return this->selectedText(); }
     bool isMisspelled() const { return m_misspelledFragment.isValid(); }
-    QStringList suggestions() const { return m_misspelledFragment.suggestions(); }
+    QStringList suggestions() const
+    {
+        QLocale::Language activeLanguage = QLocale::Language(
+                LanguageEngine::instance()->supportedLanguages()->activeLanguageCode());
+        QList<QLocale::Language> languages = m_misspelledFragment.languages();
+        if (!languages.contains(activeLanguage))
+            return m_misspelledFragment.suggestions();
+
+        QStringList ret = m_misspelledFragment.languageSuggestions(activeLanguage);
+        languages.removeAll(activeLanguage);
+        for (QLocale::Language lang : qAsConst(languages)) {
+            ret += m_misspelledFragment.languageSuggestions(lang);
+        }
+        return ret;
+    }
 
     void replace(const QString &word)
     {

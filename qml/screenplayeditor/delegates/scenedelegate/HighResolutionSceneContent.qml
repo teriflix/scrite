@@ -92,6 +92,7 @@ Item {
 
                 Loader {
                     width: parent.width
+                    height: item ? item.implicitHeight : 0
 
                     active: Runtime.screenplayEditorSettings.displaySceneCharacters
                     visible: active
@@ -104,7 +105,7 @@ Item {
 
                         partName: "StoryBeats"
                         isCurrent: sceneDelegate.isCurrent
-                        zoomLevel: sceneDelegate.zoomLevel
+                        zoomLevel: sceneDelegate.zoomLevel * 0.8
                         fontMetrics: Runtime.idealFontMetrics
                         pageMargins: sceneDelegate.pageMargins
                         screenplayAdapter: sceneDelegate.screenplayAdapter
@@ -119,6 +120,7 @@ Item {
 
                 Loader {
                     width: parent.width
+                    height: item ? item.implicitHeight : 0
 
                     active: Runtime.screenplayEditorSettings.displaySceneCharacters
                     visible: active
@@ -131,7 +133,7 @@ Item {
 
                         partName: "CharacterList"
                         isCurrent: sceneDelegate.isCurrent
-                        zoomLevel: sceneDelegate.zoomLevel
+                        zoomLevel: sceneDelegate.zoomLevel * 0.8
                         fontMetrics: Runtime.idealFontMetrics
                         pageMargins: sceneDelegate.pageMargins
                         screenplayAdapter: sceneDelegate.screenplayAdapter
@@ -144,6 +146,7 @@ Item {
 
                 Loader {
                     width: parent.width
+                    height: item ? item.implicitHeight : 0
 
                     active: Runtime.screenplayEditorSettings.displaySceneSynopsis
                     visible: active
@@ -156,7 +159,7 @@ Item {
 
                         partName: "Synopsis"
                         isCurrent: sceneDelegate.isCurrent
-                        zoomLevel: sceneDelegate.zoomLevel
+                        zoomLevel: sceneDelegate.zoomLevel * 0.9
                         fontMetrics: Runtime.idealFontMetrics
                         pageMargins: sceneDelegate.pageMargins
                         screenplayAdapter: sceneDelegate.screenplayAdapter
@@ -189,6 +192,7 @@ Item {
 
                 focus: true
                 partName: "SceneContent"
+                listView: sceneDelegate.listView
                 isCurrent: sceneDelegate.isCurrent
                 zoomLevel: sceneDelegate.zoomLevel
                 fontMetrics: sceneDelegate.fontMetrics
@@ -201,7 +205,12 @@ Item {
                         sceneDelegate.currentParagraphType = Qt.binding( () => { return currentParagraphType } )
                 }
 
-                onEnsureVisible: (item, area) => { sceneDelegate.ensureVisible(item, area) }
+                onEnsureVisible: (item, area) => {
+                                     if(cursorPosition === 0) {
+                                        sceneDelegate.ensureVisible(_sceneHeadingEditor, Qt.rect(0, 0, area.width, area.height))
+                                     } else
+                                        sceneDelegate.ensureVisible(item, area)
+                                 }
                 onEnsureCentered: (item, area) => { sceneDelegate.ensureCentered(item, area) }
 
                 onSplitSceneRequest: (paragraph, cursorPosition) => { sceneDelegate.splitSceneRequest(paragraph, cursorPosition) }
@@ -316,4 +325,5 @@ Item {
     function __updateHeightHint() {
         if(height > 0 && sceneDelegate && sceneDelegate.screenplayElement && sceneDelegate.zoomLevel > 0)
             sceneDelegate.screenplayElement.heightHint = height / zoomLevel
-    }}
+    }
+}

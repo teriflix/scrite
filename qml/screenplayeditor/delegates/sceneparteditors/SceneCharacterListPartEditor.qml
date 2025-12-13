@@ -29,7 +29,7 @@ AbstractScenePartEditor {
 
     signal newCharacterAdded(string characterName)
 
-    height: _charactersInput.height
+    implicitHeight: _charactersInput.height
 
     TextListInput {
         id: _charactersInput

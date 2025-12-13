@@ -85,7 +85,26 @@ VclDialog {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
+
             color: Runtime.colors.primary.c50.background
+
+            Action {
+                property int nextIndex: (_tabBar.currentIndex+1)%_tabBar.count
+                shortcut: ActionHub.applicationOptions.find("tabRight").shortcut
+
+                onTriggered: (source) => {
+                    _tabBar.setCurrentIndex(nextIndex)
+                }
+            }
+
+            Action {
+                property int prevIndex: (_tabBar.currentIndex-1) < 0 ? _tabBar.count-1 : (_tabBar.currentIndex-1)
+                shortcut: ActionHub.applicationOptions.find("tabLeft").shortcut
+
+                onTriggered: (source) => {
+                    _tabBar.setCurrentIndex(prevIndex)
+                }
+            }
 
             Loader {
                 anchors.fill: parent

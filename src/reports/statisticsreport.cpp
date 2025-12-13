@@ -353,7 +353,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::actDistribution() const
             ActSceneListPair pair;
             pair.first = currentAct;
             actScenesList.append(pair);
-        } else {
+        } else if (element->breakType() != Screenplay::Interval) {
             currentAct.clear();
             actIndex = -1;
         }

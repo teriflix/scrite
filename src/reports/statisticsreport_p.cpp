@@ -1509,7 +1509,7 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
     locationSeries->setLabelsPosition(QtCharts::QStackedBarSeries::LabelsCenter);
 
     QtCharts::QBarSet *locationBarSet = new QtCharts::QBarSet(QString(), locationSeries);
-    locationBarSet->setColor(StatisticsReport::pickRandomColor(StatisticsReport::Location));
+    locationBarSet->setColor(StatisticsReport::pickColor(0, false, StatisticsReport::Location));
     locationSeries->append(locationBarSet);
     locationBarSet->setLabelFont(tinyFont);
     locationBarSet->setLabelColor(Utils::Color::textColorFor(locationBarSet->color()));

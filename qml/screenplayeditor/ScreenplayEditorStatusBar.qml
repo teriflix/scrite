@@ -133,13 +133,25 @@ Rectangle {
 
         Separator { }
 
-        Image {
+
+        Item {
             Layout.preferredWidth: Runtime.idealFontMetrics.height
             Layout.preferredHeight: Runtime.idealFontMetrics.height
 
-            source: "qrc:/icons/content/time.png"
-            enabled: !Runtime.paginator.paused
-            opacity: enabled ? 1 : 0.5
+            BusyIcon {
+                anchors.fill: parent
+
+                visible: Runtime.paginator.busy
+            }
+
+            Image {
+                anchors.fill: parent
+
+                enabled: !Runtime.paginator.paused
+                opacity: enabled ? 1 : 0.5
+                source: "qrc:/icons/content/time.png"
+                visible: !Runtime.paginator.busy
+            }
         }
 
         VclText {

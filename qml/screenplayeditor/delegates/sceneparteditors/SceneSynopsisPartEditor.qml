@@ -26,7 +26,7 @@ import "qrc:/qml/controls"
 AbstractScenePartEditor {
     id: root
 
-    height: _synopsisInput.contentHeight + root.fontMetrics.lineSpacing
+    implicitHeight: _synopsisInput.contentHeight + root.fontMetrics.lineSpacing
 
     TextAreaInput {
         id: _synopsisInput

@@ -11,14 +11,16 @@
 **
 ****************************************************************************/
 
-#include "application.h"
 #include "spellcheckservice.h"
 #include "timeprofiler.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
+#include "languageengine.h"
+#include "utils.h"
 
 #include <QFuture>
 #include <QJsonObject>
+#include <QScopeGuard>
 #include <QTimerEvent>
 #include <QFutureWatcher>
 #include <QThreadStorage>
@@ -29,11 +31,38 @@
 #include "3rdparty/sonnet/sonnet/src/core/speller.h"
 #include "3rdparty/sonnet/sonnet/src/core/loader_p.h"
 #include "3rdparty/sonnet/sonnet/src/core/textbreaks_p.h"
-#include "3rdparty/sonnet/sonnet/src/core/guesslanguage.h"
 
 #ifdef Q_OS_MAC
 #include "3rdparty/sonnet/sonnet/src/plugins/nsspellchecker/nsspellcheckerclient.h"
 #endif
+
+class EnglishLanguageSpeller : public Sonnet::Speller
+{
+public:
+    static const QString languageName;
+
+    EnglishLanguageSpeller() : Sonnet::Speller(EnglishLanguageSpeller::languageName) { }
+    ~EnglishLanguageSpeller() { }
+};
+
+#ifdef Q_OS_MAC
+const QString EnglishLanguageSpeller::languageName = QStringLiteral("en");
+#else
+#ifdef Q_OS_WIN
+const QString EnglishLanguageSpeller::languageName;
+#else
+const QString EnglishLanguageSpeller::languageName = QStringLiteral("en_US");
+#endif
+#endif
+
+struct SpellCheckServiceRequest
+{
+    QString text;
+    int timestamp;
+    QStringList characterNames;
+    QStringList ignoreList;
+};
+Q_DECLARE_METATYPE(SpellCheckServiceRequest)
 
 class SpellCheckServiceResult
 {
@@ -48,33 +77,152 @@ public:
 };
 Q_DECLARE_METATYPE(SpellCheckServiceResult)
 
-class EnglishLanguageSpeller : public Sonnet::Speller
+class Spellers : public QObject
 {
 public:
-#ifdef Q_OS_MAC
-    EnglishLanguageSpeller() : Sonnet::Speller("en") { }
-#else
+    Spellers(const QList<int> &languageCodes)
+    {
+        this->reloadSpellers(languageCodes);
+
+        QObject::connect(
+                LanguageEngine::instance()->supportedLanguages(),
+                &SupportedLanguages::languagesCodesChanged, this,
+                [=](const QList<int> &languageCodes) { this->reloadSpellers(languageCodes); });
+    }
+
+    ~Spellers() { }
+
+    QList<int> supportedLanguages() const { return m_supportedLanguages.keys(); }
+
+    QStringList getSuggestions(const QString &word) const
+    {
+        if (word.isEmpty())
+            return QStringList();
+
+        QChar::Script wordScript = word.at(0).script();
+        QList<Item> wordScriptItems;
+        std::copy_if(m_items.begin(), m_items.end(), std::back_inserter(wordScriptItems),
+                     [wordScript](const Item &item) { return item.script == wordScript; });
+        if (wordScriptItems.isEmpty())
+            return QStringList();
+
+        QStringList ret;
+        for (const Item &item : qAsConst(wordScriptItems)) {
+            if (item.speller.isMisspelled(word)) {
+                const QStringList suggestions = item.speller.suggest(word);
+                ret += suggestions;
+            }
+        }
+
+        return ret;
+    }
+
+    bool checkSpelling(const Sonnet::TextBreaks::Position &wordPosition,
+                       const SpellCheckServiceRequest &request, TextFragment &fragment) const
+    {
+        const QString word = request.text.mid(wordPosition.start, wordPosition.length);
+        if (word.isEmpty())
+            return false;
+
+        if (request.ignoreList.contains(word)
+            || request.characterNames.contains(word, Qt::CaseInsensitive))
+            return false;
+
+        if (word.endsWith("\'s", Qt::CaseInsensitive)) {
+            if (request.characterNames.contains(word.leftRef(word.length() - 2),
+                                                Qt::CaseInsensitive))
+                return false;
+        }
+
+        QChar::Script wordScript = word.at(0).script();
+        QList<Item> wordScriptItems;
+        std::copy_if(m_items.begin(), m_items.end(), std::back_inserter(wordScriptItems),
+                     [wordScript](const Item &item) { return item.script == wordScript; });
+        if (wordScriptItems.isEmpty())
+            return false;
+
+        QMap<QLocale::Language, QStringList> languageSuggestions;
+        for (const Item &item : qAsConst(wordScriptItems)) {
+            if (item.speller.isMisspelled(word)) {
+                const QStringList suggestions = item.speller.suggest(word);
+                languageSuggestions[item.language] = suggestions;
+            }
+        }
+
+        if (languageSuggestions.size() == wordScriptItems.size()) {
+            fragment = TextFragment(wordPosition.start, wordPosition.length, languageSuggestions);
+            return true;
+        }
+
+        return false;
+    }
+
+private:
+    void reloadSpellers(const QList<int> &languageCodes)
+    {
+        if (m_supportedLanguages.isEmpty()) {
+            const QStringList languages = Sonnet::Loader::openLoader()->languages();
+            for (const QString &language : languages) {
+                m_supportedLanguages[QLocale(language).language()].append(language);
+            }
+        }
+
+        m_items.clear();
+
+        for (int code : languageCodes) {
+            Item item;
+            item.language = QLocale::Language(code);
+
+            const QStringList languageNames =
+                    m_supportedLanguages.value(item.language, QStringList());
+            if (languageNames.size() == 1) {
+                item.languageName = languageNames.first();
+            } else {
+                item.languageName = QLocale(item.language).name();
 #ifdef Q_OS_WIN
-    EnglishLanguageSpeller() : Sonnet::Speller() { }
-#else
-    EnglishLanguageSpeller() : Sonnet::Speller("en_US") { }
+                item.languageName = item.languageName.replace('_', '-');
 #endif
-#endif
-    ~EnglishLanguageSpeller() { }
+                if (!languageNames.isEmpty() && !languageNames.contains(item.languageName))
+                    item.languageName = languageNames.first();
+            }
+            item.script = Language::scriptForLanguage(item.language);
+            item.speller = item.language == QLocale::English ? EnglishLanguageSpeller()
+                                                             : Sonnet::Speller(item.languageName);
+
+            if (item.speller.isValid()
+                && (item.language == QLocale::English
+                            ? true
+                            : item.speller.language() == item.languageName))
+                m_items.append(item);
+            else if (!languageNames.isEmpty()) {
+                item.languageName = languageNames.first();
+                item.speller = Sonnet::Speller(item.languageName);
+                if (item.speller.language() == item.languageName)
+                    m_items.append(item);
+            }
+        }
+    }
+
+private:
+    struct Item
+    {
+        QString languageName;
+        QLocale::Language language;
+        QChar::Script script;
+        Sonnet::Speller speller;
+    };
+    QList<Item> m_items;
+    QMap<int, QStringList> m_supportedLanguages;
 };
 
-struct SpellCheckServiceRequest
-{
-    QString text;
-    int timestamp;
-    QStringList characterNames;
-    QStringList ignoreList;
-};
-Q_DECLARE_METATYPE(SpellCheckServiceRequest)
+Q_GLOBAL_STATIC(QThreadStorage<Spellers *>, ThreadSpellers)
 
-void InitializeSpellCheckThread()
+QList<int> InitializeSpellCheckThread(const QList<int> &languageCodes)
 {
     Sonnet::Loader::openLoader();
+    Spellers *spellers = new Spellers(languageCodes);
+    ThreadSpellers->setLocalData(spellers);
+    return spellers->supportedLanguages();
 }
 
 SpellCheckServiceResult CheckSpellings(const SpellCheckServiceRequest &request)
@@ -86,74 +234,19 @@ SpellCheckServiceResult CheckSpellings(const SpellCheckServiceRequest &request)
     if (request.text.isEmpty())
         return result; // Should never happen
 
-    /*
-     * Much of the code here is inspired from Sonnet::Highlighter::highlightBlock()
-     * Obviously their implementation is 'smarter' because their implementation works
-     * directly on the view, our's works on the model.
-     *
-     * Sonnet::Highlighter is intended to be used on a QTextEdit or QPlainTextEdit
-     * both of which are widgets (which means views). The highlighter directly works
-     * on QTextBlocks within a QTextDocument, which is great.
-     *
-     * We cannot do that in Scrite because we open a TextArea for each scene separately.
-     * And TextAreas get created and destroyed frequently depending on the scroll position
-     * of contentView in ScreenplayEditor. This means that each time a scene scrolls into
-     * visibility, it will have to reinitialize the entire underlying data structure related
-     * spell-check. That is an expensive thing to do.
-     *
-     * In Scrite, we simply associate a SpellCheck instance with each SceneElement and reuse
-     * its results across all views hooked to the Scene. Additionally, we use SpellCheck on
-     * Note and StructureElement also. This fits into the whole model-view thinking that
-     * QML apps are required to leverage.
-     *
-     * There is obviously room for improvement in this implementation. We could cache
-     * spell-check done in the previous round and only check for delta changes in here.
-     * But for now, we simply take a brute-force approach. But this function could be a
-     * good place for us to accept community contribution.
-     */
-
     const Sonnet::TextBreaks::Positions wordPositions =
             Sonnet::TextBreaks::wordBreaks(request.text);
     if (wordPositions.isEmpty() || Sonnet::Loader::openLoader() == nullptr)
         return result;
 
-    EnglishLanguageSpeller speller;
+    const Spellers *spellers = ::ThreadSpellers->localData();
+    if (spellers == nullptr)
+        return result;
+
     for (const Sonnet::TextBreaks::Position &wordPosition : wordPositions) {
-        const QString word = request.text.mid(wordPosition.start, wordPosition.length);
-        if (word.isEmpty())
-            continue; // not sure why this would happen, but just keeping safe.
-
-#ifndef Q_OS_MAC
-        // We have to do this on Windows and Linux, otherwise all non-English words will
-        // be flagged as spelling mistakes. What would be ideal is to check if the entire
-        // word only has non-latin letters, but this is good enough.
-        if (word.at(0).script() != QChar::Script_Latin)
-            continue;
-#endif
-
-        if (Sonnet::Loader::openLoader() == nullptr) {
-            result.misspelledFragments.clear();
-            break;
-        }
-
-        const bool misspelled = speller.isMisspelled(word);
-        if (misspelled) {
-            if (request.ignoreList.contains(word))
-                continue;
-
-            if (request.characterNames.contains(word, Qt::CaseInsensitive))
-                continue;
-
-            if (word.endsWith("\'s", Qt::CaseInsensitive)) {
-                if (request.characterNames.contains(word.leftRef(word.length() - 2),
-                                                    Qt::CaseInsensitive))
-                    continue;
-            }
-
-            const QStringList suggestions = speller.suggest(word);
-            TextFragment fragment(wordPosition.start, wordPosition.length, suggestions);
-            if (fragment.isValid())
-                result.misspelledFragments << fragment;
+        TextFragment fragment;
+        if (spellers->checkSpelling(wordPosition, request, fragment)) {
+            result.misspelledFragments.append(fragment);
         }
     }
 
@@ -171,48 +264,43 @@ bool AddToDictionary(const QString &word)
 
 QStringList GetSpellingSuggestions(const QString &word)
 {
-    /**
-     * It is assumed that word contains a single word. We won't bother checking for that.
-     */
-    EnglishLanguageSpeller speller;
-    return speller.suggest(word);
-}
-
-static QThreadPool *SpellCheckServiceThreadPool()
-{
-    /**
-     * We make use of QtConcurrent::run() method to schedule the following methods on a
-     * background thread, so that they dont block the UI.
-     * - InitializeSpellCheckThread
-     * - CheckSpellings
-     * - AddToDictionary
-     * - GetSpellingSuggestions
-     *
-     * We know for a fact that CheckSpellings() does indeed block the UI thread because
-     * spelling lookup is a slow process. The default behaviour of SpellCheckService is
-     * to looup spellings asynchronously and in the background. So, scheduling these
-     * functions in a background thread works for us.
-     *
-     * Moreover we need exactly one thread for this purpose. While a QThreadPool can
-     * allocate multiple threads for us, we need only one. And one that thread is created
-     * it should NEVER EVER terminate until the program finishes.
-     */
-    static bool initialized = false;
-    static QThreadPool threadPool;
-    if (!initialized) {
-#ifdef Q_OS_MAC
-        // Lookup documentation of this function to see why we are doing this.
-        NSSpellCheckerClient::ensureSpellCheckerAvailability();
-#endif
-        threadPool.setExpiryTimeout(-1);
-        threadPool.setMaxThreadCount(1);
-        QFuture<void> future = QtConcurrent::run(&threadPool, InitializeSpellCheckThread);
-        future.waitForFinished();
-        initialized = true;
+    const Spellers *spellers = ::ThreadSpellers->localData();
+    if (spellers == nullptr) {
+        EnglishLanguageSpeller speller;
+        return speller.suggest(word);
     }
 
-    return &threadPool;
+    return spellers->getSuggestions(word);
 }
+
+class SpellCheckThreadPool : public QThreadPool
+{
+public:
+    SpellCheckThreadPool()
+    {
+#ifdef Q_OS_MAC
+        NSSpellCheckerClient::ensureSpellCheckerAvailability();
+#endif
+        const QList<int> supportedLanguageCodes =
+                LanguageEngine::instance()->supportedLanguages()->languageCodes();
+
+        setExpiryTimeout(-1);
+        setMaxThreadCount(1);
+        QFuture<QList<int>> future = QtConcurrent::run(this, [supportedLanguageCodes]() {
+            return InitializeSpellCheckThread(supportedLanguageCodes);
+        });
+        future.waitForFinished();
+
+        m_supportedLanguages = future.result();
+    }
+
+    bool isLanguageSupported(int language) const { return m_supportedLanguages.contains(language); }
+
+private:
+    QList<int> m_supportedLanguages;
+};
+
+Q_GLOBAL_STATIC(SpellCheckThreadPool, SpellCheckServiceThreadPool)
 
 SpellCheckService::SpellCheckService(QObject *parent)
     : QObject(parent), m_textTracker(&m_textModifiable)
@@ -310,7 +398,7 @@ void SpellCheckService::update()
 QStringList SpellCheckService::suggestions(const QString &word)
 {
     QThreadPool *threadPool = SpellCheckServiceThreadPool();
-    if (threadPool == nullptr)
+    if (threadPool == nullptr || word.isEmpty())
         return QStringList();
 
     QFuture<QStringList> future = QtConcurrent::run(threadPool, GetSpellingSuggestions, word);
@@ -321,12 +409,21 @@ QStringList SpellCheckService::suggestions(const QString &word)
 bool SpellCheckService::addToDictionary(const QString &word)
 {
     QThreadPool *threadPool = SpellCheckServiceThreadPool();
-    if (threadPool == nullptr)
+    if (threadPool == nullptr || word.isEmpty())
         return false;
 
     QFuture<bool> future = QtConcurrent::run(threadPool, AddToDictionary, word);
     future.waitForFinished();
     return future.result();
+}
+
+bool SpellCheckService::canCheckLanguage(int language)
+{
+    SpellCheckThreadPool *threadPool = SpellCheckServiceThreadPool();
+    if (threadPool == nullptr)
+        return false;
+
+    return threadPool->isLanguageSupported(language);
 }
 
 void SpellCheckService::classBegin() { }

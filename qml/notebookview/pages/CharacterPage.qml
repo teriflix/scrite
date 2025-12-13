@@ -50,7 +50,10 @@ AbstractNotebookPage {
 
             name: _private.character.name
             tabs: ["Information", "Relationships", "Notes"]
-            currentTab: 0
+            currentTab: Runtime.notebookSettings.characterPageTab
+            switchTabHandlerEnabled: true
+
+            onCurrentTabChanged: Runtime.notebookSettings.characterPageTab = currentTab
         }
 
         StackLayout {

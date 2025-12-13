@@ -191,14 +191,6 @@ ListView {
                      }
     }
 
-    ActionHandler {
-        action: ActionHub.editOptions.find("toggleCommentsPanel")
-
-        onTriggered: (source) => {
-
-                     }
-    }
-
     QtObject {
         id: _private
 
@@ -590,20 +582,27 @@ ListView {
 
         }
 
-        function ensureVisible(item, rect) {
+        function ensureVisible(item, rect, marginTop, marginBottom) {
             if(item === null || rect === undefined)
                 return
 
+            if(marginTop === undefined)
+                marginTop = Math.round(root.height * 0.05)
+            if(marginBottom === undefined)
+                marginBottom = Math.round(root.height * 0.15)
+
             const pt = item.mapToItem(root.contentItem, rect.x, rect.y)
-            const endY = root.contentY + root.height - rect.height
-            const startY = root.contentY
-            if( pt.y >= startY && pt.y <= endY )
+            const startY = root.contentY + marginTop
+            const endY = root.contentY + root.height - rect.height - marginBottom
+
+            if (pt.y >= startY && pt.y <= endY)
                 return
 
-            if( pt.y < startY )
-                root.contentY = Math.round(pt.y)
+            if (pt.y < startY)
+                root.contentY = Math.round(pt.y - marginTop)
             else
-                root.contentY = Math.round((pt.y + 2*rect.height) - root.height)
+                root.contentY = Math.round((pt.y + rect.height + marginBottom) - root.height)
+
             root.returnToBounds()
         }
 

@@ -380,6 +380,11 @@ QList<TransliterationOption> Language::transliterationOptions() const
     return LanguageEngine::instance()->queryTransliterationOptions(this->code);
 }
 
+QChar::Script Language::scriptForLanguage(QLocale::Language language, QChar::Script defaultScript)
+{
+    return languageScriptMap().value(language, defaultScript);
+}
+
 TransliterationOption Language::preferredTransliterationOption() const
 {
     const QList<TransliterationOption> options = this->transliterationOptions();
@@ -400,6 +405,17 @@ AbstractLanguagesModel::AbstractLanguagesModel(QObject *parent) : QAbstractListM
     connect(this, &QAbstractListModel::modelReset, this, &AbstractLanguagesModel::countChanged);
     connect(this, &QAbstractListModel::rowsRemoved, this, &AbstractLanguagesModel::countChanged);
     connect(this, &QAbstractListModel::rowsInserted, this, &AbstractLanguagesModel::countChanged);
+
+    connect(this, &QAbstractListModel::modelReset, this,
+            &AbstractLanguagesModel::updateLanguageCodes);
+    connect(this, &QAbstractListModel::rowsRemoved, this,
+            &AbstractLanguagesModel::updateLanguageCodes);
+    connect(this, &QAbstractListModel::rowsInserted, this,
+            &AbstractLanguagesModel::updateLanguageCodes);
+    connect(this, &QAbstractListModel::rowsMoved, this,
+            &AbstractLanguagesModel::updateLanguageCodes);
+    connect(this, &QAbstractListModel::dataChanged, this,
+            &AbstractLanguagesModel::updateLanguageCodes);
 }
 
 AbstractLanguagesModel::~AbstractLanguagesModel() { }
@@ -551,6 +567,20 @@ QJsonValue AbstractLanguagesModel::toJson() const
 void AbstractLanguagesModel::fromJson(const QJsonValue &value)
 {
     Q_UNUSED(value);
+}
+
+void AbstractLanguagesModel::updateLanguageCodes()
+{
+    QList<int> codes;
+    for (const Language &language : qAsConst(m_languages))
+        codes << language.code;
+
+    std::sort(codes.begin(), codes.end());
+
+    if (m_languageCodes != codes) {
+        m_languageCodes = codes;
+        emit languagesCodesChanged(m_languageCodes);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -103,6 +103,8 @@ ScreenplayPaginator::ScreenplayPaginator(QObject *parent) : QObject(parent)
             &ScreenplayPaginator::onPaginationComplete);
     connect(m_workerNode, &ScreenplayPaginatorWorkerNode::cursorQueryResponse, this,
             &ScreenplayPaginator::onCursorQueryResponse);
+    connect(m_workerNode, &ScreenplayPaginatorWorkerNode::busyChanged, this,
+            &ScreenplayPaginator::busyChanged);
     m_workerNode->setWorker(m_worker);
 
     connect(this, &ScreenplayPaginator::enabledChanged, this, &ScreenplayPaginator::reset);
@@ -199,6 +201,11 @@ void ScreenplayPaginator::setEnabled(bool val)
     this->clear();
 
     emit enabledChanged();
+}
+
+bool ScreenplayPaginator::isBusy() const
+{
+    return m_workerNode ? m_workerNode->isBusy() : false;
 }
 
 void ScreenplayPaginator::reset()

@@ -54,6 +54,11 @@ Item {
         if(!qmlAction || !Object.isOfType(qmlAction, "QQuickAction"))
             return
 
+        if(newShortcut === undefined || newShortcut === "") {
+            qmlAction.shortcut = undefined
+            return
+        }
+
         let conflictingAction = ActionManager.findActionForShortcut(newShortcut)
         if(conflictingAction) {
             MessageBox.information("Shortcut Conflict",
@@ -306,20 +311,6 @@ Item {
             onTriggered: SaveFileTask.saveAs()
         }
 
-        Action {
-            readonly property var keywords: ["print"]
-            readonly property bool visible: false
-            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Print)
-
-            text: "Export To PDF"
-            enabled: Runtime.allowAppUsage
-            shortcut: defaultShortcut
-
-            icon.source: "qrc:/icons/exporter/pdf.png"
-
-            onTriggered: ExportConfigurationDialog.launch("Screenplay/Adobe PDF")
-        }
-
         // Action to reveal vault folder
         // Action to reveal backup folder
         // Action to reveal settings folder
@@ -482,12 +473,14 @@ Item {
             readonly property bool allowShortcut: true
             readonly property string tooltip: modelData.description
             readonly property string keywords: modelData.keywords
+            readonly property string defaultShortcut: modelData.className === "PdfExporter" ? Gui.standardShortcut(StandardKey.Print) : ""
 
             ActionManager.target: root.exportOptions
 
             text: modelData.name
             enabled: Runtime.allowAppUsage
             objectName: "export" + modelData.className
+            shortcut: defaultShortcut
 
             icon.source: "qrc" + modelData.icon
 
@@ -1051,30 +1044,38 @@ Item {
             objectName: "scrollNextScene"
         }
 
-        // This is the main jump-to-scene handler components in the app
-        // can hook to and handle. If nobody is hooking up to this handle, then
-        // we offer a global one below.
         Action {
-            id: _jumpToSceneNumber
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_PageUp)
 
+            enabled: ActionHandler.canHandle
+            objectName: "pageUp"
+            text: "Page Up"
+            shortcut: defaultShortcut
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_PageDown)
+
+            enabled: ActionHandler.canHandle
+            objectName: "pageDown"
+            text: "Page Down"
+            shortcut: defaultShortcut
+        }
+
+        Action {
             readonly property bool visible: false
             readonly property string defaultShortcut: "Ctrl+G"
 
-            enabled: ActionHandler.canHandle
+            enabled: true
             objectName: "jumpToSceneNumber"
             shortcut: defaultShortcut
             text: "Jump to Scene Number"
-        }
-
-        // This is the global jump-to-scene handler
-        Action {
-            readonly property bool visible: false
-
-            enabled: !_jumpToSceneNumber.enabled
-            shortcut: _jumpToSceneNumber.shortcut
 
             onTriggered: (source) => {
-                JumpToSceneNumberDialog.launch(Runtime.screenplayAdapter)
+                if(ActionHandler.all.length === 0)
+                    JumpToSceneNumberDialog.launch(Runtime.screenplayAdapter)
             }
         }
 
@@ -2417,6 +2418,46 @@ Item {
                 const fileInfo = File.info(Platform.settingsPath)
                 File.revealOnDesktop(fileInfo.absolutePath)
             }
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? Gui.shortcut(Qt.ShiftModifier+Qt.AltModifier+Qt.Key_Tab) : Gui.shortcut(Qt.ShiftModifier+Qt.ControlModifier+Qt.Key_Tab)
+
+            enabled: ActionHandler.canHandle
+            objectName: "tabLeft"
+            shortcut: defaultShortcut
+            text: ActionHandler.active && ActionHandler.active.text ? ActionHandler.active.text : "Previous Tab (Left)"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? Gui.shortcut(Qt.AltModifier+Qt.Key_Tab) : Gui.shortcut(Qt.ControlModifier+Qt.Key_Tab)
+
+            enabled: ActionHandler.canHandle
+            objectName: "tabRight"
+            shortcut: defaultShortcut
+            text: ActionHandler.active && ActionHandler.active.text ? ActionHandler.active.text : "Next Tab (Right)"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? Gui.shortcut(Qt.AltModifier+Qt.Key_PageUp) : Gui.shortcut(Qt.ControlModifier+Qt.Key_PageUp)
+
+            enabled: ActionHandler.canHandle
+            objectName: "tabUp"
+            shortcut: defaultShortcut
+            text: ActionHandler.active && ActionHandler.active.text ? ActionHandler.active.text : "Previous Tab (Up)"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? Gui.shortcut(Qt.AltModifier+Qt.Key_PageDown) : Gui.shortcut(Qt.ControlModifier+Qt.Key_PageDown)
+
+            enabled: ActionHandler.canHandle
+            objectName: "tabDown"
+            shortcut: defaultShortcut
+            text: ActionHandler.active && ActionHandler.active.text ? ActionHandler.active.text : "Next Tab (Down)"
         }
     }
 

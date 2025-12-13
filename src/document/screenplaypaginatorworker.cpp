@@ -481,6 +481,8 @@ void ScreenplayPaginatorWorker::syncDocument()
 
     m_lastSyncDocumentTimestamp = now;
 
+    emit paginationStart();
+
 #ifdef ENABLE_GUI_LOG
     Utils::Gui::log(QStringLiteral("ScreenplayPaginatorWorker::syncDocument(): %1 scenes")
                             .arg(m_screenplayContent.size()));
@@ -985,12 +987,45 @@ void ScreenplayPaginatorWorkerNode::setWorker(ScreenplayPaginatorWorker *worker)
                 &ScreenplayPaginatorWorker::updateScene);
         connect(this, &ScreenplayPaginatorWorkerNode::updateParagraph, m_worker,
                 &ScreenplayPaginatorWorker::updateParagraph);
-        connect(this, &ScreenplayPaginatorWorkerNode::queryCursor, m_worker,
-                &ScreenplayPaginatorWorker::queryCursor);
-
-        connect(m_worker, &ScreenplayPaginatorWorker::cursorQueryResponse, this,
-                &ScreenplayPaginatorWorkerNode::cursorQueryResponse);
         connect(m_worker, &ScreenplayPaginatorWorker::paginationComplete, this,
                 &ScreenplayPaginatorWorkerNode::paginationComplete);
+
+        connect(this, &ScreenplayPaginatorWorkerNode::queryCursor, m_worker,
+                &ScreenplayPaginatorWorker::queryCursor);
+        connect(m_worker, &ScreenplayPaginatorWorker::cursorQueryResponse, this,
+                &ScreenplayPaginatorWorkerNode::cursorQueryResponse);
+
+#if 0
+        connect(this, &ScreenplayPaginatorWorkerNode::useFormat, this,
+                &ScreenplayPaginatorWorkerNode::markBusy);
+        connect(this, &ScreenplayPaginatorWorkerNode::reset, this,
+                &ScreenplayPaginatorWorkerNode::markBusy);
+        connect(this, &ScreenplayPaginatorWorkerNode::insertElement, this,
+                &ScreenplayPaginatorWorkerNode::markBusy);
+        connect(this, &ScreenplayPaginatorWorkerNode::removeElement, this,
+                &ScreenplayPaginatorWorkerNode::markBusy);
+        connect(this, &ScreenplayPaginatorWorkerNode::omitElement, this,
+                &ScreenplayPaginatorWorkerNode::markBusy);
+        connect(this, &ScreenplayPaginatorWorkerNode::includeElement, this,
+                &ScreenplayPaginatorWorkerNode::markBusy);
+        connect(this, &ScreenplayPaginatorWorkerNode::updateScene, this,
+                &ScreenplayPaginatorWorkerNode::markBusy);
+        connect(this, &ScreenplayPaginatorWorkerNode::updateParagraph, this,
+                &ScreenplayPaginatorWorkerNode::markBusy);
+#else
+        connect(m_worker, &ScreenplayPaginatorWorker::paginationStart, this,
+                &ScreenplayPaginatorWorkerNode::markBusy);
+#endif
+        connect(m_worker, &ScreenplayPaginatorWorker::paginationComplete, this,
+                &ScreenplayPaginatorWorkerNode::markNotBusy);
     }
+}
+
+void ScreenplayPaginatorWorkerNode::setBusy(bool val)
+{
+    if (m_busy == val)
+        return;
+
+    m_busy = val;
+    emit busyChanged();
 }

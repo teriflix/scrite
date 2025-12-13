@@ -160,9 +160,9 @@ Item {
         property bool displayEmptyTitleCard: true
         property bool displayIndexCardFields: true
         property bool displayRuler: false
-        property bool displaySceneCharacters: true
+        property bool displaySceneCharacters: false
         property bool displaySceneComments: false
-        property bool displaySceneSynopsis: true
+        property bool displaySceneSynopsis: false
         property bool enableAutoCapitalizeSentences: true
         property bool enableAutoPolishParagraphs: true // for automatically adding/removing CONT'D where appropriate
         property bool enableSpellCheck: true // Since this is now fixed: https://github.com/teriflix/scrite/issues/138
@@ -284,7 +284,7 @@ Item {
         }
 
         function markTipAsShown(val) {
-            var ts = tipsShown.length > 0 ? tipsShown.split(",") : []
+            let ts = tipsShown.length > 0 ? tipsShown.split(",") : []
             if(ts.indexOf(val) < 0)
                 ts.push(val)
             tipsShown = ts.join(",")
@@ -295,7 +295,11 @@ Item {
     }
 
     readonly property Settings notebookSettings: Settings {
-        property int activeTab: 0 // 0 = Relationships, 1 = Notes
+        property int characterPageTab: 0
+        property int charactersPageTab: 0
+        property int screenplayPageTab: 0
+        property int sceneNotesPageTab: 0
+        property int sceneSynopsisTabIndex: 0
         property int graphLayoutMaxIterations: 50000
         property int graphLayoutMaxTime: 1000
 
@@ -996,6 +1000,11 @@ Item {
         target: Scrite.document
 
         function onJustReset() {
+            Runtime.notebookSettings.characterPageTab = 0
+            Runtime.notebookSettings.charactersPageTab = 0
+            Runtime.notebookSettings.screenplayPageTab = 0
+            Runtime.notebookSettings.sceneNotesPageTab = 0
+            Runtime.notebookSettings.sceneSynopsisTabIndex = 0
             Runtime.screenplayEditorSettings.sceneSidePanelOpen = false
             Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
         }

@@ -20,46 +20,62 @@ import "qrc:/qml/globals"
 QtObject {
     id: root
 
-    property var helpTip: Runtime.helpTips === undefined || tipName === "" ? undefined : Runtime.helpTips[tipName]
-    property bool tipShown: Runtime.helpNotificationSettings.isTipShown(tipName)
-    property bool enabled: helpTip !== undefined
+    readonly property string version: "_v2"
+
+    property bool enabled: _private.helpTip !== undefined
+
     property string tipName
 
-    Notification.title: helpTip ? helpTip.title : ""
-    Notification.image: helpTip ? helpTip.image.url : ""
-    Notification.active: enabled && helpTip && !tipShown
-    Notification.text: helpTip ? helpTip.text : ""
+    Notification.active: enabled && _private.helpTip && !_private.tipShown
+
+    Notification.image: _private.helpTip ? _private.helpTip.image.url : ""
+
+    Notification.text: _private.helpTip ? _private.helpTip.text : ""
+    Notification.title: _private.helpTip ? _private.helpTip.title : ""
+
     Notification.autoClose: false
     Notification.closeOnButtonClick: false
     Notification.buttons: {
         var ret = []
-        if(helpTip)
-            helpTip.buttons.forEach( (item) => {
+        if(_private.helpTip)
+            _private.helpTip.buttons.forEach( (item) => {
                                                 ret.push(item.text)
                                              })
         return ret
     }
+
     Notification.onImageClicked: {
-        if(helpTip) {
-            if(helpTip.image.action === "$dismiss")
+        if(_private.helpTip) {
+            if(_private.helpTip.image.action === "$dismiss") {
                 markTipAsShown()
-            else
-                Qt.openUrlExternally(helpTip.image.action)
+            } else {
+                Qt.openUrlExternally(_private.helpTip.image.action)
+            }
         }
     }
 
     Notification.onButtonClicked: (buttonIndex) => {
-                                      if(helpTip) {
-                                          const button = helpTip.buttons[buttonIndex]
-                                          if(button.action === "$dismiss")
-                                            markTipAsShown()
-                                          else
-                                            Qt.openUrlExternally(button.action)
-                                      } else
-                                        markTipAsShown()
+                                      if(_private.helpTip) {
+                                          const button = _private.helpTip.buttons[buttonIndex]
+                                          if(button.action === "$dismiss") {
+                                              markTipAsShown()
+                                          } else {
+                                              Qt.openUrlExternally(button.action)
+                                          }
+                                      } else {
+                                          markTipAsShown()
+                                      }
                                   }
 
     function markTipAsShown() {
-        Runtime.helpNotificationSettings.markTipAsShown(tipName)
+        Runtime.helpNotificationSettings.markTipAsShown(_private.resolvedTipName)
+    }
+
+    readonly property QtObject _private: QtObject {
+        property var helpTip: Runtime.helpTips === undefined || resolvedTipName === "" ? undefined : Runtime.helpTips[resolvedTipName]
+
+        property bool tipShown: Runtime.helpNotificationSettings.isTipShown(resolvedTipName)
+
+        property string resolvedTipName: root.tipName + root.version
     }
 }

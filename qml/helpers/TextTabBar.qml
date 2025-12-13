@@ -26,19 +26,29 @@ Item {
     property var tabs: []
     property string name: "Tabs"
     property alias spacing: _tabsRow.spacing
+    property alias switchTabHandlerEnabled: _switchTabActionHandler.enabled
 
     height: implicitHeight
     implicitHeight: _tabsRow.height + Runtime.idealFontMetrics.descent + _currentTabUnderline.height
 
-    ActionManager {
-        title: root.name + " Tabs"
+    ActionHandler {
+        id: _switchTabActionHandler
 
-        Action {
-            text: "Next Tab"
-            shortcut: Gui.shortcut(Qt.ControlModifier+Qt.Key_Tab)
+        property int nextIndex: (root.currentTab+1)%_tabsRepeater.count
+        property string text: "Switch to <b>" + _tabsRepeater.itemAt(nextIndex).text + "</b> tab in <i>" + root.name + "</i>"
 
-            onTriggered: root.currentTab = (root.currentTab+1)%_tabsRepeater.count
-        }
+        enabled: false
+        action: ActionHub.applicationOptions.find("tabRight")
+        onTriggered: root.currentTab = (root.currentTab+1)%_tabsRepeater.count
+    }
+
+    ActionHandler {
+        property int previousIndex: (root.currentTab-1) < 0 ? _tabsRepeater.count-1 : root.currentTab-1
+        property string text: "Switch to <b>" + _tabsRepeater.itemAt(previousIndex).text + "</b> tab in <i>" + root.name + "</i>"
+
+        enabled: _switchTabActionHandler.enabled
+        action: ActionHub.applicationOptions.find("tabLeft")
+        onTriggered: root.currentTab =previousIndex
     }
 
     Row {

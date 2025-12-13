@@ -31,49 +31,19 @@ AbstractScenePartEditor {
     signal sceneTagAdded(string tagName)
     signal sceneTagClicked(string tagName)
 
-    height: _tagsInput.height
+    implicitHeight: _layout.height
 
-    TextListInput {
-        id: _tagsInput
+    ColumnLayout {
+        id: _layout
 
-        width: parent.width
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.leftMargin: root.pageLeftMargin
+        anchors.rightMargin: root.pageRightMargin
 
-        leftPadding: root.pageLeftMargin
-        rightPadding: root.pageRightMargin
+        RowLayout {
+            Layout.fillWidth: true
 
-        enabled: Runtime.appFeatures.structure.enabled
-
-        addTextButtonTooltip: "Click here to tag the scene with custom keywords."
-        completionStrings: Scrite.document.structure.sceneTags
-        font: root.font
-        labelIconSource:  "qrc:/icons/action/keyword.png"
-        labelIconVisible: _private.presentableGroupNames !== ""
-        labelText: "Keywords"
-        readOnly: !Runtime.appFeatures.structure.enabled && root.readOnly
-        textBorderWidth: root.screenplayElementDelegateHasFocus ? 0 : Math.max(0.5, 1 * zoomLevel)
-        textColors: root.screenplayElementDelegateHasFocus ? Runtime.colors.accent.c600 : Runtime.colors.accent.c10
-        textList: root.scene ? root.scene.tags : 0
-        zoomLevel: root.zoomLevel
-
-        onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
-        onTextClicked: (text, source) => { root.sceneTagClicked(text) }
-        onTextCloseRequest: (text, source) => { root.scene.removeTag(text) }
-        onConfigureTextRequest: (text, tag) => { tag.closable = true }
-        onNewTextRequest: (text) => {
-                              root.scene.addTag(text)
-                              root.sceneTagAdded(text)
-
-                              if(root.isCurrent) {
-                                  _private.editSceneContent.trigger()
-                              }
-                          }
-        onNewTextCancelled: () => {
-                                if(root.isCurrent) {
-                                    _private.editSceneContent.trigger()
-                                }
-                            }
-
-        header: Row {
             spacing: _tagsInput.spacing
 
             FlatToolButton {
@@ -88,10 +58,17 @@ AbstractScenePartEditor {
                 onClicked: _private.popupFormalTagsMenu()
             }
 
+            Text {
+                font: _tagsInput.label.font
+                text: "Formal Tags"
+                visible: _private.presentableGroupNames === ""
+            }
+
             Link {
-                width: Math.min(implicitWidth, root.width*0.9)
+                Layout.fillWidth: true
 
                 text: _private.presentableGroupNames
+                font: _tagsInput.label.font
                 elide: Text.ElideRight
                 visible: _private.presentableGroupNames !== ""
                 enabled: Runtime.appFeatures.structure.enabled
@@ -99,10 +76,63 @@ AbstractScenePartEditor {
                 topPadding: 5
                 bottomPadding: 5
 
-                font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
-
                 onClicked: _private.popupFormalTagsMenu()
             }
+
+            Image {
+                Layout.preferredWidth: _tagsInput.label.height
+                Layout.preferredHeight: _tagsInput.label.height
+
+                source: "qrc:/icons/content/add_box.png"
+
+                opacity: enabled ? 1 : 0.5
+                visible: enabled && _private.presentableGroupNames === ""
+                enabled: !Scrite.document.readOnly
+
+                MouseArea {
+                    anchors.fill: parent
+
+                    onClicked: _private.popupFormalTagsMenu()
+                }
+            }
+        }
+
+        TextListInput {
+            id: _tagsInput
+
+            Layout.fillWidth: true
+
+            enabled: Runtime.appFeatures.structure.enabled
+
+            addTextButtonTooltip: "Click here to tag the scene with custom keywords."
+            completionStrings: Scrite.document.structure.sceneTags
+            font: root.font
+            labelIconSource: "qrc:/icons/action/keyword.png"
+            labelIconVisible: true
+            labelText: "Keywords"
+            readOnly: !Runtime.appFeatures.structure.enabled && root.readOnly
+            textBorderWidth: root.screenplayElementDelegateHasFocus ? 0 : Math.max(0.5, 1 * zoomLevel)
+            textColors: root.screenplayElementDelegateHasFocus ? Runtime.colors.accent.c600 : Runtime.colors.accent.c10
+            textList: root.scene ? root.scene.tags : 0
+            zoomLevel: root.zoomLevel
+
+            onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+            onTextClicked: (text, source) => { root.sceneTagClicked(text) }
+            onTextCloseRequest: (text, source) => { root.scene.removeTag(text) }
+            onConfigureTextRequest: (text, tag) => { tag.closable = true }
+            onNewTextRequest: (text) => {
+                                  root.scene.addTag(text)
+                                  root.sceneTagAdded(text)
+
+                                  if(root.isCurrent) {
+                                      _private.editSceneContent.trigger()
+                                  }
+                              }
+            onNewTextCancelled: () => {
+                                    if(root.isCurrent) {
+                                        _private.editSceneContent.trigger()
+                                    }
+                                }
         }
     }
 
