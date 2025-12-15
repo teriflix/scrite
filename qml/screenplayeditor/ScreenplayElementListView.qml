@@ -200,7 +200,7 @@ ListView {
             function go() {
                 root.returnToBounds()
                 const ci = root.screenplayAdapter.currentIndex
-                _private.scrollIntoView(ci)
+                root.positionViewAtIndex(ci, ListView.Center)
                 _private.editSceneContent.trigger()
                 if(ActionHandler.canHandle)
                    trigger()
