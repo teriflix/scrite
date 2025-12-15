@@ -194,8 +194,18 @@ ListView {
     QtObject {
         id: _private
 
+        readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent")
         readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition")
-        readonly property Action ensureCursorCentered: Action { }
+        readonly property Action ensureCursorCentered: Action {
+            function go() {
+                root.returnToBounds()
+                const ci = root.screenplayAdapter.currentIndex
+                _private.scrollIntoView(ci)
+                _private.editSceneContent.trigger()
+                if(ActionHandler.canHandle)
+                   trigger()
+            }
+        }
 
         property int currentIndex: root.screenplayAdapter ? root.screenplayAdapter.currentIndex : -1
         property int currentParagraphType: currentDelegate ? currentDelegate.currentParagraphType : -1
@@ -473,7 +483,7 @@ ListView {
         function splitScene(screenplayElement, paragraph, cursorPosition) {
             if(root.screenplayAdapter.isSourceScreenplay) {
                 root.screenplayAdapter.splitElement(screenplayElement, paragraph, cursorPosition)
-                Qt.callLater(_private.ensureCursorCentered.trigger)
+                Qt.callLater(_private.ensureCursorCentered.go)
             } else {
                 MessageBox.information("Split Scene", "Scenes can be split only while editing the entire screenplay.")
             }
@@ -492,7 +502,7 @@ ListView {
             scrollIntoView(root.screenplayAdapter.currentIndex)
             _private.focusCursorPosition.set(root.screenplayAdapter.currentIndex, newElement.scene.cursorPosition)
             _private.focusCursorPosition.trigger()
-            Qt.callLater(_private.ensureCursorCentered.trigger)
+            Qt.callLater(_private.ensureCursorCentered.go)
         }
 
         function isVisible(index) {
