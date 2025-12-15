@@ -2770,14 +2770,21 @@ void ScreenplayPasteUndoCommand::redo()
     for (int i = 0; i < m_screenplayElementsData.size(); i++) {
         const QJsonObject elementJson = m_screenplayElementsData.at(i).toObject();
         const QString sceneId = elementJson.value(QLatin1String("sceneID")).toString();
-        if (!m_structure->findElementBySceneID(sceneId)) {
-            const QJsonObject sceneJson = m_scenesData.value(sceneId).toObject();
-            if (sceneJson.isEmpty())
-                continue;
+        const QJsonObject sceneJson = m_scenesData.value(sceneId).toObject();
+        if (sceneJson.isEmpty())
+            continue;
 
-            QObjectFactory factory;
-            factory.addClass<SceneElement>();
+        QObjectFactory factory;
+        factory.addClass<SceneElement>();
 
+        StructureElement *structureElement = m_structure->findElementBySceneID(sceneId);
+        if (structureElement) {
+            Scene *scene = structureElement->scene();
+            const QByteArray backup = scene->toByteArray();
+            if (!QObjectSerializer::fromJson(sceneJson, scene, &factory)) {
+                scene->resetFromByteArray(backup);
+            }
+        } else {
             StructureElement *structureElement = new StructureElement(m_structure);
             Scene *scene = new Scene(structureElement);
             if (!QObjectSerializer::fromJson(sceneJson, scene, &factory)) {
@@ -2804,6 +2811,7 @@ void ScreenplayPasteUndoCommand::redo()
 
     m_screenplay->insertElementsAt(m_screenplayElements, m_pasteAfter + 1);
     m_screenplay->setSelection(m_screenplayElements);
+    m_screenplay->setCurrentElementIndex(m_pasteAfter + 1);
 }
 
 void ScreenplayPasteUndoCommand::undo()
@@ -2816,6 +2824,8 @@ void ScreenplayPasteUndoCommand::undo()
         structureElements.append(scene->structureElement());
     m_structure->removeElements(structureElements);
     m_scenes.clear();
+
+    m_screenplay->setCurrentElementIndex(m_pasteAfter);
 }
 
 class ScreenplayPasteFromFountainUndoCommand : public QUndoCommand
