@@ -194,8 +194,18 @@ ListView {
     QtObject {
         id: _private
 
+        readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent")
         readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition")
-        readonly property Action ensureCursorCentered: Action { }
+        readonly property Action ensureCursorCentered: Action {
+            function go() {
+                root.returnToBounds()
+                const ci = root.screenplayAdapter.currentIndex
+                root.positionViewAtIndex(ci, ListView.Center)
+                _private.editSceneContent.trigger()
+                if(ActionHandler.canHandle)
+                   trigger()
+            }
+        }
 
         property int currentIndex: root.screenplayAdapter ? root.screenplayAdapter.currentIndex : -1
         property int currentParagraphType: currentDelegate ? currentDelegate.currentParagraphType : -1
@@ -433,26 +443,18 @@ ListView {
                 if(_private.modelCurrentIndexChangedInternally)
                     return
 
+                root.returnToBounds()
+
                 const index = root.screenplayAdapter.currentIndex
-                if(_private.isVisible(index))
-                    return
+                // if(_private.isVisible(index))
+                //     return
 
                 if(index < 0)
                     root.positionViewAtBeginning()
-                else
+                else {
                     root.positionViewAtIndex(index, ListView.Beginning)
-
-                if(_private.hasFocus) {
-                    /**
-                      We cannot use _private.currentItem or _private.currentDelegate at this point,
-                      because those bound properties may not have gotten updated just yet.
-                      */
-                    const item = root.itemAtIndex(index)
-                    if(item) {
-                        const delegate = item.item
-                        if(delegate)
-                            delegate.focusIn(0)
-                    }
+                    if(_private.hasFocus)
+                        _private.editSceneContent.trigger()
                 }
 
                 _private.updateFirstAndLastIndexLater()
@@ -473,7 +475,7 @@ ListView {
         function splitScene(screenplayElement, paragraph, cursorPosition) {
             if(root.screenplayAdapter.isSourceScreenplay) {
                 root.screenplayAdapter.splitElement(screenplayElement, paragraph, cursorPosition)
-                Qt.callLater(_private.ensureCursorCentered.trigger)
+                Qt.callLater(_private.ensureCursorCentered.go)
             } else {
                 MessageBox.information("Split Scene", "Scenes can be split only while editing the entire screenplay.")
             }
@@ -492,16 +494,12 @@ ListView {
             scrollIntoView(root.screenplayAdapter.currentIndex)
             _private.focusCursorPosition.set(root.screenplayAdapter.currentIndex, newElement.scene.cursorPosition)
             _private.focusCursorPosition.trigger()
-            Qt.callLater(_private.ensureCursorCentered.trigger)
+            Qt.callLater(_private.ensureCursorCentered.go)
         }
 
         function isVisible(index) {
             if(root.contentHeight <= root.height)
                 return true
-
-            if( (firstItemIndex < 0 && lastItemIndex < 0) || (firstItemIndex === 0 && lastItemIndex === root.count-1) ) {
-                updateFirstAndLastIndex()
-            }
 
             return index >= firstItemIndex && index <= lastItemIndex
         }
@@ -518,17 +516,8 @@ ListView {
             const firstPt = root.contentItem.mapFromItem(root, root.width / 2, 1)
             const lastPt = root.contentItem.mapFromItem(root, root.width / 2, root.height-1)
 
-            let first = root.indexAt(firstPt.x, firstPt.y);
-            let last = root.indexAt(lastPt.x, lastPt.y);
-
-            if (first === -1)
-                first = 0;
-
-            if (last === -1)
-                last = root.screenplayAdapter.elementCount - 1;
-
-            firstItemIndex = first
-            lastItemIndex = last
+            firstItemIndex = root.indexAt(firstPt.x, firstPt.y);
+            lastItemIndex = root.indexAt(lastPt.x, lastPt.y);
 
             firstSceneElementIndex = root.screenplayAdapter.firstSceneElementIndex()
             lastSceneElementIndex = root.screenplayAdapter.lastSceneElementIndex()
@@ -579,7 +568,6 @@ ListView {
             } else {
                 root.positionViewAtIndex(index, ListView.Beginning)
             }
-
         }
 
         function ensureVisible(item, rect, marginTop, marginBottom) {

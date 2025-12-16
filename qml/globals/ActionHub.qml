@@ -251,7 +251,7 @@ Item {
 
             enabled: Runtime.allowAppUsage && visible
             objectName: "backupOpen"
-            text: "Backup"
+            text: "Open Backup Copy"
 
             icon.source: "qrc:/icons/file/backup_open.png"
 
