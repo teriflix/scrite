@@ -155,6 +155,95 @@ ListView {
         sceneListView: root
     }
 
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("copy")
+        enabled: true
+
+        onTriggered: (source) => {
+                         Scrite.document.screenplay.copySelection()
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("paste")
+        enabled: !Scrite.document.readOnly && Scrite.document.screenplay.canPaste
+
+        onTriggered: (source) => {
+                         Scrite.document.screenplay.pasteAfter(root.screenplayAdapter.currentIndex)
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("remove")
+        enabled: !Scrite.document.readOnly && Scrite.document.screenplay.canPaste
+
+        onTriggered: (source) => {
+                         if(_private.sceneGroup.sceneCount <= 1)
+                             Scrite.document.screenplay.removeElement(root.screenplayAdapter.currentElement)
+                         else
+                             Scrite.document.screenplay.removeSelectedElements();
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("keywords")
+        enabled: !Scrite.document.readOnly
+
+        onTriggered: (source) => {
+                         SceneGroupKeywordsDialog.launch(_private.sceneGroup)
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("clearSelection")
+        enabled: root.screenplayAdapter.isSourceScreenplay && root.screenplayAdapter.screenplay.hasSelectedElements
+
+        onTriggered: (source) => {
+                         root.screenplayAdapter.screenplay.clearSelection()
+                         result.acceptEvent = true
+                         result.filter = true
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("makeSequence")
+        enabled: !Scrite.document.readOnly && root.sceneGroup.canBeStacked
+
+        onTriggered: (source) => {
+                         if(!root.sceneGroup.stack()) {
+                             MessageBox.information("Make Sequence Error",
+                                                    "Couldn't stack these scenes to make a sequence. Please try doing this on the Structure Tab.")
+                         }
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("breakSequence")
+        enabled: !Scrite.document.readOnly && root.sceneGroup.canBeUnstacked
+
+        onTriggered: (source) => {
+                         if(!root.sceneGroup.unstack()) {
+                             MessageBox.information("Break Sequence Error",
+                                                    "Couldn't unstack these scenes to make a sequence. Please try doing this on the Structure Tab.")
+                         }
+                     }
+    }
+
+    ActionHandler {
+        property bool omitted: Scrite.document.screenplay.selectedElementsOmitStatus !== Screenplay.NotOmitted
+        property string text: omitted ? "Include" : "Omit"
+
+        action: ActionHub.sceneListPanelOptions.find("includeOmit")
+        enabled: !Scrite.document.readOnly
+
+        onTriggered: (source) => {
+                         if(omitted)
+                             Scrite.document.screenplay.includeSelectedElements()
+                         else
+                             Scrite.document.screenplay.omitSelectedElements()
+                     }
+    }
+
     Connections {
         target: root.screenplayAdapter.screenplay
         enabled: root.screenplayAdapter.isSourceScreenplay

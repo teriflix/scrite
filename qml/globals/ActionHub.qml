@@ -1300,6 +1300,81 @@ Item {
             enabled: ActionHandler.canHandle
             text: "Display Screenplay Tracks"
         }
+
+        Action {
+            readonly property string defaultShortcut: "Ctrl+Shift+C"
+
+            enabled: ActionHandler.canHandle
+            objectName: "copy"
+            shortcut: defaultShortcut
+            text: "Copy"
+
+            icon.source: "qrc:/icons/content/content_copy.png"
+        }
+
+        Action {
+            readonly property string defaultShortcut: "Ctrl+Shift+V"
+
+            enabled: ActionHandler.canHandle
+            objectName: "paste"
+            shortcut: defaultShortcut
+            text: "Paste After"
+
+            icon.source: "qrc:/icons/content/content_paste.png"
+        }
+
+        Action {
+            readonly property string defaultShortcut: Gui.shortcut(Qt.ControlModifier+Qt.ShiftModifier+Qt.Key_Backspace)
+
+            enabled: ActionHandler.canHandle
+            objectName: "remove"
+            shortcut: defaultShortcut
+            text: "Remove"
+
+            icon.source: "qrc:/icons/action/delete.png"
+        }
+
+        Action {
+            readonly property string defaultShortcut: "Ctrl+Shift+W"
+
+            enabled: ActionHandler.canHandle
+            objectName: "keywords"
+            shortcut: defaultShortcut
+            text: "Keywords"
+        }
+
+        Action {
+            readonly property string defaultShortcut: "Escape"
+
+            enabled: ActionHandler.canHandle
+            objectName: "clearSelection"
+            shortcut: defaultShortcut
+            text: "Clear Selection"
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+
+            enabled: ActionHandler.canHandle
+            objectName: "makeSequence"
+            text: "Make Sequence"
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+
+            enabled: ActionHandler.canHandle
+            objectName: "breakSequence"
+            text: "Break Sequence"
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+
+            enabled: ActionHandler.canHandle
+            objectName: "includeOmit"
+            text: ActionHandler.active ? ActionHandler.active.text : "Include/Omit"
+        }
     }
 
     readonly property ActionManager screenplayEditorOptions: ActionManager {

@@ -72,17 +72,6 @@ Item {
         }
 
         readonly property Component filledScreenplayContent: FocusScope {
-            EventFilter.target: Scrite.app
-            EventFilter.active: root.screenplayAdapter.isSourceScreenplay && root.screenplayAdapter.screenplay.hasSelectedElements
-            EventFilter.events: [EventFilter.KeyPress]
-            EventFilter.onFilter: (object,event,result) => {
-                                      if(event.key === Qt.Key_Escape) {
-                                          root.screenplayAdapter.screenplay.clearSelection()
-                                          result.acceptEvent = true
-                                          result.filter = true
-                                      }
-                                  }
-
             ColumnLayout {
                 anchors.fill: parent
 

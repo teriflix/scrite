@@ -94,7 +94,7 @@ VclMenu {
     }
 
     VclMenuItem {
-        text: "Make Sequence"
+        action: ActionHub.sceneListPanelOptions.find("makeSequence")
 
         enabled: !Scrite.document.readOnly && root.sceneGroup.canBeStacked
 

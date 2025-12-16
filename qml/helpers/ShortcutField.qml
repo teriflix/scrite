@@ -110,7 +110,7 @@ Item {
     }
 
     property real __minimumKeyWidth: fontMetrics.boundingRect("Ctrl").width + 6
-    property real __minimumKeyHeight: fontMetrics.lineSpacing
+    property real __minimumKeyHeight: fontMetrics.lineSpacing + 4
 
     component KeyboardKey : Rectangle {
         property string text
