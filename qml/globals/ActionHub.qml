@@ -1081,6 +1081,19 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool allowShortcut: true
+
+            enabled: true
+            objectName: "renameLocation"
+            text: "Rename Location"
+
+            onTriggered: (source) => {
+                RenameLocationDialog.launch()
+            }
+        }
+
+        Action {
+            readonly property bool visible: false
 
             property int cursorPosition: -2
             property int sceneElementIndex: -1

@@ -1333,6 +1333,8 @@ public:
         return m_locationHeadingsMap;
     }
 
+    Q_INVOKABLE int renameLocation(const QString &location, const QString &newLocation);
+
     // clang-format off
     Q_PROPERTY(int currentElementIndex
                READ currentElementIndex

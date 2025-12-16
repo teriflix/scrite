@@ -3797,6 +3797,20 @@ QStringList Structure::standardMoments()
     return list;
 }
 
+int Structure::renameLocation(const QString &location, const QString &newLocation)
+{
+    updateLocationHeadingMap();
+
+    const QString newLocation2 = newLocation.trimmed().toUpper();
+
+    const QList<SceneHeading *> sceneHeadings = m_locationHeadingsMap.value(location);
+    for (SceneHeading *sceneHeading : sceneHeadings) {
+        sceneHeading->setLocation(newLocation2);
+    }
+
+    return sceneHeadings.size();
+}
+
 void Structure::setCurrentElementIndex(int val)
 {
     val = qBound(-1, val, m_elements.size() - 1);

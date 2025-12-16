@@ -10,6 +10,7 @@ singleton LanguageOptionsDialog 1.0 LanguageOptionsDialog.qml
 singleton MessageBox 1.0 MessageBox.qml
 singleton PdfDialog 1.0 PdfDialog.qml
 singleton RenameCharacterDialog 1.0 RenameCharacterDialog.qml
+singleton RenameLocationDialog 1.0 RenameLocationDialog.qml
 singleton ReportConfigurationDialog 1.0 ReportConfigurationDialog.qml
 singleton RequestVersionTypeAccess 1.0 RequestVersionTypeAccess.qml
 singleton SceneGroupKeywordsDialog 1.0 SceneGroupKeywordsDialog.qml

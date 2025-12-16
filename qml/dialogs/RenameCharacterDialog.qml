@@ -20,7 +20,6 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -52,6 +51,8 @@ DialogLauncher {
         title: "Rename/Merge Character: " + _private.orignalCharacterName
 
         content: Item {
+            Component.onCompleted: Qt.callLater(newNameField.forceActiveFocus)
+
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 20
@@ -93,7 +94,6 @@ DialogLauncher {
 
                             const allCharacterNames = Scrite.document.structure.allCharacterNames()
                             if(allCharacterNames.indexOf(_private.newCharacterName) >= 0) {
-
                                 let question = "Merging " + _private.orignalCharacterName + " with <b>" + _private.newCharacterName + "</b>"
 
                                 const originalCh = Scrite.document.structure.findCharacter(_private.orignalCharacterName)
