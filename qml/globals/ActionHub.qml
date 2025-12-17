@@ -1992,7 +1992,7 @@ Item {
 
         Action {
             property bool down: ActionHandler.active ? ActionHandler.active.down : false
-            property string tooltip: ActionHandler.active ? ActionHandler.active.tooltip : "New text or form note."
+            property string tooltip: ActionHandler.active && ActionHandler.active.tooltip !== "" ? ActionHandler.active.tooltip : "New text or form note."
             readonly property string defaultShortcut: "Ctrl+T"
 
             enabled: ActionHandler.canHandle

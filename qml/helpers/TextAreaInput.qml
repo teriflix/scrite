@@ -118,21 +118,21 @@ TextArea {
         onAboutToHide: root.persistentSelection = __persistentSelection
 
         VclMenuItem {
-            text: "Cut\t" + Gui.nativeShortcut("Ctrl+X")
+            text: "Cut\t" + ActionHub.editOptions.find("cut").shortcut
             enabled: root.selectedText !== ""
             onClicked: root.cut()
             focusPolicy: Qt.NoFocus
         }
 
         VclMenuItem {
-            text: "Copy\t" + Gui.nativeShortcut("Ctrl+C")
+            text: "Copy\t" + ActionHub.editOptions.find("copy").shortcut
             enabled: root.selectedText !== ""
             onClicked: root.copy()
             focusPolicy: Qt.NoFocus
         }
 
         VclMenuItem {
-            text: "Paste\t" + Gui.nativeShortcut("Ctrl+V")
+            text: "Paste\t" + ActionHub.editOptions.find("paste").shortcut
             onClicked: root.paste()
             focusPolicy: Qt.NoFocus
         }

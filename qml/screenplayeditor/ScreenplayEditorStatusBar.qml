@@ -64,7 +64,7 @@ Rectangle {
         anchors.fill: _metricsDisplay
 
         ToolTipPopup {
-            text: "Page count and time estimates are approximate, assuming " + Scrite.document.printFormat.secondsPerPage + "(s) per page."
+            text: "Page count and time estimates are approximate, assuming " + Scrite.document.printFormat.secondsPerPage + "s per page."
             visible: _metricsDisplayOverlayMouseArea.containsMouse
         }
 

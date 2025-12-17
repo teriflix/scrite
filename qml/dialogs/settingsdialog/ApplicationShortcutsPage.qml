@@ -234,8 +234,9 @@ FocusScope {
                             opacity: enabled ? 1 : 0.5
                             description: "Shortcut for <b>" + actionManager.title + "</b> » <i>" + qmlAction.text + "</i>"
                             portableShortcut: qmlAction.shortcut !== undefined ? qmlAction.shortcut : ""
-                            placeholderText: qmlAction.defaultShortcut !== undefined ? ("Default: " + Gui.nativeShortcut(qmlAction.defaultShortcut)) :
-                                                                                       (qmlAction.allowShortcut === true ? "None Set" : "")
+                            placeholderText: qmlAction.defaultShortcut !== undefined && qmlAction.defaultShortcut !== "" ?
+                                                 ("Default: " + Gui.nativeShortcut(qmlAction.defaultShortcut)) :
+                                                 (qmlAction.allowShortcut === true ? "None Set" : "")
 
                             onActiveFocusChanged: {
                                 if(activeFocus) {

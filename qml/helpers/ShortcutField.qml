@@ -31,6 +31,7 @@ Item {
     property string placeholderText: "None Set"
     property string nativeShortcut: Gui.nativeShortcut(portableShortcut)
 
+    property bool readOnly: false
     property font font: fontMetrics.font
     property FontMetrics fontMetrics: Runtime.shortcutFontMetrics
 
@@ -103,7 +104,8 @@ Item {
 
         anchors.fill: _layout
 
-        cursorShape: Qt.PointingHandCursor
+        enabled: !root.readOnly
+        cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
         hoverEnabled: true
 
         onClicked: editShortcut()

@@ -282,7 +282,7 @@ TextField {
         focus: false
 
         VclMenuItem {
-            text: "Cut\t" + Gui.nativeShortcut("Ctrl+X")
+            text: "Cut\t" + ActionHub.editOptions.find("cut").shortcut
             enabled: root.selectedText !== ""
             focusPolicy: Qt.NoFocus
 
@@ -290,7 +290,7 @@ TextField {
         }
 
         VclMenuItem {
-            text: "Copy\t" + Gui.nativeShortcut("Ctrl+C")
+            text: "Copy\t" + ActionHub.editOptions.find("copy").shortcut
             enabled: root.selectedText !== ""
             focusPolicy: Qt.NoFocus
 
@@ -298,7 +298,7 @@ TextField {
         }
 
         VclMenuItem {
-            text: "Paste\t" + Gui.nativeShortcut("Ctrl+V")
+            text: "Paste\t" + ActionHub.editOptions.find("paste").shortcut
             focusPolicy: Qt.NoFocus
 
             onClicked: root.paste()

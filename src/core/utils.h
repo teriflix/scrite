@@ -614,6 +614,7 @@ public:
     Q_INVOKABLE static QKeySequence standardKeySequence(int standardKey);
 
     Q_INVOKABLE static QString nativeShortcut(const QString &shortcut);
+    Q_INVOKABLE static QString portableShortcut(const QVariant &shortcut);
     Q_INVOKABLE static bool acceptsTextInput(QQuickItem *item);
 
     Q_INVOKABLE static void log(const QString &message);

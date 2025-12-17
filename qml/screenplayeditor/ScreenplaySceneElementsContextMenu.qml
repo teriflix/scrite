@@ -94,7 +94,7 @@ VclMenu {
     }
 
     VclMenuItem {
-        action: ActionHub.sceneListPanelOptions.find("makeSequence")
+        text: "Make Sequence\t" + ActionHub.sceneListPanelOptions.find("makeSequence").shortcut
 
         enabled: !Scrite.document.readOnly && root.sceneGroup.canBeStacked
 
@@ -107,7 +107,7 @@ VclMenu {
     }
 
     VclMenuItem {
-        text: "Break Sequence"
+        text: "Break Sequence\t" + ActionHub.sceneListPanelOptions.find("breakSequence").shortcut
 
         enabled: !Scrite.document.readOnly && root.sceneGroup.canBeUnstacked
 
@@ -125,7 +125,7 @@ VclMenu {
     }
 
     VclMenuItem {
-        text: "Keywords"
+        text: "Keywords\t" + ActionHub.sceneListPanelOptions.find("keywords").shortcut
         enabled: !Scrite.document.readOnly
 
         onClicked: SceneGroupKeywordsDialog.launch(root.sceneGroup)
@@ -155,13 +155,13 @@ VclMenu {
     MenuSeparator { }
 
     VclMenuItem {
-        text: "Copy"
+        text: "Copy\t" + ActionHub.sceneListPanelOptions.find("copy").shortcut
 
         onClicked: Scrite.document.screenplay.copySelection()
     }
 
     VclMenuItem {
-        text: "Paste After"
+        text: "Paste After\t" + ActionHub.sceneListPanelOptions.find("paste").shortcut
         enabled: Scrite.document.screenplay.canPaste
 
         onClicked: Scrite.document.screenplay.pasteAfter( Scrite.document.screenplay.indexOfElement(element) )
@@ -174,7 +174,7 @@ VclMenu {
 
         property bool omitted: Scrite.document.screenplay.selectedElementsOmitStatus !== Screenplay.NotOmitted
 
-        text: omitted ? "Include" : "Omit"
+        text: (omitted ? "Include" : "Omit") + "\t" + ActionHub.sceneListPanelOptions.find("includeOmit").shortcut
 
         onClicked: {
             root.close()
@@ -186,7 +186,7 @@ VclMenu {
     }
 
     VclMenuItem {
-        text: "Remove"
+        text: "Remove\t" + ActionHub.sceneListPanelOptions.find("remove").shortcut
         enabled: !Scrite.document.readOnly
 
         onClicked: {

@@ -49,8 +49,11 @@ Item {
 
     VclMenu {
         id: symbolMenu
+
         width: 514
+
         focus: false
+        autoWidth: false
 
         VclMenuItem {
             width: symbolMenu.width

@@ -367,6 +367,31 @@ QString Utils::Gui::nativeShortcut(const QString &shortcut)
     return keySequence.toString(QKeySequence::NativeText);
 }
 
+QString Utils::Gui::portableShortcut(const QVariant &shortcut)
+{
+    if (shortcut.isNull() || !shortcut.isValid())
+        return QString();
+
+    if (shortcut.userType() == QMetaType::QString) {
+        const QString str = shortcut.toString();
+        QKeySequence ks = QKeySequence::fromString(str, QKeySequence::PortableText);
+        if (ks.isEmpty())
+            ks = QKeySequence::fromString(str, QKeySequence::NativeText);
+        if (ks.isEmpty())
+            return QString();
+        return ks.toString(QKeySequence::PortableText);
+    }
+
+    if (shortcut.userType() == QMetaType::QKeySequence) {
+        const QKeySequence ks = shortcut.value<QKeySequence>();
+        if (ks.isEmpty())
+            return QString();
+        return ks.toString(QKeySequence::PortableText);
+    }
+
+    return QString();
+}
+
 /**
  * \brief Checks if the given QQuickItem accepts text input.
  * \param item The QQuickItem to check.
