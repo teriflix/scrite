@@ -177,6 +177,93 @@ Item {
         sceneGroup: _private.sceneGroup
     }
 
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("copy")
+        enabled: true
+
+        onTriggered: (source) => {
+                         Scrite.document.screenplay.copySelection()
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("paste")
+        enabled: !Scrite.document.readOnly && Scrite.document.screenplay.canPaste
+
+        onTriggered: (source) => {
+                         Scrite.document.screenplay.pasteAfter(Scrite.document.currentIndex)
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("remove")
+        enabled: !Scrite.document.readOnly && Scrite.document.screenplay.canPaste
+
+        onTriggered: (source) => {
+                         if(_private.sceneGroup.sceneCount <= 1)
+                             Scrite.document.screenplay.removeElement(Scrite.document.currentElement)
+                         else
+                             Scrite.document.screenplay.removeSelectedElements();
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("keywords")
+        enabled: !Scrite.document.readOnly
+
+        onTriggered: (source) => {
+                         SceneGroupKeywordsDialog.launch(_private.sceneGroup)
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("clearSelection")
+        enabled: Scrite.document.screenplay.hasSelectedElements
+
+        onTriggered: (source) => {
+                         Scrite.document.screenplay.clearSelection()
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("makeSequence")
+        enabled: !Scrite.document.readOnly && _private.sceneGroup.canBeStacked
+
+        onTriggered: (source) => {
+                         if(!_private.sceneGroup.stack()) {
+                             MessageBox.information("Make Sequence Error",
+                                                    "Couldn't stack these scenes to make a sequence. Please try doing this on the Structure Tab.")
+                         }
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("breakSequence")
+        enabled: !Scrite.document.readOnly && _private.sceneGroup.canBeUnstacked
+
+        onTriggered: (source) => {
+                         if(!_private.sceneGroup.unstack()) {
+                             MessageBox.information("Break Sequence Error",
+                                                    "Couldn't unstack these scenes to make a sequence. Please try doing this on the Structure Tab.")
+                         }
+                     }
+    }
+
+    ActionHandler {
+        property bool omitted: Scrite.document.screenplay.selectedElementsOmitStatus !== Screenplay.NotOmitted
+        property string text: omitted ? "Include" : "Omit"
+
+        action: ActionHub.sceneListPanelOptions.find("includeOmit")
+        enabled: !Scrite.document.readOnly
+
+        onTriggered: (source) => {
+                         if(omitted)
+                             Scrite.document.screenplay.includeSelectedElements()
+                         else
+                             Scrite.document.screenplay.omitSelectedElements()
+                     }
+    }
+
     Component {
         id: _screenplayElementComponent
 
@@ -226,6 +313,10 @@ Item {
             function onSelectionChanged() {
                 Qt.callLater(_private.sceneGroup.refresh)
             }
+
+            function onCurrentElementIndexChanged() {
+                Qt.callLater(_private.sceneGroup.refresh)
+            }
         }
 
         readonly property SceneGroup sceneGroup: SceneGroup {
@@ -235,7 +326,10 @@ Item {
             evaluateLengths: true
 
             function refresh() {
-                Scrite.document.screenplay.gatherSelectedScenes(_sceneGroup)
+                if(Scrite.document.screenplay.hasSelectedElements)
+                    Scrite.document.screenplay.gatherSelectedScenes(_sceneGroup)
+                else
+                    addScene(Scrite.document.screenplay.activeScene)
             }
         }
 
