@@ -50,8 +50,6 @@ AbstractSelection {
         _private.layoutAnimation.start()
     }
 
-    interactive: !Scrite.document.readOnly && !Scrite.document.structure.forceBeatBoardLayout
-
     contextMenu: SelectionContextMenu {
         selection: root
 

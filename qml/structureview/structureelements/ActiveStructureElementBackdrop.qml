@@ -32,11 +32,6 @@ BoxShadow {
 
     signal deleteElementRequest(StructureElement element)
 
-    EventFilter.target: Scrite.app
-    EventFilter.active: enabled && visible && opacity === 1
-    EventFilter.events: [EventFilter.KeyPress]
-    EventFilter.onFilter: (object, event, result) => { _private.eventFilter(object, event, result) }
-
     x: currentElementItem ? _private.currentElementRect.x : 0
     y: currentElementItem ? _private.currentElementRect.y : 0
     width: currentElementItem ? _private.currentElementRect.width : 0
@@ -46,56 +41,5 @@ BoxShadow {
         id: _private
 
         property rect currentElementRect: root.currentElementItem ? root.currentElementItem.mapFromItem(root.parent, 0, 0, root.currentElementItem.width, root.currentElementItem.height) : Qt.rect(0,0,0,0)
-
-        function eventFilter(object, event, result) {
-            if(root.currentElementItem === null || root.currentElement === null)
-                return
-
-            const dist = (event.controlModifier ? 5 : 1) * root.tickDistance
-            const element = root.currentElement
-
-            const fbbl = Scrite.document.structure.forceBeatBoardLayout
-
-            if(!fbbl)
-                element.undoRedoEnabled = true
-
-            switch(event.key) {
-            case Qt.Key_Left:
-                if(fbbl) return
-                element.x -= dist
-                result.accept = true
-                result.filter = true
-                break
-            case Qt.Key_Right:
-                if(fbbl) return
-                element.x += dist
-                result.accept = true
-                result.filter = true
-                break
-            case Qt.Key_Up:
-                if(fbbl) return
-                element.y -= dist
-                result.accept = true
-                result.filter = true
-                break
-            case Qt.Key_Down:
-                if(fbbl) return
-                element.y += dist
-                result.accept = true
-                result.filter = true
-                break
-            case Qt.Key_Delete:
-            case Qt.Key_Backspace:
-                result.accept = true
-                result.filter = true
-                if(Scrite.document.structure.canvasUIMode === Structure.IndexCardUI && element.follow)
-                    element.follow.confirmAndDeleteSelf()
-                else
-                    root.deleteElementRequest(root.currentElement)
-                break
-            }
-
-            element.undoRedoEnabled = false
-        }
     }
 }

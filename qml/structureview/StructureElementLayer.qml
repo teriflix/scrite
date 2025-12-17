@@ -264,8 +264,6 @@ Item {
 
         anchors.fill: parent
 
-        interactive: !Scrite.document.readOnly && !Scrite.document.structure.forceBeatBoardLayout
-
         onZoomOneRequest: root.zoomOneRequest()
         onDenyCanvasPreviewRequest: root.denyCanvasPreviewRequest()
         onAllowCanvasPreviewRequest: root.allowCanvasPreviewRequest()
