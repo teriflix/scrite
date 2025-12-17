@@ -1564,8 +1564,19 @@ Item {
             text: "Rename Location"
 
             onTriggered: (source) => {
+                const locations = Scrite.document.structure.allLocations()
+                if(!locations || locations.length === 0) {
+                    MessageBox.information("Rename Location", "No locations in the screenplay to rename.")
+                    return
+                }
+
+                if(locations.length === 1) {
+                    RenameLocationDialog.launch(locations[0])
+                    return
+                }
+
                 SelectionListDialog.launch("Select a location to rename",
-                                           Scrite.document.structure.allLocations(),
+                                           locations,
                                            (location) => {
                                                RenameLocationDialog.launch(location)
                                            })
@@ -1581,8 +1592,21 @@ Item {
             text: "Rename Character"
 
             onTriggered: (source) => {
+                const characters = Scrite.document.structure.allCharacterNames()
+                if(!characters || characters.length === 0) {
+                    MessageBox.information("Rename Character", "No characters in the screenplay to rename.")
+                    return
+                }
+
+                if(characters.length === 1) {
+                    const character = Scrite.document.structure.addCharacter(characters[0])
+                    if(character)
+                        RenameCharacterDialog.launch(character)
+                    return
+                }
+
                 SelectionListDialog.launch("Select a character to rename",
-                                           Scrite.document.structure.allCharacterNames(),
+                                           characters,
                                            (characterName) => {
                                                const character = Scrite.document.structure.addCharacter(characterName)
                                                if(character) {

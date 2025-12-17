@@ -68,7 +68,10 @@ DialogLauncher {
                     horizontalAlignment: Text.AlignHCenter
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                     font.capitalization: Font.AllUppercase
-                    onReturnPressed: renameButton.click()
+                    onReturnPressed: {
+                        if(renameButton.enabled)
+                            renameButton.clicked()
+                    }
                 }
 
                 RowLayout {
@@ -199,9 +202,12 @@ DialogLauncher {
                         _private.waitDialog = null
 
                         if(_private.renameWasSuccessful) {
-                            let characterNotes = ActionHub.notebookOperations.find("characterNotes")
-                            characterNotes.characterName = _private.newCharacterName
-                            characterNotes.trigger()
+                            const tabs = Runtime.showNotebookInStructure ? [Runtime.StructureTab, Runtime.NotebookTab] : [Runtime.NotebookTab]
+                            if(tabs.indexOf(Runtime.mainWindowTab) >= 0) {
+                                let characterNotes = ActionHub.notebookOperations.find("characterNotes")
+                                characterNotes.characterName = _private.newCharacterName
+                                characterNotes.trigger()
+                            }
                             Qt.callLater(dialog.close)
                         } else {
                             MessageBox.information("Rename Error", dialog.character.renameError, () => {
