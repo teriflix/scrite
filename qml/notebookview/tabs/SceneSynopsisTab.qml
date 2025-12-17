@@ -24,6 +24,7 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 import "qrc:/qml/notebookview"
 import "qrc:/qml/structureview"
+import "qrc:/qml/screenplayeditor"
 
 Item {
     id: root
@@ -197,7 +198,10 @@ Item {
             readOnly: Scrite.document.readOnly
             textList: root.scene ? root.scene.characterNames : 0
 
-            onTextCloseRequest: (text, source) => { root.scene.removeMuteCharacter(text) }
+            onTextCloseRequest: (text, source) => {
+                                    root.scene.removeMuteCharacter(text)
+                                }
+
             onConfigureTextRequest: (text, tag) => {
                                         const chMute = root.scene.isCharacterMute(text)
                                         tag.closable = chMute
@@ -206,9 +210,14 @@ Item {
                                         tag.font.italic = !chVisible
                                         tag.opacity = chVisible ? 1 : 0.65
                                     }
+
             onNewTextRequest: (text) => {
                                   root.scene.addMuteCharacter(text)
                               }
+
+            onTextClicked: (text, source) => {
+                               _private.popupCharacterMenu(text, source)
+                           }
         }
 
         TrapeziumTabView {
@@ -330,6 +339,15 @@ Item {
 
         function popupFormalTagsMenu(parent) {
             let menu = formalTagsMenu.createObject(root)
+            menu.closed.connect(menu.destroy)
+            menu.popup()
+            return menu
+        }
+
+        property Component characterMenu: ScreenplayEditorCharacterMenu { }
+
+        function popupCharacterMenu(characterName, parent) {
+            let menu = characterMenu.createObject(parent, {"characterName": characterName})
             menu.closed.connect(menu.destroy)
             menu.popup()
             return menu
