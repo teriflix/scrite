@@ -27,7 +27,9 @@ import "qrc:/qml/helpers"
 DialogLauncher {
     id: root
 
-    function launch() { return doLaunch() }
+    function launch(location) {
+        return doLaunch({"location": location})
+    }
 
     name: "RenameLocationDialog"
     singleInstanceOnly: true
@@ -35,13 +37,24 @@ DialogLauncher {
     dialogComponent: VclDialog {
         id: _dialog
 
+        required property string location
+
         width: 680
         height: 380
 
         title: "Rename Location"
 
         content: Item {
-            Component.onCompleted: Qt.callLater(_originalName.forceActiveFocus)
+            Component.onCompleted: {
+                if(_dialog.location !== "") {
+                    _originalName.text = _dialog.location
+                    _originalName.readOnly = true
+                    _dialog.title = "Rename Location: " + _dialog.location
+                    Qt.callLater(_newName.forceActiveFocus)
+                } else {
+                    Qt.callLater(_originalName.forceActiveFocus)
+                }
+            }
 
             ColumnLayout {
                 anchors.fill: parent
@@ -128,10 +141,12 @@ DialogLauncher {
                          !_originalName.completionHasSuggestions && !_newName.completionHasSuggestions
 
                 onTriggered: (source) => {
-                    const nrHeadings = Scrite.document.structure.renameLocation(_originalName.text, _newName.text)
+                    const originalName = _originalName.text.toUpperCase()
+                    const newName = _newName.text.toUpperCase()
+                    const nrHeadings = Scrite.document.structure.renameLocation(originalName, newName)
                     if(nrHeadings > 0) {
                         MessageBox.information("Rename Successful",
-                                               _originalName.text + " was changed to " + _newName.text + " in " + nrHeadings + " scene heading(s).",
+                                               _originalName.text + " was changed to " + newName + " in " + nrHeadings + " scene heading(s).",
                                                _dialog.close)
                     }
                 }

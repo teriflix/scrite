@@ -345,5 +345,6 @@
         <file>qml/dialogs/ScreenplayEditorOptionsDialog.qml</file>
         <file>qml/dialogs/ScreenplayFormattingRulesDialog.qml</file>
         <file>qml/dialogs/RenameLocationDialog.qml</file>
+        <file>qml/dialogs/SelectionListDialog.qml</file>
     </qresource>
 </RCC>

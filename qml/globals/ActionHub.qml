@@ -1081,19 +1081,6 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property bool allowShortcut: true
-
-            enabled: true
-            objectName: "renameLocation"
-            text: "Rename Location"
-
-            onTriggered: (source) => {
-                RenameLocationDialog.launch()
-            }
-        }
-
-        Action {
-            readonly property bool visible: false
 
             property int cursorPosition: -2
             property int sceneElementIndex: -1
@@ -1566,6 +1553,41 @@ Item {
             objectName: "zoomOut"
             shortcut: defaultShortcut
             text: "Zoom Out"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+
+            enabled: true
+            objectName: "renameLocation"
+            text: "Rename Location"
+
+            onTriggered: (source) => {
+                SelectionListDialog.launch("Select a location to rename",
+                                           Scrite.document.structure.allLocations(),
+                                           (location) => {
+                                               RenameLocationDialog.launch(location)
+                                           })
+            }
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+
+            enabled: true
+            objectName: "renameCharacter"
+            text: "Rename Character"
+
+            onTriggered: (source) => {
+                SelectionListDialog.launch("Select a character to rename",
+                                           "Character names",
+                                           Scrite.document.structure.allCharacterNames(),
+                                           (characterName) => {
+                                               RenameCharacterDialog.launch( Scrite.document.structure.addCharacter(characterName) )
+                                           })
+            }
         }
     }
 
