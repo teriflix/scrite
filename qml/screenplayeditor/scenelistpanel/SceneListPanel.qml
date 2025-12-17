@@ -200,8 +200,6 @@ ListView {
 
         onTriggered: (source) => {
                          root.screenplayAdapter.screenplay.clearSelection()
-                         result.acceptEvent = true
-                         result.filter = true
                      }
     }
 
@@ -270,6 +268,10 @@ ListView {
             function onSelectionChanged() {
                 Qt.callLater(_private.sceneGroup.refresh)
             }
+
+            function onCurrentElementIndexChanged() {
+                Qt.callLater(_private.sceneGroup.refresh)
+            }
         }
 
         readonly property SceneGroup sceneGroup: SceneGroup {
@@ -279,7 +281,10 @@ ListView {
             evaluateLengths: true
 
             function refresh() {
-                root.screenplayAdapter.screenplay.gatherSelectedScenes(_sceneGroup)
+                if(root.screenplayAdapter.screenplay.hasSelectedElements)
+                    root.screenplayAdapter.screenplay.gatherSelectedScenes(_sceneGroup)
+                else
+                    addScene(root.screenplayAdapter.screenplay.activeScene)
             }
         }
 
