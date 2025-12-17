@@ -76,6 +76,6 @@ VclMenu {
             }
         }
 
-        onCountChanged: root.determineWidth()
+        onCountChanged: Qt.callLater(root.determineWidth)
     }
 }

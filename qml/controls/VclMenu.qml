@@ -21,6 +21,8 @@ import io.scrite.components 1.0
 import "qrc:/qml/globals"
 
 Menu {
+    id: root
+
     property bool autoWidth: true
 
     Material.primary: Runtime.colors.primary.key
@@ -31,9 +33,14 @@ Menu {
 
     closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
 
-    onAboutToShow: determineWidth()
+    onAboutToShow: Qt.callLater(determineWidth)
 
     function determineWidth() {
+        if(autoWidth)
+            Runtime.execLater(root, Runtime.stdAnimationDuration/2, __determineWidth)
+    }
+
+    function __determineWidth() {
         if(autoWidth) {
             let maxWidth = 0
             for(let i=0; i<count; i++) {
