@@ -36,6 +36,7 @@ VclMenu {
     height: 500
 
     title: "Tag Groups"
+    autoWidth: false
     enabled: !Scrite.document.readOnly
     closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
 
