@@ -17,12 +17,14 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/helpers"
+import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 
 AbstractSelection {
     id: root
 
     signal zoomOneRequest()
+    signal deleteElementsRequest(var elementList)
     signal denyCanvasPreviewRequest()
     signal allowCanvasPreviewRequest()
     signal ensureItemVisibleRequest(Item item)
@@ -50,8 +52,24 @@ AbstractSelection {
         _private.layoutAnimation.start()
     }
 
+    function confirmDelete() {
+        const what = Scrite.document.structure.canvasUIMode === Structure.IndexCardUI ? "index cards" : "scenes"
+        MessageBox.question("Delete Confirmation",
+                            "Are you sure you want to delete the selelected " + what,
+                            ["Yes", "No"],
+                            (answer) => {
+                                if(answer === "Yes") {
+                                    _private.deleteSelection()
+                                }
+                            })
+    }
+
     contextMenu: SelectionContextMenu {
         selection: root
+
+        onDeleteSelectionRequest: () => {
+                                      root.confirmDelete()
+                                  }
 
         onEnsureItemVisibleRequest: (item) => {
                                         root.ensureItemVisibleRequest(item)
@@ -82,6 +100,16 @@ AbstractSelection {
             onSelectItemsInBoundaryRequest: (boundary) => {
                                                  root.initiateSelectionInBoundaryRequest(boundary)
                                              }
+        }
+
+        function deleteSelection() {
+            let elements = []
+            for(let i=0; i<root.items.length; i++) {
+                elements.push( root.items[i].element )
+            }
+
+            root.clear()
+            root.deleteElementsRequest(elements)
         }
     }
 }

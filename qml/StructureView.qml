@@ -187,6 +187,10 @@ Item {
                                     _canvasScroll.canvas.rubberbandSelectionMode = selectionMode
                                 }
 
+        onDeleteSelectionRequest: () => {
+                                      _canvasScroll.canvas.selection.confirmDelete()
+                                  }
+
         onDeleteElementRequest: (element) => {
                                     _canvasScroll.confirmAndDeleteElement(element)
                                 }

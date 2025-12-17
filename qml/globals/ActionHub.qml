@@ -1825,10 +1825,12 @@ Item {
         }
 
         Action {
-            readonly property bool allowShortcut: true
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Alt+Delete" : "Alt+Backspace"
+
             enabled: ActionHandler.canHandle
             objectName: "delete"
             text: "Delete"
+            shortcut: defaultShortcut
 
             icon.source: "qrc:/icons/action/delete.png"
         }

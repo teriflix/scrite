@@ -27,6 +27,7 @@ VclMenu {
 
     required property AbstractSelection selection
 
+    signal deleteSelectionRequest()
     signal ensureItemVisibleRequest(Item item)
     signal rectangleAnnotationRequest(real x, real y, real w, real h)
 
@@ -160,6 +161,13 @@ VclMenu {
         enabled: !Scrite.document.readOnly
 
         onClicked: SceneGroupKeywordsDialog.launch(_sceneGroup)
+    }
+
+    VclMenuItem {
+        text: "Delete"
+        enabled: !Scrite.document.readOnly
+
+        onClicked: root.deleteSelectionRequest()
     }
 
     SceneGroup {

@@ -41,6 +41,7 @@ Item {
     signal newAnnotationRequest(string annotationType)
     signal groupCategoryRequest(string groupCategory)
     signal newColoredSceneRequest(color sceneColor)
+    signal deleteSelectionRequest()
     signal deleteElementRequest(StructureElement element)
     signal selectionLayoutRequest(int layout) // here layout should be one of Structure.LayoutType which are
                                               // Structure.HorizontalLayout, Structure.VerticalLayout,
@@ -384,11 +385,15 @@ Item {
 
     ActionHandler {
         action: ActionHub.structureCanvasOperations.find("delete")
-        enabled: !root.canvasScroll.selection.hasItems && root.canvasScroll.currentElementItem
+        enabled: (root.canvasScroll.selection.hasItems || root.canvasScroll.currentElementItem) && !Scrite.document.readOnly
 
         onTriggered: {
-            let element = root.canvasScroll.currentElementItem.element
-            deleteElementRequest(element)
+            if(root.canvasScroll.selection.hasItems) {
+                root.deleteSelectionRequest()
+            } else {
+                const element = root.canvasScroll.currentElementItem.element
+                root.deleteElementRequest(element)
+            }
         }
     }
 

@@ -71,6 +71,7 @@ GridBackground {
     signal zoomOneRequest()
     signal zoomOneToItemRequest(Item item)
     signal deleteElementRequest(StructureElement element)
+    signal deleteElementsRequest(var elementList)
     signal selectionModeOffRequest()
     signal denyCanvasPreviewRequest()
     signal allowCanvasPreviewRequest()
@@ -175,6 +176,10 @@ GridBackground {
         onDeleteElementRequest: (element) => {
                                     root.deleteElementRequest(element)
                                 }
+
+        onDeleteElementsRequest: (elementList) => {
+                                     root.deleteElementsRequest(elementList)
+                                 }
 
         onCanvasActiveFocusRequest: () => {
                                         root.forceActiveFocus()
