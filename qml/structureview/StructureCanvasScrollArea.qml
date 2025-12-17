@@ -209,7 +209,7 @@ ScrollArea {
         }
 
         function zoomOneToCurrentItem() {
-            const item = _canvas.currentElementItem
+            let item = _canvas.currentElementItem
             if(item === null) {
                 item = _canvas.elementItemAt(Scrite.document.structure.currentElementIndex)
             }
