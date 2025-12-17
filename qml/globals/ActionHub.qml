@@ -1582,10 +1582,12 @@ Item {
 
             onTriggered: (source) => {
                 SelectionListDialog.launch("Select a character to rename",
-                                           "Character names",
                                            Scrite.document.structure.allCharacterNames(),
                                            (characterName) => {
-                                               RenameCharacterDialog.launch( Scrite.document.structure.addCharacter(characterName) )
+                                               const character = Scrite.document.structure.addCharacter(characterName)
+                                               if(character) {
+                                                   RenameCharacterDialog.launch(character)
+                                               }
                                            })
             }
         }
