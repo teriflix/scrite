@@ -373,10 +373,10 @@ QString Utils::Gui::portableShortcut(const QVariant &shortcut)
         return QString();
 
     if (shortcut.userType() == QMetaType::QString) {
-        const QString str = shortcut.toString();
-        QKeySequence ks = QKeySequence::fromString(str, QKeySequence::PortableText);
+        const QString str = shortcut.toString().trimmed();
+        QKeySequence ks = QKeySequence::fromString(str, QKeySequence::NativeText);
         if (ks.isEmpty())
-            ks = QKeySequence::fromString(str, QKeySequence::NativeText);
+            ks = QKeySequence::fromString(str, QKeySequence::PortableText);
         if (ks.isEmpty())
             return QString();
         return ks.toString(QKeySequence::PortableText);

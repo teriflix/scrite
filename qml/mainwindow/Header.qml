@@ -257,7 +257,7 @@ Rectangle {
                         text: {
                             const tt = qmlAction.tooltip !== undefined ? qmlAction.tooltip : qmlAction.text
                             const sc = Gui.nativeShortcut(qmlAction.shortcut)
-                            return sc === "" ? tt : (tt + " (" + sc + " )")
+                            return sc === "" ? tt : (tt + " (" + sc + ")")
                         }
                         visible: container.hovered
                     }
