@@ -197,19 +197,4 @@ VclMenu {
             root.close()
         }
     }
-
-    onAboutToShow: {
-        if(element.selected) {
-            Scrite.document.screenplay.gatherSelectedScenes(root.sceneGroup)
-        } else {
-            Scrite.document.screenplay.clearSelection()
-            element.selected = true
-            root.sceneGroup.addScene(element.scene)
-        }
-    }
-
-    onClosed: {
-        element = null
-        root.sceneGroup.clearScenes()
-    }
 }
