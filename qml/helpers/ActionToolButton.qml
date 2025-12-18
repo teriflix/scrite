@@ -30,14 +30,14 @@ ToolButton {
     Material.theme: Runtime.colors.theme
 
     flat: true
-    down: action.down !== undefined ? action.down === true : pressed
+    down: action.down !== undefined ? action.down === true : (pressed || checked)
     display: action.icon.source == "" && action.icon.name == "" ? ToolButton.TextOnly : ToolButton.IconOnly
     focusPolicy: Qt.NoFocus
     visible: action.visible !== undefined ? action.visible : true
     opacity: enabled ? 1 : 0.5
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
-    icon.color: action.icon.color
+    icon.color: down ? Runtime.colors.accent.a200.background : action.icon.color
 
     ToolTipPopup {
         container: root
