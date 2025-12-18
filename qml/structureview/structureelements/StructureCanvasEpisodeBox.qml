@@ -18,7 +18,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
@@ -54,9 +53,9 @@ Rectangle {
     BoundingBoxItem.previewBorderColor: Qt.rgba(0,0,0,0.5)
 
     x: episodeBox.geometry.x - 40
-    y: episodeBox.geometry.y - 120 - _private.topMarginForStacks
+    y: episodeBox.geometry.y - 140 - _private.topMarginForStacks
     width: episodeBox.geometry.width + 80
-    height: episodeBox.geometry.height + 120 + _private.topMarginForStacks + 40
+    height: episodeBox.geometry.height + 140 + _private.topMarginForStacks + 40
 
     color: Color.translucent(Runtime.colors.accent.c100.background, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
     border.width: 2
@@ -77,10 +76,12 @@ Rectangle {
 
         anchors.top: parent.top
         anchors.left: parent.left
+        anchors.right: parent.right
         anchors.margins: 8
 
         text: "<b>" + episodeBox.name + "</b><font size=\"-2\">: " + episodeBox.sceneCount + (episodeBox.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
         color: Runtime.colors.accent.c200.text
+        elide: Text.ElideRight
 
         font.bold: true
         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 8

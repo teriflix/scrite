@@ -147,12 +147,13 @@ Rectangle {
         id: _beatLabel
 
         anchors.left: parent.left
+        anchors.right: parnet.right
         anchors.bottom: parent.top
-        anchors.leftMargin: parent.radius*2
         anchors.bottomMargin: parent.radius-parent.border.width
 
         text: "<b>" + groupBox.name + "</b><font size=\"-2\">: " + groupBox.sceneCount + (groupBox.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
         color: Runtime.colors.accent.c200.text
+        elide: Text.ElideRight
         padding: 10
 
         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 3
