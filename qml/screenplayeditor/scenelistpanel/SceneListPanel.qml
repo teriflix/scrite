@@ -281,6 +281,7 @@ ListView {
             evaluateLengths: true
 
             function refresh() {
+                clearScenes()
                 if(root.screenplayAdapter.screenplay.hasSelectedElements)
                     root.screenplayAdapter.screenplay.gatherSelectedScenes(_sceneGroup)
                 else

@@ -326,6 +326,7 @@ Item {
             evaluateLengths: true
 
             function refresh() {
+                clearScenes()
                 if(Scrite.document.screenplay.hasSelectedElements)
                     Scrite.document.screenplay.gatherSelectedScenes(_sceneGroup)
                 else
