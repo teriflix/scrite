@@ -121,9 +121,9 @@ Item {
         id: _selectionModeHandler
 
         action: ActionHub.structureCanvasOperations.find("selectionMode")
-        enabled: !Scrite.document.readOnly && (root.canvasScroll.selection.hasItems ? root.canvasScroll.selection.canLayout : Scrite.document.structure.elementCount >= 2)
+        checked: root.selectionMode
 
-        onTriggered: root.selectionLayoutRequest(Structure.HorizontalLayout)
+        onToggled: root.selectionMode = !checked
     }
 
     ActionHandler {
