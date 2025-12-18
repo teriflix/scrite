@@ -396,6 +396,7 @@ public:
     Q_INVOKABLE explicit Scene(QObject *parent = nullptr);
     ~Scene();
     Q_SIGNAL void aboutToDelete(Scene *scene);
+    Q_SIGNAL void aboutToRemoveScene(Scene *scene);
 
     Scene *clone(QObject *parent) const;
 

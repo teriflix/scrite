@@ -253,7 +253,9 @@ Column {
                     onTriggered: (source) => { _answerText.redo() }
                 }
 
-                TextAreaSpellingSuggestionsMenu { }
+                TextAreaSpellingSuggestionsMenu {
+                    textArea: _answerText
+                }
 
                 onTextChanged: root.answer = text
 

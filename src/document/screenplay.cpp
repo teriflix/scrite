@@ -142,11 +142,25 @@ void ScreenplayElement::setScreenplay(Screenplay *val)
     if (m_screenplay != nullptr || m_screenplay == val)
         return;
 
+    if (m_screenplay != nullptr) {
+        disconnect(this, &ScreenplayElement::wordCountChanged, m_screenplay,
+                   &Screenplay::evaluateWordCountLater);
+
+        if (m_scene != nullptr)
+            disconnect(m_scene, &Scene::aboutToRemoveScene, m_screenplay,
+                       &Screenplay::removeSceneElements);
+    }
+
     m_screenplay = val;
 
-    if (m_screenplay != nullptr)
+    if (m_screenplay != nullptr) {
         connect(this, &ScreenplayElement::wordCountChanged, m_screenplay,
                 &Screenplay::evaluateWordCountLater, Qt::UniqueConnection);
+
+        if (m_scene != nullptr)
+            connect(m_scene, &Scene::aboutToRemoveScene, m_screenplay,
+                    &Screenplay::removeSceneElements);
+    }
 
     emit screenplayChanged();
 }
@@ -234,13 +248,16 @@ void ScreenplayElement::setScene(Scene *val)
     connect(m_scene, &Scene::elementCountChanged, this, &ScreenplayElement::sceneContentChanged);
     connect(m_scene, &Scene::sceneElementChanged, this, &ScreenplayElement::sceneElementChanged);
 
+    connect(m_scene->heading(), &SceneHeading::enabledChanged, this,
+            &ScreenplayElement::evaluateSceneNumberRequest);
+    connect(m_scene->heading(), &SceneHeading::enabledChanged, this,
+            &ScreenplayElement::sceneHeadingChanged);
+    connect(m_scene->heading(), &SceneHeading::textChanged, this,
+            &ScreenplayElement::sceneHeadingChanged);
+
     if (m_screenplay) {
-        connect(m_scene->heading(), &SceneHeading::enabledChanged, this,
-                &ScreenplayElement::evaluateSceneNumberRequest);
-        connect(m_scene->heading(), &SceneHeading::enabledChanged, this,
-                &ScreenplayElement::sceneHeadingChanged);
-        connect(m_scene->heading(), &SceneHeading::textChanged, this,
-                &ScreenplayElement::sceneHeadingChanged);
+        connect(m_scene, &Scene::aboutToRemoveScene, m_screenplay,
+                &Screenplay::removeSceneElements);
     }
 
     emit sceneChanged();

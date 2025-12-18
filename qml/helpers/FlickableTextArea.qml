@@ -147,7 +147,9 @@ Flickable {
             onTriggered: (source) => { _textArea.redo() }
         }
 
-        TextAreaSpellingSuggestionsMenu { }
+        TextAreaSpellingSuggestionsMenu {
+            textArea: _textArea
+        }
 
         onCursorRectangleChanged: {
             let cr = cursorRectangle

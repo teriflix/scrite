@@ -102,7 +102,9 @@ TextArea {
         onTriggered: (source) => { root.redo() }
     }
 
-    TextAreaSpellingSuggestionsMenu { }
+    TextAreaSpellingSuggestionsMenu {
+        textArea: root
+    }
 
     VclMenu {
         id: _contextMenu

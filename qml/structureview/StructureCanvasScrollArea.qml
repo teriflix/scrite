@@ -143,8 +143,8 @@ ScrollArea {
         onZoomOneRequest: () => { _private.zoomOneToCurrentItem() }
         onZoomOneToItemRequest: (item) => { _private.zoomOneToItem(item) }
         onEditorRequest: () => { root.editorRequest() }
-        onDeleteElementRequest: (element) => { _private.deleteElement(element) }
-        onDeleteElementsRequest: (elementList) => { _private.deleteElements(elementList) }
+        onDeleteElementRequest: (element) => { Qt.callLater(_private.deleteElement, element) }
+        onDeleteElementsRequest: (elementList) => { Qt.callLater(_private.deleteElements, elementList) }
         onSelectionModeOffRequest: () => { root.selectionModeOffRequest() }
         onDenyCanvasPreviewRequest: () => { root.denyCanvasPreviewRequest() }
         onAllowCanvasPreviewRequest: () => { root.allowCanvasPreviewRequest() }
@@ -256,88 +256,22 @@ ScrollArea {
             if(element === null)
                 return
 
-            Runtime.undoStack.active = false
-
-            let nextScene = null
-            let nextElement = null
-            if(element.scene.addedToScreenplay) {
-                nextElement = Scrite.document.screenplay.elementAt(element.scene.screenplayElementIndexList[0]+1)
-                if(nextElement === null)
-                    nextElement = Scrite.document.screenplay.elementAt(Scrite.document.screenplay.lastSceneElementIndex())
-                if(nextElement !== null)
-                    nextScene = nextElement.scene
-            } else {
-                let idx = Scrite.document.structure.indexOfElement(element)
-                let i = 0;
-                for(i=idx+1; i<Scrite.document.structure.elementCount; i++) {
-                    nextElement = Scrite.document.structure.elementAt(i)
-                    if(nextElement.scene.addedToScreenplay)
-                        continue;
-                    nextScene = nextElement.scene
-                    break
-                }
-
-                if(nextScene === null) {
-                    for(i=0; i<idx; i++) {
-                        nextElement = Scrite.document.structure.elementAt(i)
-                        if(nextElement.scene.addedToScreenplay)
-                            continue;
-                        nextScene = nextElement.scene
-                        break
-                    }
-                }
-            }
-
             root.releaseEditorRequest()
-
-            Scrite.document.screenplay.removeSceneElements(element.scene)
-            Scrite.document.structure.removeElement(element)
-
+            Runtime.undoStack.active = false
+            Scrite.document.structure.removeElements([element])
             Runtime.undoStack.active = true
-
-            Qt.callLater(goToScene, nextScene)
-        }
-
-        function goToScene(scene) {
-            if(Scrite.document.screenplay.elementCount === 0)
-                return
-            if(scene === null)
-                scene = Scrite.document.screenplay.elementAt(Scrite.document.screenplay.lastSceneElementIndex())
-            let idx = Scrite.document.structure.indexOfScene(scene)
-            if(idx >= 0) {
-                Scrite.document.structure.currentElementIndex = idx
-                Scrite.document.screenplay.currentElementIndex = Scrite.document.screenplay.firstIndexOfScene(scene)
-            }
+            root.editorRequest()
         }
 
         function deleteElements(elementList) {
             if(elementList === undefined || elementList.length === undefined || elementList === 0)
                 return
 
+            root.releaseEditorRequest()
             Runtime.undoStack.active = false
-
-            const currentElement = root.currentElementItem.element
-            let i=0
-            for(i=0; i<elementList.length; i++) {
-                const element = elementList[i]
-                if(element === currentElement) {
-                    root.releaseEditorRequest()
-                    Scrite.document.screenplay.currentElementIndex = -1
-                    Scrite.document.structure.currentElementIndex = -1
-                }
-
-                if(element.scene.addedToScreenplay)
-                    Scrite.document.screenplay.removeSceneElements(element.scene)
-            }
-
-            for(i=0; i<elementList.length; i++) {
-                Scrite.document.structure.removeElement(elementList[i])
-            }
-
+            Scrite.document.structure.removeElements(elementList)
             Runtime.undoStack.active = true
-
-            goToScene(null)
-            zoomOneToCurrentItem()
+            root.editorRequest()
         }
     }
 }

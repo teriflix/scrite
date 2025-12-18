@@ -53,9 +53,9 @@ AbstractSelection {
     }
 
     function confirmDelete() {
-        const what = Scrite.document.structure.canvasUIMode === Structure.IndexCardUI ? "index cards" : "scenes"
+        const what = Scrite.document.structure.canvasUIMode === Structure.IndexCardUI ? " index cards" : " scenes"
         MessageBox.question("Delete Confirmation",
-                            "Are you sure you want to delete the selelected " + what,
+                            "Are you sure you want to delete the selelected " + (items.length) + what,
                             ["Yes", "No"],
                             (answer) => {
                                 if(answer === "Yes") {

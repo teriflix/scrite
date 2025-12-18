@@ -50,6 +50,7 @@ GridBackground {
 
     property bool scaleIsLessForEdit: (350*root.scale < root.canvasScrollHeight*0.25)
 
+    readonly property alias hasFocus: _private.hasFocus
     readonly property alias selection: _elementLayer.selection
     readonly property alias rubberband: _elementLayer.rubberband
     readonly property alias tabSequence: _private.tabSequence
