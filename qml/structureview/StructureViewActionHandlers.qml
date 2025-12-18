@@ -169,30 +169,28 @@ Item {
     ActionHandler {
         id: _beatBoardLayoutActionHandler
 
-        Component.onCompleted: checked = Scrite.document.structure.forceBeatBoardLayout
-
         action: ActionHub.structureCanvasOperations.find("beatBoardLayout")
         enabled: !Scrite.document.readOnly
-        checked: false
+        checked: Scrite.document.structure.forceBeatBoardLayout
 
-        onToggled: {
-            root.canvasPreview.allowed = false
-            Scrite.document.structure.forceBeatBoardLayout = checked
-            if(checked && Scrite.document.structure.elementCount > 0)
-                Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
+        onToggled: (source) => {
+                       const canvasPreviewAllowed = root.canvasPreview.allowed
+                       root.canvasPreview.allowed = false
 
-            Runtime.execLater(root.canvasPreview, 1000, function() {
-                zoomOneRequest()
-                root.canvasPreview.allowed = true
-            })
-        }
+                       Scrite.document.structure.forceBeatBoardLayout = !checked
+
+                       if(checked && Scrite.document.structure.elementCount > 0) {
+                           Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
+                       }
+
+                       Runtime.execLater(root.canvasPreview, 1000, function() {
+                           zoomOneRequest()
+                           root.canvasPreview.allowed = canvasPreviewAllowed
+                       })
+                   }
 
         Connections {
             target: Scrite.document.structure
-
-            function onForceBeatBoardLayoutChanged() {
-                _beatBoardLayoutActionHandler.checked = Scrite.document.structure.forceBeatBoardLayout
-            }
 
             function onIndexCardFieldsChanged() {
                 Qt.callLater( function() {
