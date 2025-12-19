@@ -224,6 +224,8 @@ VclDialog {
 
         Loader {
             id: fieldLoader
+
+            required property int index
             required property var modelData
 
             Layout.fillWidth: true

@@ -147,15 +147,13 @@ QVariant ScriteDocumentBackups::data(const QModelIndex &index, int role) const
 
 QHash<int, QByteArray> ScriteDocumentBackups::roleNames() const
 {
-    static QHash<int, QByteArray> roles = { { TimestampRole, QByteArrayLiteral("timestamp") },
-                                            { TimestampAsStringRole,
-                                              QByteArrayLiteral("timestampAsString") },
-                                            { RelativeTimeRole, QByteArrayLiteral("relativeTime") },
-                                            { FileNameRole, QByteArrayLiteral("fileName") },
-                                            { FilePathRole, QByteArrayLiteral("filePath") },
-                                            { FileSizeRole, QByteArrayLiteral("fileSize") },
-                                            { MetaDataRole, QByteArrayLiteral("metaData") } };
-    return roles;
+    return { { TimestampRole, QByteArrayLiteral("timestamp") },
+             { TimestampAsStringRole, QByteArrayLiteral("timestampAsString") },
+             { RelativeTimeRole, QByteArrayLiteral("relativeTime") },
+             { FileNameRole, QByteArrayLiteral("fileName") },
+             { FilePathRole, QByteArrayLiteral("filePath") },
+             { FileSizeRole, QByteArrayLiteral("fileSize") },
+             { MetaDataRole, QByteArrayLiteral("metaData") } };
 }
 
 QString ScriteDocumentBackups::relativeTime(const QDateTime &dt)
@@ -3433,12 +3431,17 @@ void ScriteDocumentCollaborators::onCallFinished()
         return;
 
     const QJsonObject response = call->responseData();
+
+#if 0
     auto it = response.begin();
     auto end = response.end();
     while (it != end) {
         m_usersInfoMap.insert(it.key(), it.value());
         ++it;
     }
+#else
+    m_usersInfoMap.insert(response.value("email").toString(), response);
+#endif
 
     this->updateModel();
 

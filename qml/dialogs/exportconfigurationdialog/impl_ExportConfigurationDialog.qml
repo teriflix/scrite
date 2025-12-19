@@ -102,7 +102,7 @@ VclDialog {
                 Repeater {
                     model: _private.configuration.fields
 
-                    Loader {
+                    delegate: Loader {
                         id: fieldLoader
 
                         required property int index

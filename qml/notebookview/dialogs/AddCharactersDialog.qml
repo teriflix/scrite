@@ -114,7 +114,8 @@ DialogLauncher {
 
                                 model: _charactersModel
 
-                                VclCheckBox {
+                                delegate: VclCheckBox {
+                                    required property int index
                                     required property string modelData
 
                                     text: modelData

@@ -127,10 +127,10 @@ ColumnLayout {
 
         ListView {
             id: sceneListView
-            model: Scrite.document.screenplay
-            clip: true
+
             property var selectedSceneNumbers: []
             property var selectedEpisodeNumbers: null
+
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
             function filter(scene) {
@@ -174,15 +174,27 @@ ColumnLayout {
                 report.setConfigurationValue(fieldInfo.name, numbers)
             }
 
+            model: Scrite.document.screenplay
+            clip: true
+
             delegate: Item {
+                required property int index
+                required property int screenplayElementType
+                required property int breakType
+                required property string sceneID
+                required property ScreenplayElement screenplayElement
+
                 width: sceneListView.width-1
                 height: sceneCheckBox.visible ? sceneCheckBox.height : 0
 
                 VclCheckBox {
                     id: sceneCheckBox
+
                     width: parent.width-1
+
                     font.family: Scrite.document.formatting.defaultFont.family
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
                     visible: screenplayElement.scene && sceneListView.filter(screenplayElement.scene)
                     text: {
                         var scene = screenplayElement.scene
@@ -192,6 +204,7 @@ ColumnLayout {
                     }
                     checked: sceneListView.selectedSceneNumbers.indexOf(screenplayElement.elementIndex) >= 0
                     enabled: screenplayElement.scene
+
                     onToggled: sceneListView.select(screenplayElement.elementIndex, checked)
                 }
             }

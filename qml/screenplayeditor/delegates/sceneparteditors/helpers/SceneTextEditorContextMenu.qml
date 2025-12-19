@@ -119,7 +119,7 @@ MenuLoader {
                     { "value": SceneElement.Transition, "display": "Transition" }
                 ]
 
-                VclMenuItem {
+                delegate: VclMenuItem {
                     required property int index
                     required property var modelData
 

@@ -132,7 +132,7 @@ Item {
 
         model: root.episodeBoxes
 
-        StructureCanvasEpisodeBox {
+        delegate: StructureCanvasEpisodeBox {
             required property int index
             required property var modelData
 
@@ -153,7 +153,7 @@ Item {
 
         model: root.groupBoxes
 
-        StructureCanvasGroupBox {
+        delegate: StructureCanvasGroupBox {
             required property int index
             required property var modelData
 
@@ -179,6 +179,8 @@ Item {
         model: Scrite.document.loading ? 0 : Scrite.document.structureElementConnectors
 
         delegate: StructureElementConnectorDelegate {
+            required property int index
+
             required property string connectorLabel
 
             required property StructureElement connectorToElement
@@ -213,6 +215,7 @@ Item {
         model: Scrite.document.loading ? null : Scrite.document.structure.elementStacks
 
         delegate: StructureElementStackTabBar {
+            required property int index
             required property QtObject objectItem
 
             elementStack: objectItem

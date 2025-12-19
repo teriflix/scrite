@@ -89,7 +89,8 @@ ColumnLayout {
 
                     model: Scrite.document.structure.sceneTags
 
-                    VclCheckBox {
+                    delegate: VclCheckBox {
+                        required property int index
                         required property string modelData
 
                         width: Math.min(parent.width * 0.8, implicitWidth)

@@ -147,7 +147,7 @@ Rectangle {
         id: _beatLabel
 
         anchors.left: parent.left
-        anchors.right: parnet.right
+        anchors.right: parent.right
         anchors.bottom: parent.top
         anchors.bottomMargin: parent.radius-parent.border.width
 

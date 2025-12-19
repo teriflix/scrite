@@ -207,8 +207,6 @@ Item {
             Repeater {
                 id: _fieldsRepeater
 
-                model: _formQuestionsModel
-
                 function switchToNextField(index) {
                     if(index === count-1)
                         return
@@ -225,14 +223,19 @@ Item {
                     item.assumeFocus(-1)
                 }
 
-                FormField {
+                model: _formQuestionsModel
+
+                delegate: FormField {
+                    required property int index
+                    required property QtObject objectItem
+
+                    property bool visibleToUser: GMath.doRectanglesIntersect( Qt.rect(x,y,width,height),
+                                                        Qt.rect(0,_flickable.contentY,width,_flickable.height) )
+
                     Component.onCompleted: {
                         if(note)
                             answer = note.getFormData(objectItem.id)
                     }
-
-                    property bool visibleToUser: GMath.doRectanglesIntersect( Qt.rect(x,y,width,height),
-                                                        Qt.rect(0,_flickable.contentY,width,_flickable.height) )
 
                     anchors.right: parent.right
 

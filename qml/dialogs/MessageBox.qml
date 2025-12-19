@@ -171,7 +171,7 @@ Item {
                         Repeater {
                             model: dialog.buttons
 
-                            VclButton {
+                            delegate: VclButton {
                                 id: button
 
                                 required property string index

@@ -44,7 +44,8 @@ Item {
         Repeater {
             model: _private.buttonsModel
 
-            FlatToolButton {
+            delegate: FlatToolButton {
+                required property int index
                 required property var modelData
 
                 toolTipText: modelData.toolTip

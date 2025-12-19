@@ -65,7 +65,8 @@ Item {
 
             model: keyCombinations.modifiers
 
-            KeyboardKey {
+            delegate: KeyboardKey {
+                required property int index
                 required property string modelData
 
                 Layout.alignment: Qt.AlignVCenter
@@ -79,7 +80,8 @@ Item {
         Repeater {
             model: keyCombinations.keys
 
-            KeyboardKey {
+            delegate: KeyboardKey {
+                required property int index
                 required property string modelData
 
                 Layout.alignment: Qt.AlignVCenter

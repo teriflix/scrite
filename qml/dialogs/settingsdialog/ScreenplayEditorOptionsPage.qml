@@ -80,7 +80,8 @@ Item {
                     Repeater {
                         model: ActionHub.screenplayEditorOptions.visibleActions
 
-                        VclCheckBox {
+                        delegate: VclCheckBox {
+                            required property int index
                             required property var modelData
 
                             property var qmlAction: modelData

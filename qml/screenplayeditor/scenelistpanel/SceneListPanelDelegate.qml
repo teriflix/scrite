@@ -162,13 +162,14 @@ Rectangle {
                         fillMode: Image.PreserveAspectFit
 
                         MouseArea {
+                            id: _warningMouseArea
                             anchors.fill: parent
 
                             hoverEnabled: enabled
 
                             ToolTipPopup {
                                 text: "" + root.scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + ").\nRefer Settings > Screenplay > Options tab."
-                                visible: parent.containsMouse
+                                visible: _warningMouseArea.containsMouse
                             }
                         }
                     }
@@ -189,6 +190,7 @@ Rectangle {
                     }
 
                     MouseArea {
+                        id: _stackHintMouseArea
                         anchors.fill: parent
 
                         hoverEnabled: true
@@ -200,7 +202,7 @@ Rectangle {
                                     ret += " Toggle 'Display Stacks' option ON to see them in the scene list panel."
                                 return ret
                             }
-                            visible: parent.containsMouse
+                            visible: _stackHintMouseArea.containsMouse
                         }
                     }
                 }
@@ -234,7 +236,7 @@ Rectangle {
 
                         ToolTipPopup {
                             text: _private.tooltipText
-                            visible: parent.containsMouse
+                            visible: _labelMouseArea.containsMouse
                         }
                     }
                 }

@@ -503,6 +503,7 @@ Item {
                 }
 
                 delegate: Item {
+                    required property int index
                     required property var modelData
 
                     width: userMessagesView.width
@@ -587,7 +588,8 @@ Item {
                                 id: buttonsRepeater
                                 model: modelData.buttons
 
-                                Link {
+                                delegate: Link {
+                                    required property int index
                                     required property var modelData
 
                                     Layout.fillWidth: true
@@ -819,11 +821,11 @@ Item {
                                 Repeater {
                                     model: queryUserSubsCall.availablePlans
 
-                                    PlanCard {
+                                    delegate: PlanCard {
+                                        required property int index
                                         required property var modelData
 
                                         Layout.fillWidth: true
-
 
                                         name: modelData.title
                                         duration: Runtime.daysSpanAsString(modelData.duration)
@@ -886,7 +888,8 @@ Item {
                                 Repeater {
                                     model: queryUserSubsCall.pastSubscriptions
 
-                                    PlanCard {
+                                    delegate: PlanCard {
+                                        required property int index
                                         required property var modelData
 
                                         Layout.fillWidth: true

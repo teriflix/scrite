@@ -38,9 +38,10 @@ Loader {
 
             model: _paginatorWatcher.pageBreaks
 
-            Item {
+            delegate: Item {
                 id: _pageBreakItem
 
+                required property int index
                 required property var modelData
 
                 property int pageNumber: modelData.pageNumber

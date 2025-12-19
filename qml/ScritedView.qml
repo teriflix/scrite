@@ -1249,6 +1249,9 @@ Item {
                 }
 
                 delegate: Rectangle {
+                    required property int index
+                    required property var arrayItem
+
                     property bool locked: arrayItem.locked
                     property bool isSceneItem: arrayItem.type === SceneElement.Heading
 

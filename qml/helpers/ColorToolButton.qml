@@ -97,9 +97,9 @@ Item {
         Repeater {
             model: Runtime.colors.forDocument
 
-            Item {
-                required property color modelData
+            delegate: Item {
                 required property int index
+                required property color modelData
 
                 width: colorsGrid.cellSize
                 height: colorsGrid.cellSize

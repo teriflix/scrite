@@ -144,7 +144,8 @@ Item {
                                 Repeater {
                                     model: Scrite.document.structure.sceneTags
 
-                                    VclCheckBox {
+                                    delegate: VclCheckBox {
+                                        required property int index
                                         required property string modelData
 
                                         text: Runtime.idealFontMetrics.elidedText(modelData, Qt.ElideRight, _keywordsFlick.width*0.6, 0)

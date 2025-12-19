@@ -99,7 +99,8 @@ MenuLoader {
             Repeater {
                 model: Runtime.sceneListReports
 
-                VclMenuItem {
+                delegate: VclMenuItem {
+                    required property int index
                     required property var modelData
 
                     text: modelData.name

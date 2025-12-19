@@ -102,7 +102,8 @@ Item {
             Repeater {
                 model: root.canvasScroll.availableAnnotationKeys
 
-                VclMenuItem {
+                delegate: VclMenuItem {
+                    required property int index
                     required property var modelData
 
                     text: modelData.title
@@ -154,7 +155,8 @@ Item {
                     { "text": "Flow Vertically", "icon": "layout_flow_vertically.png", "type": Structure.FlowVerticalLayout }
                 ]
 
-                VclMenuItem {
+                delegate: VclMenuItem {
+                    required property int index
                     required property var modelData
 
                     text: modelData.text
@@ -225,16 +227,18 @@ Item {
 
             width: 350
 
-            /*VclMenuItem {
+            VclMenuItem {
                 text: "None"
-                font.bold: currentGroupCategory === "{NONE}"
+                checkable: true
+                checked: root.canvasScroll.groupCategory === "{NONE}"
 
                 onTriggered: groupCategoryRequest("{NONE}")
-            }*/
+            }
 
             VclMenuItem {
                 text: "Acts"
-                font.bold: root.canvasScroll.groupCategory === ""
+                checkable: true
+                checked: root.canvasScroll.groupCategory === ""
 
                 onTriggered: groupCategoryRequest("")
             }
@@ -242,11 +246,13 @@ Item {
             Repeater {
                 model: Scrite.document.structure.groupCategories
 
-                VclMenuItem {
+                delegate: VclMenuItem {
+                    required property int index
                     required property string modelData
 
                     text: SMath.titleCased(modelData)
-                    font.bold: root.canvasScroll.groupCategory === modelData
+                    checkable: true
+                    checked: root.canvasScroll.groupCategory === modelData
 
                     onTriggered: groupCategoryRequest(modelData)
                 }

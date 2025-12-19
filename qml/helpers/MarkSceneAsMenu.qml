@@ -35,7 +35,7 @@ VclMenu {
             enumeration: "Type"
         }
 
-        VclMenuItem {
+        delegate: VclMenuItem {
             required property int index
             required property int enumValue
             required property string enumKey

@@ -104,9 +104,10 @@ Flow {
 
         model: root.textList
 
-        TagText {
+        delegate: TagText {
             id: _text
 
+            required property int index
             required property string modelData
 
             property var colors: containsMouse ? root.highlightedTextColors : root.textColors

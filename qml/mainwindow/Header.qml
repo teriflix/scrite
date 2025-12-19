@@ -246,7 +246,8 @@ Rectangle {
             Repeater {
                 model: ActionHub.mainWindowTabs
 
-                ToolButton {
+                delegate: ToolButton {
+                    required property int index
                     required property var qmlAction
 
                     Material.theme: Runtime.colors.theme

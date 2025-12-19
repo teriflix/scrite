@@ -111,7 +111,10 @@ Item {
                                     Repeater {
                                         model: root.character.photos
 
-                                        Image {
+                                        delegate: Image {
+                                            required property int index
+                                            required property string modelData
+
                                             width: _photoSlideView.width
                                             height: _photoSlideView.height
 
@@ -256,7 +259,10 @@ Item {
                                     Repeater {
                                         model: root.character.tags
 
-                                        TagText {
+                                        delegate: TagText {
+                                            required property int index
+                                            required property string modelData
+
                                             property var colors: containsMouse ? Runtime.colors.accent.c900 : Runtime.colors.accent.c500
 
                                             color: colors.background

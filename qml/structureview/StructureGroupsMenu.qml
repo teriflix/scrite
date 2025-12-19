@@ -154,9 +154,12 @@ VclMenu {
                         section.property: "category"
                         section.criteria: ViewSection.FullString
                         section.delegate: Rectangle {
+                            required property string section
+
                             width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
                             height: 30
                             color: Runtime.colors.primary.windowColor
+
                             VclLabel {
                                 id: categoryLabel
                                 text: section

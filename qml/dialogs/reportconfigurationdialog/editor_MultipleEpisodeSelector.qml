@@ -70,9 +70,9 @@ ColumnLayout {
 
         ListView {
             id: episodeListView
-            model: Scrite.document.screenplay.episodeInfoList
-            clip: true
+
             property var episodeNumbers: report.getConfigurationValue(fieldInfo.name)
+
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
             function select(episodeNumber, flag) {
@@ -93,8 +93,13 @@ ColumnLayout {
                 report.setConfigurationValue(fieldInfo.name, numbers)
             }
 
+            model: Scrite.document.screenplay.episodeInfoList
+            clip: true
+
             delegate: VclCheckBox {
+                required property int index
                 required property var modelData // This is a gadget of type ScreenplayBreakInfo
+
                 property int episodeNumber: modelData.number
                 property string episodeName: modelData.title + ": " + modelData.subtitle
 
@@ -102,6 +107,7 @@ ColumnLayout {
 
                 text: episodeName
                 checked: episodeListView.episodeNumbers.indexOf(episodeNumber) >= 0
+
                 onToggled: episodeListView.select(episodeNumber, checked)
             }
         }

@@ -468,6 +468,7 @@ Item {
         model: Scrite.document.supportedExportFormats
 
         delegate: Action {
+            required property int index
             required property var modelData // { className, name, icon, key, description, category, keywords }
 
             readonly property bool allowShortcut: true
@@ -499,6 +500,7 @@ Item {
         model: Scrite.document.supportedReports
 
         delegate: Action {
+            required property int index
             required property var modelData // { className, name, icon, description }
 
             readonly property bool allowShortcut: true
@@ -1955,6 +1957,18 @@ Item {
         Action {
             enabled: Runtime.mainWindowTab === Runtime.MainWindowTab.StructureTab
             checkable: true
+            checked: Scrite.document.structure.preferredGroupCategory === "{NONE}"
+            text: "None"
+
+            onToggled: {
+                if(checked)
+                    Scrite.document.structure.preferredGroupCategory = "{NONE}"
+            }
+        }
+
+        Action {
+            enabled: Runtime.mainWindowTab === Runtime.MainWindowTab.StructureTab
+            checkable: true
             checked: Scrite.document.structure.preferredGroupCategory === ""
             text: "Acts"
 
@@ -1969,6 +1983,7 @@ Item {
         model: Scrite.document.structure.groupCategories
 
         delegate: Action {
+            required property int index
             required property string modelData
 
             ActionManager.target: root.storyStructureOptions

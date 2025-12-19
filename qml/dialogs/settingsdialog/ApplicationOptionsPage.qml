@@ -307,44 +307,6 @@ Item {
             }
         }
 
-        /*
-          // We don't enable this on any platform, so why bother showing it?
-
-        GroupBox {
-            Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
-            Layout.fillHeight: true
-
-            label: VclLabel { text: "PDF Export" }
-
-            ColumnLayout {
-                spacing: 5
-                width: parent.width
-
-                VclLabel {
-                    Layout.fillWidth: true
-                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                    text: "If you are facing issues with PDF export, then choose Printer Driver in the combo-box below. Otherwise we strongly advise you to use PDF Driver."
-                    wrapMode: Text.WordWrap
-                }
-
-                VclComboBox {
-                    Layout.fillWidth: true
-
-                    enabled: false // Qt 5.15.7's PdfWriter is broken!
-                    model: [
-                        { "key": "PDF Driver", "value": true },
-                        { "key": "Printer Driver", "value": false }
-                    ]
-                    textRole: "key"
-                    // currentIndex: Runtime.pdfExportSettings.usePdfDriver ? 0 : 1
-                    currentIndex: 1
-                    onCurrentIndexChanged: Runtime.pdfExportSettings.usePdfDriver = (currentIndex === 0)
-                }
-            }
-        }
-        */
-
         GroupBox {
             Layout.alignment: Qt.AlignTop
             Layout.preferredWidth: (layout.width-layout.columnSpacing)/2

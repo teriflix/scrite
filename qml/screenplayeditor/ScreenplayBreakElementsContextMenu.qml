@@ -29,7 +29,9 @@ VclMenu {
 
     VclMenuItem {
         text: "Paste After"
+
         enabled: Scrite.document.screenplay.canPaste
+
         onClicked: {
             const index = Scrite.document.screenplay.indexOfElement(root.element);
             Scrite.document.screenplay.pasteAfter(index)
@@ -39,7 +41,9 @@ VclMenu {
 
     VclMenuItem {
         text: "Remove"
+
         enabled: !Scrite.document.readOnly
+
         onClicked: {
             Scrite.document.screenplay.removeElement(root.element)
             root.close()

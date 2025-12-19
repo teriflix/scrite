@@ -76,7 +76,10 @@ Item {
 
             model: tabs
 
-            VclLabel {
+            delegate: VclLabel {
+                required property int index
+                required property var modelData
+
                 color: root.currentTab === index ? Runtime.colors.accent.c900.background : Runtime.colors.primary.c700.background
                 font: Runtime.idealFontMetrics.font
                 text: modelData

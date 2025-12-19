@@ -51,6 +51,7 @@ VclMenu {
         delegate: VclMenuItem {
             id: _menuItem
 
+            required property int index
             required property var modelData
 
             property var qmlAction: modelData

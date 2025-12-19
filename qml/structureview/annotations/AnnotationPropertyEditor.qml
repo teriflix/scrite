@@ -59,14 +59,20 @@ Item {
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
                     padding: 10
-                    text: annotation.type.toUpperCase()
+                    text: annotation ? annotation.type.toUpperCase() : ""
                 }
 
                 VclLabel {
                     width: parent.width
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     horizontalAlignment: Text.AlignHCenter
-                    text: "<b>Position:</b> " + Math.round(annotation.geometry.x-root.canvasItemsBoundingBox.left) + ", " + Math.round(annotation.geometry.y-root.canvasItemsBoundingBox.top) + ". <b>Size:</b> " + Math.round(annotation.geometry.width) + " x " + Math.round(annotation.geometry.height)
+                    text: {
+                        if(annotation)
+                            return "<b>Position:</b> " + Math.round(annotation.geometry.x-root.canvasItemsBoundingBox.left) + ", " +
+                                                         Math.round(annotation.geometry.y-root.canvasItemsBoundingBox.top) + ". <b>Size:</b> " +
+                                                         Math.round(annotation.geometry.width) + " x " + Math.round(annotation.geometry.height)
+                        return ""
+                    }
                 }
             }
 
@@ -80,8 +86,15 @@ Item {
             Repeater {
                 model: annotation ? annotation.metaData : 0
 
-                Column {
-                    property var propertyInfo: annotation.metaData[index]
+                delegate: Column {
+                    id: editorDelegate
+
+                    required property int index
+                    required property var modelData
+
+                    property var propertyInfo: modelData
+                    property var propertyValue: annotation.attributes[ propertyInfo.name ]
+
                     spacing: 3
                     width: propertyEditorView.width - (propertyEditorView.scrollBarVisible ? 20 : 0)
                     visible: propertyInfo.visible === true
@@ -95,12 +108,9 @@ Item {
 
                     Loader {
                         id: editorLoader
-                        width: parent.width - 20
-                        anchors.right: parent.right
-                        enabled: !Scrite.document.readOnly
 
-                        property var propertyInfo: parent.propertyInfo
-                        property var propertyValue: annotation.attributes[ propertyInfo.name ]
+                        property alias propertyInfo: editorDelegate.propertyInfo
+                        property alias propertyValue: editorDelegate.propertyValue
 
                         function changePropertyValue(newValue) {
                             var attrs = annotation.attributes
@@ -108,6 +118,10 @@ Item {
                             annotation.attributes = attrs
                             annotation.saveAttributesAsDefault()
                         }
+
+                        width: parent.width - 20
+                        anchors.right: parent.right
+                        enabled: !Scrite.document.readOnly
 
                         active: propertyInfo.visible === true
                         sourceComponent: {
@@ -180,6 +194,9 @@ Item {
         id: colorEditor
 
         Row {
+            property var propertyInfo: parent.propertyInfo
+            property var propertyValue: parent.propertyValue
+
             height: 40
             spacing: 10
 
@@ -235,6 +252,9 @@ Item {
         id: numberEditor
 
         Row {
+            property var propertyInfo: parent.propertyInfo
+            property var propertyValue: parent.propertyValue
+
             SpinBox {
                 value: propertyValue
                 from: propertyInfo.min
@@ -250,6 +270,9 @@ Item {
         id: booleanEditor
 
         VclCheckBox {
+            property var propertyInfo: parent.propertyInfo
+            property var propertyValue: parent.propertyValue
+
             text: propertyInfo.text
             checked: propertyValue
             checkable: true
@@ -262,6 +285,9 @@ Item {
 
         TextArea {
             id: _textArea
+
+            property var propertyInfo: parent.propertyInfo
+            property var propertyValue: parent.propertyValue
 
             function commitTextChanges() {
                 changePropertyValue(text)
@@ -287,7 +313,7 @@ Item {
 
             wrapMode: Text.WordWrap
             selectByMouse: true
-            placeholderText: propertyInfo.placeHolderText
+            placeholderText: typeof propertyInfo.placeHolderText === "string" ? propertyInfo.placeHolderText : ""
             selectByKeyboard: true
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
@@ -315,6 +341,9 @@ Item {
         id: urlEditor
 
         Column {
+            property var propertyInfo: parent.propertyInfo
+            property var propertyValue: parent.propertyValue
+
             TextField {
                 id: urlField
                 text: propertyValue
@@ -337,6 +366,9 @@ Item {
 
         VclButton {
             id: fontFamilyButton
+
+            property var propertyInfo: parent.propertyInfo
+            property var propertyValue: parent.propertyValue
 
             Layout.fillWidth: true
 
@@ -363,12 +395,18 @@ Item {
         id: fontStyleEditor
 
         Row {
+            property var propertyInfo: parent.propertyInfo
+            property var propertyValue: parent.propertyValue
+
             spacing: 5
 
             Repeater {
                 model: ['bold', 'italic', 'underline']
 
-                VclCheckBox {
+                delegate: VclCheckBox {
+                    required property int index
+                    required property string modelData
+
                     text: modelData
                     font.capitalization: Font.Capitalize
                     font.bold: index === 0
@@ -392,12 +430,18 @@ Item {
         id: hAlignEditor
 
         Row {
+            property var propertyInfo: parent.propertyInfo
+            property var propertyValue: parent.propertyValue
+
             spacing: 5
 
             Repeater {
                 model: ['left', 'center', 'right']
 
-                VclRadioButton {
+                delegate: VclRadioButton {
+                    required property int index
+                    required property string modelData
+
                     text: modelData
                     font.capitalization: Font.Capitalize
                     checked: modelData === propertyValue
@@ -411,12 +455,18 @@ Item {
         id: vAlignEditor
 
         Row {
+            property var propertyInfo: parent.propertyInfo
+            property var propertyValue: parent.propertyValue
+
             spacing: 5
 
             Repeater {
                 model: ['top', 'center', 'bottom']
 
-                VclRadioButton {
+                delegate: VclRadioButton {
+                    required property int index
+                    required property string modelData
+
                     text: modelData
                     font.capitalization: Font.Capitalize
                     checked: modelData === propertyValue
@@ -430,6 +480,9 @@ Item {
         id: imageEditor
 
         Rectangle {
+            property var propertyInfo: parent.propertyInfo
+            property var propertyValue: parent.propertyValue
+
             height: (width/16)*9
             color: Runtime.colors.primary.c100.background
             border.width: 1
@@ -514,6 +567,9 @@ Item {
     Component {
         id: unknownEditor
 
-        Item { }
+        Item {
+            property var propertyInfo: parent.propertyInfo
+            property var propertyValue: parent.propertyValue
+        }
     }
 }

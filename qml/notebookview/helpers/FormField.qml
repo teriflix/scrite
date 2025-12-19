@@ -174,7 +174,7 @@ Column {
 
                 Component.onCompleted: {
                     forceActiveFocus()
-                    enableSpellCheck()
+                    // enableSpellCheck()
                 }
 
 

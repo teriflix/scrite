@@ -42,9 +42,13 @@ MenuLoader {
 
         Repeater {
             id: suggestionsRepeater
+
             model: root.spellingSuggestions
 
-            VclMenuItem {
+            delegate: VclMenuItem {
+                required property int index
+                required property string modelData
+
                 text: modelData
                 focusPolicy: Qt.NoFocus
                 onClicked: {

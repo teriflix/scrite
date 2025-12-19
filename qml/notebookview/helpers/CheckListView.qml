@@ -249,11 +249,10 @@ Item {
         property real rightPadding: 2
         property real bottomPadding: 2
 
-        property string text
         property bool checked
-        property alias font: _textField.font
-        property alias placeholderText: _textField.placeholderText
         property bool userIsInteracting: _textField.activeFocus || _checkBox.activeFocus
+
+        property string text
 
         signal textEdited(string text)
         signal editingFinished()

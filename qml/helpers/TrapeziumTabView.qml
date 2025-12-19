@@ -42,18 +42,20 @@ Item {
 
         Repeater {
             id: tabRepeater
+
             model: tabBar.visible ? tabNames : 0
 
-            TrapeziumTab {
+            delegate: TrapeziumTab {
+                required property int index
+                required property string modelData
+
                 tabFillColor: active ? tabColor : Runtime.colors.tint(tabColor, Runtime.colors.sceneControlTint)
-                tabBorderColor: Color.isVeryLight(tabColor) ? "gray" : tabColor
+                tabBorderColor: Color.isVeryLight(tabColor) ? Runtime.colors.primary.borderColor : tabColor
                 tabBorderWidth: 1
                 text: modelData
                 tabIndex: index
                 tabCount: 2
-                textColor: active ? Color.textColorFor(tabColor) : "black"
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                font.bold: active
+                textColor: active ? Color.textColorFor(tabColor) : Runtime.colors.primary.regular.text
                 currentTabIndex: tabBar.currentIndex
                 onRequestActivation: tabBar.currentIndex = index
             }
@@ -95,27 +97,27 @@ Item {
         }
     }
 
+    // Refactor aliases in this...
     component TrapeziumTab : Item {
         id: tabBarTab
+
         width: implicitTabSize
         height: Runtime.idealFontMetrics.font.pointSize + 16
 
         readonly property real tabTextWidth: tabText.width
         readonly property real implicitTabSize: tabTextWidth*1.1 + 2*_private.tabShapeOffset
-        property alias text: tabText.text
-        property alias textColor: tabText.color
-        property alias font: tabText.font
-        property alias tabFillColor: tabShapeItem.fillColor
-        property alias tabBorderColor: tabShapeItem.outlineColor
-        property alias tabBorderWidth: tabShapeItem.outlineWidth
-        property alias containsMouse: tabMouseArea.containsMouse
-        property alias acceptedMouseButtons: tabMouseArea.acceptedButtons
+        property string text
+        property color textColor: Runtime.colors.primary.regular.text
+        property color tabFillColor
+        property color tabBorderColor
+        property real tabBorderWidth
 
         property bool hoverEnabled: false
         property int tabCount: 1
         property int tabIndex: 0
         property int currentTabIndex: -1
         property bool active: currentTabIndex === tabIndex
+
         z: active ? tabCount+1 : (currentTabIndex < tabIndex ? tabCount-tabIndex-1 : tabIndex)
 
         property int alignment: Qt.AlignTop
@@ -125,20 +127,28 @@ Item {
 
         PainterPathItem {
             id: tabShapeItem
+
             anchors.fill: parent
             anchors.topMargin: active ? 0 : parent.height*0.1
-            fillColor: active ? Runtime.colors.primary.windowColor : Runtime.colors.primary.c200.background
-            outlineColor: Runtime.colors.primary.borderColor
-            outlineWidth: 2
+
+            fillColor: tabBarTab.tabFillColor
+            outlineColor: tabBarTab.tabBorderColor
+            outlineWidth: tabBarTab.tabBorderWidth
             renderingMechanism: PainterPathItem.UseAntialiasedQPainter
             painterPath: tabBarTab.alignment === Qt.AlignRight ? rightPainterPath.createObject(tabShapeItem) : topPainterPath.createObject(tabShapeItem)
 
             VclLabel {
                 id: tabText
+
                 anchors.centerIn: parent
                 anchors.horizontalCenterOffset: tabBarTab.alignment === Qt.AlignRight ? -tabText.height*0.1 : 0
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+                text: tabBarTab.text
+                color: tabBarTab.textColor
+
                 font.bold: tabBarTab.active
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
                 rotation: tabBarTab.alignment === Qt.AlignRight ? 90 : 0
                 Behavior on font.pixelSize {
                     enabled: Runtime.applicationSettings.enableAnimations

@@ -58,17 +58,26 @@ ColumnLayout {
 
         ListView {
             id: groupsView
+
+            property var checkedTags: report.getConfigurationValue(fieldInfo.name)
+
+            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
             clip: true
+
             model: GenericArrayModel {
                 array: Scrite.document.structure.groupsModel
                 objectMembers: ["category", "label", "name"]
             }
-            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
             section.property: "category"
             section.criteria: ViewSection.FullString
             section.delegate: Item {
+                required property string section
+
                 width: groupsView.width
                 height: 40
+
                 Rectangle {
                     anchors.fill: parent
                     anchors.margins: 3
@@ -82,10 +91,15 @@ ColumnLayout {
                     }
                 }
             }
-            property var checkedTags: report.getConfigurationValue(fieldInfo.name)
+
             delegate: VclCheckBox {
+                required property int index
+                required property string name
+                required property string label
+
                 text: label
                 checked: groupsView.checkedTags.indexOf(name) >= 0
+
                 onToggled: {
                     var tags = groupsView.checkedTags
                     if(checked)

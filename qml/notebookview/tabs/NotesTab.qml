@@ -57,7 +57,7 @@ Item {
             Repeater {
                 model: notes
 
-                Item {
+                delegate: Item {
                     id: _noteItem
 
                     required property int index

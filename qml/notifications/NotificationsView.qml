@@ -69,7 +69,7 @@ Rectangle {
             Repeater {
                 model: Scrite.notifications.count
 
-                Rectangle {
+                delegate: Rectangle {
                     id: _delegate
 
                     required property int index
@@ -163,7 +163,7 @@ Rectangle {
                                 Repeater {
                                     model: _delegate.notification.buttons
 
-                                    VclButton {
+                                    delegate: VclButton {
                                         required property int index
                                         required property string modelData
 

@@ -99,6 +99,9 @@ Item {
         delegate: Item {
             id: _annotationDelegateContainer
 
+            required property int index
+            required property var modelData
+
             property int annotationIndex: index
             property Annotation annotation: modelData
             property bool active: !_annotationsFilterModel.enabled

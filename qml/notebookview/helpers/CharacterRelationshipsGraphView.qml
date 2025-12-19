@@ -515,6 +515,7 @@ Rectangle {
         Rectangle {
             id: _nodeItem
 
+            required property int index
             required property var modelData
 
             property CharacterRelationshipGraphNode node: modelData
@@ -651,6 +652,7 @@ Rectangle {
         id: _crGraphEdgeDelegate
 
         PainterPathItem {
+            required property int index
             required property var modelData
 
             property string pathString: modelData.pathString

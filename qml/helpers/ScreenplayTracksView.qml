@@ -61,7 +61,7 @@ Flickable {
 
             model: _private.model
 
-            Rectangle {
+            delegate: Rectangle {
                 id: _track
 
                 required property int index
@@ -107,7 +107,7 @@ Flickable {
                 Repeater {
                     model: _track.items
 
-                    Rectangle {
+                    delegate: Rectangle {
                         id: _trackItem
 
                         required property int index

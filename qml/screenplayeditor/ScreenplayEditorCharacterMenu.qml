@@ -42,7 +42,8 @@ VclMenu {
     Repeater {
         model: Runtime.characterListReports
 
-        VclMenuItem {
+        delegate: VclMenuItem {
+            required property int index
             required property var modelData
 
             text: modelData.name
@@ -70,7 +71,9 @@ VclMenu {
     Repeater {
         model: Runtime.characterListReports.length > 0 ? 1 : 0
 
-        VclMenuItem {
+        delegate: VclMenuItem {
+            required property int index // not required, but only for coding convention sake
+
             text: "Rename/Merge Character"
             icon.source: "qrc:/icons/screenplay/character.png"
 

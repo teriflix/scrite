@@ -205,6 +205,7 @@ DialogLauncher {
                         }
                         ScrollBar.vertical: ScrollBar { }
                         delegate: VclLabel {
+                            required property int index
                             required property string credits
                             required property url url
 

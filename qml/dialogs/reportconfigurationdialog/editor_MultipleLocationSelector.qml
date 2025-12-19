@@ -75,6 +75,7 @@ ColumnLayout {
             clip: true
 
             delegate: VclCheckBox {
+                required property int index
                 required property var modelData
 
                 text: modelData

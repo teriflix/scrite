@@ -177,7 +177,7 @@ DialogLauncher {
                                 DelegateChoice {
                                     roleValue: "label"
 
-                                    VclLabel {
+                                    delegate: VclLabel {
                                         required property int index
                                         required property var attributes
 
@@ -205,7 +205,7 @@ DialogLauncher {
                                 DelegateChoice {
                                     roleValue: "labelWithTooltip"
 
-                                    VclLabel {
+                                    delegate: VclLabel {
                                         required property int index
                                         required property var attributes
 
