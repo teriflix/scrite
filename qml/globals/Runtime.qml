@@ -136,6 +136,8 @@ Item {
         category: "Screenplay Editor"
         fileName: Platform.settingsFile
 
+        ObjectRegister.name: "screenplayEditorSettings"
+
         property var zoomLevelModifiers: { "tab0": 0, "tab1": 0, "tab2": 0, "tab3": 0 }
 
         property int commentsPanelTabIndex: 1
@@ -182,6 +184,7 @@ Item {
         property bool showLoglineEditor: false
         property bool showSpellCheckRefreshNoticeBox: true
         property bool singleClickAutoComplete: true
+        property bool restartEpisodeScenesAtOne: false // If set, each episode starts with scene number 1
 
         property real sidePanelWidth: 400
         property real spaceBetweenScenes: 0
@@ -1013,5 +1016,4 @@ Item {
             Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
         }
     }
-
 }

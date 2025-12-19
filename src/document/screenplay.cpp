@@ -559,6 +559,9 @@ Screenplay::Screenplay(QObject *parent)
 
     QClipboard *clipboard = qApp->clipboard();
     connect(clipboard, &QClipboard::dataChanged, this, &Screenplay::canPasteChanged);
+
+    m_restartEpisodeScenesAtOne =
+            settings->value("Screenplay Editor/restartEpisodeScenesAtOne").toBool();
 }
 
 Screenplay::~Screenplay()
@@ -807,6 +810,17 @@ int Screenplay::selectedElementsCount() const
             ++ret;
 
     return ret;
+}
+
+void Screenplay::setRestartEpisodeScenesAtOne(bool val)
+{
+    if (m_restartEpisodeScenesAtOne == val)
+        return;
+
+    m_restartEpisodeScenesAtOne = val;
+    emit restartEpisodeScenesAtOneChanged();
+
+    this->evaluateSceneNumbersLater();
 }
 
 void Screenplay::setSelectedElementsOmitStatus(OmitStatus val)
@@ -3466,6 +3480,9 @@ void Screenplay::evaluateSceneNumbers(bool minorAlso)
                 lastEpisodeName = element->breakTitle();
                 if (!element->breakSubtitle().isEmpty())
                     lastEpisodeName += ": " + element->breakSubtitle();
+
+                if (m_restartEpisodeScenesAtOne)
+                    sceneNumber.reset();
             }
 
             element->setActIndex(actIndex);

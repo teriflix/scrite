@@ -1514,6 +1514,21 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
+            checkable: true
+            checked: Scrite.document.screenplay.restartEpisodeScenesAtOne
+            enabled: !Scrite.document.readOnly
+            objectName: "restartEpisodeScenesAtOne"
+            text: "Restart Episode Scene Numbers"
+
+            onTriggered: {
+                Scrite.document.screenplay.restartEpisodeScenesAtOne = !Scrite.document.screenplay.restartEpisodeScenesAtOne
+                Runtime.screenplayEditorSettings.restartEpisodeScenesAtOne = Scrite.document.screenplay.restartEpisodeScenesAtOne
+            }
+        }
+
+        Action {
             readonly property bool visible: false
             readonly property bool allowShortcut: true
 
