@@ -903,6 +903,8 @@ public:
 
     Q_INVOKABLE static QString formatAsBulletPoints(const QVariantList &items);
 
+    Q_INVOKABLE static QString removeNewlineAndTabsIn(const QString &val);
+
     static QString painterPathToString(const QPainterPath &val);
 
     static QPainterPath stringToPainterPath(const QString &val);

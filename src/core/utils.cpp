@@ -2164,6 +2164,13 @@ QString Utils::SMath::formatAsBulletPoints(const QVariantList &items)
     return ret;
 }
 
+QString Utils::SMath::removeNewlineAndTabsIn(const QString &val)
+{
+    QString val2 = val;
+    val2.replace(QRegularExpression("[\\n\\t]"), " ");
+    return val2;
+}
+
 /**
  * \brief Converts a QPainterPath to a string.
  * \param val The painter path.

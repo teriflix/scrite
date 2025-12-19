@@ -97,19 +97,21 @@ void ScreenplayElement::setBreakType(int val)
 
 void ScreenplayElement::setBreakSubtitle(const QString &val)
 {
-    if (m_breakSubtitle == val)
+    const QString val2 = Utils::SMath::removeNewlineAndTabsIn(val);
+    if (m_breakSubtitle == val2)
         return;
 
-    m_breakSubtitle = val;
+    m_breakSubtitle = val2;
     emit breakSubtitleChanged();
 }
 
 void ScreenplayElement::setBreakTitle(const QString &val)
 {
-    if (m_breakTitle == val || m_elementType != BreakElementType)
+    const QString val2 = Utils::SMath::removeNewlineAndTabsIn(val);
+    if (m_breakTitle == val2 || m_elementType != BreakElementType)
         return;
 
-    m_breakTitle = val;
+    m_breakTitle = val2;
     emit breakTitleChanged();
 }
 
