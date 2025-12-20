@@ -430,6 +430,7 @@ AbstractScenePartEditor {
                              } else {
                                  const nextPosition = _sceneTextEditor.positionAt(cursorRect.x, cursorRect.y - pageHeight)
                                  _private.placeCursorAt(nextPosition)
+                                 _private.ensureSceneTextEditorCursorIsVisible()
                              }
                          } else {
                              if(_private.scrollPreviousScene.enabled) {
@@ -452,6 +453,7 @@ AbstractScenePartEditor {
                              } else {
                                  const nextPosition = _sceneTextEditor.positionAt(cursorRect.x, cursorRect.y + pageHeight)
                                  _private.placeCursorAt(nextPosition)
+                                 _private.ensureSceneTextEditorCursorIsVisible()
                              }
                          } else {
                              if(_private.scrollNextScene.enabled) {
