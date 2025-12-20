@@ -673,6 +673,8 @@ public:
     Q_INVOKABLE static QAbstractListModel *enumModel(QObject *object, const QString &enumName);
     Q_INVOKABLE static QAbstractListModel *
     typeEnumModel(const QString &typeName, const QString &enumName, QObject *parent = nullptr);
+
+    static QVariant convertToPropertyType(const QVariant &value, const QMetaProperty &prop);
 };
 
 class ObjectRegistry : public QObject

@@ -3383,7 +3383,6 @@ QList<ScreenplayBreakInfo> Screenplay::episodeInfoList() const
     if (this->episodeCount() <= 0)
         return ret;
 
-    int epIndex = 0;
     for (int i = 0; i < m_elements.size(); i++) {
         const ScreenplayElement *element = m_elements.at(i);
         if (element->elementType() != ScreenplayElement::BreakElementType)
@@ -3392,11 +3391,9 @@ QList<ScreenplayBreakInfo> Screenplay::episodeInfoList() const
         if (element->breakType() != Screenplay::Episode)
             continue;
 
-        ScreenplayBreakInfo info({ epIndex, epIndex + 1, element->breakTitle(),
-                                   element->breakSubtitle(), QString() });
+        ScreenplayBreakInfo info({ element->episodeIndex(), element->episodeIndex() + 1,
+                                   element->breakTitle(), element->breakSubtitle(), QString() });
         ret.append(info);
-
-        ++epIndex;
     }
 
     return ret;

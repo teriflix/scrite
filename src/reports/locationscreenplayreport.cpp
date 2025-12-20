@@ -13,6 +13,8 @@
 
 #include "locationscreenplayreport.h"
 #include "scene.h"
+#include "user.h"
+#include "scrite.h"
 
 LocationScreenplayReport::LocationScreenplayReport(QObject *parent)
     : AbstractScreenplaySubsetReport(parent)

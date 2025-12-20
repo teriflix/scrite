@@ -31,8 +31,11 @@ Item {
     readonly property int stdAnimationDuration: 250
     readonly property int subscriptionTreshold: 15 // if active subscription has less than these many days, then reminders are shown upon login
 
-    readonly property var characterListReports: Scrite.document.characterListReports
-    readonly property var sceneListReports: Scrite.document.sceneListReports
+    readonly property var characterReports: Scrite.document.characterReports
+    readonly property var sceneReports: Scrite.document.sceneReports
+    readonly property var episodeReports: Scrite.document.episodeReports
+    readonly property var keywordReports: Scrite.document.keywordReports
+    readonly property var tagReports: Scrite.document.tagReports
 
     readonly property real iconImageSize: 30 // min width or height of icon Image QML elements
     readonly property real maxSceneSidePanelWidth: 400

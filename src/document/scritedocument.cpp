@@ -46,6 +46,7 @@
 #include "finaldraftexporter.h"
 #include "screenplaysubsetreport.h"
 #include "filemodificationtracker.h"
+// #include "locationscreenplayreport.h"
 #include "qtextdocumentpagedprinter.h"
 #include "characterscreenplayreport.h"
 #include "scenecharactermatrixreport.h"
@@ -705,6 +706,7 @@ DeviceIOFactories::DeviceIOFactories()
 
     ReportsFactory.addClass<ScreenplaySubsetReport>();
     ReportsFactory.addClass<LocationReport>();
+    // ReportsFactory.addClass<LocationScreenplayReport>();
     ReportsFactory.addClass<CharacterReport>();
     ReportsFactory.addClass<CharacterScreenplayReport>();
     ReportsFactory.addClass<SceneCharacterMatrixReport>();
@@ -1776,72 +1778,75 @@ QJsonArray ScriteDocument::supportedReports() const
     return reports;
 }
 
-QJsonArray ScriteDocument::characterListReports() const
+QJsonObject ScriteDocument::characterReports() const
 {
-    static QJsonArray ret;
-
-    if (ret.isEmpty()) {
-        const QList<QByteArray> keys = deviceIOFactories->ReportsFactory.keys();
-
-        for (const QByteArray &key : keys) {
-            const QMetaObject *mo = deviceIOFactories->ReportsFactory.find(key);
-            const QByteArray propName = QByteArrayLiteral("characterNames");
-            if (mo->indexOfProperty(propName) >= 0) {
-                QJsonObject item;
-                item.insert("name", QString::fromLatin1(key));
-
-                const QMetaObject *mo = deviceIOFactories->ReportsFactory.find(key);
-                const int d_cii = mo->indexOfClassInfo("Description");
-                item.insert("description",
-                            d_cii >= 0 ? QString::fromLatin1(mo->classInfo(d_cii).value())
-                                       : QString::fromLatin1(key));
-                const int i_cii = mo->indexOfClassInfo("Icon");
-                item.insert("icon",
-                            i_cii >= 0 ? QString::fromLatin1(mo->classInfo(i_cii).value())
-                                       : QStringLiteral(":/icons/reports/reports_menu_item.png"));
-
-                const int p_cii = mo->indexOfClassInfo(propName + "_FieldGroup");
-                item.insert("group", QString::fromLatin1(mo->classInfo(p_cii).value()));
-
-                ret.append(item);
-            }
-        }
-    }
-
+    static QJsonObject ret = this->queryReports(QStringLiteral("characterNames"));
     return ret;
 }
 
-QJsonArray ScriteDocument::sceneListReports() const
+QJsonObject ScriteDocument::sceneReports() const
 {
-    static QJsonArray ret;
+    static QJsonObject ret = this->queryReports(QStringLiteral("sceneNumbers"));
+    return ret;
+}
 
-    if (ret.isEmpty()) {
-        const QList<QByteArray> keys = deviceIOFactories->ReportsFactory.keys();
+QJsonObject ScriteDocument::episodeReports() const
+{
+    static QJsonObject ret = this->queryReports(QStringLiteral("episodeNumbers"));
+    return ret;
+}
 
-        for (const QByteArray &key : keys) {
+QJsonObject ScriteDocument::keywordReports() const
+{
+    static QJsonObject ret = this->queryReports(QStringLiteral("keywords"));
+    return ret;
+}
+
+QJsonObject ScriteDocument::tagReports() const
+{
+    static QJsonObject ret = this->queryReports(QStringLiteral("tags"));
+    return ret;
+}
+
+QJsonObject ScriteDocument::queryReports(const QString &propName) const
+{
+    const QList<QByteArray> keys = deviceIOFactories->ReportsFactory.keys();
+
+    QJsonArray reports;
+    const QByteArray _propName = propName.toLatin1();
+    for (const QByteArray &key : keys) {
+        const QMetaObject *mo = deviceIOFactories->ReportsFactory.find(key);
+        if (_propName.isEmpty() || mo->indexOfProperty(_propName) >= 0) {
+            QJsonObject item;
+            item.insert("className", QString::fromLatin1(mo->className()));
+            item.insert("name", QString::fromLatin1(key));
+
             const QMetaObject *mo = deviceIOFactories->ReportsFactory.find(key);
-            const QByteArray propName = QByteArrayLiteral("sceneNumbers");
-            if (mo->indexOfProperty(propName) >= 0) {
-                QJsonObject item;
-                item.insert("name", QString::fromLatin1(key));
+            const int d_cii = mo->indexOfClassInfo("Description");
+            item.insert("description",
+                        d_cii >= 0 ? QString::fromLatin1(mo->classInfo(d_cii).value())
+                                   : QString::fromLatin1(key));
 
-                const QMetaObject *mo = deviceIOFactories->ReportsFactory.find(key);
-                const int d_cii = mo->indexOfClassInfo("Description");
-                item.insert("description",
-                            d_cii >= 0 ? QString::fromLatin1(mo->classInfo(d_cii).value())
-                                       : QString::fromLatin1(key));
-                const int i_cii = mo->indexOfClassInfo("Icon");
-                item.insert("icon",
-                            i_cii >= 0 ? QString::fromLatin1(mo->classInfo(i_cii).value())
-                                       : QStringLiteral(":/icons/reports/reports_menu_item.png"));
+            const int i_cii = mo->indexOfClassInfo("Icon");
+            item.insert("icon",
+                        i_cii >= 0 ? QString::fromLatin1(mo->classInfo(i_cii).value())
+                                   : QStringLiteral(":/icons/reports/reports_menu_item.png"));
 
-                const int p_cii = mo->indexOfClassInfo(propName + "_FieldGroup");
-                item.insert("group", QString::fromLatin1(mo->classInfo(p_cii).value()));
+            const int k_cii = mo->indexOfClassInfo("Keywords");
+            item.insert("keywords",
+                        k_cii >= 0 ? QString::fromLatin1(mo->classInfo(k_cii).value())
+                                   : QStringLiteral(""));
 
-                ret.append(item);
-            }
+            const int p_cii = mo->indexOfClassInfo(_propName + "_FieldGroup");
+            item.insert("group", QString::fromLatin1(mo->classInfo(p_cii).value()));
+
+            reports.append(item);
         }
     }
+
+    QJsonObject ret;
+    ret.insert("propertyName", propName);
+    ret.insert("reports", reports);
 
     return ret;
 }

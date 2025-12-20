@@ -83,7 +83,7 @@ public:
                READ isFeatureEnabled
                NOTIFY featureEnabledChanged)
     // clang-format on
-    bool isFeatureEnabled() const;
+    virtual bool isFeatureEnabled() const;
     Q_SIGNAL void featureEnabledChanged();
 
     // clang-format off

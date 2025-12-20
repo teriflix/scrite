@@ -372,7 +372,6 @@ Item {
         }
 
         readonly property TrackerPack trackerForUpdateCacheBuffer: TrackerPack {
-
             TrackSignal {
                 target: _screenplayTracksView
                 signal: "trackCountChanged()"

@@ -137,7 +137,7 @@ VclMenu {
         width: 250
 
         Repeater {
-            model: Runtime.sceneListReports
+            model: Runtime.sceneReports.reports ? Runtime.sceneReports.reports : 0
 
             delegate: VclMenuItem {
                 required property int index
@@ -146,9 +146,14 @@ VclMenu {
                 text: modelData.name
                 icon.source: "qrc" + modelData.icon
 
-                onTriggered: ReportConfigurationDialog.launch(modelData.name,
-                                                              {"sceneNumbers": Scrite.document.screenplay.selectedElementIndexes()},
-                                                              {"initialPage": modelData.group})
+                onTriggered: {
+                    let props = {}
+                    if(Scrite.document.screenplay.hasSelectedElements)
+                        props[Runtime.sceneReports.propertyName] = Scrite.document.screenplay.selectedElementIndexes()
+                    else
+                        props[Runtime.sceneReports.propertyName] = [root.element.elementIndex]
+                    ReportConfigurationDialog.launch(modelData.name, props, {initialPage: modelData.group})
+                }
             }
         }
     }

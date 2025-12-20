@@ -52,10 +52,8 @@ VclMenu {
     VclMenu {
         title: "Reports"
 
-        width: 250
-
         Repeater {
-            model: Runtime.characterListReports
+            model: Runtime.characterReports.reports ? Runtime.characterReports.reports : 0
 
             delegate: VclMenuItem {
                 required property int index
@@ -64,9 +62,11 @@ VclMenu {
                 text: modelData.name
                 icon.source: "qrc" + modelData.icon
 
-                onTriggered: ReportConfigurationDialog.launch(modelData.name,
-                                                              {"characterNames": [root.character.name]},
-                                                              {"initialPage": modelData.group})
+                onTriggered: {
+                    let props = {}
+                    props[Runtime.characterReports.propertyName] = [root.character.name]
+                    ReportConfigurationDialog.launch(modelData.name, props, {initialPage: modelData.group})
+                }
             }
         }
     }

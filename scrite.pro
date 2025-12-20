@@ -128,6 +128,7 @@ HEADERS += \
     src/quick/items/painterpathitem.h \
     src/reports/characterreport.h \
     src/reports/locationreport.h \
+    # src/reports/locationscreenplayreport.h \
     src/reports/notebookreport.h \
     src/reports/scenecharactermatrixreport.h \
     src/reports/statisticsreport.h \
@@ -264,6 +265,7 @@ SOURCES += \
     src/quick/items/ruleritem.cpp \
     src/reports/characterreport.cpp \
     src/reports/locationreport.cpp \
+    # src/reports/locationscreenplayreport.cpp \
     src/reports/notebookreport.cpp \
     src/reports/scenecharactermatrixreport.cpp \
     src/reports/statisticsreport.cpp \
@@ -305,7 +307,6 @@ SOURCES += \
     src/reports/screenplaysubsetreport.cpp \
     src/reports/characterscreenplayreport.cpp \
     src/reports/progressreport.cpp \
-    # src/reports/locationscreenplayreport.cpp \
     src/utils/urlattributes.cpp
 
 RESOURCES += \

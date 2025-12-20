@@ -18,6 +18,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 
 VclMenu {
@@ -30,7 +31,7 @@ VclMenu {
     VclMenuItem {
         text: "Paste After"
 
-        enabled: Scrite.document.screenplay.canPaste
+        enabled: Scrite.document.screenplay.canPaste && !Scrite.document.screenplay.hasSelectedElements
 
         onClicked: {
             const index = Scrite.document.screenplay.indexOfElement(root.element);
@@ -42,11 +43,36 @@ VclMenu {
     VclMenuItem {
         text: "Remove"
 
-        enabled: !Scrite.document.readOnly
+        enabled: !Scrite.document.readOnly && !Scrite.document.screenplay.hasSelectedElements
 
         onClicked: {
             Scrite.document.screenplay.removeElement(root.element)
             root.close()
+        }
+    }
+
+    VclMenu {
+        title: "Reports"
+
+        width: 250
+        enabled: !Scrite.document.screenplay.hasSelectedElements && root.element && root.element.breakType === Screenplay.Episode
+
+        Repeater {
+            model: Runtime.episodeReports.reports ? Runtime.episodeReports.reports : 0
+
+            delegate: VclMenuItem {
+                required property int index
+                required property var modelData
+
+                text: modelData.name
+                icon.source: "qrc" + modelData.icon
+
+                onTriggered: {
+                    let props = {}
+                    props[Runtime.episodeReports.propertyName] = [root.element.episodeIndex+1]
+                    ReportConfigurationDialog.launch(modelData.name, props, {initialPage: modelData.group})
+                }
+            }
         }
     }
 }

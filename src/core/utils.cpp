@@ -1019,6 +1019,27 @@ QAbstractListModel *Utils::Object::typeEnumModel(const QString &typeName, const 
     return nullptr;
 }
 
+QVariant Utils::Object::convertToPropertyType(const QVariant &value, const QMetaProperty &prop)
+{
+    if (!prop.isValid())
+        return value;
+
+    QVariant value2 = value;
+    if (value2.userType() != prop.userType()) {
+        if (!value2.convert(prop.userType())) {
+            if (prop.userType() == qMetaTypeId<QList<int>>()) {
+                const QVariantList list = value.toList();
+                QList<int> intList;
+                for (const QVariant &item : list)
+                    intList.append(item.toInt());
+                value2 = QVariant::fromValue<QList<int>>(intList);
+            }
+        }
+    }
+
+    return value2;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 Q_GLOBAL_STATIC(QObjectListModel<QObject *>, ObjectRegistry)

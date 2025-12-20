@@ -212,7 +212,7 @@ VclDialog {
             spacing: 5
 
             Repeater {
-                model: fieldGroupIndex > 0 ? _private.configuration.groups[fieldGroupIndex].fields : []
+                model: fieldGroupIndex > 0 && _private.configuration.groups[fieldGroupIndex] ? _private.configuration.groups[fieldGroupIndex].fields : []
                 delegate: fieldEditorLoader
             }
         }

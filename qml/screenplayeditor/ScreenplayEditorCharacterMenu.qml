@@ -40,7 +40,7 @@ VclMenu {
     }
 
     Repeater {
-        model: Runtime.characterListReports
+        model: Runtime.characterReports.reports ? Runtime.characterReports.reports : 0
 
         delegate: VclMenuItem {
             required property int index
@@ -49,9 +49,11 @@ VclMenu {
             text: modelData.name
             icon.source: "qrc" + modelData.icon
 
-            onTriggered: ReportConfigurationDialog.launch(modelData.name,
-                                                          {"characterNames": [root.characterName]},
-                                                          {"initialPage": modelData.group})
+            onTriggered: {
+                let props = {}
+                props[Runtime.characterReports.propertyName] = [root.characterName]
+                ReportConfigurationDialog.launch(modelData.name, props, {initialPage: modelData.group})
+            }
         }
     }
 
@@ -68,20 +70,14 @@ VclMenu {
         }
     }
 
-    Repeater {
-        model: Runtime.characterListReports.length > 0 ? 1 : 0
+    VclMenuItem {
+        text: "Rename/Merge Character"
+        icon.source: "qrc:/icons/screenplay/character.png"
 
-        delegate: VclMenuItem {
-            required property int index // not required, but only for coding convention sake
-
-            text: "Rename/Merge Character"
-            icon.source: "qrc:/icons/screenplay/character.png"
-
-            onTriggered: {
-                const character = Scrite.document.structure.addCharacter(root.characterName)
-                if(character)
-                    RenameCharacterDialog.launch(character)
-            }
+        onTriggered: {
+            const character = Scrite.document.structure.addCharacter(root.characterName)
+            if(character)
+                RenameCharacterDialog.launch(character)
         }
     }
 }

@@ -27,6 +27,10 @@ ColumnLayout {
     property var fieldInfo
     property AbstractReportGenerator report
 
+    function getReady() {
+        episodeListView.model = Scrite.document.screenplay.episodeInfoList
+    }
+
     spacing: 5
 
     VclLabel {
@@ -71,7 +75,7 @@ ColumnLayout {
         ListView {
             id: episodeListView
 
-            property var episodeNumbers: report.getConfigurationValue(fieldInfo.name)
+            property var episodeNumbers: fieldInfo ? report.getConfigurationValue(fieldInfo.name) : []
 
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
@@ -93,7 +97,6 @@ ColumnLayout {
                 report.setConfigurationValue(fieldInfo.name, numbers)
             }
 
-            model: Scrite.document.screenplay.episodeInfoList
             clip: true
 
             delegate: VclCheckBox {
