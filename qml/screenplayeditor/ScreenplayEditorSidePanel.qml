@@ -125,15 +125,10 @@ Item {
                 DelayedProperty.delay: 10
                 DelayedProperty.set: _sceneListView.delegateCount
 
-                enabled: DelayedProperty.get === root.screenplayAdapter.elementCount && (isSceneTextModeHeading || maximumLineCount === 1)
+                enabled: DelayedProperty.get === root.screenplayAdapter.elementCount
                 visible: Runtime.sceneListPanelSettings.displayTracks && Runtime.screenplayTracksSettings.displayTracks && root.screenplayAdapter.isSourceScreenplay
                 listView: _sceneListView
                 screenplay: root.screenplayAdapter.screenplay
-
-                property int maximumLineCount: Runtime.bounded(1,Runtime.screenplayEditorSettings.slpSynopsisLineCount,5)
-                property bool isSceneTextModeHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
-                onMaximumLineCountChanged: reload()
-                onIsSceneTextModeHeadingChanged: reload()
             }
 
             SceneListPanel {

@@ -302,7 +302,7 @@ ListView {
 
         function updateCacheBuffer() {
             if(tracksVisible)
-                cacheBuffer = contentHeight
+                cacheBuffer = Qt.binding( () => { return contentHeight } )
             else
                 cacheBuffer = 0
         }
