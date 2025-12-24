@@ -80,7 +80,21 @@ Item {
         property AbstractTransliterationEngine activeTransliterator: activeTransliterationOption.valid ? activeTransliterationOption.transliterator : null
 
         function setActiveCode(code) {
+            if(activeCode === code)
+                return
+
             supported.activeLanguageCode = code
+            logActivity("language-activate", supported.activeLanguage)
+        }
+
+        function logActivity(activity, lang) {
+            if(lang && Scrite.user.info.consentToActivityLog) {
+                const txOption = lang.preferredTransliterationOption()
+                const portableShortcut = Gui.portableShortcut(lang.keySequence)
+                const shortcut = portableShortcut === "" ? "<no-shortcut>" : portableShortcut
+                const details = [lang.name, shortcut, txOption.id, txOption.name, lang.font().family, Platform.typeString].join(";")
+                Scrite.user.logActivity2(activity, details)
+            }
         }
     }
 
