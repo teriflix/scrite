@@ -34,49 +34,11 @@ Item {
     function resetBinder(binder) { _private.resetBinder(binder) }
     function isOperationAllowedByUser(operation) { return _private.isOperationAllowedByUser(operation) }
 
-    function triggerLater(action, delay) {
-        if(action)
-            Runtime.execLater(action, delay, () => {
-                                  if(action && action.enabled)
-                                    action.trigger()
-                              })
-    }
-
-    function toggleLater(action, delay) {
-        if(action)
-            Runtime.execLater(action, delay, () => {
-                                  if(action && action.enabled)
-                                    action.toggle()
-                              })
-    }
-
-    function assignShortcut(qmlAction, newShortcut) {
-        if(!qmlAction || !Object.isOfType(qmlAction, "QQuickAction"))
-            return
-
-        if(newShortcut === undefined || newShortcut === "") {
-            qmlAction.shortcut = undefined
-            return
-        }
-
-        let conflictingAction = ActionManager.findActionForShortcut(newShortcut)
-        if(conflictingAction) {
-            MessageBox.information("Shortcut Conflict",
-                                   Gui.nativeShortcut(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
-        } else {
-            qmlAction.shortcut = newShortcut
-        }
-    }
-
-    function hasShortcutConflict(shortcut) {
-        let conflictingAction = ActionManager.findActionForShortcut(shortcut)
-        if(conflictingAction) {
-            MessageBox.information("Shortcut Conflict",
-                                   Gui.nativeShortcut(shortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
-            return true
-        }
-        return false
-    }
+    function triggerLater(action, delay) { _private.triggerLater(action, delay) }
+    function toggleLater(action, delay) { _private.toggleLater(action, delay) }
+    function assignShortcut(qmlAction, newShortcut) { _private.assignShortcut(qmlAction, newShortcut) }
+    function hasShortcutConflict(shortcut) { return _private.hasShortcutConflict(shortcut) }
+    function logShortcutChangeActivity(qmlAction) { _private.logShortcutChangeActivity(qmlAction) }
 
     readonly property ActionManager mainWindowTabs: ActionManager {
         title: "Scrite Window Tabs"
@@ -2714,6 +2676,72 @@ Item {
                 return false
             }
             return true
+        }
+
+        function triggerLater(action, delay) {
+            if(action)
+                Runtime.execLater(action, delay, () => {
+                                      if(action && action.enabled)
+                                        action.trigger()
+                                  })
+        }
+
+        function toggleLater(action, delay) {
+            if(action)
+                Runtime.execLater(action, delay, () => {
+                                      if(action && action.enabled)
+                                        action.toggle()
+                                  })
+        }
+
+        function assignShortcut(qmlAction, newShortcut) {
+            if(!qmlAction || !Object.isOfType(qmlAction, "QQuickAction"))
+                return
+
+            if(newShortcut === undefined || newShortcut === "") {
+                qmlAction.shortcut = undefined
+                logShortcutChangeActivity(qmlAction)
+                return
+            }
+
+            let conflictingAction = ActionManager.findActionForShortcut(newShortcut)
+            if(conflictingAction) {
+                MessageBox.information("Shortcut Conflict",
+                                       Gui.nativeShortcut(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
+            } else {
+                qmlAction.shortcut = newShortcut
+                logShortcutChangeActivity(qmlAction)
+            }
+        }
+
+        function hasShortcutConflict(shortcut) {
+            let conflictingAction = ActionManager.findActionForShortcut(shortcut)
+            if(conflictingAction) {
+                MessageBox.information("Shortcut Conflict",
+                                       Gui.nativeShortcut(shortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
+                return true
+            }
+            return false
+        }
+
+        function logShortcutChangeActivity(qmlAction) {
+            if(!qmlAction || !Scrite.user.info.consentToActivityLog)
+                return;
+
+            const activity = "shortcut-change"
+            const shortcut = qmlAction.shortcut !== undefined ? Gui.portableShortcut(qmlAction.shortcut) : "<no-shortcut>"
+            const defaultShortcut = qmlAction.defaultShortcut ? Gui.portableShortcut(qmlAction.defaultShortcut) : "<no-default>"
+            const actionManager = mainWindowTabs.findManager(qmlAction)
+
+            let details = actionManager.title + ": " + qmlAction.text + " = " + shortcut
+            if(shortcut === defaultShortcut) {
+                details += " (default)"
+            } else {
+                details += " (default=" + defaultShortcut + ")"
+            }
+            details += ". " + Platform.typeString
+
+            Scrite.user.logActivity2(activity, details)
         }
 
         readonly property EnumerationModel availableParagraphFormats: EnumerationModel {

@@ -256,7 +256,9 @@ FocusScope {
                             opacity: enabled ? 1 : (shortcutIsEditable ? 0.5 : 0)
                             icon.source: "qrc:/icons/content/undo.png"
 
-                            onClicked: _actionsModel.restoreActionShortcut(qmlAction)
+                            onClicked: {
+                                _actionsModel.restoreActionShortcut(qmlAction)
+                            }
                         }
                     }
                 }
@@ -301,5 +303,9 @@ FocusScope {
         onModelReset: Qt.callLater(_actionsView.resetCurrentItem)
         onRowsRemoved: Qt.callLater(_actionsView.resetCurrentItem)
         onRowsInserted: Qt.callLater(_actionsView.resetCurrentItem)
+
+        onActionShortcutRestored: (action) => {
+                                      ActionHub.logShortcutChangeActivity(action)
+                                  }
     }
 }
