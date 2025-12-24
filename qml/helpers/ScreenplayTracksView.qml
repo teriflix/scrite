@@ -44,8 +44,8 @@ Flickable {
 
 
     clip: true
-    contentX: _private.isHorizontalTrack ? listView.contentX : 0
-    contentY: _private.isHorizontalTrack ? 0 : listView.contentY
+    contentX: _private.isHorizontalTrack ? listView.contentX - listView.originX: 0
+    contentY: _private.isHorizontalTrack ? 0 : listView.contentY - listView.originY
     interactive: false
     contentWidth: _content.width
     contentHeight: _content.height
@@ -53,8 +53,8 @@ Flickable {
     Item {
         id: _content
 
-        width: _private.isHorizontalTrack ? listView.contentWidth : _private.totalTracksSize
-        height: _private.isHorizontalTrack ? _private.totalTracksSize : listView.contentHeight
+        width: _private.isHorizontalTrack ? listView.contentItem.width : _private.totalTracksSize
+        height: _private.isHorizontalTrack ? _private.totalTracksSize : listView.contentItem.height
 
         Repeater {
             id: _trackRepeater
@@ -119,15 +119,15 @@ Flickable {
                                 if(_trackItem.startItem === null || _trackItem.endItem === null)
                                     return 0
 
-                                const pos = listView.contentItem.mapFromItem(_trackItem.startItem, 0, 0)
-                                return (_private.isHorizontalTrack ? pos.x : pos.y)
+                                return (_private.isHorizontalTrack ? _trackItem.startItem.x - listView.originX :
+                                                                     _trackItem.startItem.y - listView.originY)
                             }
                             property real to: {
                                 if(_trackItem.startItem === null || _trackItem.endItem === null)
                                     return 0
 
-                                const pos = listView.contentItem.mapFromItem(_trackItem.endItem, _trackItem.endItem.width, _trackItem.endItem.height)
-                                return (_private.isHorizontalTrack ? pos.x : pos.y)
+                                return (_private.isHorizontalTrack ? _trackItem.endItem.x + _trackItem.endItem.width - listView.originX :
+                                                                     _trackItem.endItem.y + _trackItem.endItem.height - listView.originY)
                             }
                         }
 

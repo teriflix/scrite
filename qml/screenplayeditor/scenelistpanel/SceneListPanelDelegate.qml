@@ -176,8 +176,9 @@ Rectangle {
                 }
 
                 Item {
-                    Layout.preferredWidth: _label.height
-                    Layout.preferredHeight: _label.height
+                    Layout.alignment: _label.lineCount === 1 ? Qt.AlignVCenter : Qt.AlignTop
+                    Layout.preferredWidth: Runtime.idealFontMetrics.height
+                    Layout.preferredHeight: Runtime.idealFontMetrics.height
 
                     z: 1
                     visible: !_private.isBreak && !root.scene.structureElement.stackLeader && root.scene.structureElement.stackId !== ""
