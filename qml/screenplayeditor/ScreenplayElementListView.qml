@@ -194,6 +194,7 @@ ListView {
     QtObject {
         id: _private
 
+        readonly property Action editSceneHeading: ActionHub.paragraphFormats.find("headingParagraph")
         readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent")
         readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition")
         readonly property Action ensureCursorCentered: Action {
@@ -230,7 +231,10 @@ ListView {
             enabled: _private.hasFocus && root.screenplayAdapter.screenplay === Scrite.document.screenplay
 
             function onNewSceneCreated(scene, elementIndex) {
-                _private.focusCursorPosition.set(elementIndex, 0)
+                if(Runtime.screenplayEditorSettings.focusCursorOnSceneHeadingInNewScenes)
+                    Qt.callLater(_private.editSceneHeading.trigger)
+                else
+                    _private.focusCursorPosition.set(elementIndex, 0)
             }
         }
 

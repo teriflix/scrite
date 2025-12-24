@@ -202,6 +202,7 @@ Item {
         property bool showSpellCheckRefreshNoticeBox: true
         property bool singleClickAutoComplete: true
         property bool restartEpisodeScenesAtOne: false // If set, each episode starts with scene number 1
+        property bool focusCursorOnSceneHeadingInNewScenes: false
 
         property real sidePanelWidth: 400
         property real spaceBetweenScenes: 0

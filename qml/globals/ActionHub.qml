@@ -1495,6 +1495,20 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+            readonly property string tooltip: "By default cursor is placed in the scene content area when a new scene is created. Check this option to place cursor on the scene heading instead."
+
+            checkable: true
+            checked: Runtime.screenplayEditorSettings.focusCursorOnSceneHeadingInNewScenes
+            objectName: "focusCursorOnSceneHeadingInNewScenes"
+            text: "Set Cursor on Heading in New Scenes"
+
+            onTriggered: {
+                Runtime.screenplayEditorSettings.focusCursorOnSceneHeadingInNewScenes = !Runtime.screenplayEditorSettings.focusCursorOnSceneHeadingInNewScenes
+            }
+        }
+
+        Action {
             readonly property bool visible: false
             readonly property bool allowShortcut: true
 
