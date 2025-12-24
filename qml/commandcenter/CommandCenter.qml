@@ -285,6 +285,17 @@ Popup {
                 if(ActionHub.languageOptions.contains(qmlAction))
                     beforeLanguage = -1
                 qmlAction.trigger()
+
+                if(Scrite.user.info.consentToActivityLog) {
+                    const actionManager = actionsModel.actionManagerOf(qmlAction)
+                    const fields = [
+                                     actionManager ? actionManager.title : "<unknown action manager>",
+                                     actionManager.containsUserData === true ? "<hidden>" : qmlAction.text
+                                 ]
+                    const activity = "command-center"
+                    const details = fields.join(": ");
+                    Scrite.user.logActivity2(activity, details)
+                }
             }
             root.close()
         }

@@ -317,6 +317,8 @@ Item {
     }
 
     readonly property ActionManager recentFileOperations: ActionManager {
+        readonly property bool containsUserData: true
+
         title: "Open Recent"
         objectName: "recentFileOperations"
     }

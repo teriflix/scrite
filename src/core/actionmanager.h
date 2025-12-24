@@ -503,6 +503,8 @@ public:
     Q_INVOKABLE int restoreAllActionShortcuts();
     Q_INVOKABLE void filter();
 
+    Q_INVOKABLE ActionManager *actionManagerOf(QObject *action) const;
+
     // QQmlParserStatus interface
     void classBegin() { }
     void componentComplete();

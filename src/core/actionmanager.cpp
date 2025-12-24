@@ -1486,6 +1486,11 @@ void ActionsModelFilter::filter()
     this->invalidateFilter();
 }
 
+ActionManager *ActionsModelFilter::actionManagerOf(QObject *action) const
+{
+    return ActionManager::findManager(action);
+}
+
 void ActionsModelFilter::componentComplete()
 {
     if (this->sourceModel() == nullptr)
