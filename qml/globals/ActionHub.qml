@@ -874,7 +874,7 @@ Item {
         }
 
         Action {
-            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Ctrl+Shift+Delete" : "Ctrl+Shift+Backspace"
+            readonly property string defaultShortcut: "Ctrl+Shift+Backspace"
 
             enabled: ActionHandler.canHandle
             objectName: "mergeScene"
@@ -1290,7 +1290,7 @@ Item {
         }
 
         Action {
-            readonly property string defaultShortcut: Gui.shortcut(Qt.ControlModifier+Qt.ShiftModifier+Qt.Key_Backspace)
+            readonly property bool allowShortcut: true
 
             enabled: ActionHandler.canHandle
             objectName: "remove"
