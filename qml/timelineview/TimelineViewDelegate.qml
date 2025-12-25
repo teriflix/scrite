@@ -171,6 +171,7 @@ Item {
                     container: _mouseArea
                     text: _private.evalToolTipText()
                     visible: _mouseArea.hoverEnabled && _mouseArea.containsMouse
+                    parseShortcutInText: false
                 }
 
                 onPressed: screenplayElementList.forceActiveFocus()
@@ -485,4 +486,3 @@ Item {
         }
     }
 }
-

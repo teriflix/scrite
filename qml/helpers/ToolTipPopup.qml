@@ -23,6 +23,7 @@ ToolTip {
     id: root
 
     readonly property real maximumContentWidth: 350
+    property bool parseShortcutInText: true
 
     property Item container: parent
 
@@ -39,6 +40,9 @@ ToolTip {
         id: _content
 
         property var fields: {
+            if(!root.parseShortcutInText)
+                return [root.text]
+
             let label = "", shortcut = ""
 
             const text = root.text
@@ -55,9 +59,11 @@ ToolTip {
 
             if(shortcut === "undefined")
                 return [label]
-            if(shortcut === "" || Gui.portableShortcut(shortcut) === "")
+
+            const portableShortcut = Gui.portableShortcut(shortcut)
+            if(shortcut === "" || portableShortcut === "")
                 return [text]
-            return [label, Gui.portableShortcut(shortcut)]
+            return [label, portableShortcut]
         }
 
         spacing: 20

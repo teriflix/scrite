@@ -146,7 +146,7 @@ Rectangle {
                 spacing: 5
 
                 Loader {
-                    Layout.alignment: _private.isSceneTextModeHeading ? Qt.AlignVCenter : Qt.AlignTop
+                    Layout.alignment: _label.lineCount === 1 ? Qt.AlignVCenter : Qt.AlignTop
                     Layout.preferredWidth: root.sceneIconSize
                     Layout.preferredHeight: root.sceneIconSize
 
@@ -237,15 +237,16 @@ Rectangle {
 
                         ToolTipPopup {
                             text: _private.tooltipText
+                            parseShortcutInText: false
                             visible: _labelMouseArea.containsMouse
                         }
                     }
                 }
 
                 Loader {
+                    Layout.alignment: _label.lineCount === 1 ? Qt.AlignVCenter : Qt.AlignTop
                     Layout.preferredWidth: root.sceneIconSize
                     Layout.preferredHeight: root.sceneIconSize
-                    Layout.alignment: _private.isSceneTextModeHeading ? Qt.AlignVCenter : Qt.AlignTop
 
                     active: !_private.isBreak && !root.scene.hasContent
                     visible: active
@@ -269,7 +270,7 @@ Rectangle {
                 }
 
                 VclLabel {
-                    Layout.alignment: Qt.AlignVCenter
+                    Layout.alignment: _label.lineCount === 1 ? Qt.AlignVCenter : Qt.AlignTop
 
                     text: _private.sceneLengthWatcher.sceneLength
                     color: Color.textColorFor(_private.color)

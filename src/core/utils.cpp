@@ -372,19 +372,29 @@ QString Utils::Gui::portableShortcut(const QVariant &shortcut)
     if (shortcut.isNull() || !shortcut.isValid())
         return QString();
 
+    auto isKeySequenceValid = [](const QKeySequence &ks) {
+        if (ks.isEmpty() || ks.count() == 0)
+            return false;
+        for (int i = 0; i < ks.count(); i++) {
+            if (ks[i] == Qt::Key_unknown)
+                return false;
+        }
+        return true;
+    };
+
     if (shortcut.userType() == QMetaType::QString) {
         const QString str = shortcut.toString().trimmed();
         QKeySequence ks = QKeySequence::fromString(str, QKeySequence::NativeText);
-        if (ks.isEmpty())
+        if (!isKeySequenceValid(ks))
             ks = QKeySequence::fromString(str, QKeySequence::PortableText);
-        if (ks.isEmpty())
+        if (!isKeySequenceValid(ks))
             return QString();
         return ks.toString(QKeySequence::PortableText);
     }
 
     if (shortcut.userType() == QMetaType::QKeySequence) {
         const QKeySequence ks = shortcut.value<QKeySequence>();
-        if (ks.isEmpty())
+        if (!isKeySequenceValid(ks))
             return QString();
         return ks.toString(QKeySequence::PortableText);
     }
