@@ -496,7 +496,12 @@ ListView {
 
         function postMergeWithPreviousScene(newElement) {
             scrollIntoView(root.screenplayAdapter.currentIndex)
-            _private.focusCursorPosition.set(root.screenplayAdapter.currentIndex, newElement.scene.cursorPosition)
+
+            const cursorPosition = newElement.cursorPositionHint >= 0 ?
+                                   newElement.cursorPositionHint : newElement.scene.cursorPosition
+            _private.focusCursorPosition.set(root.screenplayAdapter.currentIndex, cursorPosition)
+            newElement.cursorPositionHint = -1;
+
             _private.focusCursorPosition.trigger()
             Qt.callLater(_private.ensureCursorCentered.go)
         }

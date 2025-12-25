@@ -301,6 +301,15 @@ void ScreenplayElement::setHeightHint(qreal val)
     emit heightHintChanged();
 }
 
+void ScreenplayElement::setCursorPositionHint(int val)
+{
+    if (m_cursorPositionHint == val)
+        return;
+
+    m_cursorPositionHint = val;
+    emit cursorPositionHintChanged();
+}
+
 void ScreenplayElement::setSelected(bool val)
 {
     if (m_selected == val)
@@ -2030,6 +2039,8 @@ ScreenplayElement *Screenplay::mergeElementWithPrevious(ScreenplayElement *eleme
     currentScene->mergeInto(previousScene);
 
     previousSceneElement->setHeightHint(0);
+    previousSceneElement->setCursorPositionHint(previousScene->cursorPosition());
+
     screenplay->setCurrentElementIndex(previousElementIndex);
     GarbageCollector::instance()->add(element);
     return previousSceneElement;

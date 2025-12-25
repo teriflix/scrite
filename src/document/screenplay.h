@@ -221,6 +221,16 @@ public:
     Q_SIGNAL void heightHintChanged();
 
     // clang-format off
+    Q_PROPERTY(int cursorPositionHint
+               READ cursorPositionHint
+               WRITE setCursorPositionHint
+               NOTIFY cursorPositionHintChanged)
+    // clang-format on
+    void setCursorPositionHint(int val);
+    int cursorPositionHint() const { return m_cursorPositionHint; }
+    Q_SIGNAL void cursorPositionHintChanged();
+
+    // clang-format off
     Q_PROPERTY(bool selected
                READ isSelected
                WRITE setSelected
@@ -379,6 +389,7 @@ private:
     QString m_breakTitle;
     QJsonValue m_userData;
     qreal m_heightHint = 0;
+    int m_cursorPositionHint = -1;
     bool m_pageBreakAfter = false;
     bool m_pageBreakBefore = false;
     QString m_breakSummary;
