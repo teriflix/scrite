@@ -57,7 +57,7 @@ Flickable {
     }
 
     function zoomTo(val) {
-        zoomScale = Runtime.bounded(minimumScale, val, maximumScale)
+        zoomScale = Number.isNaN(val) ? 1 : Runtime.bounded(minimumScale, val, maximumScale)
     }
 
     function zoomFit(area) {
