@@ -302,8 +302,8 @@ QVersionNumber Application::prepare()
     qInstallMessageHandler(ApplicationQtMessageHandler);
 
     Application::setApplicationName(QStringLiteral("Scrite"));
-    Application::setOrganizationName(QStringLiteral("TERIFLIX"));
-    Application::setOrganizationDomain(QStringLiteral("teriflix.com"));
+    Application::setOrganizationName(QStringLiteral("VCreate Logic Pvt. Ltd."));
+    Application::setOrganizationDomain(QStringLiteral("vcreatelogic.com"));
 
     const QDir oldAppDataFolder =
             QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
