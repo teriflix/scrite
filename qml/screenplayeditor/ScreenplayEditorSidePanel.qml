@@ -125,10 +125,13 @@ Item {
                 DelayedProperty.delay: 10
                 DelayedProperty.set: _sceneListView.delegateCount
 
-                enabled: DelayedProperty.get === root.screenplayAdapter.elementCount
+                enabled: Math.abs(DelayedProperty.get - root.screenplayAdapter.elementCount) < 2
                 visible: Runtime.sceneListPanelSettings.displayTracks && Runtime.screenplayTracksSettings.displayTracks && root.screenplayAdapter.isSourceScreenplay
                 listView: _sceneListView
                 screenplay: root.screenplayAdapter.screenplay
+
+                property var __watch: [Runtime.sceneListPanelSettings.sceneTextMode, Runtime.screenplayEditorSettings.slpSynopsisLineCount]
+                on__WatchChanged: Qt.callLater(_sceneListView.updateCacheBuffer)
             }
 
             SceneListPanel {

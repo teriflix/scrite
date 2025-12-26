@@ -78,8 +78,8 @@ ListView {
     delegate: SceneListPanelDelegate {
         id: _delegate
 
-        Component.onCompleted: { _private.delegateCount = _private.delegateCount+1 }
-        Component.onDestruction: { _private.delegateCount = _private.delegateCount-1 }
+        Component.onCompleted: _private.delegateCount = _private.delegateCount+1
+        Component.onDestruction: _private.delegateCount = _private.delegateCount-1
 
         width: root.width
 
@@ -301,9 +301,10 @@ ListView {
         property int delegateCount: 0
 
         function updateCacheBuffer() {
-            if(tracksVisible)
-                cacheBuffer = Qt.binding( () => { return contentHeight } )
-            else
+            if(tracksVisible) {
+                const idealCacheBuffer = Math.round(contentHeight * 1.25)
+                cacheBuffer = Math.max(idealCacheBuffer, cacheBuffer)
+            } else
                 cacheBuffer = 0
         }
 
