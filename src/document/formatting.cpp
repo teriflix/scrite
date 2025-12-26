@@ -1699,7 +1699,7 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
             &SceneDocumentBinder::selectedElementsChanged);
 
     connect(LanguageEngine::instance(), &LanguageEngine::scriptFontFamilyChanged, this,
-            &SceneDocumentBinder::rehighlightLater);
+            &SceneDocumentBinder::refresh);
 }
 
 SceneDocumentBinder::~SceneDocumentBinder() { }

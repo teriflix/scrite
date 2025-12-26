@@ -176,7 +176,7 @@ Item {
                         Layout.alignment: Qt.AlignHCenter
 
                         text: _private.language !== undefined ? _private.language.nativeName : "- NA -"
-                        font.family: _private.language !== undefined ? _private.language.font().family : Runtime.idealFontMetrics.font.family
+                        font.family: _private.languageFont
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 5
                     }
 
@@ -232,6 +232,7 @@ Item {
                                                      if(_private.language) {
                                                          const success = Runtime.language.supported.assignLanguageFontFamily(_private.language.code, languageFonts[index])
                                                          if(success) {
+                                                             _private.reevalLanguageFont()
                                                              _private.logLanguageFont(_private.language)
                                                          }
                                                      }
@@ -405,12 +406,11 @@ Item {
         property int previouslyActiveLanguage: -1
 
         property var language: _listView.currentItem ? _listView.currentItem.language : undefined
+        property font languageFont: language !== undefined ? language.font().family : Runtime.idealFontMetrics.font.family
 
         property ListModel transliterationOptionsModel: ListModel { }
 
-        property SpellCheckService spellCheckService: SpellCheckService {
-
-        }
+        property SpellCheckService spellCheckService: SpellCheckService { }
 
         Component.onCompleted: {
             previouslyActiveLanguage = Runtime.language.activeCode
@@ -419,6 +419,10 @@ Item {
 
         Component.onDestruction: {
             Runtime.language.setActiveCode(previouslyActiveLanguage)
+        }
+
+        function reevalLanguageFont() {
+            languageFont = language !== undefined ? language.font().family : Runtime.idealFontMetrics.font.family
         }
 
         function populateTransliterationOptionsModel() {
