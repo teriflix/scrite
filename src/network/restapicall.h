@@ -435,6 +435,28 @@ public:
     QString api() const { return "app/minimumVersion"; }
 };
 
+class AppWelcomeTextApiCall : public RestApiCall
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    AppWelcomeTextApiCall(QObject *parent = nullptr);
+    ~AppWelcomeTextApiCall();
+
+    // clang-format off
+    Q_PROPERTY(QJsonObject welcomeText
+               READ welcomeText
+               NOTIFY responseChanged)
+    // clang-format on
+    QJsonObject welcomeText() const { return this->responseData(); }
+
+    // RestApiCall interface
+    Type type() const { return GET; }
+    bool useSessionToken() const { return false; }
+    QString api() const { return "app/welcomeText"; }
+};
+
 class AppCheckUserRestApiCall : public RestApiCall
 {
     Q_OBJECT
@@ -676,6 +698,53 @@ protected:
 
 private:
     QJsonObject m_updatedFields;
+};
+
+class UserOnboardingFormApiCall : public RestApiCall
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    UserOnboardingFormApiCall(QObject *parent = nullptr);
+    ~UserOnboardingFormApiCall();
+
+    // RestApiCall interface
+    Type type() const { return GET; }
+    bool useSessionToken() const { return true; }
+    QString api() const { return "user/onboardingForm"; }
+};
+
+class UserSubmitOnboardingFormApiCall : public RestApiCall
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    UserSubmitOnboardingFormApiCall(QObject *parent = nullptr);
+    ~UserSubmitOnboardingFormApiCall();
+
+    // clang-format off
+    Q_PROPERTY(QJsonObject formData
+               READ formData
+               WRITE setFormData
+               NOTIFY formDataChanged)
+    // clang-format on
+    void setFormData(const QJsonObject &val);
+    QJsonObject formData() const { return m_formData; }
+    Q_SIGNAL void formDataChanged();
+
+    // RestApiCall interface
+    Type type() const { return POST; }
+    bool useSessionToken() const { return true; }
+    QString api() const { return "user/submitOnboardingForm"; }
+    QJsonObject data() const { return { { "formData", m_formData } }; }
+
+protected:
+    void setResponse(const QJsonObject &val);
+
+private:
+    QJsonObject m_formData;
 };
 
 class UserRequestVersionTypeApiCall : public RestApiCall

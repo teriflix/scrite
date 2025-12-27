@@ -29,6 +29,11 @@ Item {
         target: Scrite.user
 
         function onLoggedInChanged() {
+            if(_private.timer && _private.timer.running) {
+                _private.timer.stop()
+                _private.timer.destroy()
+            }
+
             _private.maybeShowUserProfileScreen()
         }
     }
@@ -38,14 +43,24 @@ Item {
         running: Scrite.user.busy
     }
 
-    Component.onCompleted: Runtime.execLater(_private, 100, _private.maybeShowUserProfileScreen)
+    Component.onCompleted: {
+        _private.timer = Runtime.execLater(_private, 100, _private.maybeShowUserProfileScreen)
+    }
 
     QtObject {
         id: _private
 
+        property Timer timer
+
         function maybeShowUserProfileScreen() {
-            if(Scrite.user.loggedIn)
-                Runtime.shoutout(Runtime.announcementIds.userAccountDialogScreen, "UserProfileScreen")
+            if(Scrite.user.loggedIn) {
+                const requiresOnboarding = Runtime.requiresUserOnboarding()
+                if(requiresOnboarding) {
+                    Runtime.shoutout(Runtime.announcementIds.userAccountDialogScreen, "UserOnboardingScreen")
+                } else {
+                    Runtime.shoutout(Runtime.announcementIds.userAccountDialogScreen, "UserProfileScreen")
+                }
+            }
         }
     }
 }

@@ -22,7 +22,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -36,10 +35,10 @@ Item {
 
     function init(_parent) { parent = _parent }
     function launch(profileScreen) {
-        userAccountDialog.screenName = Scrite.user.loggedIn ? "UserProfileScreen" : _private.startScreen
+        userAccountDialog.screenName = Scrite.user.loggedIn ? (Runtime.requiresUserOnboarding() ? "UserOnboardingScreen" : "UserProfileScreen") : _private.startScreen
         userAccountDialog.open()
 
-        if(Scrite.user.loggedIn && profileScreen && profileScreen !== "") {
+        if(Scrite.user.loggedIn && profileScreen && profileScreen !== "" && !Runtime.requiresUserOnboarding()) {
             Runtime.execLater(userAccountDialog, 500, () => {
                                 Runtime.shoutout(Runtime.announcementIds.userProfileScreenPage, profileScreen)
                             })
@@ -54,6 +53,7 @@ Item {
 
         width: 900
         height: 620
+        objectName: "UserAccountDialog"
 
         handleLanguageShortcuts: true
         title: screenItem ? screenItem.title : "Activation Workflow"
@@ -83,7 +83,7 @@ Item {
                 if(data && data !== "")
                     screenName = data
                 else
-                    screenName = Scrite.user.loggedIn ? "UserProfileScreen" : _private.startScreen
+                    screenName = Scrite.user.loggedIn ? (Runtime.requiresUserOnboarding() ? "UserOnboardingScreen" : "UserProfileScreen") : _private.startScreen
 
                 if(!visible)
                     userAccountDialog.open()
@@ -94,7 +94,7 @@ Item {
     QtObject {
         id: _private
 
-        property string startScreen: Runtime.userAccountDialogSettings.welcomeScreenShown ? "AccountEmailScreen" : "WelcomeScreen"
+        property string startScreen: "WelcomeScreen" // Runtime.userAccountDialogSettings.welcomeScreenShown ? "AccountEmailScreen" : "WelcomeScreen"
 
         property SessionNewRestApiCall newSessionTokenCall: SessionNewRestApiCall {
             property VclDialog waitDialog

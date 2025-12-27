@@ -22,7 +22,7 @@ import "qrc:/qml/controls"
 
 Item {
     readonly property bool modal: true
-    readonly property string title: "Welcome to Scrite!"
+    readonly property string title: "Greetings!"
 
     Image {
         anchors.fill: parent
@@ -39,29 +39,52 @@ Item {
 
         spacing: 40
 
-        Flickable {
-            id: flick
-
+        Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            ScrollBar.vertical: VclScrollBar { }
+            color: Runtime.colors.primary.c10.background
+            border.width: _welcomeTextFlick.clip ? 1 : 0
+            border.color: Runtime.colors.primary.borderColor
 
-            clip: ScrollBar.vertical.needed
-            contentWidth: label.width
-            contentHeight: label.height
+            Flickable {
+                id: _welcomeTextFlick
 
-            VclLabel {
-                id: label
+                anchors.fill: parent
+                anchors.margins: 1
 
-                width: flick.width - (flick.clip ? 20 : 0)
+                ScrollBar.vertical: VclScrollBar { }
 
-                text: "Thank you for choosing Scrite as the place to bring your screenplays to life. We’re thrilled to have you on board and can’t wait to celebrate the stories you create with our powerful and intuitive writing tools.\n\n" +
-                      "In the next few screens, we’ll guide you through the simple process of logging in to your account and setting up your personalized copy of Scrite. This will only take a few moments, and by the end, you’ll be ready to dive right into your screenplay creation.\n\n" +
-                      "Please click Next to continue and get started on your writing journey. We’re here to make your experience as smooth and enjoyable as possible."
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignJustify
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
+                clip: contentHeight > height
+                contentWidth: _welcomeText.width
+                contentHeight: _welcomeText.height
+
+                TextArea {
+                    id: _welcomeText
+
+                    width: _welcomeTextFlick.width - 20
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+                    wrapMode: Text.WordWrap
+                    readOnly: true
+                    padding: _welcomeTextFlick.clip ? 10 : 0
+
+                    background: Item { }
+
+                    onLinkActivated: (link) => {
+                                         Qt.openUrlExternally(link)
+                                     }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: parent.linkAt(mouseX, mouseY) === "" ? Qt.ArrowCursor : Qt.PointingHandCursor
+                        onClicked: {
+                            const link = parent.linkAt(mouseX, mouseY)
+                            if(link !== "")
+                                parent.linkActivated(link)
+                        }
+                    }
+                }
             }
         }
 
@@ -69,11 +92,42 @@ Item {
             Layout.alignment: Qt.AlignRight
 
             text: "Next »"
+            enabled: !_welcomeTextApi.busy
 
             onClicked: {
                 Runtime.userAccountDialogSettings.welcomeScreenShown = true
                 Runtime.shoutout(Runtime.announcementIds.userAccountDialogScreen, "AccountEmailScreen")
             }
         }
+    }
+
+    BusyIndicator {
+        anchors.centerIn: parent
+        running: _welcomeTextApi.busy
+    }
+
+    AppWelcomeTextApiCall {
+        id: _welcomeTextApi
+
+        onFinished: {
+            if(hasResponse && !hasError) {
+                const wt = welcomeText
+                switch(wt.format) {
+                case "html":
+                    _welcomeText.textFormat = TextEdit.RichText
+                    break
+                case "markdown":
+                    _welcomeText.textFormat = TextEdit.MarkdownText
+                    break
+                default:
+                    _welcomeText.textFormat = TextEdit.PlainText
+                    break
+                }
+
+                _welcomeText.text = wt.content
+            }
+        }
+
+        Component.onCompleted: call()
     }
 }

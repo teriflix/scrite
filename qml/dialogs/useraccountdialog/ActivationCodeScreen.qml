@@ -71,7 +71,7 @@ Item {
                 placeholderText: "Verification Code"
                 horizontalAlignment: Text.AlignHCenter
 
-                Keys.onReturnPressed: activateCall.call()
+                Keys.onReturnPressed: if(activateButton.enabled) activateButton.clicked()
             }
 
             RowLayout {
@@ -120,10 +120,11 @@ Item {
                 }
 
                 VclButton {
-                    id:activateButton
+                    id: activateButton
 
                     text: "Verify »"
                     enabled: activationCodeField.text.length == 20
+
                     onClicked: activateCall.call()
                 }
             }
@@ -141,10 +142,16 @@ Item {
 
     AppActivateDeviceRestApiCall {
         id: activateCall
+
         activationCode: activationCodeField.text.trim()
+
         onFinished: {
             if(hasError) {
-                MessageBox.information("Error", errorMessage)
+                const faq = _private.userMeta.urls.faq_device_limit
+                MessageBox.information("Error", errorMessage, () => {
+                                           if(faq)
+                                            Qt.openUrlExternally(faq)
+                                       })
                 return
             }
 
@@ -153,6 +160,7 @@ Item {
                 return
             }
 
+            Runtime.userAccountDialogSettings.userOnboardingStatus = _private.userMeta.onboarding
             Session.unset("checkUserResponse")
             Runtime.shoutout(Runtime.announcementIds.userAccountDialogScreen, "ReloadUserScreen")
         }

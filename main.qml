@@ -116,6 +116,14 @@ Rectangle {
                     HomeScreen.launch()
             } else
                 Scrite.document.open(Scrite.fileNameToOpen)
+
+            Runtime.execLater(_private, 2000, _private.maybeOnboardUserSurvey)
+        }
+
+        function maybeOnboardUserSurvey() {
+            if(Runtime.userAccountDialogSettings.userOnboardingStatus === "required") {
+                UserOnboardingDialog.launch()
+            }
         }
     }
 }

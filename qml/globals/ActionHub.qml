@@ -1294,7 +1294,6 @@ Item {
 
             enabled: ActionHandler.canHandle
             objectName: "remove"
-            shortcut: defaultShortcut
             text: "Remove"
 
             icon.source: "qrc:/icons/action/delete.png"

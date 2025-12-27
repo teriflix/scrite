@@ -122,17 +122,20 @@ RowLayout {
     }
 
     component LabelWithTooltip : VclLabel {
+        id: _labelWithTooltip
+
         elide: Text.ElideRight
         wrapMode: Text.WordWrap
         maximumLineCount: 2
 
         MouseArea {
             anchors.fill: parent
+
             hoverEnabled: true
 
             ToolTipPopup {
-                visible: container.hovered
-                text: parent.text
+                visible: parent.containsMouse
+                text: _labelWithTooltip.text
             }
         }
     }

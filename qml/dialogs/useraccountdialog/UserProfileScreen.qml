@@ -19,8 +19,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
-
 import "qrc:/qml/tasks"
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
@@ -349,6 +347,13 @@ Item {
                             UserMeRestApiCall {
                                 id: refreshUserCall
                             }
+                        }
+
+                        VclButton {
+                            text: "Survey"
+                            visible: Runtime.userAccountDialogSettings.userOnboardingStatus !== "completed"
+
+                            onClicked: UserOnboardingDialog.launch()
                         }
 
                         Item {
@@ -766,6 +771,7 @@ Item {
                                                 Layout.fillWidth: true
 
                                                 focus: true
+                                                maximumLength: Runtime.bounded(queryUserSubsCall.responseData.minReferralCodeLength, queryUserSubsCall.responseData.maxReferralCodeLength, 128)
                                                 placeholderText: queryUserSubsCall.responseData.referralCodeText
                                                 horizontalAlignment: Text.AlignHCenter
                                             }

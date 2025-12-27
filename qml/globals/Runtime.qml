@@ -101,6 +101,7 @@ Item {
     // Persistent Settings
     readonly property Settings userAccountDialogSettings: Settings {
         property bool welcomeScreenShown: false
+        property string userOnboardingStatus: "unknown"
 
         category: "UserAccountDialog"
         fileName: Platform.settingsFile
@@ -758,6 +759,10 @@ Item {
 
     function closeAllDialogs() {
         Runtime.shoutout(Runtime.announcementIds.closeDialogBoxRequest, undefined)
+    }
+
+    function requiresUserOnboarding() {
+        return ["required","unknown"].indexOf(userAccountDialogSettings.userOnboardingStatus) >= 0
     }
 
     function estimateTypeSize(itemNameOrCode, imports) {
