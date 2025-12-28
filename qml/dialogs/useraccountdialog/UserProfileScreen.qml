@@ -351,7 +351,7 @@ Item {
 
                         VclButton {
                             text: "Survey"
-                            visible: Runtime.userAccountDialogSettings.userOnboardingStatus !== "completed"
+                            visible: ["recommended", "required"].indexOf(Runtime.userAccountDialogSettings.userOnboardingStatus) >= 0
 
                             onClicked: UserOnboardingDialog.launch()
                         }
