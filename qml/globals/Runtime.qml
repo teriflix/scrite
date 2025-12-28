@@ -762,7 +762,7 @@ Item {
     }
 
     function requiresUserOnboarding() {
-        return ["required","unknown"].indexOf(userAccountDialogSettings.userOnboardingStatus) >= 0
+        return "required" === userAccountDialogSettings.userOnboardingStatus
     }
 
     function estimateTypeSize(itemNameOrCode, imports) {
