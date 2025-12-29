@@ -257,6 +257,7 @@ Flickable {
                 y: _private.isHorizontalTrack ? -height - 15 : 0
 
                 container: _toolTip
+                parseShortcutInText: false
             }
         }
     }
