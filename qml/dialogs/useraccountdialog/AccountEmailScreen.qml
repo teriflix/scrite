@@ -29,6 +29,8 @@ Item {
     readonly property bool modal: true
     readonly property string title: "Setup your Scrite account"
 
+    Component.onCompleted: Qt.callLater(emailField.forceActiveFocus)
+
     Image {
         anchors.fill: parent
         source: "qrc:/images/useraccountdialogbg.png"

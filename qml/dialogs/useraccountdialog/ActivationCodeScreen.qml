@@ -31,6 +31,8 @@ Item {
     readonly property bool checkForRestartRequest: false
     readonly property bool checkForSessionStatus: false
 
+    Component.onCompleted: Qt.callLater(activationCodeField.forceActiveFocus)
+
     Image {
         anchors.fill: parent
         source: "qrc:/images/useraccountdialogbg.png"
