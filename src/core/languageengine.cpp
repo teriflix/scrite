@@ -1084,7 +1084,7 @@ QString DefaultTransliteration::onWord(const QString &word, int code)
         case QLocale::Malayalam:
             return GetMalayalamTranslator();
         case QLocale::Marathi:
-            return GetMalayalamTranslator();
+            return GetMarathiTranslator();
         case QLocale::Oriya:
             return GetOriyaTranslator();
         case QLocale::Punjabi:
