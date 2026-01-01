@@ -450,6 +450,8 @@ void SyntaxHighlighter::documentContentsChanged()
 LanguageFontSyntaxHighlighterDelegate::LanguageFontSyntaxHighlighterDelegate(QObject *parent)
     : AbstractSyntaxHighlighterDelegate(parent)
 {
+    connect(LanguageEngine::instance(), &LanguageEngine::scriptFontFamilyChanged, this,
+            &AbstractSyntaxHighlighterDelegate::rehighlight);
 }
 
 LanguageFontSyntaxHighlighterDelegate::~LanguageFontSyntaxHighlighterDelegate() { }
