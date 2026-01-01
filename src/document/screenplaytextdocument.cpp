@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-//#define DISPLAY_DOCUMENT_IN_TEXTEDIT
+// #define DISPLAY_DOCUMENT_IN_TEXTEDIT
 
 #include "screenplaytextdocument.h"
 #include "utils.h"
@@ -1294,10 +1294,11 @@ void ScreenplayTextDocument::loadScreenplay()
             cursor.insertText(QStringLiteral("Episode ")
                               + QString::number(element->episodeIndex() + 1)
                               + QStringLiteral(", "));
-        cursor.insertText(element->breakTitle());
+        LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, element->breakTitle());
 
         if (!element->breakSubtitle().isEmpty())
-            cursor.insertText(QStringLiteral(": ") + element->breakSubtitle().toUpper());
+            LanguageEngine::polishFontsAndInsertTextAtCursor(
+                    cursor, QStringLiteral(": ") + element->breakSubtitle().toUpper());
     };
 
     const int fsi = m_screenplay->firstSceneElementIndex();
@@ -1326,10 +1327,12 @@ void ScreenplayTextDocument::loadScreenplay()
                 episodeCharFormat.setFontWeight(QFont::ExtraBold);
                 cursor.setCharFormat(episodeCharFormat);
 
-                cursor.insertText(element->breakTitle().toUpper());
+                LanguageEngine::polishFontsAndInsertTextAtCursor(cursor,
+                                                                 element->breakTitle().toUpper());
 
                 if (!element->breakSubtitle().isEmpty())
-                    cursor.insertText(QStringLiteral(": ") + element->breakSubtitle().toUpper());
+                    LanguageEngine::polishFontsAndInsertTextAtCursor(
+                            cursor, QStringLiteral(": ") + element->breakSubtitle().toUpper());
 
                 lastPrintedElement = element;
                 continue;
