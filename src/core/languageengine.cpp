@@ -2083,7 +2083,7 @@ QString LanguageEngine::formattedInHtml(const QString &paragraph)
             ts << item.text;
         else {
             const QString fontFamily = LanguageEngine::instance()->scriptFontFamily(item.script);
-            ts << "<font family=\"" << fontFamily << "\">" << item.text << "</font>";
+            ts << "<span style='font-family: \"" << fontFamily << "\";'>" << item.text << "</span>";
         }
     }
 
