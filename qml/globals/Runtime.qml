@@ -84,9 +84,10 @@ Item {
                 return
 
             supported.activeLanguageCode = code
-            Scrite.document.displayFormat.defaultLanguageCode = code
             logActivity("language-activate", supported.activeLanguage)
         }
+
+        onActiveCodeChanged: Scrite.document.displayFormat.activeLanguageCode = activeCode
 
         function logActivity(activity, lang) {
             if(lang && Scrite.user.info.consentToActivityLog) {
@@ -1034,6 +1035,8 @@ Item {
             Runtime.notebookSettings.sceneSynopsisTabIndex = 0
             Runtime.screenplayEditorSettings.sceneSidePanelOpen = false
             Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
+
+            Scrite.document.displayFormat.activeLanguageCode = Runtime.language.activeLanguageCode
         }
 
         function onJustLoaded() {

@@ -559,6 +559,16 @@ public:
     Q_SIGNAL void defaultLanguageCodeChanged();
 
     // clang-format off
+    Q_PROPERTY(int activeLanguageCode
+               READ activeLanguageCode
+               WRITE setActiveLanguageCode
+               NOTIFY activeLanguageCodeChanged)
+    // clang-format on
+    void setActiveLanguageCode(int val);
+    int activeLanguageCode() const { return m_activeLanguageCode; }
+    Q_SIGNAL void activeLanguageCodeChanged();
+
+    // clang-format off
     Q_PROPERTY(QFont defaultFont
                READ defaultFont
                NOTIFY defaultFontChanged)
@@ -662,6 +672,7 @@ private:
     int m_fontPointSizeDelta = 0;
     int m_fontZoomLevelIndex = -1;
     int m_defaultLanguageCode = QLocale::English;
+    int m_activeLanguageCode = QLocale::English;
     int m_nrChangesDuringTransation = 0;
 
     bool m_inTransaction = false;

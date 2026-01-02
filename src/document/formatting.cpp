@@ -297,7 +297,7 @@ void SceneElementFormat::setDefaultLanguageCode(int val)
 void SceneElementFormat::activateDefaultLanguage()
 {
     Language language = LanguageEngine::instance()->supportedLanguages()->findLanguage(
-            m_defaultLanguageCode < 0 ? m_format->defaultLanguageCode() : m_defaultLanguageCode);
+            m_defaultLanguageCode < 0 ? m_format->activeLanguageCode() : m_defaultLanguageCode);
     language.activate();
 }
 
@@ -708,6 +708,15 @@ void ScreenplayFormat::setDefaultLanguageCode(int val)
 
     m_defaultLanguageCode = val;
     emit defaultLanguageCodeChanged();
+}
+
+void ScreenplayFormat::setActiveLanguageCode(int val)
+{
+    if (m_activeLanguageCode == val)
+        return;
+
+    m_activeLanguageCode = val;
+    emit activeLanguageCodeChanged();
 }
 
 QFont ScreenplayFormat::defaultFont() const
