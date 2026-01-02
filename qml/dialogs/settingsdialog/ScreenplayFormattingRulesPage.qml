@@ -83,9 +83,8 @@ Item {
                 textRole: "languageName"
                 valueRole: "languageCode"
                 onActivated: (index) => {
-                                 const lang = Runtime.language.supported.languageAt(index)
-                                 _private.printElementFormat.defaultLanguageCode = lang.code
-                                 _private.displayElementFormat.defaultLanguageCode = lang.code
+                                 _private.printElementFormat.defaultLanguageCode = currentValue
+                                 _private.displayElementFormat.defaultLanguageCode = currentValue
                              }
             }
 

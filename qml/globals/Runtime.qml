@@ -84,6 +84,7 @@ Item {
                 return
 
             supported.activeLanguageCode = code
+            Scrite.document.displayFormat.defaultLanguageCode = code
             logActivity("language-activate", supported.activeLanguage)
         }
 
