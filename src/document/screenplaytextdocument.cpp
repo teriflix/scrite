@@ -39,7 +39,6 @@
 #include <QPropertyAnimation>
 #include <QScopedValueRollback>
 #include <QAbstractTextDocumentLayout>
-#include <enumerationmodel.h>
 
 #include "hourglass.h"
 #include "application.h"
@@ -48,6 +47,7 @@
 #include "languageengine.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
+#include "enumerationmodel.h"
 #include "pdfexportablegraphicsscene.h"
 
 inline QString timeToString(const QTime &t)
