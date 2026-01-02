@@ -138,6 +138,12 @@ public:
     QString nativeName() const;
 
     // clang-format off
+    Q_PROPERTY(QString shortName
+               READ shortName)
+    // clang-format on
+    QString shortName() const;
+
+    // clang-format off
     Q_PROPERTY(QString glyph
                READ glyph)
     // clang-format on

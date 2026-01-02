@@ -307,6 +307,12 @@ QString Language::nativeName() const
     return QLocale(QLocale::Language(this->code)).nativeLanguageName();
 }
 
+QString Language::shortName() const
+{
+    QLocale locale(QLocale::Language(this->code));
+    return locale.name().section('_', 0, 0);
+}
+
 QString Language::glyph() const
 {
     const QChar ch = glyphForScript().value(QChar::Script(this->charScript()));

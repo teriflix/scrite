@@ -72,10 +72,6 @@ Rectangle {
                     }
 
                     ActionManagerMenu {
-                        actionManager: ActionHub.languageOptions
-                    }
-
-                    ActionManagerMenu {
                         actionManager: ActionHub.exportOptions
                     }
 
@@ -171,6 +167,22 @@ Rectangle {
             id: _group2
 
             visible: Runtime.mainWindowTab !== Runtime.MainWindowTab.ScritedTab
+
+            ActionManagerToolButton {
+                actionManager: ActionHub.languageOptions
+            }
+
+            ActionToolButton {
+                action: _alphabetMappingsHandler.action
+                down: _alphabetMappingsPopup.visible
+            }
+
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
+            }
 
             ActionManagerToolBar {
                 actionManager: ActionHub.paragraphFormats
