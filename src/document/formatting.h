@@ -562,7 +562,8 @@ public:
     Q_PROPERTY(int activeLanguageCode
                READ activeLanguageCode
                WRITE setActiveLanguageCode
-               NOTIFY activeLanguageCodeChanged)
+               NOTIFY activeLanguageCodeChanged
+               STORED false)
     // clang-format on
     void setActiveLanguageCode(int val);
     int activeLanguageCode() const { return m_activeLanguageCode; }
