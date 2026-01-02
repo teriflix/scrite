@@ -227,24 +227,29 @@ AbstractScenePartEditor {
                           _private.cut()
                       }
         onCopyRequest: () => {
-                           _sceneContentEditor.forceActiveFocus()
+                           _sceneTextEditor.forceActiveFocus()
                            _private.copy()
                        }
         onPasteRequest: () => {
-                            _sceneContentEditor.forceActiveFocus()
+                            _sceneTextEditor.forceActiveFocus()
                             _private.paste()
                         }
         onReloadSceneContentRequest: () => {
                                          _private.reload()
                                      }
         onSplitSceneAtPositionRequest: (position) => {
-                                           _sceneContentEditor.forceActiveFocus()
+                                           _sceneTextEditor.forceActiveFocus()
                                            _private.splitSceneAt(position)
                                        }
         onMergeWithPreviousSceneRequest: () => {
-                                             _sceneContentEditor.forceActiveFocus()
+                                             _sceneTextEditor.forceActiveFocus()
                                              _private.mergeWithPreviousScene(0)
                                          }
+
+        onTranslateSelection: () => {
+                                  _sceneTextEditor.forceActiveFocus()
+                                  _private.translateToActiveLanguage.trigger()
+                              }
     }
 
     SceneDocumentBinder {
@@ -463,6 +468,30 @@ AbstractScenePartEditor {
                      }
     }
 
+    ActionHandler {
+        property string text: "Translate to " + Runtime.language.active.name
+
+        action: _private.translateToActiveLanguage
+        enabled: _sceneTextEditor.activeFocus &&
+                 _sceneTextEditor.selectionEnd > _sceneTextEditor.selectionStart && _sceneTextEditor.selectionStart >= 0
+
+        onTriggered: (source) => {
+                         const option = Runtime.language.active.preferredTransliterationOption()
+                         if(option && option.inApp) {
+                             if(_sceneTextEditor.selectionEnd >= 0 &&
+                                _sceneTextEditor.selectionStart >= 0 &&
+                                _sceneTextEditor.selectionEnd > _sceneTextEditor.selectionStart) {
+                                 const pos = _sceneTextEditor.selectionStart
+                                 const txText = option.transliterateParagraph(_sceneTextEditor.selectedText)
+                                 if(txText !== "" && txText !== _sceneTextEditor.selectedText) {
+                                     _sceneTextEditor.remove(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
+                                     _sceneTextEditor.insert(pos, txText)
+                                 }
+                             }
+                         }
+                     }
+    }
+
     // Other private objects
     ResetOnChange {
         id: _spellCheckEnabledFlag
@@ -518,6 +547,7 @@ AbstractScenePartEditor {
         readonly property Action scrollNextScene: ActionHub.editOptions.find("scrollNextScene")
         readonly property Action scrollPreviousScene: ActionHub.editOptions.find("scrollPreviousScene")
         readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition")
+        readonly property Action translateToActiveLanguage: ActionHub.editOptions.find("translateToActiveLanguage")
 
         property bool canSplitScene: _sceneTextEditor.activeFocus &&
                                      !root.readOnly &&

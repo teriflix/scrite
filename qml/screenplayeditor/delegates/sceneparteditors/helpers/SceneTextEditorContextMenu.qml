@@ -18,7 +18,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/helpers"
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
@@ -40,6 +39,7 @@ MenuLoader {
     signal reloadSceneContentRequest()
     signal splitSceneAtPositionRequest(int position)
     signal mergeWithPreviousSceneRequest()
+    signal translateSelection()
 
     menu: VclMenu {
         id: _menu
@@ -103,11 +103,21 @@ MenuLoader {
             }
         }
 
+        VclMenuItem {
+            readonly property Action txAction: ActionHub.editOptions.find("translateToActiveLanguage")
+            text: "Translate to " + Runtime.language.active.name + "\t" + txAction.shortcut
+            enabled: root.sceneTextEditor.selectedText !== "" && Runtime.language.active.preferredTransliterationOption().inApp
+            focusPolicy: Qt.NoFocus
+
+            onTriggered: (source) => {
+                             root.translateSelection()
+                         }
+        }
+
         MenuSeparator {  }
 
         VclMenu {
             title: "Format"
-            width: 250
 
             Repeater {
                 model: [

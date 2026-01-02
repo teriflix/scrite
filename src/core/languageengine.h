@@ -78,6 +78,7 @@ public:
 
     Q_INVOKABLE bool activate();
     Q_INVOKABLE QString transliterateWord(const QString &word) const;
+    Q_INVOKABLE QString transliterateParagraph(const QString &paragraph) const;
 
     AbstractTransliterationEngine *transliterator() const;
 

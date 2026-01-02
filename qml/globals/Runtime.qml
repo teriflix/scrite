@@ -87,8 +87,6 @@ Item {
             logActivity("language-activate", supported.activeLanguage)
         }
 
-        onActiveCodeChanged: Scrite.document.displayFormat.activeLanguageCode = activeCode
-
         function logActivity(activity, lang) {
             if(lang && Scrite.user.info.consentToActivityLog) {
                 const txOption = lang.preferredTransliterationOption()
@@ -98,6 +96,8 @@ Item {
                 Scrite.user.logActivity2(activity, details)
             }
         }
+
+        onActiveCodeChanged: Scrite.document.displayFormat.activeLanguageCode = activeCode
     }
 
     // Persistent Settings

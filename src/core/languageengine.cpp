@@ -1301,11 +1301,33 @@ bool TransliterationOption::activate()
 
 QString TransliterationOption::transliterateWord(const QString &word) const
 {
+    if (word.isEmpty())
+        return word;
+
     AbstractTransliterationEngine *t = this->transliterator();
     if (t)
         return t->transliterateWord(word, *this);
 
     return word;
+}
+
+QString TransliterationOption::transliterateParagraph(const QString &paragraph) const
+{
+    if (paragraph.isEmpty())
+        return paragraph;
+
+    QString ret = paragraph;
+
+    AbstractTransliterationEngine *t = this->transliterator();
+    if (t) {
+        const QList<ScriptBoundary> boundaries = LanguageEngine::determineBoundaries(paragraph);
+        for (const ScriptBoundary &boundary : boundaries) {
+            ret.replace(boundary.start, boundary.end - boundary.start + 1,
+                        t->transliterateWord(boundary.text, *this));
+        }
+    }
+
+    return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

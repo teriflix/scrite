@@ -886,6 +886,16 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property string defaultShortcut: "Shift+Alt+V"
+
+            enabled: ActionHandler.canHandle
+            objectName: "translateToActiveLanguage"
+            shortcut: defaultShortcut
+            text: ActionHandler.active ? ActionHandler.active.text : "Translate to Active Language"
+        }
+
+        Action {
+            readonly property bool visible: false
             readonly property string defaultShortcut: "Alt+,"
 
             enabled: ActionHandler.canHandle
