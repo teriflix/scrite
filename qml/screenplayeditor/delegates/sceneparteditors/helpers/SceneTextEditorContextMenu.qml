@@ -105,8 +105,10 @@ MenuLoader {
 
         VclMenuItem {
             readonly property Action txAction: ActionHub.editOptions.find("translateToActiveLanguage")
+
             text: "Translate to " + Runtime.language.active.name + "\t" + txAction.shortcut
-            enabled: root.sceneTextEditor.selectedText !== "" && Runtime.language.active.preferredTransliterationOption().inApp
+            enabled: Runtime.screenplayEditorSettings.allowSelectedTextTranslation &&
+                     root.sceneTextEditor.selectedText !== "" && Runtime.language.active.preferredTransliterationOption().inApp
             focusPolicy: Qt.NoFocus
 
             onTriggered: (source) => {

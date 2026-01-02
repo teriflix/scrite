@@ -171,6 +171,7 @@ Item {
         property int slpSynopsisLineCount: 2
         property int jumpToSceneFilterMode: 0
 
+        property bool allowSelectedTextTranslation: false
         property bool allowTaggingOfScenes: false
         property bool applyUserDefinedLanguageFonts: true
         property bool autoAdjustEditorWidthInScreenplayEditor: true
@@ -188,6 +189,7 @@ Item {
         property bool enableAutoCapitalizeSentences: true
         property bool enableAutoPolishParagraphs: true // for automatically adding/removing CONT'D where appropriate
         property bool enableSpellCheck: true // Since this is now fixed: https://github.com/teriflix/scrite/issues/138
+        property bool focusCursorOnSceneHeadingInNewScenes: false
         property bool highlightCurrentLine: true
         property bool includeTitlePageInPreview: true
         property bool longSceneWarningEnabled: true
@@ -198,14 +200,13 @@ Item {
         property bool pasteByLinkingScenesWhenPossible: true
         property bool pasteByMergingAdjacentElements: true
         property bool refreshButtonInStatsReportAnimationDone: false
+        property bool restartEpisodeScenesAtOne: false // If set, each episode starts with scene number 1
         property bool sceneSidePanelOpen: false
         property bool screenplayEditorAddButtonsAnimationShown: false
         property bool showLanguageRefreshNoticeBox: true
         property bool showLoglineEditor: false
         property bool showSpellCheckRefreshNoticeBox: true
         property bool singleClickAutoComplete: true
-        property bool restartEpisodeScenesAtOne: false // If set, each episode starts with scene number 1
-        property bool focusCursorOnSceneHeadingInNewScenes: false
 
         property real sidePanelWidth: 400
         property real spaceBetweenScenes: 0

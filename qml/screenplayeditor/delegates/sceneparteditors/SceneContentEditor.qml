@@ -472,10 +472,12 @@ AbstractScenePartEditor {
         property string text: "Translate to " + Runtime.language.active.name
 
         action: _private.translateToActiveLanguage
-        enabled: _sceneTextEditor.activeFocus &&
+        enabled: Runtime.screenplayEditorSettings.allowSelectedTextTranslation && _sceneTextEditor.activeFocus &&
                  _sceneTextEditor.selectionEnd > _sceneTextEditor.selectionStart && _sceneTextEditor.selectionStart >= 0
 
         onTriggered: (source) => {
+                         if(!enabled) return
+
                          const option = Runtime.language.active.preferredTransliterationOption()
                          if(option && option.inApp) {
                              if(_sceneTextEditor.selectionEnd >= 0 &&
@@ -486,6 +488,8 @@ AbstractScenePartEditor {
                                  if(txText !== "" && txText !== _sceneTextEditor.selectedText) {
                                      _sceneTextEditor.remove(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
                                      _sceneTextEditor.insert(pos, txText)
+                                 } else {
+                                     MessageBox.information("Translation Error", "Couldn't translate the selected text to " + Runtime.language.active.name + ".")
                                  }
                              }
                          }

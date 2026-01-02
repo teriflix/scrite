@@ -1518,6 +1518,20 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+            readonly property string tooltip: "[Experimental Feature] Translate selected text from English to Indian languages using a shortcut or context menu command. Requires typing phonetic English text according to the alphabet mapping table for your active language. NOTE: Only works with PhTranslator as input method."
+
+            checkable: true
+            checked: Runtime.screenplayEditorSettings.allowSelectedTextTranslation
+            objectName: "allowSelectedTextTranslation"
+            text: "Allow Translation of Selected Text"
+
+            onTriggered: {
+                Runtime.screenplayEditorSettings.allowSelectedTextTranslation = !Runtime.screenplayEditorSettings.allowSelectedTextTranslation
+            }
+        }
+
+        Action {
             readonly property bool visible: false
             readonly property bool allowShortcut: true
 
