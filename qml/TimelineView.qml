@@ -71,6 +71,7 @@ Item {
                     return "<p>Scene Selection:</p>" + SMath.formatAsBulletPoints(fields)
                 }
                 visible: _private.sceneGroup.evaluateLengths && _private.sceneGroup.sceneCount >= 2
+                parseShortcutInText: false
             }
 
             onClearRequest: {

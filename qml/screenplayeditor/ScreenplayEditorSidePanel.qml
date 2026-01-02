@@ -161,6 +161,7 @@ Item {
                         return "<p>Scene Selection:</p>" + SMath.formatAsBulletPoints(fields)
                     }
                     visible: Runtime.sceneListPanelSettings.showTooltip && _sceneListView.sceneGroup.evaluateLengths && _sceneListView.sceneGroup.sceneCount >= 2
+                    parseShortcutInText: false
                 }
             }
         }
