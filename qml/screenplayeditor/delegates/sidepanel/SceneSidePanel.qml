@@ -85,7 +85,7 @@ AbstractScenePartEditor {
             scene: root.scene
 
             ActionHandler {
-                action: ActionHub.editOptions.find("cycleCommandPanelTab")
+                action: ActionHub.editOptions.find("cycleCommentsPanelTab")
 
                 enabled: root.isCurrent
                 onTriggered: (source) => { Runtime.screenplayEditorSettings.sceneSidePanelOpen = true }
@@ -100,7 +100,7 @@ AbstractScenePartEditor {
             onCurrentTabChanged: Runtime.screenplayEditorSettings.sceneSidePanelActiveTab = currentTab
 
             ActionHandler {
-                action: ActionHub.editOptions.find("cycleCommandPanelTab")
+                action: ActionHub.editOptions.find("cycleCommentsPanelTab")
 
                 enabled: root.isCurrent
                 onTriggered: (source) => { parent.cycleTab() }
