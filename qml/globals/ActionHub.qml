@@ -911,9 +911,9 @@ Item {
             readonly property string defaultShortcut: "Alt+."
 
             enabled: ActionHandler.canHandle
-            objectName: "cycleCommandPanelTab"
+            objectName: "cycleCommentsPanelTab"
             shortcut: defaultShortcut
-            text: "Cycle Command Panel Tab"
+            text: "Cycle Comments Panel Tab"
         }
 
         Action {
