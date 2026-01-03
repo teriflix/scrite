@@ -221,6 +221,16 @@ public:
     Q_SIGNAL void heightHintChanged();
 
     // clang-format off
+    Q_PROPERTY(int cursorPositionHint
+               READ cursorPositionHint
+               WRITE setCursorPositionHint
+               NOTIFY cursorPositionHintChanged)
+    // clang-format on
+    void setCursorPositionHint(int val);
+    int cursorPositionHint() const { return m_cursorPositionHint; }
+    Q_SIGNAL void cursorPositionHintChanged();
+
+    // clang-format off
     Q_PROPERTY(bool selected
                READ isSelected
                WRITE setSelected
@@ -337,6 +347,12 @@ protected:
             ret = QString::number(qMax(major, 1)) + ret;
             return ret;
         }
+
+        void reset()
+        {
+            major = 0;
+            minor = -1;
+        }
     };
     bool event(QEvent *event);
     void evaluateSceneNumber(SceneNumber &number, bool minorAlso = false);
@@ -373,6 +389,7 @@ private:
     QString m_breakTitle;
     QJsonValue m_userData;
     qreal m_heightHint = 0;
+    int m_cursorPositionHint = -1;
     bool m_pageBreakAfter = false;
     bool m_pageBreakBefore = false;
     QString m_breakSummary;
@@ -651,6 +668,16 @@ public:
     // clang-format on
     int selectedElementsCount() const;
     Q_SIGNAL void selectionChanged();
+
+    // clang-format off
+    Q_PROPERTY(bool restartEpisodeScenesAtOne
+               READ isRestartEpisodeScenesAtOne
+               WRITE setRestartEpisodeScenesAtOne
+               NOTIFY restartEpisodeScenesAtOneChanged)
+    // clang-format on
+    void setRestartEpisodeScenesAtOne(bool val);
+    bool isRestartEpisodeScenesAtOne() const { return m_restartEpisodeScenesAtOne; }
+    Q_SIGNAL void restartEpisodeScenesAtOneChanged();
 
     enum OmitStatus { Omitted, NotOmitted, PartiallyOmitted };
     Q_ENUM(OmitStatus)
@@ -945,6 +972,7 @@ private:
     int m_averageParagraphCount = 0;
     bool m_hasTitlePageAttributes = false;
     bool m_heightHintsAvailable = false;
+    bool m_restartEpisodeScenesAtOne = false;
     ScriteDocument *m_scriteDocument = nullptr;
     CoverPagePhotoSize m_coverPagePhotoSize = LargeCoverPhoto;
     friend class ScreenplayTextDocument;

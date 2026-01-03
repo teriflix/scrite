@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 import QtQuick 2.15
+import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
@@ -22,6 +23,7 @@ ToolTip {
     id: root
 
     readonly property real maximumContentWidth: 350
+    property bool parseShortcutInText: true
 
     property Item container: parent
 
@@ -31,21 +33,61 @@ ToolTip {
     x: 20
     y: container.height + 15
 
-    contentWidth: Math.min(Runtime.idealFontMetrics.advanceWidth(text), maximumContentWidth)
     delay: DelayedProperty.value > 0 ? 0 : Qt.styleHints.mousePressAndHoldInterval
+    contentWidth: Math.min(_content.implicitWidth, maximumContentWidth)
 
-    contentItem: Text {
-        width: root.contentWidth
+    contentItem: RowLayout {
+        id: _content
 
-        font: Runtime.idealFontMetrics.font
-        text: root.text
-        color: {
-            if(Runtime.applicationSettings.theme === "Material")
-                return "white"
+        property var fields: {
+            if(!root.parseShortcutInText)
+                return [root.text]
 
-            return root.palette.toolTipText
+            let label = "", shortcut = ""
+
+            const text = root.text
+            const boIndex = text.indexOf('(')
+            if(boIndex > 0) {
+                const bcIndex = text.lastIndexOf(')')
+                shortcut = text.slice(boIndex+1, bcIndex > boIndex ? bcIndex : text.length-1).trim()
+                label = text.slice(0, boIndex).trim()
+            } else {
+                const comps = text.split("\t")
+                label = comps[0].trim()
+                shortcut = comps.length > 1 ? comps[comps.length-1].trim() : ""
+            }
+
+            if(shortcut === "undefined")
+                return [label]
+
+            const portableShortcut = Gui.portableShortcut(shortcut)
+            if(shortcut === "" || portableShortcut === "")
+                return [text]
+            return [label, portableShortcut]
         }
-        wrapMode: Text.WordWrap
+
+        spacing: 20
+
+        Text {
+            Layout.fillWidth: true
+
+            font: Runtime.idealFontMetrics.font
+            text: _content.fields[0]
+            color: {
+                if(Runtime.applicationSettings.theme === "Material")
+                    return "white"
+
+                return root.palette.toolTipText
+            }
+            wrapMode: Text.WordWrap
+        }
+
+        ShortcutField {
+            visible: _content.fields.length > 1 && portableShortcut !== ""
+            readOnly: true
+            description: ""
+            portableShortcut: _content.fields.length > 1 ? _content.fields[_content.fields.length-1] : ""
+        }
     }
 
     exit: null

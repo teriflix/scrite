@@ -78,6 +78,7 @@ public:
 
     Q_INVOKABLE bool activate();
     Q_INVOKABLE QString transliterateWord(const QString &word) const;
+    Q_INVOKABLE QString transliterateParagraph(const QString &paragraph) const;
 
     AbstractTransliterationEngine *transliterator() const;
 
@@ -136,6 +137,12 @@ public:
                READ nativeName)
     // clang-format on
     QString nativeName() const;
+
+    // clang-format off
+    Q_PROPERTY(QString shortName
+               READ shortName)
+    // clang-format on
+    QString shortName() const;
 
     // clang-format off
     Q_PROPERTY(QString glyph

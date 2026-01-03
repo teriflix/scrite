@@ -23,6 +23,8 @@ FlickScrollSpeedControl::FlickScrollSpeedControl(QObject *parent)
     if (parent->inherits("QQuickFlickable")) {
         m_flickable = qobject_cast<QQuickItem *>(parent);
         m_flickable->installEventFilter(this);
+        m_flickable->setProperty("boundsBehavior", 0);
+        m_flickable->setProperty("boundsMovement", 0);
         this->computeValues();
     }
 }

@@ -49,8 +49,11 @@ Item {
 
     VclMenu {
         id: symbolMenu
+
         width: 514
+
         focus: false
+        autoWidth: false
 
         VclMenuItem {
             width: symbolMenu.width
@@ -106,20 +109,27 @@ Item {
 
         Rectangle {
             id: symbolsPanel
-            width: 100
+
+            property int currentIndex: 0
+            property bool currentIndexIsEmoji: symbols[symbolsPanel.currentIndex].title === "Emoji"
+
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.bottom: parent.bottom
+
+            width: 100
             color: Runtime.colors.primary.c700.background
-            property int currentIndex: 0
-            property bool currentIndexIsEmoji: symbols[symbolsPanel.currentIndex].title === "Emoji"
 
             Column {
                 width: parent.width
 
                 Repeater {
                     model: symbols
+
                     delegate: Rectangle {
+                        required property int index
+                        required property var modelData
+
                         width: symbolsPanel.width
                         height: 40
                         color: symbolsPanel.currentIndex === index ? Runtime.colors.primary.windowColor : Qt.rgba(0,0,0,0)
@@ -144,13 +154,16 @@ Item {
 
         GridView {
             id: symbolsGridView
+
+            ScrollBar.vertical: VclScrollBar { flickable: symbolsGridView }
+
             anchors.top: parent.top
             anchors.left: symbolsPanel.right
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.leftMargin: 5
+
             clip: true
-            ScrollBar.vertical: VclScrollBar { flickable: symbolsGridView }
             rightMargin: 14
 
             cellWidth: symbolsPanel.currentIndexIsEmoji ? 50 : 40
@@ -171,6 +184,9 @@ Item {
             }
 
             delegate: Item {
+                required property int index
+                required property string modelData
+
                 width: symbolsGridView.cellWidth
                 height: symbolsGridView.cellHeight
                 enabled: !symbolsPanel.currentIndexIsEmoji || includeEmojis

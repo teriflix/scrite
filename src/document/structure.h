@@ -1279,7 +1279,6 @@ public:
     QQmlListProperty<StructureElement> elements();
     Q_INVOKABLE void addElement(StructureElement *ptr);
     Q_INVOKABLE void removeElement(StructureElement *ptr);
-    void removeElements(const QList<StructureElement *> &elements);
     Q_INVOKABLE void insertElement(StructureElement *ptr, int index);
     Q_INVOKABLE void moveElement(StructureElement *ptr, int toRow);
     void setElements(const QList<StructureElement *> &list);
@@ -1302,6 +1301,9 @@ public:
     enum LayoutType { HorizontalLayout, VerticalLayout, FlowHorizontalLayout, FlowVerticalLayout };
     Q_ENUM(LayoutType)
     Q_INVOKABLE QRectF layoutElements(Structure::LayoutType layoutType);
+
+    Q_INVOKABLE void removeElements(const QList<StructureElement *> &elements);
+    Q_SIGNAL void aboutToRemoveElement(StructureElement *element);
 
     // clang-format off
     Q_PROPERTY(bool forceBeatBoardLayout
@@ -1332,6 +1334,8 @@ public:
     {
         return m_locationHeadingsMap;
     }
+
+    Q_INVOKABLE int renameLocation(const QString &location, const QString &newLocation);
 
     // clang-format off
     Q_PROPERTY(int currentElementIndex
@@ -1576,7 +1580,7 @@ public:
 protected:
     bool event(QEvent *event);
     void timerEvent(QTimerEvent *event);
-    void resetCurentElementIndex();
+    void resetCurentElementIndex(int index = -1);
     void setCanPaste(bool val);
     void onClipboardDataChanged();
 
@@ -1588,6 +1592,7 @@ private:
     QList<QPair<QString, QList<StructureElement *>>>
     evaluateGroupsImpl(Screenplay *screenplay, const QString &category = QString()) const;
 
+    bool removeElementInternal(StructureElement *ptr);
     bool renameCharacter(const QString &from, const QString &to, QString *errMsg);
 
 private:

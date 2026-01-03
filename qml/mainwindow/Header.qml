@@ -72,10 +72,6 @@ Rectangle {
                     }
 
                     ActionManagerMenu {
-                        actionManager: ActionHub.languageOptions
-                    }
-
-                    ActionManagerMenu {
                         actionManager: ActionHub.exportOptions
                     }
 
@@ -172,6 +168,22 @@ Rectangle {
 
             visible: Runtime.mainWindowTab !== Runtime.MainWindowTab.ScritedTab
 
+            ActionManagerToolButton {
+                actionManager: ActionHub.languageOptions
+            }
+
+            ActionToolButton {
+                action: _alphabetMappingsHandler.action
+                down: _alphabetMappingsPopup.visible
+            }
+
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
+            }
+
             ActionManagerToolBar {
                 actionManager: ActionHub.paragraphFormats
             }
@@ -246,7 +258,8 @@ Rectangle {
             Repeater {
                 model: ActionHub.mainWindowTabs
 
-                ToolButton {
+                delegate: ToolButton {
+                    required property int index
                     required property var qmlAction
 
                     Material.theme: Runtime.colors.theme
@@ -257,7 +270,7 @@ Rectangle {
                         text: {
                             const tt = qmlAction.tooltip !== undefined ? qmlAction.tooltip : qmlAction.text
                             const sc = Gui.nativeShortcut(qmlAction.shortcut)
-                            return sc === "" ? tt : (tt + " (" + sc + " )")
+                            return sc === "" ? tt : (tt + " (" + sc + ")")
                         }
                         visible: container.hovered
                     }

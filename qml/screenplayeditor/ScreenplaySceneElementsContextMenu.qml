@@ -94,7 +94,7 @@ VclMenu {
     }
 
     VclMenuItem {
-        text: "Make Sequence"
+        text: "Make Sequence\t" + ActionHub.sceneListPanelOptions.find("makeSequence").shortcut
 
         enabled: !Scrite.document.readOnly && root.sceneGroup.canBeStacked
 
@@ -107,7 +107,7 @@ VclMenu {
     }
 
     VclMenuItem {
-        text: "Break Sequence"
+        text: "Break Sequence\t" + ActionHub.sceneListPanelOptions.find("breakSequence").shortcut
 
         enabled: !Scrite.document.readOnly && root.sceneGroup.canBeUnstacked
 
@@ -125,7 +125,7 @@ VclMenu {
     }
 
     VclMenuItem {
-        text: "Keywords"
+        text: "Keywords\t" + ActionHub.sceneListPanelOptions.find("keywords").shortcut
         enabled: !Scrite.document.readOnly
 
         onClicked: SceneGroupKeywordsDialog.launch(root.sceneGroup)
@@ -137,17 +137,23 @@ VclMenu {
         width: 250
 
         Repeater {
-            model: Runtime.sceneListReports
+            model: Runtime.sceneReports.reports ? Runtime.sceneReports.reports : 0
 
-            VclMenuItem {
+            delegate: VclMenuItem {
+                required property int index
                 required property var modelData
 
                 text: modelData.name
                 icon.source: "qrc" + modelData.icon
 
-                onTriggered: ReportConfigurationDialog.launch(modelData.name,
-                                                              {"sceneNumbers": Scrite.document.screenplay.selectedElementIndexes()},
-                                                              {"initialPage": modelData.group})
+                onTriggered: {
+                    let props = {}
+                    if(Scrite.document.screenplay.hasSelectedElements)
+                        props[Runtime.sceneReports.propertyName] = Scrite.document.screenplay.selectedElementIndexes()
+                    else
+                        props[Runtime.sceneReports.propertyName] = [root.element.elementIndex]
+                    ReportConfigurationDialog.launch(modelData.name, props, {initialPage: modelData.group})
+                }
             }
         }
     }
@@ -155,13 +161,13 @@ VclMenu {
     MenuSeparator { }
 
     VclMenuItem {
-        text: "Copy"
+        text: "Copy\t" + ActionHub.sceneListPanelOptions.find("copy").shortcut
 
         onClicked: Scrite.document.screenplay.copySelection()
     }
 
     VclMenuItem {
-        text: "Paste After"
+        text: "Paste After\t" + ActionHub.sceneListPanelOptions.find("paste").shortcut
         enabled: Scrite.document.screenplay.canPaste
 
         onClicked: Scrite.document.screenplay.pasteAfter( Scrite.document.screenplay.indexOfElement(element) )
@@ -174,7 +180,7 @@ VclMenu {
 
         property bool omitted: Scrite.document.screenplay.selectedElementsOmitStatus !== Screenplay.NotOmitted
 
-        text: omitted ? "Include" : "Omit"
+        text: (omitted ? "Include" : "Omit") + "\t" + ActionHub.sceneListPanelOptions.find("includeOmit").shortcut
 
         onClicked: {
             root.close()
@@ -186,7 +192,7 @@ VclMenu {
     }
 
     VclMenuItem {
-        text: "Remove"
+        text: "Remove\t" + ActionHub.sceneListPanelOptions.find("remove").shortcut
         enabled: !Scrite.document.readOnly
 
         onClicked: {
@@ -196,20 +202,5 @@ VclMenu {
                 Scrite.document.screenplay.removeSelectedElements();
             root.close()
         }
-    }
-
-    onAboutToShow: {
-        if(element.selected) {
-            Scrite.document.screenplay.gatherSelectedScenes(root.sceneGroup)
-        } else {
-            Scrite.document.screenplay.clearSelection()
-            element.selected = true
-            root.sceneGroup.addScene(element.scene)
-        }
-    }
-
-    onClosed: {
-        element = null
-        root.sceneGroup.clearScenes()
     }
 }

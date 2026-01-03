@@ -27,12 +27,10 @@ Item {
     property bool selecting: false
 
     Rectangle {
-        id: selection
+        id: _selection
+
         property point from: Qt.point(0,0)
         property point to: Qt.point(0,0)
-
-        color: Color.translucent(Scrite.app.palette.highlight,0.2)
-        border { width: 2; color: Scrite.app.palette.highlight }
 
         property rect rectangle: {
             if(from === to)
@@ -44,6 +42,9 @@ Item {
         y: rectangle.y
         width: rectangle.width
         height: rectangle.height
+
+        color: Color.translucent(Scrite.app.palette.highlight,0.2)
+        border { width: 2; color: Scrite.app.palette.highlight }
         visible: root.active
     }
 
@@ -56,8 +57,8 @@ Item {
                 root.tryStart(pos)
 
                 if(root.active) {
-                    selection.from = pos
-                    selection.to = selection.from
+                    _selection.from = pos
+                    _selection.to = _selection.from
                     selecting = true
                     mouse.accepted = true
                 } else
@@ -69,15 +70,15 @@ Item {
         }
         onPositionChanged: {
             if(root.active) {
-                selection.to = Qt.point(mouse.x, mouse.y)
+                _selection.to = Qt.point(mouse.x, mouse.y)
                 mouse.accepted = true
             } else
                 mouse.accepted = false
         }
         onReleased: {
             if(root.active) {
-                selection.to = Qt.point(mouse.x, mouse.y)
-                root.select(selection.rectangle)
+                _selection.to = Qt.point(mouse.x, mouse.y)
+                root.select(_selection.rectangle)
                 selecting = false
                 root.active = false
                 mouse.accepted = true

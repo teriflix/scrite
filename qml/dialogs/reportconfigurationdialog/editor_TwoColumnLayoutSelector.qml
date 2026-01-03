@@ -41,7 +41,8 @@ RowLayout {
             { title: "All Right", icon: "twocolumn-right-layout.png", value: TwoColumnReport.EverythingRight },
         ]
 
-        ColumnLayout {
+        delegate: ColumnLayout {
+            required property int index
             required property var modelData
 
             Layout.fillWidth: true

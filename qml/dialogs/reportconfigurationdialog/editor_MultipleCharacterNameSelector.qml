@@ -70,7 +70,8 @@ ColumnLayout {
             Repeater {
                 model: characterNames
 
-                TagText {
+                delegate: TagText {
+                    required property int index
                     required property string modelData
 
                     property var colors: Runtime.colors.accent.c600

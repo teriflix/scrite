@@ -71,6 +71,17 @@ DialogLauncher {
                         highlightResizeDuration: 0
                         property string currentBackupFilePath
                         delegate: Item {
+                            required property int index
+                            required property int timestamp
+                            required property int fileSize
+
+                            required property var metaData
+
+                            required property string timestampAsString
+                            required property string relativeTime
+                            required property string fileName
+                            required property string filePath
+
                             width: backupFilesView.width
                             height: rowLayout.height + 10
 

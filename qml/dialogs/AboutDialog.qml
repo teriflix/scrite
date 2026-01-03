@@ -62,7 +62,7 @@ DialogLauncher {
                 anchors.right: parent.right
                 anchors.margins: 30
 
-                text: "Version-"+Scrite.app.versionAsString + (Scrite.app.versionType !== "" ? "-" + Scrite.app.versionType : "") + " for " + [Platform.typeString, Platform.osVersionString].join("-")
+                text: Scrite.app.versionAsString + (Scrite.app.versionType !== "" ? "-" + Scrite.app.versionType : "") + " for " + [Platform.typeString, Platform.osVersionString].join("-")
                 width: Math.min(Runtime.idealFontMetrics.advanceWidth(text), dialog.width*0.5)
                 elide: Text.ElideLeft
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -205,6 +205,7 @@ DialogLauncher {
                         }
                         ScrollBar.vertical: ScrollBar { }
                         delegate: VclLabel {
+                            required property int index
                             required property string credits
                             required property url url
 

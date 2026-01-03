@@ -64,7 +64,7 @@ Rectangle {
         anchors.fill: _metricsDisplay
 
         ToolTipPopup {
-            text: "Page count and time estimates are approximate, assuming " + Scrite.document.printFormat.secondsPerPage + "(s) per page."
+            text: "Page count and time estimates are approximate, assuming " + Scrite.document.printFormat.secondsPerPage + "s per page."
             visible: _metricsDisplayOverlayMouseArea.containsMouse
         }
 
@@ -302,7 +302,10 @@ Rectangle {
                     Repeater {
                         model: Scrite.document.structure.groupCategories
 
-                        VclMenuItem {
+                        delegate: VclMenuItem {
+                            required property int index
+                            required property string modelData
+
                             text: SMath.titleCased(modelData)
                             font.bold: Scrite.document.structure.preferredGroupCategory === modelData
                             icon.source: font.bold ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
@@ -425,9 +428,6 @@ Rectangle {
     }
 
     component IconButton : Image {
-        property alias pressed: _iconButtonMouseArea.pressed
-        property alias containsMouse: _iconButtonMouseArea.containsMouse
-
         property string tooltipText
 
         signal clicked()

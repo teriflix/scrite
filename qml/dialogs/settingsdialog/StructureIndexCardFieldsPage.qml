@@ -76,7 +76,7 @@ Item {
                 Repeater {
                     model: indexCardFieldsModel.maxCount
 
-                    VclTextField {
+                    delegate: VclTextField {
                         required property int index
 
                         Layout.preferredWidth: Runtime.idealFontMetrics.averageCharacterWidth * (maximumLength+2)
@@ -100,7 +100,7 @@ Item {
                 Repeater {
                     model: indexCardFieldsModel.maxCount
 
-                    VclTextField {
+                    delegate: VclTextField {
                         required property int index
 
                         Layout.fillWidth: true
@@ -122,7 +122,7 @@ Item {
                 Repeater {
                     model: indexCardFieldsModel.maxCount
 
-                    VclToolButton {
+                    delegate: VclToolButton {
                         required property int index
 
                         enabled: index < indexCardFieldsModel.count

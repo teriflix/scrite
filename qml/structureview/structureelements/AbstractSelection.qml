@@ -24,7 +24,6 @@ Item {
 
     property bool hasItems: items.length > 0
     property bool canLayout: items.length >= 2
-    property bool interactive: true
 
     property alias active: _tightRect.visible
     property alias contextMenu: _selectionMenu.menu
@@ -165,43 +164,6 @@ Item {
             })
         }
         items = []
-    }
-
-    EventFilter.target: Scrite.app
-    EventFilter.active: hasItems
-    EventFilter.events: [EventFilter.KeyPress]
-    EventFilter.onFilter: (object, event, result) => {
-        if(interactive) {
-            let dist = (event.controlModifier ? 5 : 1) * root.tickDistance
-            switch(event.key) {
-            case Qt.Key_Left:
-                _tightRect.x -= dist
-                result.accept = true
-                result.filter = true
-                break
-            case Qt.Key_Right:
-                _tightRect.x += dist
-                result.accept = true
-                result.filter = true
-                break
-            case Qt.Key_Up:
-                _tightRect.y -= dist
-                result.accept = true
-                result.filter = true
-                break
-            case Qt.Key_Down:
-                _tightRect.y += dist
-                result.accept = true
-                result.filter = true
-                break
-            }
-        }
-
-        if( event.key === Qt.Key_Escape ) {
-            clear()
-            result.accept = true
-            result.filter = true
-        }
     }
 
     MouseArea {

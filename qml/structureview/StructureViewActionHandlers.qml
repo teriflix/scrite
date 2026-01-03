@@ -41,6 +41,7 @@ Item {
     signal newAnnotationRequest(string annotationType)
     signal groupCategoryRequest(string groupCategory)
     signal newColoredSceneRequest(color sceneColor)
+    signal deleteSelectionRequest()
     signal deleteElementRequest(StructureElement element)
     signal selectionLayoutRequest(int layout) // here layout should be one of Structure.LayoutType which are
                                               // Structure.HorizontalLayout, Structure.VerticalLayout,
@@ -101,7 +102,8 @@ Item {
             Repeater {
                 model: root.canvasScroll.availableAnnotationKeys
 
-                VclMenuItem {
+                delegate: VclMenuItem {
+                    required property int index
                     required property var modelData
 
                     text: modelData.title
@@ -120,9 +122,9 @@ Item {
         id: _selectionModeHandler
 
         action: ActionHub.structureCanvasOperations.find("selectionMode")
-        enabled: !Scrite.document.readOnly && (root.canvasScroll.selection.hasItems ? root.canvasScroll.selection.canLayout : Scrite.document.structure.elementCount >= 2)
+        checked: root.selectionMode
 
-        onTriggered: root.selectionLayoutRequest(Structure.HorizontalLayout)
+        onToggled: root.selectionMode = !checked
     }
 
     ActionHandler {
@@ -153,7 +155,8 @@ Item {
                     { "text": "Flow Vertically", "icon": "layout_flow_vertically.png", "type": Structure.FlowVerticalLayout }
                 ]
 
-                VclMenuItem {
+                delegate: VclMenuItem {
+                    required property int index
                     required property var modelData
 
                     text: modelData.text
@@ -168,30 +171,28 @@ Item {
     ActionHandler {
         id: _beatBoardLayoutActionHandler
 
-        Component.onCompleted: checked = Scrite.document.structure.forceBeatBoardLayout
-
         action: ActionHub.structureCanvasOperations.find("beatBoardLayout")
         enabled: !Scrite.document.readOnly
-        checked: false
+        checked: Scrite.document.structure.forceBeatBoardLayout
 
-        onToggled: {
-            root.canvasPreview.allowed = false
-            Scrite.document.structure.forceBeatBoardLayout = checked
-            if(checked && Scrite.document.structure.elementCount > 0)
-                Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
+        onToggled: (source) => {
+                       const canvasPreviewAllowed = root.canvasPreview.allowed
+                       root.canvasPreview.allowed = false
 
-            Runtime.execLater(root.canvasPreview, 1000, function() {
-                zoomOneRequest()
-                root.canvasPreview.allowed = true
-            })
-        }
+                       Scrite.document.structure.forceBeatBoardLayout = !checked
+
+                       if(checked && Scrite.document.structure.elementCount > 0) {
+                           Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
+                       }
+
+                       Runtime.execLater(root.canvasPreview, 1000, function() {
+                           zoomOneRequest()
+                           root.canvasPreview.allowed = canvasPreviewAllowed
+                       })
+                   }
 
         Connections {
             target: Scrite.document.structure
-
-            function onForceBeatBoardLayoutChanged() {
-                _beatBoardLayoutActionHandler.checked = Scrite.document.structure.forceBeatBoardLayout
-            }
 
             function onIndexCardFieldsChanged() {
                 Qt.callLater( function() {
@@ -226,16 +227,18 @@ Item {
 
             width: 350
 
-            /*VclMenuItem {
+            VclMenuItem {
                 text: "None"
-                font.bold: currentGroupCategory === "{NONE}"
+                checkable: true
+                checked: root.canvasScroll.groupCategory === "{NONE}"
 
                 onTriggered: groupCategoryRequest("{NONE}")
-            }*/
+            }
 
             VclMenuItem {
                 text: "Acts"
-                font.bold: root.canvasScroll.groupCategory === ""
+                checkable: true
+                checked: root.canvasScroll.groupCategory === ""
 
                 onTriggered: groupCategoryRequest("")
             }
@@ -243,11 +246,13 @@ Item {
             Repeater {
                 model: Scrite.document.structure.groupCategories
 
-                VclMenuItem {
+                delegate: VclMenuItem {
+                    required property int index
                     required property string modelData
 
                     text: SMath.titleCased(modelData)
-                    font.bold: root.canvasScroll.groupCategory === modelData
+                    checkable: true
+                    checked: root.canvasScroll.groupCategory === modelData
 
                     onTriggered: groupCategoryRequest(modelData)
                 }
@@ -384,11 +389,15 @@ Item {
 
     ActionHandler {
         action: ActionHub.structureCanvasOperations.find("delete")
-        enabled: !root.canvasScroll.selection.hasItems && root.canvasScroll.currentElementItem
+        enabled: (root.canvasScroll.selection.hasItems || root.canvasScroll.currentElementItem) && !Scrite.document.readOnly
 
         onTriggered: {
-            let element = root.canvasScroll.currentElementItem.element
-            deleteElementRequest(element)
+            if(root.canvasScroll.selection.hasItems) {
+                root.deleteSelectionRequest()
+            } else {
+                const element = root.canvasScroll.currentElementItem.element
+                root.deleteElementRequest(element)
+            }
         }
     }
 

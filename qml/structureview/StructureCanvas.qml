@@ -19,7 +19,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -50,6 +49,7 @@ GridBackground {
 
     property bool scaleIsLessForEdit: (350*root.scale < root.canvasScrollHeight*0.25)
 
+    readonly property alias hasFocus: _private.hasFocus
     readonly property alias selection: _elementLayer.selection
     readonly property alias rubberband: _elementLayer.rubberband
     readonly property alias tabSequence: _private.tabSequence
@@ -71,6 +71,7 @@ GridBackground {
     signal zoomOneRequest()
     signal zoomOneToItemRequest(Item item)
     signal deleteElementRequest(StructureElement element)
+    signal deleteElementsRequest(var elementList)
     signal selectionModeOffRequest()
     signal denyCanvasPreviewRequest()
     signal allowCanvasPreviewRequest()
@@ -175,6 +176,10 @@ GridBackground {
         onDeleteElementRequest: (element) => {
                                     root.deleteElementRequest(element)
                                 }
+
+        onDeleteElementsRequest: (elementList) => {
+                                     root.deleteElementsRequest(elementList)
+                                 }
 
         onCanvasActiveFocusRequest: () => {
                                         root.forceActiveFocus()

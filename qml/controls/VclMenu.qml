@@ -21,6 +21,10 @@ import io.scrite.components 1.0
 import "qrc:/qml/globals"
 
 Menu {
+    id: root
+
+    property bool autoWidth: true
+
     Material.primary: Runtime.colors.primary.key
     Material.accent: Runtime.colors.accent.key
     Material.theme: Runtime.colors.theme
@@ -28,4 +32,22 @@ Menu {
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
     closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
+
+    onAboutToShow: Qt.callLater(determineWidth)
+
+    function determineWidth() {
+        if(autoWidth)
+            Runtime.execLater(root, Runtime.stdAnimationDuration/2, __determineWidth)
+    }
+
+    function __determineWidth() {
+        if(autoWidth) {
+            let maxWidth = 0
+            for(let i=0; i<count; i++) {
+                let menuItem = itemAt(i)
+                maxWidth = Math.max(menuItem.implicitWidth, maxWidth)
+            }
+            width = maxWidth + leftPadding + rightPadding
+        }
+    }
 }

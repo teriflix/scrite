@@ -18,6 +18,8 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 Item {
+    id: root
+
     property alias tabsArray: tabRepeater.model
     property alias content: contentLoader.sourceComponent
     property alias contentItem: contentLoader.item
@@ -27,19 +29,26 @@ Item {
 
     Row {
         id: tabBar
+
+        property int currentIndex: 0
+
         anchors.top: parent.top
         anchors.left: parent.left
-        property int currentIndex: 0
 
         Repeater {
             id: tabRepeater
-            model: tabBar.tabs
 
-            Rectangle {
+            model: 0
+
+            delegate: Rectangle {
+                required property int index
+                required property var modelData
+
+                property bool selected: tabBar.currentIndex === index
+
                 width: tabText.contentWidth + 40
                 height: tabText.contentHeight + 30
                 color: selected ? "white" : Qt.rgba(0,0,0,0)
-                property bool selected: tabBar.currentIndex === index
 
                 Rectangle {
                     height: 4

@@ -293,11 +293,7 @@ bool AbstractReportGenerator::setConfigurationValue(const QString &name, const Q
     if (!prop.isValid())
         return false;
 
-    QVariant value2 = value;
-    if (value2.userType() != prop.userType())
-        value2.convert(prop.userType());
-
-    return prop.write(this, value2);
+    return prop.write(this, Utils::Object::convertToPropertyType(value, prop));
 }
 
 QVariant AbstractReportGenerator::getConfigurationValue(const QString &name) const

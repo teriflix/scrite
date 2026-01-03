@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-//#define DISPLAY_DOCUMENT_IN_TEXTEDIT
+// #define DISPLAY_DOCUMENT_IN_TEXTEDIT
 
 #include "screenplaytextdocument.h"
 #include "utils.h"
@@ -39,7 +39,6 @@
 #include <QPropertyAnimation>
 #include <QScopedValueRollback>
 #include <QAbstractTextDocumentLayout>
-#include <enumerationmodel.h>
 
 #include "hourglass.h"
 #include "application.h"
@@ -48,6 +47,7 @@
 #include "languageengine.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
+#include "enumerationmodel.h"
 #include "pdfexportablegraphicsscene.h"
 
 inline QString timeToString(const QTime &t)
@@ -1294,10 +1294,11 @@ void ScreenplayTextDocument::loadScreenplay()
             cursor.insertText(QStringLiteral("Episode ")
                               + QString::number(element->episodeIndex() + 1)
                               + QStringLiteral(", "));
-        cursor.insertText(element->breakTitle());
+        LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, element->breakTitle());
 
         if (!element->breakSubtitle().isEmpty())
-            cursor.insertText(QStringLiteral(": ") + element->breakSubtitle().toUpper());
+            LanguageEngine::polishFontsAndInsertTextAtCursor(
+                    cursor, QStringLiteral(": ") + element->breakSubtitle().toUpper());
     };
 
     const int fsi = m_screenplay->firstSceneElementIndex();
@@ -1326,10 +1327,12 @@ void ScreenplayTextDocument::loadScreenplay()
                 episodeCharFormat.setFontWeight(QFont::ExtraBold);
                 cursor.setCharFormat(episodeCharFormat);
 
-                cursor.insertText(element->breakTitle().toUpper());
+                LanguageEngine::polishFontsAndInsertTextAtCursor(cursor,
+                                                                 element->breakTitle().toUpper());
 
                 if (!element->breakSubtitle().isEmpty())
-                    cursor.insertText(QStringLiteral(": ") + element->breakSubtitle().toUpper());
+                    LanguageEngine::polishFontsAndInsertTextAtCursor(
+                            cursor, QStringLiteral(": ") + element->breakSubtitle().toUpper());
 
                 lastPrintedElement = element;
                 continue;
@@ -3166,15 +3169,16 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     {
         QTextStream ts(&titleHtml, QIODevice::WriteOnly);
         ts << "<center>";
-        ts << "<font size=\"+2\"><strong>" << title << "</strong></font>";
+        ts << "<font size=\"+2\"><strong>" << LanguageEngine::formattedInHtml(title)
+           << "</strong></font>";
         if (!subtitle.isEmpty())
-            ts << "<br/>" << subtitle;
+            ts << "<br/>" << LanguageEngine::formattedInHtml(subtitle);
         if (!authors.isEmpty())
-            ts << "<br/><br/>" << writtenBy << "<br/>" << authors;
+            ts << "<br/><br/>" << writtenBy << "<br/>" << LanguageEngine::formattedInHtml(authors);
         if (!basedOn.isEmpty())
-            ts << "<br/><br/>" << basedOn;
+            ts << "<br/><br/>" << LanguageEngine::formattedInHtml(basedOn);
         if (!version.isEmpty())
-            ts << "<br/><br/>" << version;
+            ts << "<br/><br/>" << LanguageEngine::formattedInHtml(version);
 
         const QSettings *settings = Application::instance()->settings();
         const bool includeTimestamp =
@@ -3204,6 +3208,9 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     QStringList contactCardFields({ contact, address, phoneNumber, email, website });
     contactCardFields.removeAll(QString());
     if (!contactCardFields.isEmpty()) {
+        for (QString &contactCardField : contactCardFields)
+            contactCardField = LanguageEngine::formattedInHtml(contactCardField);
+
         QString contactHtml;
         contactCardFields.prepend(QStringLiteral("Contact:"));
         contactHtml = contactCardFields.join(QStringLiteral("<br/>"));
@@ -3251,11 +3258,12 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
         const QString openP = QLatin1String("<p>");
         const QString closeP = QLatin1String("</p>");
         for (const QString &loglinePara : qAsConst(loglineParas)) {
+            const QString formattedLoglinePara = LanguageEngine::formattedInHtml(loglinePara);
             if (loglineHtml.isEmpty())
-                loglineHtml =
-                        openP + QLatin1String("<strong>Logline:</strong> ") + loglinePara + closeP;
+                loglineHtml = openP + QLatin1String("<strong>Logline:</strong> ")
+                        + formattedLoglinePara + closeP;
             else
-                loglineHtml += openP + loglinePara + closeP;
+                loglineHtml += openP + formattedLoglinePara + closeP;
         }
         loglineCard->setHtml(loglineHtml);
 

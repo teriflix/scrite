@@ -56,8 +56,7 @@ Rectangle {
             toolTipText: "Bring this annotation to front"
 
             onClicked: {
-                let a = root.annotation
-                Scrite.document.structure.bringToFront(a)
+                Scrite.document.structure.bringToFront(annotation)
             }
         }
 
@@ -68,7 +67,7 @@ Rectangle {
 
             onClicked: {
                 root.resetRequest()
-                Scrite.document.structure.sendToBack(a)
+                Scrite.document.structure.sendToBack(annotation)
             }
         }
 

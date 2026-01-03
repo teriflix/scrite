@@ -6,9 +6,10 @@ TARGET = Scrite
 CONFIG += c++17
 DEFINES += PHTRANSLATE_STATICLIB
 
-VERSION = 1.9.14
+VERSION = 2.0.3
 DEFINES += SCRITE_VERSION=\\\"$$VERSION\\\"
-DEFINES += SCRITE_VERSION_TYPE=\\\"beta\\\"
+# DEFINES += SCRITE_VERSION_TYPE=\\\"beta\\\"
+DEFINES += SCRITE_VERSION_TYPE=\\\"\\\"
 
 #QT += testlib
 
@@ -128,6 +129,7 @@ HEADERS += \
     src/quick/items/painterpathitem.h \
     src/reports/characterreport.h \
     src/reports/locationreport.h \
+    # src/reports/locationscreenplayreport.h \
     src/reports/notebookreport.h \
     src/reports/scenecharactermatrixreport.h \
     src/reports/statisticsreport.h \
@@ -264,6 +266,7 @@ SOURCES += \
     src/quick/items/ruleritem.cpp \
     src/reports/characterreport.cpp \
     src/reports/locationreport.cpp \
+    # src/reports/locationscreenplayreport.cpp \
     src/reports/notebookreport.cpp \
     src/reports/scenecharactermatrixreport.cpp \
     src/reports/statisticsreport.cpp \
@@ -305,7 +308,6 @@ SOURCES += \
     src/reports/screenplaysubsetreport.cpp \
     src/reports/characterscreenplayreport.cpp \
     src/reports/progressreport.cpp \
-    # src/reports/locationscreenplayreport.cpp \
     src/utils/urlattributes.cpp
 
 RESOURCES += \
@@ -343,7 +345,7 @@ QTQUICK_COMPILER_SKIPPED_RESOURCES += scrite_misc.qrc
 macx {
     ICON = appicon.icns
     QMAKE_INFO_PLIST = Info.plist
-    VERSION_INFO = "1.9.14-macos"
+    VERSION_INFO = "2.0.3-macos"
 
     HEADERS += src/core/platformtransliterator_macos.h
     OBJECTIVE_SOURCES += src/core/platformtransliterator_macos.mm
@@ -355,9 +357,9 @@ macx {
 
 win32 {
     contains(QT_ARCH, i386) {
-        VERSION_INFO = "1.9.14-windows-x86"
+        VERSION_INFO = "2.0.3-windows-x86"
     } else {
-        VERSION_INFO = "1.9.14-windows-x64"
+        VERSION_INFO = "2.0.3-windows-x64"
     }
 
     RC_ICONS = appicon.ico
@@ -372,7 +374,7 @@ linux {
     PKGCONFIG += ibus-1.0
 
     CONFIG+=use_gold_linker
-    VERSION_INFO = "1.9.14-linux"
+    VERSION_INFO = "2.0.3-linux"
 
     HEADERS += src/core/platformtransliterator_linux.h
     SOURCES += src/core/platformtransliterator_linux.cpp

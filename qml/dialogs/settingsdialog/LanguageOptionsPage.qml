@@ -176,7 +176,7 @@ Item {
                         Layout.alignment: Qt.AlignHCenter
 
                         text: _private.language !== undefined ? _private.language.nativeName : "- NA -"
-                        font.family: _private.language !== undefined ? _private.language.font().family : Runtime.idealFontMetrics.font.family
+                        font.family: _private.languageFont
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 5
                     }
 
@@ -204,7 +204,9 @@ Item {
                                                           return
                                                       }
 
-                                                      Runtime.language.supported.assignLanguageShortcut(_private.language.code, newShortcut)
+                                                      if(Runtime.language.supported.assignLanguageShortcut(_private.language.code, newShortcut)) {
+                                                          _private.logLanguageShortcut(_private.language)
+                                                      }
                                                   }
                             }
                         }
@@ -227,8 +229,13 @@ Item {
                                     currentIndex: _private.language !== undefined ? languageFonts.indexOf(_private.language.font().family) : -1
 
                                     onActivated: (index) => {
-                                                     if(_private.language)
-                                                        Runtime.language.supported.assignLanguageFontFamily(_private.language.code, languageFonts[index])
+                                                     if(_private.language) {
+                                                         const success = Runtime.language.supported.assignLanguageFontFamily(_private.language.code, languageFonts[index])
+                                                         if(success) {
+                                                             _private.reevalLanguageFont()
+                                                             _private.logLanguageFont(_private.language)
+                                                         }
+                                                     }
                                                  }
                                 }
 
@@ -255,10 +262,15 @@ Item {
 
                                     onToggled: {
                                         if(_private.language) {
+                                            let success = false
                                             if(checked) {
-                                                Runtime.language.supported.resetLanguageTranslator(_private.language.code);
+                                                success = Runtime.language.supported.resetLanguageTranslator(_private.language.code);
                                             } else {
-                                                Runtime.language.supported.useLanguageTransliteratorId(_private.language.code, _private.language.preferredTransliterationOption().id)
+                                                success = Runtime.language.supported.useLanguageTransliteratorId(_private.language.code, _private.language.preferredTransliterationOption().id)
+                                            }
+
+                                            if(success) {
+                                                _private.logLanguageIM(_private.language)
                                             }
                                         }
                                     }
@@ -274,7 +286,10 @@ Item {
                                     currentIndex: _private.language !== undefined ? indexOfValue(_private.language.preferredTransliterationOption().id) : -1
                                     onActivated: (index) => {
                                                      if(_private.language) {
-                                                        Runtime.language.supported.useLanguageTransliteratorId( _private.language.code, _private.transliterationOptionsModel.get(index).id )
+                                                         const success = Runtime.language.supported.useLanguageTransliteratorId( _private.language.code, _private.transliterationOptionsModel.get(index).id )
+                                                         if(success) {
+                                                             _private.logLanguageIM(_private.language)
+                                                         }
                                                      }
                                                  }
                                 }
@@ -326,6 +341,11 @@ Item {
                 const languageCode = availableLanguages.codes[index]
                 const row = Runtime.language.supported.addLanguage(languageCode)
                 if(row >= 0) {
+                    if(Scrite.user.info.consentToActivityLog) {
+                        const lang = Runtime.language.supported.languageAt(row)
+                        Qt.callLater(_private.logAddLanguageActivity, lang)
+                    }
+
                     _listView.currentIndex = row
                     _newLanguageDialog.close()
                 } else {
@@ -386,12 +406,11 @@ Item {
         property int previouslyActiveLanguage: -1
 
         property var language: _listView.currentItem ? _listView.currentItem.language : undefined
+        property font languageFont: language !== undefined ? language.font().family : Runtime.idealFontMetrics.font.family
 
         property ListModel transliterationOptionsModel: ListModel { }
 
-        property SpellCheckService spellCheckService: SpellCheckService {
-
-        }
+        property SpellCheckService spellCheckService: SpellCheckService { }
 
         Component.onCompleted: {
             previouslyActiveLanguage = Runtime.language.activeCode
@@ -400,6 +419,10 @@ Item {
 
         Component.onDestruction: {
             Runtime.language.setActiveCode(previouslyActiveLanguage)
+        }
+
+        function reevalLanguageFont() {
+            languageFont = language !== undefined ? language.font().family : Runtime.idealFontMetrics.font.family
         }
 
         function populateTransliterationOptionsModel() {
@@ -442,6 +465,28 @@ Item {
 
             _listView.currentIndex = -1
             _listView.currentIndex = Math.max(0, Math.min(row, _listView.count-1))
+
+            logRemoveLanguageActivity(language)
+        }
+
+        function logAddLanguageActivity(lang) {
+            Runtime.language.logActivity("language-add", lang)
+        }
+
+        function logRemoveLanguageActivity(lang) {
+            Runtime.language.logActivity("language-remove", lang)
+        }
+
+        function logLanguageShortcut(lang) {
+            Runtime.language.logActivity("language-shortcut", lang)
+        }
+
+        function logLanguageIM(lang) {
+            Runtime.language.logActivity("language-im", lang)
+        }
+
+        function logLanguageFont(lang) {
+            Runtime.language.logActivity("language-font", lang)
         }
 
         onLanguageChanged: populateTransliterationOptionsModel()

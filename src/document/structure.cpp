@@ -2945,46 +2945,8 @@ static int structureIndexOfElement(Structure *structure, StructureElement *ptr)
 
 void Structure::removeElement(StructureElement *ptr)
 {
-    if (ptr == nullptr)
+    if (!this->removeElementInternal(ptr))
         return;
-
-    const int index = m_elements.indexOf(ptr);
-    if (index < 0)
-        return;
-
-    QScopedPointer<PushObjectListCommand<Structure, StructureElement>> cmd;
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
-    if (!info->isLocked() && /* DISABLES CODE */ (false)) {
-        ObjectListPropertyMethods<Structure, StructureElement> methods(
-                &structureAppendElement, &structureRemoveElement, &structureInsertElement,
-                &structureElementAt, structureIndexOfElement);
-        cmd.reset(new PushObjectListCommand<Structure, StructureElement>(
-                ptr, this, "elements", ObjectList::RemoveOperation, methods));
-    }
-
-    const Scene *scene = ptr->scene();
-    const QList<SceneElement *> sceneElements = scene->findChildren<SceneElement *>();
-    for (SceneElement *sceneElement : sceneElements)
-        this->onAboutToRemoveSceneElement(sceneElement);
-    this->updateCharacterNamesShotsTransitionsAndTagsLater();
-
-    m_elements.removeAt(index);
-
-    disconnect(ptr, &StructureElement::elementChanged, this, &Structure::structureChanged);
-    disconnect(ptr, &StructureElement::aboutToDelete, this, &Structure::removeElement);
-    disconnect(ptr, &StructureElement::sceneLocationChanged, this,
-               &Structure::updateLocationHeadingMapLater);
-    disconnect(ptr, &StructureElement::geometryChanged, &m_elements,
-               &QObjectListModel<StructureElement *>::objectChanged);
-    disconnect(ptr, &StructureElement::aboutToDelete, &m_elements,
-               &QObjectListModel<StructureElement *>::objectDestroyed);
-    disconnect(ptr, &StructureElement::stackIdChanged, &m_elementStacks,
-               &StructureElementStacks::evaluateStacksLater);
-    disconnect(ptr, &StructureElement::stackIdChanged, this, &Structure::elementStackingChanged);
-    this->updateLocationHeadingMapLater();
-
-    emit elementCountChanged();
-    emit elementsChanged();
 
     this->resetCurentElementIndex();
 
@@ -2993,18 +2955,6 @@ void Structure::removeElement(StructureElement *ptr)
                                                   : ScriteDocument::instance()->screenplay();
         this->placeElementsInBeatBoardLayout(screenplay);
     }
-
-    if (ptr->parent() == this)
-        GarbageCollector::instance()->add(ptr);
-}
-
-void Structure::removeElements(const QList<StructureElement *> &elements)
-{
-    if (elements.isEmpty())
-        return;
-
-    for (StructureElement *element : elements)
-        this->removeElement(element);
 }
 
 void Structure::insertElement(StructureElement *ptr, int index)
@@ -3267,6 +3217,33 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     return newBoundingRect;
 }
 
+void Structure::removeElements(const QList<StructureElement *> &elements)
+{
+    if (elements.isEmpty())
+        return;
+
+    if (elements.contains(this->elementAt(this->currentElementIndex()))) {
+        this->setCurrentElementIndex(-1);
+    }
+
+    const int minElementIndex = this->indexOfElement(*std::min_element(
+            elements.begin(), elements.end(), [=](StructureElement *a, StructureElement *b) {
+                return this->indexOfElement(a) < this->indexOfElement(b);
+            }));
+
+    for (StructureElement *element : elements) {
+        this->removeElementInternal(element);
+    }
+
+    this->resetCurentElementIndex(qBound(0, minElementIndex + 1, m_elements.size() - 1));
+
+    if (m_forceBeatBoardLayout) {
+        Screenplay *screenplay = m_scriteDocument ? m_scriteDocument->screenplay()
+                                                  : ScriteDocument::instance()->screenplay();
+        this->placeElementsInBeatBoardLayout(screenplay);
+    }
+}
+
 void Structure::setForceBeatBoardLayout(bool val)
 {
     if (m_forceBeatBoardLayout == val || m_deserializationStage == BeingDeserialized)
@@ -3362,7 +3339,7 @@ QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
 {
     QRectF newBoundingRect;
 
-    if (screenplay == nullptr)
+    if (screenplay == nullptr || this->elementCount() == 0)
         return newBoundingRect;
 
     const QList<QPair<QString, QList<StructureElement *>>> beats =
@@ -3699,6 +3676,59 @@ Structure::evaluateGroupsImpl(Screenplay *screenplay, const QString &category) c
     return ret;
 }
 
+bool Structure::removeElementInternal(StructureElement *ptr)
+{
+    if (ptr == nullptr)
+        return false;
+
+    const int index = m_elements.indexOf(ptr);
+    if (index < 0)
+        return false;
+
+    QScopedPointer<PushObjectListCommand<Structure, StructureElement>> cmd;
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "elements");
+    if (!info->isLocked() && /* DISABLES CODE */ (false)) {
+        ObjectListPropertyMethods<Structure, StructureElement> methods(
+                &structureAppendElement, &structureRemoveElement, &structureInsertElement,
+                &structureElementAt, structureIndexOfElement);
+        cmd.reset(new PushObjectListCommand<Structure, StructureElement>(
+                ptr, this, "elements", ObjectList::RemoveOperation, methods));
+    }
+
+    const Scene *scene = ptr->scene();
+    const QList<SceneElement *> sceneElements = scene->findChildren<SceneElement *>();
+    for (SceneElement *sceneElement : sceneElements)
+        this->onAboutToRemoveSceneElement(sceneElement);
+    this->updateCharacterNamesShotsTransitionsAndTagsLater();
+
+    emit aboutToRemoveElement(ptr);
+    if (ptr->scene())
+        emit ptr->scene()->aboutToRemoveScene(ptr->scene());
+
+    m_elements.removeAt(index);
+
+    disconnect(ptr, &StructureElement::elementChanged, this, &Structure::structureChanged);
+    disconnect(ptr, &StructureElement::aboutToDelete, this, &Structure::removeElement);
+    disconnect(ptr, &StructureElement::sceneLocationChanged, this,
+               &Structure::updateLocationHeadingMapLater);
+    disconnect(ptr, &StructureElement::geometryChanged, &m_elements,
+               &QObjectListModel<StructureElement *>::objectChanged);
+    disconnect(ptr, &StructureElement::aboutToDelete, &m_elements,
+               &QObjectListModel<StructureElement *>::objectDestroyed);
+    disconnect(ptr, &StructureElement::stackIdChanged, &m_elementStacks,
+               &StructureElementStacks::evaluateStacksLater);
+    disconnect(ptr, &StructureElement::stackIdChanged, this, &Structure::elementStackingChanged);
+    this->updateLocationHeadingMapLater();
+
+    emit elementCountChanged();
+    emit elementsChanged();
+
+    if (ptr->parent() == this)
+        GarbageCollector::instance()->add(ptr);
+
+    return true;
+}
+
 bool Structure::renameCharacter(const QString &from, const QString &to, QString *errMsg)
 {
     auto setError = [=](const QString &msg) {
@@ -3795,6 +3825,20 @@ QStringList Structure::standardMoments()
                                       QStringLiteral("DAWN"),
                                       QStringLiteral("DUSK") };
     return list;
+}
+
+int Structure::renameLocation(const QString &location, const QString &newLocation)
+{
+    updateLocationHeadingMap();
+
+    const QString newLocation2 = newLocation.trimmed().toUpper();
+
+    const QList<SceneHeading *> sceneHeadings = m_locationHeadingsMap.value(location);
+    for (SceneHeading *sceneHeading : sceneHeadings) {
+        sceneHeading->setLocation(newLocation2);
+    }
+
+    return sceneHeadings.size();
 }
 
 void Structure::setCurrentElementIndex(int val)
@@ -4913,9 +4957,9 @@ void Structure::timerEvent(QTimerEvent *event)
     QObject::timerEvent(event);
 }
 
-void Structure::resetCurentElementIndex()
+void Structure::resetCurentElementIndex(int index)
 {
-    int val = m_currentElementIndex;
+    int val = index < 0 ? m_currentElementIndex : index;
     if (m_elements.isEmpty())
         val = -1;
     else

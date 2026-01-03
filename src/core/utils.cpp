@@ -367,6 +367,41 @@ QString Utils::Gui::nativeShortcut(const QString &shortcut)
     return keySequence.toString(QKeySequence::NativeText);
 }
 
+QString Utils::Gui::portableShortcut(const QVariant &shortcut)
+{
+    if (shortcut.isNull() || !shortcut.isValid())
+        return QString();
+
+    auto isKeySequenceValid = [](const QKeySequence &ks) {
+        if (ks.isEmpty() || ks.count() == 0)
+            return false;
+        for (int i = 0; i < ks.count(); i++) {
+            if (ks[i] == Qt::Key_unknown)
+                return false;
+        }
+        return true;
+    };
+
+    if (shortcut.userType() == QMetaType::QString) {
+        const QString str = shortcut.toString().trimmed();
+        QKeySequence ks = QKeySequence::fromString(str, QKeySequence::NativeText);
+        if (!isKeySequenceValid(ks))
+            ks = QKeySequence::fromString(str, QKeySequence::PortableText);
+        if (!isKeySequenceValid(ks))
+            return QString();
+        return ks.toString(QKeySequence::PortableText);
+    }
+
+    if (shortcut.userType() == QMetaType::QKeySequence) {
+        const QKeySequence ks = shortcut.value<QKeySequence>();
+        if (!isKeySequenceValid(ks))
+            return QString();
+        return ks.toString(QKeySequence::PortableText);
+    }
+
+    return QString();
+}
+
 /**
  * \brief Checks if the given QQuickItem accepts text input.
  * \param item The QQuickItem to check.
@@ -992,6 +1027,27 @@ QAbstractListModel *Utils::Object::typeEnumModel(const QString &typeName, const 
         return new EnumerationModel(mo, enumName, parent);
 
     return nullptr;
+}
+
+QVariant Utils::Object::convertToPropertyType(const QVariant &value, const QMetaProperty &prop)
+{
+    if (!prop.isValid())
+        return value;
+
+    QVariant value2 = value;
+    if (value2.userType() != prop.userType()) {
+        if (!value2.convert(prop.userType())) {
+            if (prop.userType() == qMetaTypeId<QList<int>>()) {
+                const QVariantList list = value.toList();
+                QList<int> intList;
+                for (const QVariant &item : list)
+                    intList.append(item.toInt());
+                value2 = QVariant::fromValue<QList<int>>(intList);
+            }
+        }
+    }
+
+    return value2;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2137,6 +2193,13 @@ QString Utils::SMath::formatAsBulletPoints(const QVariantList &items)
     ts.flush();
 
     return ret;
+}
+
+QString Utils::SMath::removeNewlineAndTabsIn(const QString &val)
+{
+    QString val2 = val;
+    val2.replace(QRegularExpression("[\\n\\t]"), " ");
+    return val2;
 }
 
 /**

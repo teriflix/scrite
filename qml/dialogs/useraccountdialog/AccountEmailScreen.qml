@@ -27,7 +27,9 @@ import "qrc:/qml/dialogs"
 
 Item {
     readonly property bool modal: true
-    readonly property string title: "Setup your Scrite login"
+    readonly property string title: "Setup your Scrite account"
+
+    Component.onCompleted: Qt.callLater(emailField.forceActiveFocus)
 
     Image {
         anchors.fill: parent
@@ -57,9 +59,16 @@ Item {
             VclLabel {
                 Layout.fillWidth: true
 
-                text: "Please provide us the following information to setup your Scrite login."
+                text: "Please provide us your email."
                 font.bold: true
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+                wrapMode: Text.WordWrap
+            }
+
+            VclLabel {
+                Layout.fillWidth: true
+
+                text: "Your free trial and other subscription plans will be linked to this email."
                 wrapMode: Text.WordWrap
             }
 
@@ -82,100 +91,8 @@ Item {
                 maximumLength: 128
                 selectByMouse: true
                 undoRedoEnabled: true
-                placeholderText: "Email *"
-            }
 
-            VclTextField {
-                id: nameField
-
-                Layout.fillWidth: true
-
-                TabSequenceItem.manager: userInfoFields
-                TabSequenceItem.sequence: 1
-
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
-
-                maximumLength: 128
-                selectByMouse: true
-                undoRedoEnabled: true
-                placeholderText: "Name " + (length > 0 ? "" : "(optional)")
-            }
-
-            VclTextField {
-                id: phoneField
-
-                Layout.fillWidth: true
-
-                TabSequenceItem.manager: userInfoFields
-                TabSequenceItem.sequence: 2
-
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
-
-                maximumLength: 32
-                selectByMouse: true
-                undoRedoEnabled: true
-                placeholderText: "Phone " + (length > 0 ? "" : "(optional)")
-
-                validator: RegExpValidator {
-                    regExp: /^\+?(\d{1,3})?[\s\-]?\(?\d{1,4}\)?[\s\-]?\d{1,4}[\s\-]?\d{1,4}$/
-                }
-            }
-
-            VclTextField {
-                id: experienceField
-
-                Layout.fillWidth: true
-
-                TabSequenceItem.manager: userInfoFields
-                TabSequenceItem.sequence: 3
-
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
-
-                maximumLength: 128
-                selectByMouse: true
-                undoRedoEnabled: true
-                placeholderText: "Experience " + (length > 0 ? "" : "(optional)")
-
-                completionStrings: [
-                    "Hobby Writer",
-                    "Actively Pursuing a Writing Career",
-                    "Working Writer",
-                    "Have Produced Credits"
-                ]
-                minimumCompletionPrefixLength: 0
-            }
-
-            VclTextField {
-                id: wdyhasField
-
-                Layout.fillWidth: true
-
-                TabSequenceItem.manager: userInfoFields
-                TabSequenceItem.sequence: 4
-
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
-
-                maximumLength: 128
-                selectByMouse: true
-                undoRedoEnabled: true
-                placeholderText: "Where did you hear about Scrite? " + (length > 0 ? "" : "(optional)")
-
-                completionStrings: [
-                    "From another Scrite User",
-                    "I am already a Scrite User",
-                    "Google Search",
-                    "YouTube",
-                    "Film School",
-                    "Film Workshop",
-                    "Twitter",
-                    "Recommended by a friend",
-                    "Instagram",
-                    "Reddit",
-                    "LinkedIn",
-                    "Facebook",
-                ]
-                maxVisibleItems: 11
-                minimumCompletionPrefixLength: 0
+                onReturnPressed: if(submit.enabled) submit.clicked()
             }
 
             Item {
@@ -186,11 +103,14 @@ Item {
             VclButton {
                 id: submit
 
+                Component.onCompleted: determineEnabled()
                 Layout.alignment: Qt.AlignRight
 
-                text: "Continue »"
+                function determineEnabled() {
+                    enabled = Runtime.validateEmail(emailField.text.trim())
+                }
 
-                onClicked: checkUserCall.check()
+                text: "Continue »"
 
                 Connections {
                     target: emailField
@@ -200,11 +120,7 @@ Item {
                     }
                 }
 
-                function determineEnabled() {
-                    enabled = Runtime.validateEmail(emailField.text.trim())
-                }
-
-                Component.onCompleted: determineEnabled()
+                onClicked: checkUserCall.check()
             }
         }
 
@@ -222,17 +138,6 @@ Item {
             const _email = emailField.text.trim()
             if(Runtime.validateEmail(_email)) {
                 email = _email
-
-                let nameComps = nameField.text.trim().split(" ")
-                if(nameComps.length >= 1) {
-                    firstName = nameComps[0]
-                    nameComps.shift()
-                }
-
-                lastName = nameComps.join(" ")
-                experience = experienceField.text.trim()
-                wdyhas = wdyhasField.text.trim()
-                phone = phoneField.text.trim()
 
                 call()
             }

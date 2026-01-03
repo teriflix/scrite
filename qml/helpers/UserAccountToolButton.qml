@@ -151,9 +151,6 @@ Item {
         }
 
         MouseArea {
-            ToolTip.text: Scrite.user.loggedIn ? ("Account Profile (" + Gui.nativeShortcut(_userAccountHandler.action.shortcut) + ")") : "Login"
-            ToolTip.visible: containsMouse
-
             anchors.fill: parent
 
             cursorShape: Qt.PointingHandCursor
@@ -168,6 +165,11 @@ Item {
                     screenName = "Subscriptions"
 
                 UserAccountDialog.launch(screenName)
+            }
+
+            ToolTipPopup {
+                text: Scrite.user.loggedIn ? ("Account Profile (" + Gui.nativeShortcut(_userAccountHandler.action.shortcut) + ")") : "Login"
+                visible: parent.containsMouse
             }
         }
 

@@ -20,8 +20,9 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/controls"
 
-Menu {
+VclMenu {
     id: root
 
     required property ActionManager actionManager
@@ -45,11 +46,12 @@ Menu {
     Repeater {
         id: _menuItems
 
-        model: root.actionManager ? _private.visibleActions : 0
+        model: root.actionManager ? root.actionManager.visibleActions : 0
 
-        delegate: MenuItem {
+        delegate: VclMenuItem {
             id: _menuItem
 
+            required property int index
             required property var modelData
 
             property var qmlAction: modelData
@@ -70,36 +72,11 @@ Menu {
             ToolTipPopup {
                 container: _menuItem
 
-                text: {
-                    const sc = Gui.nativeShortcut(qmlAction.shortcut)
-                    if(sc === "")
-                        return qmlAction.tooltip !== undefined ? qmlAction.tooltip : ""
-
-                    const tt = qmlAction.tooltip !== undefined ? qmlAction.tooltip : qmlAction.text
-                    return tt + " (" + sc + " )"
-                }
+                text: qmlAction.tooltip !== undefined ? qmlAction.tooltip : ""
                 visible: text !== "" && _menuItem.hovered
             }
         }
-    }
 
-    onAboutToShow: _private.adjustMenuWidth()
-
-    QtObject {
-        id: _private
-
-        readonly property var visibleActions: root.actionManager.visibleActions
-
-        function adjustMenuWidth() {
-            let width = 200
-
-            for(let i=0; i<_menuItems.count; i++) {
-                const menuItem = _menuItems.itemAt(i)
-                const itemWidth = menuItem.contentItem.implicitWidth + menuItem.leftPadding + menuItem.rightPadding
-                width = Math.max(width, itemWidth)
-            }
-
-            root.width = width + 20
-        }
+        onCountChanged: Qt.callLater(root.determineWidth)
     }
 }

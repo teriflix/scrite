@@ -226,10 +226,10 @@ DialogLauncher {
                             ListElement { name: "Website";    fieldSize: 100;    key: "website"     }
                         }
 
-                        Item {
+                        delegate: Item {
                             required property int index
-                            required property string name
                             required property int fieldSize
+                            required property string name
                             required property string key
 
                             width: (titlePageFields.width-titlePageFields.columnSpacing)/2

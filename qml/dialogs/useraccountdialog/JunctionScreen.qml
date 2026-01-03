@@ -72,6 +72,7 @@ Item {
 
     AppRequestActivationCodeRestApiCall {
         id: sendActivationCodeCall
+
         onFinished: {
             if(hasError || !hasResponse) {
                 const errMsg = hasError ? errorMessage : "Couldn't request activation code. Please try again."

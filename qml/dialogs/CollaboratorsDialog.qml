@@ -118,6 +118,11 @@ DialogLauncher {
                         property var collaboratorsMetaData
 
                         delegate: Item {
+                            required property int index
+                            required property string collaborator
+                            required property string collaboratorName
+                            required property string collaboratorEmail
+
                             width: collaboratorsList.viewportWidth
                             height: delegateLayout.height + 4
 

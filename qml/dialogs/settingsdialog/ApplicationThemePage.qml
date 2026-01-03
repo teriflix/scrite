@@ -53,18 +53,20 @@ Item {
             VclComboBox {
                 id: themesComboBox
 
+                readonly property int materialStyleIndex: Scrite.app.availableThemes.indexOf("Material");
+
                 Layout.fillWidth: true
 
                 enabled: Runtime.currentUseSoftwareRenderer === false
-
                 model: Scrite.app.availableThemes
-                readonly property int materialStyleIndex: Scrite.app.availableThemes.indexOf("Material");
+
                 currentIndex: {
                     const idx = Scrite.app.availableThemes.indexOf(Runtime.applicationSettings.theme)
                     if(idx < 0)
                         return materialStyleIndex
                     return idx
                 }
+
                 onCurrentTextChanged: {
                     Runtime.applicationSettings.theme = currentText
                     if(Runtime.currentTheme !== currentText)
@@ -106,7 +108,7 @@ Item {
                     Repeater {
                         model: _private.availableColorOptions
 
-                        Rectangle {
+                        delegate: Rectangle {
                             required property int modelData
 
                             implicitWidth: _private.colorSelectorSize

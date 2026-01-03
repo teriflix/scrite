@@ -31,8 +31,11 @@ Item {
     readonly property int stdAnimationDuration: 250
     readonly property int subscriptionTreshold: 15 // if active subscription has less than these many days, then reminders are shown upon login
 
-    readonly property var characterListReports: Scrite.document.characterListReports
-    readonly property var sceneListReports: Scrite.document.sceneListReports
+    readonly property var characterReports: Scrite.document.characterReports
+    readonly property var sceneReports: Scrite.document.sceneReports
+    readonly property var episodeReports: Scrite.document.episodeReports
+    readonly property var keywordReports: Scrite.document.keywordReports
+    readonly property var tagReports: Scrite.document.tagReports
 
     readonly property real iconImageSize: 30 // min width or height of icon Image QML elements
     readonly property real maxSceneSidePanelWidth: 400
@@ -77,13 +80,30 @@ Item {
         property AbstractTransliterationEngine activeTransliterator: activeTransliterationOption.valid ? activeTransliterationOption.transliterator : null
 
         function setActiveCode(code) {
+            if(activeCode === code)
+                return
+
             supported.activeLanguageCode = code
+            logActivity("language-activate", supported.activeLanguage)
         }
+
+        function logActivity(activity, lang) {
+            if(lang && Scrite.user.info.consentToActivityLog) {
+                const txOption = lang.preferredTransliterationOption()
+                const portableShortcut = Gui.portableShortcut(lang.keySequence)
+                const shortcut = portableShortcut === "" ? "<no-shortcut>" : portableShortcut
+                const details = [lang.name, shortcut, txOption.id, txOption.name, lang.font().family, Platform.typeString].join(";")
+                Scrite.user.logActivity2(activity, details)
+            }
+        }
+
+        onActiveCodeChanged: Scrite.document.displayFormat.activeLanguageCode = activeCode
     }
 
     // Persistent Settings
     readonly property Settings userAccountDialogSettings: Settings {
         property bool welcomeScreenShown: false
+        property string userOnboardingStatus: "unknown"
 
         category: "UserAccountDialog"
         fileName: Platform.settingsFile
@@ -136,6 +156,8 @@ Item {
         category: "Screenplay Editor"
         fileName: Platform.settingsFile
 
+        ObjectRegister.name: "screenplayEditorSettings"
+
         property var zoomLevelModifiers: { "tab0": 0, "tab1": 0, "tab2": 0, "tab3": 0 }
 
         property int commentsPanelTabIndex: 1
@@ -149,6 +171,7 @@ Item {
         property int slpSynopsisLineCount: 2
         property int jumpToSceneFilterMode: 0
 
+        property bool allowSelectedTextTranslation: false
         property bool allowTaggingOfScenes: false
         property bool applyUserDefinedLanguageFonts: true
         property bool autoAdjustEditorWidthInScreenplayEditor: true
@@ -166,6 +189,7 @@ Item {
         property bool enableAutoCapitalizeSentences: true
         property bool enableAutoPolishParagraphs: true // for automatically adding/removing CONT'D where appropriate
         property bool enableSpellCheck: true // Since this is now fixed: https://github.com/teriflix/scrite/issues/138
+        property bool focusCursorOnSceneHeadingInNewScenes: false
         property bool highlightCurrentLine: true
         property bool includeTitlePageInPreview: true
         property bool longSceneWarningEnabled: true
@@ -176,6 +200,7 @@ Item {
         property bool pasteByLinkingScenesWhenPossible: true
         property bool pasteByMergingAdjacentElements: true
         property bool refreshButtonInStatsReportAnimationDone: false
+        property bool restartEpisodeScenesAtOne: false // If set, each episode starts with scene number 1
         property bool sceneSidePanelOpen: false
         property bool screenplayEditorAddButtonsAnimationShown: false
         property bool showLanguageRefreshNoticeBox: true
@@ -739,6 +764,10 @@ Item {
         Runtime.shoutout(Runtime.announcementIds.closeDialogBoxRequest, undefined)
     }
 
+    function requiresUserOnboarding() {
+        return "required" === userAccountDialogSettings.userOnboardingStatus
+    }
+
     function estimateTypeSize(itemNameOrCode, imports) {
         const defaultImports = ["QtQuick 2.15",
                                 "QtQuick.Controls 2.15",
@@ -1007,11 +1036,12 @@ Item {
             Runtime.notebookSettings.sceneSynopsisTabIndex = 0
             Runtime.screenplayEditorSettings.sceneSidePanelOpen = false
             Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
+
+            Scrite.document.displayFormat.activeLanguageCode = Runtime.language.activeLanguageCode
         }
 
         function onJustLoaded() {
             Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
         }
     }
-
 }

@@ -37,14 +37,6 @@ public:
 
 protected:
     GarbageCollector(QObject *parent = nullptr);
-    void timerEvent(QTimerEvent *event);
-    void onObjectDestroyed(QObject *obj);
-
-private:
-    QObjectList m_objects;
-    QObjectList m_shredder;
-    QObjectList m_avoidList;
-    ExecLaterTimer m_timer;
 };
 
 #endif // GARBAGECOLLECTOR_H

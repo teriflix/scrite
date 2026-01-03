@@ -19,8 +19,9 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
-import "qrc:/qml/controls"
+import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
+import "qrc:/qml/controls"
 
 ListView {
     id: root
@@ -157,17 +158,6 @@ ListView {
         }
 
         property real contentOffset: 0
-
-        EventFilter.target: Scrite.app
-        EventFilter.active: Scrite.document.screenplay.hasSelectedElements
-        EventFilter.events: [EventFilter.KeyPress]
-        EventFilter.onFilter: (object,event,result) => {
-                                  if(event.key === Qt.Key_Escape) {
-                                      Scrite.document.screenplay.clearSelection()
-                                      result.acceptEvent = true
-                                      result.filter = true
-                                  }
-                              }
     }
 }
 

@@ -90,8 +90,8 @@ AbstractScreenplayElementDelegate {
                 placeholderText: root.screenplayElement.breakTitle
                 enableTransliteration: true
 
-                onTextEdited: root.screenplayElement.breakSubtitle = text
-                onEditingComplete: root.screenplayElement.breakSubtitle = text
+                onTextEdited: root.screenplayElement.breakSubtitle = text.replace(/[\n\t]/g, ' ')
+                onEditingComplete: root.screenplayElement.breakSubtitle = text.replace(/[\n\t]/g, ' ')
             }
 
             Item {

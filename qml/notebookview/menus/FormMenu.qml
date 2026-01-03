@@ -37,7 +37,8 @@ VclMenu {
     Repeater {
         model: _model
 
-        VclMenuItem {
+        delegate: VclMenuItem {
+            required property int index
             required property var objectItem
 
             text: objectItem.title

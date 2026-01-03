@@ -34,49 +34,11 @@ Item {
     function resetBinder(binder) { _private.resetBinder(binder) }
     function isOperationAllowedByUser(operation) { return _private.isOperationAllowedByUser(operation) }
 
-    function triggerLater(action, delay) {
-        if(action)
-            Runtime.execLater(action, delay, () => {
-                                  if(action && action.enabled)
-                                    action.trigger()
-                              })
-    }
-
-    function toggleLater(action, delay) {
-        if(action)
-            Runtime.execLater(action, delay, () => {
-                                  if(action && action.enabled)
-                                    action.toggle()
-                              })
-    }
-
-    function assignShortcut(qmlAction, newShortcut) {
-        if(!qmlAction || !Object.isOfType(qmlAction, "QQuickAction"))
-            return
-
-        if(newShortcut === undefined || newShortcut === "") {
-            qmlAction.shortcut = undefined
-            return
-        }
-
-        let conflictingAction = ActionManager.findActionForShortcut(newShortcut)
-        if(conflictingAction) {
-            MessageBox.information("Shortcut Conflict",
-                                   Gui.nativeShortcut(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
-        } else {
-            qmlAction.shortcut = newShortcut
-        }
-    }
-
-    function hasShortcutConflict(shortcut) {
-        let conflictingAction = ActionManager.findActionForShortcut(shortcut)
-        if(conflictingAction) {
-            MessageBox.information("Shortcut Conflict",
-                                   Gui.nativeShortcut(shortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
-            return true
-        }
-        return false
-    }
+    function triggerLater(action, delay) { _private.triggerLater(action, delay) }
+    function toggleLater(action, delay) { _private.toggleLater(action, delay) }
+    function assignShortcut(qmlAction, newShortcut) { _private.assignShortcut(qmlAction, newShortcut) }
+    function hasShortcutConflict(shortcut) { return _private.hasShortcutConflict(shortcut) }
+    function logShortcutChangeActivity(qmlAction) { _private.logShortcutChangeActivity(qmlAction) }
 
     readonly property ActionManager mainWindowTabs: ActionManager {
         title: "Scrite Window Tabs"
@@ -251,7 +213,7 @@ Item {
 
             enabled: Runtime.allowAppUsage && visible
             objectName: "backupOpen"
-            text: "Backup"
+            text: "Open Backup Copy"
 
             icon.source: "qrc:/icons/file/backup_open.png"
 
@@ -317,6 +279,8 @@ Item {
     }
 
     readonly property ActionManager recentFileOperations: ActionManager {
+        readonly property bool containsUserData: true
+
         title: "Open Recent"
         objectName: "recentFileOperations"
     }
@@ -468,6 +432,7 @@ Item {
         model: Scrite.document.supportedExportFormats
 
         delegate: Action {
+            required property int index
             required property var modelData // { className, name, icon, key, description, category, keywords }
 
             readonly property bool allowShortcut: true
@@ -499,6 +464,7 @@ Item {
         model: Scrite.document.supportedReports
 
         delegate: Action {
+            required property int index
             required property var modelData // { className, name, icon, description }
 
             readonly property bool allowShortcut: true
@@ -908,7 +874,7 @@ Item {
         }
 
         Action {
-            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Ctrl+Shift+Delete" : "Ctrl+Shift+Backspace"
+            readonly property string defaultShortcut: "Ctrl+Shift+Backspace"
 
             enabled: ActionHandler.canHandle
             objectName: "mergeScene"
@@ -916,6 +882,16 @@ Item {
             text: "Join Previous Scene"
 
             icon.source: "qrc:/icons/action/merge_scene.png"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Shift+Alt+V"
+
+            enabled: ActionHandler.canHandle
+            objectName: "translateToActiveLanguage"
+            shortcut: defaultShortcut
+            text: ActionHandler.active ? ActionHandler.active.text : "Translate to Active Language"
         }
 
         Action {
@@ -1300,6 +1276,80 @@ Item {
             enabled: ActionHandler.canHandle
             text: "Display Screenplay Tracks"
         }
+
+        Action {
+            readonly property string defaultShortcut: "Ctrl+Shift+C"
+
+            enabled: ActionHandler.canHandle
+            objectName: "copy"
+            shortcut: defaultShortcut
+            text: "Copy"
+
+            icon.source: "qrc:/icons/content/content_copy.png"
+        }
+
+        Action {
+            readonly property string defaultShortcut: "Ctrl+Shift+V"
+
+            enabled: ActionHandler.canHandle
+            objectName: "paste"
+            shortcut: defaultShortcut
+            text: "Paste After"
+
+            icon.source: "qrc:/icons/content/content_paste.png"
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+
+            enabled: ActionHandler.canHandle
+            objectName: "remove"
+            text: "Remove"
+
+            icon.source: "qrc:/icons/action/delete.png"
+        }
+
+        Action {
+            readonly property string defaultShortcut: "Ctrl+Shift+W"
+
+            enabled: ActionHandler.canHandle
+            objectName: "keywords"
+            shortcut: defaultShortcut
+            text: "Keywords"
+        }
+
+        Action {
+            readonly property string defaultShortcut: "Escape"
+
+            enabled: ActionHandler.canHandle
+            objectName: "clearSelection"
+            shortcut: defaultShortcut
+            text: "Clear Selection"
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+
+            enabled: ActionHandler.canHandle
+            objectName: "makeSequence"
+            text: "Make Sequence"
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+
+            enabled: ActionHandler.canHandle
+            objectName: "breakSequence"
+            text: "Break Sequence"
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+
+            enabled: ActionHandler.canHandle
+            objectName: "includeOmit"
+            text: ActionHandler.active ? ActionHandler.active.text : "Include/Omit"
+        }
     }
 
     readonly property ActionManager screenplayEditorOptions: ActionManager {
@@ -1439,6 +1489,49 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+
+            checkable: true
+            checked: Scrite.document.screenplay.restartEpisodeScenesAtOne
+            enabled: !Scrite.document.readOnly
+            objectName: "restartEpisodeScenesAtOne"
+            text: "Restart Episode Scene Numbers"
+
+            onTriggered: {
+                Scrite.document.screenplay.restartEpisodeScenesAtOne = !Scrite.document.screenplay.restartEpisodeScenesAtOne
+                Runtime.screenplayEditorSettings.restartEpisodeScenesAtOne = Scrite.document.screenplay.restartEpisodeScenesAtOne
+            }
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property string tooltip: "By default cursor is placed in the scene content area when a new scene is created. Check this option to place cursor on the scene heading instead."
+
+            checkable: true
+            checked: Runtime.screenplayEditorSettings.focusCursorOnSceneHeadingInNewScenes
+            objectName: "focusCursorOnSceneHeadingInNewScenes"
+            text: "Set Cursor on Heading in New Scenes"
+
+            onTriggered: {
+                Runtime.screenplayEditorSettings.focusCursorOnSceneHeadingInNewScenes = !Runtime.screenplayEditorSettings.focusCursorOnSceneHeadingInNewScenes
+            }
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+            readonly property string tooltip: "[Experimental Feature] Translate selected text from English to Indian languages using a shortcut or context menu command. Requires typing phonetic English text according to the alphabet mapping table for your active language. NOTE: Only works with PhTranslator as input method."
+
+            checkable: true
+            checked: Runtime.screenplayEditorSettings.allowSelectedTextTranslation
+            objectName: "allowSelectedTextTranslation"
+            text: "Allow Translation of Selected Text"
+
+            onTriggered: {
+                Runtime.screenplayEditorSettings.allowSelectedTextTranslation = !Runtime.screenplayEditorSettings.allowSelectedTextTranslation
+            }
+        }
+
+        Action {
             readonly property bool visible: false
             readonly property bool allowShortcut: true
 
@@ -1478,6 +1571,67 @@ Item {
             objectName: "zoomOut"
             shortcut: defaultShortcut
             text: "Zoom Out"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+
+            enabled: true
+            objectName: "renameLocation"
+            text: "Rename Location"
+
+            onTriggered: (source) => {
+                const locations = Scrite.document.structure.allLocations()
+                if(!locations || locations.length === 0) {
+                    MessageBox.information("Rename Location", "No locations in the screenplay to rename.")
+                    return
+                }
+
+                if(locations.length === 1) {
+                    RenameLocationDialog.launch(locations[0])
+                    return
+                }
+
+                SelectionListDialog.launch("Select a location to rename",
+                                           locations,
+                                           (location) => {
+                                               RenameLocationDialog.launch(location)
+                                           })
+            }
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+
+            enabled: true
+            objectName: "renameCharacter"
+            text: "Rename Character"
+
+            onTriggered: (source) => {
+                const characters = Scrite.document.structure.allCharacterNames()
+                if(!characters || characters.length === 0) {
+                    MessageBox.information("Rename Character", "No characters in the screenplay to rename.")
+                    return
+                }
+
+                if(characters.length === 1) {
+                    const character = Scrite.document.structure.addCharacter(characters[0])
+                    if(character)
+                        RenameCharacterDialog.launch(character)
+                    return
+                }
+
+                SelectionListDialog.launch("Select a character to rename",
+                                           characters,
+                                           (characterName) => {
+                                               const character = Scrite.document.structure.addCharacter(characterName)
+                                               if(character) {
+                                                   RenameCharacterDialog.launch(character)
+                                               }
+                                           })
+            }
         }
     }
 
@@ -1689,10 +1843,12 @@ Item {
         }
 
         Action {
-            readonly property bool allowShortcut: true
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Alt+Delete" : "Alt+Backspace"
+
             enabled: ActionHandler.canHandle
             objectName: "delete"
             text: "Delete"
+            shortcut: defaultShortcut
 
             icon.source: "qrc:/icons/action/delete.png"
         }
@@ -1802,6 +1958,18 @@ Item {
         Action {
             enabled: Runtime.mainWindowTab === Runtime.MainWindowTab.StructureTab
             checkable: true
+            checked: Scrite.document.structure.preferredGroupCategory === "{NONE}"
+            text: "None"
+
+            onToggled: {
+                if(checked)
+                    Scrite.document.structure.preferredGroupCategory = "{NONE}"
+            }
+        }
+
+        Action {
+            enabled: Runtime.mainWindowTab === Runtime.MainWindowTab.StructureTab
+            checkable: true
             checked: Scrite.document.structure.preferredGroupCategory === ""
             text: "Acts"
 
@@ -1816,6 +1984,7 @@ Item {
         model: Scrite.document.structure.groupCategories
 
         delegate: Action {
+            required property int index
             required property string modelData
 
             ActionManager.target: root.storyStructureOptions
@@ -1882,7 +2051,7 @@ Item {
 
         Action {
             property bool down: ActionHandler.active ? ActionHandler.active.down : false
-            property string tooltip: ActionHandler.active ? ActionHandler.active.tooltip : "New text or form note."
+            property string tooltip: ActionHandler.active && ActionHandler.active.tooltip !== "" ? ActionHandler.active.tooltip : "New text or form note."
             readonly property string defaultShortcut: "Ctrl+T"
 
             enabled: ActionHandler.canHandle
@@ -2544,6 +2713,72 @@ Item {
                 return false
             }
             return true
+        }
+
+        function triggerLater(action, delay) {
+            if(action)
+                Runtime.execLater(action, delay, () => {
+                                      if(action && action.enabled)
+                                        action.trigger()
+                                  })
+        }
+
+        function toggleLater(action, delay) {
+            if(action)
+                Runtime.execLater(action, delay, () => {
+                                      if(action && action.enabled)
+                                        action.toggle()
+                                  })
+        }
+
+        function assignShortcut(qmlAction, newShortcut) {
+            if(!qmlAction || !Object.isOfType(qmlAction, "QQuickAction"))
+                return
+
+            if(newShortcut === undefined || newShortcut === "") {
+                qmlAction.shortcut = undefined
+                logShortcutChangeActivity(qmlAction)
+                return
+            }
+
+            let conflictingAction = ActionManager.findActionForShortcut(newShortcut)
+            if(conflictingAction) {
+                MessageBox.information("Shortcut Conflict",
+                                       Gui.nativeShortcut(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
+            } else {
+                qmlAction.shortcut = newShortcut
+                logShortcutChangeActivity(qmlAction)
+            }
+        }
+
+        function hasShortcutConflict(shortcut) {
+            let conflictingAction = ActionManager.findActionForShortcut(shortcut)
+            if(conflictingAction) {
+                MessageBox.information("Shortcut Conflict",
+                                       Gui.nativeShortcut(shortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
+                return true
+            }
+            return false
+        }
+
+        function logShortcutChangeActivity(qmlAction) {
+            if(!qmlAction || !Scrite.user.info.consentToActivityLog)
+                return;
+
+            const activity = "shortcut-change"
+            const shortcut = qmlAction.shortcut !== undefined ? Gui.portableShortcut(qmlAction.shortcut) : "<no-shortcut>"
+            const defaultShortcut = qmlAction.defaultShortcut ? Gui.portableShortcut(qmlAction.defaultShortcut) : "<no-default>"
+            const actionManager = mainWindowTabs.findManager(qmlAction)
+
+            let details = actionManager.title + ": " + qmlAction.text + " = " + shortcut
+            if(shortcut === defaultShortcut) {
+                details += " (default)"
+            } else {
+                details += " (default=" + defaultShortcut + ")"
+            }
+            details += ". " + Platform.typeString
+
+            Scrite.user.logActivity2(activity, details)
         }
 
         readonly property EnumerationModel availableParagraphFormats: EnumerationModel {

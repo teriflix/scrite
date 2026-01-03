@@ -96,38 +96,70 @@ Item {
                     }
 
                     Flickable {
+                        id: _keywordsFlick
+
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
                         ScrollBar.vertical: VclScrollBar { }
 
                         contentWidth: width
-                        contentHeight: _keywordsList.height
+                        contentHeight: _keywordsFlickLayout.height
 
-                        TextListInput {
-                            id: _keywordsList
+                        clip: true
+                        enabled: _chkKeywordsTracks.checked
+                        opacity: enabled ? 1 : 0.5
 
-                            width: parent.width - 20
+                        ColumnLayout {
+                            id: _keywordsFlickLayout
 
-                            enabled: _chkKeywordsTracks.checked
-                            opacity: enabled ? 1 : 0.5
+                            width: _keywordsFlick.width - 20
 
-                            textList: _private.keywords
-                            completionStrings: Scrite.document.structure.sceneTags
-                            addTextButtonTooltip: "Click here to include a keyword to allowed list, and eliminate others."
-                            font: Runtime.idealFontMetrics.font
-                            labelText: "Keywords"
-                            labelIconSource:  "qrc:/icons/action/keyword.png"
-                            labelIconVisible: true
+                            TextListInput {
+                                id: _keywordsList
 
-                            readOnly: Scrite.document.readOnly
+                                Layout.fillWidth: true
 
-                            onEnsureVisible: (item, area) => {  }
-                            onTextClicked: (text, source) => {  }
-                            onTextCloseRequest: (text, source) => { _private.removeKeyword(text) }
-                            onConfigureTextRequest: (text, tag) => { tag.closable = true }
-                            onNewTextRequest: (text) => { _private.addKeyword(text) }
-                            onNewTextCancelled: () => { }
+                                textList: _private.keywords
+                                completionStrings: Scrite.document.structure.sceneTags
+                                addTextButtonTooltip: "Click here to include a keyword to allowed list, and eliminate others."
+                                font: Runtime.idealFontMetrics.font
+                                labelText: "Keywords"
+                                labelIconSource:  "qrc:/icons/action/keyword.png"
+                                labelIconVisible: true
+
+                                readOnly: Scrite.document.readOnly
+
+                                onEnsureVisible: (item, area) => {  }
+                                onTextClicked: (text, source) => {  }
+                                onTextCloseRequest: (text, source) => { _private.removeKeyword(text) }
+                                onConfigureTextRequest: (text, tag) => { tag.closable = true }
+                                onNewTextRequest: (text) => { _private.addKeyword(text) }
+                                onNewTextCancelled: () => { }
+                            }
+
+                            Flow {
+                                Layout.fillWidth: true
+
+                                Repeater {
+                                    model: Scrite.document.structure.sceneTags
+
+                                    delegate: VclCheckBox {
+                                        required property int index
+                                        required property string modelData
+
+                                        text: Runtime.idealFontMetrics.elidedText(modelData, Qt.ElideRight, _keywordsFlick.width*0.6, 0)
+                                        checked: _private.keywords.indexOf(modelData) >= 0
+
+                                        onToggled: {
+                                            if(checked)
+                                                _private.addKeyword(modelData)
+                                            else
+                                                _private.removeKeyword(modelData)
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

@@ -122,6 +122,10 @@ AbstractScenePartEditor {
                                  }
                 }
 
+                onTextEdited: {
+                    root.screenplayElement.userSceneNumber = text
+                }
+
                 onEditingFinished: {
                     if(root.isCurrent) {
                         _private.editSceneContent.trigger()

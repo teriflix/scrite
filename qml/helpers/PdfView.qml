@@ -102,7 +102,9 @@ Item {
                         Repeater {
                             model: Math.max(1,(endPageIndex-startPageIndex)+1)
 
-                            Rectangle {
+                            delegate: Rectangle {
+                                required property int index
+
                                 width: _pdfView.pdfPageWidth
                                 height: _pdfView.pdfPageHeight
 

@@ -28,7 +28,7 @@ DialogLauncher {
     id: root
 
     function launch() {
-        if(!Scrite.user.loggedIn || Scrite.user.info.hasTrialSubscription || Scrite.user.info.hasActiveSubscription)
+        if(!Scrite.user.loggedIn || Scrite.user.info.hasTrialSubscription || Scrite.user.info.hasActiveSubscription || Runtime.requiresUserOnboarding())
             return null
 
         return doLaunch()
@@ -192,6 +192,7 @@ DialogLauncher {
 
             SubscriptionPlanActivationRestApiCall {
                 id: activateTrialApi
+
                 api: SubscriptionPlanOperations.taxonomy.trialActivationApi
 
                 onFinished: {

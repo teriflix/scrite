@@ -30,6 +30,7 @@
 #include <QJsonValue>
 #include <QJsonDocument>
 #include <QNetworkReply>
+#include <QRegularExpression>
 #include <QOperatingSystemVersion>
 
 const QString RestApi::E_API_KEY = QStringLiteral("E_API_KEY");
@@ -222,6 +223,40 @@ bool RestApiCall::queue(RestApiCallQueue *queue)
     return false;
 }
 
+QJsonValue sanitizeJsonValue(const QJsonValue &value)
+{
+    if (value.isString()) {
+        QString str = value.toString();
+        // Trim + remove NUL and basic control chars only
+        return str.trimmed()
+                .replace(QChar::Null, "")
+                .replace(QRegularExpression("[\x00-\x1F\x7F]"), "");
+    }
+
+    if (value.isObject()) {
+        QJsonObject obj = value.toObject();
+        for (auto it = obj.begin(); it != obj.end(); ++it) {
+            it.value() = sanitizeJsonValue(it.value());
+        }
+        return obj;
+    }
+
+    if (value.isArray()) {
+        QJsonArray arr = value.toArray();
+        for (int i = 0; i < arr.size(); ++i) {
+            arr[i] = sanitizeJsonValue(arr[i]);
+        }
+        return arr;
+    }
+
+    return value; // Numbers, bools, null untouched
+}
+
+QJsonObject sanitizeJsonObject(const QJsonObject &obj)
+{
+    return sanitizeJsonValue(obj).toObject();
+}
+
 bool RestApiCall::call()
 {
     if (this->api().isEmpty() || m_reply != nullptr || this->isBusy())
@@ -232,7 +267,7 @@ bool RestApiCall::call()
 
     emit aboutToCall();
 
-    const QJsonObject compiledData = LocalStorage::compile(this->data());
+    const QJsonObject compiledData = sanitizeJsonObject(LocalStorage::compile(this->data()));
 
     QString path =
             QStringLiteral("/") + QLatin1String(REST_API_ROOT) + QStringLiteral("/") + this->api();
@@ -698,6 +733,12 @@ bool AppMinimumVersionRestApiCall::isVersionSupported() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+AppWelcomeTextApiCall::AppWelcomeTextApiCall(QObject *parent) { }
+
+AppWelcomeTextApiCall::~AppWelcomeTextApiCall() { }
+
+///////////////////////////////////////////////////////////////////////////////
+
 AppCheckUserRestApiCall::AppCheckUserRestApiCall(QObject *parent) : RestApiCall(parent)
 {
     m_email = LocalStorage::load(LocalStorage::email).toString();
@@ -899,6 +940,41 @@ void UserMeRestApiCall::setResponse(const QJsonObject &val)
     QTimer::singleShot(0, User::instance(), &User::loadInfoFromStorage);
     QTimer::singleShot(0, RestApi::instance(), &RestApi::sessionTokenAvailable);
     QTimer::singleShot(100, User::instance(), &User::checkIfVersionTypeUseIsAllowed);
+
+    RestApiCall::setResponse(val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+UserOnboardingFormApiCall::UserOnboardingFormApiCall(QObject *parent) : RestApiCall(parent) { }
+
+UserOnboardingFormApiCall::~UserOnboardingFormApiCall() { }
+
+///////////////////////////////////////////////////////////////////////////////
+
+UserSubmitOnboardingFormApiCall::UserSubmitOnboardingFormApiCall(QObject *parent)
+    : RestApiCall(parent)
+{
+}
+
+UserSubmitOnboardingFormApiCall::~UserSubmitOnboardingFormApiCall() { }
+
+void UserSubmitOnboardingFormApiCall::setFormData(const QJsonObject &val)
+{
+    if (m_formData == val)
+        return;
+
+    m_formData = val;
+    emit formDataChanged();
+}
+
+void UserSubmitOnboardingFormApiCall::setResponse(const QJsonObject &val)
+{
+    const QJsonObject data = val.value("data").toObject();
+    LocalStorage::store(LocalStorage::user, QJsonDocument(data).toJson());
+    LocalStorage::store(LocalStorage::userId, data.value("_id").toString());
+
+    QTimer::singleShot(0, User::instance(), &User::loadInfoFromStorage);
 
     RestApiCall::setResponse(val);
 }

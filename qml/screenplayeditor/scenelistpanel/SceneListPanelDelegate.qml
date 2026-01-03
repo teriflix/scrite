@@ -146,7 +146,7 @@ Rectangle {
                 spacing: 5
 
                 Loader {
-                    Layout.alignment: _private.isSceneTextModeHeading ? Qt.AlignVCenter : Qt.AlignTop
+                    Layout.alignment: _label.lineCount === 1 ? Qt.AlignVCenter : Qt.AlignTop
                     Layout.preferredWidth: root.sceneIconSize
                     Layout.preferredHeight: root.sceneIconSize
 
@@ -162,21 +162,23 @@ Rectangle {
                         fillMode: Image.PreserveAspectFit
 
                         MouseArea {
+                            id: _warningMouseArea
                             anchors.fill: parent
 
                             hoverEnabled: enabled
 
                             ToolTipPopup {
                                 text: "" + root.scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + ").\nRefer Settings > Screenplay > Options tab."
-                                visible: parent.containsMouse
+                                visible: _warningMouseArea.containsMouse
                             }
                         }
                     }
                 }
 
                 Item {
-                    Layout.preferredWidth: _label.height
-                    Layout.preferredHeight: _label.height
+                    Layout.alignment: _label.lineCount === 1 ? Qt.AlignVCenter : Qt.AlignTop
+                    Layout.preferredWidth: Runtime.idealFontMetrics.height
+                    Layout.preferredHeight: Runtime.idealFontMetrics.height
 
                     z: 1
                     visible: !_private.isBreak && !root.scene.structureElement.stackLeader && root.scene.structureElement.stackId !== ""
@@ -189,6 +191,7 @@ Rectangle {
                     }
 
                     MouseArea {
+                        id: _stackHintMouseArea
                         anchors.fill: parent
 
                         hoverEnabled: true
@@ -200,7 +203,7 @@ Rectangle {
                                     ret += " Toggle 'Display Stacks' option ON to see them in the scene list panel."
                                 return ret
                             }
-                            visible: parent.containsMouse
+                            visible: _stackHintMouseArea.containsMouse
                         }
                     }
                 }
@@ -234,15 +237,16 @@ Rectangle {
 
                         ToolTipPopup {
                             text: _private.tooltipText
-                            visible: parent.containsMouse
+                            parseShortcutInText: false
+                            visible: _labelMouseArea.containsMouse
                         }
                     }
                 }
 
                 Loader {
+                    Layout.alignment: _label.lineCount === 1 ? Qt.AlignVCenter : Qt.AlignTop
                     Layout.preferredWidth: root.sceneIconSize
                     Layout.preferredHeight: root.sceneIconSize
-                    Layout.alignment: _private.isSceneTextModeHeading ? Qt.AlignVCenter : Qt.AlignTop
 
                     active: !_private.isBreak && !root.scene.hasContent
                     visible: active
@@ -266,7 +270,7 @@ Rectangle {
                 }
 
                 VclLabel {
-                    Layout.alignment: Qt.AlignVCenter
+                    Layout.alignment: _label.lineCount === 1 ? Qt.AlignVCenter : Qt.AlignTop
 
                     text: _private.sceneLengthWatcher.sceneLength
                     color: Color.textColorFor(_private.color)

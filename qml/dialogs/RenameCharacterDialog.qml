@@ -20,7 +20,6 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -52,6 +51,8 @@ DialogLauncher {
         title: "Rename/Merge Character: " + _private.orignalCharacterName
 
         content: Item {
+            Component.onCompleted: Qt.callLater(newNameField.forceActiveFocus)
+
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 20
@@ -67,7 +68,10 @@ DialogLauncher {
                     horizontalAlignment: Text.AlignHCenter
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                     font.capitalization: Font.AllUppercase
-                    onReturnPressed: renameButton.click()
+                    onReturnPressed: {
+                        if(renameButton.enabled)
+                            renameButton.clicked()
+                    }
                 }
 
                 RowLayout {
@@ -93,7 +97,6 @@ DialogLauncher {
 
                             const allCharacterNames = Scrite.document.structure.allCharacterNames()
                             if(allCharacterNames.indexOf(_private.newCharacterName) >= 0) {
-
                                 let question = "Merging " + _private.orignalCharacterName + " with <b>" + _private.newCharacterName + "</b>"
 
                                 const originalCh = Scrite.document.structure.findCharacter(_private.orignalCharacterName)
@@ -199,9 +202,12 @@ DialogLauncher {
                         _private.waitDialog = null
 
                         if(_private.renameWasSuccessful) {
-                            let characterNotes = ActionHub.notebookOperations.find("characterNotes")
-                            characterNotes.characterName = _private.newCharacterName
-                            characterNotes.trigger()
+                            const tabs = Runtime.showNotebookInStructure ? [Runtime.StructureTab, Runtime.NotebookTab] : [Runtime.NotebookTab]
+                            if(tabs.indexOf(Runtime.mainWindowTab) >= 0) {
+                                let characterNotes = ActionHub.notebookOperations.find("characterNotes")
+                                characterNotes.characterName = _private.newCharacterName
+                                characterNotes.trigger()
+                            }
                             Qt.callLater(dialog.close)
                         } else {
                             MessageBox.information("Rename Error", dialog.character.renameError, () => {

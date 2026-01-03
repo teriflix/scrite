@@ -77,7 +77,10 @@ Rectangle {
                     Repeater {
                         model: charactersModel.availableTags
 
-                        VclMenuItem {
+                        delegate: VclMenuItem {
+                            required property int index
+                            required property string modelData
+
                             text: modelData
                             checkable: true
                             checked: charactersModel.hasTag(modelData)
@@ -130,19 +133,16 @@ Rectangle {
             Repeater {
                 model: charactersModel
 
-                VclCheckBox {
+                delegate: VclCheckBox {
+                    required property int index
+                    required property string modelData
+
                     id: characterCheckBox
-                    width: charactersListLayout.columnWidth
-                    Component.onCompleted: charactersListLayout.columnWidth = Math.max(charactersListLayout.columnWidth, implicitWidth)
-                    checkable: true
-                    checked: charactersModel.isInSelection(modelData)
-                    text: modelData
-                    onToggled: charactersModel.toggleSelection(modelData)
 
                     property bool highlight: false
-                    background: Rectangle {
-                        color: characterCheckBox.Material.background
-                    }
+
+                    Component.onCompleted: charactersListLayout.columnWidth = Math.max(charactersListLayout.columnWidth, implicitWidth)
+
                     Material.background: highlight ? Runtime.colors.accent.c300.background : Runtime.colors.primary.c10.background
                     Material.foreground: highlight ? Runtime.colors.accent.c300.text : Runtime.colors.primary.c10.text
 
@@ -156,8 +156,20 @@ Rectangle {
                     }
                     SearchAgent.onClearSearchRequest: characterCheckBox.font.bold = false
 
+                    width: charactersListLayout.columnWidth
+                    checkable: true
+                    checked: charactersModel.isInSelection(modelData)
+                    text: modelData
+
+                    onToggled: charactersModel.toggleSelection(modelData)
+
+                    background: Rectangle {
+                        color: characterCheckBox.Material.background
+                    }
+
                     Connections {
                         target: charactersModel
+
                         function onSelectedCharactersChanged() {
                             characterCheckBox.checked = charactersModel.isInSelection(characterCheckBox.text)
                         }

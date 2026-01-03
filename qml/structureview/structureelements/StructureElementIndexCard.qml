@@ -103,7 +103,14 @@ AbstractStructureElementUI {
     }
 
     function confirmAndDeleteSelf() {
-        _deleteConfirmationBoxLoader.active = true
+        MessageBox.question("Delete Confirmation",
+                            "Are you sure you want to delete the selelected index card?",
+                            ["Yes", "No"],
+                            (answer) => {
+                                if(answer === "Yes") {
+                                    root.deleteElementRequest(root.element)
+                                }
+                            })
     }
 
     x: _positionBinder.get.x
@@ -352,8 +359,6 @@ AbstractStructureElementUI {
 
                             selectByMouse: false
                             selectByKeyboard: false
-
-                            TextAreaSpellingSuggestionsMenu { }
                         }
                     }
 
@@ -448,7 +453,9 @@ AbstractStructureElementUI {
                                     enabled: !Scrite.document.readOnly
                                 }
 
-                                TextAreaSpellingSuggestionsMenu { }
+                                TextAreaSpellingSuggestionsMenu {
+                                    textArea: _synopsisField
+                                }
 
                                 cursorDelegate: TextEditCursorDelegate {
                                     textEdit: _synopsisField
@@ -776,85 +783,6 @@ AbstractStructureElementUI {
                 }
 
                 Qt.callLater( function() { root.element.stackLeader = true } )
-            }
-        }
-    }
-
-    Loader {
-        id: _deleteConfirmationBoxLoader
-
-        anchors.fill: parent
-
-        active: false
-
-        sourceComponent: Rectangle {
-            id: _deleteConfirmationBox
-
-            property bool allowDeactivate: false
-            property bool visibleInViewport: _private.isVisibleInViewport
-
-            Component.onCompleted: {
-                root.zoomOneForFocus()
-                forceActiveFocus()
-                Runtime.execLater(_deleteConfirmationBox, 500, function() {
-                    _deleteConfirmationBox.allowDeactivate = true
-                })
-            }
-
-            color: Color.translucent(Runtime.colors.primary.c600.background,0.85)
-
-            MouseArea {
-                anchors.fill: parent
-            }
-
-            ColumnLayout {
-                anchors.centerIn: parent
-
-                width: parent.width-20
-
-                spacing: 40
-
-                VclLabel {
-                    Layout.fillWidth: true
-
-                    text: "Are you sure you want to delete this index card?"
-                    color: Runtime.colors.primary.c600.text
-                    wrapMode: Text.WordWrap
-                    horizontalAlignment: Text.AlignHCenter
-
-                    font.bold: true
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                }
-
-                RowLayout {
-                    Layout.alignment: Qt.AlignHCenter
-
-                    spacing: 20
-
-                    VclButton {
-                        text: "Yes"
-                        focusPolicy: Qt.NoFocus
-
-                        onClicked: root.deleteElementRequest(root.element)
-                    }
-
-                    VclButton {
-                        text: "No"
-                        focusPolicy: Qt.NoFocus
-
-                        onClicked: _deleteConfirmationBoxLoader.active = false
-                    }
-                }
-            }
-
-            onVisibleInViewportChanged: {
-                if(!visibleInViewport && allowDeactivate)
-                    _deleteConfirmationBoxLoader.active = false
-            }
-
-            onActiveFocusChanged: {
-                if(!activeFocus && allowDeactivate)
-                    _deleteConfirmationBoxLoader.active = false
             }
         }
     }

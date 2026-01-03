@@ -90,7 +90,7 @@ public:
                 [=](const QList<int> &languageCodes) { this->reloadSpellers(languageCodes); });
     }
 
-    ~Spellers() { }
+    ~Spellers() { this->clearItems(); }
 
     QList<int> supportedLanguages() const { return m_supportedLanguages.keys(); }
 
@@ -108,8 +108,8 @@ public:
 
         QStringList ret;
         for (const Item &item : qAsConst(wordScriptItems)) {
-            if (item.speller.isMisspelled(word)) {
-                const QStringList suggestions = item.speller.suggest(word);
+            if (item.speller->isMisspelled(word)) {
+                const QStringList suggestions = item.speller->suggest(word);
                 ret += suggestions;
             }
         }
@@ -143,8 +143,8 @@ public:
 
         QMap<QLocale::Language, QStringList> languageSuggestions;
         for (const Item &item : qAsConst(wordScriptItems)) {
-            if (item.speller.isMisspelled(word)) {
-                const QStringList suggestions = item.speller.suggest(word);
+            if (item.speller->isMisspelled(word)) {
+                const QStringList suggestions = item.speller->suggest(word);
                 languageSuggestions[item.language] = suggestions;
             }
         }
@@ -167,7 +167,7 @@ private:
             }
         }
 
-        m_items.clear();
+        this->clearItems();
 
         for (int code : languageCodes) {
             Item item;
@@ -186,21 +186,30 @@ private:
                     item.languageName = languageNames.first();
             }
             item.script = Language::scriptForLanguage(item.language);
-            item.speller = item.language == QLocale::English ? EnglishLanguageSpeller()
-                                                             : Sonnet::Speller(item.languageName);
+            item.speller = item.language == QLocale::English
+                    ? new EnglishLanguageSpeller()
+                    : new Sonnet::Speller(item.languageName);
 
-            if (item.speller.isValid()
+            if (item.speller->isValid()
                 && (item.language == QLocale::English
                             ? true
-                            : item.speller.language() == item.languageName))
+                            : item.speller->language() == item.languageName))
                 m_items.append(item);
             else if (!languageNames.isEmpty()) {
                 item.languageName = languageNames.first();
-                item.speller = Sonnet::Speller(item.languageName);
-                if (item.speller.language() == item.languageName)
+                if (item.speller)
+                    delete item.speller;
+                item.speller = new Sonnet::Speller(item.languageName);
+                if (item.speller->language() == item.languageName)
                     m_items.append(item);
             }
         }
+    }
+
+    void clearItems()
+    {
+        while (!m_items.isEmpty())
+            delete m_items.takeFirst().speller;
     }
 
 private:
@@ -209,7 +218,7 @@ private:
         QString languageName;
         QLocale::Language language;
         QChar::Script script;
-        Sonnet::Speller speller;
+        Sonnet::Speller *speller = nullptr;
     };
     QList<Item> m_items;
     QMap<int, QStringList> m_supportedLanguages;

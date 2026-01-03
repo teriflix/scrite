@@ -120,8 +120,6 @@ Item {
     }
 
     component IconButton : Image {
-        property alias containsMouse: _iconButtonMouseArea.containsMouse
-
         property string tooltipText
 
         signal clicked()

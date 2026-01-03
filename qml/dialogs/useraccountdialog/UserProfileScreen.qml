@@ -19,8 +19,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
-
 import "qrc:/qml/tasks"
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
@@ -351,6 +349,13 @@ Item {
                             }
                         }
 
+                        VclButton {
+                            text: "Survey"
+                            visible: ["recommended", "required"].indexOf(Runtime.userAccountDialogSettings.userOnboardingStatus) >= 0
+
+                            onClicked: UserOnboardingDialog.launch()
+                        }
+
                         Item {
                             Layout.fillWidth: true
                         }
@@ -503,6 +508,7 @@ Item {
                 }
 
                 delegate: Item {
+                    required property int index
                     required property var modelData
 
                     width: userMessagesView.width
@@ -587,7 +593,8 @@ Item {
                                 id: buttonsRepeater
                                 model: modelData.buttons
 
-                                Link {
+                                delegate: Link {
+                                    required property int index
                                     required property var modelData
 
                                     Layout.fillWidth: true
@@ -764,6 +771,7 @@ Item {
                                                 Layout.fillWidth: true
 
                                                 focus: true
+                                                maximumLength: Runtime.bounded(queryUserSubsCall.responseData.minReferralCodeLength, queryUserSubsCall.responseData.maxReferralCodeLength, 128)
                                                 placeholderText: queryUserSubsCall.responseData.referralCodeText
                                                 horizontalAlignment: Text.AlignHCenter
                                             }
@@ -819,11 +827,11 @@ Item {
                                 Repeater {
                                     model: queryUserSubsCall.availablePlans
 
-                                    PlanCard {
+                                    delegate: PlanCard {
+                                        required property int index
                                         required property var modelData
 
                                         Layout.fillWidth: true
-
 
                                         name: modelData.title
                                         duration: Runtime.daysSpanAsString(modelData.duration)
@@ -886,7 +894,8 @@ Item {
                                 Repeater {
                                     model: queryUserSubsCall.pastSubscriptions
 
-                                    PlanCard {
+                                    delegate: PlanCard {
+                                        required property int index
                                         required property var modelData
 
                                         Layout.fillWidth: true

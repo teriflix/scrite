@@ -67,12 +67,7 @@ bool AbstractExporter::setConfigurationValue(const QString &name, const QVariant
     if (!prop.isValid())
         return false;
 
-    QVariant value2 = value;
-    if (value2.userType() != prop.userType()) {
-        value2.convert(prop.userType());
-    }
-
-    return prop.write(this, value2);
+    return prop.write(this, Utils::Object::convertToPropertyType(value, prop));
 }
 
 QVariant AbstractExporter::getConfigurationValue(const QString &name) const

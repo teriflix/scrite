@@ -78,8 +78,8 @@ ListView {
     delegate: SceneListPanelDelegate {
         id: _delegate
 
-        Component.onCompleted: { _private.delegateCount = _private.delegateCount+1 }
-        Component.onDestruction: { _private.delegateCount = _private.delegateCount-1 }
+        Component.onCompleted: _private.delegateCount = _private.delegateCount+1
+        Component.onDestruction: _private.delegateCount = _private.delegateCount-1
 
         width: root.width
 
@@ -155,6 +155,93 @@ ListView {
         sceneListView: root
     }
 
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("copy")
+        enabled: true
+
+        onTriggered: (source) => {
+                         Scrite.document.screenplay.copySelection()
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("paste")
+        enabled: !Scrite.document.readOnly && Scrite.document.screenplay.canPaste
+
+        onTriggered: (source) => {
+                         Scrite.document.screenplay.pasteAfter(root.screenplayAdapter.currentIndex)
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("remove")
+        enabled: !Scrite.document.readOnly && Scrite.document.screenplay.canPaste
+
+        onTriggered: (source) => {
+                         if(_private.sceneGroup.sceneCount <= 1)
+                             Scrite.document.screenplay.removeElement(root.screenplayAdapter.currentElement)
+                         else
+                             Scrite.document.screenplay.removeSelectedElements();
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("keywords")
+        enabled: !Scrite.document.readOnly
+
+        onTriggered: (source) => {
+                         SceneGroupKeywordsDialog.launch(_private.sceneGroup)
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("clearSelection")
+        enabled: root.screenplayAdapter.isSourceScreenplay && root.screenplayAdapter.screenplay.hasSelectedElements
+
+        onTriggered: (source) => {
+                         root.screenplayAdapter.screenplay.clearSelection()
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("makeSequence")
+        enabled: !Scrite.document.readOnly && root.sceneGroup.canBeStacked
+
+        onTriggered: (source) => {
+                         if(!root.sceneGroup.stack()) {
+                             MessageBox.information("Make Sequence Error",
+                                                    "Couldn't stack these scenes to make a sequence. Please try doing this on the Structure Tab.")
+                         }
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("breakSequence")
+        enabled: !Scrite.document.readOnly && root.sceneGroup.canBeUnstacked
+
+        onTriggered: (source) => {
+                         if(!root.sceneGroup.unstack()) {
+                             MessageBox.information("Break Sequence Error",
+                                                    "Couldn't unstack these scenes to make a sequence. Please try doing this on the Structure Tab.")
+                         }
+                     }
+    }
+
+    ActionHandler {
+        property bool omitted: Scrite.document.screenplay.selectedElementsOmitStatus !== Screenplay.NotOmitted
+        property string text: omitted ? "Include" : "Omit"
+
+        action: ActionHub.sceneListPanelOptions.find("includeOmit")
+        enabled: !Scrite.document.readOnly
+
+        onTriggered: (source) => {
+                         if(omitted)
+                             Scrite.document.screenplay.includeSelectedElements()
+                         else
+                             Scrite.document.screenplay.omitSelectedElements()
+                     }
+    }
+
     Connections {
         target: root.screenplayAdapter.screenplay
         enabled: root.screenplayAdapter.isSourceScreenplay
@@ -181,6 +268,10 @@ ListView {
             function onSelectionChanged() {
                 Qt.callLater(_private.sceneGroup.refresh)
             }
+
+            function onCurrentElementIndexChanged() {
+                Qt.callLater(_private.sceneGroup.refresh)
+            }
         }
 
         readonly property SceneGroup sceneGroup: SceneGroup {
@@ -190,7 +281,11 @@ ListView {
             evaluateLengths: true
 
             function refresh() {
-                root.screenplayAdapter.screenplay.gatherSelectedScenes(_sceneGroup)
+                clearScenes()
+                if(root.screenplayAdapter.screenplay.hasSelectedElements)
+                    root.screenplayAdapter.screenplay.gatherSelectedScenes(_sceneGroup)
+                else
+                    addScene(root.screenplayAdapter.screenplay.activeScene)
             }
         }
 
@@ -206,9 +301,10 @@ ListView {
         property int delegateCount: 0
 
         function updateCacheBuffer() {
-            if(tracksVisible)
-                cacheBuffer = contentHeight
-            else
+            if(tracksVisible) {
+                const idealCacheBuffer = Math.round(contentHeight * 1.25)
+                cacheBuffer = Math.max(idealCacheBuffer, cacheBuffer)
+            } else
                 cacheBuffer = 0
         }
 

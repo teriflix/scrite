@@ -82,7 +82,10 @@ Rectangle {
                 Repeater {
                     id: pageRepeater
 
-                    Item {
+                    delegate: Item {
+                        required property int index
+                        required property var modelData
+
                         Layout.fillWidth: true
                         Layout.preferredHeight: pageLabel.height*1.25
 

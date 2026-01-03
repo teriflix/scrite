@@ -834,18 +834,41 @@ public:
     QJsonArray supportedReports() const;
 
     // clang-format off
-    Q_PROPERTY(QJsonArray characterListReports
-               READ characterListReports
+    Q_PROPERTY(QJsonObject characterReports
+               READ characterReports
                CONSTANT )
     // clang-format on
-    QJsonArray characterListReports() const;
+    QJsonObject characterReports() const;
 
     // clang-format off
-    Q_PROPERTY(QJsonArray sceneListReports
-               READ sceneListReports
+    Q_PROPERTY(QJsonObject sceneReports
+               READ sceneReports
                CONSTANT )
     // clang-format on
-    QJsonArray sceneListReports() const;
+    QJsonObject sceneReports() const;
+
+    // clang-format off
+    Q_PROPERTY(QJsonObject episodeReports
+               READ episodeReports
+               CONSTANT)
+    // clang-format on
+    QJsonObject episodeReports() const;
+
+    // clang-format off
+    Q_PROPERTY(QJsonObject keywordReports
+               READ keywordReports
+               CONSTANT)
+    // clang-format on
+    QJsonObject keywordReports() const;
+
+    // clang-format off
+    Q_PROPERTY(QJsonObject tagReports
+               READ tagReports
+               CONSTANT)
+    // clang-format on
+    QJsonObject tagReports() const;
+
+    QJsonObject queryReports(const QString &withPropName) const;
 
     Q_INVOKABLE QString reportFileSuffix() const;
 

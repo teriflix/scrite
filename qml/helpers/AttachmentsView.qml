@@ -48,6 +48,7 @@ ListView {
     delegate: Item {
         id: _delegate
 
+        required property int index
         required property var objectItem
 
         property bool isSelected: root.currentIndex === index

@@ -40,7 +40,7 @@ Rectangle {
         Repeater {
             model: _private.mappingModels
 
-            Column {
+            delegate: Column {
                 required property int index
                 required property var modelData
 
@@ -72,7 +72,7 @@ Rectangle {
                     Repeater {
                         model: modelData.array
 
-                        Row {
+                        delegate: Row {
                             required property int index
                             required property var modelData
 

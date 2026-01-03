@@ -89,8 +89,8 @@ DialogLauncher {
                         delegate: Rectangle {
                             id: characterRowItem
 
-                            required property string modelData
                             required property int index
+                            required property string modelData
 
                             property string thisCharacterName: SMath.titleCased(character.name)
                             property string otherCharacterName: modelData

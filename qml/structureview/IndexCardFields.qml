@@ -59,7 +59,8 @@ Item {
         Repeater {
             model: indexCardFieldsModel
 
-            VclLabel {
+            delegate: VclLabel {
+                required property int index
                 required property string name
 
                 Layout.topMargin: root.lod === LodLoader.LOD.Low ? 0 : 8
@@ -72,9 +73,10 @@ Item {
         Repeater {
             model: indexCardFieldsModel
 
-            LodLoader {
+            delegate: LodLoader {
                 required property int index
                 required property string description
+
                 property string value: _private.getFieldValue(index)
 
                 Layout.fillWidth: true

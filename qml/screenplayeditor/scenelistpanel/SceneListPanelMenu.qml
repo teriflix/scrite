@@ -119,10 +119,4 @@ VclMenu {
             onClicked: ScreenplayTracksDialog.launch()
         }
     }
-
-    VclMenuItem {
-        text: "Title Page Fields"
-
-        onClicked: TitlePageDialog.launch()
-    }
 }

@@ -98,7 +98,7 @@ Item {
             Repeater {
                 model: allowedExtensions
 
-                VclRadioButton {
+                delegate: VclRadioButton {
                     required property var modelData
 
                     text: modelData.label + " (." + modelData.suffix + ")"

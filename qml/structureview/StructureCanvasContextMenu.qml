@@ -66,7 +66,8 @@ VclMenu {
         Repeater {
             model: AnnotationFactory.keys
 
-            VclMenuItem {
+            delegate: VclMenuItem {
+                required property int index
                 required property var modelData
 
                 text: modelData.title

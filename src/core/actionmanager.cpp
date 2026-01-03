@@ -302,9 +302,8 @@ bool ActionManager::restoreActionShortcut(QObject *action)
     const QKeySequence defaultShortcut = defaultActionShortcut(action);
     if (defaultShortcut.isEmpty()) {
         const QVariant currentShortcut = action->property(_QQuickActionShortcutProperty);
-        if (currentShortcut.isValid()) {
-            action->setProperty(_QQuickActionShortcutProperty, QVariant());
-            return true;
+        if (currentShortcut.isValid() && !Utils::Gui::portableShortcut(currentShortcut).isEmpty()) {
+            return action->setProperty(_QQuickActionShortcutProperty, QVariant());
         }
         return false;
     }
@@ -1447,7 +1446,7 @@ QObject *ActionsModelFilter::findActionForShortcut(const QString &shortcut) cons
     return nullptr;
 }
 
-bool ActionsModelFilter::restoreActionShortcut(QObject *action) const
+bool ActionsModelFilter::restoreActionShortcut(QObject *action)
 {
     // NOTE: This works only for actions avaialable as filtered through this model
     ActionsModel *srcModel = qobject_cast<ActionsModel *>(this->sourceModel());
@@ -1457,8 +1456,14 @@ bool ActionsModelFilter::restoreActionShortcut(QObject *action) const
             return false;
 
         const QModelIndex index = this->mapFromSource(srcModel->index(row));
-        if (index.isValid())
-            return srcModel->restoreActionShortcut(action);
+        if (index.isValid()) {
+            bool success = srcModel->restoreActionShortcut(action);
+            if (success) {
+                emit dataChanged(index, index);
+                emit actionShortcutRestored(action);
+            }
+            return success;
+        }
     }
 
     return false;
@@ -1472,10 +1477,8 @@ int ActionsModelFilter::restoreAllActionShortcuts()
     for (int i = 0; i < this->rowCount(); i++) {
         const QModelIndex index = this->index(i, 0);
         QObject *action = index.data(ActionsModel::ActionRole).value<QObject *>();
-        if (this->restoreActionShortcut(action)) {
-            emit dataChanged(index, index);
+        if (this->restoreActionShortcut(action))
             ++restoreCount;
-        }
     }
 
     return restoreCount;
@@ -1484,6 +1487,11 @@ int ActionsModelFilter::restoreAllActionShortcuts()
 void ActionsModelFilter::filter()
 {
     this->invalidateFilter();
+}
+
+ActionManager *ActionsModelFilter::actionManagerOf(QObject *action) const
+{
+    return ActionManager::findManager(action);
 }
 
 void ActionsModelFilter::componentComplete()

@@ -26,18 +26,18 @@ QtObject {
 
     property string tipName
 
-    Notification.active: enabled && _private.helpTip && !_private.tipShown
+    Notification.active: enabled && _private.helpTip !== undefined && !_private.tipShown
 
-    Notification.image: _private.helpTip ? _private.helpTip.image.url : ""
+    Notification.image: _private.helpTip !== undefined ? _private.helpTip.image.url : ""
 
-    Notification.text: _private.helpTip ? _private.helpTip.text : ""
-    Notification.title: _private.helpTip ? _private.helpTip.title : ""
+    Notification.text: _private.helpTip !== undefined  ? _private.helpTip.text : ""
+    Notification.title: _private.helpTip !== undefined  ? _private.helpTip.title : ""
 
     Notification.autoClose: false
     Notification.closeOnButtonClick: false
     Notification.buttons: {
         var ret = []
-        if(_private.helpTip)
+        if(_private.helpTip !== undefined)
             _private.helpTip.buttons.forEach( (item) => {
                                                 ret.push(item.text)
                                              })
@@ -45,7 +45,7 @@ QtObject {
     }
 
     Notification.onImageClicked: {
-        if(_private.helpTip) {
+        if(_private.helpTip !== undefined) {
             if(_private.helpTip.image.action === "$dismiss") {
                 markTipAsShown()
             } else {
@@ -55,7 +55,7 @@ QtObject {
     }
 
     Notification.onButtonClicked: (buttonIndex) => {
-                                      if(_private.helpTip) {
+                                      if(_private.helpTip !== undefined) {
                                           const button = _private.helpTip.buttons[buttonIndex]
                                           if(button.action === "$dismiss") {
                                               markTipAsShown()

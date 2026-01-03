@@ -72,17 +72,6 @@ Item {
         }
 
         readonly property Component filledScreenplayContent: FocusScope {
-            EventFilter.target: Scrite.app
-            EventFilter.active: root.screenplayAdapter.isSourceScreenplay && root.screenplayAdapter.screenplay.hasSelectedElements
-            EventFilter.events: [EventFilter.KeyPress]
-            EventFilter.onFilter: (object,event,result) => {
-                                      if(event.key === Qt.Key_Escape) {
-                                          root.screenplayAdapter.screenplay.clearSelection()
-                                          result.acceptEvent = true
-                                          result.filter = true
-                                      }
-                                  }
-
             ColumnLayout {
                 anchors.fill: parent
 
@@ -136,15 +125,13 @@ Item {
                 DelayedProperty.delay: 10
                 DelayedProperty.set: _sceneListView.delegateCount
 
-                enabled: DelayedProperty.get === root.screenplayAdapter.elementCount && (isSceneTextModeHeading || maximumLineCount === 1)
+                enabled: Math.abs(DelayedProperty.get - root.screenplayAdapter.elementCount) < 2
                 visible: Runtime.sceneListPanelSettings.displayTracks && Runtime.screenplayTracksSettings.displayTracks && root.screenplayAdapter.isSourceScreenplay
                 listView: _sceneListView
                 screenplay: root.screenplayAdapter.screenplay
 
-                property int maximumLineCount: Runtime.bounded(1,Runtime.screenplayEditorSettings.slpSynopsisLineCount,5)
-                property bool isSceneTextModeHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
-                onMaximumLineCountChanged: reload()
-                onIsSceneTextModeHeadingChanged: reload()
+                property var __watch: [Runtime.sceneListPanelSettings.sceneTextMode, Runtime.screenplayEditorSettings.slpSynopsisLineCount]
+                on__WatchChanged: Qt.callLater(_sceneListView.updateCacheBuffer)
             }
 
             SceneListPanel {
@@ -174,6 +161,7 @@ Item {
                         return "<p>Scene Selection:</p>" + SMath.formatAsBulletPoints(fields)
                     }
                     visible: Runtime.sceneListPanelSettings.showTooltip && _sceneListView.sceneGroup.evaluateLengths && _sceneListView.sceneGroup.sceneCount >= 2
+                    parseShortcutInText: false
                 }
             }
         }

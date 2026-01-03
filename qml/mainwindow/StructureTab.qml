@@ -183,7 +183,15 @@ Item {
 
                 active: Runtime.appFeatures.structure.enabled
 
-                sourceComponent: StructureView {}
+                sourceComponent: StructureView {
+                    onEditorRequest: () => {
+                                          // TODO
+                                     }
+
+                    onReleaseEditorRequest: () => {
+                                                // TODO
+                                            }
+                }
             }
 
             DisabledFeatureNotice {

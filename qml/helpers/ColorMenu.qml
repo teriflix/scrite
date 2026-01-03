@@ -73,13 +73,17 @@ VclMenu {
         id: colorItemDelegate
 
         Rectangle {
-            width: parent.cellSize
-            height: parent.cellSize
-            color: (colorGrid.currentIndex === index) ? Color.translucent(Scrite.app.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
+            required property int index
+            required property color modelData
+
             Component.onCompleted: {
                 if(modelData == selectedColor)
                     colorGrid.currentIndex = index
             }
+
+            width: parent.cellSize
+            height: parent.cellSize
+            color: (colorGrid.currentIndex === index) ? Color.translucent(Scrite.app.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
 
             Rectangle {
                 anchors.fill: parent

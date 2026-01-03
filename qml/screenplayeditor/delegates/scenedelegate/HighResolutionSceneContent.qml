@@ -224,7 +224,7 @@ Item {
 
                 isCurrent: sceneDelegate.isCurrent
                 zoomLevel: sceneDelegate.zoomLevel
-                fontMetrics: Runtime.minimumFontMetrics
+                fontMetrics: Runtime.idealFontMetrics
                 sceneTextEditor: _sceneContentEditor.editor
                 screenplayElement: sceneDelegate.screenplayElement
             }

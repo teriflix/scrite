@@ -31,6 +31,7 @@ Item {
     property string placeholderText: "None Set"
     property string nativeShortcut: Gui.nativeShortcut(portableShortcut)
 
+    property bool readOnly: false
     property font font: fontMetrics.font
     property FontMetrics fontMetrics: Runtime.shortcutFontMetrics
 
@@ -64,7 +65,8 @@ Item {
 
             model: keyCombinations.modifiers
 
-            KeyboardKey {
+            delegate: KeyboardKey {
+                required property int index
                 required property string modelData
 
                 Layout.alignment: Qt.AlignVCenter
@@ -78,7 +80,8 @@ Item {
         Repeater {
             model: keyCombinations.keys
 
-            KeyboardKey {
+            delegate: KeyboardKey {
+                required property int index
                 required property string modelData
 
                 Layout.alignment: Qt.AlignVCenter
@@ -103,14 +106,15 @@ Item {
 
         anchors.fill: _layout
 
-        cursorShape: Qt.PointingHandCursor
+        enabled: !root.readOnly
+        cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
         hoverEnabled: true
 
         onClicked: editShortcut()
     }
 
     property real __minimumKeyWidth: fontMetrics.boundingRect("Ctrl").width + 6
-    property real __minimumKeyHeight: fontMetrics.lineSpacing
+    property real __minimumKeyHeight: fontMetrics.lineSpacing + 4
 
     component KeyboardKey : Rectangle {
         property string text

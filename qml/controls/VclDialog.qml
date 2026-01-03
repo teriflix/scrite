@@ -139,6 +139,7 @@ Dialog {
 
             anchors.fill: parent
 
+            clip: true
             contentWidth: _contentItemLoader.width
             contentHeight: _contentItemLoader.height
 
@@ -256,7 +257,8 @@ Dialog {
         Repeater {
             model: root.visible && root.modal && root.handleLanguageShortcuts ? LanguageEngine.supportedLanguages : 0
 
-            Item {
+            delegate: Item {
+                required property int index
                 required property var language // This is of type Language, but we have to use var here.
                 // You cannot use Q_GADGET struct names as type names in QML
                 // that privilege is only reserved for QObject types.

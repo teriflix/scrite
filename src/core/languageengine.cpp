@@ -307,6 +307,12 @@ QString Language::nativeName() const
     return QLocale(QLocale::Language(this->code)).nativeLanguageName();
 }
 
+QString Language::shortName() const
+{
+    QLocale locale(QLocale::Language(this->code));
+    return locale.name().section('_', 0, 0);
+}
+
 QString Language::glyph() const
 {
     const QChar ch = glyphForScript().value(QChar::Script(this->charScript()));
@@ -1084,7 +1090,7 @@ QString DefaultTransliteration::onWord(const QString &word, int code)
         case QLocale::Malayalam:
             return GetMalayalamTranslator();
         case QLocale::Marathi:
-            return GetMalayalamTranslator();
+            return GetMarathiTranslator();
         case QLocale::Oriya:
             return GetOriyaTranslator();
         case QLocale::Punjabi:
@@ -1295,11 +1301,33 @@ bool TransliterationOption::activate()
 
 QString TransliterationOption::transliterateWord(const QString &word) const
 {
+    if (word.isEmpty())
+        return word;
+
     AbstractTransliterationEngine *t = this->transliterator();
     if (t)
         return t->transliterateWord(word, *this);
 
     return word;
+}
+
+QString TransliterationOption::transliterateParagraph(const QString &paragraph) const
+{
+    if (paragraph.isEmpty())
+        return paragraph;
+
+    QString ret = paragraph;
+
+    AbstractTransliterationEngine *t = this->transliterator();
+    if (t) {
+        const QList<ScriptBoundary> boundaries = LanguageEngine::determineBoundaries(paragraph);
+        for (const ScriptBoundary &boundary : boundaries) {
+            ret.replace(boundary.start, boundary.end - boundary.start + 1,
+                        t->transliterateWord(boundary.text, *this));
+        }
+    }
+
+    return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2083,7 +2111,7 @@ QString LanguageEngine::formattedInHtml(const QString &paragraph)
             ts << item.text;
         else {
             const QString fontFamily = LanguageEngine::instance()->scriptFontFamily(item.script);
-            ts << "<font family=\"" << fontFamily << "\">" << item.text << "</font>";
+            ts << "<span style='font-family: \"" << fontFamily << "\";'>" << item.text << "</span>";
         }
     }
 

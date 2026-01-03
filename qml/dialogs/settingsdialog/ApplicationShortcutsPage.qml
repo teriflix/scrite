@@ -234,8 +234,9 @@ FocusScope {
                             opacity: enabled ? 1 : 0.5
                             description: "Shortcut for <b>" + actionManager.title + "</b> » <i>" + qmlAction.text + "</i>"
                             portableShortcut: qmlAction.shortcut !== undefined ? qmlAction.shortcut : ""
-                            placeholderText: qmlAction.defaultShortcut !== undefined ? ("Default: " + Gui.nativeShortcut(qmlAction.defaultShortcut)) :
-                                                                                       (qmlAction.allowShortcut === true ? "None Set" : "")
+                            placeholderText: qmlAction.defaultShortcut !== undefined && qmlAction.defaultShortcut !== "" ?
+                                                 ("Default: " + Gui.nativeShortcut(qmlAction.defaultShortcut)) :
+                                                 (qmlAction.allowShortcut === true ? "None Set" : "")
 
                             onActiveFocusChanged: {
                                 if(activeFocus) {
@@ -255,7 +256,9 @@ FocusScope {
                             opacity: enabled ? 1 : (shortcutIsEditable ? 0.5 : 0)
                             icon.source: "qrc:/icons/content/undo.png"
 
-                            onClicked: _actionsModel.restoreActionShortcut(qmlAction)
+                            onClicked: {
+                                _actionsModel.restoreActionShortcut(qmlAction)
+                            }
                         }
                     }
                 }
@@ -300,5 +303,9 @@ FocusScope {
         onModelReset: Qt.callLater(_actionsView.resetCurrentItem)
         onRowsRemoved: Qt.callLater(_actionsView.resetCurrentItem)
         onRowsInserted: Qt.callLater(_actionsView.resetCurrentItem)
+
+        onActionShortcutRestored: (action) => {
+                                      ActionHub.logShortcutChangeActivity(action)
+                                  }
     }
 }

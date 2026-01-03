@@ -10,6 +10,7 @@ singleton LanguageOptionsDialog 1.0 LanguageOptionsDialog.qml
 singleton MessageBox 1.0 MessageBox.qml
 singleton PdfDialog 1.0 PdfDialog.qml
 singleton RenameCharacterDialog 1.0 RenameCharacterDialog.qml
+singleton RenameLocationDialog 1.0 RenameLocationDialog.qml
 singleton ReportConfigurationDialog 1.0 ReportConfigurationDialog.qml
 singleton RequestVersionTypeAccess 1.0 RequestVersionTypeAccess.qml
 singleton SceneGroupKeywordsDialog 1.0 SceneGroupKeywordsDialog.qml
@@ -17,6 +18,7 @@ singleton ScreenplayEditorOptionsDialog 1.0 ScreenplayEditorOptionsDialog.qml
 singleton ScreenplayFormattingRulesDialog 1.0 ScreenplayFormattingRulesDialog.qml
 singleton ScreenplayPageSetupDialog 1.0 ScreenplayPageSetupDialog.qml
 singleton ScreenplayTracksDialog 1.0 ScreenplayTracksDialog.qml
+singleton SelectionListDialog 1.0 SelectionListDialog.qml
 singleton SettingsDialog 1.0 SettingsDialog.qml
 singleton ShortcutEditorDialog 1.0 ShortcutEditorDialog.qml
 singleton ShortcutInputDialog 1.0 ShortcutInputDialog.qml
@@ -28,4 +30,5 @@ singleton SubscriptionPlanComparisonDialog 1.0 SubscriptionPlanComparisonDialog.
 singleton TitlePageDialog 1.0 TitlePageDialog.qml
 singleton TrialNotActivatedDialog 1.0 TrialNotActivatedDialog.qml
 singleton UserAccountDialog 1.0 UserAccountDialog.qml
+singleton UserOnboardingDialog 1.0 UserOnboardingDialog.qml
 singleton WaitDialog 1.0 WaitDialog.qml

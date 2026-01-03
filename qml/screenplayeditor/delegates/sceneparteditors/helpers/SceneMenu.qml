@@ -97,9 +97,10 @@ MenuLoader {
             width: 250
 
             Repeater {
-                model: Runtime.sceneListReports
+                model: Runtime.sceneReports.reports ? Runtime.sceneReports.reports : 0
 
-                VclMenuItem {
+                delegate: VclMenuItem {
+                    required property int index
                     required property var modelData
 
                     text: modelData.name
@@ -111,9 +112,9 @@ MenuLoader {
                             sceneNumbers.splice(0, sceneNumbers.length)
                         sceneNumbers.push(root.screenplayElement.elementIndex)
 
-                        ReportConfigurationDialog.launch(modelData.name,
-                                                         {"sceneNumbers": sceneNumbers},
-                                                         {"initialPage": modelData.group})
+                        let props = {}
+                        props[Runtime.sceneReports.propertyName] = sceneNumbers
+                        ReportConfigurationDialog.launch(modelData.name, props, {initialPage: modelData.group})
                     }
                 }
             }

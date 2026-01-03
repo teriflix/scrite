@@ -47,7 +47,8 @@ ToolBar {
         Repeater {
             model: root.actionManager.visibleActions
 
-            ActionToolButton {
+            delegate: ActionToolButton {
+                required property int index
                 required property var modelData
 
                 property var qmlAction: modelData

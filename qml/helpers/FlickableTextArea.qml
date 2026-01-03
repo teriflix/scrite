@@ -147,7 +147,9 @@ Flickable {
             onTriggered: (source) => { _textArea.redo() }
         }
 
-        TextAreaSpellingSuggestionsMenu { }
+        TextAreaSpellingSuggestionsMenu {
+            textArea: _textArea
+        }
 
         onCursorRectangleChanged: {
             let cr = cursorRectangle
@@ -180,21 +182,21 @@ Flickable {
         onAboutToHide: _textArea.persistentSelection = __persistentSelection
 
         VclMenuItem {
-            text: "Cut\t" + Gui.nativeShortcut("Ctrl+X")
+            text: "Cut\t" + ActionHub.editOptions.find("cut").shortcut
             enabled: _textArea.selectedText !== ""
             onClicked: _textArea.cut()
             focusPolicy: Qt.NoFocus
         }
 
         VclMenuItem {
-            text: "Copy\t" + Gui.nativeShortcut("Ctrl+C")
+            text: "Copy\t" + ActionHub.editOptions.find("copy").shortcut
             enabled: _textArea.selectedText !== ""
             onClicked: _textArea.copy()
             focusPolicy: Qt.NoFocus
         }
 
         VclMenuItem {
-            text: "Paste\t" + Gui.nativeShortcut("Ctrl+V")
+            text: "Paste\t" + ActionHub.editOptions.find("paste").shortcut
             onClicked: _textArea.paste()
             focusPolicy: Qt.NoFocus
         }

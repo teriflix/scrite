@@ -614,6 +614,7 @@ public:
     Q_INVOKABLE static QKeySequence standardKeySequence(int standardKey);
 
     Q_INVOKABLE static QString nativeShortcut(const QString &shortcut);
+    Q_INVOKABLE static QString portableShortcut(const QVariant &shortcut);
     Q_INVOKABLE static bool acceptsTextInput(QQuickItem *item);
 
     Q_INVOKABLE static void log(const QString &message);
@@ -672,6 +673,8 @@ public:
     Q_INVOKABLE static QAbstractListModel *enumModel(QObject *object, const QString &enumName);
     Q_INVOKABLE static QAbstractListModel *
     typeEnumModel(const QString &typeName, const QString &enumName, QObject *parent = nullptr);
+
+    static QVariant convertToPropertyType(const QVariant &value, const QMetaProperty &prop);
 };
 
 class ObjectRegistry : public QObject
@@ -901,6 +904,8 @@ public:
     Q_INVOKABLE static bool isValidEmail(const QString &email);
 
     Q_INVOKABLE static QString formatAsBulletPoints(const QVariantList &items);
+
+    Q_INVOKABLE static QString removeNewlineAndTabsIn(const QString &val);
 
     static QString painterPathToString(const QPainterPath &val);
 

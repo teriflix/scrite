@@ -97,19 +97,21 @@ void ScreenplayElement::setBreakType(int val)
 
 void ScreenplayElement::setBreakSubtitle(const QString &val)
 {
-    if (m_breakSubtitle == val)
+    const QString val2 = Utils::SMath::removeNewlineAndTabsIn(val);
+    if (m_breakSubtitle == val2)
         return;
 
-    m_breakSubtitle = val;
+    m_breakSubtitle = val2;
     emit breakSubtitleChanged();
 }
 
 void ScreenplayElement::setBreakTitle(const QString &val)
 {
-    if (m_breakTitle == val || m_elementType != BreakElementType)
+    const QString val2 = Utils::SMath::removeNewlineAndTabsIn(val);
+    if (m_breakTitle == val2 || m_elementType != BreakElementType)
         return;
 
-    m_breakTitle = val;
+    m_breakTitle = val2;
     emit breakTitleChanged();
 }
 
@@ -142,11 +144,25 @@ void ScreenplayElement::setScreenplay(Screenplay *val)
     if (m_screenplay != nullptr || m_screenplay == val)
         return;
 
+    if (m_screenplay != nullptr) {
+        disconnect(this, &ScreenplayElement::wordCountChanged, m_screenplay,
+                   &Screenplay::evaluateWordCountLater);
+
+        if (m_scene != nullptr)
+            disconnect(m_scene, &Scene::aboutToRemoveScene, m_screenplay,
+                       &Screenplay::removeSceneElements);
+    }
+
     m_screenplay = val;
 
-    if (m_screenplay != nullptr)
+    if (m_screenplay != nullptr) {
         connect(this, &ScreenplayElement::wordCountChanged, m_screenplay,
                 &Screenplay::evaluateWordCountLater, Qt::UniqueConnection);
+
+        if (m_scene != nullptr)
+            connect(m_scene, &Scene::aboutToRemoveScene, m_screenplay,
+                    &Screenplay::removeSceneElements);
+    }
 
     emit screenplayChanged();
 }
@@ -234,13 +250,16 @@ void ScreenplayElement::setScene(Scene *val)
     connect(m_scene, &Scene::elementCountChanged, this, &ScreenplayElement::sceneContentChanged);
     connect(m_scene, &Scene::sceneElementChanged, this, &ScreenplayElement::sceneElementChanged);
 
+    connect(m_scene->heading(), &SceneHeading::enabledChanged, this,
+            &ScreenplayElement::evaluateSceneNumberRequest);
+    connect(m_scene->heading(), &SceneHeading::enabledChanged, this,
+            &ScreenplayElement::sceneHeadingChanged);
+    connect(m_scene->heading(), &SceneHeading::textChanged, this,
+            &ScreenplayElement::sceneHeadingChanged);
+
     if (m_screenplay) {
-        connect(m_scene->heading(), &SceneHeading::enabledChanged, this,
-                &ScreenplayElement::evaluateSceneNumberRequest);
-        connect(m_scene->heading(), &SceneHeading::enabledChanged, this,
-                &ScreenplayElement::sceneHeadingChanged);
-        connect(m_scene->heading(), &SceneHeading::textChanged, this,
-                &ScreenplayElement::sceneHeadingChanged);
+        connect(m_scene, &Scene::aboutToRemoveScene, m_screenplay,
+                &Screenplay::removeSceneElements);
     }
 
     emit sceneChanged();
@@ -280,6 +299,15 @@ void ScreenplayElement::setHeightHint(qreal val)
 
     m_heightHint = val;
     emit heightHintChanged();
+}
+
+void ScreenplayElement::setCursorPositionHint(int val)
+{
+    if (m_cursorPositionHint == val)
+        return;
+
+    m_cursorPositionHint = val;
+    emit cursorPositionHintChanged();
 }
 
 void ScreenplayElement::setSelected(bool val)
@@ -542,6 +570,9 @@ Screenplay::Screenplay(QObject *parent)
 
     QClipboard *clipboard = qApp->clipboard();
     connect(clipboard, &QClipboard::dataChanged, this, &Screenplay::canPasteChanged);
+
+    m_restartEpisodeScenesAtOne =
+            settings->value("Screenplay Editor/restartEpisodeScenesAtOne").toBool();
 }
 
 Screenplay::~Screenplay()
@@ -790,6 +821,17 @@ int Screenplay::selectedElementsCount() const
             ++ret;
 
     return ret;
+}
+
+void Screenplay::setRestartEpisodeScenesAtOne(bool val)
+{
+    if (m_restartEpisodeScenesAtOne == val)
+        return;
+
+    m_restartEpisodeScenesAtOne = val;
+    emit restartEpisodeScenesAtOneChanged();
+
+    this->evaluateSceneNumbersLater();
 }
 
 void Screenplay::setSelectedElementsOmitStatus(OmitStatus val)
@@ -1997,6 +2039,8 @@ ScreenplayElement *Screenplay::mergeElementWithPrevious(ScreenplayElement *eleme
     currentScene->mergeInto(previousScene);
 
     previousSceneElement->setHeightHint(0);
+    previousSceneElement->setCursorPositionHint(previousScene->cursorPosition());
+
     screenplay->setCurrentElementIndex(previousElementIndex);
     GarbageCollector::instance()->add(element);
     return previousSceneElement;
@@ -2770,14 +2814,21 @@ void ScreenplayPasteUndoCommand::redo()
     for (int i = 0; i < m_screenplayElementsData.size(); i++) {
         const QJsonObject elementJson = m_screenplayElementsData.at(i).toObject();
         const QString sceneId = elementJson.value(QLatin1String("sceneID")).toString();
-        if (!m_structure->findElementBySceneID(sceneId)) {
-            const QJsonObject sceneJson = m_scenesData.value(sceneId).toObject();
-            if (sceneJson.isEmpty())
-                continue;
+        const QJsonObject sceneJson = m_scenesData.value(sceneId).toObject();
+        if (sceneJson.isEmpty())
+            continue;
 
-            QObjectFactory factory;
-            factory.addClass<SceneElement>();
+        QObjectFactory factory;
+        factory.addClass<SceneElement>();
 
+        StructureElement *structureElement = m_structure->findElementBySceneID(sceneId);
+        if (structureElement) {
+            Scene *scene = structureElement->scene();
+            const QByteArray backup = scene->toByteArray();
+            if (!QObjectSerializer::fromJson(sceneJson, scene, &factory)) {
+                scene->resetFromByteArray(backup);
+            }
+        } else {
             StructureElement *structureElement = new StructureElement(m_structure);
             Scene *scene = new Scene(structureElement);
             if (!QObjectSerializer::fromJson(sceneJson, scene, &factory)) {
@@ -2804,6 +2855,7 @@ void ScreenplayPasteUndoCommand::redo()
 
     m_screenplay->insertElementsAt(m_screenplayElements, m_pasteAfter + 1);
     m_screenplay->setSelection(m_screenplayElements);
+    m_screenplay->setCurrentElementIndex(m_pasteAfter + 1);
 }
 
 void ScreenplayPasteUndoCommand::undo()
@@ -2816,6 +2868,8 @@ void ScreenplayPasteUndoCommand::undo()
         structureElements.append(scene->structureElement());
     m_structure->removeElements(structureElements);
     m_scenes.clear();
+
+    m_screenplay->setCurrentElementIndex(m_pasteAfter);
 }
 
 class ScreenplayPasteFromFountainUndoCommand : public QUndoCommand
@@ -3340,7 +3394,6 @@ QList<ScreenplayBreakInfo> Screenplay::episodeInfoList() const
     if (this->episodeCount() <= 0)
         return ret;
 
-    int epIndex = 0;
     for (int i = 0; i < m_elements.size(); i++) {
         const ScreenplayElement *element = m_elements.at(i);
         if (element->elementType() != ScreenplayElement::BreakElementType)
@@ -3349,11 +3402,9 @@ QList<ScreenplayBreakInfo> Screenplay::episodeInfoList() const
         if (element->breakType() != Screenplay::Episode)
             continue;
 
-        ScreenplayBreakInfo info({ epIndex, epIndex + 1, element->breakTitle(),
-                                   element->breakSubtitle(), QString() });
+        ScreenplayBreakInfo info({ element->episodeIndex(), element->episodeIndex() + 1,
+                                   element->breakTitle(), element->breakSubtitle(), QString() });
         ret.append(info);
-
-        ++epIndex;
     }
 
     return ret;
@@ -3439,6 +3490,9 @@ void Screenplay::evaluateSceneNumbers(bool minorAlso)
                 lastEpisodeName = element->breakTitle();
                 if (!element->breakSubtitle().isEmpty())
                     lastEpisodeName += ": " + element->breakSubtitle();
+
+                if (m_restartEpisodeScenesAtOne)
+                    sceneNumber.reset();
             }
 
             element->setActIndex(actIndex);

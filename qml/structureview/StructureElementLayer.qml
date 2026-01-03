@@ -19,7 +19,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -68,6 +67,7 @@ Item {
 
     signal zoomOneRequest()
     signal editorRequest()
+    signal deleteElementsRequest(var elementList)
     signal deleteElementRequest(StructureElement element)
     signal zoomOneToItemRequest(Item item)
     signal selectionModeOffRequest()
@@ -132,7 +132,7 @@ Item {
 
         model: root.episodeBoxes
 
-        StructureCanvasEpisodeBox {
+        delegate: StructureCanvasEpisodeBox {
             required property int index
             required property var modelData
 
@@ -153,7 +153,7 @@ Item {
 
         model: root.groupBoxes
 
-        StructureCanvasGroupBox {
+        delegate: StructureCanvasGroupBox {
             required property int index
             required property var modelData
 
@@ -179,6 +179,8 @@ Item {
         model: Scrite.document.loading ? 0 : Scrite.document.structureElementConnectors
 
         delegate: StructureElementConnectorDelegate {
+            required property int index
+
             required property string connectorLabel
 
             required property StructureElement connectorToElement
@@ -213,6 +215,7 @@ Item {
         model: Scrite.document.loading ? null : Scrite.document.structure.elementStacks
 
         delegate: StructureElementStackTabBar {
+            required property int index
             required property QtObject objectItem
 
             elementStack: objectItem
@@ -264,9 +267,8 @@ Item {
 
         anchors.fill: parent
 
-        interactive: !Scrite.document.readOnly && !Scrite.document.structure.forceBeatBoardLayout
-
         onZoomOneRequest: root.zoomOneRequest()
+        onDeleteElementsRequest: (elementList) => { root.deleteElementsRequest(elementList) }
         onDenyCanvasPreviewRequest: root.denyCanvasPreviewRequest()
         onAllowCanvasPreviewRequest: root.allowCanvasPreviewRequest()
         onEnsureItemVisibleRequest: (item) => { root.ensureItemVisibleRequest(item) }

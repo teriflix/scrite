@@ -11,44 +11,46 @@
 **
 ****************************************************************************/
 
+pragma Singleton
+
 import QtQuick 2.15
-import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/qml/"
 import "qrc:/qml/globals"
+import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/dialogs/useraccountdialog"
 
-ToolBar {
+DialogLauncher {
     id: root
 
-    required property ActionManager actions
+    function launch(activeTab) { return doLaunch() }
 
-    Material.accent: Runtime.colors.accent.key
-    Material.background: Runtime.colors.primary.c10.background
-    Material.elevation: 0
-    Material.primary: Runtime.colors.primary.key
-    Material.theme: Runtime.colors.theme
+    name: "UserOnboardingDialog"
+    singleInstanceOnly: true
 
-    Flow {
-        id: _layout
+    dialogComponent: VclDialog {
+        id: _dialog
 
-        height: parent.height
+        width: 900
+        height: Math.max( Scrite.window.height*0.75, 620 )
+        title: "User Onboarding Survey"
 
-        flow: Flow.TopToBottom
+        content: UserOnboardingScreen {
+            standalone: true
 
-        Repeater {
-            model: root.actions
-
-            delegate: ActionToolButton {
-                required property int index
-                required property var qmlAction
-
-                action: qmlAction
+            onFormSubmitted: {
+                _userMeApi.call()
+                _dialog.close()
             }
         }
+    }
+
+    UserMeRestApiCall {
+        id: _userMeApi
     }
 }

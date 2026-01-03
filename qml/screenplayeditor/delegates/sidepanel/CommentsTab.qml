@@ -56,7 +56,7 @@ AbstractScenePartEditor {
         }
 
         TextAreaSpellingSuggestionsMenu {
-
+            textArea: _commentsEdit
         }
 
         onTextChanged: () => {

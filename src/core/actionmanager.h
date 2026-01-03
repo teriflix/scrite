@@ -40,7 +40,7 @@ public:
 
     static ActionManagerAttached *qmlAttachedProperties(QObject *object);
 
-    static ActionManager *findManager(QObject *action);
+    Q_INVOKABLE static ActionManager *findManager(QObject *action);
     static bool canChangeActionShortcut(QObject *action);
     static bool changeActionShortcut(QObject *action, const QString &shortcut);
     static QKeySequence defaultActionShortcut(QObject *action);
@@ -499,9 +499,11 @@ public:
     Q_SIGNAL void customFilterModeChanged();
 
     Q_INVOKABLE QObject *findActionForShortcut(const QString &shortcut) const;
-    Q_INVOKABLE bool restoreActionShortcut(QObject *action) const;
+    Q_INVOKABLE bool restoreActionShortcut(QObject *action);
     Q_INVOKABLE int restoreAllActionShortcuts();
     Q_INVOKABLE void filter();
+
+    Q_INVOKABLE ActionManager *actionManagerOf(QObject *action) const;
 
     // QQmlParserStatus interface
     void classBegin() { }
@@ -509,6 +511,7 @@ public:
 
 signals:
     void filterRequest(QObject *qmlAction, ActionManager *actionManager, BooleanResult *result);
+    void actionShortcutRestored(QObject *qmlAction);
 
 protected:
     // QSortFilterProxyModel interface
