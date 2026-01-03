@@ -69,4 +69,4 @@ build/*
 /tools/codingstyle/package-lock.json
 
 # Mkdocs environment
-/docs/userguide/mkdocs-env/
+/docs/userguide/venv/
