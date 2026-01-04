@@ -55,6 +55,21 @@ Editor Options Dialog, and dragging to color intensity slider as you see fit.
 
 <img src="../images/screenplay/006-color-intensity.jpg" width=480"/>
 
+## Scene Blocks
+
+As mentioned in the quick start, Scrite offers a scene centric approach to
+writing screenplays. Each scene is a distint block of text, even if they show up
+line a single long document. If you prefer to see each scene as a distinct
+block, then toggle the `Scene Blocks` option either in Screenplay Editor
+Options, or by using the [`Command Center`](./user-interface.md#command-center).
+
+<img src="../images/screenplay/006a-scene-blocks.jpg" width=480"/>
+
+When `Scene Blocks` is toggled ON, each scene is shown as a separate block on
+the screenplay editor.
+
+<img src="../images/screenplay/006b-scene-blocks.jpg" width=720"/>
+
 ## Scene List Panel
 
 You can toggle the visibility of the Scene List panel by clicking on the button
@@ -644,6 +659,40 @@ sequence while generating PDFs.
 
 <img src="../images/screenplay/059-page-breaks.jpg" width="720"/>
 
+## Acts
+
+You can break your screenplay into multiple acts by adding act breaks. Simply
+click on the `Act Break` icon in the toolbar, or use the keyboard shortcut
+`Ctrl+Shift+B` to insert an act break after the current scene.
+
+<img src="../images/quickstart/013-adding-elements.png" width="320"/>
+
+By default, Scrite uses `Save The Cat` story structure. So acts are named ACT 1,
+ACT 2A, ACT 2B and ACT 3. But you can offer your own act naming convention by
+editing the [formal story beats](#formal-story-beats) used in your screenplay.
+
+<img src="../images/screenplay/070-act-breaks.jpg" width="720"/>
+
+You can move act breaks up and down the scene list panel, just like you can
+[move up and down scenes](#reordering-scenes).
+
+## Episodes
+
+Just like act breaks, you can add episode breaks as well. This is especially
+useful when you are writing screenplay for multiple episodes in a single
+document. To insert an episode break after the current scene use the `Episode
+Break` button on the toolbar, or the keyboard shortcut `Ctrl+Shift+P`.
+
+<img src="../images/screenplay/071-episode-breaks.jpg" width="720"/>
+
+### Episode Scene Numbers
+
+Act numbers reset after each episode, but scene numbers remain linear by
+default. You can restart scene numbers after each episode by toggling the
+`Restart Episode Scene Numbers` option.
+
+<img src="../images/screenplay/072-episode-breaks.jpg" width="720"/>
+
 ## Copy / Paste
 
 You can copy a text snippet, a couple of paragraphs, an entire scene or several
@@ -748,44 +797,4 @@ You can enable/disable spell-check in Settings > Screenplay > Options page.
 
 <img src="../images/screenplay/069-spell-check.jpg" width="720"/>
 
-## Auto Save
 
-Scrite auto‑saves documents by default every 60 seconds. Auto‑save kicks in only
-after you save your work to a `.scrite` file once. Scrite creates a folder
-alongside your `.scrite` file and stores backups periodically.
-
-You can toggle auto‑save, change the interval, and limit the number of backups
-in Settings → Application → Options.
-
-< screenshot >
-
-## Loading A Backup
-
-The toolbar shows the number of backups available for the current screenplay.
-Click it to open a dialog and select a backup to load in a new or the current
-window. Backups load anonymously—you must save them explicitly with a new file
-name, and they won’t overwrite the source file.
-
-< screenshot >
-
-## Shield
-
-By default, Scrite stores screenplays in an interoperable format (see
-https://www.scrite.io/interoperable-document-format/). If you want to restrict
-opening to devices where Scrite is activated using your email ID, use Shield to
-lock screenplays.
-
-Click the shield icon at the bottom‑left of the editor to open the dialog and
-toggle protection. You can add collaborator email IDs to allow opening on their
-devices as well. Collaborators cannot turn off Shield or add more collaborators.
-
-Note: Shield encrypts contents of screenplay, notebook, and structure tabs.
-Photos/attachments in notebook and the title page aren’t encrypted yet. While
-our keys aren’t public, we don’t guarantee the mechanism is hack‑proof.
-
-< screenshot >
-
-## What’s next?
-
-In the next article, learn how to write in Indian languages using Scrite:
-https://www.scrite.io/index.php/typing-in-multiple-languages/
