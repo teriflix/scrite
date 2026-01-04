@@ -173,6 +173,12 @@ in Settings → Screenplay → Page Setup.
 
 <img src="../images/screenplay/018-time-per-page.jpg" width=640"/>
 
+Scrite automatically recalculates page count and time estimate as you type in a
+background thread. You can, however, force a full refersh of these estimates by
+clicking on the reload icon in the status bar.
+
+<img src="../images/screenplay/018-2-page-time-number.jpg" width=640"/>
+
 > **NOTE**: Page counts vary across apps. Final Draft, Scrite, and Fade In Pro
 may report different counts for the same screenplay; making them identical is
 rarely possible. Infact, page count estimates done by Scrite on Windows, macOS
@@ -214,11 +220,37 @@ Click “Make Default” to set current options as your defaults.
 
 ## Page Setup & Watermark
 
-TODO: Describe page setup and watermark
+You can configure the page size, and content to show in header & footer of
+generated PDFs by opening Settings > Screenplay > Page Setup tab.
+
+<img src="../images/screenplay/053-page-setup.jpg" width="720">
+
+In the same page you can also configure the watermark to use in generated PDF
+files.
+
+### Watermarks are File Specific
+
+Please note that watermarks are file-specific. This means that any change you
+make to watermark settings only applies to the file that is currently open. If
+you open another file, the watermark settings wont carry over to that file. Said
+in other words, watermark settings are saved along with the file and will be
+loaded whenever that file is opened.
+
+You could save modified watermark settings as defaults, so that new documents
+created from then on will use those settings.
+
+### Impromptu Watermarks
+
+While generating PDF of your screenplay or extracting reports, you can change
+the watermark text in the [report generation](./reports.md) dialog box.
+
+> NOTE: The ability to configure or turn off watermark is restricted in certain
+> subscription plans. Please lookup plan features for more information.
 
 ## Title Page
 
-TODO: Describe page setup and watermark
+Editing the title page is described in the [Quick
+Start](./quickstart.md#editing-the-title-page) guide. 
 
 ## Markup Tools
 
@@ -231,12 +263,12 @@ Options menu. You can move the dock to any part of the screen.
 Select any text snippet and use Markup Tools to apply custom formatting. Hover
 over buttons to see shortcuts:
 
-- Bold: Ctrl+B
-- Italics: Ctrl+I
-- Underline: Ctrl+U
-- Strikeout: Ctrl+R
-- ALL CAPS: Shift+F3
-- small caps: Ctrl+Shift+F3
+- Bold: `Ctrl+B`
+- Italics: `Ctrl+I`
+- Underline: `Ctrl+U`
+- Strikeout: `Ctrl+R`
+- ALL CAPS: `Shift+F3`
+- small caps: `Ctrl+Shift+F3`
 
 <img src="../images/screenplay/024-markup-tools.jpg" width=640"/>
 
@@ -256,13 +288,15 @@ numbers appear in preview, exported PDFs, and reports.
 ## Side Panel
 
 Scrite lets you capture additional information per scene. While the Notebook tab
-is best for capturing this information, but the Screenplay editor offers access
+is best for capturing this information, the Screenplay editor also offers access
 to Comments, Featured Image, and Index Card Fields.
+
+<img src="../images/screenplay/027-enable-side-panel.jpg" width=720"/>
 
 ### Comments
 
-Enable “Scene Comments” in Screenplay Editor Options to show a pullout for each
-scene. 
+Check the "Show Comments Panel" in Screenplay Editor Options to show a pullout
+for each scene. 
 
 <img src="../images/screenplay/027-scene-comments-panel.jpg" width=720"/>
 
@@ -376,14 +410,14 @@ If you have “Show Scene Characters and Tags” turned on in Screenplay Editor
 options, then you can click on a character name in the character list shown
 under scene heading and select “Rename/Merge Character” option ….
 
-<img src="../images/screenplay/038-rename-characters.jpg" width="360"/>
+<img src="../images/screenplay/038-rename-characters.jpg" width="640"/>
 
 … and Scrite will then present a dialog box for you where you can provide a new
 name for your character.
 
-<img src="../images/screenplay/039-rename-characters.jpg" width="360"/>
+<img src="../images/screenplay/039-rename-characters.jpg" width="640"/>
 
-In this dialogue you can either provide a new name and Scrite will rename it for
+In this dialog you can either provide a new name and Scrite will rename it for
 you.
 
 Once renamed, the changes cannot be undone. However, you can rename the new name
@@ -403,24 +437,24 @@ character name in it.
 Suppose that you have a screenplay where you may have accidentally used two
 names for the same character. In this case, Maya and Mayavi.
 
-<img src="../images/screenplay/040-merge-characters.png" width="360"/>
+<img src="../images/screenplay/040-merge-characters.png" width="640"/>
 
 You may want to merge Mayavi into Maya across the entire screenplay, even if the
 name is used in action or dialogue paragraphs. Just like you would rename
 characters, you can click on Mayavi and select the “Rename/Merge Character”
 option.
 
-<img src="../images/screenplay/041-merge-characters.png" width="360"/>
+<img src="../images/screenplay/041-merge-characters.png" width="640"/>
 
 Scrite will present a dialog for you to enter the new character name. In that
 dialog box, write the name of the character you want to merge this one with.
 
-<img src="../images/screenplay/042-merge-characters.png" width="360"/>
+<img src="../images/screenplay/042-merge-characters.png" width="640"/>
 
 Now, upon clicking the “Rename” button, you will notice that Scrite recognizes
 it as a merge workflow and will ask you to confirm it.
 
-<img src="../images/screenplay/043-merge-characters.png" width="360"/>
+<img src="../images/screenplay/043-merge-characters.png" width="640"/>
 
 Upon clicking “Yes” in this dialog box, Scrite not only changes Mayavi to Maya
 everywhere in the screenplay, but it will also move notes, attachments, and
@@ -433,11 +467,57 @@ photos associated with Mayavi with the notes, attachments, and photos of Maya.
 
 ## Story Beats & Keywords
 
+Scrite lets you tag additional meta-data to your scenes to get an overall
+impression of your story structure, design or flow. The way in which all of this
+is shown in the screenplay tab differs from the way in which its shown in the
+structure tab. Together they give you a comprehensive view of your story.
+
 ### Formal Story Beats
+
+By formal story beats we mean beats from story structures like `Save The Cat`,
+or `Hero's Journey`, or even custom beat sheets you may create.
+
+With `Characters & Tags` enabled you can click on the plus sign next to `Formal
+Tags` to tag the scene with one or more beats from your story structure.
+
+<img src="../images/screenplay/054-formal-tags.jpg" width="640"/>
+
+By default, Scrite offers beats from `Save The Cat` beat sheet. But you can add
+your own beats by clicking on the `Customize` button in the popup.
+
+<img src="../images/screenplay/055-formal-tags.jpg" width="640"/>
+
+The syntax for describing story beats is self-explanatory.
 
 ### Keywords
 
+In addition to formal story beats, you can tag your scenes with custom keywords
+which can offer additional context to your scenes.
+
+Just click on the plus icon next to `Keywords` ...
+
+<img src="../images/screenplay/056-keywords.jpg" width="640"/>
+
+... and add a keyword in the text field shown there. You can add any number of
+keywords to a scene.
+
+Keywords and tags thus added will be rendered as tracks along side scenes in the
+[scene list panel](#scene-list-panel).
+
 ### Sequences
+
+As a writer you may want to bundle multiple scenes into a sequence, because they
+all form a logical group in your story. Simply select a range of scenes and
+bundle them together into a sequence.
+
+<img src="../images/screenplay/015-scene-list-panel-sequence.jpg" width=640"/>
+
+Scenes that are part of a sequence have a arrow prior to their scene number in
+the [scene list panel](#scene-list-panel).
+
+You can easily add/remove scenes to a sequence by using the context menu.
+Bundling scenes together like this allows you to capture rich detail about the
+way you look at elements of the story unfolding across scenes in the screenplay.
 
 ## Writing with Scene‑Centric Precision in Scrite
 
@@ -457,7 +537,15 @@ Best practices:
 
 ### Long Scene Warning
 
-TODO: Describe what it is.
+By default, Scrite displays a warning icon next to scenes that have more than
+150 words.
+
+<img src="../images/screenplay/057-long-scene-warning.jpg" width="640"/>
+
+You can edit this treshold, or turn off long scene warning all together in
+Settings > Screenplay > Options page.
+
+<img src="../images/screenplay/058-long-scene-warning.jpg" width="720"/>
 
 ### Scenes Without Heading
 
@@ -549,9 +637,73 @@ context from the previous scene in their new location.
 
 ### Page Breaks
 
+While generating PDF files you can configure Scrite to generate each scene, or
+episode, or act on a new page. In addition to that, you can also insert page
+breaks before and after scenes. This allows you to bunch a group of scenes in
+sequence while generating PDFs.
+
+<img src="../images/screenplay/059-page-breaks.jpg" width="720"/>
+
 ## Copy / Paste
 
-TODO: Describe vanilla copy/paste options, fountain format and more.
+You can copy a text snippet, a couple of paragraphs, an entire scene or several
+scenes at once to the clipboard. You can also pasted text from a second Scrite
+instance, or from another application too. Copy/paste in an app like Scrite,
+while easy to use, has certain nuances which is useful to be aware of.
+
+### Coping text snippets
+
+When you select a snippet of text and copy `Ctrl+C`, Scrite copies the selected
+text to clipboard. 
+
+<img src="../images/screenplay/060-copy-text-snippet.jpg" width="720"/>
+
+You can paste the copied text elsewhere in the same Scrite document, or into
+another, or into a document opened in any 3rd party app on your Desktop.
+
+<img src="../images/screenplay/061-copy-text-snippet.jpg" width="720"/>
+
+### Copying an entire scene
+
+If your selection includes more than one block of text or an entire scene, ... 
+
+<img src="../images/screenplay/062-copy-full-scene.jpg" width="720"/>
+
+...then by default, Scrite copies a Fountain representation of the selection
+when you trigger Copy `Ctrl+C`.
+
+<img src="../images/screenplay/063-copy-full-scene.jpg" width="720"/>
+
+The benefit of copying text in Fountain format is that it makes pasting into
+Scrite, or 3rd-party screenwriting apps more productive because Fountain
+preserves formatting.
+
+However, if you prefer to copy in plain-text, then you can uncheck the `Copy
+text in Fountain format` in Settings > Screenplay > Options.
+
+<img src="../images/screenplay/064-copy-full-scene.jpg" width="720"/>
+
+### Copying several scenes at once
+
+You can select one or more scenes on the scene list panel, right click and click
+on `Copy` or use keyboard shortcut `Ctrl+Shift+C` to copy the selected scenes at
+once.
+
+<img src="../images/screenplay/065-copy-many-scenes.jpg" width="720"/>
+
+Scrite copies a Fountain representation to the clipboard.
+
+<img src="../images/screenplay/066-copy-many-scenes.jpg" width="720"/>
+
+### Pasting content
+
+Text snippets are pasted inline, much like other apps do.
+
+However if the text on the clipboard contains several blocks of text, then
+Scrite parses it as a Fountain file and lets you paste content into a specific
+scene. You could also select the `Paste After` option (`Ctrl+Shift+V`) to paste
+content after the current scene. This is especially useful while copy/pasting
+content to 3rd party apps.
 
 ### Copy/Pasting Scenes to 3rd Party Apps
 
@@ -566,17 +718,35 @@ This way you can copy content out of Scrite to third party apps, and back.
 
 ## Undo / Redo
 
+Scrite offers undo `Ctrl+Z` and redo `Ctrl+Y` or `Ctrl+Shift+Z` much like other
+Desktop apps. However, since Scrite has a hierarchy of documents some edits
+cannot be undone. 
+
 ## Spell Check
 
 Scrite integrates with your operating system’s spell check, sharing dictionaries
-with other apps. 
+with other apps. If the language pack installed in your OS for a given language
+comes bundled with a spell-check dictionary, then Scrite will simply make use of
+that to mark mispelled words and offer suggestions from the same.
 
-Enable/disable in Settings. Misspelled words are highlighted in red; right‑click
-for corrections. Choose “Add to dictionary” (system‑wide) or “Ignore” (current
-document only). Scrite recognizes character names as correct by default. Grammar
-check is not yet available.
+<img src="../images/screenplay/067-spell-check.jpg" width="720"/>
 
-< screenshot >
+> NOTE: Scrite completely relies on the operating-system to drive the
+> spell-check functionality. It does not come bundled with a dictionary of its
+> own.
+
+Misspelled words are highlighted in red; right‑click for corrections. 
+
+<img src="../images/screenplay/068-spell-check.jpg" width="320"/>
+
+Choose “Add to dictionary” (system‑wide) or “Ignore” (current document only).
+Scrite recognizes character names as correct by default. 
+
+> NOTE: Grammar check is not yet available.
+
+You can enable/disable spell-check in Settings > Screenplay > Options page.
+
+<img src="../images/screenplay/069-spell-check.jpg" width="720"/>
 
 ## Auto Save
 

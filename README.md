@@ -70,7 +70,7 @@ works best if a separate environment is created for serving docs.
     # Project-specific virtualenv (isolates from system)
     cd your-scrite-docs-folder
     python3 -m venv venv
-    source venv/bin/activate  # On every new terminal
+    source venv/bin/activate
 
     # Install MkDocs ecosystem
     pip install mkdocs mkdocs-material mkdocs-video
