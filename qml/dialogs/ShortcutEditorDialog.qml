@@ -40,6 +40,7 @@ DialogLauncher {
         id: _dialog
 
         property string lookup
+        property int beforeLanguage: -1
 
         width: Math.min(Scrite.window.width-80, 800)
         height: Math.min(Scrite.window.height-80, 750)
@@ -48,6 +49,18 @@ DialogLauncher {
 
         content: ApplicationShortcutsPage {
             lookup: _dialog.lookup
+        }
+
+        onAboutToShow: {
+            beforeLanguage = Runtime.language.activeCode
+            Runtime.language.setActiveCode(QtLocale.English)
+            contentItem.forceActiveFocus()
+        }
+
+        onAboutToHide: {
+            if(beforeLanguage > 0)
+                Runtime.language.setActiveCode(beforeLanguage)
+            beforeLanguage = -1
         }
     }
 }
