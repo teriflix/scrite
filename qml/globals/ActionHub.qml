@@ -636,6 +636,27 @@ Item {
 
             onTriggered: LanguageOptionsDialog.launch()
         }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string tooltip: "Cycles through languages added in the language menu."
+            readonly property string defaultShortcut: "F6"
+
+            text: "Activate Next Language"
+            objectName: "nextLanguage"
+            enabled: LanguageEngine.supportedLanguages.count > 1
+            shortcut: defaultShortcut
+
+            onTriggered: {
+                const model = LanguageEngine.supportedLanguages
+                let index = model.activeLanguageRow
+                index = (index+1) % model.count
+
+                const nextLanguage = model.languageAt(index)
+                if(nextLanguage.valid)
+                    Runtime.language.setActiveCode(nextLanguage.code)
+            }
+        }
     }
 
     Instantiator {
