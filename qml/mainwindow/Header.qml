@@ -149,8 +149,8 @@ Rectangle {
             VclLabel {
                 Layout.preferredWidth: contentWidth + rightPadding
 
-                text: Runtime.language.active.name
-                rightPadding: Runtime.minimumFontMetrics.averageCharacterWidth * 2
+                text: root.width < 1500 ? Runtime.language.active.shortName.toUpperCase() : Runtime.language.active.name
+                rightPadding: Runtime.minimumFontMetrics.averageCharacterWidth
 
                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize
             }
@@ -203,15 +203,13 @@ Rectangle {
             }
 
             ActionToolButton {
-                action: ActionHub.editOptions.find("reload")
-            }
-
-            ActionToolButton {
                 action: ActionHub.editOptions.find("splitScene")
+                visible: root.width >= 1600
             }
 
             ActionToolButton {
                 action: ActionHub.editOptions.find("mergeScene")
+                visible: root.width >= 1600
             }
 
             ActionToolButton {
@@ -252,6 +250,8 @@ Rectangle {
         }
 
         Item {
+            id: _space
+
             Layout.fillWidth: true
         }
 
@@ -280,7 +280,7 @@ Rectangle {
 
                     action: qmlAction
                     down: qmlAction.down
-                    display: down ? Button.TextBesideIcon : Button.IconOnly
+                    display: down && root.width >= 1400 ? Button.TextBesideIcon : Button.IconOnly
                     flat: true
                     visible: qmlAction.visible !== undefined ? qmlAction.visible === true : true
 
