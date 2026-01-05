@@ -1263,7 +1263,7 @@ Item {
             checked: ActionHandler.active ? ActionHandler.active.checked : false
             enabled: ActionHandler.canHandle
             shortcut: defaultShortcut
-            text: "Display Panel"
+            text: "Toggle Scene List Panel"
         }
 
         Action {
