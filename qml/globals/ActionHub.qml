@@ -640,7 +640,7 @@ Item {
         Action {
             readonly property bool visible: false
             readonly property string tooltip: "Cycles through languages added in the language menu."
-            readonly property string defaultShortcut: "F6"
+            readonly property string defaultShortcut: "Ctrl+L"
 
             text: "Activate Next Language"
             objectName: "nextLanguage"
