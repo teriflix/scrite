@@ -691,6 +691,8 @@ Item {
         objectName: "paragraphFormats"
 
         Action {
+            readonly property bool visible: false
+
             enabled: ActionHandler.canHandle
             objectName: "nextFormat"
             shortcut: "Tab"
