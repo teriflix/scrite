@@ -91,7 +91,10 @@ QString PlatformTransliterationEngine::transliterateWord(const QString &word,
 
 void PlatformLanguageObserver::setupObservation()
 {
-    // TODO
+    this->setActiveLanguageCode(::Backend->activeLanguage());
+
+    connect(::Backend, &LinuxIBusBackend::activeLangugeChanged, this,
+            [=]() { this->setActiveLanguageCode(::Backend->activeLanguage()); });
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -128,6 +131,16 @@ struct LinuxIBusBackendData
     }
 };
 
+static void global_engine_changed_callback(IBusBus *bus, const gchar *engine_name,
+                                           gpointer user_data)
+{
+    Q_UNUSED(bus)
+    Q_UNUSED(engine_name)
+    Q_UNUSED(user_data)
+
+    emit ::Backend->activeLangugeChanged();
+}
+
 inline QString qstr(const gchar *string)
 {
     return QString::fromLatin1(string);
@@ -157,6 +170,12 @@ LinuxIBusBackend::LinuxIBusBackend(QObject *parent) : QObject(parent)
 {
     d = new LinuxIBusBackendData;
 
+    // Connect to the global-engine-changed signal
+    if (d->bus) {
+        g_signal_connect(d->bus, "global-engine-changed",
+                         G_CALLBACK(global_engine_changed_callback), this);
+    }
+
     qApp->installEventFilter(this);
     connect(qApp, &QGuiApplication::aboutToQuit, this, &LinuxIBusBackend::activateDefaultLanguage);
 
@@ -184,6 +203,16 @@ int LinuxIBusBackend::activateDefaultLanguage() const
                 break;
             }
         }
+    }
+
+    return -1;
+}
+
+int LinuxIBusBackend::activeLanguage() const
+{
+    if (!d->engines.isEmpty()) {
+        IBusEngineDesc *engine = ibus_bus_get_global_engine(d->bus);
+        return engine_language(engine);
     }
 
     return -1;
