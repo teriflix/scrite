@@ -351,6 +351,7 @@ private:
     explicit SupportedLanguages(QObject *parent = nullptr);
 
     void loadBuiltInLanguages();
+    void reviewLoadBuiltInLanguages();
     void transliterationOptionsUpdated();
     void onScriptFontFamilyChanged(QChar::Script script, const QString &fontFamily);
 
@@ -366,6 +367,7 @@ private:
     friend class LanguageEngine;
     int m_activeLanguageCode = -1;
     int m_defaultLanguageCode = -1;
+    bool m_loadedBuiltInLanguages = false;
 };
 
 class AvailableLanguages : public AbstractLanguagesModel

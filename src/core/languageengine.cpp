@@ -14,6 +14,7 @@
 #include "languageengine.h"
 #include "application.h"
 #include "utils.h"
+#include "user.h"
 
 #include <PhTranslateLib>
 
@@ -813,6 +814,30 @@ void SupportedLanguages::loadBuiltInLanguages()
     }
 
     this->AbstractLanguagesModel::setLanguages(languages);
+
+    m_loadedBuiltInLanguages = true;
+
+    connect(User::instance(), &User::loggedInChanged, this,
+            &SupportedLanguages::reviewLoadBuiltInLanguages, Qt::UniqueConnection);
+}
+
+void SupportedLanguages::reviewLoadBuiltInLanguages()
+{
+    if (m_loadedBuiltInLanguages && User::instance()->isLoggedIn() && !User::instance()->isBusy()) {
+        const UserInfo userInfo = User::instance()->info();
+        if (userInfo.country != QStringLiteral("India")) {
+            // Get rid of all built in languages
+            const QList<int> builtInLanguages = DefaultTransliteration::supportedLanguageCodes();
+            for (int code : builtInLanguages) {
+                this->removeLanguage(code);
+            }
+            m_loadedBuiltInLanguages = false;
+        }
+
+        disconnect(User::instance(), &User::loggedInChanged, this,
+                   &SupportedLanguages::reviewLoadBuiltInLanguages);
+    } else
+        QTimer::singleShot(0, this, &SupportedLanguages::reviewLoadBuiltInLanguages);
 }
 
 void SupportedLanguages::transliterationOptionsUpdated()
