@@ -531,18 +531,22 @@ public:
     /** should return true if it supports transliteration to the said language */
     virtual bool canTransliterate(int lang) const { return !this->options(lang).isEmpty(); }
 
+    /** public API - called as soon as editor receives focus **/
+    bool doActivate(const TransliterationOption &option);
+
     /** should return a list of transliteration options */
     virtual QList<TransliterationOption> options(int lang) const = 0;
 
     /** called to verify if an option is still available */
     virtual bool canActivate(const TransliterationOption &option) = 0;
 
-    /** called as soon as editor receives focus **/
-    virtual bool activate(const TransliterationOption &option) = 0;
-
     /** caled to fetch the transliterated word for the said language **/
     virtual QString transliterateWord(const QString &word,
                                       const TransliterationOption &lang) const = 0;
+
+protected:
+    /** called as soon as editor receives focus **/
+    virtual bool activate(const TransliterationOption &option) = 0;
 
 signals:
     /** Implementations must emit this signal when their capacity to support
@@ -811,6 +815,16 @@ public:
     // clang-format on
     SupportedLanguages *supportedLanguages() const { return m_supportedLanguages; }
 
+    // clang-format off
+    Q_PROPERTY(bool handleLanguageSwitch
+               READ isHandleLanguageSwitch
+               WRITE setHandleLanguageSwitch
+               NOTIFY handleLanguageSwitchChanged)
+    // clang-format on
+    void setHandleLanguageSwitch(bool val);
+    bool isHandleLanguageSwitch() const { return m_handleLanguageSwitch; }
+    Q_SIGNAL void handleLanguageSwitchChanged();
+
     Q_INVOKABLE bool setScriptFontFamily(QChar::Script script, const QString &fontFamily);
     Q_INVOKABLE QString scriptFontFamily(QChar::Script script) const;
 
@@ -849,6 +863,7 @@ private:
 
 private:
     QString m_configFileName;
+    bool m_handleLanguageSwitch = true;
     AvailableLanguages *m_availableLanguages = nullptr;
     SupportedLanguages *m_supportedLanguages = nullptr;
     QMap<QChar::Script, QString> m_defaultScriptFontFamily, m_scriptFontFamily;

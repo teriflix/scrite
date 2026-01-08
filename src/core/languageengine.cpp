@@ -353,7 +353,10 @@ int Language::fontWritingSystem() const
 bool Language::activate()
 {
     TransliterationOption option = this->preferredTransliterationOption();
-    return option.activate();
+    if (option.isValid())
+        return option.activate();
+
+    return false;
 }
 
 QString Language::charScriptName() const
@@ -620,13 +623,7 @@ void SupportedLanguages::setActiveLanguageCode(int val)
 
     m_activeLanguageCode = language.code;
 
-    const TransliterationOption option = language.preferredTransliterationOption();
-    if (option.isValid()) {
-        AbstractTransliterationEngine *engine =
-                qobject_cast<AbstractTransliterationEngine *>(option.transliteratorObject);
-        if (engine)
-            engine->activate(option);
-    }
+    language.activate();
 
     emit activeLanguageCodeChanged();
 }
@@ -1026,15 +1023,8 @@ void SupportedLanguages::verifyActiveLanguage()
 void SupportedLanguages::ensureActiveLanguage()
 {
     Language language = this->findLanguage(m_activeLanguageCode);
-    if (language.isValid()) {
-        const TransliterationOption option = language.preferredTransliterationOption();
-        if (option.isValid()) {
-            AbstractTransliterationEngine *engine =
-                    qobject_cast<AbstractTransliterationEngine *>(option.transliteratorObject);
-            if (engine)
-                engine->activate(option);
-        }
-    }
+    if (language.isValid())
+        language.activate();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1319,7 +1309,7 @@ bool TransliterationOption::activate()
 {
     AbstractTransliterationEngine *t = this->transliterator();
     if (t)
-        return t->activate(*this);
+        return t->doActivate(*this);
 
     return false;
 }
@@ -1360,6 +1350,14 @@ QString TransliterationOption::transliterateParagraph(const QString &paragraph) 
 AbstractTransliterationEngine::AbstractTransliterationEngine(QObject *parent) : QObject(parent) { }
 
 AbstractTransliterationEngine::~AbstractTransliterationEngine() { }
+
+bool AbstractTransliterationEngine::doActivate(const TransliterationOption &option)
+{
+    if (LanguageEngine::instance()->isHandleLanguageSwitch())
+        return this->activate(option);
+
+    return false;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1528,7 +1526,7 @@ void LanguageTransliterator::setPopup(QObject *val)
 bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
 {
     if (m_editor != nullptr && object == m_editor && m_enabled && m_option.isValid()
-        && m_option.inApp) {
+        && m_option.inApp && LanguageEngine::instance()->isHandleLanguageSwitch()) {
         if (event->type() == QEvent::FocusOut) {
             this->commitWordToEditor();
             return false;
@@ -1538,7 +1536,7 @@ bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
                 qobject_cast<AbstractTransliterationEngine *>(m_option.transliteratorObject);
 
         if (event->type() == QEvent::FocusIn) {
-            transliterationEngine->activate(m_option);
+            transliterationEngine->doActivate(m_option);
             return false;
         }
 
@@ -1886,6 +1884,19 @@ LanguageEngine::LanguageEngine(QObject *parent) : QObject(parent)
 }
 
 LanguageEngine::~LanguageEngine() { }
+
+void LanguageEngine::setHandleLanguageSwitch(bool val)
+{
+    if (m_handleLanguageSwitch == val)
+        return;
+
+    if (!val) {
+        m_supportedLanguages->setActiveLanguageCode(m_supportedLanguages->defaultLanguageCode());
+    }
+
+    m_handleLanguageSwitch = val;
+    emit handleLanguageSwitchChanged();
+}
 
 bool LanguageEngine::setScriptFontFamily(QChar::Script script, const QString &fontFamily)
 {
@@ -2275,6 +2286,9 @@ void LanguageEngine::loadConfiguration()
         const QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
         const QJsonObject config = doc.object();
 
+        this->setHandleLanguageSwitch(
+                config.value("handleLanguageSwitch").toBool(m_handleLanguageSwitch));
+
         const QJsonArray scriptFonts = config.value("script-fonts").toArray();
         if (!scriptFonts.isEmpty()) {
             const QMetaEnum scriptEnum = QMetaEnum::fromType<QtChar::Script>();
@@ -2316,6 +2330,8 @@ void LanguageEngine::saveConfiguration()
         if (file.open(QFile::WriteOnly)) {
             QJsonObject config;
 
+            config.insert("handleLanguageSwitch", m_handleLanguageSwitch);
+
             // Save script font associations.
             if (!m_scriptFontFamily.isEmpty()) {
                 const QMetaEnum scriptEnum = QMetaEnum::fromType<QtChar::Script>();
@@ -2356,7 +2372,7 @@ void LanguageEngine::activateTransliterationOptionOnActiveLanguage()
     if (activeLanguage.isValid()) {
         const TransliterationOption activeOption = activeLanguage.preferredTransliterationOption();
         if (activeLanguage.isValid() && !activeOption.transliteratorObject.isNull()) {
-            activeOption.transliterator()->activate(activeOption);
+            activeOption.transliterator()->doActivate(activeOption);
         }
     }
 }

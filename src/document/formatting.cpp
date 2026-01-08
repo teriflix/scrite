@@ -112,7 +112,7 @@ SceneElementFormat::~SceneElementFormat() { }
 QFont SceneElementFormat::font() const
 {
     Language language = LanguageEngine::instance()->supportedLanguages()->findLanguage(
-            m_defaultLanguageCode < 0 ? m_format->defaultLanguageCode() : m_defaultLanguageCode);
+            m_format->defaultLanguageCode());
 
     QFont font = language.font();
     if (m_fontBold != Auto)
@@ -296,9 +296,11 @@ void SceneElementFormat::setDefaultLanguageCode(int val)
 
 void SceneElementFormat::activateDefaultLanguage()
 {
-    Language language = LanguageEngine::instance()->supportedLanguages()->findLanguage(
-            m_defaultLanguageCode < 0 ? m_format->activeLanguageCode() : m_defaultLanguageCode);
-    language.activate();
+    if (LanguageEngine::instance()->isHandleLanguageSwitch()) {
+        Language language = LanguageEngine::instance()->supportedLanguages()->findLanguage(
+                m_defaultLanguageCode < 0 ? m_format->activeLanguageCode() : m_defaultLanguageCode);
+        language.activate();
+    }
 }
 
 QTextBlockFormat SceneElementFormat::createBlockFormat(Qt::Alignment overrideAlignment,
