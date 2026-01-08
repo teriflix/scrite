@@ -139,20 +139,29 @@ Rectangle {
 
             ActionManagerToolButton {
                 actionManager: ActionHub.languageOptions
+                enabled: visible
+                visible: LanguageEngine.handleLanguageSwitch
             }
 
             ActionToolButton {
                 action: _alphabetMappingsHandler.action
                 down: _alphabetMappingsPopup.visible
+                visible: action.visible && LanguageEngine.handleLanguageSwitch
             }
 
             VclLabel {
                 Layout.preferredWidth: contentWidth + rightPadding
 
-                text: root.width < 1500 ? Runtime.language.active.shortName.toUpperCase() : Runtime.language.active.name
                 rightPadding: Runtime.minimumFontMetrics.averageCharacterWidth
+                text: root.width < 1500 ? Runtime.language.active.shortName.toUpperCase() : Runtime.language.active.name
+                visible: LanguageEngine.handleLanguageSwitch
 
                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+            }
+
+            ActionToolButton {
+                action: ActionHub.languageOptions.find("platformLanguage")
+                display: ToolButton.TextBesideIcon
             }
 
             Rectangle {
@@ -170,13 +179,18 @@ Rectangle {
 
             ActionManagerToolButton {
                 actionManager: ActionHub.languageOptions
-                visible: !_group1.visible
+                visible: !_group1.visible && LanguageEngine.handleLanguageSwitch
             }
 
             ActionToolButton {
                 action: _alphabetMappingsHandler.action
                 down: _alphabetMappingsPopup.visible
-                visible: action.visible && !_group1.visible
+                visible: action.visible && !_group1.visible && LanguageEngine.handleLanguageSwitch
+            }
+
+            ActionToolButton {
+                action: ActionHub.languageOptions.find("platformLanguage")
+                visible: !_group1.visible && action.visible
             }
 
             Rectangle {
@@ -184,7 +198,7 @@ Rectangle {
                 Layout.preferredWidth: 1
 
                 color: Runtime.colors.primary.borderColor
-                visible: !_group1.visible
+                visible: !_group1.visible && LanguageEngine.handleLanguageSwitch
             }
 
             ActionManagerToolBar {
@@ -311,6 +325,8 @@ Rectangle {
         width: _alphabetMappingsPopup.width
 
         action: ActionHub.inputOptions.find("alphabetMappings")
+        enabled: LanguageEngine.handleLanguageSwitch
+
         onTriggered: _alphabetMappingsPopup.open()
 
         Popup {

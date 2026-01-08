@@ -629,10 +629,10 @@ Item {
         objectName: "languageOptions"
 
         Action {
-            readonly property var keywords: ["add language", "input methods", "input tools", "baraha", "nudi", "ism", "font"]
+            readonly property var keywords: ["add language", "input methods", "input tools", "baraha", "nudi", "ism", "font", "more languages"]
             property int sortOrder: LanguageEngine.supportedLanguages.count + 1
 
-            text: "More Languages ..."
+            text: "Language Settings"
 
             onTriggered: LanguageOptionsDialog.launch()
         }
@@ -644,7 +644,7 @@ Item {
 
             text: "Activate Next Language"
             objectName: "nextLanguage"
-            enabled: LanguageEngine.supportedLanguages.count > 1
+            enabled: LanguageEngine.supportedLanguages.count > 1 && LanguageEngine.handleLanguageSwitch
             shortcut: defaultShortcut
 
             onTriggered: {
@@ -657,12 +657,53 @@ Item {
                     Runtime.language.setActiveCode(nextLanguage.code)
             }
         }
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+            readonly property string tooltip: "When checked, Scrite handles all language switches ignoring any language switch initiated by the operating system."
+
+            checkable: true
+            checked: LanguageEngine.handleLanguageSwitch
+            enabled: LanguageEngine.supportedLanguages.count > 1
+            objectName: "handleLanguageSwitch"
+            text: "Handle language input method switch"
+
+            onTriggered: {
+                LanguageEngine.handleLanguageSwitch = !LanguageEngine.handleLanguageSwitch
+                Runtime.screenplayEditorSettings.languageInputPreferenceChecked = true
+            }
+        }
+
+        Action {
+            property bool visible: !LanguageEngine.handleLanguageSwitch
+
+            text: _platformLanguageObserver.activeLanguage.shortName
+            objectName: "platformLanguage"
+            icon.source: _platformLanguageObserver.activeLanguage.iconSource
+
+            onTriggered: {
+                MessageBox.question("Platform Language",
+                                   "The active language in your OS is <b>" + _platformLanguageObserver.activeLanguage.name + "</b>. " +
+                                   "Language input is handled by your operating system. Do you want to configure Scrite to assume ownership of language input?",
+                                    ["Yes", "No"], (answer) => {
+                                        if(answer === "Yes")
+                                            LanguageOptionsDialog.launch()
+                                    })
+            }
+        }
+    }
+
+    PlatformLanguageObserver {
+        id: _platformLanguageObserver
     }
 
     Instantiator {
         model: LanguageEngine.supportedLanguages
 
         delegate: Action {
+            readonly property bool hideInCommandCenter: true
+
             required property int index
             required property var language // This is of type Language, but we have to use var here.
             // You cannot use Q_GADGET struct names as type names in QML
@@ -674,6 +715,7 @@ Item {
 
             checkable: true
             checked: Runtime.language.activeCode === language.code
+            enabled: LanguageEngine.handleLanguageSwitch
             shortcut: language.shortcut()
             text: language.name
 

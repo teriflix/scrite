@@ -89,6 +89,13 @@ QString PlatformTransliterationEngine::transliterateWord(const QString &word,
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void PlatformLanguageObserver::setupObservation()
+{
+    // TODO
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 struct LinuxIBusBackendData
 {
     IBusBus *bus = nullptr;

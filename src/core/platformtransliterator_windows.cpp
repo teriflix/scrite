@@ -86,6 +86,16 @@ QString PlatformTransliterationEngine::transliterateWord(const QString &word,
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void PlatformLanguageObserver::setupObservation()
+{
+    this->setActiveLanguageCode(::Backend->activeLanguage());
+
+    connect(::Backend, &WindowsBackend::activeLanguageChanged, this,
+            [=]() { this->setActiveLanguageCode(::Backend->activeLanguage()); });
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 #include "Windows.h"
 
 struct TextInputSource
@@ -107,6 +117,7 @@ struct WindowsBackendData
 WindowsBackend::WindowsBackend(QObject *parent) : QObject(parent), d(new WindowsBackendData)
 {
     qApp->installEventFilter(this);
+    qApp->installNativeEventFilter(this);
 
     this->reload();
 }
@@ -139,6 +150,19 @@ int WindowsBackend::activateDefaultLanguage() const
     }
 
     // Report error otherwise
+    return -1;
+}
+
+int WindowsBackend::activeLanguage() const
+{
+    HKL activeKeyboardLayout = GetKeyboardLayout(0);
+    auto it = std::find_if(
+            d->textInputSources.begin(), d->textInputSources.end(),
+            [=](const TextInputSource &tis) { return tis.hkl == activeKeyboardLayout; });
+
+    if (it != d->textInputSources.end())
+        return it->languageCode;
+
     return -1;
 }
 
@@ -210,6 +234,20 @@ bool WindowsBackend::eventFilter(QObject *object, QEvent *event)
         && qApp->applicationState() == Qt::ApplicationActive) {
         if (this->reload())
             emit textInputSourcesChanged();
+    }
+
+    return false;
+}
+
+bool WindowsBackend::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+{
+    Q_UNUSED(eventType)
+    Q_UNUSED(result)
+
+    const MSG *winMsg = static_cast<MSG *>(message);
+    if (winMsg->message == WM_INPUTLANGCHANGE) {
+        emit activeLanguageChanged();
+        return false;
     }
 
     return false;

@@ -79,6 +79,7 @@ Item {
                 Layout.preferredWidth: _private.lanugageModel.longestKeyWidth
 
                 model: _private.lanugageModel
+                enabled: LanguageEngine.handleLanguageSwitch
 
                 textRole: "languageName"
                 valueRole: "languageCode"
@@ -394,6 +395,7 @@ Item {
                 SceneDocumentBinder {
                     id: previewTextBinder
                     screenplayFormat: Scrite.document.printFormat
+                    applyLanguageFonts: true
                     applyFormattingEvenInTransaction: true
                     scene: Scene {
                         elements: [
@@ -541,6 +543,17 @@ Item {
 
                 onClicked: Scrite.document.formatting.saveAsUserDefaults()
             }
+        }
+
+        VclText {
+            Layout.fillWidth: true
+            Layout.topMargin: 20
+
+            readonly property Action action: ActionHub.languageOptions.find("handleLanguageSwitch")
+
+            visible: !LanguageEngine.handleLanguageSwitch
+            wrapMode: Text.WordWrap
+            text: "NOTE: Paragraph language option cannot be configured when <b>" + action.text + "</b> option is unchecked in Language settings."
         }
     }
 

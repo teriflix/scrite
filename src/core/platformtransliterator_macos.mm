@@ -286,3 +286,10 @@ QString PlatformTransliterationEngine::transliterateWord(const QString &word,
     Q_UNUSED(option);
     return word;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+void PlatformLanguageObserver::setupObservation()
+{
+  // TODO
+}

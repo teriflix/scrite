@@ -298,7 +298,9 @@ void SceneElementFormat::activateDefaultLanguage()
 {
     Language language = LanguageEngine::instance()->supportedLanguages()->findLanguage(
             m_defaultLanguageCode < 0 ? m_format->activeLanguageCode() : m_defaultLanguageCode);
-    language.activate();
+    if (language.activate()) {
+        LanguageEngine::instance()->supportedLanguages()->setActiveLanguageCode(language.code);
+    }
 }
 
 QTextBlockFormat SceneElementFormat::createBlockFormat(Qt::Alignment overrideAlignment,

@@ -21,7 +21,6 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
@@ -40,7 +39,7 @@ DialogLauncher {
     dialogComponent: VclDialog {
         id: dialog
 
-        title: "Language Options"
+        title: "Language Settings"
         width: Math.min(Scrite.window.width-80, 830)
         height: Math.min(Scrite.window.height-80, 750)
 
