@@ -318,7 +318,7 @@ QTextBlockFormat SceneElementFormat::createBlockFormat(Qt::Alignment overrideAli
             givenContentWidth ? *givenContentWidth : m_format->pageLayout()->contentWidth();
     const qreal leftMargin = contentWidth * m_leftMargin * dpr;
     const qreal rightMargin = contentWidth * m_rightMargin * dpr;
-    const qreal topMargin = fm.lineSpacing() * m_lineSpacingBefore;
+    const qreal topMargin = fm.lineSpacing() * m_lineSpacingBefore * m_lineHeight;
 
     QTextBlockFormat format;
     format.setLeftMargin(leftMargin);
