@@ -305,8 +305,6 @@ AbstractScenePartEditor {
         onRequestCursorPosition: (position) => {
                                      _sceneTextEditor.cursorPosition = position < 0 ? _sceneTextEditor.length : position
                                  }
-
-        onCurrentFontChanged: Gui.log("Current Font: " + currentFont.family)
     }
 
     // Scene content search

@@ -139,14 +139,11 @@ Rectangle {
 
             ActionManagerToolButton {
                 actionManager: ActionHub.languageOptions
-                visible: LanguageEngine.handleLanguageSwitch
-                enabled: visible
             }
 
             ActionToolButton {
                 action: _alphabetMappingsHandler.action
                 down: _alphabetMappingsPopup.visible
-                visible: action.visible && LanguageEngine.handleLanguageSwitch
             }
 
             VclLabel {
@@ -154,7 +151,6 @@ Rectangle {
 
                 text: root.width < 1500 ? Runtime.language.active.shortName.toUpperCase() : Runtime.language.active.name
                 rightPadding: Runtime.minimumFontMetrics.averageCharacterWidth
-                visible: LanguageEngine.handleLanguageSwitch
 
                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize
             }
@@ -164,7 +160,6 @@ Rectangle {
                 Layout.preferredWidth: 1
 
                 color: Runtime.colors.primary.borderColor
-                visible: LanguageEngine.handleLanguageSwitch
             }
         }
 
@@ -175,13 +170,13 @@ Rectangle {
 
             ActionManagerToolButton {
                 actionManager: ActionHub.languageOptions
-                visible: !_group1.visible && LanguageEngine.handleLanguageSwitch
+                visible: !_group1.visible
             }
 
             ActionToolButton {
                 action: _alphabetMappingsHandler.action
                 down: _alphabetMappingsPopup.visible
-                visible: action.visible && !_group1.visible && LanguageEngine.handleLanguageSwitch
+                visible: action.visible && !_group1.visible
             }
 
             Rectangle {
@@ -189,7 +184,7 @@ Rectangle {
                 Layout.preferredWidth: 1
 
                 color: Runtime.colors.primary.borderColor
-                visible: !_group1.visible && LanguageEngine.handleLanguageSwitch
+                visible: !_group1.visible
             }
 
             ActionManagerToolBar {
@@ -316,8 +311,6 @@ Rectangle {
         width: _alphabetMappingsPopup.width
 
         action: ActionHub.inputOptions.find("alphabetMappings")
-        enabled: LanguageEngine.handleLanguageSwitch
-
         onTriggered: _alphabetMappingsPopup.open()
 
         Popup {

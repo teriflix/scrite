@@ -644,7 +644,7 @@ Item {
 
             text: "Activate Next Language"
             objectName: "nextLanguage"
-            enabled: LanguageEngine.supportedLanguages.count > 1 && LanguageEngine.handleLanguageSwitch
+            enabled: LanguageEngine.supportedLanguages.count > 1
             shortcut: defaultShortcut
 
             onTriggered: {
@@ -657,30 +657,12 @@ Item {
                     Runtime.language.setActiveCode(nextLanguage.code)
             }
         }
-
-        Action {
-            readonly property bool visible: false
-            readonly property bool allowShortcut: true
-            readonly property string tooltip: "When checked, Scrite handles all language switches ignoring any language switch initiated by the operating system."
-
-            checkable: true
-            checked: LanguageEngine.handleLanguageSwitch
-            enabled: LanguageEngine.supportedLanguages.count > 1
-            objectName: "handleLanguageSwitch"
-            text: "Scrite handles all language switches"
-
-            onTriggered: {
-                LanguageEngine.handleLanguageSwitch = !LanguageEngine.handleLanguageSwitch
-            }
-        }
     }
 
     Instantiator {
         model: LanguageEngine.supportedLanguages
 
         delegate: Action {
-            readonly property bool hideInCommandCenter: true /* Doesn't make sense, since command center always insists on English anyway */
-
             required property int index
             required property var language // This is of type Language, but we have to use var here.
             // You cannot use Q_GADGET struct names as type names in QML
@@ -694,7 +676,6 @@ Item {
             checked: Runtime.language.activeCode === language.code
             shortcut: language.shortcut()
             text: language.name
-            enabled: LanguageEngine.handleLanguageSwitch
 
             icon.source: language.iconSource
 
