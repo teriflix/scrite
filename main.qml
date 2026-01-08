@@ -31,6 +31,7 @@ import "qrc:/qml/floatingdockpanels"
 
 Rectangle {
     id: scriteRoot
+
     width: 1366
     height: 700
     color: Runtime.colors.primary.windowColor

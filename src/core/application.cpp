@@ -931,12 +931,12 @@ void Application::toggleFullscreen(QWindow *window)
     if (window->windowStates() & Qt::WindowFullScreen) {
         const bool waxMaxed = window->property(propName).toBool();
         if (waxMaxed)
-            window->showMaximized();
+            window->setVisibility(QWindow::Maximized);
         else
-            window->showNormal();
+            window->setVisibility(QWindow::Windowed);
     } else {
-        window->setProperty(propName, window->windowStates().testFlag(Qt::WindowMaximized));
-        window->showFullScreen();
+        window->setProperty(propName, window->visibility() == QWindow::FullScreen);
+        window->setVisibility(QWindow::FullScreen);
     }
 }
 
