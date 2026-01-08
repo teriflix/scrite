@@ -2874,7 +2874,7 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
         const QList<ScriptBoundary> boundaries = LanguageEngine::determineBoundaries(text);
 
         for (const ScriptBoundary &boundary : boundaries) {
-            if (!boundary.isValid() || boundary.script == QChar::Script_Latin)
+            if (!boundary.isValid() /*|| boundary.script == QChar::Script_Latin*/)
                 continue;
 
             QTextCharFormat format;
