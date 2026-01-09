@@ -69,7 +69,7 @@ Item {
 
                 Layout.fillWidth: true
 
-                DiacriticHandler.enabled: inputMethodComposing
+                DiacriticHandler.enabled: activeFocus
 
                 font.bold: true
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4

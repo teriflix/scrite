@@ -177,7 +177,7 @@ DialogLauncher {
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
 
-                                DiacriticHandler.enabled: inputMethodComposing
+                                DiacriticHandler.enabled: activeFocus
 
                                 Keys.onReturnPressed: addCollaborator()
 

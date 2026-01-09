@@ -2984,10 +2984,10 @@ bool SceneDocumentBinder::eventFilter(QObject *watched, QEvent *event)
 {
     Q_UNUSED(watched)
 
-    if (m_cursorPosition >= 0
-        && QList<int>({ QEvent::KeyPress, QEvent::KeyRelease, QEvent::Shortcut,
-                        QEvent::ShortcutOverride })
-                   .contains(event->type())) {
+    static QList<int> keyEvents(
+            { QEvent::KeyPress, QEvent::KeyRelease, QEvent::Shortcut, QEvent::ShortcutOverride });
+
+    if (m_cursorPosition >= 0 && keyEvents.contains(event->type())) {
         if (m_sceneElementTaskTimer.isActive())
             m_sceneElementTaskTimer.start(500, this);
     }

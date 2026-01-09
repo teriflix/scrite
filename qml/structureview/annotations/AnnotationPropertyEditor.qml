@@ -301,7 +301,7 @@ Item {
             ]
             SyntaxHighlighter.textDocument: textDocument
 
-            DiacriticHandler.enabled: inputMethodComposing
+            DiacriticHandler.enabled: activeFocus
 
             LanguageTransliterator.popup: LanguageTransliteratorPopup {
                 editorFont: _textArea.font

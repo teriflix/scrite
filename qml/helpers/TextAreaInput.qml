@@ -44,7 +44,7 @@ TextArea {
     SyntaxHighlighter.textDocument: textDocument
     SyntaxHighlighter.textDocumentUndoRedoEnabled: undoRedoEnabled
 
-    DiacriticHandler.enabled: inputMethodComposing
+    DiacriticHandler.enabled: activeFocus
 
     LanguageTransliterator.popup: LanguageTransliteratorPopup {
         editorFont: root.font

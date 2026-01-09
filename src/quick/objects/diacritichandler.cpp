@@ -15,27 +15,15 @@
 
 #include <QKeyEvent>
 #include <QQuickItem>
-
-static const char *inputMethodComposing = "inputMethodComposing";
-static const char *inputMethodComposingChanged = SIGNAL(inputMethodComposingChanged());
+#include <QGuiApplication>
 
 DiacriticHandler::DiacriticHandler(QObject *parent) : QObject { parent }
 {
     m_editorItem = qobject_cast<QQuickItem *>(parent);
 
 #ifdef Q_OS_MACOS
-    if (m_editorItem) {
-        int propIndex = m_editorItem->metaObject()->indexOfProperty(inputMethodComposing);
-        if (propIndex >= 0) {
-            m_editorInputMethodComposingProperty = m_editorItem->metaObject()->property(propIndex);
-            this->setEnabled(m_editorInputMethodComposingProperty.read(m_editorItem).toBool());
-            connect(m_editorItem, inputMethodComposingChanged, this,
-                    SLOT(onEditorItemInputMethodComposingChanged()));
-        } else
-            this->setEnabled(false);
-
+    if (m_editorItem)
         m_editorItem->installEventFilter(this);
-    }
 #endif
 }
 
@@ -64,23 +52,47 @@ void DiacriticHandler::setEnabled(bool val)
 bool DiacriticHandler::eventFilter(QObject *object, QEvent *event)
 {
 #ifdef Q_OS_MACOS
-    if (m_enabled && object == m_editorItem && event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if (keyEvent->isAutoRepeat()) {
-            keyEvent->accept();
-            return true;
+    if (m_enabled && object == m_editorItem) {
+        const QEvent::Type eventType = event->type();
+
+        if (eventType == QEvent::KeyPress) {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            if (keyEvent->isAutoRepeat()) {
+                if (keyEvent->text().isEmpty())
+                    return false;
+
+                keyEvent->accept();
+                return true;
+            }
+            m_lastKeyText = keyEvent->text();
+        } else if (eventType == QEvent::InputMethod) {
+            QInputMethodEvent *imEvent = static_cast<QInputMethodEvent *>(event);
+
+            if (!imEvent->commitString().isEmpty() && !m_lastKeyText.isEmpty()) {
+                QInputMethodQueryEvent query(Qt::ImCursorPosition);
+                qApp->sendEvent(m_editorItem, &query);
+
+                const int cp = query.value(Qt::ImCursorPosition).toInt();
+                const int removeLength =
+                        m_lastKeyText.length() /*+ imEvent->commitString().length()*/;
+
+                QInputMethodEvent *replaceEvent = new QInputMethodEvent;
+
+                if (cp >= removeLength) {
+                    const int offset = -removeLength;
+                    replaceEvent->setCommitString(imEvent->commitString(), offset, removeLength);
+                } else {
+                    replaceEvent->setCommitString(imEvent->commitString(), -cp, cp);
+                }
+
+                qApp->postEvent(m_editorItem, replaceEvent);
+                m_lastKeyText.clear();
+                imEvent->accept();
+                return true;
+            }
         }
     }
 #endif
 
     return QObject::eventFilter(object, event);
-}
-
-void DiacriticHandler::onEditorItemInputMethodComposingChanged()
-{
-#ifdef Q_OS_MACOS
-    if (m_editorItem && m_editorInputMethodComposingProperty.isValid()) {
-        this->setEnabled(m_editorInputMethodComposingProperty.read(m_editorItem).toBool());
-    }
-#endif
 }

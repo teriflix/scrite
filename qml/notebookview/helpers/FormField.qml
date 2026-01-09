@@ -210,7 +210,7 @@ Column {
                 SyntaxHighlighter.textDocument: textDocument
                 SyntaxHighlighter.textDocumentUndoRedoEnabled: enableUndoRedo
 
-                DiacriticHandler.enabled: inputMethodComposing
+                DiacriticHandler.enabled: activeFocus
 
                 LanguageTransliterator.popup: LanguageTransliteratorPopup {
                     editorFont: _answerText.font

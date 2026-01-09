@@ -171,7 +171,7 @@ DialogLauncher {
 
                     Layout.fillWidth: true
 
-                    DiacriticHandler.enabled: inputMethodComposing
+                    DiacriticHandler.enabled: activeFocus
 
                     selectByMouse: true
                     placeholderText: "Search for a font"

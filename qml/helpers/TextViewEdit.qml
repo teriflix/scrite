@@ -137,7 +137,7 @@ Loader {
                 }
             ]
 
-            DiacriticHandler.enabled: inputMethodComposing
+            DiacriticHandler.enabled: activeFocus
 
             LanguageTransliterator.popup: LanguageTransliteratorPopup {
                 editorFont: _textArea.font

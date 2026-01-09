@@ -45,14 +45,11 @@ public:
 protected:
     bool eventFilter(QObject *object, QEvent *event) override;
 
-private slots:
-    void onEditorItemInputMethodComposingChanged();
-
 private:
     Q_DISABLE_COPY(DiacriticHandler)
     bool m_enabled = false;
+    QString m_lastKeyText;
     QQuickItem *m_editorItem = nullptr;
-    QMetaProperty m_editorInputMethodComposingProperty;
 };
 
 #endif // DIACRITICHANDLER_H
