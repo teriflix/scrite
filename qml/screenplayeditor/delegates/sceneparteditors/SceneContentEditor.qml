@@ -172,7 +172,7 @@ AbstractScenePartEditor {
 
                 action: ActionHub.paragraphFormats.find("nextFormat")
                 enabled: _sceneTextEditor.activeFocus && !root.readOnly && !_completion.model.hasSuggestion
-                onTriggered: (source) => { _sceneDocumentBinder.tab() }
+                onTriggered: (source) => {  } // Do nothing, since we already handle this in Keys.onTabPressed()
             }
         }
 
