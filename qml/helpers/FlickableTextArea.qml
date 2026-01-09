@@ -77,6 +77,8 @@ Flickable {
 
         font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
+        DiacriticHandler.enabled: inputMethodComposing
+
         KeyNavigation.tab: root.tabItem
         KeyNavigation.backtab: root.backTabItem
         KeyNavigation.priority: KeyNavigation.AfterItem

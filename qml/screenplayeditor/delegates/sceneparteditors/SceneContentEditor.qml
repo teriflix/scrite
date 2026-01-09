@@ -83,6 +83,8 @@ AbstractScenePartEditor {
         Keys.onUpPressed: (event) => { _private.handleSceneTextEditorKeyUpPressed(event) }
         Keys.onDownPressed: (event) => { _private.handleSceneTextEditorKeyDownPressed(event) }
 
+        DiacriticHandler.enabled: inputMethodComposing
+
         LanguageTransliterator.popup: LanguageTransliteratorPopup {
             editorFont: _sceneTextEditor.font
         }

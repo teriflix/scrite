@@ -404,6 +404,8 @@ AbstractStructureElementUI {
                                 ]
                                 SyntaxHighlighter.textDocument: textDocument
 
+                                DiacriticHandler.enabled: inputMethodComposing
+
                                 LanguageTransliterator.popup: LanguageTransliteratorPopup { }
                                 LanguageTransliterator.option: Runtime.language.activeTransliterationOption
                                 LanguageTransliterator.enabled: !readOnly

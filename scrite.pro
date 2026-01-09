@@ -102,6 +102,7 @@ HEADERS += \
     src/quick/objects/contextmenuevent.h \
     src/quick/objects/delayedproperty.h \
     src/quick/objects/deltadocument.h \
+    src/quick/objects/diacritichandler.h \
     src/quick/objects/filemanager.h \
     src/quick/objects/flickscrollspeedcontrol.h \
     src/quick/objects/itempositionmapper.h \
@@ -239,6 +240,7 @@ SOURCES += \
     src/quick/objects/contextmenuevent.cpp \
     src/quick/objects/delayedproperty.cpp \
     src/quick/objects/deltadocument.cpp \
+    src/quick/objects/diacritichandler.cpp \
     src/quick/objects/filemanager.cpp \
     src/quick/objects/flickscrollspeedcontrol.cpp \
     src/quick/objects/itempositionmapper.cpp \

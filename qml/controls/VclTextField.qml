@@ -110,6 +110,8 @@ TextField {
     KeyNavigation.tab: tabItem
     KeyNavigation.backtab: backTabItem
 
+    DiacriticHandler.enabled: inputMethodComposing
+
     LanguageTransliterator.popup: LanguageTransliteratorPopup {
         editorFont: root.font
     }
