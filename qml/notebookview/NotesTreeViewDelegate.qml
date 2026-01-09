@@ -79,6 +79,17 @@ Item {
         }
     }
 
+    Image {
+        anchors.right: _layout.left
+        anchors.verticalCenter: _layout.verticalCenter
+
+        width: Runtime.idealFontMetrics.height
+        height: Runtime.idealFontMetrics.height
+
+        source: itemData.isExpanded ? "qrc:/icons/navigation/arrow_down.png" : "qrc:/icons/navigation/arrow_right.png"
+        visible: itemData.hasChildren
+    }
+
     Row {
         id: _layout
 
