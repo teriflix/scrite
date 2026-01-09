@@ -341,16 +341,11 @@ Item {
                              }
         }
 
-        property int sceneNotesPageTabIndex: 0
         readonly property Component sceneNotesPage: SceneNotesPage {
             pageData: _notebookTree.currentData
             notebookModel: _notebookModel
             maxTextAreaSize: _private.maxTextAreaSize
             minTextAreaSize: _private.minTextAreaSize
-
-            currentTab: _private.sceneNotesPageTabIndex
-
-            onCurrentTabChanged: _private.sceneNotesPageTabIndex = currentTab
 
             onSwitchRequest: (item) => {
                                  _private.scheduleSwitchTo(item)
@@ -418,16 +413,11 @@ Item {
             minTextAreaSize: _private.minTextAreaSize
         }
 
-        property int screenplayPageTabIndex: 0
         readonly property Component screenplayPage: ScreenplayPage {
             pageData: _notebookTree.currentData
             notebookModel: _notebookModel
             maxTextAreaSize: _private.maxTextAreaSize
             minTextAreaSize: _private.minTextAreaSize
-
-            currentTab: _private.screenplayPageTabIndex
-
-            onCurrentTabChanged: _private.screenplayPageTabIndex = currentTab
 
             onSwitchRequest: (item) => {
                                  _private.scheduleSwitchTo(item)
@@ -446,16 +436,11 @@ Item {
             minTextAreaSize: _private.minTextAreaSize
         }
 
-        property int charactersPageTabIndex: 0
         readonly property Component charactersPage: CharactersPage {
             pageData: _notebookTree.currentData
             notebookModel: _notebookModel
             maxTextAreaSize: _private.maxTextAreaSize
             minTextAreaSize: _private.minTextAreaSize
-
-            currentTab: _private.charactersPageTabIndex
-
-            onCurrentTabChanged: _private.charactersPageTabIndex = currentTab
 
             onSwitchRequest: (item) => {
                                  _private.scheduleSwitchTo(item)
@@ -467,16 +452,11 @@ Item {
                                       }
         }
 
-        property int characterPageTabIndex: 0
         readonly property Component characterPage: CharacterPage {
             pageData: _notebookTree.currentData
             notebookModel: _notebookModel
             maxTextAreaSize: _private.maxTextAreaSize
             minTextAreaSize: _private.minTextAreaSize
-
-            currentTab: _private.characterPageTabIndex
-
-            onCurrentTabChanged: _private.characterPageTabIndex = currentTab
 
             onSwitchRequest: (item) => {
                                  _private.scheduleSwitchTo(item)
