@@ -257,6 +257,8 @@ AbstractScenePartEditor {
     SceneDocumentBinder {
         id: _sceneDocumentBinder
 
+        readonly property TextArea textArea: _sceneTextEditor
+
         function preserveScrollAndReload() {
             var cy = contentView.contentY
             reload()

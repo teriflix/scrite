@@ -122,6 +122,7 @@ void SceneUndoCommand::undo()
 {
     SceneUndoCommand::current = this;
     Scene *scene = this->fromByteArray(m_before);
+    m_allowMerging = false;
     SceneUndoCommand::current = nullptr;
 
     if (scene == nullptr)
@@ -138,6 +139,7 @@ void SceneUndoCommand::redo()
 
     SceneUndoCommand::current = this;
     Scene *scene = this->fromByteArray(m_after);
+    m_allowMerging = false;
     SceneUndoCommand::current = nullptr;
 
     if (scene == nullptr)
@@ -148,11 +150,8 @@ bool SceneUndoCommand::mergeWith(const QUndoCommand *other)
 {
     if (m_allowMerging && this->id() == other->id()) {
         const SceneUndoCommand *cmd = reinterpret_cast<const SceneUndoCommand *>(other);
-        if (cmd->m_allowMerging == false)
-            return false;
-
-        if (cmd->m_sceneId != m_sceneId || cmd->m_kind != m_kind || cmd->m_kind == UnknownKind
-            || m_kind == UnknownKind)
+        if (!cmd->m_allowMerging || cmd->m_sceneId != m_sceneId || cmd->m_kind != m_kind
+            || cmd->m_kind == UnknownKind || m_kind == UnknownKind)
             return false;
 
         const qint64 timegap = qAbs(m_timestamp.msecsTo(cmd->m_timestamp));
@@ -399,7 +398,7 @@ void SceneHeading::setEnabled(bool val)
     if (m_enabled == val)
         return;
 
-    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneHeadingEnabled);
+    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneHeadingEnabled, false);
 
     m_enabled = val;
     emit enabledChanged();

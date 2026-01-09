@@ -792,8 +792,14 @@ Item {
 
             onTriggered: {
                 // When index=0, its scene heading and that's handled separately.
-                if(enumValue !== SceneElement.Heading)
-                _private.binder.currentElement.type = enumValue
+                if(enumValue !== SceneElement.Heading) {
+                    _private.persistBinderSelection()
+
+                    const elements = _private.binder.selectedElements
+                    for(let i=0; i<elements.length; i++) {
+                        elements[i].type = enumValue
+                    }
+                }
             }
         }
     }
@@ -1297,7 +1303,10 @@ Item {
 
             icon.source: "qrc:/icons/editor/uppercase.png"
 
-            onTriggered: _private.binder.changeTextCase(SceneDocumentBinder.UpperCase)
+            onTriggered: {
+                _private.persistBinderSelection()
+                _private.binder.changeTextCase(SceneDocumentBinder.UpperCase)
+            }
         }
 
         Action {
@@ -1311,7 +1320,10 @@ Item {
 
             icon.source: "qrc:/icons/editor/lowercase.png"
 
-            onTriggered: _private.binder.changeTextCase(SceneDocumentBinder.LowerCase)
+            onTriggered: {
+                _private.persistBinderSelection()
+                _private.binder.changeTextCase(SceneDocumentBinder.LowerCase)
+            }
         }
     }
 
@@ -2770,6 +2782,22 @@ Item {
                 _private.binder = null
         }
 
+        function persistBinderSelection() {
+            let selectionStart = -1, selectionEnd = -1
+
+            if(binder.textArea) {
+                selectionStart = binder.textArea.selectionStart
+                selectionEnd = binder.textArea.selectionEnd
+            }
+
+            if(selectionStart >= 0 && selectionEnd > selectionStart) {
+                Runtime.execLater(_private.binder, Runtime.stdAnimationDuration,
+                                  (args) => {
+                                      _private.binder.textArea.select(args[0], args[1])
+                                  }, [selectionStart, selectionEnd])
+            }
+        }
+
         function isOperationAllowedByUser(operation) {
             if(Scrite.document.hasCollaborators && !Scrite.document.canModifyCollaborators) {
                 MessageBox.information("Action Prohibitted",
@@ -3010,6 +3038,8 @@ Item {
         }
 
         function toggleSelectedElementsAlignment(givenAlignment) {
+            persistBinderSelection()
+
             const alignment = _private.sceneElement.alignment === givenAlignment ? 0 : givenAlignment
             _private.sceneElement.alignment = alignment
 
