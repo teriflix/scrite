@@ -237,6 +237,32 @@ private:
 
 bool SceneElementTextUndoCommand::busy = false;
 
+class PushSceneElementTextUndoCommand
+{
+    friend class SceneElement;
+    static bool enabled;
+
+public:
+    PushSceneElementTextUndoCommand(SceneElement *sceneElement)
+    {
+        if (enabled && !SceneElementTextUndoCommand::busy && UndoHub::active()
+            && sceneElement != nullptr && sceneElement->scene()->isUndoRedoEnabled())
+            m_command = new SceneElementTextUndoCommand(sceneElement);
+    }
+    ~PushSceneElementTextUndoCommand()
+    {
+        if (enabled && m_command != nullptr && UndoHub::active()) {
+            UndoHub::active()->push(m_command);
+        } else
+            delete m_command;
+    }
+
+private:
+    SceneElementTextUndoCommand *m_command = nullptr;
+};
+
+bool PushSceneElementTextUndoCommand::enabled = true;
+
 SceneElementTextUndoCommand::SceneElementTextUndoCommand(SceneElement *sceneElement)
     : m_sceneElement(sceneElement)
 {
@@ -613,8 +639,7 @@ void SceneElement::setText(const QString &val)
     if (m_text == val)
         return;
 
-    QScopedPointer<SceneElementTextUndoCommand> cmd(
-            SceneElementTextUndoCommand::busy ? nullptr : new SceneElementTextUndoCommand(this));
+    PushSceneElementTextUndoCommand cmd(this);
 
     m_text = val.trimmed();
     if (m_spellCheck != nullptr)
@@ -624,10 +649,6 @@ void SceneElement::setText(const QString &val)
 
     this->reportSceneElementChanged(Scene::ElementTextChange);
     this->evaluateWordCountLater();
-
-    if (!cmd.isNull() && PushSceneUndoCommand::enabled && UndoHub::active()) {
-        UndoHub::active()->push(cmd.take());
-    }
 }
 
 void SceneElement::setAlignment(Qt::Alignment val)
