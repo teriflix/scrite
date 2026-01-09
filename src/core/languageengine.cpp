@@ -2170,10 +2170,14 @@ QString LanguageEngine::formattedInHtml(const QString &paragraph)
 
 int LanguageEngine::wordCount(const QString &paragraph)
 {
+    if (paragraph.isEmpty())
+        return 0;
+
+    const int paragraphLength = paragraph.length();
     int wordCount = 0;
 
     QTextBoundaryFinder boundaryFinder(QTextBoundaryFinder::Word, paragraph);
-    while (boundaryFinder.position() < paragraph.length()) {
+    while (boundaryFinder.position() < paragraphLength) {
         QTextBoundaryFinder::BoundaryReasons reasons = boundaryFinder.boundaryReasons();
         if (!(reasons.testFlag(QTextBoundaryFinder::StartOfItem))
             || reasons.testFlag(QTextBoundaryFinder::SoftHyphen)) {
@@ -2187,6 +2191,62 @@ int LanguageEngine::wordCount(const QString &paragraph)
     }
 
     return wordCount;
+}
+
+int LanguageEngine::fastWordCount(const QString &paragraph)
+{
+    if (paragraph.isEmpty())
+        return 0;
+
+    int count = 0;
+    bool inWord = false;
+
+    for (const QChar &ch : paragraph) {
+        const bool isLetter = ch.isLetterOrNumber();
+        if (isLetter && !inWord) {
+            ++count;
+            inWord = true;
+        } else if (!isLetter) {
+            inWord = false;
+        }
+    }
+
+    return count;
+}
+
+int LanguageEngine::sentenceCount(const QString &paragraph)
+{
+    int sentenceCount = 0;
+
+    QTextBoundaryFinder boundaryFinder(QTextBoundaryFinder::Sentence, paragraph);
+    while (boundaryFinder.position() < paragraph.length()) {
+        QTextBoundaryFinder::BoundaryReasons reasons = boundaryFinder.boundaryReasons();
+        if (!(reasons.testFlag(QTextBoundaryFinder::StartOfItem))) {
+            if (boundaryFinder.toNextBoundary() == -1)
+                break;
+            continue;
+        }
+
+        ++sentenceCount;
+        boundaryFinder.toNextBoundary();
+    }
+
+    return sentenceCount;
+}
+
+int LanguageEngine::fastSentenceCount(const QString &paragraph)
+{
+    if (paragraph.isEmpty())
+        return 0;
+
+    int count = 1;
+
+    for (const QChar &ch : paragraph) {
+        if (ch == '.' || ch == '!' || ch == '?')
+            ++count;
+    }
+
+    return count;
 }
 
 QVector<QTextLayout::FormatRange>

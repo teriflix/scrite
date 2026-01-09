@@ -705,6 +705,7 @@ public:
     Q_INVOKABLE void removeElement(SceneElement *ptr);
     Q_INVOKABLE int indexOfElement(SceneElement *ptr) { return m_elements.indexOf(ptr); }
     Q_INVOKABLE SceneElement *elementAt(int index) const;
+    Q_INVOKABLE SceneElement *findElementById(const QString &id) const;
     void setElements(const QList<SceneElement *> &list);
     // clang-format off
     Q_PROPERTY(int elementCount
@@ -723,7 +724,7 @@ public:
     Q_SIGNAL void sceneChanged();
     Q_SIGNAL void sceneRefreshed();
     Q_SIGNAL void sceneAboutToReset();
-    Q_SIGNAL void sceneReset(int elementIndex);
+    Q_SIGNAL void sceneReset(int cursorPosition);
 
     // clang-format off
     Q_PROPERTY(Notes *notes

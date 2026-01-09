@@ -3378,13 +3378,14 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
      * cursor position based on the parameters given to this function before we set the text
      * on the SceneElement
      */
-    auto guard = qScopeGuard([=]() {
+    auto updateCursorPosition = [=]() {
         QTextCursor cursor(m_textDocument->textDocument());
         cursor.movePosition(QTextCursor::End);
         int newCursorPosition =
                 qBound(0, charsAdded > 0 ? from + charsAdded : from, cursor.position());
         m_scene->setCursorPosition(newCursorPosition);
-    });
+    };
+    auto guard = qScopeGuard(updateCursorPosition);
     if (m_cursorPosition < 0)
         guard.dismiss();
 
@@ -3434,6 +3435,7 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
         }
     }
 
+    updateCursorPosition();
     do {
         QTextBlock block = cursor.block();
         SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);

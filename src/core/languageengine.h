@@ -840,6 +840,9 @@ public:
     static void determineBoundariesAndInsertText(QTextCursor &cursor, const QString &paragraph);
     static QString formattedInHtml(const QString &paragraph);
     static int wordCount(const QString &paragraph);
+    static int fastWordCount(const QString &paragraph);
+    static int sentenceCount(const QString &paragraph);
+    static int fastSentenceCount(const QString &paragraph);
     static QVector<QTextLayout::FormatRange>
     mergeTextFormats(const QList<ScriptBoundary> &boundaries,
                      const QVector<QTextLayout::FormatRange> &formats);
