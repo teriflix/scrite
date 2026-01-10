@@ -624,6 +624,23 @@ public:
     // clang-format on
     QQmlListProperty<SceneElementFormat> elementFormats();
 
+    // clang-format off
+    Q_PROPERTY(QColor hyperlinkTextColor
+                       READ hyperlinkTextColor
+                               WRITE setHyperlinkTextColor
+                                       NOTIFY hyperlinkTextColorChanged)
+    // clang-format on
+    void setHyperlinkTextColor(const QColor &val)
+    {
+        if (m_hyperlinkTextColor == val)
+            return;
+        m_hyperlinkTextColor = val;
+        emit hyperlinkTextColorChanged();
+    }
+    QColor hyperlinkTextColor() const { return m_hyperlinkTextColor; }
+    Q_SIGNAL void hyperlinkTextColorChanged();
+    QColor m_hyperlinkTextColor;
+
     void applyToAll(const SceneElementFormat *from, SceneElementFormat::Properties properties);
 
     enum Role { SceneElementFomat = Qt::UserRole };
@@ -789,6 +806,16 @@ public:
 
     Q_INVOKABLE void resetBackgroundColor() { this->setBackgroundColor(Qt::transparent); }
 
+    // clang-format off
+    Q_PROPERTY(QString link
+               READ link
+               WRITE setLink
+               NOTIFY linkChanged)
+    // clang-format on
+    void setLink(const QString &val);
+    QString link() const { return m_link; }
+    Q_SIGNAL void linkChanged();
+
     Q_INVOKABLE void reset();
 
     void updateFromCharFormat(const QTextCharFormat &format);
@@ -808,6 +835,7 @@ private:
     bool m_updatingFromFormat = false;
     QColor m_textColor = Qt::transparent;
     QColor m_backgroundColor = Qt::transparent;
+    QString m_link;
 };
 
 class SceneDocumentBlockUserData;
@@ -1089,6 +1117,44 @@ public:
     // clang-format on
     bool isWordUnderCursorIsMisspelled() const { return m_wordUnderCursorIsMisspelled; }
     Q_SIGNAL void wordUnderCursorIsMisspelledChanged();
+
+    // clang-format off
+    Q_PROPERTY(QString selectedText
+               READ selectedText
+               NOTIFY selectedTextChanged)
+    // clang-format on
+    QString selectedText() const;
+    Q_SIGNAL void selectedTextChanged();
+
+    // clang-format off
+    Q_PROPERTY(QString wordUnderCursor
+               READ wordUnderCursor
+               NOTIFY cursorPositionChanged)
+    // clang-format on
+    QString wordUnderCursor() const;
+
+    // clang-format off
+    Q_PROPERTY(QString hyperlinkUnderCursor
+               READ hyperlinkUnderCursor
+               NOTIFY cursorPositionChanged)
+    // clang-format on
+    QString hyperlinkUnderCursor() const;
+
+    // clang-format off
+    Q_PROPERTY(int hyperlinkUnderCursorStartPosition
+               READ hyperlinkUnderCursorStartPosition
+               NOTIFY cursorPositionChanged)
+    // clang-format on
+    int hyperlinkUnderCursorStartPosition() const;
+    Q_SIGNAL void hyperlinkUnderCursorStartPositionChanged();
+
+    // clang-format off
+    Q_PROPERTY(int hyperlinkUnderCursorEndPosition
+               READ hyperlinkUnderCursorEndPosition
+               NOTIFY cursorPositionChanged)
+    // clang-format on
+    int hyperlinkUnderCursorEndPosition() const;
+    Q_SIGNAL void hyperlinkUnderCursorEndPositionChanged();
 
     Q_INVOKABLE QStringList spellingSuggestionsForWordAt(int position) const;
 

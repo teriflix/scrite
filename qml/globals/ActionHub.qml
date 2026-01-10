@@ -1241,6 +1241,18 @@ Item {
         }
 
         Action {
+            readonly property string tooltip: "Add a clickable hyperlink"
+            readonly property string defaultShortcut: "Ctrl+Alt+K"
+
+            enabled: ActionHandler.enabled
+            objectName: "link"
+            text: "Hyperlink"
+            shortcut: defaultShortcut
+
+            icon.source: "qrc:/icons/editor/format_hyperlink.png"
+        }
+
+        Action {
             enabled: _private.textFormat && Runtime.allowAppUsage
             objectName: "clear"
             text: "Clear Formatting"

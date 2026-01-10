@@ -2313,6 +2313,13 @@ void LanguageEngine::polishFontsAndInsertTextAtCursor(
             if (length > 0) {
                 cursor.setPosition(startPos + formatRange.start + length, QTextCursor::KeepAnchor);
                 cursor.mergeCharFormat(formatRange.format);
+
+                if (formatRange.format.isAnchor()) {
+                    QTextCharFormat linkFormat;
+                    linkFormat.setForeground(Qt::blue);
+                    linkFormat.setFontUnderline(true);
+                    cursor.mergeCharFormat(linkFormat);
+                }
             }
         }
         cursor.setPosition(endPos);

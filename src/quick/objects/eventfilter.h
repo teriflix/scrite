@@ -136,7 +136,9 @@ public:
         DragEnter = QEvent::DragEnter,
         DragMove = QEvent::DragMove,
         DragLeave = QEvent::DragLeave,
-        Drop = QEvent::Drop
+        Drop = QEvent::Drop,
+        FocusIn = QEvent::FocusIn,
+        FocusOut = QEvent::FocusOut
     };
     Q_ENUM(Event)
 

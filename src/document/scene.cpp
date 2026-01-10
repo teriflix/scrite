@@ -989,6 +989,13 @@ QJsonArray SceneElement::textFormatsToJson(const QVector<QTextLayout::FormatRang
         item.insert(QLatin1String("length"), formatRange.length);
 
         QJsonObject attribs;
+
+        if (format.isAnchor() && format.hasProperty(QTextFormat::AnchorHref)) {
+            const QString href = format.anchorHref();
+            if (!href.isEmpty())
+                attribs.insert(QLatin1String("href"), href);
+        }
+
         if (format.hasProperty(QTextFormat::FontWeight)) {
             if (format.fontWeight() == QFont::Bold)
                 attribs.insert(QLatin1String("bold"), true);
@@ -1047,8 +1054,14 @@ QVector<QTextLayout::FormatRange> SceneElement::textFormatsFromJson(const QJsonA
             formatRange.length = item.value(QLatin1String("length")).toInt();
 
             const QJsonObject attribs = item.value(QLatin1String("attribs")).toObject();
-
             QTextCharFormat &format = formatRange.format;
+
+            const QString href = attribs.value("href").toString();
+            if (!href.isEmpty()) {
+                format.setAnchor(true);
+                format.setAnchorHref(href);
+            }
+
             if (attribs.value(QLatin1String("bold")).toBool())
                 format.setFontWeight(QFont::Bold);
             if (attribs.value(QLatin1String("italics")).toBool())

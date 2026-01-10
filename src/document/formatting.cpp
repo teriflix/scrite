@@ -1182,6 +1182,18 @@ void TextFormat::setBackgroundColor(const QColor &val)
         emit formatChanged({ QTextFormat::BackgroundBrush });
 }
 
+void TextFormat::setLink(const QString &val)
+{
+    if (m_link == val)
+        return;
+
+    m_link = val;
+    emit linkChanged();
+
+    if (!m_updatingFromFormat)
+        emit formatChanged({ QTextFormat::AnchorHref });
+}
+
 void TextFormat::reset()
 {
     m_updatingFromFormat = true;
@@ -1191,6 +1203,7 @@ void TextFormat::reset()
     this->setBold(false);
     this->setItalics(false);
     this->setUnderline(false);
+    this->setLink(QString());
 
     m_updatingFromFormat = false;
 
@@ -1234,6 +1247,11 @@ void TextFormat::updateFromCharFormat(const QTextCharFormat &format)
         this->setStrikeout(format.fontStrikeOut());
     else
         this->setStrikeout(false);
+
+    if (format.isAnchor() && format.hasProperty(QTextFormat::AnchorHref))
+        this->setLink(format.anchorHref());
+    else
+        this->setLink(QString());
 }
 
 QTextCharFormat TextFormat::toCharFormat(const QList<int> &properties) const
@@ -1265,15 +1283,25 @@ QTextCharFormat TextFormat::toCharFormat(const QList<int> &properties) const
         if (m_strikeout)
             format.setFontStrikeOut(m_strikeout);
 
+    if (properties.isEmpty() || properties.contains(QTextFormat::AnchorHref)) {
+        if (!m_link.isEmpty()) {
+            format.setAnchor(true);
+            format.setAnchorHref(m_link);
+        } else {
+            format.setAnchor(false);
+            format.setAnchorHref(QString());
+        }
+    }
+
     return format;
 }
 
 QList<int> TextFormat::allProperties()
 {
-    return { QTextFormat::ForegroundBrush,   QTextFormat::BackgroundBrush,
-             QTextFormat::FontWeight,        QTextFormat::FontItalic,
-             QTextFormat::FontUnderline,     QTextFormat::FontStrikeOut,
-             QTextFormat::TextUnderlineStyle };
+    return { QTextFormat::ForegroundBrush,    QTextFormat::BackgroundBrush,
+             QTextFormat::FontWeight,         QTextFormat::FontItalic,
+             QTextFormat::FontUnderline,      QTextFormat::FontStrikeOut,
+             QTextFormat::TextUnderlineStyle, QTextFormat::AnchorHref };
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2007,6 +2035,7 @@ void SceneDocumentBinder::setSelectionStartPosition(int val)
 
     m_selectionStartPosition = val;
     emit selectionStartPositionChanged();
+    emit selectedTextChanged();
 }
 
 void SceneDocumentBinder::setSelectionEndPosition(int val)
@@ -2016,6 +2045,7 @@ void SceneDocumentBinder::setSelectionEndPosition(int val)
 
     m_selectionEndPosition = val;
     emit selectionEndPositionChanged();
+    emit selectedTextChanged();
 }
 
 bool SceneDocumentBinder::changeTextCase(TextCasing casing)
@@ -2446,6 +2476,95 @@ int SceneDocumentBinder::currentBlockPosition() const
     QTextCursor cursor(this->document());
     cursor.setPosition(m_cursorPosition);
     return cursor.block().position();
+}
+
+QString SceneDocumentBinder::selectedText() const
+{
+    if (m_selectionStartPosition >= 0 && m_selectionEndPosition > m_selectionStartPosition) {
+        QTextCursor cursor(m_textDocument->textDocument());
+        cursor.setPosition(m_selectionStartPosition);
+        cursor.setPosition(m_selectionEndPosition, QTextCursor::KeepAnchor);
+        return cursor.selectedText();
+    }
+
+    return QString();
+}
+
+QString SceneDocumentBinder::wordUnderCursor() const
+{
+    if (m_cursorPosition >= 0) {
+        QTextCursor cursor(m_textDocument->textDocument());
+        cursor.setPosition(m_cursorPosition);
+        cursor.select(QTextCursor::WordUnderCursor);
+        return cursor.selectedText();
+    }
+
+    return QString();
+}
+
+QString SceneDocumentBinder::hyperlinkUnderCursor() const
+{
+    if (m_cursorPosition >= 0) {
+        QTextCursor cursor(m_textDocument->textDocument());
+        cursor.setPosition(m_cursorPosition);
+
+        QTextCharFormat format = cursor.charFormat();
+        return format.isAnchor() ? format.anchorHref() : QString();
+    }
+
+    return QString();
+}
+
+int SceneDocumentBinder::hyperlinkUnderCursorStartPosition() const
+{
+    if (m_cursorPosition >= 0) {
+        QTextCursor cursor(m_textDocument->textDocument());
+        cursor.setPosition(m_cursorPosition);
+
+        QTextCharFormat format = cursor.charFormat();
+        if (format.isAnchor() && format.anchorHref() != "") {
+            const QString href = format.anchorHref();
+            while (1) {
+                if (!cursor.movePosition(QTextCursor::Left))
+                    break;
+
+                format = cursor.charFormat();
+                if (!format.isAnchor() || format.anchorHref() != href) {
+                    break;
+                }
+            }
+
+            return cursor.position();
+        }
+    }
+
+    return -1;
+}
+
+int SceneDocumentBinder::hyperlinkUnderCursorEndPosition() const
+{
+    if (m_cursorPosition >= 0) {
+        QTextCursor cursor(m_textDocument->textDocument());
+        cursor.setPosition(m_cursorPosition);
+
+        QTextCharFormat format = cursor.charFormat();
+        if (format.isAnchor() && format.anchorHref() != "") {
+            const QString href = format.anchorHref();
+            while (1) {
+                if (!cursor.movePosition(QTextCursor::Right))
+                    break;
+                format = cursor.charFormat();
+                if (!format.isAnchor() || format.anchorHref() != href) {
+                    cursor.movePosition(QTextCursor::Left);
+                    break;
+                }
+            }
+
+            return cursor.position();
+        }
+    }
+
+    return -1;
 }
 
 QFont SceneDocumentBinder::currentFont() const
@@ -2940,6 +3059,17 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
         }
 
         emit spellingMistakesDetected();
+    }
+
+    // Links should appear in blue text and underline format.
+    const QVector<QTextLayout::FormatRange> formats = block.textFormats();
+    for (const QTextLayout::FormatRange &format : formats) {
+        if (format.format.isAnchor() && !format.format.anchorHref().isEmpty()) {
+            QTextCharFormat linkFormat;
+            linkFormat.setForeground(Qt::blue);
+            linkFormat.setFontUnderline(true);
+            this->mergeFormat(format.start, format.length, linkFormat);
+        }
     }
 }
 

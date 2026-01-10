@@ -1,6 +1,7 @@
 singleton AboutDialog 1.0 AboutDialog.qml
 singleton BackupsDialog 1.0 BackupsDialog.qml
 singleton CollaboratorsDialog 1.0 CollaboratorsDialog.qml
+singleton EditHyperlinkDialog 1.0 EditHyperlinkDialog.qml
 singleton ExportConfigurationDialog 1.0 ExportConfigurationDialog.qml
 singleton FontSelectionDialog 1.0 FontSelectionDialog.qml
 singleton HomeScreen 1.0 HomeScreen.qml
