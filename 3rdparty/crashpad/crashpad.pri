@@ -46,7 +46,7 @@ macx {
     exists($${CRASHPAD_SDK}/lib/libclient.a) {
         LIBS += -L$${CRASHPAD_SDK}/lib/ -lcommon -lclient -lutil -lbase -lmig_output
         LIBS += -L/usr/lib -lbsm -framework AppKit -framework Security
-        INCLUDEPATH += $${CRASHPAD_SDK}/include $${CRASHPAD_SDK}/include/crashpad
+        INCLUDEPATH += $${CRASHPAD_SDK}/include $${CRASHPAD_SDK}/include/crashpad $${CRASHPAD_SDK}/include/mini_chromium
 
         CRASHPAD_HANDLER.files = $${CRASHPAD_SDK}/bin/crashpad_handler
         CRASHPAD_HANDLER.path = Contents/MacOS

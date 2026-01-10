@@ -15,20 +15,10 @@ rm -f dmgbackdropgen.qml
 # https://ss64.com/osx/sips.html
 sips -s dpiWidth 144 -s dpiHeight 144 background.png
 
-# https://github.com/create-dmg/create-dmg
-~/Utils/create-dmg/create-dmg \
-  --volicon "Scrite.icns" \
-  --volname "Scrite-2.0.4" \
-  --background "background.png" \
-  --window-pos 272 136 \
-  --window-size 896 660 \
-  --icon-size 128 \
-  --icon "Scrite.app" 256 300 \
-  --hide-extension "Scrite.app" \
-  --app-drop-link 620 300 \
-  --hdiutil-verbose \
-  "Scrite-2.0.4.dmg" \
-  "Scrite-2.0.4/"
+sed "s/{{VERSION}}/2.0.4/" dmg_settings_tmpl.py > dmg_settings.py
+
+dmgbuild -s dmg_settings.py "Scrite-2.0.4" Scrite-2.0.4.dmg
+
 rm -f background.png
 rm -f dmgbackdrop.png
 rm -f Scrite.icns
