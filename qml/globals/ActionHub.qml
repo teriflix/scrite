@@ -124,9 +124,26 @@ Item {
             enabled: Runtime.allowAppUsage
             objectName: "fileNew"
             shortcut: defaultShortcut
-            text: "New"
+            text: "New File"
 
             onTriggered: HomeScreen.launch()
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Close)
+
+            enabled: Runtime.allowAppUsage
+            objectName: "fileClose"
+            shortcut: defaultShortcut
+            text: "Close File"
+
+            onTriggered: {
+                SaveFileTask.save( () => {
+                                      OpenFromLibraryTask.openTemplateAt(Runtime.libraryService, 0)
+                                  })
+            }
         }
 
         Action {
@@ -2548,6 +2565,19 @@ Item {
     readonly property ActionManager applicationOptions: ActionManager {
         title: "Application"
         objectName: "applicationOptions"
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+            readonly property var keywords: ["quit", "shutdown"]
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Quit)
+
+            objectName: "quitApp"
+            text: Platform.isMacOSDesktop ? "Quit Scrite" : "Exit Scrite Application"
+            shortcut: defaultShortcut
+
+            onTriggered: Scrite.window.close()
+        }
 
         Action {
             readonly property string defaultShortcut: "Alt+`"
