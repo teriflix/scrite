@@ -305,11 +305,15 @@ QString Language::name() const
 
 QString Language::nativeName() const
 {
-    return QLocale(QLocale::Language(this->code)).nativeLanguageName();
+    return this->code >= 0 ? QLocale(QLocale::Language(this->code)).nativeLanguageName()
+                           : QString();
 }
 
 QString Language::shortName() const
 {
+    if (this->code < 0)
+        return QString();
+
     QLocale locale(QLocale::Language(this->code));
     return locale.name().section('_', 0, 0);
 }
@@ -337,11 +341,17 @@ QStringList Language::fontFamilies() const
 
 int Language::localeScript() const
 {
+    if (this->code < 0)
+        return QLocale::AnyScript;
+
     return QLocale(QLocale::Language(this->code)).script();
 }
 
 int Language::charScript() const
 {
+    if (this->code < 0)
+        return QChar::Script_Unknown;
+
     return languageScriptMap().value(QLocale::Language(this->code), QChar::Script_Latin);
 }
 
@@ -384,6 +394,9 @@ QString Language::fontWritingSystemName() const
 
 QList<TransliterationOption> Language::transliterationOptions() const
 {
+    if (this->code < 0)
+        return QList<TransliterationOption>();
+
     return LanguageEngine::instance()->queryTransliterationOptions(this->code);
 }
 
