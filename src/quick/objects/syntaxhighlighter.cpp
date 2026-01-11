@@ -242,7 +242,7 @@ void SyntaxHighlighter::setTextDocument(QQuickTextDocument *val)
 
         QTextDocument *doc = m_textDocument->textDocument();
         if (doc != nullptr)
-            doc->setUndoRedoEnabled(val);
+            doc->setUndoRedoEnabled(m_textDocumentUndoRedoEnabled);
     }
 
     emit textDocumentChanged();

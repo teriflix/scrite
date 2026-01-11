@@ -588,7 +588,7 @@ AbstractScenePartEditor {
             _sceneTextEditor.highlightCursor()
         }
 
-        function onModelAboutToBeReset() {
+        /*function onModelAboutToBeReset() {
             if(_sceneTextEditor.activeFocus)
                 _private.cursorPositionBeforeSceneReset = _sceneTextEditor.cursorPosition
         }
@@ -600,7 +600,7 @@ AbstractScenePartEditor {
                                 }, _private.cursorPositionBeforeSceneReset )
                 _private.cursorPositionBeforeSceneReset = -1
             }
-        }
+        }*/
 
         function onSceneAboutToReset() {
             _private.captureCursorOffset()

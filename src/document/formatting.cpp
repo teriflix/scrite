@@ -3514,6 +3514,7 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
         int newCursorPosition =
                 qBound(0, charsAdded > 0 ? from + charsAdded : from, cursor.position());
         m_scene->setCursorPosition(newCursorPosition);
+        return newCursorPosition;
     };
     auto guard = qScopeGuard(updateCursorPosition);
     if (m_cursorPosition < 0)
@@ -3565,7 +3566,6 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
         }
     }
 
-    updateCursorPosition();
     do {
         QTextBlock block = cursor.block();
         SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
@@ -3615,8 +3615,6 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
     if (nrBlocks < 0)
         nrBlocks = this->document()->blockCount();
 
-    int deltaBlocks = nrBlocks - m_scene->elementCount();
-
     /*
      * Ensure that blocks on the QTextDocument are in sync with
      * SceneElements in the Scene. I know that we are using a for loop
@@ -3628,8 +3626,6 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
      */
 
     bool doPolishElements = false;
-
-    int cursorPosition = m_cursorPosition;
 
     m_scene->beginUndoCapture();
 
@@ -3699,11 +3695,6 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
 
     if (doPolishElements)
         this->polishAllSceneElements();
-
-    if (cursorPosition == 0 && deltaBlocks == -1) {
-        // Bugfix: Deleting empty first blank line causes cursor to jump to the last position.
-        QTimer::singleShot(100, this, [=]() { emit requestCursorPosition(cursorPosition); });
-    }
 }
 
 void SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix()
