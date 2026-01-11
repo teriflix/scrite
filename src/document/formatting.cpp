@@ -3627,6 +3627,8 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
 
     bool doPolishElements = false;
 
+    int cursorPosition = m_cursorPosition;
+
     m_scene->beginUndoCapture();
 
     QList<SceneElement *> elementList;
@@ -3695,6 +3697,10 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
 
     if (doPolishElements)
         this->polishAllSceneElements();
+
+    if (cursorPosition >= 0) {
+        QTimer::singleShot(100, this, [=]() { emit requestCursorPosition(cursorPosition); });
+    }
 }
 
 void SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix()
