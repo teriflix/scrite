@@ -66,7 +66,7 @@ ListView {
 
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-    Component.onCompleted: _private.updateFirstAndLastIndexLater()
+    Component.onCompleted: Qt.callLater(_private.init)
 
     objectName: "ScreenplayEditorListView"
 
@@ -463,6 +463,19 @@ ListView {
 
                 _private.updateFirstAndLastIndexLater()
             }
+        }
+
+        function init() {
+            root.returnToBounds()
+            const index = root.screenplayAdapter.currentIndex
+            if(index < 0)
+                root.positionViewAtBeginning()
+            else {
+                root.positionViewAtIndex(index, ListView.Beginning)
+                if(hasFocus)
+                    editSceneContent.trigger()
+            }
+            updateFirstAndLastIndexLater()
         }
 
         function pickDelegateComponent(delegateKind) {
