@@ -3615,6 +3615,8 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
     if (nrBlocks < 0)
         nrBlocks = this->document()->blockCount();
 
+    int deltaBlocks = nrBlocks - m_scene->elementCount();
+
     /*
      * Ensure that blocks on the QTextDocument are in sync with
      * SceneElements in the Scene. I know that we are using a for loop
@@ -3698,7 +3700,8 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
     if (doPolishElements)
         this->polishAllSceneElements();
 
-    if (cursorPosition >= 0) {
+    if (cursorPosition == 0 && deltaBlocks == -1) {
+        // Bugfix: Deleting empty first blank line causes cursor to jump to the last position.
         QTimer::singleShot(100, this, [=]() { emit requestCursorPosition(cursorPosition); });
     }
 }
