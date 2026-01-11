@@ -849,7 +849,9 @@ qreal ScreenplayPaginatorWorker::cursorPixelOffset(int cursorPosition,
     cursorPosition += block.position();
 
     QTextCursor cursor(m_document);
-    cursor.setPosition(cursorPosition);
+    cursor.movePosition(QTextCursor::End);
+    if (cursorPosition < cursor.position())
+        cursor.setPosition(cursorPosition);
 
     return this->cursorPixelOffset(cursor);
 }
