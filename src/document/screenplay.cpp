@@ -2007,6 +2007,8 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
         undoCommand.take();
     }
 
+    this->evaluateSceneNumbers(true);
+
     return ret;
 }
 
