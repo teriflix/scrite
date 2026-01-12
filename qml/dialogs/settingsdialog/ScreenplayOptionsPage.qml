@@ -130,6 +130,7 @@ Item {
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
                     text: "Diacritic Editing"
+                    enabled: Platform.isMacOSDesktop
                     checked: Runtime.screenplayEditorSettings.allowDiacriticEditing
                     onToggled: Runtime.screenplayEditorSettings.allowDiacriticEditing = checked
                 }
