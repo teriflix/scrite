@@ -82,7 +82,7 @@ public:
                 this->addToPending(qmlAction, keySequence);
         } else if (event->type() == QEvent::Shortcut) {
             QShortcutEvent *shortcutEvent = reinterpret_cast<QShortcutEvent *>(event);
-            this->removeFromPending(object, shortcutEvent->key());
+            this->removeFromPending(nullptr, shortcutEvent->key());
         }
 
         return false;
@@ -111,12 +111,14 @@ public:
 private:
     int findPending(QObject *object, const QKeySequence &sequence) const
     {
-        if (m_pendingShortcuts.isEmpty() || (object == nullptr && sequence.isEmpty()))
+        if (m_pendingShortcuts.isEmpty() || sequence.isEmpty())
             return -1;
 
         auto it = std::find_if(m_pendingShortcuts.begin(), m_pendingShortcuts.end(),
                                [=](const QPair<QObject *, QKeySequence> &item) {
-                                   return (item.first == object || item.second == sequence);
+                                   if (object == nullptr)
+                                       return sequence == item.second;
+                                   return object == item.first && sequence == item.second;
                                });
         if (it != m_pendingShortcuts.end())
             return std::distance(m_pendingShortcuts.begin(), it);
@@ -139,7 +141,7 @@ private:
 
     void removeFromPending(QObject *object, const QKeySequence &sequence)
     {
-        if (object == nullptr || sequence.isEmpty())
+        if (object == nullptr && sequence.isEmpty())
             return;
 
         int index = this->findPending(object, sequence);
