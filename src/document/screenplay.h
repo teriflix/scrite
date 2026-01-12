@@ -930,7 +930,7 @@ protected:
     void onSceneHeadingChanged();
     void onSceneElementChanged(SceneElement *sceneElement);
     void onScreenplayElementOmittedChanged();
-    void evaluateSceneNumbers(bool minorAlso = false);
+    void evaluateSceneNumbers(bool minorAlso = true);
     void evaluateSceneNumbersLater();
     void validateCurrentElementIndex();
     void evaluateParagraphCounts();
