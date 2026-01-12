@@ -337,7 +337,7 @@ bool SceneElementTextUndoCommand::mergeWith(const QUndoCommand *other)
     if (qAbs(cmd->m_newCursorPosition - m_newCursorPosition) >= 2)
         return false;
 
-    if (qAbs(cmd->m_timestamp - m_timestamp) > qint64(UndoHub::instance()->mergeTimeGap()))
+    if (qAbs(cmd->m_timestamp - m_timestamp) > 5000)
         return false;
 
     if (LanguageEngine::fastSentenceCount(m_newText)
