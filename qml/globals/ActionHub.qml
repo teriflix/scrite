@@ -1656,7 +1656,19 @@ Item {
             text: "Reset Scene Numbers"
             enabled: !Scrite.document.readOnly
 
-            onTriggered: Scrite.document.structure.resetSceneNumbers()
+            onTriggered: {
+                const options = ["Reset", "Reevaluate"]
+                MessageBox.question("Reset Options",
+                                    "Do you want to reset all custom scene numbers, or just reevaluate the scene number sequence?<br/><br/>" +
+                                    "<b>NOTE</b>: Reset removes custom scene numbers like 2A, where-as reeevaluate updates the numerical part according to scene sequence. Either way, custom scene numbers withou a letter will be pruned.",
+                                    options, (answer) => {
+                                        if(answer === options[0]) {
+                                            Scrite.document.screenplay.removeUserSceneNumbers()
+                                        } else {
+                                            Scrite.document.screenplay.reevaluateSceneNumbers()
+                                        }
+                                    })
+            }
         }
 
         Action {

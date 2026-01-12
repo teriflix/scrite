@@ -47,6 +47,7 @@ Popup {
     width: Runtime.bounded(600, Scrite.window.width * 0.75, 800)
 
     modal: false
+    focus: true
     closePolicy: Popup.CloseOnPressOutside|Popup.CloseOnEscape
 
     contentItem: FocusScope {
@@ -83,6 +84,14 @@ Popup {
                 onTextEdited: {
                     if(_private.actionsModel)
                         _private.actionsModel.filter()
+                }
+
+                Connections {
+                    target: root
+
+                    function onAboutToShow() {
+                        Qt.callLater(_commandText.forceActiveFocus)
+                    }
                 }
             }
 
@@ -213,6 +222,12 @@ Popup {
                 }
             }
         }
+
+        onVisibleChanged: {
+            if(visible) {
+                Qt.callLater(_commandText.forceActiveFocus)
+            }
+        }
     }
 
     ActionHandler {
@@ -228,7 +243,6 @@ Popup {
         Runtime.language.setActiveCode(QtLocale.English)
 
         _commandText.text = ""
-        contentItem.forceActiveFocus()
     }
 
     onAboutToHide: {
