@@ -110,7 +110,7 @@ TextField {
     KeyNavigation.tab: tabItem
     KeyNavigation.backtab: backTabItem
 
-    DiacriticHandler.enabled: activeFocus
+    DiacriticHandler.enabled: Runtime.screenplayEditorSettings.allowDiacriticEditing && activeFocus
 
     LanguageTransliterator.popup: LanguageTransliteratorPopup {
         editorFont: root.font

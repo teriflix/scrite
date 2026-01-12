@@ -60,7 +60,7 @@ FocusScope {
                 Keys.onEnterPressed: _actionsView.editCurrentItem()
                 Keys.onReturnPressed: _actionsView.editCurrentItem()
 
-                DiacriticHandler.enabled: activeFocus
+                DiacriticHandler.enabled: Runtime.screenplayEditorSettings.allowDiacriticEditing && activeFocus
 
                 focus: true
                 placeholderText: "Filter by name"

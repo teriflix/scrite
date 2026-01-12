@@ -11,11 +11,13 @@
 **
 ****************************************************************************/
 
+#include "utils.h"
 #include "diacritichandler.h"
 
 #include <QKeyEvent>
 #include <QQuickItem>
 #include <QGuiApplication>
+#include <QRegularExpression>
 
 DiacriticHandler::DiacriticHandler(QObject *parent) : QObject { parent }
 {
@@ -54,13 +56,13 @@ bool DiacriticHandler::eventFilter(QObject *object, QEvent *event)
 #ifdef Q_OS_MACOS
     if (m_enabled && object == m_editorItem) {
         const QEvent::Type eventType = event->type();
-
         if (eventType == QEvent::KeyPress) {
             QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-            if (keyEvent->isAutoRepeat()) {
-                if (keyEvent->text().isEmpty())
-                    return false;
+            const QString text = keyEvent->text().remove(QRegularExpression("\\P{L}"));
+            if (text.isEmpty())
+                return false;
 
+            if (keyEvent->isAutoRepeat()) {
                 keyEvent->accept();
                 return true;
             }
