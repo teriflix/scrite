@@ -1651,24 +1651,27 @@ Item {
         Action {
             readonly property bool visible: false
             readonly property bool allowShortcut: true
+            readonly property var keywords: ["reset scene number"]
+            readonly property string tooltip: "Remove user defined scene numbers on all scenes and restores sequential scene numbers."
 
             objectName: "resetSceneNumbers"
-            text: "Reset Scene Numbers"
+            text: "Remove user scene numbers"
             enabled: !Scrite.document.readOnly
 
-            onTriggered: {
-                const options = ["Reset", "Reevaluate"]
-                MessageBox.question("Reset Options",
-                                    "Do you want to reset all custom scene numbers, or just reevaluate the scene number sequence?<br/><br/>" +
-                                    "<b>NOTE</b>: Reset removes custom scene numbers like 2A, where-as reeevaluate updates the numerical part according to scene sequence. Either way, custom scene numbers withou a letter will be pruned.",
-                                    options, (answer) => {
-                                        if(answer === options[0]) {
-                                            Scrite.document.screenplay.removeUserSceneNumbers()
-                                        } else {
-                                            Scrite.document.screenplay.reevaluateSceneNumbers()
-                                        }
-                                    })
-            }
+            onTriggered: Scrite.document.screenplay.removeUserSceneNumbers()
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+            readonly property var keywords: ["reset scene number"]
+            readonly property string tooltip: "Evaluates scene numbers afresh, updaing 1A, 2A as required to reflect their new sequence in the screenplay."
+
+            objectName: "reevalSceneNumbers"
+            text: "Re-evaluate Scene Numbers"
+            enabled: !Scrite.document.readOnly
+
+            onTriggered: Scrite.document.screenplay.reevaluateSceneNumbers()
         }
 
         Action {
