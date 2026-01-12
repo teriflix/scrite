@@ -98,6 +98,24 @@ Item {
             clip: true
 
             initialItem: ContentPageLayout2 { }
+
+            function onShowScriptalay() {
+                push(scriptalayPage)
+            }
+
+            function onShowImportPanel() {
+                push(importPage)
+            }
+
+            function onShowVaultPanel() {
+                push(vaultPage)
+            }
+
+            Component.onCompleted: {
+                _private.showScriptalay.connect(onShowScriptalay)
+                _private.showVaultPanel.connect(onShowVaultPanel)
+                _private.showImportPanel.connect(onShowImportPanel)
+            }
         }
     }
 

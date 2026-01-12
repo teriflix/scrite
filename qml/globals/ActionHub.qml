@@ -1651,12 +1651,27 @@ Item {
         Action {
             readonly property bool visible: false
             readonly property bool allowShortcut: true
+            readonly property var keywords: ["reset scene number"]
+            readonly property string tooltip: "Remove user defined scene numbers on all scenes and restores sequential scene numbers."
 
             objectName: "resetSceneNumbers"
-            text: "Reset Scene Numbers"
+            text: "Remove user scene numbers"
             enabled: !Scrite.document.readOnly
 
-            onTriggered: Scrite.document.structure.resetSceneNumbers()
+            onTriggered: Scrite.document.screenplay.removeUserSceneNumbers()
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+            readonly property var keywords: ["reset scene number"]
+            readonly property string tooltip: "Evaluates scene numbers afresh, updaing 1A, 2A as required to reflect their new sequence in the screenplay."
+
+            objectName: "reevalSceneNumbers"
+            text: "Re-evaluate Scene Numbers"
+            enabled: !Scrite.document.readOnly
+
+            onTriggered: Scrite.document.screenplay.reevaluateSceneNumbers()
         }
 
         Action {

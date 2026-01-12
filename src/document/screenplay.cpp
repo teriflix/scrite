@@ -2007,6 +2007,8 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
         undoCommand.take();
     }
 
+    this->evaluateSceneNumbers(true);
+
     return ret;
 }
 
@@ -2678,7 +2680,15 @@ int Screenplay::replace(const QString &text, const QString &replacementText, int
     return counter;
 }
 
-void Screenplay::resetSceneNumbers()
+void Screenplay::removeUserSceneNumbers()
+{
+    for (ScreenplayElement *element : qAsConst(m_elements)) {
+        element->setUserSceneNumber(QString());
+    }
+    this->evaluateSceneNumbers(true);
+}
+
+void Screenplay::reevaluateSceneNumbers()
 {
     this->evaluateSceneNumbers(true);
 }

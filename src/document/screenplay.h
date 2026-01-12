@@ -862,7 +862,8 @@ public:
 
     Q_SIGNAL void paragraphCountChanged();
 
-    Q_INVOKABLE void resetSceneNumbers();
+    Q_INVOKABLE void removeUserSceneNumbers();
+    Q_INVOKABLE void reevaluateSceneNumbers();
 
     Q_INVOKABLE bool polishText();
     Q_INVOKABLE bool capitalizeSentences();

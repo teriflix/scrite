@@ -245,7 +245,8 @@ public:
     PushSceneElementTextUndoCommand(SceneElement *sceneElement)
     {
         if (enabled && !SceneElementTextUndoCommand::busy && UndoHub::active()
-            && sceneElement != nullptr && sceneElement->scene()->isUndoRedoEnabled())
+            && sceneElement != nullptr && sceneElement->scene() != nullptr
+            && sceneElement->scene()->isUndoRedoEnabled())
             m_command = new SceneElementTextUndoCommand(sceneElement);
     }
     ~PushSceneElementTextUndoCommand()
@@ -336,7 +337,7 @@ bool SceneElementTextUndoCommand::mergeWith(const QUndoCommand *other)
     if (qAbs(cmd->m_newCursorPosition - m_newCursorPosition) >= 2)
         return false;
 
-    if (qAbs(cmd->m_timestamp - m_timestamp) > qint64(UndoHub::instance()->mergeTimeGap()))
+    if (qAbs(cmd->m_timestamp - m_timestamp) > 5000)
         return false;
 
     if (LanguageEngine::fastSentenceCount(m_newText)

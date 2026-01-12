@@ -170,6 +170,7 @@ Item {
         property int slpSynopsisLineCount: 2
         property int jumpToSceneFilterMode: 0
 
+        property bool allowDiacriticEditing: true
         property bool allowSelectedTextTranslation: false
         property bool allowTaggingOfScenes: false
         property bool applyUserDefinedLanguageFonts: true
