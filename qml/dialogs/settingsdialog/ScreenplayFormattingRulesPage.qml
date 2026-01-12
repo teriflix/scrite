@@ -398,6 +398,8 @@ Item {
                     applyLanguageFonts: true
                     applyFormattingEvenInTransaction: true
                     scene: Scene {
+                        undoRedoEnabled: false
+
                         elements: [
                             SceneElement {
                                 type: SceneElement.Heading

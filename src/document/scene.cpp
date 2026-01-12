@@ -245,7 +245,8 @@ public:
     PushSceneElementTextUndoCommand(SceneElement *sceneElement)
     {
         if (enabled && !SceneElementTextUndoCommand::busy && UndoHub::active()
-            && sceneElement != nullptr && sceneElement->scene()->isUndoRedoEnabled())
+            && sceneElement != nullptr && sceneElement->scene() != nullptr
+            && sceneElement->scene()->isUndoRedoEnabled())
             m_command = new SceneElementTextUndoCommand(sceneElement);
     }
     ~PushSceneElementTextUndoCommand()
