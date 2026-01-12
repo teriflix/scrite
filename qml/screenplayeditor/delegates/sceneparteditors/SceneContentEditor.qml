@@ -18,7 +18,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
 import "qrc:/qml/globals"
@@ -75,6 +74,7 @@ AbstractScenePartEditor {
         id: _sceneTextEditor
 
         property bool hasSelection: selectionStart >= 0 && selectionEnd >= 0 && selectionEnd > selectionStart
+        property bool controlModifierPressed: false
 
         signal highlightCursor()
 
@@ -82,6 +82,21 @@ AbstractScenePartEditor {
         Keys.onPressed: (event) => { _private.handleSceneTextEditorKeyPressed(event) }
         Keys.onUpPressed: (event) => { _private.handleSceneTextEditorKeyUpPressed(event) }
         Keys.onDownPressed: (event) => { _private.handleSceneTextEditorKeyDownPressed(event) }
+
+        EventFilter.events: [EventFilter.KeyPress,EventFilter.KeyRelease,EventFilter.FocusOut]
+        EventFilter.onFilter: (object, event, result) => {
+                                  result.filter = false
+                                  result.acceptEvent = false
+                                  if(event.type === EventFilter.FocusOut) {
+                                      controlModifierPressed = false
+                                  } else {
+                                      if(event.modifiers & Qt.ControlModifier) {
+                                          controlModifierPressed = event.type === EventFilter.KeyPress
+                                      }
+                                  }
+                              }
+
+        DiacriticHandler.enabled: activeFocus
 
         LanguageTransliterator.popup: LanguageTransliteratorPopup {
             editorFont: _sceneTextEditor.font
@@ -170,11 +185,11 @@ AbstractScenePartEditor {
 
                 action: ActionHub.paragraphFormats.find("nextFormat")
                 enabled: _sceneTextEditor.activeFocus && !root.readOnly && !_completion.model.hasSuggestion
-                onTriggered: (source) => { _sceneDocumentBinder.tab() }
+                onTriggered: (source) => {  } // Do nothing, since we already handle this in Keys.onTabPressed()
             }
         }
 
-        // For handling context menu popup
+        // For handling context menu popup and hyperlinks
         MouseArea {
             anchors.fill: parent
 
@@ -199,8 +214,28 @@ AbstractScenePartEditor {
                        }
         }
 
-        onActiveFocusChanged: Qt.callLater(_private.handleSceneTextEditorFocusChange)
-        onCursorRectangleChanged: Qt.callLater(_private.ensureSceneTextEditorCursorIsVisible)
+        onLinkActivated: (link) => {
+                             if(activeFocus && controlModifierPressed) {
+                                 controlModifierPressed = false
+                                 const maxWidth = Math.min(500, Scrite.window.width * 0.5) - 40
+                                 const elidedLink = Runtime.idealFontMetrics.elidedText(link, Text.ElideMiddle, maxWidth)
+                                 MessageBox.question("Link clicked",
+                                                     "The following link was activated. Do you want to open it?\n\n" +
+                                                     elidedLink, ["Yes", "No"], (answer) => {
+                                                         if(answer === "Yes") {
+                                                             Qt.openUrlExternally(link);
+                                                         }
+                                                     })
+                             }
+                         }
+
+        onActiveFocusChanged: () => {
+                                  Qt.callLater(_private.handleSceneTextEditorFocusChange)
+                              }
+
+        onCursorRectangleChanged: () => {
+                                      Qt.callLater(_private.ensureSceneTextEditorCursorIsVisible)
+                                  }
     }
 
     SceneTextEditorSpellingSuggestionsMenu {
@@ -254,6 +289,8 @@ AbstractScenePartEditor {
 
     SceneDocumentBinder {
         id: _sceneDocumentBinder
+
+        readonly property TextArea textArea: _sceneTextEditor
 
         function preserveScrollAndReload() {
             var cy = contentView.contentY
@@ -496,6 +533,41 @@ AbstractScenePartEditor {
                      }
     }
 
+    ActionHandler {
+        action: ActionHub.markupTools.find("link")
+
+        enabled: _sceneTextEditor.activeFocus && Runtime.allowAppUsage
+
+        onTriggered: (source) => {
+                         let cursorPosition = -1
+                         let selectedText = _sceneDocumentBinder.selectedText
+                         let selectionStart = _sceneTextEditor.selectionStart
+                         let selectionEnd = _sceneTextEditor.selectionEnd
+                         if(selectedText === "") {
+                             selectedText = _sceneDocumentBinder.wordUnderCursor
+                             selectionStart = _sceneDocumentBinder.hyperlinkUnderCursorStartPosition
+                             selectionEnd = _sceneDocumentBinder.hyperlinkUnderCursorEndPosition
+                             cursorPosition = _sceneTextEditor.cursorPosition
+                         }
+                         if(selectedText === "") {
+                             MessageBox.information("Link Error", "Cannot add hyperlink to unselected text.")
+                             return
+                         }
+
+                         EditHyperlinkDialog.launch(selectedText, _sceneDocumentBinder.textFormat.link, (newLink) => {
+                                                        _sceneTextEditor.forceActiveFocus()
+                                                        _sceneTextEditor.select(selectionStart, selectionEnd)
+                                                        Qt.callLater( () => {
+                                                                         _sceneDocumentBinder.textFormat.link = newLink
+                                                                         _sceneTextEditor.deselect()
+                                                                         if(cursorPosition >= 0) {
+                                                                             _sceneTextEditor.cursorPosition = cursorPosition
+                                                                         }
+                                                                     })
+                                                    })
+                     }
+    }
+
     // Other private objects
     ResetOnChange {
         id: _spellCheckEnabledFlag
@@ -516,7 +588,7 @@ AbstractScenePartEditor {
             _sceneTextEditor.highlightCursor()
         }
 
-        function onModelAboutToBeReset() {
+        /*function onModelAboutToBeReset() {
             if(_sceneTextEditor.activeFocus)
                 _private.cursorPositionBeforeSceneReset = _sceneTextEditor.cursorPosition
         }
@@ -528,7 +600,7 @@ AbstractScenePartEditor {
                                 }, _private.cursorPositionBeforeSceneReset )
                 _private.cursorPositionBeforeSceneReset = -1
             }
-        }
+        }*/
 
         function onSceneAboutToReset() {
             _private.captureCursorOffset()
@@ -540,6 +612,11 @@ AbstractScenePartEditor {
     }
 
     // Signal handlers
+    onIsCurrentChanged: () => {
+                            if(!isCurrent)
+                                _sceneTextEditor.deselect()
+                        }
+
     on__SearchBarSaysReplaceCurrent: (replacementText, searchAgent) => {
                                          _sceneSearch.replaceCurrentSelection(replacementText)
                                      }

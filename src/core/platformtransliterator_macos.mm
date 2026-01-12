@@ -44,9 +44,8 @@ static void macOSNotificationHandler(CFNotificationCenterRef center, void *obser
     if (macOSBackend) {
         if (qname == QString::fromCFString(kTISNotifyEnabledKeyboardInputSourcesChanged))
             macOSBackend->reload();
-        /*else if (qname == QString::fromCFString(kTISNotifySelectedKeyboardInputSourceChanged))
-
-        */
+        else if (qname == QString::fromCFString(kTISNotifySelectedKeyboardInputSourceChanged))
+            emit macOSBackend->activeLanguageChanged();
     }
 }
 
@@ -64,10 +63,10 @@ MacOSBackend::MacOSBackend(QObject *parent) : QObject(parent), d(new MacOSBacken
                                     kTISNotifyEnabledKeyboardInputSourcesChanged, NULL,
                                     CFNotificationSuspensionBehaviorDeliverImmediately);
 
-    /*CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(), this,
+    CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(), this,
                                     &macOSNotificationHandler,
                                     kTISNotifySelectedKeyboardInputSourceChanged, NULL,
-                                    CFNotificationSuspensionBehaviorDeliverImmediately);*/
+                                    CFNotificationSuspensionBehaviorDeliverImmediately);
 
     this->reload();
 }
@@ -110,6 +109,20 @@ int MacOSBackend::activateDefaultLanguage() const
     }
 
     // Report error otherwise
+    return -1;
+}
+
+int MacOSBackend::activeLanguage() const
+{
+    auto it = std::find_if(d->textInputSources.begin(), d->textInputSources.end(),
+                           [=](const TextInputSource &tis) {
+                               return (CFBooleanRef)TISGetInputSourceProperty(
+                                              tis.inputSource, kTISPropertyInputSourceIsSelected)
+                                       == kCFBooleanTrue;
+                           });
+    if (it != d->textInputSources.end())
+        return it->languageCode;
+
     return -1;
 }
 
@@ -214,6 +227,7 @@ bool MacOSBackend::reload()
     if (d->textInputSources != textInputSources) {
         d->textInputSources = textInputSources;
         emit textInputSourcesChanged();
+        emit activeLanguageChanged();
         return true;
     }
 
@@ -285,4 +299,14 @@ QString PlatformTransliterationEngine::transliterateWord(const QString &word,
     // transliterations.
     Q_UNUSED(option);
     return word;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void PlatformLanguageObserver::setupObservation()
+{
+    this->setActiveLanguageCode(::Backend->activeLanguage());
+
+    connect(::Backend, &MacOSBackend::activeLanguageChanged, this,
+            [=]() { this->setActiveLanguageCode(::Backend->activeLanguage()); });
 }

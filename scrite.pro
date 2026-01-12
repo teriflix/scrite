@@ -6,7 +6,7 @@ TARGET = Scrite
 CONFIG += c++17
 DEFINES += PHTRANSLATE_STATICLIB
 
-VERSION = 2.0.4
+VERSION = 2.0.6
 DEFINES += SCRITE_VERSION=\\\"$$VERSION\\\"
 # DEFINES += SCRITE_VERSION_TYPE=\\\"beta\\\"
 DEFINES += SCRITE_VERSION_TYPE=\\\"\\\"
@@ -102,6 +102,7 @@ HEADERS += \
     src/quick/objects/contextmenuevent.h \
     src/quick/objects/delayedproperty.h \
     src/quick/objects/deltadocument.h \
+    src/quick/objects/diacritichandler.h \
     src/quick/objects/filemanager.h \
     src/quick/objects/flickscrollspeedcontrol.h \
     src/quick/objects/itempositionmapper.h \
@@ -239,6 +240,7 @@ SOURCES += \
     src/quick/objects/contextmenuevent.cpp \
     src/quick/objects/delayedproperty.cpp \
     src/quick/objects/deltadocument.cpp \
+    src/quick/objects/diacritichandler.cpp \
     src/quick/objects/filemanager.cpp \
     src/quick/objects/flickscrollspeedcontrol.cpp \
     src/quick/objects/itempositionmapper.cpp \
@@ -345,7 +347,8 @@ QTQUICK_COMPILER_SKIPPED_RESOURCES += scrite_misc.qrc
 macx {
     ICON = appicon.icns
     QMAKE_INFO_PLIST = Info.plist
-    VERSION_INFO = "2.0.4-macos"
+    VERSION_INFO = "2.0.6-macos"
+    QMAKE_APPLE_DEVICE_ARCHS = x86_64 arm64
 
     HEADERS += src/core/platformtransliterator_macos.h
     OBJECTIVE_SOURCES += src/core/platformtransliterator_macos.mm
@@ -357,9 +360,9 @@ macx {
 
 win32 {
     contains(QT_ARCH, i386) {
-        VERSION_INFO = "2.0.4-windows-x86"
+        VERSION_INFO = "2.0.6-windows-x86"
     } else {
-        VERSION_INFO = "2.0.4-windows-x64"
+        VERSION_INFO = "2.0.6-windows-x64"
     }
 
     RC_ICONS = appicon.ico
@@ -374,7 +377,7 @@ linux {
     PKGCONFIG += ibus-1.0
 
     CONFIG+=use_gold_linker
-    VERSION_INFO = "2.0.4-linux"
+    VERSION_INFO = "2.0.6-linux"
 
     HEADERS += src/core/platformtransliterator_linux.h
     SOURCES += src/core/platformtransliterator_linux.cpp
@@ -388,23 +391,23 @@ include($$PWD/3rdparty/crashpad/crashpad.pri)
 DISTFILES += \
     3rdparty/openssl/README \
     3rdparty/openssl/license.txt \
+    3rdparty/poly2tri/License.txt \
     Info.plist \
     README \
-    packaging/linux/package.sh \
     packaging/linux/Scrite.desktop \
-    packaging/windows/FileAssociation.nsh \
-    packaging/windows/license.txt \
-    packaging/windows/package-x86.bat \
-    packaging/windows/package-x64.bat \
-    packaging/windows/installer-x86.nsi.in \
-    packaging/windows/installer-x64.nsi.in \
-    packaging/mac/package.sh \
-    packaging/mac/prepare.sh \
+    packaging/linux/package.sh \
+    packaging/mac/dmg_settings_tmpl.py \
     packaging/mac/dmgbackdrop.qml \
-    3rdparty/poly2tri/License.txt \
+    packaging/mac/package.sh \
+    packaging/windows/FileAssociation.nsh \
+    packaging/windows/installer-x64.nsi.in \
+    packaging/windows/installer-x86.nsi.in \
+    packaging/windows/license.txt \
+    packaging/windows/package-x64.bat \
+    packaging/windows/package-x86.bat \
     packaging/windows/qt.conf \
-    tools/urlattribs/urlattribs.php \
     tools/urlattribs/OpenGraph.php
+    tools/urlattribs/urlattribs.php \
 
 # The following lines ensure that timestamp of application_build_timestamp.cpp is
 # modified to current time stamp before every build. This ensures that build

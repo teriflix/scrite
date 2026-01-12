@@ -341,5 +341,7 @@
         <file>icons/editor/uppercase_inverted.png</file>
         <file>icons/editor/palette.png</file>
         <file>icons/editor/palette_inverted.png</file>
+        <file>icons/editor/format_hyperlink_inverted.png</file>
+        <file>icons/editor/format_hyperlink.png</file>
     </qresource>
 </RCC>

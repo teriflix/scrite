@@ -61,6 +61,15 @@ QUndoStack *UndoHub::active()
     return UndoHub::blocked ? nullptr : UndoHub::instance()->activeStack();
 }
 
+void UndoHub::setMergeTimeGap(int val)
+{
+    if (m_mergeTimeGap == val)
+        return;
+
+    m_mergeTimeGap = val;
+    emit mergeTimeGapChanged();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 UndoStack::UndoStack(QObject *parent) : QUndoStack(parent)

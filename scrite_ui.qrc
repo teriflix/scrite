@@ -348,5 +348,6 @@
         <file>qml/dialogs/SelectionListDialog.qml</file>
         <file>qml/dialogs/useraccountdialog/UserOnboardingScreen.qml</file>
         <file>qml/dialogs/UserOnboardingDialog.qml</file>
+        <file>qml/dialogs/EditHyperlinkDialog.qml</file>
     </qresource>
 </RCC>

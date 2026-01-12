@@ -48,7 +48,7 @@ Item {
 
         enabled: _switchTabActionHandler.enabled
         action: ActionHub.applicationOptions.find("tabLeft")
-        onTriggered: root.currentTab =previousIndex
+        onTriggered: root.currentTab = previousIndex
     }
 
     Row {
@@ -87,6 +87,8 @@ Item {
                 MouseArea {
                     anchors.fill: parent
 
+                    cursorShape: Qt.PointingHandCursor
+
                     onClicked: root.currentTab = index
                 }
             }
@@ -96,7 +98,7 @@ Item {
     ItemPositionMapper {
         id: _currentTabItemPositionMapper
 
-        from: _tabsRepeater.count > 0 ? _tabsRepeater.itemAt(root.currentTab) : null
+        from: _tabsRepeater.count > 0 && root.currentTab >= 0 && root.currentTab < _tabsRepeater.count ? _tabsRepeater.itemAt(root.currentTab) : null
         to: root
 
         onMappedPositionChanged: Qt.callLater( function() { _currentTabUnderline.placedOnce = true } )
@@ -116,6 +118,7 @@ Item {
         x: _currentTabItemPositionMapper.mappedPosition.x
 
         color: Runtime.colors.accent.c900.background
+        visible: _currentTabItemPositionMapper.from !== null
 
         Behavior on x {
             enabled: _currentTabUnderline.placedOnce && Runtime.applicationSettings.enableAnimations

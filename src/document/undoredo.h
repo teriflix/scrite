@@ -44,6 +44,10 @@ class UndoHub : public QUndoGroup
                READ activeStack
                WRITE setActiveStack
                NOTIFY _activeStackChanged)
+    Q_PROPERTY(int mergeTimeGap
+               READ mergeTimeGap
+               WRITE setMergeTimeGap
+               NOTIFY mergeTimeGapChanged)
     // clang-format on
 
 public:
@@ -58,6 +62,10 @@ public:
     Q_INVOKABLE static QUndoStack *active(); // This is different from QUndoGroup::activeStack(), in
                                              // that it returns nullptr, if enabled = false
 
+    void setMergeTimeGap(int val);
+    int mergeTimeGap() const { return m_mergeTimeGap; }
+    Q_SIGNAL void mergeTimeGapChanged();
+
 signals:
     /** we need these because Q_PROPERTY NOTIFY signals cannot have args, but the ones from the base
      * class do */
@@ -67,6 +75,9 @@ signals:
 
 private:
     explicit UndoHub(QObject *parent = nullptr);
+
+private:
+    int m_mergeTimeGap = 1000;
 };
 
 class UndoStack : public QUndoStack

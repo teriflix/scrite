@@ -30,6 +30,8 @@ public:
     int defaultLanguage() const;
     int activateDefaultLanguage() const;
 
+    int activeLanguage() const;
+
     QList<TransliterationOption> options(int lang,
                                          const PlatformTransliterationEngine *transliterator) const;
     bool canActivate(const TransliterationOption &option,
@@ -43,6 +45,7 @@ public:
 
 signals:
     void activeEnginesChanged();
+    void activeLangugeChanged();
 
 private:
     bool reload();

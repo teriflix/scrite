@@ -45,7 +45,8 @@ AppWindow::AppWindow()
     this->setFormat(QSurfaceFormat::defaultFormat());
 
 #ifdef Q_OS_MAC
-    this->setFlag(Qt::WindowFullscreenButtonHint); // [0.5.2 All] Full Screen Mode #194
+    this->setFlags(Qt::Window
+                   | Qt::WindowFullscreenButtonHint); // [0.5.2 All] Full Screen Mode #194
 #endif
     this->setObjectName(QStringLiteral("ScriteWindow"));
 

@@ -7,8 +7,8 @@ windeployqt --qmldir ..\..\qml --no-compiler-runtime --no-translations . --list 
 copy %SCRITE_CRASHPAD_ROOT%\bin\crashpad_handler.exe .
 fillnsi --installs-key WINDEPLOYQT_INSTALLS --uninstalls-key WINDEPLOYQT_UNINSTALLS --list files.txt --input installer-x64.nsi.in --output installer-x64.nsi
 %MakeNSISTool% installer-x64.nsi
-%CodeSignTool% sign /tr http://timestamp.sectigo.com /td sha256 /fd sha256 /n "%SCRITE_BUSINESS_NAME%" Scrite-2.0.4-64bit-Setup.exe
+%CodeSignTool% sign /tr http://timestamp.sectigo.com /td sha256 /fd sha256 /n "%SCRITE_BUSINESS_NAME%" Scrite-2.0.6-64bit-Setup.exe
 mkdir ..\..\..\Release\Deploy
-copy Scrite-2.0.4-64bit-Setup.exe ..\..\..\Release\Deploy
-copy ..\..\..\Release\scrite.pdb ..\..\..\Release\Deploy\Scrite-2.0.4-64bit.pdb
+copy Scrite-2.0.6-64bit-Setup.exe ..\..\..\Release\Deploy
+copy ..\..\..\Release\scrite.pdb ..\..\..\Release\Deploy\Scrite-2.0.6-64bit.pdb
 

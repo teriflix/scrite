@@ -60,6 +60,7 @@ DialogLauncher {
 
                 VclTextField {
                     id: newNameField
+
                     Layout.fillWidth: true
 
                     placeholderText: "New name"

@@ -15,11 +15,12 @@
 #define PLATFORMTRANSLITERATOR_WINDOWS_H
 
 #include <QObject>
+#include <QAbstractNativeEventFilter>
 
 #include "languageengine.h"
 
 struct WindowsBackendData;
-class WindowsBackend : public QObject
+class WindowsBackend : public QObject, public QAbstractNativeEventFilter
 {
     Q_OBJECT
 
@@ -29,6 +30,8 @@ public:
 
     int defaultLanguage() const;
     int activateDefaultLanguage() const;
+
+    int activeLanguage() const;
 
     QList<TransliterationOption> options(int lang,
                                          const PlatformTransliterationEngine *transliterator) const;
@@ -40,8 +43,10 @@ public:
                  PlatformTransliterationEngine *transliterator);
 
     bool eventFilter(QObject *object, QEvent *event);
+    bool nativeEventFilter(const QByteArray &eventType, void *message, long *result);
 
 signals:
+    void activeLanguageChanged();
     void textInputSourcesChanged();
 
 private:

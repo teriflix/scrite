@@ -124,9 +124,26 @@ Item {
             enabled: Runtime.allowAppUsage
             objectName: "fileNew"
             shortcut: defaultShortcut
-            text: "New"
+            text: "New File"
 
             onTriggered: HomeScreen.launch()
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Close)
+
+            enabled: Runtime.allowAppUsage
+            objectName: "fileClose"
+            shortcut: defaultShortcut
+            text: "Close File"
+
+            onTriggered: {
+                SaveFileTask.save( () => {
+                                      OpenFromLibraryTask.openTemplateAt(Runtime.libraryService, 0)
+                                  })
+            }
         }
 
         Action {
@@ -629,10 +646,10 @@ Item {
         objectName: "languageOptions"
 
         Action {
-            readonly property var keywords: ["add language", "input methods", "input tools", "baraha", "nudi", "ism", "font"]
+            readonly property var keywords: ["add language", "input methods", "input tools", "baraha", "nudi", "ism", "font", "more languages"]
             property int sortOrder: LanguageEngine.supportedLanguages.count + 1
 
-            text: "More Languages ..."
+            text: "Language Settings"
 
             onTriggered: LanguageOptionsDialog.launch()
         }
@@ -640,11 +657,11 @@ Item {
         Action {
             readonly property bool visible: false
             readonly property string tooltip: "Cycles through languages added in the language menu."
-            readonly property string defaultShortcut: "Ctrl+L"
+            readonly property string defaultShortcut: "F6"
 
             text: "Activate Next Language"
             objectName: "nextLanguage"
-            enabled: LanguageEngine.supportedLanguages.count > 1
+            enabled: LanguageEngine.supportedLanguages.count > 1 && LanguageEngine.handleLanguageSwitch
             shortcut: defaultShortcut
 
             onTriggered: {
@@ -657,12 +674,53 @@ Item {
                     Runtime.language.setActiveCode(nextLanguage.code)
             }
         }
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+            readonly property string tooltip: "When checked, Scrite handles all language switches ignoring any language switch initiated by the operating system."
+
+            checkable: true
+            checked: LanguageEngine.handleLanguageSwitch
+            enabled: LanguageEngine.supportedLanguages.count > 1
+            objectName: "handleLanguageSwitch"
+            text: "Handle language input method switch"
+
+            onTriggered: {
+                LanguageEngine.handleLanguageSwitch = !LanguageEngine.handleLanguageSwitch
+                Runtime.screenplayEditorSettings.languageInputPreferenceChecked = true
+            }
+        }
+
+        Action {
+            property bool visible: !LanguageEngine.handleLanguageSwitch
+
+            text: _platformLanguageObserver.activeLanguage.shortName
+            objectName: "platformLanguage"
+            icon.source: _platformLanguageObserver.activeLanguage.iconSource
+
+            onTriggered: {
+                MessageBox.question("Platform Language",
+                                   "The active language in your OS is <b>" + _platformLanguageObserver.activeLanguage.name + "</b>. " +
+                                   "Language input is handled by your operating system. Do you want to configure Scrite to assume ownership of language input?",
+                                    ["Yes", "No"], (answer) => {
+                                        if(answer === "Yes")
+                                            LanguageOptionsDialog.launch()
+                                    })
+            }
+        }
+    }
+
+    PlatformLanguageObserver {
+        id: _platformLanguageObserver
     }
 
     Instantiator {
         model: LanguageEngine.supportedLanguages
 
         delegate: Action {
+            readonly property bool hideInCommandCenter: true
+
             required property int index
             required property var language // This is of type Language, but we have to use var here.
             // You cannot use Q_GADGET struct names as type names in QML
@@ -674,6 +732,7 @@ Item {
 
             checkable: true
             checked: Runtime.language.activeCode === language.code
+            enabled: LanguageEngine.handleLanguageSwitch
             shortcut: language.shortcut()
             text: language.name
 
@@ -750,8 +809,14 @@ Item {
 
             onTriggered: {
                 // When index=0, its scene heading and that's handled separately.
-                if(enumValue !== SceneElement.Heading)
-                _private.binder.currentElement.type = enumValue
+                if(enumValue !== SceneElement.Heading) {
+                    _private.persistBinderSelection()
+
+                    const elements = _private.binder.selectedElements
+                    for(let i=0; i<elements.length; i++) {
+                        elements[i].type = enumValue
+                    }
+                }
             }
         }
     }
@@ -1193,6 +1258,18 @@ Item {
         }
 
         Action {
+            readonly property string tooltip: "Add a clickable hyperlink"
+            readonly property string defaultShortcut: "Ctrl+Alt+K"
+
+            enabled: ActionHandler.enabled
+            objectName: "link"
+            text: "Hyperlink"
+            shortcut: defaultShortcut
+
+            icon.source: "qrc:/icons/editor/format_hyperlink.png"
+        }
+
+        Action {
             enabled: _private.textFormat && Runtime.allowAppUsage
             objectName: "clear"
             text: "Clear Formatting"
@@ -1255,7 +1332,10 @@ Item {
 
             icon.source: "qrc:/icons/editor/uppercase.png"
 
-            onTriggered: _private.binder.changeTextCase(SceneDocumentBinder.UpperCase)
+            onTriggered: {
+                _private.persistBinderSelection()
+                _private.binder.changeTextCase(SceneDocumentBinder.UpperCase)
+            }
         }
 
         Action {
@@ -1269,7 +1349,10 @@ Item {
 
             icon.source: "qrc:/icons/editor/lowercase.png"
 
-            onTriggered: _private.binder.changeTextCase(SceneDocumentBinder.LowerCase)
+            onTriggered: {
+                _private.persistBinderSelection()
+                _private.binder.changeTextCase(SceneDocumentBinder.LowerCase)
+            }
         }
     }
 
@@ -2484,6 +2567,19 @@ Item {
         objectName: "applicationOptions"
 
         Action {
+            readonly property bool visible: false
+            readonly property bool allowShortcut: true
+            readonly property var keywords: ["quit", "shutdown"]
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Quit)
+
+            objectName: "quitApp"
+            text: Platform.isMacOSDesktop ? "Quit Scrite" : "Exit Scrite Application"
+            shortcut: defaultShortcut
+
+            onTriggered: Scrite.window.close()
+        }
+
+        Action {
             readonly property string defaultShortcut: "Alt+`"
             readonly property string tooltip: "App menu displayed when main window is small."
             property bool visible: ActionHandler.canHandle
@@ -2728,6 +2824,22 @@ Item {
                 _private.binder = null
         }
 
+        function persistBinderSelection() {
+            let selectionStart = -1, selectionEnd = -1
+
+            if(binder.textArea) {
+                selectionStart = binder.textArea.selectionStart
+                selectionEnd = binder.textArea.selectionEnd
+            }
+
+            if(selectionStart >= 0 && selectionEnd > selectionStart) {
+                Runtime.execLater(_private.binder, Runtime.stdAnimationDuration,
+                                  (args) => {
+                                      _private.binder.textArea.select(args[0], args[1])
+                                  }, [selectionStart, selectionEnd])
+            }
+        }
+
         function isOperationAllowedByUser(operation) {
             if(Scrite.document.hasCollaborators && !Scrite.document.canModifyCollaborators) {
                 MessageBox.information("Action Prohibitted",
@@ -2968,6 +3080,8 @@ Item {
         }
 
         function toggleSelectedElementsAlignment(givenAlignment) {
+            persistBinderSelection()
+
             const alignment = _private.sceneElement.alignment === givenAlignment ? 0 : givenAlignment
             _private.sceneElement.alignment = alignment
 

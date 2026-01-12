@@ -58,6 +58,10 @@ static const char *_QQuickActionTriggerCountChanged = SIGNAL(triggerCountChanged
 
 static const QByteArray _QQuickActionTriggerMethod = QByteArrayLiteral("triggerMethod");
 
+#ifdef Q_OS_MAC
+#define DEBUG_SHORTCUT_DELIVERY
+#endif
+
 #ifdef DEBUG_SHORTCUT_DELIVERY
 class ActionManagers : public QObjectListModel<ActionManager *>
 {
@@ -91,6 +95,7 @@ public:
 
             while (!m_pendingShortcuts.isEmpty()) {
                 auto item = m_pendingShortcuts.takeFirst();
+                disconnect(item.first, &QObject::destroyed, this, &ActionManagers::objectDestroyed);
                 if (item.first->property(_QQuickActionEnabledProperty).toBool()) {
                     if (item.first->property(_QQuickActionCheckableProperty).toBool()) {
                         QMetaObject::invokeMethod(item.first, "toggled", Qt::DirectConnection,
@@ -125,7 +130,8 @@ private:
             return;
 
         if (this->findPending(object, sequence) < 0) {
-            connect(object, &QObject::destroyed, this, &ActionManagers::objectDestroyed);
+            connect(object, &QObject::destroyed, this, &ActionManagers::objectDestroyed,
+                    Qt::UniqueConnection);
             m_pendingShortcuts.append({ object, sequence });
             m_processPendingShortcuts.start(m_delay, this);
         }

@@ -282,7 +282,17 @@ bool HtmlExporter::doExport(QIODevice *device)
             if (customStyle)
                 ts << "\"";
 
-            ts << ">" << text.mid(format.start, format.length) << "</span>";
+            ts << ">";
+
+            if (format.format.isAnchor() && !format.format.anchorHref().isEmpty())
+                ts << "<a href=\"" << format.format.anchorHref() << "\">";
+
+            ts << text.mid(format.start, format.length);
+
+            if (format.format.isAnchor() && !format.format.anchorHref().isEmpty())
+                ts << "</a>";
+
+            ts << "</span>";
         }
         ts << "</p>\n";
     };

@@ -14,6 +14,7 @@
 #include "languageengine.h"
 #include "application.h"
 #include "utils.h"
+#include "user.h"
 
 #include <PhTranslateLib>
 
@@ -304,11 +305,15 @@ QString Language::name() const
 
 QString Language::nativeName() const
 {
-    return QLocale(QLocale::Language(this->code)).nativeLanguageName();
+    return this->code >= 0 ? QLocale(QLocale::Language(this->code)).nativeLanguageName()
+                           : QString();
 }
 
 QString Language::shortName() const
 {
+    if (this->code < 0)
+        return QString();
+
     QLocale locale(QLocale::Language(this->code));
     return locale.name().section('_', 0, 0);
 }
@@ -336,11 +341,17 @@ QStringList Language::fontFamilies() const
 
 int Language::localeScript() const
 {
+    if (this->code < 0)
+        return QLocale::AnyScript;
+
     return QLocale(QLocale::Language(this->code)).script();
 }
 
 int Language::charScript() const
 {
+    if (this->code < 0)
+        return QChar::Script_Unknown;
+
     return languageScriptMap().value(QLocale::Language(this->code), QChar::Script_Latin);
 }
 
@@ -383,6 +394,9 @@ QString Language::fontWritingSystemName() const
 
 QList<TransliterationOption> Language::transliterationOptions() const
 {
+    if (this->code < 0)
+        return QList<TransliterationOption>();
+
     return LanguageEngine::instance()->queryTransliterationOptions(this->code);
 }
 
@@ -624,7 +638,7 @@ void SupportedLanguages::setActiveLanguageCode(int val)
         AbstractTransliterationEngine *engine =
                 qobject_cast<AbstractTransliterationEngine *>(option.transliteratorObject);
         if (engine)
-            engine->activate(option);
+            engine->doActivate(option);
     }
 
     emit activeLanguageCodeChanged();
@@ -813,6 +827,30 @@ void SupportedLanguages::loadBuiltInLanguages()
     }
 
     this->AbstractLanguagesModel::setLanguages(languages);
+
+    m_loadedBuiltInLanguages = true;
+
+    connect(User::instance(), &User::loggedInChanged, this,
+            &SupportedLanguages::reviewLoadBuiltInLanguages, Qt::UniqueConnection);
+}
+
+void SupportedLanguages::reviewLoadBuiltInLanguages()
+{
+    if (m_loadedBuiltInLanguages && User::instance()->isLoggedIn() && !User::instance()->isBusy()) {
+        const UserInfo userInfo = User::instance()->info();
+        if (userInfo.country != QStringLiteral("India")) {
+            // Get rid of all built in languages
+            const QList<int> builtInLanguages = DefaultTransliteration::supportedLanguageCodes();
+            for (int code : builtInLanguages) {
+                this->removeLanguage(code);
+            }
+            m_loadedBuiltInLanguages = false;
+        }
+
+        disconnect(User::instance(), &User::loggedInChanged, this,
+                   &SupportedLanguages::reviewLoadBuiltInLanguages);
+    } else
+        QTimer::singleShot(0, this, &SupportedLanguages::reviewLoadBuiltInLanguages);
 }
 
 void SupportedLanguages::transliterationOptionsUpdated()
@@ -1007,7 +1045,7 @@ void SupportedLanguages::ensureActiveLanguage()
             AbstractTransliterationEngine *engine =
                     qobject_cast<AbstractTransliterationEngine *>(option.transliteratorObject);
             if (engine)
-                engine->activate(option);
+                engine->doActivate(option);
         }
     }
 }
@@ -1294,7 +1332,7 @@ bool TransliterationOption::activate()
 {
     AbstractTransliterationEngine *t = this->transliterator();
     if (t)
-        return t->activate(*this);
+        return t->doActivate(*this);
 
     return false;
 }
@@ -1335,6 +1373,14 @@ QString TransliterationOption::transliterateParagraph(const QString &paragraph) 
 AbstractTransliterationEngine::AbstractTransliterationEngine(QObject *parent) : QObject(parent) { }
 
 AbstractTransliterationEngine::~AbstractTransliterationEngine() { }
+
+bool AbstractTransliterationEngine::doActivate(const TransliterationOption &option)
+{
+    if (LanguageEngine::instance()->isHandleLanguageSwitch())
+        return this->activate(option);
+
+    return false;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1513,7 +1559,7 @@ bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
                 qobject_cast<AbstractTransliterationEngine *>(m_option.transliteratorObject);
 
         if (event->type() == QEvent::FocusIn) {
-            transliterationEngine->activate(m_option);
+            transliterationEngine->doActivate(m_option);
             return false;
         }
 
@@ -1862,6 +1908,15 @@ LanguageEngine::LanguageEngine(QObject *parent) : QObject(parent)
 
 LanguageEngine::~LanguageEngine() { }
 
+void LanguageEngine::setHandleLanguageSwitch(bool val)
+{
+    if (m_handleLanguageSwitch == val)
+        return;
+
+    m_handleLanguageSwitch = val;
+    emit handleLanguageSwitchChanged();
+}
+
 bool LanguageEngine::setScriptFontFamily(QChar::Script script, const QString &fontFamily)
 {
     if (m_scriptFontFamily.value(script) == fontFamily || fontFamily.isEmpty())
@@ -1937,6 +1992,12 @@ QStringList LanguageEngine::scriptFontFamilies(QChar::Script script) const
     }
 
     return ret;
+}
+
+bool LanguageEngine::hasPlatformLanguages() const
+{
+    const QList<int> languages = this->platformLanguages();
+    return languages.size() > 1 || (languages.size() == 1 && languages.first() != QLocale::English);
 }
 
 QList<int> LanguageEngine::platformLanguages() const
@@ -2122,10 +2183,14 @@ QString LanguageEngine::formattedInHtml(const QString &paragraph)
 
 int LanguageEngine::wordCount(const QString &paragraph)
 {
+    if (paragraph.isEmpty())
+        return 0;
+
+    const int paragraphLength = paragraph.length();
     int wordCount = 0;
 
     QTextBoundaryFinder boundaryFinder(QTextBoundaryFinder::Word, paragraph);
-    while (boundaryFinder.position() < paragraph.length()) {
+    while (boundaryFinder.position() < paragraphLength) {
         QTextBoundaryFinder::BoundaryReasons reasons = boundaryFinder.boundaryReasons();
         if (!(reasons.testFlag(QTextBoundaryFinder::StartOfItem))
             || reasons.testFlag(QTextBoundaryFinder::SoftHyphen)) {
@@ -2139,6 +2204,62 @@ int LanguageEngine::wordCount(const QString &paragraph)
     }
 
     return wordCount;
+}
+
+int LanguageEngine::fastWordCount(const QString &paragraph)
+{
+    if (paragraph.isEmpty())
+        return 0;
+
+    int count = 0;
+    bool inWord = false;
+
+    for (const QChar &ch : paragraph) {
+        const bool isLetter = ch.isLetterOrNumber();
+        if (isLetter && !inWord) {
+            ++count;
+            inWord = true;
+        } else if (!isLetter) {
+            inWord = false;
+        }
+    }
+
+    return count;
+}
+
+int LanguageEngine::sentenceCount(const QString &paragraph)
+{
+    int sentenceCount = 0;
+
+    QTextBoundaryFinder boundaryFinder(QTextBoundaryFinder::Sentence, paragraph);
+    while (boundaryFinder.position() < paragraph.length()) {
+        QTextBoundaryFinder::BoundaryReasons reasons = boundaryFinder.boundaryReasons();
+        if (!(reasons.testFlag(QTextBoundaryFinder::StartOfItem))) {
+            if (boundaryFinder.toNextBoundary() == -1)
+                break;
+            continue;
+        }
+
+        ++sentenceCount;
+        boundaryFinder.toNextBoundary();
+    }
+
+    return sentenceCount;
+}
+
+int LanguageEngine::fastSentenceCount(const QString &paragraph)
+{
+    if (paragraph.isEmpty())
+        return 0;
+
+    int count = 1;
+
+    for (const QChar &ch : paragraph) {
+        if (ch == '.' || ch == '!' || ch == '?')
+            ++count;
+    }
+
+    return count;
 }
 
 QVector<QTextLayout::FormatRange>
@@ -2205,6 +2326,13 @@ void LanguageEngine::polishFontsAndInsertTextAtCursor(
             if (length > 0) {
                 cursor.setPosition(startPos + formatRange.start + length, QTextCursor::KeepAnchor);
                 cursor.mergeCharFormat(formatRange.format);
+
+                if (formatRange.format.isAnchor()) {
+                    QTextCharFormat linkFormat;
+                    linkFormat.setForeground(Qt::blue);
+                    linkFormat.setFontUnderline(true);
+                    cursor.mergeCharFormat(linkFormat);
+                }
             }
         }
         cursor.setPosition(endPos);
@@ -2250,6 +2378,9 @@ void LanguageEngine::loadConfiguration()
         const QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
         const QJsonObject config = doc.object();
 
+        this->setHandleLanguageSwitch(
+                config.value("handleLanguageSwitch").toBool(m_handleLanguageSwitch));
+
         const QJsonArray scriptFonts = config.value("script-fonts").toArray();
         if (!scriptFonts.isEmpty()) {
             const QMetaEnum scriptEnum = QMetaEnum::fromType<QtChar::Script>();
@@ -2291,6 +2422,8 @@ void LanguageEngine::saveConfiguration()
         if (file.open(QFile::WriteOnly)) {
             QJsonObject config;
 
+            config.insert("handleLanguageSwitch", m_handleLanguageSwitch);
+
             // Save script font associations.
             if (!m_scriptFontFamily.isEmpty()) {
                 const QMetaEnum scriptEnum = QMetaEnum::fromType<QtChar::Script>();
@@ -2331,7 +2464,40 @@ void LanguageEngine::activateTransliterationOptionOnActiveLanguage()
     if (activeLanguage.isValid()) {
         const TransliterationOption activeOption = activeLanguage.preferredTransliterationOption();
         if (activeLanguage.isValid() && !activeOption.transliteratorObject.isNull()) {
-            activeOption.transliterator()->activate(activeOption);
+            activeOption.transliterator()->doActivate(activeOption);
         }
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PlatformLanguageObserver::PlatformLanguageObserver(QQuickItem *parent) : QQuickItem(parent)
+{
+    this->setFlag(QQuickItem::ItemHasContents, false);
+
+    QTimer::singleShot(0, this, &PlatformLanguageObserver::setupObservation);
+}
+
+PlatformLanguageObserver::~PlatformLanguageObserver() { }
+
+Language PlatformLanguageObserver::activeLanguage() const
+{
+    if (m_activeLanguageCode < 0)
+        return Language();
+
+    Language ret =
+            LanguageEngine::instance()->supportedLanguages()->findLanguage(m_activeLanguageCode);
+    if (!ret.isValid())
+        ret = LanguageEngine::instance()->availableLanguages()->findLanguage(m_activeLanguageCode);
+
+    return ret;
+}
+
+void PlatformLanguageObserver::setActiveLanguageCode(int val)
+{
+    if (m_activeLanguageCode == val)
+        return;
+
+    m_activeLanguageCode = val;
+    emit activeLanguageCodeChanged();
 }

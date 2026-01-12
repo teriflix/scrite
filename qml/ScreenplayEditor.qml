@@ -205,6 +205,26 @@ Rectangle {
             showSceneComments: _private.showSceneComments
             spaceAvailableOnTheLeft: x-minLeftMargin-1
             spaceAvailableOnTheRight: parent.width - x - width - (_scrollBar.visible ? _scrollBar.width : 0)
+
+            onHasFocusChanged: {
+                if(hasFocus && !Runtime.screenplayEditorSettings.languageInputPreferenceChecked) {
+                    if(LanguageEngine.hasPlatformLanguages()) {
+                        Runtime.screenplayEditorSettings.languageInputPreferenceChecked = true
+
+                        let message = ""
+                        if(LanguageEngine.handleLanguageSwitch)
+                            message = "Currently Scrite handles switching between language input methods. Would you like to change that?"
+                        else
+                            message = "Currently the operating system handles switching between language input methods. Would you like to change that?"
+
+                        MessageBox.question("Language Input", message, ["Yes", "No"], (answer) => {
+                                                   if(answer === "Yes") {
+                                                       LanguageOptionsDialog.launch()
+                                                   }
+                                               })
+                    }
+                }
+            }
         }
 
         VclScrollBar {

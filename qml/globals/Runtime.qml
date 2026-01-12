@@ -84,6 +84,7 @@ Item {
                 return
 
             supported.activeLanguageCode = code
+            Scrite.document.displayFormat.activeLanguageCode = activeCode
             logActivity("language-activate", supported.activeLanguage)
         }
 
@@ -96,8 +97,6 @@ Item {
                 Scrite.user.logActivity2(activity, details)
             }
         }
-
-        onActiveCodeChanged: Scrite.document.displayFormat.activeLanguageCode = activeCode
     }
 
     // Persistent Settings
@@ -192,6 +191,7 @@ Item {
         property bool focusCursorOnSceneHeadingInNewScenes: false
         property bool highlightCurrentLine: true
         property bool includeTitlePageInPreview: true
+        property bool languageInputPreferenceChecked: false
         property bool longSceneWarningEnabled: true
         property bool markupToolsDockVisible: false
         property bool optimiseScrolling: false

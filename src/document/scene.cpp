@@ -35,6 +35,7 @@
 #include <QJsonArray>
 #include <QTextTable>
 #include <QJsonObject>
+#include <QScopeGuard>
 #include <QQuickWindow>
 #include <QUndoCommand>
 #include <QJsonDocument>
@@ -64,7 +65,23 @@ class SceneUndoCommand : public QUndoCommand
 public:
     static SceneUndoCommand *current;
 
-    explicit SceneUndoCommand(Scene *scene, bool allowMerging = true);
+    enum Kind {
+        UnknownKind = -1,
+        SceneHeadingLocationType,
+        SceneHeadingLocation,
+        SceneHeadingMoment,
+        SceneHeadingEnabled,
+        SceneElementType,
+        SceneElementText,
+        SceneElementAlignment,
+        SceneElementTextFormats,
+        SceneInsertElement,
+        SceneRemoveElement,
+        SceneUndoCapture,
+        SceneSplitScene
+    };
+
+    explicit SceneUndoCommand(Scene *scene, Kind kind, bool allowMerging = true);
     ~SceneUndoCommand();
 
     // QUndoCommand interface
@@ -81,6 +98,7 @@ private:
 private:
     friend class PushSceneUndoCommand;
     bool m_allowMerging = true;
+    Kind m_kind = UnknownKind;
     QString m_sceneId;
     QByteArray m_after;
     QByteArray m_before;
@@ -90,10 +108,11 @@ private:
 
 SceneUndoCommand *SceneUndoCommand::current = nullptr;
 
-SceneUndoCommand::SceneUndoCommand(Scene *scene, bool allowMerging)
+SceneUndoCommand::SceneUndoCommand(Scene *scene, Kind kind, bool allowMerging)
     : m_allowMerging(allowMerging), m_timestamp(QDateTime::currentDateTime()), m_scene(scene)
 {
     m_sceneId = m_scene->id();
+    m_kind = kind;
     m_before = this->toByteArray(scene);
 }
 
@@ -103,6 +122,7 @@ void SceneUndoCommand::undo()
 {
     SceneUndoCommand::current = this;
     Scene *scene = this->fromByteArray(m_before);
+    m_allowMerging = false;
     SceneUndoCommand::current = nullptr;
 
     if (scene == nullptr)
@@ -119,6 +139,7 @@ void SceneUndoCommand::redo()
 
     SceneUndoCommand::current = this;
     Scene *scene = this->fromByteArray(m_after);
+    m_allowMerging = false;
     SceneUndoCommand::current = nullptr;
 
     if (scene == nullptr)
@@ -129,14 +150,12 @@ bool SceneUndoCommand::mergeWith(const QUndoCommand *other)
 {
     if (m_allowMerging && this->id() == other->id()) {
         const SceneUndoCommand *cmd = reinterpret_cast<const SceneUndoCommand *>(other);
-        if (cmd->m_allowMerging == false)
-            return false;
-
-        if (cmd->m_sceneId != m_sceneId)
+        if (!cmd->m_allowMerging || cmd->m_sceneId != m_sceneId || cmd->m_kind != m_kind
+            || cmd->m_kind == UnknownKind || m_kind == UnknownKind)
             return false;
 
         const qint64 timegap = qAbs(m_timestamp.msecsTo(cmd->m_timestamp));
-        static qint64 minTimegap = 1000;
+        static qint64 minTimegap = UndoHub::instance()->mergeTimeGap();
         if (timegap < minTimegap) {
             m_after = cmd->m_after;
             m_timestamp = cmd->m_timestamp;
@@ -163,7 +182,7 @@ class PushSceneUndoCommand
     static bool enabled;
 
 public:
-    PushSceneUndoCommand(Scene *scene, bool allowMerging = true);
+    PushSceneUndoCommand(Scene *scene, SceneUndoCommand::Kind kind, bool allowMerging = true);
     ~PushSceneUndoCommand();
 
 private:
@@ -172,11 +191,12 @@ private:
 
 bool PushSceneUndoCommand::enabled = true;
 
-PushSceneUndoCommand::PushSceneUndoCommand(Scene *scene, bool allowMerging)
+PushSceneUndoCommand::PushSceneUndoCommand(Scene *scene, SceneUndoCommand::Kind kind,
+                                           bool allowMerging)
 {
     if (enabled && SceneUndoCommand::current == nullptr && UndoHub::active() && scene != nullptr
         && scene->isUndoRedoEnabled())
-        m_command = new SceneUndoCommand(scene, allowMerging);
+        m_command = new SceneUndoCommand(scene, kind, allowMerging);
 }
 
 PushSceneUndoCommand::~PushSceneUndoCommand()
@@ -185,6 +205,173 @@ PushSceneUndoCommand::~PushSceneUndoCommand()
         UndoHub::active()->push(m_command);
     } else
         delete m_command;
+}
+
+class SceneElementTextUndoCommand : public QUndoCommand
+{
+public:
+    static bool busy;
+
+    SceneElementTextUndoCommand(SceneElement *sceneElement);
+    ~SceneElementTextUndoCommand();
+
+    // QUndoCommand interface
+    enum { ID = 101 };
+    void undo();
+    void redo();
+    int id() const { return ID; }
+    bool mergeWith(const QUndoCommand *other);
+
+private:
+    void lookupSceneElement();
+
+private:
+    int m_oldCursorPosition = -1, m_newCursorPosition = -1;
+    QString m_sceneId;
+    QString m_sceneElementId;
+    QString m_oldText, m_newText;
+    QPointer<SceneElement> m_sceneElement;
+    qint64 m_timestamp = 0;
+};
+
+bool SceneElementTextUndoCommand::busy = false;
+
+class PushSceneElementTextUndoCommand
+{
+    friend class SceneElement;
+    static bool enabled;
+
+public:
+    PushSceneElementTextUndoCommand(SceneElement *sceneElement)
+    {
+        if (enabled && !SceneElementTextUndoCommand::busy && UndoHub::active()
+            && sceneElement != nullptr && sceneElement->scene()->isUndoRedoEnabled())
+            m_command = new SceneElementTextUndoCommand(sceneElement);
+    }
+    ~PushSceneElementTextUndoCommand()
+    {
+        if (enabled && m_command != nullptr && UndoHub::active()) {
+            UndoHub::active()->push(m_command);
+        } else
+            delete m_command;
+    }
+
+private:
+    SceneElementTextUndoCommand *m_command = nullptr;
+};
+
+bool PushSceneElementTextUndoCommand::enabled = true;
+
+SceneElementTextUndoCommand::SceneElementTextUndoCommand(SceneElement *sceneElement)
+    : m_sceneElement(sceneElement)
+{
+    if (sceneElement && sceneElement->scene()) {
+        const Scene *scene = sceneElement->scene();
+        m_oldCursorPosition = scene->cursorPosition();
+        m_oldText = m_sceneElement->text();
+    }
+
+    m_timestamp = QDateTime::currentMSecsSinceEpoch();
+}
+
+SceneElementTextUndoCommand::~SceneElementTextUndoCommand() { }
+
+void SceneElementTextUndoCommand::undo()
+{
+    SceneElementTextUndoCommand::busy = true;
+    auto guard = qScopeGuard([]() { SceneElementTextUndoCommand::busy = false; });
+
+    this->lookupSceneElement();
+    if (m_sceneElement.isNull()) {
+        this->setObsolete(true);
+        return;
+    }
+
+    m_sceneElement->setText(m_oldText);
+    m_sceneElement->scene()->sceneReset(m_oldCursorPosition);
+}
+
+void SceneElementTextUndoCommand::redo()
+{
+    SceneElementTextUndoCommand::busy = true;
+    auto guard = qScopeGuard([]() { SceneElementTextUndoCommand::busy = false; });
+
+    if (m_sceneElementId.isEmpty()) {
+        if (m_sceneElement.isNull()) {
+            this->setObsolete(true);
+            return;
+        }
+
+        const Scene *scene = m_sceneElement->scene();
+        if (scene == nullptr) {
+            this->setObsolete(true);
+            return;
+        }
+
+        m_sceneId = scene->id();
+        m_sceneElementId = m_sceneElement->id();
+        m_newCursorPosition = scene->cursorPosition();
+        m_newText = m_sceneElement->text();
+    } else {
+        this->lookupSceneElement();
+        if (m_sceneElement.isNull()) {
+            this->setObsolete(true);
+            return;
+        }
+
+        Scene *scene = m_sceneElement->scene();
+        m_sceneElement->setText(m_newText);
+        emit scene->sceneReset(m_newCursorPosition);
+    }
+}
+
+bool SceneElementTextUndoCommand::mergeWith(const QUndoCommand *other)
+{
+    if (ID != other->id())
+        return false;
+
+    const SceneElementTextUndoCommand *cmd =
+            reinterpret_cast<const SceneElementTextUndoCommand *>(other);
+
+    if (qAbs(cmd->m_newCursorPosition - m_newCursorPosition) >= 2)
+        return false;
+
+    if (qAbs(cmd->m_timestamp - m_timestamp) > qint64(UndoHub::instance()->mergeTimeGap()))
+        return false;
+
+    if (LanguageEngine::fastSentenceCount(m_newText)
+        == LanguageEngine::fastSentenceCount(cmd->m_newText)) {
+        m_newText = cmd->m_newText;
+        m_newCursorPosition = cmd->m_newCursorPosition;
+        return true;
+    }
+
+    return false;
+}
+
+void SceneElementTextUndoCommand::lookupSceneElement()
+{
+    if (m_sceneElement.isNull()) {
+        if (m_sceneId.isEmpty() || m_sceneElementId.isEmpty()) {
+            this->setObsolete(true);
+            return;
+        }
+
+        const StructureElement *structureElement =
+                ScriteDocument::instance()->structure()->findElementBySceneID(m_sceneId);
+        if (structureElement == nullptr) {
+            this->setObsolete(true);
+            return;
+        }
+
+        const Scene *scene = structureElement->scene();
+        if (scene == nullptr) {
+            this->setObsolete(true);
+            return;
+        }
+
+        m_sceneElement = scene->findElementById(m_sceneElementId);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -211,7 +398,7 @@ void SceneHeading::setEnabled(bool val)
     if (m_enabled == val)
         return;
 
-    PushSceneUndoCommand cmd(m_scene);
+    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneHeadingEnabled, false);
 
     m_enabled = val;
     emit enabledChanged();
@@ -223,7 +410,7 @@ void SceneHeading::setLocationType(const QString &val2)
     if (m_locationType == val)
         return;
 
-    PushSceneUndoCommand cmd(m_scene);
+    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneHeadingLocationType);
 
     m_locationType = val;
     emit locationTypeChanged();
@@ -235,7 +422,7 @@ void SceneHeading::setLocation(const QString &val2)
     if (m_location == val)
         return;
 
-    PushSceneUndoCommand cmd(m_scene);
+    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneHeadingLocation);
 
     m_location = val;
     emit locationChanged();
@@ -247,7 +434,7 @@ void SceneHeading::setMoment(const QString &val2)
     if (m_moment == val)
         return;
 
-    PushSceneUndoCommand cmd(m_scene);
+    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneHeadingMoment);
 
     m_moment = val;
     emit momentChanged();
@@ -425,7 +612,7 @@ void SceneElement::setType(SceneElement::Type val)
     if (m_type == val)
         return;
 
-    PushSceneUndoCommand cmd(m_scene);
+    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneElementType);
 
     m_type = val;
     emit typeChanged();
@@ -451,7 +638,7 @@ void SceneElement::setText(const QString &val)
     if (m_text == val)
         return;
 
-    PushSceneUndoCommand cmd(m_scene);
+    PushSceneElementTextUndoCommand cmd(this);
 
     m_text = val.trimmed();
     if (m_spellCheck != nullptr)
@@ -469,7 +656,7 @@ void SceneElement::setAlignment(Qt::Alignment val)
     if (m_alignment == val2)
         return;
 
-    PushSceneUndoCommand cmd(m_scene);
+    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneElementAlignment);
 
     m_alignment = val2;
     emit alignmentChanged();
@@ -754,7 +941,18 @@ void SceneElement::setTextFormats(const QVector<QTextLayout::FormatRange> &forma
     if (m_textFormats == formats)
         return;
 
-    PushSceneUndoCommand cmd(m_scene);
+    bool hasSomeFormatting = false;
+    for (const QTextLayout::FormatRange &formatRange : formats) {
+        if (!formatRange.format.isEmpty()) {
+            hasSomeFormatting = true;
+            break;
+        }
+    }
+
+    if (!hasSomeFormatting && m_textFormats.isEmpty())
+        return;
+
+    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneElementTextFormats);
 
     m_textFormats = formats;
     emit elementChanged();
@@ -791,6 +989,13 @@ QJsonArray SceneElement::textFormatsToJson(const QVector<QTextLayout::FormatRang
         item.insert(QLatin1String("length"), formatRange.length);
 
         QJsonObject attribs;
+
+        if (format.isAnchor() && format.hasProperty(QTextFormat::AnchorHref)) {
+            const QString href = format.anchorHref();
+            if (!href.isEmpty())
+                attribs.insert(QLatin1String("href"), href);
+        }
+
         if (format.hasProperty(QTextFormat::FontWeight)) {
             if (format.fontWeight() == QFont::Bold)
                 attribs.insert(QLatin1String("bold"), true);
@@ -849,8 +1054,14 @@ QVector<QTextLayout::FormatRange> SceneElement::textFormatsFromJson(const QJsonA
             formatRange.length = item.value(QLatin1String("length")).toInt();
 
             const QJsonObject attribs = item.value(QLatin1String("attribs")).toObject();
-
             QTextCharFormat &format = formatRange.format;
+
+            const QString href = attribs.value("href").toString();
+            if (!href.isEmpty()) {
+                format.setAnchor(true);
+                format.setAnchorHref(href);
+            }
+
             if (attribs.value(QLatin1String("bold")).toBool())
                 format.setFontWeight(QFont::Bold);
             if (attribs.value(QLatin1String("italics")).toBool())
@@ -1733,7 +1944,7 @@ void Scene::insertElementAt(SceneElement *ptr, int index)
     if (index < 0 || index > m_elements.size())
         return;
 
-    PushSceneUndoCommand cmd(this);
+    PushSceneUndoCommand cmd(this, SceneUndoCommand::SceneInsertElement);
 
     if (!m_inSetElementsList)
         this->beginInsertRows(QModelIndex(), index, index);
@@ -1764,7 +1975,7 @@ void Scene::removeElement(SceneElement *ptr)
     if (row < 0)
         return;
 
-    PushSceneUndoCommand cmd(this);
+    PushSceneUndoCommand cmd(this, SceneUndoCommand::SceneRemoveElement);
 
     if (!m_inSetElementsList)
         this->beginRemoveRows(QModelIndex(), row, row);
@@ -1787,6 +1998,16 @@ void Scene::removeElement(SceneElement *ptr)
 SceneElement *Scene::elementAt(int index) const
 {
     return index < 0 || index >= m_elements.size() ? nullptr : m_elements.at(index);
+}
+
+SceneElement *Scene::findElementById(const QString &id) const
+{
+    for (SceneElement *ptr : qAsConst(m_elements)) {
+        if (ptr->id() == id)
+            return ptr;
+    }
+
+    return nullptr;
 }
 
 void Scene::setElements(const QList<SceneElement *> &list)
@@ -1837,7 +2058,8 @@ void Scene::beginUndoCapture(bool allowMerging)
     if (m_pushUndoCommand != nullptr)
         return;
 
-    m_pushUndoCommand = new PushSceneUndoCommand(this, allowMerging);
+    m_pushUndoCommand =
+            new PushSceneUndoCommand(this, SceneUndoCommand::SceneUndoCapture, allowMerging);
 }
 
 void Scene::endUndoCapture()
@@ -1915,7 +2137,7 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
     if (element->type() == SceneElement::Heading || element->type() == SceneElement::Parenthetical)
         return nullptr;
 
-    PushSceneUndoCommand cmd(this);
+    PushSceneUndoCommand cmd(this, SceneUndoCommand::SceneSplitScene);
 
     emit sceneAboutToReset();
 

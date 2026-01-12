@@ -66,7 +66,10 @@ Item {
 
             TextField {
                 id: activationCodeField
+
                 Layout.fillWidth: true
+
+                DiacriticHandler.enabled: activeFocus
 
                 font.bold: true
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
