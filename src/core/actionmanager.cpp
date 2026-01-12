@@ -111,12 +111,12 @@ public:
 private:
     int findPending(QObject *object, const QKeySequence &sequence) const
     {
-        if (m_pendingShortcuts.isEmpty() || (object == nullptr && sequence.isEmpty()))
+        if (m_pendingShortcuts.isEmpty() || object == nullptr || sequence.isEmpty())
             return -1;
 
         auto it = std::find_if(m_pendingShortcuts.begin(), m_pendingShortcuts.end(),
                                [=](const QPair<QObject *, QKeySequence> &item) {
-                                   return (item.first == object || item.second == sequence);
+                                   return (item.first == object && item.second == sequence);
                                });
         if (it != m_pendingShortcuts.end())
             return std::distance(m_pendingShortcuts.begin(), it);
