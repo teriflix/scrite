@@ -1,1 +1,3 @@
 # Templates
+
+## New from Clipboard

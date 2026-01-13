@@ -771,6 +771,11 @@ Scrite offers undo `Ctrl+Z` and redo `Ctrl+Y` or `Ctrl+Shift+Z` much like other
 Desktop apps. However, since Scrite has a hierarchy of documents some edits
 cannot be undone. 
 
+> Note: As of writing, Undo/Redo is a work in progress. As you face issues
+> please consider adding a description of the issue to this [dedicated
+> thread](https://discord.com/channels/867082699716689951/1460194668959633534/1460194668959633534)
+> on our Discord community server.
+
 ## Spell Check
 
 Scrite integrates with your operating system’s spell check, sharing dictionaries
