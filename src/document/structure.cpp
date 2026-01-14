@@ -4545,7 +4545,8 @@ static inline QJsonObject fetchPasteDataFromClipboard(QString *className = nullp
         const QUrl url = mimeData->hasUrls() ? [mimeData]() {
             const QList<QUrl> urls = mimeData->urls();
             return urls.first();
-        }() : QUrl(text);
+        }()
+                                             : QUrl(text, QUrl::StrictMode);
 
         if (mimeData->hasImage()) {
             const QImage image = mimeData->imageData().value<QImage>();
@@ -4585,7 +4586,7 @@ static inline QJsonObject fetchPasteDataFromClipboard(QString *className = nullp
             data = QJsonDocument::fromJson(json.toUtf8()).object();
             if (className)
                 *className = QLatin1String(Annotation::staticMetaObject.className());
-        } else if (url.isValid()) {
+        } else if (url.isValid() && !url.scheme().isEmpty()) {
             const QString json = QStringLiteral("{"
                                                 "    \"attributes\": {"
                                                 "        \"url\": \"%1\""
