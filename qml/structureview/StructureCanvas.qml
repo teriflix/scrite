@@ -133,6 +133,18 @@ GridBackground {
         ColorAnimation { duration: 250 }
     }
 
+    MouseArea {
+        id: _focusMonitor
+
+        anchors.fill: parent
+        enabled: !root.hasFocus
+
+        onClicked: (event) => {
+                           root.forceActiveFocus()
+                           event.accepted = false
+                   }
+    }
+
     AnnotationLayer {
         id: _annotationLayer
 

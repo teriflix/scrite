@@ -391,48 +391,66 @@ Item {
         action: ActionHub.structureCanvasOperations.find("delete")
         enabled: (root.canvasScroll.selection.hasItems || root.canvasScroll.currentElementItem) && !Scrite.document.readOnly
 
-        onTriggered: {
-            if(root.canvasScroll.selection.hasItems) {
-                root.deleteSelectionRequest()
-            } else {
-                const element = root.canvasScroll.currentElementItem.element
-                root.deleteElementRequest(element)
-            }
-        }
+        onTriggered: (source) => {
+                         // Don't delete if a shortcut was used to trigger it,
+                         // and the focus is not with the canvas
+                         if(source && Object.isOfType(source, "QQuickAction") && !root.canvasScroll.canvas.hasFocus) {
+                             return
+                         }
+
+                         if(root.canvasScroll.selection.hasItems) {
+                             root.deleteSelectionRequest()
+                         } else {
+                             const element = root.canvasScroll.currentElementItem.element
+                             root.deleteElementRequest(element)
+                         }
+                     }
     }
 
     ActionHandler {
         action: ActionHub.structureCanvasOperations.find("copy")
         enabled: !root.canvasScroll.selection.hasItems && (root.canvasScroll.currentAnnotation != null || root.canvasScroll.currentElementItem !== null)
 
-        onTriggered: {
-            if(root.canvasScroll.currentAnnotation != null) {
-                Scrite.document.structure.copy(root.canvasScroll.currentAnnotation)
-                AnimatedTextOverlay.show("Annotation Copied")
-            } else {
-                let spe = Scrite.document.structure.elementAt(Scrite.document.structure.currentElementIndex)
-                if(spe !== null) {
-                    Scrite.document.structure.copy(spe)
-                    AnimatedTextOverlay.show("Scene Copied")
-                }
-            }
-        }
+        onTriggered: (source) => {
+                         // Don't copy if a shortcut was used to trigger it,
+                         // and the focus is not with the canvas
+                         if(source && Object.isOfType(source, "QQuickAction") && !root.canvasScroll.canvas.hasFocus) {
+                             return
+                         }
+
+                         if(root.canvasScroll.currentAnnotation != null) {
+                             Scrite.document.structure.copy(root.canvasScroll.currentAnnotation)
+                             AnimatedTextOverlay.show("Annotation Copied")
+                         } else {
+                             let spe = Scrite.document.structure.elementAt(Scrite.document.structure.currentElementIndex)
+                             if(spe !== null) {
+                                 Scrite.document.structure.copy(spe)
+                                 AnimatedTextOverlay.show("Scene Copied")
+                             }
+                         }
+                     }
     }
 
     ActionHandler {
         action: ActionHub.structureCanvasOperations.find("paste")
         enabled: !Scrite.document.readOnly && Scrite.document.structure.canPaste
 
-        onTriggered: {
-            let gpos = MouseCursor.position()
-            let pos = root.canvasScroll.mapFromGlobal(gpos.x, gpos.y)
-            if(pos.x < 0 || pos.y < 0 || pos.x >= root.canvasScroll.width || pos.y >= root.canvasScroll.height)
-                Scrite.document.structure.paste()
-            else {
-                pos = root.canvasScroll.canvas.mapFromGlobal(gpos.x, gpos.y)
-                Scrite.document.structure.paste(Qt.point(pos.x,pos.y))
-            }
-        }
+        onTriggered: (source) => {
+                         // Don't paste if a shortcut was used to trigger it,
+                         // and the focus is not with the canvas
+                         if(source && Object.isOfType(source, "QQuickAction") && !root.canvasScroll.canvas.hasFocus) {
+                             return
+                         }
+
+                         let gpos = MouseCursor.position()
+                         let pos = root.canvasScroll.mapFromGlobal(gpos.x, gpos.y)
+                         if(pos.x < 0 || pos.y < 0 || pos.x >= root.canvasScroll.width || pos.y >= root.canvasScroll.height)
+                         Scrite.document.structure.paste()
+                         else {
+                             pos = root.canvasScroll.canvas.mapFromGlobal(gpos.x, gpos.y)
+                             Scrite.document.structure.paste(Qt.point(pos.x,pos.y))
+                         }
+                     }
     }
 
     ActionHandler {
