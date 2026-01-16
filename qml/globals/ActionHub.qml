@@ -700,8 +700,9 @@ Item {
             icon.source: _platformLanguageObserver.activeLanguage.valid ? _platformLanguageObserver.activeLanguage.iconSource : "qrc:/icons/content/language.png"
 
             onTriggered: {
+                const langName = _platformLanguageObserver.activeLanguage.valid ? _platformLanguageObserver.activeLanguage.name : "unknown"
                 MessageBox.question("Platform Language",
-                                   "The active language in your OS is <b>" + _platformLanguageObserver.activeLanguage.name + "</b>. " +
+                                   "The active language in your OS is <b>" + langName + "</b>. " +
                                    "Language input is handled by your operating system. Do you want to configure Scrite to assume ownership of language input?",
                                     ["Yes", "No"], (answer) => {
                                         if(answer === "Yes")
