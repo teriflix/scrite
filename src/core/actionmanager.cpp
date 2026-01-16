@@ -77,9 +77,12 @@ public:
         if (object == qApp->focusWindow() && event->type() == QEvent::ShortcutOverride) {
             QKeyEvent *keyEvent = reinterpret_cast<QKeyEvent *>(event);
             QKeySequence keySequence(keyEvent->modifiers() + keyEvent->key());
-            QObject *qmlAction = ActionManager::findActionForShortcut(keySequence.toString());
-            if (qmlAction)
+            QObject *qmlAction = keySequence.isEmpty()
+                    ? nullptr
+                    : ActionManager::findActionForShortcut(keySequence.toString());
+            if (qmlAction && qmlAction->property(_QQuickActionEnabledProperty).toBool()) {
                 this->addToPending(qmlAction, keySequence);
+            }
         } else if (event->type() == QEvent::Shortcut) {
             QShortcutEvent *shortcutEvent = reinterpret_cast<QShortcutEvent *>(event);
             this->removeFromPending(nullptr, shortcutEvent->key());
@@ -326,6 +329,9 @@ bool ActionManager::restoreActionShortcut(QObject *action)
 
 QObject *ActionManager::findActionForShortcut(const QString &shortcut)
 {
+    if (shortcut.isEmpty())
+        return nullptr;
+
     for (const ActionManager *manager : ::ActionManagerModel->constList()) {
         QObject *action = manager->findByShortcut(shortcut);
         if (action)
@@ -381,9 +387,24 @@ QObject *ActionManager::find(const QString &actionName) const
 
 QObject *ActionManager::findByShortcut(const QString &shortcut) const
 {
+    if (shortcut.isEmpty())
+        return nullptr;
+
     auto it = std::find_if(m_actions.begin(), m_actions.end(), [shortcut](QObject *action) {
-        const QString actionShortcut = action->property(_QQuickActionShortcutProperty).toString();
-        return actionShortcut == shortcut;
+        const QVariant actionShortcutVariant = action->property(_QQuickActionShortcutProperty);
+        if (actionShortcutVariant.isValid()) {
+            if (actionShortcutVariant.canConvert(QMetaType::QString)) {
+                const QString actionShortcut =
+                        action->property(_QQuickActionShortcutProperty).toString();
+                return actionShortcut == shortcut;
+            }
+            if (actionShortcutVariant.userType() == QMetaType::QKeySequence) {
+                const QKeySequence keySequence = actionShortcutVariant.value<QKeySequence>();
+                return (keySequence.toString(QKeySequence::PortableText) == shortcut
+                        || keySequence.toString(QKeySequence::NativeText) == shortcut);
+            }
+        }
+        return false;
     });
     if (it != m_actions.end())
         return *it;
