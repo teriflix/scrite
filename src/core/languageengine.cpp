@@ -407,6 +407,9 @@ QChar::Script Language::scriptForLanguage(QLocale::Language language, QChar::Scr
 
 TransliterationOption Language::preferredTransliterationOption() const
 {
+    if (!LanguageEngine::instance()->isHandleLanguageSwitch())
+        return TransliterationOption();
+
     const QList<TransliterationOption> options = this->transliterationOptions();
     if (this->preferredTransliterationOptionId.isEmpty())
         return options.isEmpty() ? TransliterationOption() : options.first();
@@ -1548,6 +1551,9 @@ void LanguageTransliterator::setPopup(QObject *val)
 
 bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
 {
+    if (!LanguageEngine::instance()->isHandleLanguageSwitch())
+        return false;
+
     if (m_editor != nullptr && object == m_editor && m_enabled && m_option.isValid()
         && m_option.inApp) {
         if (event->type() == QEvent::FocusOut) {
