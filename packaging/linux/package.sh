@@ -1,8 +1,8 @@
 export PATH=~/Qt/5.15.19/gcc_64/bin:/usr/lib/x86_64-linux-gnu:$PATH
 export LD_LIBRARY_PATH=~/Qt/5.15.19/gcc_64/lib:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-export VERSION=2.0.10
-mkdir Scrite-2.0.10.AppImage
-cd Scrite-2.0.10.AppImage
+export VERSION=2.0.11
+mkdir Scrite-2.0.11.AppImage
+cd Scrite-2.0.11.AppImage
 mkdir bin
 cp ../../../../Release/Scrite ./bin/
 mkdir lib
@@ -20,5 +20,5 @@ cp ../../../images/appicon.png share/icons/hicolor/512x512/apps/Scrite.png
 mkdir -p share/icons/hicolor/256x256/apps/
 convert ../../../images/appicon.png -resize 256x256 share/icons/hicolor/256x256/apps/Scrite.png
 cd ../
-~/linuxdeployqt Scrite-2.0.10.AppImage/share/applications/Scrite.desktop -appimage -qmldir=../../qml -verbose=2 -no-translations -no-copy-copyright-files
+~/linuxdeployqt Scrite-2.0.11.AppImage/share/applications/Scrite.desktop -appimage -qmldir=../../qml -verbose=2 -no-translations -no-copy-copyright-files
 cd ../
