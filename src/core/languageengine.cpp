@@ -1709,12 +1709,16 @@ QString LanguageIconProvider::name()
 
 QUrl LanguageIconProvider::iconUrlFor(const Language &language)
 {
-    QString fontFamily = language.font().family();
-    fontFamily.remove(QRegularExpression("\\s"));
+    if (language.isValid()) {
+        QString fontFamily = language.font().family();
+        fontFamily.remove(QRegularExpression("\\s"));
 
-    const QString ret = QStringLiteral("image://") + name() + "/" + QString::number(language.code)
-            + "/" + fontFamily.toLower();
-    return QUrl(ret);
+        const QString ret = QStringLiteral("image://") + name() + "/"
+                + QString::number(language.code) + "/" + fontFamily.toLower();
+        return QUrl(ret);
+    }
+
+    return QUrl("qrc:/icons/content/language.png");
 }
 
 QImage LanguageIconProvider::requestImage(const QString &id, QSize *size,

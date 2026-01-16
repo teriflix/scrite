@@ -695,9 +695,9 @@ Item {
         Action {
             property bool visible: !LanguageEngine.handleLanguageSwitch
 
-            text: _platformLanguageObserver.activeLanguage.shortName
+            text: _platformLanguageObserver.activeLanguage.valid ? _platformLanguageObserver.activeLanguage.shortName : "OTH"
             objectName: "platformLanguage"
-            icon.source: _platformLanguageObserver.activeLanguage.iconSource
+            icon.source: _platformLanguageObserver.activeLanguage.valid ? _platformLanguageObserver.activeLanguage.iconSource : "qrc:/icons/content/language.png"
 
             onTriggered: {
                 MessageBox.question("Platform Language",
