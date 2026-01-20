@@ -242,7 +242,7 @@ Item {
                              "kind": "labelWithTooltip",
                              "attributes": {
                                  "text": "Activation Limit",
-                                 "tooltip": "Number of devices on which you can activate the subscription",
+                                 "tooltip": "Number of devices on which you can activate the subscriptipon",
                                  "color": "" + Runtime.colors.accent.c100.text,
                                  "background": "" + Runtime.colors.accent.c100.background,
                                  "horizontalAlignment": Text.AlignRight,
