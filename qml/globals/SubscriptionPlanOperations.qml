@@ -241,8 +241,8 @@ Item {
         listModel.append({
                              "kind": "labelWithTooltip",
                              "attributes": {
-                                 "text": "Device Count",
-                                 "tooltip": "Number of devices on which you can use the subscriptipon",
+                                 "text": "Activation Limit",
+                                 "tooltip": "Number of devices on which you can activate the subscriptipon",
                                  "color": "" + Runtime.colors.accent.c100.text,
                                  "background": "" + Runtime.colors.accent.c100.background,
                                  "horizontalAlignment": Text.AlignRight,

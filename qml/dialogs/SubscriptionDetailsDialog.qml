@@ -118,7 +118,7 @@ DialogLauncher {
                             let ret = dialog.subscription.hasExpired ? "Was used for " : (dialog.subscription.isUpcoming ? "Will be valid for " : "Valid for ")
                             ret += "<b>" + Runtime.daysSpanAsString(dialog.subscription.plan.duration) + "</b>"
                             ret += " from <b>" + Runtime.formatDateIncludingYear(new Date(dialog.subscription.from)) + "</b> until <b>" + Runtime.formatDateIncludingYear(new Date(dialog.subscription.until)) + "</b>"
-                            ret += ", on up to " + dialog.subscription.plan.devices + " devices."
+                            ret += ", with activation limit of <b>" + dialog.subscription.plan.devices + "</b> device(s)."
                             return ret
                         }
                         wrapMode: Text.WordWrap
