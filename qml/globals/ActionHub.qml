@@ -592,7 +592,7 @@ Item {
         }
 
         Action {
-            readonly property var keywords: ["mobile", "device count", "cloud", "realtime collaboration"]
+            readonly property var keywords: ["mobile", "device count", "cloud", "realtime collaboration", "activation limit"]
 
             text: "FAQs"
 

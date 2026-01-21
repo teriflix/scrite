@@ -43,6 +43,11 @@ namespace {
 qint64 getTotalSystemRam()
 {
 #ifdef Q_OS_WIN
+    ULONGLONG totalMemoryInKilobytes = 0;
+    if (GetPhysicallyInstalledSystemMemory(&totalMemoryInKilobytes)) {
+        return totalMemoryInKilobytes * 1024;
+    }
+
     MEMORYSTATUSEX status;
     status.dwLength = sizeof(status);
     GlobalMemoryStatusEx(&status);

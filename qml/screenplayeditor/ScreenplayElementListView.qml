@@ -211,7 +211,7 @@ ListView {
         property int currentIndex: root.screenplayAdapter ? root.screenplayAdapter.currentIndex : -1
         property int currentParagraphType: currentDelegate ? currentDelegate.currentParagraphType : -1
 
-        property Loader currentDelegateLoader: currentIndex >= 0 ? root.itemAtIndex(currentIndex) : null
+        property Loader currentDelegateLoader: hasFocus || currentIndex >= 0 ? root.itemAtIndex(currentIndex) : null
         property AbstractScreenplayElementDelegate currentDelegate: currentDelegateLoader ? currentDelegateLoader.item : null
 
         property int lastItemIndex: -1

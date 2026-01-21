@@ -2044,8 +2044,9 @@ QList<TransliterationOption> LanguageEngine::queryTransliterationOptions(int lan
 QChar::Script LanguageEngine::determineScript(const QString &text)
 {
     for (const QChar &ch : text) {
-        if (ch.script() != QChar::Script_Common && ch.script() != QChar::Script_Inherited)
+        if (ch.script() != QChar::Script_Common && ch.script() != QChar::Script_Inherited) {
             return ch.script();
+        }
     }
 
     return QChar::Script_Latin;
@@ -2134,13 +2135,17 @@ QList<ScriptBoundary> LanguageEngine::determineBoundaries(const QString &paragra
     if (ret.size() == 1)
         return ret;
 
-    // Ensure that there are no missing parts inbetween boundaries.
-    for (int i = 0; i < ret.size() - 1; i++) {
+    // Fill gaps between boundaries by creating new boundaries.
+    for (int i = ret.size() - 2; i >= 0; i--) {
         ScriptBoundary &a = ret[i];
         const ScriptBoundary &b = ret[i + 1];
         if (a.end != b.start) {
-            a.end = b.start;
-            a.text = paragraph.mid(a.start, a.end - a.start);
+            ScriptBoundary gap;
+            gap.start = a.end;
+            gap.end = b.start;
+            gap.text = paragraph.mid(gap.start, gap.end - gap.start);
+            gap.script = determineScript(gap.text);
+            ret.insert(i + 1, gap);
         }
     }
 
