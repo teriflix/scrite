@@ -874,6 +874,7 @@ public:
 
     Q_INVOKABLE void removeUserSceneNumbers();
     Q_INVOKABLE void reevaluateSceneNumbers();
+    Q_INVOKABLE void resetTextAlignment(Qt::Alignment newAlignment = Qt::Alignment(0));
 
     Q_INVOKABLE bool polishText();
     Q_INVOKABLE bool capitalizeSentences();

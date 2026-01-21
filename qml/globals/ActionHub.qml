@@ -1694,6 +1694,28 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool allowShortcut: true
+            readonly property string tooltip: "Resets text alignment for all paragraphs so that alignment settings from Screenplay Formatting Rules is followed in the entire screenplay."
+
+            objectName: "resetTextAlignment"
+            text: "Reset text alignment"
+            enabled: !Scrite.document.readOnly
+
+            onTriggered: {
+                MessageBox.question("Confirm Reset", "Cannot undo reset of text alignment. Please confirm if you want to proceed.",
+                                    ["Proceed", "Cancel"], (answer) => {
+                                        if(answer === "Proceed") {
+                                            if(Scrite.document.fileName !== "")
+                                                Scrite.document.save(); // So that there is a backup to rollback to, just in case.
+
+                                            Scrite.document.screenplay.resetTextAlignment()
+                                        }
+                                    })
+            }
+        }
+
+        Action {
+            readonly property bool visible: false
             readonly property string defaultShortcut: "Ctrl+="
 
             enabled: ActionHandler.canHandle

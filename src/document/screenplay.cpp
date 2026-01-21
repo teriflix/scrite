@@ -2814,6 +2814,21 @@ void Screenplay::reevaluateSceneNumbers()
         delete cmd;
 }
 
+void Screenplay::resetTextAlignment(Qt::Alignment newAlignment)
+{
+    QScopedValueRollback<bool> rollback(UndoHub::blocked, true);
+
+    for (ScreenplayElement *element : qAsConst(m_elements)) {
+        Scene *scene = element->scene();
+        if (scene) {
+            for (int i = 0; i < scene->elementCount(); i++) {
+                SceneElement *paragraph = scene->elementAt(i);
+                paragraph->setAlignment(newAlignment);
+            }
+        }
+    }
+}
+
 bool Screenplay::polishText()
 {
     bool ret = false;
