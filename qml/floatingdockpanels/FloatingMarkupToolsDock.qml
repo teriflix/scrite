@@ -20,7 +20,6 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
@@ -30,18 +29,16 @@ FloatingDock {
 
     x: adjustedX(Runtime.markupToolsSettings.contentX)
     y: adjustedY(Runtime.markupToolsSettings.contentY)
-    width: toolbuttonSize.width * ActionHub.markupTools.count
-    height: toolbuttonSize.height + titleBarHeight
+    width: _private.toolbuttonSize.width * ActionHub.markupTools.count
+    height: _private.toolbuttonSize.height + titleBarHeight
+    visible: _private.dockVisibility
 
     title: "Markup Tools"
-    visible: Runtime.screenplayEditorSettings.markupToolsDockVisible && Runtime.screenplayEditor
 
     function init() { }
 
     Component.onCompleted: {
-        Qt.callLater( () => {
-                         _saveSettingsTask.enabled = true
-                     })
+        Qt.callLater( () => { _private.enableSaveCoordinates = true })
     }
 
     content: ActionManagerToolBar {
@@ -49,34 +46,39 @@ FloatingDock {
         actionManager: ActionHub.markupTools
     }
 
-    // Private Section
-
-    // This block ensures that everytime the floating dock coordinates change,
-    // they are stored in persistent settings
-    Connections {
-        id: _saveSettingsTask
-
-        target: root
-        enabled: false
-
-        function onXChanged() {
-            Qt.callLater(_saveSettingsTask.saveCoordinates)
-        }
-
-        function onYChanged() {
-            Qt.callLater(_saveSettingsTask.saveCoordinates)
-        }
-
-        function onCloseRequest() {
-            Runtime.screenplayEditorSettings.markupToolsDockVisible = false
-        }
-
-        // Private
-        function saveCoordinates() {
-            Runtime.markupToolsSettings.contentX = Math.round(root.x)
-            Runtime.markupToolsSettings.contentY = Math.round(root.y)
-        }
+    onXChanged: {
+        Qt.callLater(_private.saveCoordinates)
     }
 
-    readonly property size toolbuttonSize: Runtime.estimateTypeSize("ToolButton { icon.source: \"qrc:/icons/content/blank.png\"; display: ToolButton.IconOnly }")
+    onYChanged: {
+        Qt.callLater(_private.saveCoordinates)
+    }
+
+    onCloseRequest: {
+        Runtime.screenplayEditorSettings.markupToolsDockVisible = false
+    }
+
+    // Private Section
+    QtObject {
+        id: _private
+
+        readonly property size toolbuttonSize: Runtime.estimateTypeSize("ToolButton { icon.source: \"qrc:/icons/content/blank.png\"; display: ToolButton.IconOnly }")
+
+        property bool enableSaveCoordinates: false
+        property bool dockVisibility: Runtime.screenplayEditorSettings.markupToolsDockVisible && Runtime.screenplayEditor
+
+        function saveCoordinates() {
+            if(enableSaveCoordinates) {
+                Runtime.markupToolsSettings.contentX = Math.round(root.x)
+                Runtime.markupToolsSettings.contentY = Math.round(root.y)
+            }
+        }
+
+        onDockVisibilityChanged: {
+            if(dockVisibility)
+                root.open()
+            else
+                root.close()
+        }
+    }
 }

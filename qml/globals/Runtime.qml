@@ -124,6 +124,8 @@ Item {
         property real connectorLineWidth: 2
         property real overflowFactor: 0.05
         property real previewSize: 300
+        property real annotationDockX: 80
+        property real annotationDockY: 100
 
         property color canvasColor: Runtime.colors.accent.c50.background
         property color gridColor: Runtime.colors.accent.c400.background
@@ -280,16 +282,6 @@ Item {
         property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
 
         category: "Scrited"
-        fileName: Platform.settingsFile
-    }
-
-    readonly property Settings shortcutsDockWidgetSettings: Settings {
-        property real contentX: -1
-        property real contentY: -1
-
-        property bool visible: true
-
-        category: "Shortcuts Dock Widget"
         fileName: Platform.settingsFile
     }
 

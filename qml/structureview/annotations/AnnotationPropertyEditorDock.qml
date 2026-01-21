@@ -20,7 +20,6 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/floatingdockpanels"
@@ -31,13 +30,13 @@ FloatingDock {
     property Annotation annotation
     property BoundingBoxEvaluator canvasItemsBoundingBox
 
-    DelayedProperty.set: Runtime.structureCanvasSettings.displayAnnotationProperties && annotation !== null
+    Component.onCompleted: { Qt.callLater( () => { _private.enableSaveCoordinates = true } ) }
 
-    x: 80
-    y: Scrite.window.height * 0.15
+    x: adjustedX(Runtime.structureCanvasSettings.annotationDockX)
+    y: adjustedY(Runtime.structureCanvasSettings.annotationDockY)
     width: 375
     height: Scrite.window.height * 0.6
-    visible: typeof DelayedProperty.get === "boolean" ? DelayedProperty.get : false
+    visible: _private.dockVisibility
 
     title: "Annotation Properties"
 
@@ -46,7 +45,29 @@ FloatingDock {
         canvasItemsBoundingBox: root.canvasItemsBoundingBox
     }
 
-    onCloseRequest: {
-        Runtime.structureCanvasSettings.displayAnnotationProperties = false
+    onXChanged: Qt.callLater(_private.saveCoordinates)
+    onYChanged: Qt.callLater(_private.saveCoordinates)
+    onCloseRequest: Runtime.structureCanvasSettings.displayAnnotationProperties = false
+
+    // Private section
+    QtObject {
+        id: _private
+
+        property bool enableSaveCoordinates: false
+        property bool dockVisibility: Runtime.structureCanvasSettings.displayAnnotationProperties && root.annotation !== null && Runtime.structureView !== null
+
+        function saveCoordinates() {
+            if(enableSaveCoordinates) {
+                Runtime.structureCanvasSettings.annotationDockX = Math.round(root.x)
+                Runtime.structureCanvasSettings.annotationDockY = Math.round(root.y)
+            }
+        }
+
+        onDockVisibilityChanged: {
+            if(dockVisibility)
+                root.open()
+            else
+                root.close()
+        }
     }
 }
