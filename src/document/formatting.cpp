@@ -2036,6 +2036,7 @@ void SceneDocumentBinder::setSelectionStartPosition(int val)
     m_selectionStartPosition = val;
     emit selectionStartPositionChanged();
     emit selectedTextChanged();
+    emit selectedBlockCountChanged();
 }
 
 void SceneDocumentBinder::setSelectionEndPosition(int val)
@@ -2046,6 +2047,37 @@ void SceneDocumentBinder::setSelectionEndPosition(int val)
     m_selectionEndPosition = val;
     emit selectionEndPositionChanged();
     emit selectedTextChanged();
+    emit selectedBlockCountChanged();
+}
+
+int SceneDocumentBinder::selectedBlockCount() const
+{
+    if (m_selectionStartPosition >= 0 && m_selectionEndPosition > m_selectionStartPosition) {
+        QTextCursor cursor(m_textDocument->textDocument());
+        cursor.setPosition(m_selectionStartPosition);
+
+        if (!cursor.movePosition(QTextCursor::EndOfBlock))
+            return 0;
+
+        if (m_selectionEndPosition < cursor.position())
+            return 0;
+
+        if (!cursor.movePosition(QTextCursor::StartOfBlock))
+            return 0;
+
+        int blockCount = 1;
+        while (1) {
+            if (!cursor.movePosition(QTextCursor::NextBlock))
+                break;
+
+            if (m_selectionEndPosition > cursor.position())
+                ++blockCount;
+        }
+
+        return blockCount;
+    }
+
+    return 0;
 }
 
 bool SceneDocumentBinder::changeTextCase(TextCasing casing)

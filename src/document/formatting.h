@@ -974,6 +974,14 @@ public:
     int selectionEndPosition() const { return m_selectionEndPosition; }
     Q_SIGNAL void selectionEndPositionChanged();
 
+    // clang-format off
+    Q_PROPERTY(int selectedBlockCount
+               READ selectedBlockCount
+               NOTIFY selectedBlockCountChanged)
+    // clang-format on
+    int selectedBlockCount() const;
+    Q_SIGNAL void selectedBlockCountChanged();
+
     enum TextCasing { LowerCase, UpperCase };
     Q_ENUM(TextCasing)
 

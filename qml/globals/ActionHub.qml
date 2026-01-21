@@ -1277,17 +1277,20 @@ Item {
 
             icon.source: "qrc:/icons/editor/format_clear.png"
 
-            onTriggered: _private.textFormat.reset()
+            onTriggered: {
+                _private.textFormat.reset()
+                _private.toggleSelectedElementsAlignment(0)
+            }
         }
 
         Action {
             readonly property bool allowShortcut: true
 
-            enabled: _private.sceneElement && Runtime.allowAppUsage
-            checkable: true
-            checked: _private.sceneElement ? _private.sceneElement.alignment === Qt.AlignLeft : false
+            enabled: _private.sceneElement && Runtime.allowAppUsage && (_private.sceneElement.type === SceneElement.Action || _private.binder.selectedBlockCount > 1)
+            checkable: _private.sceneElement && _private.binder.selectedBlockCount <= 1
+            checked: checkable ? _private.sceneElement.alignment === Qt.AlignLeft : false
             objectName: "alignLeft"
-            text: "Left Align"
+            text: "Left Align (Action Paragraphs Only)"
 
             icon.source: "qrc:/icons/editor/format_align_left.png"
 
@@ -1297,11 +1300,11 @@ Item {
         Action {
             readonly property bool allowShortcut: true
 
-            enabled: _private.sceneElement && Runtime.allowAppUsage
-            checkable: true
-            checked: _private.sceneElement ? _private.sceneElement.alignment === Qt.AlignHCenter : false
+            enabled: _private.sceneElement && Runtime.allowAppUsage && (_private.sceneElement.type === SceneElement.Action || _private.binder.selectedBlockCount > 1)
+            checkable: _private.sceneElement && _private.binder.selectedBlockCount <= 1
+            checked: checkable ? _private.sceneElement.alignment === Qt.AlignHCenter : false
             objectName: "alignCenter"
-            text: "Center Align"
+            text: "Center Align (Action Paragraphs Only)"
 
             icon.source: "qrc:/icons/editor/format_align_center.png"
 
@@ -1311,15 +1314,29 @@ Item {
         Action {
             readonly property bool allowShortcut: true
 
-            enabled: _private.sceneElement && Runtime.allowAppUsage
-            checkable: true
-            checked: _private.sceneElement ? _private.sceneElement.alignment === Qt.AlignRight : false
+            enabled: _private.sceneElement && Runtime.allowAppUsage && (_private.sceneElement.type === SceneElement.Action || _private.binder.selectedBlockCount > 1)
+            checkable: _private.sceneElement && _private.binder.selectedBlockCount <= 1
+            checked: checkable ? _private.sceneElement.alignment === Qt.AlignRight : false
             objectName: "alignRight"
-            text: "Right Align"
+            text: "Right Align (Action Paragraphs Only)"
 
             icon.source: "qrc:/icons/editor/format_align_right.png"
 
             onTriggered: _private.toggleSelectedElementsAlignment(Qt.AlignRight)
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+
+            enabled: _private.sceneElement && Runtime.allowAppUsage && (_private.sceneElement.type === SceneElement.Action || _private.binder.selectedBlockCount > 1)
+            checkable: _private.sceneElement && _private.binder.selectedBlockCount <= 1
+            checked: checkable ? _private.sceneElement.alignment === Qt.AlignJustify : false
+            objectName: "alignJustify"
+            text: "Justify (Action Paragraphs Only)"
+
+            icon.source: "qrc:/icons/editor/format_align_justify.png"
+
+            onTriggered: _private.toggleSelectedElementsAlignment(Qt.AlignJustify)
         }
 
         Action {

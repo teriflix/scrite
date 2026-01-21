@@ -172,6 +172,8 @@ Item {
 
                         VclMenuItem {
                             text: "Left"
+                            checkable: true
+                            checked: textAlignment.value === Qt.AlignLeft
                             icon.source: "qrc:/icons/editor/format_align_left.png"
                             font.bold: textAlignment.value === Qt.AlignLeft
                             onClicked: {
@@ -183,6 +185,8 @@ Item {
 
                         VclMenuItem {
                             text: "Center"
+                            checkable: true
+                            checked: textAlignment.value === Qt.AlignHCenter
                             icon.source: "qrc:/icons/editor/format_align_center.png"
                             font.bold: textAlignment.value === Qt.AlignHCenter
                             onClicked: {
@@ -194,6 +198,8 @@ Item {
 
                         VclMenuItem {
                             text: "Right"
+                            checkable: true
+                            checked: textAlignment.value === Qt.AlignRight
                             icon.source: "qrc:/icons/editor/format_align_right.png"
                             font.bold: textAlignment.value === Qt.AlignRight
                             onClicked: {
@@ -205,6 +211,8 @@ Item {
 
                         VclMenuItem {
                             text: "Justify"
+                            checkable: true
+                            checked: textAlignment.value === Qt.AlignJustify
                             icon.source: "qrc:/icons/editor/format_align_justify.png"
                             font.bold: textAlignment.value === Qt.AlignJustify
                             onClicked: {
