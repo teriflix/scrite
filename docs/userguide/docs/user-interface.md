@@ -142,6 +142,9 @@ By clicking on the Revert icon next to the shortcut, you can revert to default.
 
 It’s that simple. Explore existing shortcuts and customize them as you like.
 
+> NOTE: Shortcuts for switching between languages can only be configured in the
+> [Language Settings](./languages.md#keyboard-shortcuts) dialog box.
+
 ## Command Center
 
 Scrite has hundreds of actions, and it’s hard to remember every shortcut. The

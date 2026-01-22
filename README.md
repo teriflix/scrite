@@ -30,7 +30,7 @@ Here is a link to our Discord server: https://discord.gg/bGHquFX5jK
 ## Conference Talks based on Scrite
 These talks may help you find your way around the code.
 
-- Solving Problems for Yourself, and Accidentally Thousands More - [IndiaFOSS 2025](https://www.youtube.com/watch?v=_wbqbblIexY)
+- Solving Problems for Yourself, and Accidentally Thousands More - [IndiaFOSS 2025](https://www.youtube.com/watch?v=2O9A4HRlJAY)
 - Closing The Gaps - QML on the Desktop - [Qt DevCon 2022](https://youtu.be/tyn90zQZTEg)
 - Building Beautiful Desktop Apps Using QML - [Qt DevDes Days 2021](https://youtu.be/zQAGs8cuGv8)
 - Insights from Building Scrite Using QML - [Qt Desktop Days 2020](https://youtu.be/z7GEUrRyh0U)
@@ -46,7 +46,7 @@ These talks may help you find your way around the code.
 
 - [ScreenwritingScribe reviews Scrite, Jan 2025](https://www.youtube.com/watch?v=8PXrQ6DUw9o)
 - [Sarvana from Film Psychology reviews Scrite, in Tamil](https://www.youtube.com/watch?v=ipWjr_33iIk)
-- [Rahul, Pooja of Paramvah Studios talks about their Film and Scrite](https://youtu.be/niG2X6nCYCA)
+- [Rahul, Pooja of Paramvah Studios talk about their Film and Scrite](https://youtu.be/niG2X6nCYCA)
 - [Nhân Trương reviews Scrite, in Vietnamese](https://www.youtube.com/watch?v=oY4kQrzIgvU)
 - [James K Martin reviews Scrite](https://www.youtube.com/watch?v=_JkTx75oVbE)
 
