@@ -63,7 +63,7 @@ generate the PDF export. Listed below are the options
 |Include act breaks|When checked, it ensures that act breaks are clearly stated in the PDF.|
 
 In addition to the checkable options stated above, you can customize the
-[watermark text and comment](./screenplay.md#page-setup--watermark) to
+[watermark text and comment](./screenplay.md#page-setup-and-watermark) to
 optionally include in header or footer for this specific PDF file.
 
 <img src="../images/exports/004-pdf-export.jpg" width="640"/>

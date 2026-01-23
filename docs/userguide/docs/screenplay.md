@@ -233,7 +233,7 @@ Click “Make Default” to set current options as your defaults.
 
 <img src="../images/screenplay/022-formatting.png" width=720"/>
 
-## Page Setup & Watermark
+## Page Setup and Watermark
 
 You can configure the page size, and content to show in header & footer of
 generated PDFs by opening Settings > Screenplay > Page Setup tab.

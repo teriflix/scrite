@@ -11,7 +11,7 @@ The following table lists all shortcuts related to file operations in Scrite.
 |Shortcut|Description|
 |--------|-----------|
 |`Ctrl+O`|*Open File*: Launches [Home Screen](./quickstart.md#home-screen). You can open a file from [Scriptalay](./scriptalay.md), [Recent Files](#recent-files) list or from the disk|
-|`Ctrl+N`|*New File*: Launches [Home Screen](./quickstart.md#home-screen). You can start a new file from a [template](./templates.md), or [clipboard](./templates.md#new-from-clipboard).|
+|`Ctrl+N`|*New File*: Launches [Home Screen](./quickstart.md#home-screen). You can start a new file from a [template](./templates.md), or [clipboard](./imports.md#new-from-clipboard).|
 |`Ctrl+Shift+O`|*Scriptalay*: Launches [Home Screen](./quickstart.md#home-screen) and switches to the [Scriptalay](./scriptalay.md) page if its not already visible.|
 |`Ctrl+S`|*Save File*: Saves the currently open file. If the file is being saved for the first time, a file dialog is displayed to ask for folder & file name.|
 |`Ctrl+Shift+S`|*Save As*: Always shows a file dialog box to ask for a new name to save the file|

@@ -1,9 +1,9 @@
 # Reports
 
-Scrite’s **Reports** feature lets you generate ready‑made, exportable summaries
-of your screenplay from a variety of perspectives. Most reports can be exported
-as a PDF or ODT file (and some as CSV) and is designed to help you analyze,
-share, or present your work.
+Scrite’s **Reports** lets you generate ready‑made, exportable summaries of your
+screenplay from a variety of perspectives. Most reports can be exported as a PDF
+or ODT file (and some as CSV) and is designed to help you analyze, share, or
+present your work.
 
  - [Character Report](#character-report) – an extract of dialogues for one or
    more selected characters.
