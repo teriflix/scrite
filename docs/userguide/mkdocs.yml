@@ -1,4 +1,5 @@
 site_name: Scrite User Guide
+site_url: https://www.scrite.io/docs/userguide
 theme:
   name: material
   logo: images/scrite-appicon.png
@@ -15,6 +16,8 @@ markdown_extensions:
       toc_depth: 4
 plugins:
   - mkdocs-video
+hooks:
+  - hooks.py
 nav:
   - index.md
   - quickstart.md

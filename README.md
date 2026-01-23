@@ -73,7 +73,7 @@ works best if a separate environment is created for serving docs.
     source venv/bin/activate
 
     # Install MkDocs ecosystem
-    pip install mkdocs mkdocs-material mkdocs-video
+    pip install mkdocs mkdocs-material mkdocs-video mkdocs-rss-plugin
 
     # Serve docs
     mkdocs serve --livereload
