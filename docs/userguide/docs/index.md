@@ -105,20 +105,20 @@ Scrite is a desktop app for Windows, macOS, and Linux.
 would like to support them at some point in the future.
 
 ### Minimum Requirements
-- Operating System - Windows 10 or later - Scrite may run on Windows 7/8.1, but
-        it’s not actively tested. - If installation fails or the app won’t start
-                (DLL errors), install Windows Updates and then reinstall Scrite.
+- Operating System 
+    - Windows 10 or later 
+        - Scrite may run on Windows 7/8.1, but it’s not actively tested. 
+        - If installation fails or the app won’t start (DLL errors), install Windows Updates and then reinstall Scrite.
     - macOS High Sierra 10.13 or later
-        - Intel x86_64 builds available
-        - Native Apple Silicon builds not yet available
+        - Universal builds with native support for both x86_64 and Apple Silicon 
     - GNU/Linux
         - Ubuntu 22.04 or later
         - X11 or Wayland
 - Hardware
-    - Display Resolution: 1280×768 or higher recommended
+    - Display Resolution: 1366x768 or higher recommended
     - RAM: 8 GB
     - Any Intel processor with 2 cores or more
-    - Graphics Card with 16MB or more VRAM would is recommended, although not
+    - Graphics Card with 16MB or more VRAM is recommended, although not
       absolutely required
 
 The best way to check if Scrite works for you is to install it and use the free
