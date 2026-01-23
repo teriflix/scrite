@@ -279,6 +279,9 @@ open it in a browser.
 
 At the moment it is not possible to import a HTML file in Scrite.
 
+> NOTE: While Scrite encodes formatting options in the generated HTML file, you
+> may notice formatting errors when the file is opened in certain browsers.
+
 ## Export Options are Persistent
 
 Checkable options in each of the export dialog boxes are persistent across
