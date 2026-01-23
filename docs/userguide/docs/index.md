@@ -108,7 +108,8 @@ would like to support them at some point in the future.
 - Operating System 
     - Windows 10 or later 
         - Scrite may run on Windows 7/8.1, but it’s not actively tested. 
-        - If installation fails or the app won’t start (DLL errors), install Windows Updates and then reinstall Scrite.
+        - If installation fails or the app won’t start (DLL errors), install
+          Windows Updates and then reinstall Scrite.
     - macOS High Sierra 10.13 or later
         - Universal builds with native support for both x86_64 and Apple Silicon 
     - GNU/Linux
@@ -144,7 +145,7 @@ On first launch, set up your login using your email address.
 > sync documents or settings across devices.
 
 <img src="./images/quickstart/003-creating-account.png" alt="Scrite Account"
-width="640"/>
+width="720"/>
 
 Click “Continue” and you’ll receive an activation code by email.
 
@@ -154,7 +155,7 @@ Code" width="480"/>
 Copy the code and paste it into Scrite.
 
 <img src="./images/quickstart/004-activation.png" alt="Activation Code"
-width="480"/>
+width="720"/>
 
 Once verified, Scrite issues license tokens and unlocks the app.
 
@@ -168,7 +169,7 @@ Free Trial—no credit card required. You can import from other formats and expo
 Scrite documents to third‑party formats.
 
 <img src="./images/quickstart/005-trial-activation.png" alt="Free Trial"
-width="640"/>
+width="720"/>
 
 The following features are restricted during the free trial:
 
@@ -191,11 +192,12 @@ At any time, click the `User Account` icon (top‑right) to open the User Profil
 dialog. Switch to the Subscriptions tab to view available plans.
 
 <img src="./images/quickstart/006-subscription-plans.png" alt="Subscription
-Plans" width="640"/>
+Plans" width="720"/>
 
 Click `Compare Plans` (bottom‑right) to open a feature comparison table.
 
-<screenshot>
+<img src="./images/quickstart/007-subscription-plans.png" alt="Subscription
+Plans" width="720"/>
 
 Review features carefully before purchasing. Cancellation or upgrade isn’t
 currently offered.
@@ -207,7 +209,22 @@ app may still show “TRIAL”, but paid features are available.
 If you run into payment or activation issues, check the FAQ. For help, email
 support@scrite.io.
 
+> NOTE: [Latest plans and pricing](https://www.scrite.io/pricing-and-features/)
+> can be looked up on our website.
+
+### Referral Code
+
+Sometimes you may get hold of a referral code from one of our partners, or
+existing subscribers. You may enter the referral code by clicking on the `Enter
+Referral Code` link. This will open a dialog box into which you can enter the
+referral code to unlock special discounted plans, provided the codes are valid
+and active.
+
+<img src="./images/quickstart/008-referral-code.png" alt="Referral Code"
+width="720"/>
+
 ### Build from Source
+
 Scrite is open source. Find the code on
 [GitHub](https://github.com/teriflix/scrite) and follow the
 [README](https://github.com/teriflix/scrite/blob/master/README.md) for build
