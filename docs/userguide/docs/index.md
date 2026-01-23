@@ -8,7 +8,6 @@ reports—all with tools that suit beginners and professionals alike.
 - [Official Scrite Website](https://www.scrite.io/)
 - [Downloads Page](https://www.scrite.io/downloads/)
 - [Pricing](https://www.scrite.io/pricing-and-features/)
-- [Source Code](https://github.com/teriflix/scrite)
 
 ## Scene‑Centric Approach
 Most apps treat a screenplay as pages; Scrite treats it as scenes—because that’s
@@ -147,7 +146,7 @@ On first launch, set up your login using your email address.
 <img src="./images/quickstart/003-creating-account.png" alt="Scrite Account"
 width="720"/>
 
-Click “Continue” and you’ll receive an activation code by email.
+Click "Continue" and you’ll receive an activation code by email.
 
 <img src="./images/quickstart/004-activation-code-email.png" alt="Activation
 Code" width="480"/>
@@ -164,7 +163,7 @@ least once every 28 days. If the app can’t connect within that window, it lock
 and prompts you to reactivate.
 
 ### Start a 30‑Day Free Trial
-Try all features and ensure Scrite works on your devices. Click “Start” next to
+Try all features and ensure Scrite works on your devices. Click "Start" next to
 Free Trial—no credit card required. You can import from other formats and export
 Scrite documents to third‑party formats.
 
@@ -204,7 +203,7 @@ currently offered.
 
 When ready, click `Buy` on your chosen plan. Complete payment in the browser,
 then return to Scrite—the plan activates immediately. If trial days remain, the
-app may still show “TRIAL”, but paid features are available.
+app may still show "TRIAL", but paid features are available.
 
 If you run into payment or activation issues, check the FAQ. For help, email
 support@scrite.io.
@@ -222,15 +221,4 @@ and active.
 
 <img src="./images/quickstart/008-referral-code.png" alt="Referral Code"
 width="720"/>
-
-### Build from Source
-
-Scrite is open source. Find the code on
-[GitHub](https://github.com/teriflix/scrite) and follow the
-[README](https://github.com/teriflix/scrite/blob/master/README.md) for build
-instructions.
-
-> **Note:** We don’t provide support for building Scrite or for unofficial
-> builds.
-
 
