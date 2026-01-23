@@ -300,6 +300,13 @@ numbers appear in preview, exported PDFs, and reports.
 
 <img src="../images/screenplay/026-custom-scene-numbers.png" width=720"/>
 
+## Scene Type
+
+Many writers, specificially Indian writers, prefer to mark a scene as action,
+montage or song scene. This helps them with production planning and more.
+
+<img src="../images/screenplay/026a-scene-type.jpg" width=640"/>
+
 ## Side Panel
 
 Scrite lets you capture additional information per scene. While the Notebook tab

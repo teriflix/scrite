@@ -76,7 +76,7 @@ works best if a separate environment is created for serving docs.
     pip install mkdocs mkdocs-material mkdocs-video
 
     # Serve docs
-    mkdocs serve
+    mkdocs serve --livereload
 
     # Open http://127.0.0.1:8000 on your browser
 
