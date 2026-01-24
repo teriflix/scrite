@@ -15,21 +15,22 @@
 #include "restapicall.h"
 #include "utils.h"
 
-#include <QGuiApplication>
-#include <QMessageBox>
-#include <QOffscreenSurface>
-#include <QOpenGLContext>
-#include <QOpenGLFunctions>
-#include <QOperatingSystemVersion>
-#include <QProgressDialog>
-#include <QScreen>
-#include <QStorageInfo>
-#include <QThread>
-#include <QNetworkInterface>
-#include <QHostAddress>
 #include <QTimer>
 #include <QLabel>
+#include <QScreen>
+#include <QThread>
+#include <QSettings>
+#include <QMessageBox>
+#include <QHostAddress>
+#include <QStorageInfo>
+#include <QOpenGLContext>
+#include <QProgressDialog>
+#include <QGuiApplication>
+#include <QOpenGLFunctions>
 #include <QDesktopServices>
+#include <QOffscreenSurface>
+#include <QNetworkInterface>
+#include <QOperatingSystemVersion>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -250,6 +251,15 @@ bool SystemRequirements::checkAndReport(const QList<Aspect> aspects)
         const QString errorString = describe(failedChecks);
 
         if (allowWithWarning) {
+            const QString appSettingsFile =
+                    QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
+                            .absoluteFilePath("settings.ini");
+            const QString minReqCheckedOn = QStringLiteral("Application/minReqCheckedOn");
+            QSettings appSettings(appSettingsFile, QSettings::IniFormat);
+            if (appSettings.contains(minReqCheckedOn)
+                && appSettings.value(minReqCheckedOn).toString() == QStringLiteral(SCRITE_VERSION))
+                return true;
+
             QMessageBox::StandardButton answer = QMessageBox::question(
                     nullptr, QObject::tr("System Requirements Not Met"),
                     QObject::tr("The following requirements were not met:\n\n") + errorString
@@ -257,6 +267,10 @@ bool SystemRequirements::checkAndReport(const QList<Aspect> aspects)
                                           "function. Do you want to "
                                           "continue using Scrite anyway?"),
                     QMessageBox::Yes | QMessageBox::No);
+
+            if (answer == QMessageBox::Yes)
+                appSettings.setValue(minReqCheckedOn, QStringLiteral(SCRITE_VERSION));
+
             return answer == QMessageBox::Yes;
         } else {
             aspectsToCheck.removeOne(Aspect::SupportedScriteVersion);
