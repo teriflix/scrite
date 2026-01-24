@@ -20,7 +20,7 @@ struct TextInputSource
     QString id;
     int languageCode = -1;
     QString displayName;
-    TISInputSourceRef inputSource;
+    TISInputSourceRef inputSource = nullptr;
     bool isDefault = false;
 
     bool operator==(const TextInputSource &other) const
@@ -51,7 +51,7 @@ static void macOSNotificationHandler(CFNotificationCenterRef center, void *obser
 
 struct MacOSBackendData
 {
-    CFArrayRef sourceList;
+    CFArrayRef sourceList = nullptr;
 
     QList<TextInputSource> textInputSources;
 };
@@ -188,7 +188,7 @@ bool MacOSBackend::reload()
         CFRelease(d->sourceList);
 
     d->sourceList = TISCreateInputSourceList(NULL, false);
-    const int nrSources = CFArrayGetCount(d->sourceList);
+    const int nrSources = d->sourceList != nullptr ? CFArrayGetCount(d->sourceList) : 0;
     TISInputSourceRef defaultSource =
             (nrSources > 0) ? (TISInputSourceRef)CFArrayGetValueAtIndex(d->sourceList, 0) : NULL;
 
