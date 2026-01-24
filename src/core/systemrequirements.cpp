@@ -306,9 +306,10 @@ bool SystemRequirements::hasMinimumScreenResolution(int minWidth, int minHeight)
 {
     QScreen *primaryScreen = QGuiApplication::primaryScreen();
     if (primaryScreen) {
-        QRect availableGeometry = primaryScreen->availableGeometry();
-        return availableGeometry.width() >= minWidth && availableGeometry.height() >= minHeight;
+        const QRect screenGeometry = primaryScreen->geometry();
+        return screenGeometry.width() >= minWidth && screenGeometry.height() >= minHeight;
     }
+
     return false;
 }
 
