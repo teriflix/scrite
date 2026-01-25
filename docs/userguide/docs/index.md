@@ -187,8 +187,9 @@ support@scrite.io for discounted options.
 After starting your trial, you can explore available plans or close the profile
 window and start writing.
 
-At any time, click the `User Account` icon (top‑right) to open the User Profile
-dialog. Switch to the Subscriptions tab to view available plans.
+At any time, click the [`User Account`](./user-account.md) icon (top‑right) to
+open the User Profile dialog. Switch to the Subscriptions tab to view available
+plans.
 
 <img src="./images/quickstart/006-subscription-plans.png" alt="Subscription
 Plans" width="720"/>
