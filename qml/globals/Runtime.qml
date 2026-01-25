@@ -177,6 +177,7 @@ Item {
         property bool allowTaggingOfScenes: false
         property bool applyUserDefinedLanguageFonts: true
         property bool autoAdjustEditorWidthInScreenplayEditor: true
+        property bool autoSelectSceneUnderMouse: true
         property bool captureInvisibleCharacters: false
         property bool copyAsFountain: true
         property bool copyFountainUsingStrictSyntax: true

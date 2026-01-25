@@ -116,7 +116,7 @@ ListView {
 
     onMovingChanged: {
         if(!movingVertically)
-            _private.scheduleMakeItemUnderCursorCurrent()
+            _private.scheduleMakeItemUnderMouseCurrent()
     }
 
     onWidthChanged: _private.updateFirstAndLastIndexLater()
@@ -558,7 +558,10 @@ ListView {
             modelCurrentIndexChangedInternally = false
         }
 
-        function makeItemUnderCursorCurrent() {
+        function makeItemUnderMouseCurrent() {
+            if(!Runtime.screenplayEditorSettings.autoSelectSceneUnderMouse)
+                return
+
             const globalCursorPos = MouseCursor.position()
             let localCursorPos = MouseCursor.itemPosition(root, globalCursorPos)
             localCursorPos.x = root.width/2
@@ -570,8 +573,8 @@ ListView {
             }
         }
 
-        function scheduleMakeItemUnderCursorCurrent() {
-            Runtime.execLater(_private, Runtime.placeholderInterval, _private.makeItemUnderCursorCurrent)
+        function scheduleMakeItemUnderMouseCurrent() {
+            Runtime.execLater(_private, Runtime.placeholderInterval, _private.makeItemUnderMouseCurrent)
         }
 
         function scrollIntoView(index) {
@@ -699,7 +702,7 @@ ListView {
             scrollIntoView(pidx)
         }
 
-        onLastItemIndexChanged: if(scrolling || root.flicking) scheduleMakeItemUnderCursorCurrent()
-        onFirstItemIndexChanged: if(scrolling || root.flicking) scheduleMakeItemUnderCursorCurrent()
+        onLastItemIndexChanged: if(scrolling || root.flicking) scheduleMakeItemUnderMouseCurrent()
+        onFirstItemIndexChanged: if(scrolling || root.flicking) scheduleMakeItemUnderMouseCurrent()
     }
 }

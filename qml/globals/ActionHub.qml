@@ -1656,6 +1656,20 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+            readonly property string tooltip: "When checked, the screenplay editor makes the scene under mouse as active while scrolling."
+
+            checkable: true
+            checked: Runtime.screenplayEditorSettings.autoSelectSceneUnderMouse
+            objectName: "autoSelectSceneUnderMouse"
+            text: "Auto Select Scene under Mouse"
+
+            onTriggered: {
+                Runtime.screenplayEditorSettings.autoSelectSceneUnderMouse = !Runtime.screenplayEditorSettings.autoSelectSceneUnderMouse
+            }
+        }
+
+        Action {
             readonly property bool visible: false
             readonly property bool allowShortcut: true
 
