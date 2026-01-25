@@ -23,6 +23,8 @@ struct TextInputSource
     TISInputSourceRef inputSource = nullptr;
     bool isDefault = false;
 
+    bool isValid() const { return this->languageCode >= 0 && this->inputSource != nullptr; }
+
     bool operator==(const TextInputSource &other) const
     {
         return this->inputSource == other.inputSource;
@@ -54,27 +56,58 @@ struct MacOSBackendData
     CFArrayRef sourceList = nullptr;
 
     QList<TextInputSource> textInputSources;
+
+    ~MacOSBackendData();
+
+    void clear();
 };
+
+MacOSBackendData::~MacOSBackendData()
+{
+    this->clear();
+}
+
+void MacOSBackendData::clear()
+{
+    for (TextInputSource &tis : this->textInputSources) {
+        if (tis.isValid()) {
+            CFRelease(tis.inputSource);
+            tis.inputSource = nullptr;
+        }
+    }
+    this->textInputSources.clear();
+
+    if (this->sourceList != nullptr) {
+        CFRelease(this->sourceList);
+        this->sourceList = nullptr;
+    }
+}
 
 MacOSBackend::MacOSBackend(QObject *parent) : QObject(parent), d(new MacOSBackendData)
 {
-    CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(), this,
-                                    &macOSNotificationHandler,
-                                    kTISNotifyEnabledKeyboardInputSourcesChanged, NULL,
-                                    CFNotificationSuspensionBehaviorDeliverImmediately);
+    CFNotificationCenterRef center = CFNotificationCenterGetDistributedCenter();
+    if (center != nullptr) {
+        CFNotificationCenterAddObserver(center, this, &macOSNotificationHandler,
+                                        kTISNotifyEnabledKeyboardInputSourcesChanged, NULL,
+                                        CFNotificationSuspensionBehaviorDeliverImmediately);
 
-    CFNotificationCenterAddObserver(CFNotificationCenterGetDistributedCenter(), this,
-                                    &macOSNotificationHandler,
-                                    kTISNotifySelectedKeyboardInputSourceChanged, NULL,
-                                    CFNotificationSuspensionBehaviorDeliverImmediately);
+        CFNotificationCenterAddObserver(center, this, &macOSNotificationHandler,
+                                        kTISNotifySelectedKeyboardInputSourceChanged, NULL,
+                                        CFNotificationSuspensionBehaviorDeliverImmediately);
+    }
 
     this->reload();
 }
 
 MacOSBackend::~MacOSBackend()
 {
-    if (d->sourceList != nullptr)
-        CFRelease(d->sourceList);
+    CFNotificationCenterRef center = CFNotificationCenterGetDistributedCenter();
+    if (center != nullptr) {
+        CFNotificationCenterRemoveObserver(center, this,
+                                           kTISNotifyEnabledKeyboardInputSourcesChanged, nullptr);
+        CFNotificationCenterRemoveObserver(center, this,
+                                           kTISNotifySelectedKeyboardInputSourceChanged, nullptr);
+    }
 
     delete d;
 }
@@ -84,7 +117,7 @@ int MacOSBackend::defaultLanguage() const
     auto it = std::find_if(d->textInputSources.begin(), d->textInputSources.end(),
                            [](const TextInputSource &tis) { return tis.isDefault; });
     if (it != d->textInputSources.end())
-        return it->languageCode;
+        return it->isValid() ? it->languageCode : QLocale::English;
 
     return -1;
 }
@@ -96,7 +129,7 @@ int MacOSBackend::activateDefaultLanguage() const
                            [](const TextInputSource &tis) { return tis.isDefault; });
 
     // If found, then activate it.
-    if (it != d->textInputSources.end()) {
+    if (it != d->textInputSources.end() && it->isValid()) {
         const bool alreadyActive = (CFBooleanRef)TISGetInputSourceProperty(
                                            it->inputSource, kTISPropertyInputSourceIsSelected)
                 == kCFBooleanTrue;
@@ -120,7 +153,7 @@ int MacOSBackend::activeLanguage() const
                                               tis.inputSource, kTISPropertyInputSourceIsSelected)
                                        == kCFBooleanTrue;
                            });
-    if (it != d->textInputSources.end())
+    if (it != d->textInputSources.end() && it->isValid())
         return it->languageCode;
 
     return -1;
@@ -132,7 +165,7 @@ MacOSBackend::options(int lang, const PlatformTransliterationEngine *translitera
     QList<TransliterationOption> ret;
 
     for (const TextInputSource &tis : qAsConst(d->textInputSources)) {
-        if (tis.languageCode == lang)
+        if (tis.isValid() && tis.languageCode == lang)
             ret << TransliterationOption(
                     { (QObject *)transliterator, lang, tis.id, tis.displayName, false });
     }
@@ -147,7 +180,7 @@ bool MacOSBackend::canActivate(const TransliterationOption &option,
 
     auto it = std::find_if(d->textInputSources.begin(), d->textInputSources.end(),
                            [option](const TextInputSource &tis) { return option.id == tis.id; });
-    return (it != d->textInputSources.end());
+    return (it != d->textInputSources.end() && it->isValid());
 }
 
 bool MacOSBackend::activate(const TransliterationOption &option,
@@ -158,7 +191,7 @@ bool MacOSBackend::activate(const TransliterationOption &option,
     auto it = std::find_if(d->textInputSources.begin(), d->textInputSources.end(),
                            [option](const TextInputSource &tis) { return option.id == tis.id; });
 
-    if (it != d->textInputSources.end()) {
+    if (it != d->textInputSources.end() && it->isValid()) {
         const bool alreadyActive = (CFBooleanRef)TISGetInputSourceProperty(
                                            it->inputSource, kTISPropertyInputSourceIsSelected)
                 == kCFBooleanTrue;
@@ -184,8 +217,7 @@ bool MacOSBackend::reload()
 {
     QList<TextInputSource> textInputSources;
 
-    if (d->sourceList != nullptr)
-        CFRelease(d->sourceList);
+    d->clear();
 
     d->sourceList = TISCreateInputSourceList(NULL, false);
     const int nrSources = d->sourceList != nullptr ? CFArrayGetCount(d->sourceList) : 0;
@@ -212,7 +244,7 @@ bool MacOSBackend::reload()
 
         CFArrayRef languages = (CFArrayRef)TISGetInputSourceProperty(
                 tis.inputSource, kTISPropertyInputSourceLanguages);
-        const int nrLanguages = CFArrayGetCount(languages);
+        const int nrLanguages = languages != nullptr ? CFArrayGetCount(languages) : 0;
         if (nrLanguages >= 1) {
             const QString primaryLanguage =
                     QString::fromCFString((CFStringRef)CFArrayGetValueAtIndex(languages, 0))
