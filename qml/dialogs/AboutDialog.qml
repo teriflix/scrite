@@ -315,7 +315,7 @@ DialogLauncher {
 
                     Button {
                         text: "Learning Guides"
-                        onClicked: Qt.openUrlExternally("https://www.scrite.io/help/")
+                        onClicked: Qt.openUrlExternally(Runtime.userGuidesUrl)
                     }
 
                     Button {
