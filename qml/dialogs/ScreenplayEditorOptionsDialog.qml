@@ -38,7 +38,7 @@ DialogLauncher {
 
     dialogComponent: VclDialog {
         width: Math.min(Scrite.window.width-80, 800)
-        height: Math.min(Scrite.window.height-80, 700)
+        height: Math.min(Scrite.window.height-80, 720)
 
         title: "Screenplay Editor Options"
 

@@ -25,6 +25,16 @@ import "qrc:/qml/controls"
 Item {
     id: root
 
+    Rectangle {
+        anchors.fill: _flickable
+        anchors.margins: -3
+
+        visible: _flickable.clip
+
+        border.width: 1
+        border.color: Runtime.colors.primary.borderColor
+    }
+
     Flickable {
         id: _flickable
 
@@ -32,6 +42,8 @@ Item {
         anchors.margins: 20
 
         ScrollBar.vertical: VclScrollBar { }
+
+        FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
         clip: contentHeight > height
         contentWidth: _layout.width
