@@ -86,10 +86,6 @@ Item {
             }
             return userProfilePageComponent
         }
-        onPageContentItemChanged: {
-            if(userProfilePageView.currentIndex !== 1)
-                pageContentItem.height = availablePageContentHeight
-        }
         cornerContent: Item {
             Image {
                 anchors.bottom: parent.bottom
@@ -104,11 +100,12 @@ Item {
                 mipmap: true
 
                 MouseArea {
+                    id: discordButtonMouseArea
                     anchors.fill: parent
 
                     ToolTipPopup {
                         text: "Ask questions, post feedback, request features and connect with other Scrite users."
-                        visible: container.hovered
+                        visible: discordButtonMouseArea.hovered
                     }
 
                     cursorShape: Qt.PointingHandCursor
@@ -125,6 +122,8 @@ Item {
 
         Item {
             id: userProfilePage
+
+            height: userProfilePageView.availablePageContentHeight
 
             property var userInfo: Scrite.user.info
             property RestApiCallList callList : RestApiCallList {
@@ -992,131 +991,229 @@ Item {
         Item {
             id: userInstallationsPage
 
+            height: userProfilePageView.availablePageContentHeight
+
             ColumnLayout {
+                id: userInstallationsPageLayout
+
                 anchors.fill: parent
                 anchors.margins: 20
                 anchors.leftMargin: 0
 
-                spacing: 10
-
+                // Header Section
                 VclLabel {
                     Layout.fillWidth: true
 
-                    wrapMode: Text.WordWrap
-                    text: "Installations of Scrite linked to your account:"
+                    font.bold: true
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize + 1
+                    text: {
+                        const total = Scrite.user.info.installations.length
+                        const active = Scrite.user.info.activeInstallationCount
+                        if(active === total)
+                            return active + " Installations Active"
+                        return total + " Total Installations, " + active + " Active"
+                    }
                 }
 
+                // Devices Grid
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    enabled: !deactivateOtherCall.busy && !Scrite.user.busy
-                    opacity: enabled ? 1 : 0.5
-
-                    color: Runtime.colors.primary.c10.background
-                    border.width: 1
+                    color: Runtime.colors.transparent
+                    border.width: devicesFlickable.contentHeight > devicesFlickable.height ? 1 : 0
                     border.color: Runtime.colors.primary.borderColor
 
-                    ListView {
-                        id: installationsView
+                    Flickable {
+                        id: devicesFlickable
 
                         anchors.fill: parent
-                        anchors.margins: 1
+                        anchors.margins: clip ? 2 : 0
 
-                        ScrollBar.vertical: VclScrollBar {
-                            flickable: installationsView
-                        }
+                        enabled: !deactivateOtherCall.busy && !Scrite.user.busy
+                        opacity: enabled ? 1 : 0.5
 
-                        clip: true
-                        model: Scrite.user.info.installations
-                        spacing: 20
-                        currentIndex: -1
+                        ScrollBar.vertical: VclScrollBar { }
+                        FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-                        highlight: Rectangle {
-                            color: Runtime.colors.primary.highlight.background
-                        }
-                        highlightMoveDuration: 0
-                        highlightResizeDuration: 0
+                        clip: contentHeight > height
+                        contentWidth: width
+                        contentHeight: devicesFlow.height
 
-                        delegate: Item {
-                            required property int index
-                            required property var modelData
+                        Flow {
+                            id: devicesFlow
 
-                            width: installationsView.width
-                            height: installationsViewDelegateLayout.height + 20
+                            width: devicesFlickable.width - (devicesFlickable.clip ? 20 : 0)
+                            spacing: 10
 
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: installationsView.currentIndex = index
-                            }
+                            Repeater {
+                                model: Scrite.user.info.installations
 
-                            RowLayout {
-                                id: installationsViewDelegateLayout
+                                delegate: Rectangle {
+                                    required property int index
+                                    required property var modelData
 
-                                anchors.centerIn: parent
+                                    width: Math.min(450, (devicesFlow.width - devicesFlow.spacing) / 2 - 1)
+                                    height: deviceCardLayout.implicitHeight + 40
 
-                                width: parent.width-10
+                                    color: Runtime.colors.primary.c10.background
+                                    border.width: modelData.isCurrent ? 3 : 1
+                                    border.color: modelData.isCurrent ? Runtime.colors.accent.c600.background : Runtime.colors.primary.borderColor
 
-                                ColumnLayout {
-                                    Layout.fillWidth: true
+                                    ColumnLayout {
+                                        id: deviceCardLayout
 
-                                    spacing: 5
+                                        anchors.fill: parent
+                                        anchors.margins: 20
 
-                                    VclLabel {
-                                        Layout.fillWidth: true
+                                        spacing: 10
 
-                                        font.bold: modelData.isCurrent
-                                        text: {
-                                            let ret = ""
-                                            if(modelData.hostName !== "")
-                                                ret = modelData.hostName + ": "
-                                            ret += modelData.platform + " " + modelData.platformVersion + " (" + modelData.platformType + ")"
-                                            return ret
+                                        RowLayout {
+                                            Layout.fillWidth: true
+                                            spacing: 15
+
+                                            Rectangle {
+                                                Layout.preferredWidth: 60
+                                                Layout.preferredHeight: 60
+                                                Layout.alignment: Qt.AlignTop
+
+                                                color: Runtime.colors.primary.c100.background
+                                                border.width: 1
+                                                border.color: Runtime.colors.primary.borderColor
+                                                radius: 4
+
+                                                Image {
+                                                    anchors.fill: parent
+                                                    anchors.margins: 5
+
+                                                    mipmap: true
+                                                    fillMode: Image.PreserveAspectFit
+                                                    opacity: modelData.isCurrent ? 1 : 0.6
+
+                                                    source: {
+                                                        switch(modelData.platform.toLowerCase()) {
+                                                            case "windows": return "qrc:/icons/hardware/windows-platform.png"
+                                                            case "macos": return "qrc:/icons/hardware/macOS-platform.png"
+                                                            case "linux": return "qrc:/icons/hardware/linux-platform.png"
+                                                        }
+                                                        return "qrc:/icons/hardware/desktop-platform.png"
+                                                    }
+                                                }
+                                            }
+
+                                            ColumnLayout {
+                                                Layout.fillWidth: true
+                                                spacing: 5
+
+                                                RowLayout {
+                                                    Layout.fillWidth: true
+                                                    spacing: 10
+
+                                                    VclLabel {
+                                                        Layout.fillWidth: true
+
+                                                        font.bold: modelData.isCurrent
+                                                        font.pointSize: Runtime.idealFontMetrics.font.pointSize + 1
+                                                        text: {
+                                                            let ret = ""
+                                                            if(modelData.hostName !== "")
+                                                                ret = modelData.hostName
+                                                            else
+                                                                ret = modelData.platform + " Device"
+                                                            return ret
+                                                        }
+                                                        elide: Text.ElideRight
+                                                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                                        maximumLineCount: 2
+                                                    }
+
+                                                    Rectangle {
+                                                        visible: modelData.isCurrent
+
+                                                        Layout.preferredHeight: thisDeviceLabel.implicitHeight + 8
+                                                        Layout.preferredWidth: thisDeviceLabel.implicitWidth + 12
+
+                                                        color: Runtime.colors.accent.c500.background
+                                                        radius: 4
+
+                                                        VclLabel {
+                                                            id: thisDeviceLabel
+                                                            anchors.centerIn: parent
+
+                                                            text: "THIS DEVICE"
+                                                            color: Runtime.colors.accent.c500.text
+                                                            font.bold: true
+                                                            font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
+                                                        }
+                                                    }
+                                                }
+
+                                                VclLabel {
+                                                    Layout.fillWidth: true
+
+                                                    text: modelData.platform + " " + modelData.platformVersion
+                                                    elide: Text.ElideRight
+                                                    color: Runtime.colors.primary.c600.text
+                                                }
+
+                                                VclLabel {
+                                                    Layout.fillWidth: true
+
+                                                    text: "Scrite " + modelData.appVersion
+                                                    elide: Text.ElideRight
+                                                    color: Runtime.colors.primary.c600.text
+                                                }
+                                            }
                                         }
-                                        elide: Text.ElideRight
-                                    }
 
-                                    VclLabel {
-                                        Layout.fillWidth: true
+                                        Rectangle {
+                                            Layout.fillWidth: true
+                                            Layout.preferredHeight: 1
+                                            color: Runtime.colors.primary.borderColor
+                                        }
 
-                                        text: "Runs Scrite " + modelData.appVersion
-                                        elide: Text.ElideRight
-                                    }
+                                        RowLayout {
+                                            Layout.fillWidth: true
+                                            spacing: 10
 
-                                    VclLabel {
-                                        Layout.fillWidth: true
+                                            VclLabel {
+                                                Layout.fillWidth: true
 
-                                        text: "Since: " + TMath.relativeTime(new Date(modelData.creationDate))
-                                        elide: Text.ElideRight
-                                    }
+                                                text: modelData.isCurrent ?
+                                                          "Active since: " + Qt.formatDateTime(new Date(modelData.lastSessionDate), "dddd, h:mm AP (MMM dd, yyyy)") :
+                                                          "Last Login: " + TMath.relativeTime(new Date(modelData.lastSessionDate))
+                                                elide: Text.ElideRight
+                                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                                maximumLineCount: 2
+                                            }
 
-                                    VclLabel {
-                                        Layout.fillWidth: true
+                                            VclButton {
+                                                visible: !modelData.isCurrent
+                                                enabled: modelData.activated
 
-                                        text: "Last Login: " + TMath.relativeTime(new Date(modelData.lastSessionDate))
-                                        elide: Text.ElideRight
-                                    }
-                                }
+                                                text: "Sign Out"
+                                                icon.source: "qrc:/icons/action/logout.png"
+                                                icon.width: 16
+                                                icon.height: 16
 
-                                FlatToolButton {
-                                    id: logoutButton
-                                    iconSource: "qrc:/icons/action/logout.png"
-                                    enabled: modelData.activated && !modelData.isCurrent
-                                    opacity: enabled ? 1 : 0.2
-                                    onClicked: {
-                                        deactivateOtherCall.installationId = modelData.id
-                                        deactivateOtherCall.call()
+                                                onClicked: {
+                                                    deactivateOtherCall.installationId = modelData.id
+                                                    deactivateOtherCall.call()
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-
-                    BusyIndicator {
-                        anchors.centerIn: parent
-                        running: deactivateOtherCall.busy || Scrite.user.busy
                     }
                 }
+            }
+
+            BusyIndicator {
+                anchors.centerIn: parent
+                running: deactivateOtherCall.busy || Scrite.user.busy
             }
 
             InstallationDeactivateOtherRestApiCall {

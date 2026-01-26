@@ -168,7 +168,10 @@ Rectangle {
 
             Loader {
                 id: pageContentLoader
+
                 width: pageContentArea.contentWidth
+
+                onItemChanged: Object.resetProperty(pageContentLoader, "height")
             }
         }
     }

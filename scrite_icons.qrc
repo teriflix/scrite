@@ -343,5 +343,9 @@
         <file>icons/editor/palette_inverted.png</file>
         <file>icons/editor/format_hyperlink_inverted.png</file>
         <file>icons/editor/format_hyperlink.png</file>
+        <file>icons/hardware/linux-platform.png</file>
+        <file>icons/hardware/macOS-platform.png</file>
+        <file>icons/hardware/windows-platform.png</file>
+        <file>icons/hardware/desktop-platform.png</file>
     </qresource>
 </RCC>
