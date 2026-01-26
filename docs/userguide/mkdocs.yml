@@ -7,6 +7,10 @@ theme:
     - scheme: default
       primary: purple
       accent: purple
+  features:
+    - navigation.expand
+    - search.suggest
+    - search.highlight
 extra_css:
   - styles/style.css
 markdown_extensions:
@@ -16,6 +20,7 @@ markdown_extensions:
       toc_depth: 4
 plugins:
   - mkdocs-video
+  - search
 hooks:
   - hooks.py
 nav:

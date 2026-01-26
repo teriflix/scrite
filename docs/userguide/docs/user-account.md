@@ -104,7 +104,7 @@ them.
 This page shows every device that has ever activated Scrite under your account. The current device
 is highlighted in **bold**; other devices are listed below in order of most recent session time.
 
-Each entry has a **Logout** button. Clicking it removes the device from the active list. The change
+Each entry has a **Sign Out** button. Clicking it removes the device from the active list. The change
 takes effect on the remote device after it reconnects or restarts, which may take up to an hour.
 
 <img src="../images/user-account/008-installations.jpg" width=640"/>
@@ -112,7 +112,7 @@ takes effect on the remote device after it reconnects or restarts, which may tak
 ### Device limits
 Scrite enforces a maximum number of active devices per subscription tier. If you exceed the limit,
 you’ll need to log out of an existing device before adding a new one. Use the **Logout** button
-either on another device in this page, or in the [Profile](#profile-page) page to free a slot.
+either on another device in this page, or in the [Profile](#logout) page to free a slot.
 
 ## Messages Page
 
