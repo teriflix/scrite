@@ -588,7 +588,7 @@ Item {
 
             icon.source: "qrc:/icons/action/help.png"
 
-            onTriggered: Qt.openUrlExternally("https://www.scrite.io/help/")
+            onTriggered: Qt.openUrlExternally(Runtime.userGuidesUrl)
         }
 
         Action {

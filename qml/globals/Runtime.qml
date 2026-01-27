@@ -42,6 +42,8 @@ Item {
     readonly property real minSceneSidePanelWidth: 250
     readonly property real minWindowWidthForShowingNotebookInStructure: 1600
 
+    readonly property url userGuidesUrl: "https://www.scrite.io/docs/userguide/"
+
     property int mainWindowTab: Runtime.MainWindowTab.ScreenplayTab
     property int placeholderInterval: bounded(50, Runtime.screenplayEditorSettings.placeholderInterval, 1000)
     property int visibleTooltipCount: 0

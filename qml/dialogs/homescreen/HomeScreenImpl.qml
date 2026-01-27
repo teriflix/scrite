@@ -157,7 +157,7 @@ Item {
                 textColor: "white"
                 iconSource: "qrc:/icons/action/help_inverted.png"
 
-                onClicked: Qt.openUrlExternally("https://www.scrite.io/help/")
+                onClicked: Qt.openUrlExternally(Runtime.userGuidesUrl)
             }
 
             LinkButton {
@@ -350,7 +350,7 @@ Item {
                         text: "Learning Guides"
                         iconSource: "qrc:/icons/action/help.png"
 
-                        onClicked: Qt.openUrlExternally("https://www.scrite.io/help/")
+                        onClicked: Qt.openUrlExternally(Runtime.userGuidesUrl)
                     }
 
                     LinkButton {
