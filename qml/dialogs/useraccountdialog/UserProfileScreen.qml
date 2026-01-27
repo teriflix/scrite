@@ -1082,6 +1082,16 @@ Item {
                                                 border.color: Runtime.colors.primary.borderColor
                                                 radius: 4
 
+                                                VclText {
+                                                    anchors.centerIn: parent
+
+                                                    text: "Mac"
+                                                    visible: modelData.platform === "macOS"
+
+                                                    font.capitalization: Font.AllUppercase
+                                                    font.pixelSize: parent.height * 0.25
+                                                }
+
                                                 Image {
                                                     anchors.fill: parent
                                                     anchors.margins: 5
@@ -1089,11 +1099,11 @@ Item {
                                                     mipmap: true
                                                     fillMode: Image.PreserveAspectFit
                                                     opacity: modelData.isCurrent ? 1 : 0.6
+                                                    visible: modelData.platform !== "macOS"
 
                                                     source: {
                                                         switch(modelData.platform.toLowerCase()) {
                                                             case "windows": return "qrc:/icons/hardware/windows-platform.png"
-                                                            case "macos": return "qrc:/icons/hardware/macOS-platform.png"
                                                             case "linux": return "qrc:/icons/hardware/linux-platform.png"
                                                         }
                                                         return "qrc:/icons/hardware/desktop-platform.png"
