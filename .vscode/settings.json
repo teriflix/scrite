@@ -12,5 +12,5 @@
         "xutility": "cpp",
         "algorithm": "cpp"
     },
-    "cmake.sourceDirectory": "C:/Workspace/ScriteProject/scrite/3rdparty/quazip"
+    "cmake.sourceDirectory": "/Users/prashanthudupa/GitHubCode/scrite/3rdparty/sonnet/sonnet/src/plugins"
 }

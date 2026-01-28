@@ -16,16 +16,16 @@ right of the window, or by using the keyboard shortcuts as listed above.
 The screenplay tab offers a scene-after-scene view of your screenplay, as you
 might have already seen in the chapters before. 
 
-<img src="../images/quickstart/012-second-scene.png" width="720"/>
+<img src="../images/quickstart/012-second-scene.png" width="100%"/>
 
 Each scene is a distinct block of text. Infact, if you toggle the Scene Blocks
 option ON ...
 
-<img src="../images/screenplay-tab/001-scene-blocks.jpg" width="640"/>
+<img src="../images/screenplay-tab/001-scene-blocks.jpg" width="85%"/>
 
 ... the Screenplay Editor shows each scene as a distinct block.
 
-<img src="../images/screenplay-tab/002-scene-blocks.jpg" width="640"/>
+<img src="../images/screenplay-tab/002-scene-blocks.jpg" width="85%"/>
 
 Scrite's document model stores each scene as a distinct object, and within each
 scene it stores each paragraph as a distinct object with a unique ID. This
@@ -36,7 +36,7 @@ Each scene has a scene heading, followed by scene content. The UI also shows
 scene number and a page number bubble at approximately the place within the
 scene where the page break is likely to land.
 
-<img src="../images/screenplay-tab/003-parts-of-a-scene.jpg" width="720"/>
+<img src="../images/screenplay-tab/003-parts-of-a-scene.jpg" width="100%"/>
 
 As [mentioned earlier](index.md#pagecentric), Scrite is structure-first and
 scene-centric. Even so, it updates the page count and current page as you type.
@@ -62,7 +62,7 @@ Further reading: [Screenplay Tab](screenplay.md)
 When Scrite began, this was the only tab. It remains central to how we think
 about screenplays. At its core, the tab has three parts:
 
-<img src="../images/structure-tab/001-parts-of-structure-tab.jpg" width="720"/>
+<img src="../images/structure-tab/001-parts-of-structure-tab.jpg" width="100%"/>
 
 - The structure canvas lets you shape your story by placing index cards on a
   wide, open canvas.
@@ -83,7 +83,7 @@ Some writers like to start writing scenes right away. Others prefer to plot the
 story on a canvas or whiteboard—in which case the Structure tab, described
 earlier, is ideal.
 
-<img src="../images/notebook-tab/001-story-structure.jpg" width="720"/>
+<img src="../images/notebook-tab/001-story-structure.jpg" width="100%"/>
 
 Many writers begin by capturing notes and research: story ideas, character
 details, relationships, and a breakdown of acts, key scenes, or story beats.
@@ -94,19 +94,19 @@ and characters later.
 In both cases, the Notebook provides a comprehensive set of tools for capturing
 notes about scenes, characters, and the story.
 
-<img src="../images/notebook-tab/002-notebook.jpg" width="720"/>
+<img src="../images/notebook-tab/002-notebook.jpg" width="100%"/>
 
 By default, the Notebook has its own tab. You can also stack it inside the
 Structure tab to reference notes while writing.
 
 <img src="../images/notebook-tab/003-notebook-within-structure.jpg"
-width="640"/>
+width="85%"/>
 
 Toggle the “Stack Structure & Notebook” option in Settings to view both in a
 single tab and automatically pull up scene or character notes as you type.
 
 <img src="../images/notebook-tab/004-notebook-within-structure.jpg"
-width="720"/>
+width="100%"/>
 
 Further reading: [Notebook Tab](notebook.md)
 

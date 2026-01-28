@@ -18,7 +18,7 @@ If you prefer text descriptions, then here we go!
 ## Home Screen
 When you start Scrite, you’ll see the Home Screen.
 
-<img src="../images/quickstart/007-home-screen.png" width="720"/>
+<img src="../images/quickstart/007-home-screen.png" width="100%"/>
 
 From here you can:
 
@@ -37,7 +37,7 @@ Many writers start by importing existing screenplays from Final Draft or
 Fountain. To do this, close the Home Screen and drag‑and‑drop your FDX or
 Fountain file onto the Scrite window.
 
-<img src="../images/quickstart/008-importing-screenplays.png" width="720"/>
+<img src="../images/quickstart/008-importing-screenplays.png" width="100%"/>
 
 Scrite allows importing from:
 
@@ -51,7 +51,7 @@ transition are imported and tagged accordingly.
 After import, open the Scene List panel (left‑side icon) or press `Alt+0` to
 view all scenes.
 
-<img src="../images/quickstart/009-scene-list-panel.png" width="720"/>
+<img src="../images/quickstart/009-scene-list-panel.png" width="100%"/>
 
 Click any scene in the list to jump to it in the editor.
 
@@ -59,7 +59,7 @@ Scrite calculates page count and estimates screen time after import. The Scene
 List shows each scene’s estimated duration; hover a scene to view more metadata.
 By default, one page ≈ one minute—this can be configured.
 
-<img src="../images/quickstart/009-page-and-time-estimate.png" width="540"/>
+<img src="../images/quickstart/009-page-and-time-estimate.png" width="75%"/>
 
 > **NOTE**: Scrite estimates page count and screentime in a background thread,
 > which means that it may take some time before you see final estimates on the
@@ -67,17 +67,17 @@ By default, one page ≈ one minute—this can be configured.
 
 You can reorder scenes by dragging them to a new position.
 
-<img src="../images/quickstart/009-reorder-scenes.gif" width="320"/>
+<img src="../images/quickstart/009-reorder-scenes.gif" width="40%"/>
 
 ## Creating a New Screenplay
 To start from scratch, open the Home Screen and select "Blank Document".
 
-<img src="../images/quickstart/010-blank-document.png" width="720"/>
+<img src="../images/quickstart/010-blank-document.png" width="100%"/>
 
 Your first document starts with a blank scene, using a default heading like
 `EXT. SOMEWHERE – DAY`.
 
-<img src="../images/quickstart/010-first-scene.png" width="720"/>
+<img src="../images/quickstart/010-first-scene.png" width="100%"/>
 
 Scrite’s UI is scene‑centric: you won’t see pages; you’ll work with a text block
 for each scene.
@@ -85,17 +85,17 @@ for each scene.
 To create a new scene, click `New Scene` on the toolbar or use `Ctrl+Shift+N`
 (Windows/Linux) or `⌘+Shift+N` (macOS).
 
-<img src="../images/quickstart/011-second-scene.png" width="540"/>
+<img src="../images/quickstart/011-second-scene.png" width="75%"/>
 
 This creates a new empty scene after the selected scene (or at the end if none
 is selected).
 
-<img src="../images/quickstart/012-second-scene.png" width="720"/>
+<img src="../images/quickstart/012-second-scene.png" width="100%"/>
 
 You can also append a new scene, act, or episode break using the buttons at the
 end. More on this in a [later section](#adding-more-scenes).
 
-<img src="../images/quickstart/013-adding-elements.png" width="320"/>
+<img src="../images/quickstart/013-adding-elements.png" width="40%"/>
 
 Scrite adds the scene with a default heading and places the cursor in the
 content area.
@@ -123,7 +123,7 @@ You can open files by:
 Click the scene heading or press `Ctrl+0` (`⌘+0`) to move the cursor to the
 heading and edit it.
 
-<img src="../images/quickstart/014-editing-scene-heading.png" width="540"/>
+<img src="../images/quickstart/014-editing-scene-heading.png" width="75%"/>
 
 Press `Enter` to switch the cursor to the scene content area.
 
@@ -135,14 +135,14 @@ The scene heading area is color‑tinted and shows the character list. You can
 also show the scene synopsis.
 
 <img src="../images/quickstart/015-enabling-scene-heading-fields.png"
-width="540"/>
+width="75%"/>
 
 By enabling the highlighted options in this dialog box, you will see a space for
 synopsis, characters and tags in each scene heading. This is especially useful
 in large screenplays where you may want to capture synopsis, and additional meta
 data against each scene.
 
-<img src="../images/quickstart/016-synopsis-characters-tags.png" width="720"/>
+<img src="../images/quickstart/016-synopsis-characters-tags.png" width="100%"/>
 
 By default, synopsis isn’t exported to PDF—you can enable it if desired.
 
@@ -157,7 +157,7 @@ make changes, and come back you can
 Format action, character, dialogue, parenthetical, shot, and transition
 paragraphs using the toolbar buttons.
 
-<img src="../images/quickstart/017-format-toolbar.png" width="320"/>
+<img src="../images/quickstart/017-format-toolbar.png" width="40%"/>
 
 You can also use keyboard shortcuts to switch paragraph types:
 
@@ -175,13 +175,13 @@ appropriate type.
 
 Below is an example scene with paragraphs properly formatted.
 
-<img src="../images/quickstart/018-formatted-scene.png" width="720"/>
+<img src="../images/quickstart/018-formatted-scene.png" width="100%"/>
 
 ## Adding More Scenes
 Keep creating scenes and adding content. To add a new scene, click the button at
 the end of the page or use the toolbar.
 
-<img src="../images/quickstart/019-episode-scene-act-toolbar.png" width="320"/>
+<img src="../images/quickstart/019-episode-scene-act-toolbar.png" width="40%"/>
 
 Alternatively, you can use the following keyboard shortcuts to insert a scene,
 act or episode break after the current scene.
@@ -201,30 +201,30 @@ best when scenes are under a page, with occasional scenes up to two pages.
 Longer scenes are supported, but if most scenes exceed two pages, performance
 may suffer. Keeping scenes concise helps pacing and readability.
 
-<img src="../images/quickstart/020-long-scene-warning.png" width="540"/>
+<img src="../images/quickstart/020-long-scene-warning.png" width="75%"/>
 
 ## Distraction‑Free Writing
 Use "Screenplay Editor Options" to hide the character list and synopsis panels,
 optionally reducing color intensity if you prefer. 
 
-<img src="../images/quickstart/021-distraction-free-writing.png" width="540"/>
+<img src="../images/quickstart/021-distraction-free-writing.png" width="75%"/>
 
 Hide the toolbar using keyboard shortcut `Ctrl+.`, and collapse the "Scene List
 Panel" with keyboard shortcut `Alt+0` to maximize your writing area.
 
-<img src="../images/quickstart/022-distraction-free-writing.png" width="720"/>
+<img src="../images/quickstart/022-distraction-free-writing.png" width="100%"/>
 
 ## Editing the Title Page
 Click "Edit Title Page" at the top of your screenplay, or by using the keyboard
 shortcut `Ctrl+Shift+T`. This opens the Title Page editor where you can assign a
 cover image and fill in title‑page fields.
 
-<img src="../images/quickstart/023-title-page-fields.png" width="720"/>
+<img src="../images/quickstart/023-title-page-fields.png" width="100%"/>
 
 Click the close icon (top‑right) to apply changes. The title page appears before
 the first scene.
 
-<img src="../images/quickstart/024-title-page.png" width="720"/>
+<img src="../images/quickstart/024-title-page.png" width="100%"/>
 
 ## Exporting to PDF
 Select `Export → Adobe PDF`, or press `Ctrl+P` (Windows/Linux) or `⌘+P` (macOS)
@@ -233,13 +233,13 @@ to preview your PDF.
 The Export dialog offers options to customize your PDF—toggle title page,
 include synopsis, and more.
 
-<img src="../images/quickstart/025-pdf-export-dialog.png" width="540"/>
+<img src="../images/quickstart/025-pdf-export-dialog.png" width="75%"/>
 
 Review the options and customize the output to your preference.
 
 Click "Generate PDF" to create a preview.
 
-<img src="../images/quickstart/026-pdf-with-watermark.png" width="720"/>
+<img src="../images/quickstart/026-pdf-with-watermark.png" width="100%"/>
 
 When you’re satisfied, click "Save PDF" to export to a location of your choice.
 
@@ -247,7 +247,7 @@ When you’re satisfied, click "Save PDF" to export to a location of your choice
 removed. Purchase a plan that supports watermark customization to modify or
 remove it.
 
-<img src="../images/quickstart/027-watermark-settings.png" width="720"/>
+<img src="../images/quickstart/027-watermark-settings.png" width="100%"/>
 
 > **NOTE**: Certain plans may just show a PDF preview, but not allow you to save
 > it. Please review plan features before subscribing.

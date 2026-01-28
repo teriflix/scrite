@@ -29,12 +29,12 @@ present your work.
 When you have a screenplay open in Scrite, click on the Report menu to get a
 list of report options.
 
-<img src="../images/reports/001-reports-menu.jpg" width="480"/>
+<img src="../images/reports/001-reports-menu.jpg" width="60%"/>
 
 Another way to get to export options is by typing `Reports` in the [Command
 Center](./user-interface.md#command-center).
 
-<img src="../images/reports/002-report-options.jpg" width="720"/>
+<img src="../images/reports/002-report-options.jpg" width="100%"/>
 
 You can assign a shortcut of your choice to frequently used reports to invoke
 them quickly. Additionally, certain reports can be invoked from a scene or
@@ -47,7 +47,7 @@ Reports can be finely configured before generating files. Unlike export, the
 configuration dialog box for reports are a bit more elaborate in that they
 present options across one or more pages.
 
-<img src="../images/reports/003-dialog-box-layout.jpg" width="480"/>
+<img src="../images/reports/003-dialog-box-layout.jpg" width="60%"/>
 
 We will not be going through each option in every report within this chapter,
 but we will broadly present the kind of options available in each report. We
@@ -73,12 +73,12 @@ Upon invoking this report in the menu or command center, you can switch to the
 Characters tab to select one or more characters whose dialogues you want
 included in the report.
 
-<img src="../images/reports/004-character-report.jpg" width="640"/>
+<img src="../images/reports/004-character-report.jpg" width="85%"/>
 
 Hit the `Generate` button once you've selected characters to include to see a
 preview of the report.
 
-<img src="../images/reports/005-character-report.jpg" width="720"/>
+<img src="../images/reports/005-character-report.jpg" width="100%"/>
 
 The preview can then be saved to disk using the `Save As` option in the dialog
 box footer bar.
@@ -86,7 +86,7 @@ box footer bar.
 This report, and others that support filtering by character names, can be
 invoked by clicking on the character name bubble as well.
 
-<img src="../images/reports/006-character-report.jpg" width="480"/>
+<img src="../images/reports/006-character-report.jpg" width="60%"/>
 
 ## Character Screenplay
 
@@ -98,19 +98,19 @@ Upon invoking this report in the menu or command center, you can switch to the
 Characters tab to select one or more characters whose dialogues you want
 included in the report.
 
-<img src="../images/reports/007-character-screenplay.jpg" width="640"/>
+<img src="../images/reports/007-character-screenplay.jpg" width="85%"/>
 
 To further filter for scenes that match a keyword or story beat, you can switch
 to the `Keywords` and `Tags` page.
 
-<img src="../images/reports/008-character-screenplay.jpg" width="640"/>
+<img src="../images/reports/008-character-screenplay.jpg" width="85%"/>
 
 Similarly, if you are working on a multi-episode screenplay switch to the
 `Episodes` page and select the episodes you want to filter.
 
 Hit the `Generate` button once you've configured all options.
 
-<img src="../images/reports/009-character-screenplay.jpg" width="720"/>
+<img src="../images/reports/009-character-screenplay.jpg" width="100%"/>
 
 The preview can then be saved to disk using the `Save As` option in the dialog
 box footer bar.
@@ -118,7 +118,7 @@ box footer bar.
 This report, and others that support filtering by character names, can be
 invoked by clicking on the character name bubble as well.
 
-<img src="../images/reports/010-character-screenplay.jpg" width="480"/>
+<img src="../images/reports/010-character-screenplay.jpg" width="60%"/>
 
 ## Location Report
 
@@ -130,11 +130,11 @@ Upon invoking this report in the menu or command center, you will see a dialog
 box like this. This is a very simple report so there aren't many options to
 configure.
 
-<img src="../images/reports/011-location-report.jpg" width="640"/>
+<img src="../images/reports/011-location-report.jpg" width="85%"/>
 
 Hit the `Generate` button to generate the report.
 
-<img src="../images/reports/012-location-report.jpg" width="720"/>
+<img src="../images/reports/012-location-report.jpg" width="100%"/>
 
 The preview can then be saved to disk using the `Save As` option in the dialog
 box footer bar.
@@ -142,7 +142,7 @@ box footer bar.
 If you select Open Document Text in the report dialog box, then Scrite will
 generate an ODT file for you with the same contents.
 
-<img src="../images/reports/013-location-report.jpg" width="720"/>
+<img src="../images/reports/013-location-report.jpg" width="100%"/>
 
 ## Notebook Report
 
@@ -150,7 +150,7 @@ Exports a PDF/ODT that compiles all notes from the Notebook, including story,
 scene, and character annotations. Ideal for keeping a single source of truth for
 all research and ideas.
 
-<img src="../images/reports/014-notebook-report.jpg" width="720"/>
+<img src="../images/reports/014-notebook-report.jpg" width="100%"/>
 
 More information about all the variations of this report are explained in the
 chapter on [Notebook Tab](./notebook.md).
@@ -164,17 +164,17 @@ production planning.
 Upon invoking this report in the menu or command center, you will see a dialog
 box like this. 
 
-<img src="../images/reports/015-scene-character-matrix.jpg" width="640"/>
+<img src="../images/reports/015-scene-character-matrix.jpg" width="85%"/>
 
 By default all characters are selected, but you can shortlist only a subset of
 characters if you like. The PDF report looks like this.
 
-<img src="../images/reports/016-scene-character-matrix.jpg" width="720"/>
+<img src="../images/reports/016-scene-character-matrix.jpg" width="100%"/>
 
 When exported in ODT format, the app actually generates a CSV file which can
 then be opened in any spreadsheet app.
 
-<img src="../images/reports/017-scene-character-matrix.jpg" width="720"/>
+<img src="../images/reports/017-scene-character-matrix.jpg" width="100%"/>
 
 ## Screenplay Subset
 
@@ -187,17 +187,17 @@ In the configuration dialog for this report, switch to the `Scenes` page and
 enter the location name in the filter above to get a filtered set of scenes.
 Then hit `Select All` to select them.
 
-<img src="../images/reports/018-screenplay-subset-report.jpg" width="640"/>
+<img src="../images/reports/018-screenplay-subset-report.jpg" width="85%"/>
 
 Then hit the `Generate` button to generate a PDF of just the selected scenes.
 
-<img src="../images/reports/019-screenplay-subset-report.jpg" width="720"/>
+<img src="../images/reports/019-screenplay-subset-report.jpg" width="100%"/>
 
 Another way to genrate this report is by select a bunch of scenes on the [scene
 list panel](./screenplay.md#scene-list-panel), and invoking this report from the
 context menu.
 
-<img src="../images/reports/020-screenplay-subset-report.jpg" width="640"/>
+<img src="../images/reports/020-screenplay-subset-report.jpg" width="85%"/>
 
 Scenes selected on the scene list panel will already show up checked in the
 dialog box. You can configure more options if you like and generate the report
@@ -213,13 +213,13 @@ except it generates output in two column format. You can pick from one of the
 layouts listed in the configuration dialog box, and even customise the space
 distribution between the columns.
 
-<img src="../images/reports/021-two-column-report.jpg" width="640"/>
+<img src="../images/reports/021-two-column-report.jpg" width="85%"/>
 
 Upon generating the report you will notice that the entire screenplay is
 presented in a two column format. All the visuals in the column on the left,
 with the dialogues on the right column.
 
-<img src="../images/reports/022-two-column-report.jpg" width="720"/>
+<img src="../images/reports/022-two-column-report.jpg" width="100%"/>
 
 ## Statistics Report
 
@@ -231,11 +231,11 @@ The configuration dialog box for this report lets you pick characters and
 locations to include. By default the report picks up to 6 most prominent
 characters and locations.
 
-<img src="../images/reports/023-statistics-report.jpg" width="640"/>
+<img src="../images/reports/023-statistics-report.jpg" width="85%"/>
 
 Upon hitting `Generate` button you will get a one page PDF that looks like this.
 
-<img src="../images/reports/024-statistics-report.jpg" width="720"/>
+<img src="../images/reports/024-statistics-report.jpg" width="100%"/>
 
 By making use of graphs this one single page communicates the ratio of action to
 dialog, interior to exterior scenes, time distribution between various acts and

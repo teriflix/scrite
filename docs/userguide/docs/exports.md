@@ -18,12 +18,12 @@ for different purposes:
 When you have a screenplay open in Scrite, click on the Export menu to get a
 list of export options.
 
-<img src="../images/exports/001-export-options.jpg" width="480"/>
+<img src="../images/exports/001-export-options.jpg" width="60%"/>
 
 Another way to get to export options is by typing `Export` into the [Command
 Center](./user-interface.md#command-center).
 
-<img src="../images/exports/002-export-options.jpg" width="720"/>
+<img src="../images/exports/002-export-options.jpg" width="100%"/>
 
 As you can notice the `Ctrl+P` shortcut is assigned to PDF Export by default.
 You can assign a shortcut of your choice to all other export options.
@@ -40,7 +40,7 @@ Center](./user-interface.md#command-center), or by using the
 [shortcut](./user-interface.md#keyboard-shortcuts) `Ctrl+P`, you will see a
 dialog box like this.
 
-<img src="../images/exports/003-pdf-export.jpg" width="640"/>
+<img src="../images/exports/003-pdf-export.jpg" width="85%"/>
 
 This dialog box presents several options to customize the way in which you
 generate the PDF export. Listed below are the options
@@ -66,13 +66,13 @@ In addition to the checkable options stated above, you can customize the
 [watermark text and comment](./screenplay.md#page-setup-and-watermark) to
 optionally include in header or footer for this specific PDF file.
 
-<img src="../images/exports/004-pdf-export.jpg" width="640"/>
+<img src="../images/exports/004-pdf-export.jpg" width="85%"/>
 
 Upon clicking the `Generate PDF` button in the export dialog box, a PDF file is
 generated and displayed for preview. To save this file, click on the `Save As`
 button along the bottom bar and select a location to save the file.
 
-<img src="../images/exports/005-pdf-export.jpg" width="720"/>
+<img src="../images/exports/005-pdf-export.jpg" width="100%"/>
 
 > NOTE: Language fonts are bundled into the PDF so that they render exactly as
 > displayed on your computer anywhere they get opened. We recommend generating
@@ -91,7 +91,7 @@ When you select Final Draft from the [export menu](#export-menu), or [Command
 Center](./user-interface.md#command-center), you will see a dialog box like
 this.
 
-<img src="../images/exports/006-final-draft.jpg" width="640"/>
+<img src="../images/exports/006-final-draft.jpg" width="85%"/>
 
 By default files exported are stored in the Downloads folder within your HOME
 directory, but you can select any path you like by clicking on the `Change Path`
@@ -111,7 +111,7 @@ Click on the `Export` button in the dialog box to export the FDX file. Typically
 Scrite will launch a `Finder` or `File Explorer` window with the exported file
 selected, so that you can quickly open it in another app.
 
-<img src="../images/exports/007-final-draft.jpg" width="720"/>
+<img src="../images/exports/007-final-draft.jpg" width="100%"/>
 
 At any point you can [import the changed Final
 Draft](./imports.md#drag-and-drop-to-import) file back into Scrite and continue
@@ -132,7 +132,7 @@ When you select Fountain from the [export menu](#export-menu), or [Command
 Center](./user-interface.md#command-center), you will see a dialog box like
 this.
 
-<img src="../images/exports/008-fountain.jpg" width="640"/>
+<img src="../images/exports/008-fountain.jpg" width="85%"/>
 
 You can change the file name in the field provided for that, and optionally
 configure the following additional options:
@@ -150,7 +150,7 @@ This is especially useful if you just want to paste the content to another app.
 When exported, typically Scrite will launch a `Finder` or `File Explorer` window
 with the exported file selected, so that you can quickly open it in another app.
 
-<img src="../images/exports/009-fountain.jpg" width="720"/>
+<img src="../images/exports/009-fountain.jpg" width="100%"/>
 
 At any point you can [import the changed Fountain
 File](./imports.md#drag-and-drop-to-import) file back into Scrite and continue
@@ -168,7 +168,7 @@ When you select Text File from the [export menu](#export-menu), or [Command
 Center](./user-interface.md#command-center), you will see a dialog box like
 this.
 
-<img src="../images/exports/010-plain-text.jpg" width="640"/>
+<img src="../images/exports/010-plain-text.jpg" width="85%"/>
 
 You can change the file name in the field provided for that, and optionally
 configure the following additional options:
@@ -188,7 +188,7 @@ This is especially useful if you just want to paste the content to another app.
 When exported, typically Scrite will launch a `Finder` or `File Explorer` window
 with the exported file selected, so that you can quickly open it in another app.
 
-<img src="../images/exports/011-plain-text.jpg" width="720"/>
+<img src="../images/exports/011-plain-text.jpg" width="100%"/>
 
 At any point you can [import the changed text
 file](./imports.md#drag-and-drop-to-import) file back into Scrite and continue
@@ -212,7 +212,7 @@ When you select Open Document Format from the [export menu](#export-menu), or
 [Command Center](./user-interface.md#command-center), you will see a dialog box
 like this.
 
-<img src="../images/exports/012-odf.jpg" width="640"/>
+<img src="../images/exports/012-odf.jpg" width="85%"/>
 
 You can change the file name in the field provided for that, and optionally
 configure the following additional options:
@@ -232,7 +232,7 @@ option to export to a ODT file. Typically, Scrite will launch a `Finder` or
 `File Explorer` window with the exported file selected, so that you can quickly
 open it in another app.
 
-<img src="../images/exports/013-odf.jpg" width="720"/>
+<img src="../images/exports/013-odf.jpg" width="100%"/>
 
 At the moment it is not possible to import a ODT or DOCX file in Scrite.
 However, you can copy a plain-text representation of the entire screenplay to
@@ -254,7 +254,7 @@ When you select HTML from the [export menu](#export-menu), or [Command
 Center](./user-interface.md#command-center), you will see a dialog box like
 this.
 
-<img src="../images/exports/014-html.jpg" width="640"/>
+<img src="../images/exports/014-html.jpg" width="85%"/>
 
 You can change the file name in the field provided for that, and optionally
 configure the following additional options:
@@ -273,9 +273,9 @@ open it in a browser.
 > referenced in the HTML file. When you distribute or upload the HTML to a site,
 > please ensure that the fonts folder is also placed on the server in the same
 > folder as the `.html` file. <img src="../images/exports/015-html.jpg"
-> width="320"/>
+> width="40%"/>
 
-<img src="../images/exports/016-html.jpg" width="720"/>
+<img src="../images/exports/016-html.jpg" width="100%"/>
 
 At the moment it is not possible to import a HTML file in Scrite.
 

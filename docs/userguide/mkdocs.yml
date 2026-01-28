@@ -3,6 +3,9 @@ site_url: https://www.scrite.io/docs/userguide
 theme:
   name: material
   logo: images/scrite-appicon.png
+  font:
+    text: Rubik
+    code: Roboto Mono
   palette: 
     - scheme: default
       primary: purple
@@ -34,6 +37,7 @@ nav:
   - imports.md
   - exports.md
   - structure.md
+  - structure-advanced.md
   - templates.md
   - notebook.md
   - reports.md

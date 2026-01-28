@@ -46,11 +46,11 @@ you want and have Scrite open it. It's that simple.
 
 To configure the contents of the recent files list, click on the edit icon.
 
-<img src="../images/files/001-recent-files.jpg" width="640"/>
+<img src="../images/files/001-recent-files.jpg" width="85%"/>
 
 In the resulting dialog box, you can remove one or more files from the list.
 
-<img src="../images/files/002-recent-files.jpg" width="640"/>
+<img src="../images/files/002-recent-files.jpg" width="85%"/>
 
 ## Auto Save
 
@@ -61,7 +61,7 @@ alongside your `.scrite` file and stores backups periodically.
 You can toggle auto‑save, change the interval, and limit the number of backups
 in Settings → Application → Options.
 
-<img src="../images/files/003-auto-save.jpg" width="720"/>
+<img src="../images/files/003-auto-save.jpg" width="100%"/>
 
 ## Loading a Backup
 
@@ -69,17 +69,17 @@ Everytime a file is saved either manually, or as a result of [auto
 save](#auto-save), Scrite stores a backup. Up to 15 backups are saved by default
 for each file, however you can configure that to any other value you like.
 
-<img src="../images/files/004-loading-a-backup.jpg" width="720"/>
+<img src="../images/files/004-loading-a-backup.jpg" width="100%"/>
 
 Whenver you open a file the toolbar shows an icon for loading a backup copy of
 that file.
 
-<img src="../images/files/005-loading-a-backup.jpg" width="360"/>
+<img src="../images/files/005-loading-a-backup.jpg" width="50%"/>
 
 Click it to open a dialog and select a backup to load in a new or the current
 window. 
 
-<img src="../images/files/006-loading-a-backup.jpg" width="640"/>
+<img src="../images/files/006-loading-a-backup.jpg" width="85%"/>
 
 > NOTE: Backups load anonymously—you must save them explicitly with a new file
 name, and they won’t overwrite the source file.
@@ -93,7 +93,7 @@ files in the vault from which you can recover.
 The vault can be accessed from the [Home Screen](./quickstart.md#home-screen) or
 by typing Recover in the [Command Center](#command-center).
 
-<img src="../images/files/007-vault.jpg" width="720"/>
+<img src="../images/files/007-vault.jpg" width="100%"/>
 
 Files recovered from the vault are opened anonymously and have to be saved to
 disk explicitly.
@@ -115,13 +115,13 @@ screenplays.
 
 Click on the shield icon on the bottom left corner of the screenplay editor.
 
-<img src="../images/files/008-shield.jpg" width="480"/>
+<img src="../images/files/008-shield.jpg" width="60%"/>
 
 This launches a dialog box where you can toggle protection, to lock the
 screenplay so it can only be opened on devices where Scrite is activated using
 your email-id.
 
-<img src="../images/files/009-shield.png" width="720"/>
+<img src="../images/files/009-shield.png" width="100%"/>
 
 Optionally, you can add email ids of one or more collaborators who you want to
 hand-pick and permit opening the file. This means that the file can now be
@@ -137,11 +137,11 @@ your collaborator’s email ids.
 
 If anybody else attempts to open the screenplay, they will see this message.
 
-<img src="../images/files/010-shield.png" width="480"/>
+<img src="../images/files/010-shield.png" width="60%"/>
 
 Once locked, the shield icon on the status bar shows up as checked.
 
-<img src="../images/files/011-shield.png" width="640"/>
+<img src="../images/files/011-shield.png" width="85%"/>
 
 At any time, you can turn off Shield protection for your files by going back to
 the shield dialog box.

@@ -6,7 +6,7 @@ original screenplay can be downloaded from
 and all rights for the screenplay rests with its owners. We are using the
 screenplay only for explaining features in the product.
 
-<img src="../images/screenplay/001-knives-out.jpg" width="720"/>
+<img src="../images/screenplay/001-knives-out.jpg" width="100%"/>
 
 ## Capturing The Logline
 
@@ -238,7 +238,7 @@ Click “Make Default” to set current options as your defaults.
 You can configure the page size, and content to show in header & footer of
 generated PDFs by opening Settings > Screenplay > Page Setup tab.
 
-<img src="../images/screenplay/053-page-setup.jpg" width="720">
+<img src="../images/screenplay/053-page-setup.jpg" width="100%">
 
 In the same page you can also configure the watermark to use in generated PDF
 files.
@@ -393,7 +393,7 @@ cancel icon, which makes it possible to remove them from the scene.
 To automatically scan for mute characters, trigger the "Scan Mute Characters"
 action from the [command center](user-interface.md#command-center).
 
-<img src="../images/screenplay/035-scan-mute-characters.jpg" width="640"/>
+<img src="../images/screenplay/035-scan-mute-characters.jpg" width="85%"/>
 
 Scrite will look for references to character names in the scene, who may not
 have a dialogue but are present in the scene nevertheless. However, please note
@@ -410,7 +410,7 @@ In some cases, it is possible that a character has a dialogue in the scene but
 is invisible.
 
 <img src="../images/screenplay/036-capture-invisible-characters.jpg"
-width="640"/>
+width="85%"/>
 
 In the scene above, Joni has a dialogue but is invisible, because we only hear
 Joni’s voice but don’t actually see Joni on the scene. Said in other words, Joni
@@ -424,7 +424,7 @@ Invisible character names are shown in italics, if "Capture Invisible Character"
 is checked in Settings > Screenplay > Options page.
 
 <img src="../images/screenplay/037-capture-invisible-characters.jpg"
-width="640"/>
+width="85%"/>
 
 ### Rename Character
 
@@ -432,12 +432,12 @@ If you have “Show Scene Characters and Tags” turned on in Screenplay Editor
 options, then you can click on a character name in the character list shown
 under scene heading and select “Rename/Merge Character” option ….
 
-<img src="../images/screenplay/038-rename-characters.jpg" width="640"/>
+<img src="../images/screenplay/038-rename-characters.jpg" width="85%"/>
 
 … and Scrite will then present a dialog box for you where you can provide a new
 name for your character.
 
-<img src="../images/screenplay/039-rename-characters.jpg" width="640"/>
+<img src="../images/screenplay/039-rename-characters.jpg" width="85%"/>
 
 In this dialog you can either provide a new name and Scrite will rename it for
 you.
@@ -459,24 +459,24 @@ character name in it.
 Suppose that you have a screenplay where you may have accidentally used two
 names for the same character. In this case, Maya and Mayavi.
 
-<img src="../images/screenplay/040-merge-characters.png" width="640"/>
+<img src="../images/screenplay/040-merge-characters.png" width="85%"/>
 
 You may want to merge Mayavi into Maya across the entire screenplay, even if the
 name is used in action or dialogue paragraphs. Just like you would rename
 characters, you can click on Mayavi and select the “Rename/Merge Character”
 option.
 
-<img src="../images/screenplay/041-merge-characters.png" width="640"/>
+<img src="../images/screenplay/041-merge-characters.png" width="85%"/>
 
 Scrite will present a dialog for you to enter the new character name. In that
 dialog box, write the name of the character you want to merge this one with.
 
-<img src="../images/screenplay/042-merge-characters.png" width="640"/>
+<img src="../images/screenplay/042-merge-characters.png" width="85%"/>
 
 Now, upon clicking the “Rename” button, you will notice that Scrite recognizes
 it as a merge workflow and will ask you to confirm it.
 
-<img src="../images/screenplay/043-merge-characters.png" width="640"/>
+<img src="../images/screenplay/043-merge-characters.png" width="85%"/>
 
 Upon clicking “Yes” in this dialog box, Scrite not only changes Mayavi to Maya
 everywhere in the screenplay, but it will also move notes, attachments, and
@@ -502,12 +502,12 @@ or `Hero's Journey`, or even custom beat sheets you may create.
 With `Characters & Tags` enabled you can click on the plus sign next to `Formal
 Tags` to tag the scene with one or more beats from your story structure.
 
-<img src="../images/screenplay/054-formal-tags.jpg" width="640"/>
+<img src="../images/screenplay/054-formal-tags.jpg" width="85%"/>
 
 By default, Scrite offers beats from `Save The Cat` beat sheet. But you can add
 your own beats by clicking on the `Customize` button in the popup.
 
-<img src="../images/screenplay/055-formal-tags.jpg" width="640"/>
+<img src="../images/screenplay/055-formal-tags.jpg" width="85%"/>
 
 The syntax for describing story beats is self-explanatory.
 
@@ -518,7 +518,7 @@ which can offer additional context to your scenes.
 
 Just click on the plus icon next to `Keywords` ...
 
-<img src="../images/screenplay/056-keywords.jpg" width="640"/>
+<img src="../images/screenplay/056-keywords.jpg" width="85%"/>
 
 ... and add a keyword in the text field shown there. You can add any number of
 keywords to a scene.
@@ -562,12 +562,12 @@ Best practices:
 By default, Scrite displays a warning icon next to scenes that have more than
 150 words.
 
-<img src="../images/screenplay/057-long-scene-warning.jpg" width="640"/>
+<img src="../images/screenplay/057-long-scene-warning.jpg" width="85%"/>
 
 You can edit this treshold, or turn off long scene warning all together in
 Settings > Screenplay > Options page.
 
-<img src="../images/screenplay/058-long-scene-warning.jpg" width="720"/>
+<img src="../images/screenplay/058-long-scene-warning.jpg" width="100%"/>
 
 ### Scenes Without Heading
 
@@ -575,23 +575,23 @@ You can turn off scene headings for specific scenes. Pull out the scene menu and
 uncheck “Scene Heading”. The editor shows “NO SCENE HEADING”. Such scenes are
 shown as is in preview and exported as such in PDF and reports.
 
-<img src="../images/screenplay/044-no-scene-heading.png" width="720"/>
+<img src="../images/screenplay/044-no-scene-heading.png" width="100%"/>
 
 ### Inserting Scenes
 
 To insert a scene in-between two existing scenes in the screenplay, simply make
 the first of the two scenes active…
 
-<img src="../images/screenplay/045-insert-scenes.png" width="720"/>
+<img src="../images/screenplay/045-insert-scenes.png" width="100%"/>
 
 … then click on the add scene button in the toolbar …
 
-<img src="../images/quickstart/013-adding-elements.png" width="320"/>
+<img src="../images/quickstart/013-adding-elements.png" width="40%"/>
 
 … or use the [keyboard shortcut](./user-interface.md#keyboard-shortcuts)
 `Ctrl+Shift+N`.
 
-<img src="../images/screenplay/046-insert-scenes.png" width="720"/>
+<img src="../images/screenplay/046-insert-scenes.png" width="100%"/>
 
 Scrite automatically adds a scene, whose heading is a slight variation of the
 previous scene. You can edit both the scene heading and the scene contents.
@@ -602,14 +602,14 @@ want to alter the auto-generated heading for the new scene, then you can hit
 "Set Cursor on Heading in New Scenes" options in "Screenplay Editor Options"
 accessible from the [command center](user-interface.md#command-center).
 
-<img src="../images/screenplay/047-insert-scenes.png" width="640"/>
+<img src="../images/screenplay/047-insert-scenes.png" width="85%"/>
 
 ### Removing Scenes
 
 Removing a scene is as simple as pulling out the scene menu and selecting the
 “Remove” option.
 
-<img src="../images/screenplay/048-remove-scene.jpg" width="360"/>
+<img src="../images/screenplay/048-remove-scene.jpg" width="50%"/>
 
 > NOTE: Removed scenes are not deleted, they are just no longer a part of the
 > screenplay. You can always add them back by switching to the Structure tab.
@@ -621,13 +621,13 @@ used the scene numbers as stated in the screenplay. Later, you might want to
 remove a scene. However, removing a scene alters the scene numbers of all
 subsequent scenes, which can be an issue. Instead, you can omit the scene.
 
-<img src="../images/screenplay/051-omit-scene.jpg" width="360"/>
+<img src="../images/screenplay/051-omit-scene.jpg" width="50%"/>
 
 Omitted scenes appear in the screenplay but are hidden in the UI and generated
 PDFs. This reduces the screenplay’s time and page count. You can click the
 "Include" button to bring them back.
 
-<img src="../images/screenplay/052-omit-scene.jpg" width="720"/>
+<img src="../images/screenplay/052-omit-scene.jpg" width="100%"/>
 
 This approach keeps the scene numbers intact while effectively removing the
 scene.
@@ -639,7 +639,7 @@ split, then right‑click and select “Split Scene” or use `Ctrl+Shift+Enter`
 (Windows/Linux) or `⌘+Shift+Return` (macOS). Dialogue character lists are split
 accurately; mute characters remain in the original scene.
 
-<img src="../images/screenplay/049-split-scene.jpg" width="640"/>
+<img src="../images/screenplay/049-split-scene.jpg" width="85%"/>
 
 ### Merging Scenes
 
@@ -648,14 +648,14 @@ then right‑click “Join Previous Scene” or use `Ctrl+Shift+Backspace`
 (Windows/Linux) or `⌘+Shift+Backspace` (macOS). Scrite inserts a separator
 paragraph; you can delete it.
 
-<img src="../images/screenplay/050-merge-scene.jpg" width="640"/>
+<img src="../images/screenplay/050-merge-scene.jpg" width="85%"/>
 
 ### Reordering Scenes
 
 Drag scenes in the Scene List panel to reorder. Heading‑less scenes inherit
 context from the previous scene in their new location.
 
-<img src="../images/quickstart/009-reorder-scenes.gif" width="320"/>
+<img src="../images/quickstart/009-reorder-scenes.gif" width="40%"/>
 
 ### Page Breaks
 
@@ -664,7 +664,7 @@ episode, or act on a new page. In addition to that, you can also insert page
 breaks before and after scenes. This allows you to bunch a group of scenes in
 sequence while generating PDFs.
 
-<img src="../images/screenplay/059-page-breaks.jpg" width="720"/>
+<img src="../images/screenplay/059-page-breaks.jpg" width="100%"/>
 
 ## Acts
 
@@ -672,13 +672,13 @@ You can break your screenplay into multiple acts by adding act breaks. Simply
 click on the `Act Break` icon in the toolbar, or use the keyboard shortcut
 `Ctrl+Shift+B` to insert an act break after the current scene.
 
-<img src="../images/quickstart/013-adding-elements.png" width="320"/>
+<img src="../images/quickstart/013-adding-elements.png" width="40%"/>
 
 By default, Scrite uses `Save The Cat` story structure. So acts are named ACT 1,
 ACT 2A, ACT 2B and ACT 3. But you can offer your own act naming convention by
 editing the [formal story beats](#formal-story-beats) used in your screenplay.
 
-<img src="../images/screenplay/070-act-breaks.jpg" width="720"/>
+<img src="../images/screenplay/070-act-breaks.jpg" width="100%"/>
 
 You can move act breaks up and down the scene list panel, just like you can
 [move up and down scenes](#reordering-scenes).
@@ -690,7 +690,7 @@ useful when you are writing screenplay for multiple episodes in a single
 document. To insert an episode break after the current scene use the `Episode
 Break` button on the toolbar, or the keyboard shortcut `Ctrl+Shift+P`.
 
-<img src="../images/screenplay/071-episode-breaks.jpg" width="720"/>
+<img src="../images/screenplay/071-episode-breaks.jpg" width="100%"/>
 
 ### Episode Scene Numbers
 
@@ -698,7 +698,7 @@ Act numbers reset after each episode, but scene numbers remain linear by
 default. You can restart scene numbers after each episode by toggling the
 `Restart Episode Scene Numbers` option.
 
-<img src="../images/screenplay/072-episode-breaks.jpg" width="720"/>
+<img src="../images/screenplay/072-episode-breaks.jpg" width="100%"/>
 
 ## Copy / Paste
 
@@ -712,23 +712,23 @@ while easy to use, has certain nuances which is useful to be aware of.
 When you select a snippet of text and copy `Ctrl+C`, Scrite copies the selected
 text to clipboard. 
 
-<img src="../images/screenplay/060-copy-text-snippet.jpg" width="720"/>
+<img src="../images/screenplay/060-copy-text-snippet.jpg" width="100%"/>
 
 You can paste the copied text elsewhere in the same Scrite document, or into
 another, or into a document opened in any 3rd party app on your Desktop.
 
-<img src="../images/screenplay/061-copy-text-snippet.jpg" width="720"/>
+<img src="../images/screenplay/061-copy-text-snippet.jpg" width="100%"/>
 
 ### Copying an entire scene
 
 If your selection includes more than one block of text or an entire scene, ... 
 
-<img src="../images/screenplay/062-copy-full-scene.jpg" width="720"/>
+<img src="../images/screenplay/062-copy-full-scene.jpg" width="100%"/>
 
 ...then by default, Scrite copies a Fountain representation of the selection
 when you trigger Copy `Ctrl+C`.
 
-<img src="../images/screenplay/063-copy-full-scene.jpg" width="720"/>
+<img src="../images/screenplay/063-copy-full-scene.jpg" width="100%"/>
 
 The benefit of copying text in Fountain format is that it makes pasting into
 Scrite, or 3rd-party screenwriting apps more productive because Fountain
@@ -737,7 +737,7 @@ preserves formatting.
 However, if you prefer to copy in plain-text, then you can uncheck the `Copy
 text in Fountain format` in Settings > Screenplay > Options.
 
-<img src="../images/screenplay/064-copy-full-scene.jpg" width="720"/>
+<img src="../images/screenplay/064-copy-full-scene.jpg" width="100%"/>
 
 ### Copying several scenes at once
 
@@ -745,11 +745,11 @@ You can select one or more scenes on the scene list panel, right click and click
 on `Copy` or use keyboard shortcut `Ctrl+Shift+C` to copy the selected scenes at
 once.
 
-<img src="../images/screenplay/065-copy-many-scenes.jpg" width="720"/>
+<img src="../images/screenplay/065-copy-many-scenes.jpg" width="100%"/>
 
 Scrite copies a Fountain representation to the clipboard.
 
-<img src="../images/screenplay/066-copy-many-scenes.jpg" width="720"/>
+<img src="../images/screenplay/066-copy-many-scenes.jpg" width="100%"/>
 
 ### Pasting content
 
@@ -790,7 +790,7 @@ with other apps. If the language pack installed in your OS for a given language
 comes bundled with a spell-check dictionary, then Scrite will simply make use of
 that to mark mispelled words and offer suggestions from the same.
 
-<img src="../images/screenplay/067-spell-check.jpg" width="720"/>
+<img src="../images/screenplay/067-spell-check.jpg" width="100%"/>
 
 > NOTE: Scrite completely relies on the operating-system to drive the
 > spell-check functionality. It does not come bundled with a dictionary of its
@@ -798,7 +798,7 @@ that to mark mispelled words and offer suggestions from the same.
 
 Misspelled words are highlighted in red; right‑click for corrections. 
 
-<img src="../images/screenplay/068-spell-check.jpg" width="320"/>
+<img src="../images/screenplay/068-spell-check.jpg" width="40%"/>
 
 Choose “Add to dictionary” (system‑wide) or “Ignore” (current document only).
 Scrite recognizes character names as correct by default. 
@@ -807,6 +807,6 @@ Scrite recognizes character names as correct by default.
 
 You can enable/disable spell-check in Settings > Screenplay > Options page.
 
-<img src="../images/screenplay/069-spell-check.jpg" width="720"/>
+<img src="../images/screenplay/069-spell-check.jpg" width="100%"/>
 
 

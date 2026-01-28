@@ -15,7 +15,7 @@ how films are made. Instead of page counts, Scrite helps you structure and
 visualize your story with a structure-first scene‑centric UI.
 
 <img src="./images/quickstart/001-scene-centric-ui.png" alt="Photo by Tima
-Miroshnichenko from Pexels" width="320"/>
+Miroshnichenko from Pexels" width="40%"/>
 
 ## Why Scenes First?
 Traditional screenwriting apps mirror typewriters: one page ≈ one minute. Page
@@ -42,7 +42,7 @@ typewriter‑inspired, page‑centric approach. Scrite reimagines writing by usi
 scenes as the fundamental unit of storytelling.
 
 <img src="./images/quickstart/002-what-scrite-is-not.jpg" alt="Photo by Min An
-from Pexels" width="320"/>
+from Pexels" width="40%"/>
 
 > **NOTE**: Scrite does calculate page count, estimates screentime, and displays
 > approxmate page boundaries. However, it is not designed to be a page-centric
@@ -144,17 +144,17 @@ On first launch, set up your login using your email address.
 > sync documents or settings across devices.
 
 <img src="./images/quickstart/003-creating-account.png" alt="Scrite Account"
-width="720"/>
+width="100%"/>
 
 Click "Continue" and you’ll receive an activation code by email.
 
 <img src="./images/quickstart/004-activation-code-email.png" alt="Activation
-Code" width="480"/>
+Code" width="60%"/>
 
 Copy the code and paste it into Scrite.
 
 <img src="./images/quickstart/004-activation.png" alt="Activation Code"
-width="720"/>
+width="100%"/>
 
 Once verified, Scrite issues license tokens and unlocks the app.
 
@@ -168,7 +168,7 @@ Free Trial—no credit card required. You can import from other formats and expo
 Scrite documents to third‑party formats.
 
 <img src="./images/quickstart/005-trial-activation.png" alt="Free Trial"
-width="720"/>
+width="100%"/>
 
 The following features are restricted during the free trial:
 
@@ -192,12 +192,12 @@ open the User Profile dialog. Switch to the Subscriptions tab to view available
 plans.
 
 <img src="./images/quickstart/006-subscription-plans.png" alt="Subscription
-Plans" width="720"/>
+Plans" width="100%"/>
 
 Click `Compare Plans` (bottom‑right) to open a feature comparison table.
 
 <img src="./images/quickstart/007-subscription-plans.png" alt="Subscription
-Plans" width="720"/>
+Plans" width="100%"/>
 
 Review features carefully before purchasing. Cancellation or upgrade isn’t
 currently offered.
@@ -221,5 +221,5 @@ referral code to unlock special discounted plans, provided the codes are valid
 and active.
 
 <img src="./images/quickstart/008-referral-code.png" alt="Referral Code"
-width="720"/>
+width="100%"/>
 

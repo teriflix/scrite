@@ -2,11 +2,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap');
 
 /* Apply Rubik font globally */
+body {
+    background-color: #fbfbfb;
+}
+
 body, .md-typeset,
 .md-nav__title, 
 .md-nav__link, 
 .md-nav__item {
     font-family: 'Rubik', sans-serif;
+    font-size: 12pt;
 }
 
 button, input, textarea, select {
@@ -15,6 +20,36 @@ button, input, textarea, select {
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
+}
+
+/* Increase main content width */
+.md-container {
+    width: 90%;
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.md-grid {
+    width: 100%;
+    min-width: 1200px;
+    max-width: none;
+}
+
+.md-main {
+    width: 100%;
+}
+
+/* Increase content area specifically */
+.md-content {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    background-color: white;
+}
+
+.md-article {
+    background-color: white;
 }
 
 .md-typeset h1, 
@@ -26,10 +61,9 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bold !important;
 }
 
-div.md-header__topic:nth-child(1) > span:nth-child(1) {
-    font-family: 'Rubik', sans-serif;
+div.md-header__topic {
     font-weight: bold;
-    font-size: larger;
+    font-size: 1.5em;
 }
 
 h1, 
@@ -65,4 +99,45 @@ h5,
 .red-x {
     color: red;
     font-weight: bolder;
+}
+
+/* Increase md-content text size */
+.md-typeset {
+    font-size: 14pt;
+    line-height: 1.75;
+}
+
+.md-typeset p {
+    font-size: 14pt;
+    margin-bottom: 1.5em;
+}
+
+.md-typeset li {
+    font-size: 14pt;
+}
+
+.md-typeset code {
+    font-size: 16px;
+}
+
+/* Increase header height */
+.md-header {
+    height: 3.25rem;
+}
+
+.md-header__inner {
+    padding: 0.5rem 1rem;
+}
+
+.md-header-nav {
+    padding: 0.5rem 0;
+}
+
+/* Sidebar styling */
+.md-sidebar--primary {
+    background-color: #fbfbfb !important;
+}
+
+.md-sidebar--secondary {
+    background-color: #fbfbfb !important;
 }
