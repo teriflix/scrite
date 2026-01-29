@@ -8,7 +8,9 @@ details.
 Instead of text, if you would much rather watch a video then this one is for
 you:
 
-![type:video](https://www.youtube.com/embed/O9UusQzv58M)
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%;">
+  <iframe src="https://www.youtube.com/embed/Ych8qKq3Epw" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" frameborder="0" allowfullscreen></iframe>
+</div>
 
 If you prefer text descriptions, then here we go!
 

@@ -3,6 +3,10 @@ Scrite is an open‑source desktop screenwriting app for Windows, macOS, and
 Linux. Write in multiple languages, export industry‑standard PDFs, and generate
 reports—all with tools that suit beginners and professionals alike.
 
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%;">
+  <iframe src="https://www.youtube.com/embed/T7J_8ebSVsk" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" frameborder="0" allowfullscreen></iframe>
+</div>
+
 ## Quick Links
 
 - [Official Scrite Website](https://www.scrite.io/)
