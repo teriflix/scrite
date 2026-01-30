@@ -2604,7 +2604,12 @@ QJsonArray Screenplay::search(const QString &text, int flags) const
 
     const int nrScenes = m_elements.size();
     for (int i = 0; i < nrScenes; i++) {
-        Scene *scene = m_elements.at(i)->scene();
+        ScreenplayElement *screenplayElement = m_elements.at(i);
+        if (screenplayElement->elementType() != ScreenplayElement::SceneElementType
+            || screenplayElement->isOmitted())
+            continue;
+
+        Scene *scene = screenplayElement->scene();
         if (scene == nullptr)
             continue;
 
@@ -2626,8 +2631,8 @@ QJsonArray Screenplay::search(const QString &text, int flags) const
 
                     const QString _from = QStringLiteral("from");
                     const QString _to = QStringLiteral("to");
-                    item.insert(_from, _from);
-                    item.insert(_to, _to);
+                    item.insert(_from, result.value(_from));
+                    item.insert(_to, result.value(_to));
                     ret.append(item);
                 }
             }

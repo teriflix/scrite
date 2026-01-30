@@ -34,6 +34,8 @@ import "qrc:/qml/floatingdockpanels"
 Rectangle {
     id: root
 
+    readonly property alias searchBar: _searchBarArea
+
     property alias hasFocus: _elementListView.hasFocus
     property alias minSidePanelWidth: _private.minSidePanelWidth
     property alias maxSidePanelWidth: _private.maxSidePanelWidth
@@ -60,6 +62,8 @@ Rectangle {
 
     ScreenplayEditorSearchBar {
         id: _searchBarArea
+
+        ObjectRegister.name: "screenplayEditorSearchBar"
 
         anchors.top: parent.top
         anchors.left: parent.left

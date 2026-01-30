@@ -344,6 +344,16 @@ AbstractScenePartEditor {
                                  }
     }
 
+    Connections {
+        target: Runtime.screenplayEditor.searchBar
+
+        enabled: _sceneSearch.currentResultIndex >= 0
+
+        function onReplaceCurrentRequest(replacementText, searchAgent) {
+            _sceneSearch.replaceCurrentSelection(replacementText)
+        }
+    }
+
     // Scene content search
     TextDocumentSearch {
         id: _sceneSearch
