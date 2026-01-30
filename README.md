@@ -13,6 +13,8 @@ built-in cloud syncing. You can find more information on our [official website](
 - Generate Character and Location Reports
 - Capture character and scene notes.
 
+A complete user guide can be found [here](https://www.scrite.io/docs/userguide).
+
 ## Building from source
 Scrite is developed using Qt 5.15.19. To build scrite, simply install
 this version of Qt on your computer (Windows, macOS or Linux).
