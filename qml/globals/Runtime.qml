@@ -55,6 +55,7 @@ Item {
     property bool currentUseSoftwareRenderer
     property bool loadMainUiContent: true
     property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
+    property bool allowDiacriticEditing: Platform.isMacOSDesktop ? (screenplayEditorSettings.allowDiacriticEditing && !language.activeTransliterationIsInApp) : false
 
     property string currentTheme
 
@@ -78,6 +79,8 @@ Item {
 
         property var active: supported.activeLanguage
         property var activeTransliterationOption: active.valid ? active.preferredTransliterationOption() : undefined
+
+        property bool activeTransliterationIsInApp: activeTransliterationOption && activeTransliterationOption.valid && activeTransliterationOption.inApp
 
         property AbstractTransliterationEngine activeTransliterator: activeTransliterationOption.valid ? activeTransliterationOption.transliterator : null
 

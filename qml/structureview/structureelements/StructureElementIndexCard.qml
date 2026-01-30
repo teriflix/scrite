@@ -404,7 +404,7 @@ AbstractStructureElementUI {
                                 ]
                                 SyntaxHighlighter.textDocument: textDocument
 
-                                DiacriticHandler.enabled: Runtime.screenplayEditorSettings.allowDiacriticEditing && activeFocus
+                                DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
 
                                 LanguageTransliterator.popup: LanguageTransliteratorPopup { }
                                 LanguageTransliterator.option: Runtime.language.activeTransliterationOption

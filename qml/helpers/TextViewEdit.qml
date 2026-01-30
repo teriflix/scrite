@@ -137,7 +137,7 @@ Loader {
                 }
             ]
 
-            DiacriticHandler.enabled: Runtime.screenplayEditorSettings.allowDiacriticEditing && activeFocus
+            DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
 
             LanguageTransliterator.popup: LanguageTransliteratorPopup {
                 editorFont: _textArea.font
