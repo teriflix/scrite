@@ -181,13 +181,14 @@ to use.
 > itself, unless you configure the app to [delegate it entirely to the
 > OS](#letting-os-manage-input-method-switching).
 
-### More input methods coming up!
+### Third Party Input Methods
 
-In a future update we will be adding native support for
-[Nudi](https://nudityping.com), [Baraha](https://baraha.com/main.php),
+Native support for [Nudi](https://nudityping.com),
+[Baraha](https://baraha.com/main.php),
 [ISMv6](https://ismv6.com/ism-v6-software-download-for-windows/),
 [Alar](https://alar.ink), [Olam](https://olam.in) and custom [keyboard layout
-files](https://www.microsoft.com/en-us/download/details.aspx?id=102134).
+files](https://www.microsoft.com/en-us/download/details.aspx?id=102134) is
+currently not available. We may build support for them in a future update.
 
 ### Letting OS Manage Input Method Switching
 

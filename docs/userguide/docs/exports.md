@@ -114,7 +114,7 @@ selected, so that you can quickly open it in another app.
 <img src="../images/exports/007-final-draft.jpg" width="100%"/>
 
 At any point you can [import the changed Final
-Draft](./imports.md#drag-and-drop-to-import) file back into Scrite and continue
+Draft](./imports.md#drag-and-drop) file back into Scrite and continue
 working on it. Successive export & imports will not result in loss of screenplay
 content itself, but may lead to loss of other meta data like notes, tags and so
 on.
@@ -153,7 +153,7 @@ with the exported file selected, so that you can quickly open it in another app.
 <img src="../images/exports/009-fountain.jpg" width="100%"/>
 
 At any point you can [import the changed Fountain
-File](./imports.md#drag-and-drop-to-import) file back into Scrite and continue
+File](./imports.md#drag-and-drop) file back into Scrite and continue
 working on it. Successive export & imports will not result in loss of screenplay
 content, however you may need to reformat in parts occassionally.
 
@@ -191,7 +191,7 @@ with the exported file selected, so that you can quickly open it in another app.
 <img src="../images/exports/011-plain-text.jpg" width="100%"/>
 
 At any point you can [import the changed text
-file](./imports.md#drag-and-drop-to-import) file back into Scrite and continue
+file](./imports.md#drag-and-drop) file back into Scrite and continue
 working on it. Successive export & imports will not result in loss of screenplay
 content, however you may need to reformat in parts occassionally.
 

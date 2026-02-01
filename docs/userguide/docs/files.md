@@ -133,7 +133,7 @@ your collaborator’s email ids.
 > share the file with them via email or cloud storage services like Google
 > Drive, OneDrive etc. Please also note that collaborators added thus cannot
 > edit the file in real time, since [we do not support
-> that](#no-real-time-collaborative-editing-yet) just yet.
+> that](#no-real-time-collaboration) just yet.
 
 If anybody else attempts to open the screenplay, they will see this message.
 
@@ -157,7 +157,7 @@ additional collaborators. That right rests only with you.
 > possible that someone may be able to decrypt the contents of your file, but we
 > imagine that it isn’t too easy to do so.
 
-## Real-Time Collaboration <span class="red-x">✗</span>
+## No Real-Time Collaboration
 
 Scrite does not offer real time collaborative editing yet. We hope to build
 support for that in a future update.

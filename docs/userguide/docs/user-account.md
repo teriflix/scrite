@@ -15,12 +15,12 @@ There are two ways to launch the user account dialog.
 - One is by clicking on the user account icon to the top right corner of the main-window,
 - The other is by using the `F8` shortcut.
 
-<img src="../images/user-account/001-user-account-icon.jpg" width=480"/>
+<img src="../images/user-account/001-user-account-icon.jpg" width="65%"/>
 
 You can discover and configure shortcuts for each of the pages displayed here in the [shortcuts
 dialog](./user-interface.md#keyboard-shortcuts).
 
-<img src="../images/user-account/001-user-account-shortcuts.jpg" width=640"/>
+<img src="../images/user-account/001-user-account-shortcuts.jpg" width="85%"/>
 
 ## Profile Page
 
@@ -34,7 +34,7 @@ Below the fields are two toggle switches:
 
 After changing any field or toggle, click Save to apply the updates.
 
-<img src="../images/user-account/002-profile-page.jpg" width=640"/>
+<img src="../images/user-account/002-profile-page.jpg" width="85%"/>
 
 ### Logout
 
@@ -42,7 +42,7 @@ You can click on the `Logout` button to volutarily relinquiesh the activation of
 on the current device. This allows you to recycle your subscription on a new device. Please read the
 section on [Installations](#installations-page) for more information.
 
-<img src="../images/user-account/002-logout-button.jpg" width=640"/>
+<img src="../images/user-account/002-logout-button.jpg" width="85%"/>
 
 ## Subscriptions Page
 
@@ -51,17 +51,17 @@ The **Subscriptions** page shows two kinds of information:
 1. **Your subscription history** – the plans you’ve already purchased.  
 2. **Available plans** – new plans you can buy when your current plan is ending or has ended.
 
-<img src="../images/user-account/003-subscriptions-page.jpg" width=640"/>
+<img src="../images/user-account/003-subscriptions-page.jpg" width="85%"/>
 
 Each subscription entry has a **Details** link. Clicking it opens a dialog that lists the plan’s
 features, the start and end dates, and any billing details you may need.
 
-<img src="../images/user-account/003-plan-details.jpg" width=640"/>
+<img src="../images/user-account/003-plan-details.jpg" width="85%"/>
 
 To compare the feature sets of all plans, click the **Compare Plans** link. This opens a
 side‑by‑side comparison table that highlights the differences between each tier.
 
-<img src="../images/user-account/004-compare-plans-page.jpg" width=640"/>
+<img src="../images/user-account/004-compare-plans-page.jpg" width="85%"/>
 
 ### Buying a new plan
 Next to every plan that’s available for purchase you’ll see a **Buy** link. Clicking it opens a web
@@ -72,7 +72,7 @@ refreshes automatically to show the new plan.
 If you purchase a new plan while an existing subscription is still active, the new plan appears as
 an **Upcoming** subscription.  You can immediately use all features of the new plan.  
 
-<img src="../images/user-account/004-upcoming-plans.jpg" width=640"/>
+<img src="../images/user-account/004-upcoming-plans.jpg" width="85%"/>
 
 For example, buying a yearly plan while on the Free Trial lets you edit or remove watermarks from
 PDFs for the remainder of the trial period.
@@ -85,11 +85,11 @@ participating in partner events and workshops.
 
 Click **Enter Referral Code** link, and type the code you received from a video or a friend.  
 
-<img src="../images/user-account/005-referral-code.jpg" width=640"/>
+<img src="../images/user-account/005-referral-code.jpg" width="85%"/>
 
 After submitting, the page will refresh to show any new plans that have been unlocked.  
 
-<img src="../images/user-account/006-referral-code.jpg" width=640"/>
+<img src="../images/user-account/006-referral-code.jpg" width="85%"/>
 
 These plans can be purchased exactly like the regular ones by clicking the **Buy** link next to
 them.
@@ -107,7 +107,7 @@ is highlighted in **bold**; other devices are listed below in order of most rece
 Each entry has a **Sign Out** button. Clicking it removes the device from the active list. The change
 takes effect on the remote device after it reconnects or restarts, which may take up to an hour.
 
-<img src="../images/user-account/008-installations.jpg" width=640"/>
+<img src="../images/user-account/008-installations.jpg" width="85%"/>
 
 ### Device Limits
 Scrite enforces a maximum number of active devices per subscription tier. If you exceed the limit,
@@ -120,5 +120,5 @@ All messages from the Scrite project appear here. A badge on the user‑account 
 of unread messages; clicking the icon jumps straight to this page. Critical messages also trigger a
 notification in the main window.
 
-<img src="../images/user-account/007-messages.jpg" width=640"/>
+<img src="../images/user-account/007-messages.jpg" width="85%"/>
 
