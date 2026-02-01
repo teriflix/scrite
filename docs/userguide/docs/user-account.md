@@ -8,7 +8,7 @@ This dialog brings together profile information, subscription status, a catalog 
 devices, and in-app messages. Visiting it allows you to update your profile, reiview subscription
 and device activations.
 
-## Opening The User Account Dialog
+## User Account Dialog
 
 There are two ways to launch the user account dialog. 
 
@@ -77,7 +77,7 @@ an **Upcoming** subscription.  You can immediately use all features of the new p
 For example, buying a yearly plan while on the Free Trial lets you edit or remove watermarks from
 PDFs for the remainder of the trial period.
 
-### Referral codes
+### Referral Codes
 Referral codes unlock special plans that aren’t normally available. Special plans thus unlocked may
 offer you access to a new set of features and/or offer a significant discont on generally available
 plans. You may get hold of referral codes from a friend, or a video on social media, or by
@@ -109,7 +109,7 @@ takes effect on the remote device after it reconnects or restarts, which may tak
 
 <img src="../images/user-account/008-installations.jpg" width=640"/>
 
-### Device limits
+### Device Limits
 Scrite enforces a maximum number of active devices per subscription tier. If you exceed the limit,
 you’ll need to log out of an existing device before adding a new one. Use the **Logout** button
 either on another device in this page, or in the [Profile](#logout) page to free a slot.

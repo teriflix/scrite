@@ -197,7 +197,7 @@ act or episode break after the current scene.
 > **NOTE**: In the chapter on [User Interface](user-interface.md) you can find
 tips to discover and configure keyboard shortcuts to your liking.
 
-### A note on scene lengths
+### Optimal Scene Length
 Scrite is optimized for screenplays with mostly short scenes. The app performs
 best when scenes are under a page, with occasional scenes up to two pages.
 Longer scenes are supported, but if most scenes exceed two pages, performance

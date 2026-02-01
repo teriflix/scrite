@@ -7,7 +7,7 @@ You can import screenplays from popular 3rd party formats like FDX (Final Draft
 > yet. Work is underway to explore the possibility of importing from PDF by
 > leveraging on-device AI. This feature will be introduced in a future update.
 
-## Drag and Drop to Import
+## Drag and Drop
 
 The simplest way to import a file is to simply drag and drop a file on the
 screenplay editor tab.
@@ -22,7 +22,7 @@ be said about screenplays imported from Plain Text or Fountain files.
 Scrite makes best effort to import well formatted screenplays, but sometimes you
 may have to manually reformat in parts.
 
-## Import Option in Home Screen
+## Import Option
 
 You can click on the Import option in the Home Screen ..
 

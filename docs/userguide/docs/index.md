@@ -83,7 +83,7 @@ you can use tools like ChatGPT, Claude, Grok, or Gemini alongside Scrite.
 We’re exploring AI‑enabled workflows that respect your creative voice. When
 they’re ready, we’ll announce them on our website and in this guide. 
 
-### Production Planning Tools <span class="red-x">✗</span>
+### Production Planning <span class="red-x">✗</span>
 Right now, Scrite focuses on writing. We’re assembling a team to build
 production planning features thoughtfully.
 
@@ -141,7 +141,7 @@ sign up for a paid plan.
 
 > **Note:** Without an active subscription (trial or paid), the app is locked.
 
-### Create Your Scrite Account
+### Scrite Account
 On first launch, set up your login using your email address.
 
 > **Note:** Your Scrite account manages trials and subscriptions. It doesn’t
@@ -166,7 +166,7 @@ License tokens renew automatically as long as you’re online and use Scrite at
 least once every 28 days. If the app can’t connect within that window, it locks
 and prompts you to reactivate.
 
-### Start a 30‑Day Free Trial
+### 30‑Day Free Trial
 Try all features and ensure Scrite works on your devices. Click "Start" next to
 Free Trial—no credit card required. You can import from other formats and export
 Scrite documents to third‑party formats.

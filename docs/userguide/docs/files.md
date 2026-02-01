@@ -157,7 +157,7 @@ additional collaborators. That right rests only with you.
 > possible that someone may be able to decrypt the contents of your file, but we
 > imagine that it isn’t too easy to do so.
 
-## No Real-Time Collaborative Editing Yet
+## Real-Time Collaboration <span class="red-x">✗</span>
 
 Scrite does not offer real time collaborative editing yet. We hope to build
 support for that in a future update.
