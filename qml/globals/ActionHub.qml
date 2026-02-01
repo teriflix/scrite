@@ -838,7 +838,7 @@ Item {
         }
 
         Action {
-            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Replace)
+            readonly property string defaultShortcut: Platform.MacOSDesktop ? "Ctrl+Shift+F" : Gui.standardShortcut(StandardKey.Replace)
             readonly property bool visible: false
 
             enabled: ActionHandler.canHandle

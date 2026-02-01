@@ -210,7 +210,12 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
 
                     suggestedHeight: 40
-                    toolTipText: (checked ? "Hide replace field." : "Show replace field.") + " (" + Gui.nativeShortcut("Ctrl+Shift+F") + ")"
+                    toolTipText: {
+                        const replaceAction = ActionHub.editOptions.find("replace")
+                        const replaceShortcut = Gui.nativeShortcut(replaceShortcut)
+                        return (checked ? "Hide replace field." : "Show replace field.") +
+                                (replaceShortcut !== "" ? " (" + replaceShortcut + ")" : "")
+                    }
 
                     down: checked
                     checked: _replaceUiRect.visible
