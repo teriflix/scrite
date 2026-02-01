@@ -190,6 +190,10 @@ Native support for [Nudi](https://nudityping.com),
 files](https://www.microsoft.com/en-us/download/details.aspx?id=102134) is
 currently not available. We may build support for them in a future update.
 
+> If you prefer using third party language input methods (like Nudi, or Baraha)
+> then read the next section to learn how to delegate input method switching to
+> the OS.
+
 ### Letting OS Manage Input Method Switching
 
 Some users prefer to let their OS handle all input method switching because they
