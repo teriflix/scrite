@@ -167,8 +167,8 @@ ScrollArea {
         property bool interactive: {
             const canvasInteractionGoingOn =  (_canvas.rubberband.active ||
                                                _canvas.selection.active ||
-                                               root.canvasPreviewInteracting ||
-                                               _canvas.annotationGrip)
+                                               root.canvasPreviewInteracting /*||
+                                               _canvas.annotationGrip*/)
             const canvasItemInteractionGoingOn = (/*_canvas.currentElementItem ||*/
                                                   _canvas.editElementItem ||
                                                   _canvas.draggedElementItem)

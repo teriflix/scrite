@@ -61,6 +61,17 @@ Item {
         return imageAnnot
     }
 
+    function snapAnnotationToGrid(annotation) {
+        if(annotation) {
+            const rect = annotation.geometry
+            var gx = Scrite.document.structure.snapToGrid(rect.x)
+            var gy = Scrite.document.structure.snapToGrid(rect.y)
+            var gw = Scrite.document.structure.snapToGrid(rect.width)
+            var gh = Scrite.document.structure.snapToGrid(rect.height)
+            annotation.geometry = Qt.rect(gx, gy, gw, gh)
+        }
+    }
+
     function resetGrip() {
         _gripLoader.reset()
     }
@@ -139,10 +150,12 @@ Item {
             structureCanvasScale: root.canvasScale
 
             onResetRequest: _gripLoader.reset()
+            onSnapToGridRequest: root.snapAnnotationToGrid(annotation)
             onRequestCanvasFocus: root.canvasActiveFocusRequest()
         }
 
         function reset() {
+            root.snapAnnotationToGrid(annotation)
             annotation = null
             annotationItem = null
         }

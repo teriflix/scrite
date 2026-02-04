@@ -31,6 +31,7 @@ Item {
     required property real structureCanvasScale
 
     signal resetRequest()
+    signal snapToGridRequest()
     signal requestCanvasFocus()
 
     EventFilter.target: Scrite.app
@@ -94,6 +95,11 @@ Item {
         drag.minimumX: 0
         drag.minimumY: 0
 
+        drag.onActiveChanged: {
+            if(!drag.active)
+                root.snapToGridRequest()
+        }
+
         onPressed: requestCanvasFocus()
 
         onDoubleClicked: {
@@ -110,7 +116,7 @@ Item {
         dragAxis: Drag.XAxis
 
         onGripPressed: root.requestCanvasFocus()
-        onGripHandleMoved: _private.snapAnnotationGeometryToGrid(Qt.rect(root.x, root.y, x + width/2, root.height))
+        onGripHandleMoved: _private.updateGeometry(Qt.rect(root.x, root.y, x + width/2, root.height))
     }
 
     GripHandle {
@@ -121,7 +127,7 @@ Item {
         dragAxis: Drag.YAxis
 
         onGripPressed: root.requestCanvasFocus()
-        onGripHandleMoved: _private.snapAnnotationGeometryToGrid(Qt.rect(root.x, root.y, root.width, y + height/2))
+        onGripHandleMoved: _private.updateGeometry(Qt.rect(root.x, root.y, root.width, y + height/2))
     }
 
     GripHandle {
@@ -132,7 +138,7 @@ Item {
         dragAxis: Drag.XAndYAxis
 
         onGripPressed: root.requestCanvasFocus()
-        onGripHandleMoved: _private.snapAnnotationGeometryToGrid(Qt.rect(root.x, root.y, x + width/2, y + height/2))
+        onGripHandleMoved: _private.updateGeometry(Qt.rect(root.x, root.y, x + width/2, y + height/2))
     }
 
     onXChanged: _private.geoUpdateTimer.start()
@@ -196,7 +202,7 @@ Item {
         readonly property Timer geoUpdateTimer: Timer {
             interval: _private.geometryUpdateInterval
 
-            onTriggered: _private.snapAnnotationGeometryToGrid(Qt.rect(root.x,root.y,root.width,root.height))
+            onTriggered: _private.updateGeometry(Qt.rect(root.x,root.y,root.width,root.height))
         }
 
         function filterEvent(event, result) {
@@ -254,12 +260,8 @@ Item {
             }
         }
 
-        function snapAnnotationGeometryToGrid(rect) {
-            var gx = Scrite.document.structure.snapToGrid(rect.x)
-            var gy = Scrite.document.structure.snapToGrid(rect.y)
-            var gw = Scrite.document.structure.snapToGrid(rect.width)
-            var gh = Scrite.document.structure.snapToGrid(rect.height)
-            annotation.geometry = Qt.rect(gx, gy, gw, gh)
+        function updateGeometry(rect) {
+            annotation.geometry = rect
         }
     }
 }
