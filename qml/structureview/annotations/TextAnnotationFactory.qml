@@ -34,7 +34,7 @@ QtObject {
 
         let w = 200
         let h = 40
-        let geometry = Qt.rect(x-w/2, y-w/2, w, h)
+        let geometry = Qt.rect(x-w/2, y-h/2, w, h)
         let annot = Runtime.newAnnotation(parent, type, geometry, null)
         Scrite.document.structure.addAnnotation(annot)
 
