@@ -582,19 +582,10 @@ void ScreenplayPageLayout::evaluateRectsNow()
 
 void ScreenplayPageLayout::evaluateRects()
 {
-    if (m_format->screen()) {
-        this->setDefaultResolution(m_format->screen()->logicalDotsPerInch());
-        this->loadCustomResolutionFromSettings();
-        this->setResolution(qFuzzyIsNull(m_customResolution) ? m_defaultResolution
-                                                             : m_customResolution);
-    } else {
-#ifdef Q_OS_MAC
-        this->setDefaultResolution(72);
-#else
-        this->setDefaultResolution(96);
-#endif
-        this->setResolution(qt_defaultDpi());
-    }
+    this->setDefaultResolution(qt_defaultDpi());
+    this->loadCustomResolutionFromSettings();
+    this->setResolution(qFuzzyIsNull(m_customResolution) ? m_defaultResolution
+                                                         : m_customResolution);
 
     // Page margins
     const ParagraphMetrics paraMetrics;
