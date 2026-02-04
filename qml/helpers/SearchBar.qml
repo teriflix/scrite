@@ -212,7 +212,7 @@ Item {
                     suggestedHeight: 40
                     toolTipText: {
                         const replaceAction = ActionHub.editOptions.find("replace")
-                        const replaceShortcut = Gui.nativeShortcut(replaceShortcut)
+                        const replaceShortcut = Gui.nativeShortcut(replaceAction ? replaceAction.shortcut : "")
                         return (checked ? "Hide replace field." : "Show replace field.") +
                                 (replaceShortcut !== "" ? " (" + replaceShortcut + ")" : "")
                     }
