@@ -115,7 +115,7 @@ Item {
 
                 VclTextField {
                     Layout.fillWidth: true
-                    placeholderText: "leave empty for default (" + Math.round(Scrite.document.displayFormat.pageLayout.defaultResolution) + "), or enter a custom value."
+                    placeholderText: "Default: " + Math.round(Scrite.document.displayFormat.pageLayout.defaultResolution) + ". Leave empty, or enter a custom value."
                     text: Scrite.document.displayFormat.pageLayout.customResolution > 0 ? Scrite.document.displayFormat.pageLayout.customResolution : ""
                     onEditingComplete: {
                         var value = parseFloat(text)
