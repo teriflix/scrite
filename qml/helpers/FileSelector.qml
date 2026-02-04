@@ -48,9 +48,9 @@ Item {
             }
             return Url.fromPath(StandardPaths.writableLocation(StandardPaths.DownloadFolder))
         }
-        selectFolder: false
+        selectFolder: true
         selectMultiple: false
-        selectExisting: false
+        selectExisting: true
         onAccepted: fileInfo.absolutePath = Url.toPath(fileUrl)
          // The default Ctrl+U interfers with underline
     }
