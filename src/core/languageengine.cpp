@@ -1698,7 +1698,7 @@ QString ScriptBoundary::fontFamily() const
 
 bool ScriptBoundary::isValid() const
 {
-    return this->start >= 0 && this->end > 0 && this->end - this->start > 1
+    return this->start >= 0 && this->end > 0 && this->end - this->start >= 1
             && !this->text.isEmpty();
 }
 
