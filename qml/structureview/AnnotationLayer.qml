@@ -196,7 +196,7 @@ Item {
             if(Scrite.document.readOnly)
                 return null
 
-           return AnnotationFactory.create(type, x, y, root)
+            return AnnotationFactory.create(type, x, y, root)
         }
 
         function getAnnotationDelegate(type) {

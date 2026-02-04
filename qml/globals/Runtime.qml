@@ -853,7 +853,7 @@ Item {
         annot.type = type
         annot.geometry = geometry
         if(config) {
-            for(member in config)
+            for(let member in config)
                 annot.setAttribute(member, config[member])
         }
 
