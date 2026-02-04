@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "gridbackgrounditem.h"
+#include "utils.h"
 
 #include <QtQuick/QSGFlatColorMaterial>
 #include <QtQuick/QSGGeometryNode>
@@ -164,9 +165,14 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode,
     qDebug("GridBackgroundItem is painting.");
 #endif
 
-    if (oldNode)
-        delete oldNode;
     Q_UNUSED(nodeData)
+
+    // Always recreate the scene graph to ensure proper rendering
+    // when child items move or when properties change
+    if (oldNode) {
+        delete oldNode;
+        oldNode = nullptr;
+    }
 
     QSGNode *rootNode = new QSGNode;
     const qreal w = this->width();
@@ -174,14 +180,10 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode,
 
     {
         if (!qFuzzyIsNull(m_backgroundColor.alphaF())) {
-            QSGOpacityNode *backgroundNode = new QSGOpacityNode;
-            backgroundNode->setFlag(QSGGeometryNode::OwnedByParent);
-            backgroundNode->setOpacity(this->opacity());
-            rootNode->appendChildNode(backgroundNode);
-
             QSGGeometryNode *geometryNode = new QSGGeometryNode;
             geometryNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial
                                    | QSGNode::OwnedByParent);
+            rootNode->appendChildNode(geometryNode);
 
             QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), 6);
             geometry->setDrawingMode(QSGGeometry::DrawTriangles);
@@ -192,27 +194,28 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode,
             points[0].x = 0.0f;
             points[0].y = 0.0f;
 
-            points[1].x = float(w) - 1.0f;
+            points[1].x = float(w);
             points[1].y = 0.0f;
 
-            points[2].x = float(w) - 1.0f;
-            points[2].y = float(h) - 1.0f;
+            points[2].x = 0.0f;
+            points[2].y = float(h);
 
             points[3].x = 0.0f;
-            points[3].y = 0.0f;
+            points[3].y = float(h);
 
-            points[4].x = float(w) - 1.0f;
-            points[4].y = float(h) - 1.0f;
+            points[4].x = float(w);
+            points[4].y = 0.0f;
 
-            points[5].x = 0.0f;
-            points[5].y = float(h) - 1.0f;
+            points[5].x = float(w);
+            points[5].y = float(h);
 
             QSGFlatColorMaterial *material = new QSGFlatColorMaterial();
             geometryNode->setMaterial(material);
-            material->setFlag(QSGMaterial::Blending);
-            material->setColor(m_backgroundColor);
 
-            backgroundNode->appendChildNode(geometryNode);
+            QColor color = m_backgroundColor;
+            color.setAlphaF(color.alphaF() * this->opacity());
+            material->setFlag(QSGMaterial::Blending);
+            material->setColor(color);
         }
     }
 
@@ -362,7 +365,7 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode,
 
         QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), 4);
         geometry->setDrawingMode(QSGGeometry::DrawLineLoop);
-        geometry->setLineWidth(float(m_majorTickLineWidth));
+        geometry->setLineWidth(float(m_border->width()));
         geometryNode->setGeometry(geometry);
 
         QSGGeometry::Point2D *points = geometry->vertexDataAsPoint2D();
@@ -382,8 +385,8 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode,
         QSGFlatColorMaterial *material = new QSGFlatColorMaterial();
         geometryNode->setMaterial(material);
 
-        QColor color = m_majorTickColor;
-        color.setAlphaF(color.alphaF() * m_tickColorOpacity * this->opacity());
+        QColor color = m_border->color();
+        color.setAlphaF(color.alphaF() * this->opacity());
         material->setFlag(QSGMaterial::Blending);
         material->setColor(color);
 
