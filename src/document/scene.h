@@ -511,9 +511,9 @@ public:
     // Keep this updated and synced with SceneTypeImage.qml
     // clang-format off
     Q_CLASSINFO("Type.Standard:icon", "qrc:/icons/content/blank.png")
-    Q_CLASSINFO("Type.Song:icon", "qrc:/icons/content/queue_mus24px.png")
-    Q_CLASSINFO("Type.Action:icon", "qrc:/icons/content/fight_scene.png")
-    Q_CLASSINFO("Type.Montage:icon", "qrc:/icons/content/camera_alt.png")
+    Q_CLASSINFO("Type.Song:icon", "qrc:/icons/content/music.png")
+    Q_CLASSINFO("Type.Action:icon", "qrc:/icons/content/fight.png")
+    Q_CLASSINFO("Type.Montage:icon", "qrc:/icons/content/montage.png")
     // clang-format on
 
     enum Type { Standard = 0, Song, Action, Montage };

@@ -149,7 +149,7 @@ Item {
         Action {
             readonly property bool visible: false
             readonly property bool allowShortcut: true
-            readonly property var keywords: ["protect", "lock", "unlock", "collaborat"]
+            readonly property var keywords: ["protect", "lock", "unlock", "collaborate"]
             property string tooltip: {
                 if(Scrite.document.readOnly)
                     return "Cannot lock/unlock for editing on this computer."
@@ -558,7 +558,7 @@ Item {
             objectName: "fullscreen"
             shortcut: defaultShortcut
 
-            icon.source: "qrc:/icons/navigation/fullscreen.png"
+            icon.source: Scrite.window.visibility === AppWindow.FullScreen ? "qrc:/icons/navigation/fullscreen_exit.png" : "qrc:/icons/navigation/fullscreen.png"
 
             onTriggered: Scrite.app.toggleFullscreen(Scrite.window)
         }
