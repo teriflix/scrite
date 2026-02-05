@@ -285,7 +285,7 @@ Item {
             shortcut: defaultShortcut
             text: "Save As"
 
-            icon.source: "qrc:/icons/file/file_download.png"
+            icon.source: "qrc:/icons/content/save_as.png"
 
             onTriggered: SaveFileTask.saveAs()
         }

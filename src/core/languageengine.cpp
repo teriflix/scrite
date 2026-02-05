@@ -1783,10 +1783,11 @@ QImage LanguageIconProvider::requestImage(const QString &id, QSize *size,
         return defaultColor;
     };
 
-    const QColor background =
-            fetchColor(QStringLiteral("c800"), QStringLiteral("background"), Qt::darkGray);
-    const QColor foreground = fetchColor(QStringLiteral("c800"), QStringLiteral("text"), Qt::white);
+    const QString colorGroup = QStringLiteral("c800");
+    const QColor background = fetchColor(colorGroup, QStringLiteral("background"), Qt::darkGray);
+    const QColor foreground = fetchColor(colorGroup, QStringLiteral("text"), Qt::white);
 
+    paint.setPen(Qt::NoPen);
     paint.setBrush(QBrush(background));
     paint.drawRoundedRect(image.rect().adjusted(2, 2, -3, -3), 20, 20, Qt::RelativeSize);
 

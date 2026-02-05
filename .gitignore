@@ -70,3 +70,7 @@ build/*
 
 # Mkdocs environment
 /docs/userguide/venv/
+/docs/userguide/site/
+/docs/userguide/site.zip
+/docs/userguide/__pycache__/
+
