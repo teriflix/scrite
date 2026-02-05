@@ -68,7 +68,7 @@ Item {
             lineHeightMode: Text.ProportionalHeight
             text: "<b>" + label + ":</b><br/>(" + filePathPrefix + "<u>" + fileInfo.absoluteFilePath + "</u>. <a href=\"change\">Change path</a>.)</font>"
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            visible: selectedExtension && selectedExtension.value !== AbstractReportGenerator.AdobePDF
+            visible: selectedExtension && selectedExtension.value !== AbstractReportGenerator.PdfFormat
             enabled: visible
 
             MouseArea {
@@ -88,7 +88,7 @@ Item {
             width: parent.width
             onTextEdited: fileInfo.baseName = text
             TabSequenceItem.manager: tabSequenceManager
-            visible: selectedExtension.value !== AbstractReportGenerator.AdobePDF
+            visible: selectedExtension.value !== AbstractReportGenerator.PdfFormat
             enabled: visible
         }
 

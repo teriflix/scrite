@@ -1853,7 +1853,7 @@ QJsonObject ScriteDocument::queryReports(const QString &propName) const
 
 QString ScriteDocument::reportFileSuffix() const
 {
-    return QString("Adobe PDF (*.pdf)");
+    return QString("PDF (*.pdf)");
 }
 
 bool ScriteDocument::importFile(const QString &fileName, const QString &format)
@@ -2098,7 +2098,7 @@ void ScriteDocument::setupReportGenerator(AbstractReportGenerator *reportGenerat
             suggestedName = QStringLiteral("Scrite");
 
         const QString reportName = reportGenerator->name();
-        const QString suffix = reportGenerator->format() == AbstractReportGenerator::AdobePDF
+        const QString suffix = reportGenerator->format() == AbstractReportGenerator::PdfFormat
                 ? QStringLiteral(".pdf")
                 : QStringLiteral(".odt");
         suggestedName = suggestedName + QStringLiteral(" - ") + reportName + QStringLiteral(" - ")

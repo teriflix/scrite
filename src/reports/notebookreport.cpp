@@ -103,7 +103,7 @@ QString NotebookReport::polishFileName(const QString &fileName) const
     const QFileInfo fi(fileName);
     const QDir folder = fi.absoluteDir();
     const QString suffix =
-            this->format() == AdobePDF ? QLatin1String(".pdf") : QLatin1String(".odt");
+            this->format() == PdfFormat ? QLatin1String(".pdf") : QLatin1String(".odt");
     return folder.absoluteFilePath(m_title + QLatin1String(" - ") + m_subtitle + suffix);
 }
 

@@ -23,7 +23,7 @@ class CharacterRelationshipsGraphExporter : public AbstractExporter
     Q_OBJECT
     // clang-format off
     Q_CLASSINFO("Format", "Notebook/Character Relationship Graph")
-    Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
+    Q_CLASSINFO("NameFilters", "PDF (*.pdf)")
     Q_CLASSINFO("Description", "Exports to PDF the current character relationship graph in the Notebook.")
     Q_CLASSINFO("Icon", ":/icons/exporter/character_relationship_graph.png")
     // clang-format on

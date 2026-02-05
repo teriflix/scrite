@@ -213,7 +213,7 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
     QTextCursor cursor(document);
 
     // Title Page
-    if (this->format() == AdobePDF) {
+    if (this->format() == PdfFormat) {
         if (m_generateTitlePage) {
             ScreenplayTitlePageObjectInterface *tpoi =
                     document->findChild<ScreenplayTitlePageObjectInterface *>();
@@ -358,7 +358,7 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
             QTextTableFormat sceneTableFormat;
             sceneTableFormat.setColumns(2);
 
-            if (this->format() == AdobePDF) {
+            if (this->format() == PdfFormat) {
                 const int lColWidth = qRound(m_leftColumnWidth * 100.0);
                 const int rColWidth = 100 - lColWidth;
                 sceneTableFormat.setColumnWidthConstraints(
@@ -395,7 +395,7 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
         if (scene->heading()->isEnabled()) {
             cursor = placeCursor(m_layout == EverythingRight ? RightColumn : LeftColumn);
 
-            if (m_includeSceneIcons && this->format() == AdobePDF) {
+            if (m_includeSceneIcons && this->format() == PdfFormat) {
                 QTextCharFormat sceneIconFormat;
                 sceneIconFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
                 sceneIconFormat.setFont(format->elementFormat(SceneElement::Heading)->font());
@@ -408,7 +408,7 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
 
             const QString sceneNumber =
                     m_includeSceneNumbers ? element->resolvedSceneNumber() : QString();
-            if (this->format() == AdobePDF && !sceneNumber.isEmpty()) {
+            if (this->format() == PdfFormat && !sceneNumber.isEmpty()) {
                 QTextCharFormat sceneNumberFormat;
                 sceneNumberFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
                 sceneNumberFormat.setFont(document->defaultFont());
@@ -422,8 +422,8 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
             }
 
             const QString headingText =
-                    ((sceneNumber.isEmpty() || this->format() == AdobePDF) ? QString()
-                                                                           : (sceneNumber + ". "))
+                    ((sceneNumber.isEmpty() || this->format() == PdfFormat) ? QString()
+                                                                            : (sceneNumber + ". "))
                     + scene->heading()->displayText();
 
             QTextCharFormat headingFormat = elementCharFormat(SceneElement::Heading);
@@ -463,7 +463,7 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
                                              true);
                     } else if (j > 0
                                && scene->elementAt(j - 1)->type() != SceneElement::Character) {
-                        if (this->format() == AdobePDF)
+                        if (this->format() == PdfFormat)
                             cursor.insertBlock();
                         else
                             cursor.insertText(" ");
@@ -518,7 +518,7 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
                     } break;
                     case SceneElement::Character:
                     case SceneElement::Parenthetical: {
-                        cursor = placeCursor(LeftColumn, this->format() == AdobePDF);
+                        cursor = placeCursor(LeftColumn, this->format() == PdfFormat);
 
                         const bool cellIsEmpty = cursor.block().text().isEmpty();
 
@@ -529,12 +529,12 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
 
                         if (cellIsEmpty)
                             cursor.mergeBlockFormat(format);
-                        else if (this->format() == AdobePDF)
+                        else if (this->format() == PdfFormat)
                             cursor.insertBlock(format);
 
                         const QString suffix = sceneElement->type() == SceneElement::Character
                                 ? QStringLiteral(":")
-                                : (cellIsEmpty || this->format() == AdobePDF
+                                : (cellIsEmpty || this->format() == PdfFormat
                                            ? QString()
                                            : QStringLiteral(", "));
                         cursor.setCharFormat(elementCharFormat(sceneElement->type()));

@@ -346,5 +346,6 @@
         <file>icons/hardware/linux-platform.png</file>
         <file>icons/hardware/windows-platform.png</file>
         <file>icons/hardware/desktop-platform.png</file>
+        <file>icons/reports/reports.png</file>
     </qresource>
 </RCC>

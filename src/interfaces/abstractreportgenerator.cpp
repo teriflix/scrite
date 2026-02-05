@@ -52,7 +52,7 @@ void AbstractReportGenerator::setFormat(AbstractReportGenerator::Format val)
 
     if (!this->fileName().isEmpty()) {
         const QString suffix =
-                m_format == AdobePDF ? QStringLiteral(".pdf") : QStringLiteral(".odt");
+                m_format == PdfFormat ? QStringLiteral(".pdf") : QStringLiteral(".odt");
         const QFileInfo fileInfo(this->fileName());
         this->setFileName(
                 fileInfo.absoluteDir().absoluteFilePath(fileInfo.completeBaseName() + suffix));
@@ -158,7 +158,7 @@ bool AbstractReportGenerator::generate()
 
     const bool usePdfWriter = this->usePdfWriter();
 
-    if (m_format == AdobePDF) {
+    if (m_format == PdfFormat) {
         if (this->canDirectPrintToPdf()) {
             QScopedPointer<QPdfWriter> qpdfWriter;
             QScopedPointer<QPrinter> qprinter;
@@ -311,7 +311,7 @@ Utils::ObjectConfig AbstractReportGenerator::configuration() const
 
 QString AbstractReportGenerator::fileNameExtension() const
 {
-    return m_format == AdobePDF ? QStringLiteral("pdf") : QStringLiteral("odt");
+    return m_format == PdfFormat ? QStringLiteral("pdf") : QStringLiteral("odt");
 }
 
 bool AbstractReportGenerator::usePdfWriter() const

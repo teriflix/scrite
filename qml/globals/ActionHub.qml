@@ -471,7 +471,7 @@ Item {
     }
 
     readonly property ActionManager reportOptions: ActionManager {
-        readonly property string iconSource: "qrc:/icons/exporter/pdf.png"
+        readonly property string iconSource: "qrc:/icons/reports/reports.png"
 
         title: "Reports"
         objectName: "reportOptions"

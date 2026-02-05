@@ -20,8 +20,8 @@ class PdfExporter : public AbstractTextDocumentExporter
 {
     Q_OBJECT
     // clang-format off
-    Q_CLASSINFO("Format", "Screenplay/Adobe PDF")
-    Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
+    Q_CLASSINFO("Format", "Screenplay/PDF")
+    Q_CLASSINFO("NameFilters", "PDF (*.pdf)")
     Q_CLASSINFO("Description", "Exports the current screenplay to PDF format.")
     Q_CLASSINFO("Icon", ":/icons/exporter/pdf.png")
     Q_CLASSINFO("Keywords", "print")

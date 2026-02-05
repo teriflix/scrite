@@ -358,7 +358,7 @@ Item {
     VclFileDialog {
         id: _saveFileDialog
 
-        nameFilters: ["Adobe PDF Files (*.pdf)"]
+        nameFilters: ["PDF Files (*.pdf)"]
         folder: Url.fromPath(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
         selectFolder: false
         selectMultiple: false

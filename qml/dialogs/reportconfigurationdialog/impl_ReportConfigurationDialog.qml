@@ -149,10 +149,10 @@ VclDialog {
                 enabled: _private.reportSaveFeature.enabled
                 allowedExtensions: [
                     {
-                        "label": "Adobe PDF Format",
+                        "label": "PDF Format",
                         "suffix": "pdf",
-                        "value": AbstractReportGenerator.AdobePDF,
-                        "enabled": report.supportsFormat(AbstractReportGenerator.AdobePDF)
+                        "value": AbstractReportGenerator.PdfFormat,
+                        "enabled": report.supportsFormat(AbstractReportGenerator.PdfFormat)
                     },
                     {
                         "label": "Open Document Format",
@@ -162,8 +162,8 @@ VclDialog {
                     }
                 ]
                 nameFilters: {
-                    if(report.format === AbstractReportGenerator.AdobePDF)
-                        return "Adobe PDF (*.pdf)"
+                    if(report.format === AbstractReportGenerator.PdfFormat)
+                        return "PDF (*.pdf)"
                     return "Open Document Format (*.odt)"
                 }
 
@@ -172,7 +172,7 @@ VclDialog {
 
                 Component.onCompleted: {
                     const aes = allowedExtensions
-                    const idx = report.format === AbstractReportGenerator.AdobePDF ? 0 : 1
+                    const idx = report.format === AbstractReportGenerator.PdfFormat ? 0 : 1
                     selectedExtension = aes[idx]
                 }
             }
@@ -363,7 +363,7 @@ VclDialog {
         id: _private
 
         property var configuration: report ? report.configuration() : {"title": "Unknown", "description": "", "groups": []}
-        property bool isPdfExport: report ? report.format === AbstractReportGenerator.AdobePDF : false
+        property bool isPdfExport: report ? report.format === AbstractReportGenerator.PdfFormat : false
         property bool reportEnabled: report ? report.featureEnabled : false
 
         property AppFeature reportSaveFeature: AppFeature {

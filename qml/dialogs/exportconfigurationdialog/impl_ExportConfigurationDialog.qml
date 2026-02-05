@@ -285,7 +285,7 @@ VclDialog {
         id: _private
 
         property var configuration: exporter ? exporter.configuration() : {"title": "Unknown", "fields": []}
-        property bool isPdfExport: exporter ? exporter.format === "Screenplay/Adobe PDF" : false
+        property bool isPdfExport: exporter ? exporter.format === "Screenplay/PDF" : false
         property bool exportEnabled: exporter ? exporter.featureEnabled : false
 
         property AppFeature exportSaveFeature: AppFeature {

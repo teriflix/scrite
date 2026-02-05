@@ -37,7 +37,7 @@ public:
     ~AbstractReportGenerator();
     Q_SIGNAL void aboutToDelete(AbstractReportGenerator *gen);
 
-    enum Format { AdobePDF, OpenDocumentFormat };
+    enum Format { PdfFormat, OpenDocumentFormat };
     Q_ENUM(Format)
     // clang-format off
     Q_PROPERTY(Format format
@@ -170,7 +170,7 @@ protected:
     virtual bool polishOdtContent(QDomDocument &) { return false; }
 
 private:
-    Format m_format = AdobePDF;
+    Format m_format = PdfFormat;
     QString m_comment;
     QString m_watermark;
 };
