@@ -595,7 +595,6 @@ Item {
         Action {
             text: "User Guides"
             objectName: "userGuides"
-            shortcut: defaultShortcut
 
             icon.source: "qrc:/icons/action/help.png"
 
