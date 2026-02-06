@@ -435,6 +435,53 @@ public:
     QString api() const { return "app/minimumVersion"; }
 };
 
+class AppUserGuideSearchIndexRestApiCall : public RestApiCall
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    AppUserGuideSearchIndexRestApiCall(QObject *parent = nullptr);
+    ~AppUserGuideSearchIndexRestApiCall();
+
+    // clang-format off
+    Q_PROPERTY(QUrl userGuideBaseUrl
+               READ userGuideBaseUrl
+               NOTIFY responseChanged)
+    // clang-format on
+    QUrl userGuideBaseUrl() const;
+
+    // clang-format off
+    Q_PROPERTY(QUrl userGuideIndexUrl
+               READ userGuideIndexUrl
+               NOTIFY responseChanged)
+    // clang-format on
+    QUrl userGuideIndexUrl() const;
+
+    // clang-format off
+    Q_PROPERTY(QStringList userGuideSortOrder
+               READ userGuideSortOrder
+               NOTIFY responseChanged)
+    // clang-format on
+    QStringList userGuideSortOrder() const;
+
+    // clang-format off
+    Q_PROPERTY(bool isUpdateRequired
+               READ isUpdateRequired
+               NOTIFY responseChanged)
+    // clang-format on
+    bool isUpdateRequired() const;
+
+    // RestApiCall interface
+    Type type() const { return GET; }
+    bool useSessionToken() const { return false; }
+    QString api() const { return "app/userGuideSearchIndex"; }
+    QJsonObject data() const;
+
+protected:
+    void setResponse(const QJsonObject &val);
+};
+
 class AppWelcomeTextApiCall : public RestApiCall
 {
     Q_OBJECT

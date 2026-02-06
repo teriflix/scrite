@@ -30,6 +30,7 @@ public:
     static QString userId;
     static QString userInfo;
     static QString userMessages;
+    static QString userGuideSearchIndexTimestamp;
 
     static void store(const QString &key, const QVariant &value);
     static QVariant load(const QString &key, const QVariant &defaultValue = QVariant());

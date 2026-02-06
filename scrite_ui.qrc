@@ -349,5 +349,6 @@
         <file>qml/dialogs/useraccountdialog/UserOnboardingScreen.qml</file>
         <file>qml/dialogs/UserOnboardingDialog.qml</file>
         <file>qml/dialogs/EditHyperlinkDialog.qml</file>
+        <file>qml/commandcenter/HelpCenter.qml</file>
     </qresource>
 </RCC>

@@ -750,6 +750,11 @@ Item {
 
     }
 
+    // Global user guide search index
+    readonly property UserGuideSearchIndex userGuideSearchIndex: UserGuideSearchIndex {
+
+    }
+
     function init(_parent) {
         if( !(_parent && Object.isOfType(_parent, "QQuickItem")) )
             _parent = Scrite.window.contentItem

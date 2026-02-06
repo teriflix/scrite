@@ -733,7 +733,55 @@ bool AppMinimumVersionRestApiCall::isVersionSupported() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-AppWelcomeTextApiCall::AppWelcomeTextApiCall(QObject *parent) { }
+AppUserGuideSearchIndexRestApiCall::AppUserGuideSearchIndexRestApiCall(QObject *parent)
+    : RestApiCall(parent)
+{
+}
+
+AppUserGuideSearchIndexRestApiCall::~AppUserGuideSearchIndexRestApiCall() { }
+
+QUrl AppUserGuideSearchIndexRestApiCall::userGuideBaseUrl() const
+{
+    return QUrl(this->responseData().value("baseUrl").toString());
+}
+
+QUrl AppUserGuideSearchIndexRestApiCall::userGuideIndexUrl() const
+{
+    return QUrl(this->responseData().value("indexUrl").toString());
+}
+
+QStringList AppUserGuideSearchIndexRestApiCall::userGuideSortOrder() const
+{
+    const QJsonArray array = this->responseData().value("sortOrder").toArray();
+
+    QStringList ret;
+    for (const QJsonValue &item : array)
+        ret << item.toString();
+
+    return ret;
+}
+
+bool AppUserGuideSearchIndexRestApiCall::isUpdateRequired() const
+{
+    return this->responseData().value("updateRequired").toBool(true);
+}
+
+QJsonObject AppUserGuideSearchIndexRestApiCall::data() const
+{
+    return { { "timestamp", "$" + LocalStorage::userGuideSearchIndexTimestamp } };
+}
+
+void AppUserGuideSearchIndexRestApiCall::setResponse(const QJsonObject &val)
+{
+    RestApiCall::setResponse(val);
+
+    const QVariant timestamp = this->responseData().value("timestamp").toVariant();
+    LocalStorage::store(LocalStorage::userGuideSearchIndexTimestamp, timestamp.toString());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+AppWelcomeTextApiCall::AppWelcomeTextApiCall(QObject *parent) : RestApiCall(parent) { }
 
 AppWelcomeTextApiCall::~AppWelcomeTextApiCall() { }
 

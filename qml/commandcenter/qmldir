@@ -1,1 +1,2 @@
 singleton CommandCenter 1.0 CommandCenter.qml
+singleton HelpCenter 1.0 HelpCenter.qml

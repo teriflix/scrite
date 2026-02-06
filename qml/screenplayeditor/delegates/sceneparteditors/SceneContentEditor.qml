@@ -345,7 +345,7 @@ AbstractScenePartEditor {
     }
 
     Connections {
-        target: Runtime.screenplayEditor.searchBar
+        target: Runtime.screenplayEditor ? Runtime.screenplayEditor.searchBar : null
 
         enabled: _sceneSearch.currentResultIndex >= 0
 

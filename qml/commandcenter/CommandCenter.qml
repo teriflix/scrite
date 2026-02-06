@@ -64,6 +64,24 @@ Popup {
 
             spacing: 20
 
+            VclLabel {
+                Layout.fillWidth: true
+
+                padding: 10
+
+                background: Rectangle {
+                    color: Runtime.colors.accent.c500.background
+                }
+                color: Runtime.colors.accent.c500.text
+                text: "Command Center"
+                verticalAlignment: Text.AlignHCenter
+                horizontalAlignment: Text.AlignHCenter
+
+                font.bold: true
+                font.family: Runtime.idealFontMetrics.font.family
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 3
+            }
+
             TextField {
                 id: _commandText
 
@@ -77,7 +95,7 @@ Popup {
                 DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
 
                 focus: true
-                placeholderText: "Search for a command or topic ..."
+                placeholderText: "Search for a help topic ..."
 
                 font: Runtime.idealFontMetrics.font
 

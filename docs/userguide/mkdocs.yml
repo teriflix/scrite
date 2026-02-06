@@ -14,8 +14,6 @@ theme:
     - navigation.expand
     - search.suggest
     - search.highlight
-extra_css:
-  - styles/style.css
 markdown_extensions:
   - toc:
       permalink: true
@@ -23,9 +21,11 @@ markdown_extensions:
       toc_depth: 4
 plugins:
   - mkdocs-video
-  - search
-hooks:
-  - hooks.py
+  - search:
+      lang: en
+      separator: '[\s\-.]+'
+# hooks:
+#   - hooks.py
 nav:
   - index.md
   - quickstart.md

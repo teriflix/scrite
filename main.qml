@@ -56,6 +56,7 @@ Rectangle {
             // Initialize runtime
             Runtime.init(scriteRoot)
             ActionHub.init(scriteRoot)
+            HelpCenter.init(scriteRoot)
             CommandCenter.init(scriteRoot)
             SubscriptionPlanOperations.init(scriteRoot)
 

@@ -97,6 +97,8 @@ QString LocalStorage::user = QStringLiteral("user");
 QString LocalStorage::userId = QStringLiteral("userId");
 QString LocalStorage::userInfo = QStringLiteral("userInfo");
 QString LocalStorage::userMessages = QStringLiteral("userMessages");
+QString LocalStorage::userGuideSearchIndexTimestamp =
+        QStringLiteral("userGuideSearchIndexTimestamp");
 
 void LocalStorage::store(const QString &key, const QVariant &value)
 {

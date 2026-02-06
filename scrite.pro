@@ -59,6 +59,7 @@ HEADERS += \
     src/core/languageengine.h \
     src/core/localstorage.h \
     src/core/systemrequirements.h \
+    src/core/userguidesearchindex.h \
     src/core/utils.h \
     src/core/valueindexlookup.h \
     src/document/screenplaypaginator.h \
@@ -198,6 +199,7 @@ SOURCES += \
     src/core/languageengine.cpp \
     src/core/localstorage.cpp \
     src/core/systemrequirements.cpp \
+    src/core/userguidesearchindex.cpp \
     src/core/utils.cpp \
     src/core/valueindexlookup.cpp \
     src/document/screenplaypaginator.cpp \

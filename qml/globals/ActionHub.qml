@@ -552,6 +552,18 @@ Item {
         }
 
         Action {
+            readonly property bool hideInCommandCenter: true
+            readonly property string defaultShortcut: "F1"
+
+            enabled: ActionHandler.canHandle
+            objectName: "helpCenter"
+            shortcut: defaultShortcut
+            text: "Help Center"
+
+            icon.source: "qrc:/icons/action/help.png"
+        }
+
+        Action {
             readonly property string defaultShortcut: "F7"
 
             text: "Toggle Fullscreen"
@@ -580,8 +592,6 @@ Item {
         objectName: "helpSupport"
 
         Action {
-            readonly property string defaultShortcut: "F1"
-
             text: "User Guides"
             objectName: "userGuides"
             shortcut: defaultShortcut
