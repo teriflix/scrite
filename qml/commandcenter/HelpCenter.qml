@@ -240,6 +240,7 @@ Popup {
             onModelReset: Qt.callLater(_private.resetCurrentActionViewItem)
             onRowsRemoved: Qt.callLater(_private.resetCurrentActionViewItem)
             onRowsInserted: Qt.callLater(_private.resetCurrentActionViewItem)
+            onFilterChanged: Qt.callLater(_private.resetCurrentActionViewItem)
         }
 
         property int beforeLanguage: -1
