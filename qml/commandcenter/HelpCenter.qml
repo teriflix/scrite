@@ -175,7 +175,7 @@ Popup {
                             text: fullTitle
                             font.bold: _helpText.length > 0
                             font.family: Runtime.idealFontMetrics.font.family
-                            font.pixelSize: Runtime.idealFontMetrics.font.pointSize
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         }
 
                         VclText {
