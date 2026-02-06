@@ -95,7 +95,7 @@ Popup {
                 DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
 
                 focus: true
-                placeholderText: "Search for a command or topic ..."
+                placeholderText: "Search for a help topic ..."
 
                 font: Runtime.idealFontMetrics.font
 

@@ -113,6 +113,7 @@ void UserGuideSearchIndex::loadSearchIndex()
         if (recordLocation.isEmpty() || recordLocation.startsWith("#"))
             item.sortOrder = 0;
         else {
+            item.sortOrder = sortOrder.size() + 2;
             for (int i = 0; i < sortOrder.size(); i++) {
                 if (recordLocation.startsWith(sortOrder.at(i))) {
                     item.sortOrder = i + 1;
@@ -268,6 +269,9 @@ bool UserGuideSearchIndexFilter::filterAcceptsRow(int source_row,
             const QString title = source_index.data(UserGuideSearchIndex::FullTitleRole).toString();
             const QString plainText =
                     source_index.data(UserGuideSearchIndex::PlainTextRole).toString();
+            if (plainText.isEmpty())
+                return false;
+
             return title.contains(m_trimmedFilter, Qt::CaseInsensitive)
                     || plainText.contains(m_trimmedFilter, Qt::CaseInsensitive);
         }
@@ -280,7 +284,7 @@ bool UserGuideSearchIndexFilter::lessThan(const QModelIndex &source_left,
                                           const QModelIndex &source_right) const
 {
     if (m_trimmedFilter.isEmpty())
-        return QSortFilterProxyModel::lessThan(source_left, source_right);
+        return source_left.row() < source_right.row();
 
     const QString titleA = source_left.data(UserGuideSearchIndex::FullTitleRole).toString();
     const QString titleB = source_right.data(UserGuideSearchIndex::FullTitleRole).toString();
