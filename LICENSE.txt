@@ -52,20 +52,22 @@ licenses compatible with GPLv3.
 
 ===============================================================================
 
-Scrite was originally developed by Prashanth under TERIFLIX Entertainment Spaces
-Pvt. Ltd. As of June 2022, further development, maintenance and monetization of
-Scrite will be done by VCreate Logic Pvt. Ltd, a software consulting company
-founded by Prashanth, who is the creator of Scrite.
+Scrite was originally developed by Prashanth N Udupa under TERIFLIX
+Entertainment Spaces Pvt. Ltd. As of June 2022, further development, maintenance
+and monetization of Scrite will be done by VCreate Logic Pvt. Ltd, a software
+consulting company founded by Prashanth N Udupa, who is the creator of Scrite.
+Copyright of the entire Scrite source code rests with Prashanth N Udupa
+(prashanth@scrite.io, prashanth.udupa@gmail.com, prashanth@vcreatelogic.com)
 
-The development of Scrite is done using a commercial version of Qt 5.15.10
-However the entire source code of Scrite is made available under GPLv3.
-The complete license text of GPLv3 is given below. VCreate Logic reserves the
-right to release the source code of Scrite, in parts or whole, under any
-other license terms at any point in the future. Contributions to Scrite are
-currently accepted, only if they are offered under the terms of GPLv3.
+The development of Scrite is done using a commercial version of Qt 5.15.19
+However the entire source code of Scrite is made available under GPLv3. The
+complete license text of GPLv3 is given below. Prashanth N Udupa reserves the
+right to release the source code of Scrite, in parts or whole, under any other
+license terms at any point in the future. Contributions to Scrite are currently
+accepted, only if they are offered under the terms of GPLv3.
 
-The complete source code and documentation accompying this project are
-made available under the following license terms.
+The complete source code and documentation accompying this project are made
+available under the following license terms.
 
 ===============================================================================
 

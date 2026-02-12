@@ -1,7 +1,9 @@
 /****************************************************************************
 **
-** Copyright (C) VCreate Logic Pvt. Ltd. Bengaluru
-** Author: Prashanth N Udupa (prashanth@scrite.io)
+** Copyright (C) 2020 Prashanth N Udupa
+** Author: Prashanth N Udupa (prashanth@scrite.io,
+**                            prashanth.udupa@gmail.com,
+**                            prashanth@vcreatelogic.com)
 **
 ** This code is distributed under GPL v3. Complete text of the license
 ** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
