@@ -100,6 +100,34 @@ disk explicitly.
 
 > NOTE: Vault only keeps a copy of files that have *not* been saved even once. 
 
+## Lock File
+Scrite creates a .lock file next to your document every time it is opened. This
+is done to ensure that a second instance of Scrite doesn’t open the same
+document and cause read-write-locks, or worse corrupt your document.
+
+This .lock file is automatically deleted when you close the Scrite app or open
+another document in it. In odd cases where the .lock file was not removed you
+will see an error message like this:
+
+<img src="../images/files/012-lockfile.jpg" width="65%"/>
+
+As the dialog box suggests,
+
+- First verify that there are no other instances of Scrite either in your
+  computer or elsewhere (over the network) where the document in question is
+  opened.
+- Click “Ok” on the dialog box.
+- Scrite would have launched File Explorer (on Windows), Finder (on macOS) or
+  File Manager (on Linux) where the lock file in question can be found. If you
+  dont see it, check if they are opened in a background window. Go ahead and
+  delete the .lock file manually.
+- You can then come back and reopen the document and it should work fine.
+
+*If you see this message all the time*, then its possible that Scrite isn’t
+closing properly or that you are saving directly on a cloud-synced folder and
+the syncing of files across devices is not working properly. Try saving your
+Scrite file on a local folder and check again.
+
 ## Shield
 
 By default Scrite stores screenplays in an interoperable format as described in

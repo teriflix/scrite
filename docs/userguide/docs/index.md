@@ -1,7 +1,8 @@
 # Welcome to Scrite
 Scrite is an open‑source desktop screenwriting app for Windows, macOS, and
-Linux. Write in multiple languages, export industry‑standard PDFs, and generate
-reports—all with tools that suit beginners and professionals alike.
+Linux. You can write in multiple languages, export industry‑standard PDFs, and
+generate reports and more. Watch this video to get a quick visual overview of
+the product.
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%;">
   <iframe src="https://www.youtube.com/embed/T7J_8ebSVsk" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" frameborder="0" allowfullscreen></iframe>
@@ -14,20 +15,31 @@ reports—all with tools that suit beginners and professionals alike.
 - [Pricing](https://www.scrite.io/pricing-and-features/)
 
 ## Scene‑Centric Approach
-Most apps treat a screenplay as pages; Scrite treats it as scenes—because that’s
-how films are made. Instead of page counts, Scrite helps you structure and
-visualize your story with a structure-first scene‑centric UI.
+Most screenwriting apps treat a screenplay like a series of pages, but Scrite
+treats it like a series of scenes—because that’s how movies are made. Instead of
+focusing on page counts, Scrite helps you structure and visualize your story
+through its structure-first-scene-centric UI.
 
 <img src="./images/quickstart/001-scene-centric-ui.png" alt="Photo by Tima
 Miroshnichenko from Pexels" width="40%"/>
 
 ## Why Scenes First?
-Traditional screenwriting apps mirror typewriters: one page ≈ one minute. Page
-count still matters, but filmmakers think in scenes. Scrite shifts the focus to
-building your story scene by scene—making structure clearer, relationships
-easier to see, and navigation more natural.
+Screenwriting apps have traditionally mirrored typewriters, where each page
+roughly translates to one minute of screen time, a format deeply rooted in the
+industry. While page count remains important, Scrite shifts the focus to scenes
+because that’s how filmmakers think.
 
-Scrite supports industry formatting while encouraging a scene‑first mindset.
+In Scrite, you don’t write with pages in mind—you build your screenplay scene by
+scene. This approach makes it easier to structure your narrative, see
+relationships between different scenes, and navigate your story organically.
+Scrite incorporates familiar elements from traditional apps, but presents them
+in a way that prioritizes scene flow rather than rigid page formatting.
+
+By embracing this scene-first mindset, Scrite offers a unique writing experience
+that better aligns with the way stories are conceived, developed, and brought to
+life.
+
+Scrite still supports industry standards but helps writers think in scenes first.
 
 | Page‑Centric Apps	| Scrite’s Scene‑Centric Approach| 
 |:------------------|:-------------------------------|
@@ -41,9 +53,10 @@ Scrite supports industry formatting while encouraging a scene‑first mindset.
 To set expectations clearly, here’s what Scrite does not aim to be.
 
 ### Page‑Centric <span class="red-x">✗</span>
-Scrite isn’t a clone of Final Draft, Celtx, or Arc Studio. It doesn’t mimic the
-typewriter‑inspired, page‑centric approach. Scrite reimagines writing by using
-scenes as the fundamental unit of storytelling.
+Scrite is not a direct replacement for traditional screenwriting apps like Final
+Draft, Celtx, or Arc Studio. It doesn’t mimic the typewriter-based, page-centric
+approach these apps follow. Instead, it reimagines screenplay writing by
+focusing on scenes as the fundamental unit of storytelling.
 
 <img src="./images/quickstart/002-what-scrite-is-not.jpg" alt="Photo by Min An
 from Pexels" width="40%"/>
@@ -54,20 +67,24 @@ from Pexels" width="40%"/>
 
 ### Cloud Storage <span class="red-x">✗</span>
 Scrite saves files locally on your computer. We don’t store your work on our
-servers, so backups are your responsibility. We can’t recover lost or deleted
-files—use a cloud‑synced folder (Dropbox, Google Drive, etc.) to keep your work
-safe.
+server, and therefore cannot offer file sync across different devices, nor can
+we offer to recover your lost files. 
+
+While Scrite does offer to [auto save](./files.md#auto-save) changes frequently,
+helps restore from a [backup](./files.md#loading-a-backup) and also [store
+unsaved](./files.md#vault) ones in a private vault, these still rely on your
+local computer storage. 
 
 > In the future, we plan to add built-in integrations for popular cloud storage
 > services like Google Drive and OneDrive. Until then, you can use the
-> folder-sync features provided by these platforms to keep your documents synced
-> across multiple devices.
+> folder-sync features provided by these platforms for file sync and backup.
 
 ### Real‑Time Collaboration <span class="red-x">✗</span>
 Scrite doesn’t support multiple writers editing the same document
-simultaneously. The app warns when a file is opened on more than one device, but
-safeguards aren’t foolproof. Concurrent editing may cause conflicts or data
-loss.
+simultaneously. The app [warns](./files.md#lock-file) when a file is opened on
+more than one device, but safeguards aren’t foolproof. Concurrent editing may
+cause conflicts or data loss. We recommend using [Shield](./files.md#shield)
+to limit write access to one or more users identified by their email.
 
 > Real-time collaboration is planned for a future update.
 
@@ -84,10 +101,8 @@ We’re exploring AI‑enabled workflows that respect your creative voice. When
 they’re ready, we’ll announce them on our website and in this guide. 
 
 ### Production Planning <span class="red-x">✗</span>
-Right now, Scrite focuses on writing. We’re assembling a team to build
-production planning features thoughtfully.
-
-Planned areas include:
+Right now, Scrite focuses on offering a smooth writing experience. In the near
+future we plan to build product planning tools like,
 
 - Shot division
 - Storyboarding
