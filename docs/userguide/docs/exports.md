@@ -3,7 +3,7 @@
 Screenplays written in Scrite can be exported to several formats, each suited
 for different purposes:
 
-- [Adobe PDF](#adobe-pdf) — Share a read-only copy with others
+- [PDF](#pdf) — Share a read-only copy with others
 - [Final Draft](#final-draft) — Use with production planning and script
   breakdown software
 - [Fountain](#fountain) or [Plain Text](#plain-text) — Edit with markdown
@@ -28,14 +28,14 @@ Center](./user-interface.md#command-center).
 As you can notice the `Ctrl+P` shortcut is assigned to PDF Export by default.
 You can assign a shortcut of your choice to all other export options.
 
-## Adobe PDF
+## PDF
 
 PDF is the most widely used format for sharing screenplays. It preserves your
 screenplay's formatting perfectly across all devices and platforms, making it
 ideal for sending to actors, directors, producers, or anyone who needs to read
 your script without making changes.
 
-When you select Adobe PDF from the [export menu](#export-menu), or [Command
+When you select PDF from the [export menu](#export-menu), or [Command
 Center](./user-interface.md#command-center), or by using the
 [shortcut](./user-interface.md#keyboard-shortcuts) `Ctrl+P`, you will see a
 dialog box like this.
@@ -286,7 +286,7 @@ At the moment it is not possible to import a HTML file in Scrite.
 
 Checkable options in each of the export dialog boxes are persistent across
 multiple use and sessions. This means if you have checked the `Generate title
-page` option in [PDF Export](#adobe-pdf) dialog box, it will remain checked in
+page` option in [PDF Export](#pdf) dialog box, it will remain checked in
 all future use of the same. This is done to save you the burden of having to
 configure export options each time.
 

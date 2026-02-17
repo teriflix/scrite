@@ -229,7 +229,7 @@ the first scene.
 <img src="../images/quickstart/024-title-page.png" width="100%"/>
 
 ## Exporting to PDF
-Select `Export → Adobe PDF`, or press `Ctrl+P` (Windows/Linux) or `⌘+P` (macOS)
+Select `Export → PDF`, or press `Ctrl+P` (Windows/Linux) or `⌘+P` (macOS)
 to preview your PDF.
 
 The Export dialog offers options to customize your PDF—toggle title page,

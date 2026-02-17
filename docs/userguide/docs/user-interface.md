@@ -172,6 +172,17 @@ author, title, subtitle, or any word in the logline.
 > context. So its possible that you won't find one or more commands in here,
 > even though they are listed in the shortcuts dialog box.
 
+## Help Center
+
+Starting with version 2.0.20, you can lookup help topics in this user guide,
+from within the app.
+
+Just hit the `F1` key to launch the help center. Type a keyword or two to filter
+relavent topics, use the arrow keys to select one and hit `Return` to open it in
+your browser.
+
+<img src="../images/ui/011-help-center.jpg" width="85%"/>
+
 ## Jump to Scene
 Working in a large screenplay? Press `Ctrl+G`, type a scene/act/episode, and
 press `Enter` to jump.
