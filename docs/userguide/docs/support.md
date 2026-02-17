@@ -17,13 +17,14 @@ to reach us.
 ## Tutorials and Walkthroughs
 This page offers links to various video guides available on our channel.
 
+### Fresh Video Guides
 - [Introducing Scrite](https://youtu.be/T7J_8ebSVsk)
 - [Quick Start Guide](https://youtu.be/Ych8qKq3Epw)
 - [Importing & Exporting Files](https://youtu.be/yla0zvKDtHE)
 - [Two Column Report](https://youtu.be/CuQm-dEZfhA)
 - [Phonetic Typing in Indian Languages](https://youtu.be/n4qrbB5XehE)
 
-### Old Videos
+### Erstwhile Video Guides
 - [Guided Tour of Scrite, Sep 2022](https://youtu.be/Web6WEj56wo)
 - [Generating the Statistics Report](https://youtu.be/qp8ZSYI8Z_w)
 - [Using Custom Story Beats](https://youtu.be/Ql_BjMVpjNc)
