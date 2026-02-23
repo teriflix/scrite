@@ -18,13 +18,14 @@
 
 #include <QFont>
 #include <QObject>
+#include <QQuickItem>
 #include <QQmlEngine>
 #include <QTextLayout>
 #include <QKeySequence>
+#include <QNetworkReply>
 #include <QFontDatabase>
 #include <QAbstractListModel>
 #include <QQuickImageProvider>
-#include <QQuickItem>
 
 class QTextCursor;
 class LanguageEngine;
@@ -554,6 +555,9 @@ signals:
     /** Implementations must emit this signal when their capacity to support
         a one or more languages has changed at run time. */
     void capacityChanged();
+
+    /** Implementations can optionally emit additional suggestions asynchronously */
+    void transliterationOptions(const QString &word, const QStringList &options);
 };
 
 /*
@@ -574,6 +578,49 @@ public:
     bool canActivate(const TransliterationOption &option);
     bool activate(const TransliterationOption &option);
     QString transliterateWord(const QString &word, const TransliterationOption &option) const;
+};
+
+class QNetworkReply;
+
+/*
+ * This engine offers transliteration suggestions from dictpress based services.
+ * Dictpress is a free, open-source, single-binary web server application designed by Kailash Nadh
+ * for creating and publishing fast, searchable dictionaries, which stores data in SQLite DB files.
+ *
+ * As of now we have Alar and Olam, offering dictionaries for Kannada and Malayalam.
+ */
+class DictpressTransliterationEngine : public AbstractTransliterationEngine
+{
+    Q_OBJECT
+
+public:
+    explicit DictpressTransliterationEngine(int language, QObject *parent = nullptr);
+    ~DictpressTransliterationEngine();
+
+    bool isValid() const;
+
+    // AbstractTransliterationEngine interface
+    QString name() const;
+    QList<TransliterationOption> options(int lang) const;
+    bool canActivate(const TransliterationOption &option);
+    bool activate(const TransliterationOption &option);
+    QString transliterateWord(const QString &word, const TransliterationOption &option) const;
+
+protected:
+    void requestSuggestions(const QString &word);
+    void onReplyDestroyed();
+    void sendServiceRequest();
+    void onNetworkReplyFinished();
+    virtual void processServiceResponse(const QJsonObject &response);
+
+private:
+    int m_language = -1;
+    QString m_name;
+    QString m_baseUrl;
+
+    QString m_word;
+    QTimer *m_timer = nullptr;
+    QPointer<QNetworkReply> m_reply;
 };
 
 /*

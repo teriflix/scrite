@@ -13,10 +13,11 @@
 **
 ****************************************************************************/
 
-#include "languageengine.h"
-#include "application.h"
-#include "utils.h"
 #include "user.h"
+#include "utils.h"
+#include "application.h"
+#include "languageengine.h"
+#include "networkaccessmanager.h"
 
 #include <PhTranslateLib>
 
@@ -28,9 +29,11 @@
 #include <QTextBlock>
 #include <QScopeGuard>
 #include <QApplication>
+#include <QNetworkReply>
 #include <QFontDatabase>
 #include <QJsonDocument>
 #include <QTextDocument>
+#include <QNetworkRequest>
 #include <QTextBoundaryFinder>
 
 static const QMap<QLocale::Language, QChar::Script> languageScriptMap()
@@ -1432,6 +1435,154 @@ QString StaticTransliterationEngine::transliterateWord(const QString &word,
 
 ///////////////////////////////////////////////////////////////////////////////
 
+DictpressTransliterationEngine::DictpressTransliterationEngine(int language, QObject *parent)
+    : AbstractTransliterationEngine(parent)
+{
+    switch (language) {
+    case QLocale::Kannada:
+        m_name = QStringLiteral("alar.ink");
+        m_baseUrl = QString("https://alar.ink/atl/kn/");
+        m_language = QLocale::Kannada;
+        break;
+    case QLocale::Malayalam:
+        m_name = QStringLiteral("olam.in");
+        m_baseUrl = QString("https://olam.in/atl/malayalam/");
+        m_language = QLocale::Malayalam;
+        break;
+    default:
+        m_language = -1;
+    }
+}
+
+DictpressTransliterationEngine::~DictpressTransliterationEngine() { }
+
+bool DictpressTransliterationEngine::isValid() const
+{
+    return m_language == QLocale::Kannada || m_language == QLocale::Malayalam;
+}
+
+QString DictpressTransliterationEngine::name() const
+{
+    return m_name;
+}
+
+QList<TransliterationOption> DictpressTransliterationEngine::options(int lang) const
+{
+    if (lang == m_language)
+        return QList<TransliterationOption>(
+                { { (QObject *)this, lang, QStringLiteral("Dictpress"), this->name(), true } });
+
+    return QList<TransliterationOption>();
+}
+
+bool DictpressTransliterationEngine::canActivate(const TransliterationOption &option)
+{
+    return option.transliteratorObject == this && option.languageCode == m_language;
+}
+
+bool DictpressTransliterationEngine::activate(const TransliterationOption &option)
+{
+    // Nothing to do here.
+    Q_UNUSED(option);
+    return false;
+}
+
+QString DictpressTransliterationEngine::transliterateWord(const QString &word,
+                                                          const TransliterationOption &option) const
+{
+    DictpressTransliterationEngine *that = const_cast<DictpressTransliterationEngine *>(this);
+    that->requestSuggestions(word);
+
+    // Return from PhTranslator right away anyway.
+    return DefaultTransliteration::onWord(word, option.languageCode);
+}
+
+void DictpressTransliterationEngine::requestSuggestions(const QString &word)
+{
+    // Batch requests that come within a 250ms timegap
+    if (m_timer == nullptr) {
+        m_timer = new QTimer(this);
+        m_timer->setInterval(50);
+        m_timer->setSingleShot(true);
+        connect(m_timer, &QTimer::timeout, this,
+                &DictpressTransliterationEngine::sendServiceRequest);
+    }
+
+    m_word = word;
+    m_timer->start();
+}
+
+void DictpressTransliterationEngine::sendServiceRequest()
+{
+    if (!m_reply.isNull()) {
+        m_reply->disconnect(this);
+        m_reply->deleteLater();
+    }
+
+    QUrl url(m_baseUrl + m_word);
+
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    m_reply = NetworkAccessManager::instance()->get(request);
+    connect(m_reply, &QNetworkReply::finished, this,
+            &DictpressTransliterationEngine::onNetworkReplyFinished);
+    connect(m_reply, &QNetworkReply::finished, m_reply, &QNetworkReply::deleteLater);
+}
+
+void DictpressTransliterationEngine::onNetworkReplyFinished()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(this->sender());
+    if (reply != nullptr && m_reply == reply && !m_word.isEmpty()) {
+        const QByteArray response = reply->readAll();
+        const QJsonDocument jsonDoc = QJsonDocument::fromJson(response);
+        const QJsonObject jsonObj = jsonDoc.object();
+        this->processServiceResponse(jsonObj);
+    }
+}
+
+void DictpressTransliterationEngine::processServiceResponse(const QJsonObject &response)
+{
+    struct Match
+    {
+        QString word;
+        int weight = -1;
+    };
+    QList<Match> matches;
+
+    auto addOptionsFrom = [&matches](const QJsonArray &array) {
+        for (const QJsonValue &item : array) {
+            const QJsonObject obj = item.toObject();
+            matches << Match({ obj.value("word").toString(), obj.value("weight").toInt() });
+        }
+    };
+
+    auto it = response.begin();
+    auto end = response.end();
+    while (it != end) {
+        if (it.value().isArray()) {
+            addOptionsFrom(it.value().toArray());
+        }
+        ++it;
+    }
+
+    // Bundle PhTranslator suggestion first.
+    QStringList suggestions({ DefaultTransliteration::onWord(m_word, m_language) });
+    if (!matches.isEmpty()) {
+        std::sort(matches.begin(), matches.end(),
+                  [](const Match &a, const Match &b) { return a.weight > b.weight; });
+
+        for (const Match &match : qAsConst(matches)) {
+            if (!suggestions.contains(match.word))
+                suggestions.append(match.word);
+        }
+    }
+
+    emit transliterationOptions(m_word, suggestions);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 FallbackTransliterationEngine::FallbackTransliterationEngine(
         AbstractTransliterationEngine *platformEngine, QObject *parent)
     : AbstractTransliterationEngine(parent), m_platformEngine(platformEngine)
@@ -1840,6 +1991,8 @@ LanguageEngine::LanguageEngine(QObject *parent) : QObject(parent)
     // default. So, that should go first in the list.
     m_transliterators << new PlatformTransliterationEngine(this);
     m_transliterators << new StaticTransliterationEngine(this);
+    m_transliterators << new DictpressTransliterationEngine(QLocale::Kannada, this); // For Alar
+    m_transliterators << new DictpressTransliterationEngine(QLocale::Malayalam, this); // For Olam
     m_transliterators << new FallbackTransliterationEngine(m_transliterators.first(), this);
     for (AbstractTransliterationEngine *transliterator : qAsConst(m_transliterators))
         connect(transliterator, &AbstractTransliterationEngine::capacityChanged, this,
