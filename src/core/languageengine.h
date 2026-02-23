@@ -728,12 +728,20 @@ public:
     Q_SIGNAL void currentWordChanged();
 
     // clang-format off
-    Q_PROPERTY(QString commitString
-               READ commitString
-               NOTIFY commitStringChanged)
+    Q_PROPERTY(QStringList suggestions
+               READ suggestions
+               NOTIFY suggestionsChanged)
     // clang-format on
-    QString commitString() const { return m_currentWord.commitString; }
-    Q_SIGNAL void commitStringChanged();
+    QStringList suggestions() const { return m_currentWord.suggestions; }
+    Q_SIGNAL void suggestionsChanged();
+
+    // clang-format off
+    Q_PROPERTY(int currentSuggestionIndex
+               READ currentSuggestionIndex
+               NOTIFY currentSuggestionIndexChanged)
+    // clang-format on
+    int currentSuggestionIndex() const { return m_currentWord.m_currentSuggestionIndex; }
+    Q_SIGNAL void currentSuggestionIndexChanged();
 
     // clang-format off
     Q_PROPERTY(QRect textRect
@@ -758,6 +766,9 @@ private:
     bool updateWordFromInput(const QKeyEvent *keyEvent);
     bool commitWordToEditor();
     void resetCurrentWord();
+    void useSuggestions(const QString &word, const QStringList &suggestions);
+    void setCurrentSuggestions(const QStringList &suggestions);
+    void setCurrentSuggestionIndex(int val);
 
 private:
     struct Word
@@ -765,8 +776,9 @@ private:
         int start = -1;
         int end = -1;
         QRect textRect;
-        QString commitString;
         QString originalString;
+        QStringList suggestions;
+        int m_currentSuggestionIndex = 0;
     } m_currentWord;
 
     bool m_enabled = false;

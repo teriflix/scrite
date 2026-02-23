@@ -34,17 +34,47 @@ Popup {
 
     x: textRect.x + 10
     y: textRect.y + textRect.height + 5
+    width: _content.implicitWidth + leftPadding + rightPadding
+    height: _content.implicitHeight + topPadding + bottomPadding
 
     parent: Scrite.window.contentItem
-    visible: transliterator ? transliterator.commitString !== "" : false
+    visible: transliterator ? transliterator.suggestions.length > 0 : false
     closePolicy: Popup.NoAutoClose
 
     contentItem: ColumnLayout {
-        Label {
-            Layout.fillWidth: true
+        id: _content
 
-            text: root.transliterator ? root.transliterator.commitString : ""
-            font: root.editorFont
+        ListView {
+            id: _suggestionsList
+
+            ScrollBar.vertical: ScrollBar {
+                policy: ScrollBar.AsNeeded
+            }
+
+            Layout.fillWidth: true
+            Layout.preferredWidth: GMath.horizontalAdvance(transliterator.suggestions, root.editorFont) + 30
+            Layout.preferredHeight: count ? itemAtIndex(0).height * Math.min(count, 5) : 30
+
+            clip: contentHeight > height
+            model: transliterator.suggestions
+            currentIndex: transliterator.currentSuggestionIndex
+
+            delegate: Label {
+                required property string modelData
+
+                width: _suggestionsList.width
+
+                text: modelData
+                font: root.editorFont
+                padding: 8
+            }
+
+            highlight: Rectangle {
+                color: "lightsteelblue"
+                visible: _suggestionsList.count > 1
+            }
+            highlightMoveDuration: 0
+            highlightResizeDuration: 0
         }
 
         Item {
@@ -60,11 +90,17 @@ Popup {
         }
 
         Link {
+            id: _needHelp
+
+            Layout.fillWidth: true
+            Layout.minimumWidth: contentWidth
+
             text: "Need help?"
+            elide: Text.ElideRight
             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
             horizontalAlignment: Text.AlignHCenter
 
-            onClicked: Qt.openUrlExternally("https://www.scrite.io/typing-in-multiple-languages/")
+            onClicked: Qt.openUrlExternally("https://www.scrite.io/docs/userguide/languages/")
         }
     }
 }

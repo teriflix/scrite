@@ -1679,6 +1679,17 @@ qreal Utils::GMath::distanceBetweenPoints(const QPointF &p1, const QPointF &p2)
     return QLineF(p1, p2).length();
 }
 
+qreal Utils::GMath::horizontalAdvance(const QStringList &texts, const QFont &font)
+{
+    const QFontMetrics fm(font);
+
+    int ret = 0;
+    for (const QString &text : texts)
+        ret = qMax(ret, fm.horizontalAdvance(text));
+
+    return qreal(ret);
+}
+
 /**
  * \brief Adjusts a rectangle by margins.
  * \param rect The original rectangle.

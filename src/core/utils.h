@@ -832,6 +832,8 @@ public:
 
     Q_INVOKABLE static qreal distanceBetweenPoints(const QPointF &p1, const QPointF &p2);
 
+    Q_INVOKABLE static qreal horizontalAdvance(const QStringList &text, const QFont &font);
+
     Q_INVOKABLE static QRectF adjustRectangle(const QRectF &rect, qreal left, qreal top,
                                               qreal right, qreal bottom);
     Q_INVOKABLE static QRectF boundingRect(const QString &text, const QFont &font);
