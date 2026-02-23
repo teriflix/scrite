@@ -166,6 +166,11 @@ DialogLauncher {
                             }
 
                             ListElement {
+                                credits: "<strong>Alar</strong> and <strong>Olam</strong> Dictpress dictionaries for phonetic transliteration in Kannada and Malayalam."
+                                url: "https://dict.press/"
+                            }
+
+                            ListElement {
                                 credits: "<strong>Sonnet</strong> from KDE Frameworks for powering English spell check."
                                 url: "https://api.kde.org/frameworks/sonnet/html/index.html"
                             }
@@ -216,7 +221,7 @@ DialogLauncher {
                             color: creditLabelMouseArea.containsMouse ? "blue" : "black"
                             width: creditsView.width // - (creditsView.ScrollBar.vertical.needed ? 20 : 0)
                             wrapMode: Text.WordWrap
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                             horizontalAlignment: Text.AlignHCenter
 
                             MouseArea {
