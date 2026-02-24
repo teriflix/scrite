@@ -1441,12 +1441,12 @@ DictpressTransliterationEngine::DictpressTransliterationEngine(int language, QOb
     switch (language) {
     case QLocale::Kannada:
         m_name = QStringLiteral("alar.ink");
-        m_baseUrl = QString("https://alar.ink/atl/kn/");
+        m_baseUrl = QStringLiteral("https://alar.ink/atl/kn/");
         m_language = QLocale::Kannada;
         break;
     case QLocale::Malayalam:
         m_name = QStringLiteral("olam.in");
-        m_baseUrl = QString("https://olam.in/atl/malayalam/");
+        m_baseUrl = QStringLiteral("https://olam.in/atl/malayalam/");
         m_language = QLocale::Malayalam;
         break;
     default:

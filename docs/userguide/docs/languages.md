@@ -181,12 +181,35 @@ to use.
 > itself, unless you configure the app to [delegate it entirely to the
 > OS](#letting-os-manage-input-method-switching).
 
+### Dictpress: Alar and Olam
+
+[dictpress](https://dict.press) is a free and open source, single binary
+webserver application for building and publishing fast, searchable dictionaries
+for any language. The project has published two dictionaries
+[Alar](https://alar.ink) (for Kannada) and [Olam](https://olam.in) (for
+Malayalam). 
+
+<img src="../images/language-support/018-dictpress-transliteration.jpg"
+width="100%"/>
+
+From version 2.0.21, Scrite lets you use these dictionaries to offer
+transliteration suggestions as you type, in addition to the static
+transliteration offered by [PhTranslator](https://phtranslator.sourceforge.net). 
+
+<img src="../images/language-support/019-dictpress-transliteration.jpg"
+width="60%"/>
+
+> Please note that [Alar](https://alar.ink) and [Olam](https://olam.in)
+> dictionaries are a work in progress and you may not always find the
+> transliterated text you are looking for. However they are increasingly getting
+> better and better with each update.
+
 ### Third Party Input Methods
 
 Native support for [Nudi](https://nudityping.com),
 [Baraha](https://baraha.com/main.php),
-[ISMv6](https://ismv6.com/ism-v6-software-download-for-windows/),
-[Alar](https://alar.ink), [Olam](https://olam.in) and custom [keyboard layout
+[ISMv6](https://ismv6.com/ism-v6-software-download-for-windows/), and custom
+[keyboard layout
 files](https://www.microsoft.com/en-us/download/details.aspx?id=102134) is
 currently not available. We may build support for them in a future update.
 
