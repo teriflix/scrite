@@ -40,6 +40,7 @@ class Forms;
 class QSettings;
 class QQuickItem;
 class AutoUpdate;
+class QQmlEngine;
 class QNetworkConfigurationManager;
 
 class Application : public QtApplicationClass
@@ -212,7 +213,7 @@ public:
     Q_INVOKABLE void toggleFullscreen(QWindow *window);
 
     // Must be called from main.cpp
-    void initializeStandardColors(QQmlEngine *);
+    void initialize(QQmlEngine *engine);
 
     // QCoreApplication interface
     bool notify(QObject *, QEvent *);

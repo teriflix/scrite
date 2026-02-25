@@ -31,48 +31,61 @@ import "qrc:/qml/commandcenter"
 import "qrc:/qml/notifications"
 import "qrc:/qml/floatingdockpanels"
 
-Rectangle {
-    id: scriteRoot
+ApplicationWindow {
+    id: root
+
+    property bool closeButtonVisible: true
+
+    AppWindow.closeButtonVisible: closeButtonVisible
+    AppWindow.onInitialize: _private.initialize()
 
     width: 1366
     height: 700
+    visibility: ApplicationWindow.Maximized
+
     color: Runtime.colors.primary.windowColor
 
     Material.primary: Runtime.colors.primary.key
     Material.accent: Runtime.colors.accent.key
-    Material.theme: Material.Light
-    Material.background: Runtime.colors.accent.c700.background
+    Material.theme: Runtime.colors.theme
 
-    ScriteMainWindow {
+    Loader {
+        id: _contentLoader
+
         anchors.fill: parent
-        enabled: !NotificationsView.visible && Runtime.allowAppUsage
+
+        active: false
+        sourceComponent: ScriteMainWindowContent {
+            enabled: !NotificationsView.visible && Runtime.allowAppUsage
+        }
     }
 
     // Private Section
-    Component.onCompleted: _private.initialize()
-
     QtObject {
         id: _private
 
         function initialize() {
             // Initialize runtime
-            Runtime.init(scriteRoot)
-            ActionHub.init(scriteRoot)
-            HelpCenter.init(scriteRoot)
-            CommandCenter.init(scriteRoot)
-            SubscriptionPlanOperations.init(scriteRoot)
+            Runtime.init(_contentLoader)
+            ActionHub.init(_contentLoader)
+            HelpCenter.init(_contentLoader)
+            CommandCenter.init(_contentLoader)
+            SubscriptionPlanOperations.init(_contentLoader)
 
             // Determine font size provided by QML
             determineDefaultFontSize()
 
+            // Show the main-window content
+            _contentLoader.active = true
+
             // Initialize layers
-            BusyOverlay.init(scriteRoot)
+            BusyOverlay.init(_contentLoader)
             SubscriptionDetailsDialog.init()
             SubscriptionPlanComparisonDialog.init()
-            UserAccountDialog.init(scriteRoot)
-            FloatingDockLayer.init(scriteRoot)
-            OverlaysLayer.init(scriteRoot)
-            NotificationsLayer.init(scriteRoot)
+            UserAccountDialog.init(_contentLoader)
+            FloatingDockLayer.init(_contentLoader)
+            OverlaysLayer.init(_contentLoader)
+            NotificationsLayer.init(_contentLoader)
 
             // Raise window
             Scrite.window.raise()
@@ -94,7 +107,7 @@ Rectangle {
 
         function determineDefaultFontSize() {
             if( Scrite.app.customFontPointSize === 0) {
-                var textItem = Qt.createQmlObject("import QtQuick 2.15; Text { text: \"Welcome to Scrite\" }", scriteRoot)
+                var textItem = Qt.createQmlObject("import QtQuick 2.15; Text { text: \"Welcome to Scrite\" }", _contentLoader)
                 if(textItem) {
                     Scrite.app.customFontPointSize = textItem.font.pointSize
                     textItem.destroy()

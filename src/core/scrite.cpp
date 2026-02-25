@@ -40,7 +40,7 @@ Application *Scrite::app()
     return Application::instance();
 }
 
-AppWindow *Scrite::window()
+QQuickWindow *Scrite::window()
 {
     return AppWindow::instance();
 }

@@ -17,6 +17,8 @@ CONFIG += qmltypes
 QML_IMPORT_NAME = io.scrite.components
 QML_IMPORT_MAJOR_VERSION = 1
 
+DEFINES += SCRITE_QML_URI=\\\"$$QML_IMPORT_NAME\\\"
+
 CONFIG(release, debug|release) {
     DEFINES += QT_NO_DEBUG_OUTPUT
     CONFIG += qtquickcompiler

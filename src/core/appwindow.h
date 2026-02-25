@@ -16,25 +16,23 @@
 #ifndef APPWINDOW_H
 #define APPWINDOW_H
 
-#include <QQuickView>
 #include <QQmlEngine>
+#include <QQuickWindow>
 
-class AppWindow : public QQuickView
+class AppWindow : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_ATTACHED(AppWindow)
 
 public:
-    static AppWindow *instance();
-
-    explicit AppWindow();
+    static QQuickWindow *instance();
     ~AppWindow();
 
-    // By default, this is true and close button on the title bar is visible.
-    // When set to false, it becomes invisible or disabled. Please ensure
-    // that the flag is turned back to true as soon as the utility of this
-    // flag is over.
+    static AppWindow *qmlAttachedProperties(QObject *object);
+
+    QQuickWindow *window() const { return m_window; }
+
     // clang-format off
     Q_PROPERTY(bool closeButtonVisible
                READ isCloseButtonVisible
@@ -45,10 +43,16 @@ public:
     bool isCloseButtonVisible() const { return m_closeButtonVisible; }
     Q_SIGNAL void closeButtonVisibleChanged();
 
+signals:
+    void initialize();
+
 private:
+    explicit AppWindow(QQuickWindow *window);
+
     void initializeFileNameToOpen();
 
 private:
+    QQuickWindow *m_window = nullptr;
     bool m_closeButtonVisible = true;
     Qt::WindowFlags m_defaultWindowFlags;
 };

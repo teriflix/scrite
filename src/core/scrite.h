@@ -195,11 +195,11 @@ public:
     static Application *app();
 
     // clang-format off
-    Q_PROPERTY(AppWindow *window
+    Q_PROPERTY(QQuickWindow *window
                READ window
                CONSTANT )
     // clang-format on
-    static AppWindow *window();
+    static QQuickWindow *window();
 
     // clang-format off
     Q_PROPERTY(User *user

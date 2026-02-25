@@ -82,9 +82,9 @@ Item {
         property var active: supported.activeLanguage
         property var activeTransliterationOption: active.valid ? active.preferredTransliterationOption() : undefined
 
-        property bool activeTransliterationIsInApp: activeTransliterationOption && activeTransliterationOption.valid && activeTransliterationOption.inApp
+        property bool activeTransliterationIsInApp: activeTransliterationOption && activeTransliterationOption.valid ? activeTransliterationOption.inApp : false
 
-        property AbstractTransliterationEngine activeTransliterator: activeTransliterationOption.valid ? activeTransliterationOption.transliterator : null
+        property AbstractTransliterationEngine activeTransliterator: activeTransliterationOption && activeTransliterationOption.valid ? activeTransliterationOption.transliterator : null
 
         function setActiveCode(code) {
             if(activeCode === code)
@@ -1043,7 +1043,7 @@ Item {
             Runtime.screenplayEditorSettings.sceneSidePanelOpen = false
             Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
 
-            Scrite.document.displayFormat.activeLanguageCode = Runtime.language.activeLanguageCode
+            Scrite.document.displayFormat.activeLanguageCode = Runtime.language.activeCode
         }
 
         function onJustLoaded() {

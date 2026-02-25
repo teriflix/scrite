@@ -47,7 +47,7 @@ VclDialog {
 
         DisabledFeatureNotice {
             color: Qt.rgba(1,1,1,0.9)
-            featureName: exporter.format
+            featureName: exporter ? exporter.format : Scrite.ExportFeature
         }
     }
 
@@ -297,7 +297,7 @@ VclDialog {
         property VclDialog waitDialog
     }
 
-    onClosed: Runtime.execLater(exporter, 100, exporter.discard)
+    onClosed: Runtime.execLater(exporter, 100, () => { if(exporter) exporter.discard() } )
 
     Connections {
         target: root.exporter

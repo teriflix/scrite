@@ -43,6 +43,7 @@
 #include <QDateTime>
 #include <QMetaEnum>
 #include <QHostInfo>
+#include <QQmlEngine>
 #include <QQuickItem>
 #include <QJsonArray>
 #include <QClipboard>
@@ -351,16 +352,16 @@ QVersionNumber Application::prepare()
         const QByteArray qtScaleFactor =
                 QByteArray::number(qRound(qBound(0.1, uiScaleFactor, 10.0) * 100) / 100.0);
         Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
-        Application::setAttribute(Qt::AA_Use96Dpi);
         Application::setAttribute(Qt::AA_DisableHighDpiScaling);
+        Application::setAttribute(Qt::AA_Use96Dpi);
         qputenv("QT_SCALE_FACTOR", qtScaleFactor);
     } else {
         if (dpiMode == QByteArrayLiteral("HIGH_DPI")) {
             Application::setAttribute(Qt::AA_EnableHighDpiScaling);
             Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
         } else /*if (dpiMode == QByteArrayLiteral("96_DPI_ONLY"))*/ {
-            Application::setAttribute(Qt::AA_Use96Dpi);
             Application::setAttribute(Qt::AA_DisableHighDpiScaling);
+            Application::setAttribute(Qt::AA_Use96Dpi);
         }
     }
 #endif
@@ -999,4 +1000,28 @@ bool Application::registerFileTypes()
     return true;
 #endif
 #endif
+}
+
+#include "qimageitem.h"
+#include "languageengine.h"
+#include "colorimageprovider.h"
+#include "basicfileiconprovider.h"
+
+void Application::initialize(QQmlEngine *engine)
+{
+    QObject::connect(engine, &QQmlEngine::quit, this, &Application::quit);
+
+    // Force registration of QML types in io.scrite.components
+    extern void qml_register_types_io_scrite_components();
+    qml_register_types_io_scrite_components();
+
+    // Init modules
+    const char *uri = SCRITE_QML_URI;
+    UndoHub::init(uri, engine);
+    LanguageEngine::init(uri, engine);
+
+    // Register image providers
+    engine->addImageProvider(ColorImageProvider::name(), new ColorImageProvider);
+    engine->addImageProvider(BasicFileIconProvider::name(), new BasicFileIconProvider);
+    engine->addImageProvider(ImageIconProvider::name(), new ImageIconProvider);
 }

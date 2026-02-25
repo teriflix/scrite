@@ -13,17 +13,11 @@
 **
 ****************************************************************************/
 
-#include "user.h"
+#include "utils.h"
 #include "scrite.h"
-#include "qimageitem.h"
 #include "appwindow.h"
-#include "callgraph.h"
 #include "application.h"
-#include "actionmanager.h"
 #include "scritedocument.h"
-#include "languageengine.h"
-#include "colorimageprovider.h"
-#include "basicfileiconprovider.h"
 
 #include <QMenuBar>
 #include <QSettings>
@@ -31,72 +25,60 @@
 #include <QQmlContext>
 #include <QOperatingSystemVersion>
 
-static AppWindow *AppWindowInstance = nullptr;
+static AppWindow *GlobalAppWindowInstance = nullptr;
 
-AppWindow *AppWindow::instance()
+QQuickWindow *AppWindow::instance()
 {
-    // CAPTURE_FIRST_CALL_GRAPH;
-    return ::AppWindowInstance;
+    return GlobalAppWindowInstance ? GlobalAppWindowInstance->window() : nullptr;
 }
 
-AppWindow::AppWindow()
+AppWindow *AppWindow::qmlAttachedProperties(QObject *object)
 {
-    // CAPTURE_CALL_GRAPH;
-    ::AppWindowInstance = this;
+    if (GlobalAppWindowInstance != nullptr)
+        return nullptr;
 
-    this->setFormat(QSurfaceFormat::defaultFormat());
+    QQuickWindow *window = qobject_cast<QQuickWindow *>(object);
+    if (window == nullptr)
+        return nullptr;
 
+    GlobalAppWindowInstance = new AppWindow(window);
+    return GlobalAppWindowInstance;
+}
+
+AppWindow::AppWindow(QQuickWindow *window) : QObject(window), m_window(window)
+{
 #ifdef Q_OS_MAC
-    this->setFlags(Qt::Window
-                   | Qt::WindowFullscreenButtonHint); // [0.5.2 All] Full Screen Mode #194
+    window->setFlags(Qt::Window
+                     | Qt::WindowFullscreenButtonHint); // [0.5.2 All] Full Screen Mode #194
 #endif
-    this->setObjectName(QStringLiteral("ScriteWindow"));
+    window->setObjectName(QStringLiteral("ScriteWindow"));
 
 #ifdef Q_OS_MAC
     QMenuBar *menuBar = new QMenuBar(nullptr);
     QAction *quitAction = menuBar->addMenu("File")->addAction("Quit");
-    QObject::connect(quitAction, &QAction::triggered, this, &QQuickView::close);
+    QObject::connect(quitAction, &QAction::triggered, window, &QQuickWindow::close);
 #endif
 
     // Handle minimize window request from application to minimize this window
     Application &scriteApp = *Application::instance();
-    QObject::connect(&scriteApp, &Application::minimizeWindowRequest, this,
-                     &QQuickView::showMinimized);
-    QObject::connect(this->engine(), &QQmlEngine::quit, &scriteApp, &Application::quit);
+    QObject::connect(&scriteApp, &Application::minimizeWindowRequest, window,
+                     &QQuickWindow::showMinimized);
 
     // Hook up to Scrite Document
     ScriteDocument *scriteDocument = ScriteDocument::instance();
-    scriteDocument->formatting()->setSreeenFromWindow(this);
+    scriteDocument->formatting()->setSreeenFromWindow(window);
     scriteDocument->clearModified();
-    this->setTitle(scriteDocument->documentWindowTitle());
-    QObject::connect(scriteDocument, &ScriteDocument::documentWindowTitleChanged, this,
-                     &QQuickView::setTitle);
+    window->setTitle(scriteDocument->documentWindowTitle());
+    QObject::connect(scriteDocument, &ScriteDocument::documentWindowTitleChanged, window,
+                     &QQuickWindow::setTitle);
 
     // Configure minimum size of the application window
     const QScreen *screen = scriteApp.primaryScreen();
     const QSize screenSize = screen->availableSize();
-    this->setMinimumSize(QSize(qMin(600, screenSize.width()), qMin(375, screenSize.height())));
+    window->setMinimumSize(QSize(qMin(600, screenSize.width()), qMin(375, screenSize.height())));
 
     // If supplied in args, load the file-name
     this->initializeFileNameToOpen();
-
-    // Force registration of QML types in io.scrite.components
-    extern void qml_register_types_io_scrite_components();
-    qml_register_types_io_scrite_components();
-
-    // Other inits
-    this->setResizeMode(QQuickView::SizeRootObjectToView);
-    // this->setTextRenderType(QQuickView::NativeTextRendering);
-
-    // Init modules
-    static const char *uri = "io.scrite.components";
-    UndoHub::init(uri, this->engine());
-    LanguageEngine::init(uri, this->engine());
-
-    // Register image providers
-    this->engine()->addImageProvider(ColorImageProvider::name(), new ColorImageProvider);
-    this->engine()->addImageProvider(BasicFileIconProvider::name(), new BasicFileIconProvider);
-    this->engine()->addImageProvider(ImageIconProvider::name(), new ImageIconProvider);
 
     const bool useNativeTextRendering = [=]() -> bool {
 #ifdef Q_OS_WIN
@@ -109,16 +91,19 @@ AppWindow::AppWindow()
                           .toBool()
                 : true;
     }();
-    setTextRenderType(useNativeTextRendering ? NativeTextRendering : QtTextRendering);
+    window->setTextRenderType(useNativeTextRendering ? QQuickWindow::NativeTextRendering
+                                                     : QQuickWindow::QtTextRendering);
 
-    m_defaultWindowFlags = this->flags();
+    m_defaultWindowFlags = window->flags();
 
-    this->setMinimumSize(QSize(1366, 700));
+    window->setMinimumSize(QSize(1366, 700));
+
+    QTimer::singleShot(50, this, &AppWindow::initialize);
 }
 
 AppWindow::~AppWindow()
 {
-    ::AppWindowInstance = nullptr;
+    GlobalAppWindowInstance = nullptr;
 }
 
 void AppWindow::setCloseButtonVisible(bool val)
@@ -131,7 +116,7 @@ void AppWindow::setCloseButtonVisible(bool val)
     Qt::WindowFlags newFlags = m_defaultWindowFlags;
     if (!val)
         newFlags |= Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint;
-    this->setFlags(newFlags);
+    m_window->setFlags(newFlags);
 
     emit closeButtonVisibleChanged();
 }

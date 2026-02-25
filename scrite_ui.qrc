@@ -7,7 +7,7 @@
         <file>main.qml</file>
         <file>qml/NotebookView.qml</file>
         <file>qml/ScreenplayEditor.qml</file>
-        <file>qml/ScriteMainWindow.qml</file>
+        <file>qml/ScriteMainWindowContent.qml</file>
         <file>qml/ScritedView.qml</file>
         <file>qml/StructureView.qml</file>
         <file>qml/TimelineView.qml</file>

@@ -26,7 +26,7 @@
 #include "notificationmanager.h"
 #include "systemrequirements.h"
 
-#include <QQuickStyle>
+#include <QQmlApplicationEngine>
 
 int main(int argc, char **argv)
 {
@@ -59,11 +59,9 @@ int main(int argc, char **argv)
     ScriteDocument::instance();
     ScriteDocumentVault::instance();
 
-    AppWindow scriteWindow;
-    QTimer::singleShot(0, &scriteWindow, [&scriteWindow]() {
-        scriteWindow.setSource(QUrl("qrc:/main.qml"));
-        scriteWindow.show();
-    });
+    QQmlApplicationEngine qmlEngine;
+    scriteApp.initialize(&qmlEngine);
+    qmlEngine.load(QUrl("qrc:/main.qml"));
 
     return scriteApp.exec();
 }
