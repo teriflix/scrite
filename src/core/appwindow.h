@@ -49,6 +49,7 @@ signals:
 private:
     explicit AppWindow(QQuickWindow *window);
 
+    void init();
     void initializeFileNameToOpen();
 
 private:

@@ -98,7 +98,7 @@ AppWindow::AppWindow(QQuickWindow *window) : QObject(window), m_window(window)
 
     window->setMinimumSize(QSize(1366, 700));
 
-    QTimer::singleShot(50, this, &AppWindow::initialize);
+    QTimer::singleShot(50, this, &AppWindow::init);
 }
 
 AppWindow::~AppWindow()
@@ -159,6 +159,22 @@ static inline QString getFileNameToOpenFromAppArgs()
     }
 
     return QString();
+}
+
+void AppWindow::init()
+{
+    emit initialize();
+
+    /*
+     * For some strange reason the UI doesn't render unless the window is resized
+     * a bit. This is very very strange, but it seems to happen.
+     */
+    if (m_window != nullptr) {
+        const int w = m_window->width();
+        const int h = m_window->height();
+        m_window->resize(w - 1, h - 1);
+        m_window->resize(w, h);
+    }
 }
 
 void AppWindow::initializeFileNameToOpen()
