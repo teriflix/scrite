@@ -369,7 +369,7 @@ void AbstractReportGenerator::polishOdtContent(const QString &fileName)
             return;
 
         QTextStream ts(&contentXmlFile);
-        ts.setCodec("utf-8");
+        ts.setEncoding(QStringConverter::Utf8);
         ts.setAutoDetectUnicode(true);
         ts << contentXmlDom.toString();
         ts.flush();

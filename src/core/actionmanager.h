@@ -108,8 +108,8 @@ public:
 private:
     static void staticAppendAction(QQmlListProperty<QObject> *list, QObject *ptr);
     static void staticClearActions(QQmlListProperty<QObject> *list);
-    static QObject *staticActionAt(QQmlListProperty<QObject> *list, int index);
-    static int staticActionCount(QQmlListProperty<QObject> *list);
+    static QObject *staticActionAt(QQmlListProperty<QObject> *list, qsizetype index);
+    static qsizetype staticActionCount(QQmlListProperty<QObject> *list);
 
 public:
     // QAbstractItemModel interface

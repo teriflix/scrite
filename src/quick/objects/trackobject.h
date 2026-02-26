@@ -262,8 +262,8 @@ private:
                                     AbstractObjectTracker *ptr);
     static void staticClearTrackers(QQmlListProperty<AbstractObjectTracker> *list);
     static AbstractObjectTracker *staticTrackerAt(QQmlListProperty<AbstractObjectTracker> *list,
-                                                  int index);
-    static int staticTrackerCount(QQmlListProperty<AbstractObjectTracker> *list);
+                                                  qsizetype index);
+    static qsizetype staticTrackerCount(QQmlListProperty<AbstractObjectTracker> *list);
     QList<AbstractObjectTracker *> m_trackers;
 };
 

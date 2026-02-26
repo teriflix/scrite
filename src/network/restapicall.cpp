@@ -273,7 +273,7 @@ bool RestApiCall::call()
 
     QString path =
             QStringLiteral("/") + QLatin1String(REST_API_ROOT) + QStringLiteral("/") + this->api();
-    path = path.replace(QRegExp(QStringLiteral("/+")), QStringLiteral("/"));
+    path = path.replace(QRegularExpression(QStringLiteral("/+")), QStringLiteral("/"));
 
     QUrl url = QUrl(QLatin1String(REST_API_URL));
     url.setPath(path);
@@ -511,7 +511,7 @@ RestApiCallQueue::~RestApiCallQueue()
 
 RestApiCallQueue *RestApiCallQueue::find(RestApiCall *call)
 {
-    for (RestApiCallQueue *queue : qAsConst(*::RestApiCallQueues)) {
+    for (RestApiCallQueue *queue : std::as_const(*::RestApiCallQueues)) {
         if (queue->contains(call) || queue->current() == call)
             return queue;
     }
@@ -666,12 +666,12 @@ void RestApiCallList::staticClearCalls(QQmlListProperty<RestApiCall> *list)
     reinterpret_cast<RestApiCallList *>(list->data)->clearCalls();
 }
 
-RestApiCall *RestApiCallList::staticCallAt(QQmlListProperty<RestApiCall> *list, int index)
+RestApiCall *RestApiCallList::staticCallAt(QQmlListProperty<RestApiCall> *list, qsizetype index)
 {
     return reinterpret_cast<RestApiCallList *>(list->data)->callAt(index);
 }
 
-int RestApiCallList::staticCallCount(QQmlListProperty<RestApiCall> *list)
+qsizetype RestApiCallList::staticCallCount(QQmlListProperty<RestApiCall> *list)
 {
     return reinterpret_cast<RestApiCallList *>(list->data)->callCount();
 }

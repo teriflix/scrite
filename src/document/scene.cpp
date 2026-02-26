@@ -1457,7 +1457,7 @@ void Scene::inferSynopsisFromContent()
 
     auto findParagraph = [=](SceneElement::Type type, SceneElement *fromElement = nullptr) {
         bool checkElement = fromElement == nullptr;
-        for (SceneElement *element : qAsConst(m_elements)) {
+        for (SceneElement *element : std::as_const(m_elements)) {
             if (!checkElement && fromElement != nullptr && element == fromElement) {
                 checkElement = true;
                 continue;
@@ -1683,13 +1683,13 @@ void Scene::scanMuteCharacters(const QStringList &characterNames)
     const QList<SceneElement::Type> skipTypes = QList<SceneElement::Type>()
             << SceneElement::Character << SceneElement::Transition << SceneElement::Shot;
 
-    for (SceneElement *element : qAsConst(m_elements)) {
+    for (SceneElement *element : std::as_const(m_elements)) {
         if (skipTypes.contains(element->type()))
             continue;
 
         const QString text = element->text();
 
-        for (const QString &name : qAsConst(names)) {
+        for (const QString &name : std::as_const(names)) {
             int pos = 0;
             while (pos < text.length()) {
                 pos = text.indexOf(name, pos, Qt::CaseInsensitive);
@@ -1791,7 +1791,7 @@ void Scene::addToGroup(const QString &group)
 void Scene::removeFromGroup(const QString &group)
 {
     int index = -1;
-    for (const QString &item : qAsConst(m_groups)) {
+    for (const QString &item : std::as_const(m_groups)) {
         ++index;
         if (!item.compare(group, Qt::CaseInsensitive))
             break;
@@ -2005,7 +2005,7 @@ SceneElement *Scene::elementAt(int index) const
 
 SceneElement *Scene::findElementById(const QString &id) const
 {
-    for (SceneElement *ptr : qAsConst(m_elements)) {
+    for (SceneElement *ptr : std::as_const(m_elements)) {
         if (ptr->id() == id)
             return ptr;
     }
@@ -2078,7 +2078,7 @@ bool Scene::polishText(Scene *previousScene)
 {
     bool ret = false;
 
-    for (SceneElement *para : qAsConst(m_elements))
+    for (SceneElement *para : std::as_const(m_elements))
         ret |= para->polishText(previousScene);
 
     if (ret)
@@ -2091,7 +2091,7 @@ bool Scene::capitalizeSentences()
 {
     bool ret = false;
 
-    for (SceneElement *para : qAsConst(m_elements))
+    for (SceneElement *para : std::as_const(m_elements))
         ret |= para->capitalizeSentences();
 
     if (ret)
@@ -2823,7 +2823,7 @@ void Scene::renameCharacter(const QString &from, const QString &to)
     m_heading->renameCharacter(from, to);
 
     // Rename character name in paragraphs
-    for (SceneElement *element : qAsConst(m_elements))
+    for (SceneElement *element : std::as_const(m_elements))
         element->renameCharacter(from, to);
 
     if (isFromMute) {
@@ -2883,7 +2883,7 @@ void Scene::evaluateWordCount()
     if (m_heading->isEnabled())
         wordCount += m_heading->wordCount();
 
-    for (const SceneElement *element : qAsConst(m_elements))
+    for (const SceneElement *element : std::as_const(m_elements))
         wordCount += element->wordCount();
 
     this->setWordCount(wordCount);
@@ -2960,12 +2960,12 @@ void Scene::staticClearElements(QQmlListProperty<SceneElement> *list)
     reinterpret_cast<Scene *>(list->data)->clearElements();
 }
 
-SceneElement *Scene::staticElementAt(QQmlListProperty<SceneElement> *list, int index)
+SceneElement *Scene::staticElementAt(QQmlListProperty<SceneElement> *list, qsizetype index)
 {
     return reinterpret_cast<Scene *>(list->data)->elementAt(index);
 }
 
-int Scene::staticElementCount(QQmlListProperty<SceneElement> *list)
+qsizetype Scene::staticElementCount(QQmlListProperty<SceneElement> *list)
 {
     return reinterpret_cast<Scene *>(list->data)->elementCount();
 }
@@ -3216,9 +3216,8 @@ void SceneSizeHintItem::timerEvent(QTimerEvent *te)
 
         const QString watcherName = QStringLiteral("SceneSizeHintItemFutureWatcher");
 
-        QFutureWatcher<SceneSizeHintItem_TaskResult> *watcher =
-                this->findChild<QFutureWatcher<SceneSizeHintItem_TaskResult> *>(watcherName);
-        if (watcher) {
+        QFutureWatcherBase *watcherBase = this->findChild<QFutureWatcherBase *>(watcherName);
+        if (watcherBase) {
             this->updateSizeAndImageLater();
             return;
         }
@@ -3237,7 +3236,8 @@ void SceneSizeHintItem::timerEvent(QTimerEvent *te)
             static int taskResultTypeId = qRegisterMetaType<SceneSizeHintItem_TaskResult>();
             Q_UNUSED(taskResultTypeId)
 
-            watcher = new QFutureWatcher<SceneSizeHintItem_TaskResult>(this);
+            QFutureWatcher<SceneSizeHintItem_TaskResult> *watcher =
+                    new QFutureWatcher<SceneSizeHintItem_TaskResult>(this);
             watcher->setObjectName(watcherName);
             connect(watcher, &QFutureWatcher<SceneSizeHintItem_TaskResult>::finished, this, [=]() {
                 const SceneSizeHintItem_TaskResult result = watcher->result();
@@ -3426,7 +3426,7 @@ void SceneGroup::toggle(int row)
     const QString groupName = item.value(nameKey).toString();
 
     if (item.value(checkedKey) != fullyCheckedVal) {
-        for (Scene *scene : qAsConst(m_scenes)) {
+        for (Scene *scene : std::as_const(m_scenes)) {
             disconnect(scene, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
             scene->addToGroup(groupName);
             connect(scene, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
@@ -3434,7 +3434,7 @@ void SceneGroup::toggle(int row)
 
         item.insert(checkedKey, fullyCheckedVal);
     } else {
-        for (Scene *scene : qAsConst(m_scenes)) {
+        for (Scene *scene : std::as_const(m_scenes)) {
             disconnect(scene, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
             scene->removeFromGroup(groupName);
             connect(scene, &Scene::groupsChanged, this, &SceneGroup::reevalLater);
@@ -3456,7 +3456,7 @@ bool SceneGroup::stack()
     if (m_structure != nullptr && m_canBeStacked) {
         const QString stackId = Utils::SMath::createUniqueId();
 
-        for (Scene *scene : qAsConst(m_scenes)) {
+        for (Scene *scene : std::as_const(m_scenes)) {
             StructureElement *structureElement = scene->structureElement();
             structureElement->setStackId(stackId);
         }
@@ -3470,7 +3470,7 @@ bool SceneGroup::stack()
 bool SceneGroup::unstack()
 {
     if (m_structure != nullptr && this->canBeUnstacked()) {
-        for (Scene *scene : qAsConst(m_scenes)) {
+        for (Scene *scene : std::as_const(m_scenes)) {
             StructureElement *structureElement = scene->structureElement();
             structureElement->setStackId(QString());
         }
@@ -3486,7 +3486,7 @@ bool SceneGroup::addOpenTag(const QString &tag)
     if (tag.isEmpty() || this->hasOpenTag(tag))
         return false;
 
-    for (Scene *scene : qAsConst(m_scenes)) {
+    for (Scene *scene : std::as_const(m_scenes)) {
         scene->addTag(tag);
     }
 
@@ -3501,7 +3501,7 @@ bool SceneGroup::removeOpenTag(const QString &tag)
     if (tag.isEmpty() || !this->hasOpenTag(tag))
         return false;
 
-    for (Scene *scene : qAsConst(m_scenes)) {
+    for (Scene *scene : std::as_const(m_scenes)) {
         scene->removeTag(tag);
     }
 
@@ -3706,7 +3706,7 @@ void SceneGroup::reeval()
     QMap<QString, int> groupCounter;
     QMap<QString, int> openTagsCounter;
 
-    for (Scene *scene : qAsConst(m_scenes)) {
+    for (Scene *scene : std::as_const(m_scenes)) {
         const QStringList groups = scene->groups();
         for (const QString &group : groups)
             groupCounter[group] = groupCounter.value(group, 0) + 1;
@@ -3818,7 +3818,7 @@ void SceneGroup::evaluateLengths()
 
     if (m_scenes.size() >= 2) {
         screenplay = new Screenplay(m_paginator);
-        for (Scene *scene : qAsConst(m_scenes))
+        for (Scene *scene : std::as_const(m_scenes))
             screenplay->addScene(scene);
         m_paginator->setScreenplay(screenplay);
     } else {
@@ -3836,12 +3836,12 @@ void SceneGroup::staticClearScenes(QQmlListProperty<Scene> *list)
     reinterpret_cast<SceneGroup *>(list->data)->clearScenes();
 }
 
-Scene *SceneGroup::staticSceneAt(QQmlListProperty<Scene> *list, int index)
+Scene *SceneGroup::staticSceneAt(QQmlListProperty<Scene> *list, qsizetype index)
 {
     return reinterpret_cast<SceneGroup *>(list->data)->sceneAt(index);
 }
 
-int SceneGroup::staticSceneCount(QQmlListProperty<Scene> *list)
+qsizetype SceneGroup::staticSceneCount(QQmlListProperty<Scene> *list)
 {
     return reinterpret_cast<SceneGroup *>(list->data)->sceneCount();
 }

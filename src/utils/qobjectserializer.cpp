@@ -161,7 +161,8 @@ QJsonObject QObjectSerializer::toJson(const QObject *object)
     if (object == nullptr)
         return ret;
 
-    QObjectSerializer::Interface *interface = qobject_cast<QObjectSerializer::Interface *>(object);
+    QObjectSerializer::Interface *interface =
+            qobject_cast<QObjectSerializer::Interface *>(const_cast<QObject *>(object));
     if (interface != nullptr)
         interface->prepareForSerialization();
 
@@ -818,7 +819,7 @@ QVariant QFontHelper::fromJson(const QJsonValue &value, int type) const
         font.setPointSize(json.value("pointSize").toInt());
 
     if (json.contains("weight"))
-        font.setWeight(json.value("weight").toInt());
+        font.setWeight(QFont::Weight(json.value("weight").toInt()));
 
     if (json.contains("caps"))
         font.setCapitalization(
@@ -895,7 +896,8 @@ QVariantMap QObjectSerializer::cacheDefaultPropertyValues(const QObject *object,
     if (defaultPropertyValueMap.contains(className) || readonly)
         return defaultPropertyValueMap.value(className);
 
-    QObjectSerializer::Interface *interface = qobject_cast<QObjectSerializer::Interface *>(object);
+    QObjectSerializer::Interface *interface =
+            qobject_cast<QObjectSerializer::Interface *>(const_cast<QObject *>(object));
 
     QStack<const QMetaObject *> metaObjects;
     QStringList classNames;

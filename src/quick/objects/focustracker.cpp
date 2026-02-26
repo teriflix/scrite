@@ -186,7 +186,7 @@ void FocusTracker::evaluateHasFocus()
 
     QList<QQuickItem *> trackedItems;
     if (m_evaluationMethod == ExclusiveFocusEvaluation) {
-        for (FocusTracker *tracker : qAsConst(*::GlobalFocusTrackerList)) {
+        for (FocusTracker *tracker : std::as_const(*::GlobalFocusTrackerList)) {
             if (tracker == this)
                 continue;
             trackedItems << tracker->item();

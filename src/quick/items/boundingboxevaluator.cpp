@@ -133,7 +133,7 @@ void BoundingBoxEvaluator::evaluateNow()
     QRectF rect = m_initialRect;
     QRectF trect;
 
-    for (BoundingBoxItem *item : qAsConst(m_items)) {
+    for (BoundingBoxItem *item : std::as_const(m_items)) {
         if (item->item()) {
             if (rect.isNull())
                 rect = item->boundingRect();
@@ -177,7 +177,7 @@ void BoundingBoxEvaluator::updatePreview()
      * get a function to create preview-picture in a thread.
      */
     QList<QJsonObject> itemInfoArray;
-    for (BoundingBoxItem *item : qAsConst(m_items)) {
+    for (BoundingBoxItem *item : std::as_const(m_items)) {
         if (item->isPreviewEnabled())
             itemInfoArray << item->asJson();
     }
@@ -255,7 +255,7 @@ QPicture BoundingBoxEvaluator::createPreviewPicture(const QList<QJsonObject> &it
         return ret;
     };
 
-    for (const QJsonObject &item : qAsConst(itemsCopy)) {
+    for (const QJsonObject &item : std::as_const(itemsCopy)) {
         const QRectF itemRect = rectFromJson(item.value(QStringLiteral("boundingRect")).toObject());
         const QImage itemPreview = imageFromJson(item.value(QStringLiteral("preview")));
         const QColor previewBorderColor(

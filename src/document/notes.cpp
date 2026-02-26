@@ -854,7 +854,7 @@ void Notes::deserializeFromJson(const QJsonObject &json)
         const QJsonObject jsNoteItem = jsNoteItemValue.toObject();
         const QString jsNoteId = jsNoteItem.value(idAttr).toString();
         bool jsNoteIsUnique = true;
-        for (const QJsonObject &uniqueJsNote : qAsConst(uniqueJsNotes)) {
+        for (const QJsonObject &uniqueJsNote : std::as_const(uniqueJsNotes)) {
             if (uniqueJsNote.value(idAttr).toString() == jsNoteId) {
                 jsNoteIsUnique = false;
                 break;
@@ -866,7 +866,7 @@ void Notes::deserializeFromJson(const QJsonObject &json)
     }
 
     notes.reserve(jsNotes.size());
-    for (const QJsonObject &jsNote : qAsConst(uniqueJsNotes)) {
+    for (const QJsonObject &jsNote : std::as_const(uniqueJsNotes)) {
         Note *note = new Note(this);
         if (QObjectSerializer::fromJson(jsNote, note))
             notes.append(note);

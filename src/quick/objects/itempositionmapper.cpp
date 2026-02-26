@@ -103,7 +103,7 @@ void ItemPositionMapper::trackToItemMovement()
 
 void ItemPositionMapper::trackMovement(QQuickItem *item, QList<QObject *> &list)
 {
-    for (QObject *ptr : qAsConst(list)) {
+    for (QObject *ptr : std::as_const(list)) {
         disconnect(ptr, SIGNAL(destroyed(QObject *)), this,
                    SLOT(trackedObjectDestroyed(QObject *)));
         disconnect(ptr, nullptr, &m_recomputePositionTimer, nullptr);

@@ -173,7 +173,7 @@ WindowsBackend::options(int lang, const PlatformTransliterationEngine *translite
 {
     QList<TransliterationOption> ret;
 
-    for (const TextInputSource &tis : qAsConst(d->textInputSources)) {
+    for (const TextInputSource &tis : std::as_const(d->textInputSources)) {
         if (tis.languageCode == lang)
             ret << TransliterationOption(
                     { (QObject *)transliterator, lang, tis.id, tis.displayName, false });

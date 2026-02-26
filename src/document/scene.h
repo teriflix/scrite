@@ -872,8 +872,8 @@ private:
 
     static void staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr);
     static void staticClearElements(QQmlListProperty<SceneElement> *list);
-    static SceneElement *staticElementAt(QQmlListProperty<SceneElement> *list, int index);
-    static int staticElementCount(QQmlListProperty<SceneElement> *list);
+    static SceneElement *staticElementAt(QQmlListProperty<SceneElement> *list, qsizetype index);
+    static qsizetype staticElementCount(QQmlListProperty<SceneElement> *list);
     QList<SceneElement *> m_elements;
 };
 
@@ -1200,8 +1200,8 @@ private:
 private:
     static void staticAppendScene(QQmlListProperty<Scene> *list, Scene *ptr);
     static void staticClearScenes(QQmlListProperty<Scene> *list);
-    static Scene *staticSceneAt(QQmlListProperty<Scene> *list, int index);
-    static int staticSceneCount(QQmlListProperty<Scene> *list);
+    static Scene *staticSceneAt(QQmlListProperty<Scene> *list, qsizetype index);
+    static qsizetype staticSceneCount(QQmlListProperty<Scene> *list);
 
     bool m_canBeStacked = false;
     bool m_evaluateLengths = false;

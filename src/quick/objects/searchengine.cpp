@@ -417,12 +417,12 @@ void SearchEngine::sortSearchAgentsLater()
     m_searchAgentSortTimer.start(0, this);
 }
 
-SearchAgent *SearchEngine::staticSearchAgentAt(QQmlListProperty<SearchAgent> *list, int index)
+SearchAgent *SearchEngine::staticSearchAgentAt(QQmlListProperty<SearchAgent> *list, qsizetype index)
 {
     return reinterpret_cast<SearchEngine *>(list->data)->searchAgentAt(index);
 }
 
-int SearchEngine::staticSearchAgentCount(QQmlListProperty<SearchAgent> *list)
+qsizetype SearchEngine::staticSearchAgentCount(QQmlListProperty<SearchAgent> *list)
 {
     return reinterpret_cast<SearchEngine *>(list->data)->searchAgentCount();
 }
@@ -433,7 +433,7 @@ void SearchEngine::doSearch()
 
     if (!m_searchResults.isEmpty()) {
         SearchAgent *agent = nullptr;
-        for (const QPair<SearchAgent *, int> &result : qAsConst(m_searchResults)) {
+        for (const QPair<SearchAgent *, int> &result : std::as_const(m_searchResults)) {
             if (agent == result.first)
                 continue;
 
@@ -458,7 +458,7 @@ void SearchEngine::doSearch()
     if (m_searchString.isEmpty())
         return;
 
-    for (SearchAgent *agent : qAsConst(m_searchAgents)) {
+    for (SearchAgent *agent : std::as_const(m_searchAgents)) {
         // Ask the agent to perform search
         agent->searchRequest(m_searchString);
 

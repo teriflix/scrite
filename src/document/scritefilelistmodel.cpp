@@ -320,7 +320,7 @@ void ScriteFileListModel::setFilesInternal(const QStringList &filePaths)
 
     this->beginResetModel();
     m_files = newList.mid(0, m_maxCount);
-    for (const ScriteFileInfo &sfi : qAsConst(m_files))
+    for (const ScriteFileInfo &sfi : std::as_const(m_files))
         m_watcher->addPath(sfi.filePath);
     this->endResetModel();
 

@@ -157,10 +157,12 @@ void PdfExportableGraphicsScene::addStandardItems(int items)
         fields[HeaderFooter::Website] = screenplay->website();
         fields[HeaderFooter::Comment] = m_comment;
         fields[HeaderFooter::Watermark] = m_watermark;
-        fields[HeaderFooter::Date] = QDate::currentDate().toString(Qt::SystemLocaleShortDate);
-        fields[HeaderFooter::Time] = QTime::currentTime().toString(Qt::SystemLocaleShortDate);
+        fields[HeaderFooter::Date] =
+                QLocale::system().toString(QDate::currentDate(), QLocale::ShortFormat);
+        fields[HeaderFooter::Time] =
+                QLocale::system().toString(QTime::currentTime(), QLocale::ShortFormat);
         fields[HeaderFooter::DateTime] =
-                QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate);
+                QLocale::system().toString(QDateTime::currentDateTime(), QLocale::ShortFormat);
         fields[HeaderFooter::PageNumber] = QStringLiteral("1.");
         fields[HeaderFooter::PageNumberOfCount] = QStringLiteral("1/1");
     }
@@ -292,7 +294,7 @@ GraphicsHeaderItem::GraphicsHeaderItem(const QString &title, const QString &subt
     titleFont.setBold(true);
 
     const QFontMetricsF titleFontMetrics(titleFont);
-    const qreal actualTitleWidth = titleFontMetrics.width(title);
+    const qreal actualTitleWidth = titleFontMetrics.boundingRect(title).width();
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem(this);
     titleText->setTextWidth(qMin(actualTitleWidth, maxTitleWidth));
@@ -389,7 +391,7 @@ qreal GraphicsHeaderItem::idealContainerWidth(const QString &title)
         return ret;
     }();
     const QFontMetricsF titleFontMetrics(titleFont);
-    const qreal actualTitleWidth = titleFontMetrics.width(title);
+    const qreal actualTitleWidth = titleFontMetrics.boundingRect(title).width();
     return qMax(712.0, actualTitleWidth / 0.35);
 }
 

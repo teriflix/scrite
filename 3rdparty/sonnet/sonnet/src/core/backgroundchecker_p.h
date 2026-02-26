@@ -22,6 +22,8 @@
 #define SONNET_BACKGROUNDCHECKER_P_H
 
 #include <QObject>
+#include <QStringRef>
+
 #include "backgroundchecker.h"
 #include "languagefilter_p.h"
 #include "tokenizer_p.h"
@@ -33,10 +35,7 @@ class BackgroundCheckerPrivate : public QObject
 {
     Q_OBJECT
 public:
-    BackgroundCheckerPrivate() : mainTokenizer(new SentenceTokenizer)
-        , sentenceOffset(-1)
-    {
-    }
+    BackgroundCheckerPrivate() : mainTokenizer(new SentenceTokenizer), sentenceOffset(-1) { }
 
     void start();
     void continueChecking();

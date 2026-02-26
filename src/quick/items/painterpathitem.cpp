@@ -174,7 +174,7 @@ void PainterPath::markDirty()
 void PainterPath::composePath()
 {
     m_path = QPainterPath();
-    for (AbstractPathElement *element : qAsConst(m_pathElements)) {
+    for (AbstractPathElement *element : std::as_const(m_pathElements)) {
         if (element->isEnabled())
             element->apply(m_path);
     }
@@ -184,7 +184,7 @@ void PainterPath::composePath()
 }
 
 AbstractPathElement *PainterPath::elements_at(QQmlListProperty<AbstractPathElement> *list,
-                                              int index)
+                                              qsizetype index)
 {
     PainterPath *path = qobject_cast<PainterPath *>(list->object);
     if (path == nullptr || index < 0 || index >= path->m_pathElements.size())
@@ -207,7 +207,7 @@ void PainterPath::elements_append(QQmlListProperty<AbstractPathElement> *list,
     emit path->elementsChanged();
 }
 
-int PainterPath::elements_count(QQmlListProperty<AbstractPathElement> *list)
+qsizetype PainterPath::elements_count(QQmlListProperty<AbstractPathElement> *list)
 {
     PainterPath *path = qobject_cast<PainterPath *>(list->object);
     if (path == nullptr)

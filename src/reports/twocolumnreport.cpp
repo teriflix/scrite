@@ -637,7 +637,7 @@ bool TwoColumnReport::includeElementByCharacter(const ScreenplayElement *element
 
     const Scene *scene = element->scene();
     const QStringList sceneCharacters = scene->characterNames();
-    for (const QString &characterName : qAsConst(m_characterNames))
+    for (const QString &characterName : std::as_const(m_characterNames))
         if (sceneCharacters.contains(characterName))
             return true;
 

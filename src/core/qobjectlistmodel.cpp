@@ -150,7 +150,7 @@ bool SortFilterObjectListModel::lessThan(const QModelIndex &source_left,
 
     const QVariant left = left_object->property(m_sortByProperty);
     const QVariant right = right_object->property(m_sortByProperty);
-    return left < right;
+    return QVariant::compare(left, right) == QPartialOrdering::Less;
 }
 
 bool SortFilterObjectListModel::filterAcceptsRow(int source_row,

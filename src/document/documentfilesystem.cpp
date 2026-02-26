@@ -302,15 +302,15 @@ bool DocumentFileSystem::save(const QString &fileName, bool encrypt, SaveMode mo
         emit saveStarted();
 
         const QString saveTaskWatcher = QStringLiteral("saveTaskWatcher");
-        QFutureWatcher<bool> *watcher = this->findChild<QFutureWatcher<bool> *>(
-                saveTaskWatcher, Qt::FindDirectChildrenOnly);
-        if (watcher) {
-            disconnect(watcher, &QFutureWatcher<bool>::finished, this,
+        QFutureWatcherBase *watcherBase =
+                this->findChild<QFutureWatcherBase *>(saveTaskWatcher, Qt::FindDirectChildrenOnly);
+        if (watcherBase) {
+            disconnect(watcherBase, &QFutureWatcher<bool>::finished, this,
                        &DocumentFileSystem::saveTaskFinished);
-            watcher->deleteLater();
+            watcherBase->deleteLater();
         }
 
-        watcher = new QFutureWatcher<bool>(this);
+        QFutureWatcher<bool> *watcher = new QFutureWatcher<bool>(this);
         watcher->setObjectName(saveTaskWatcher);
         connect(watcher, &QFutureWatcher<bool>::finished, this,
                 &DocumentFileSystem::saveTaskFinished);

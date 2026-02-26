@@ -129,7 +129,7 @@ void ScriteDocumentVault::setEnabled(bool val)
 
 void ScriteDocumentVault::clearAllDocuments()
 {
-    for (const ScriteFileInfo &sfi : qAsConst(m_allFileInfoList))
+    for (const ScriteFileInfo &sfi : std::as_const(m_allFileInfoList))
         QFile::remove(sfi.fileInfo.absoluteFilePath());
 
     ++m_nrUnsavedChanges;
@@ -282,17 +282,17 @@ void ScriteDocumentVault::updateModelFromFolder()
 
     const QString futureWatcherName = QStringLiteral("ScriteDocumentVault::updateModelFromFolder");
 
-    QFutureWatcher<QList<ScriteFileInfo>> *futureWatcher =
-            this->findChild<QFutureWatcher<QList<ScriteFileInfo>> *>(futureWatcherName,
-                                                                     Qt::FindDirectChildrenOnly);
-    if (futureWatcher) {
-        futureWatcher->cancel();
-        futureWatcher->deleteLater();
+    QFutureWatcherBase *futureWatcherBase =
+            this->findChild<QFutureWatcherBase *>(futureWatcherName, Qt::FindDirectChildrenOnly);
+    if (futureWatcherBase) {
+        futureWatcherBase->cancel();
+        futureWatcherBase->deleteLater();
     }
 
     this->setBusy(true);
 
-    futureWatcher = new QFutureWatcher<QList<ScriteFileInfo>>(this);
+    QFutureWatcher<QList<ScriteFileInfo>> *futureWatcher =
+            new QFutureWatcher<QList<ScriteFileInfo>>(this);
     connect(futureWatcher, &QFutureWatcher<QList<ScriteFileInfo>>::finished, this, [=]() {
         m_allFileInfoList = futureWatcher->result();
         this->prepareModel();
@@ -321,8 +321,7 @@ QString ScriteDocumentVault::vaultFilePath() const
 void ScriteDocumentVault::pauseSaveToVault(int timeout)
 {
     m_nrUnsavedChanges = -100000;
-    ExecLaterTimer::call(
-            "pauseSaveToVaultTimer", this, [=]() { m_nrUnsavedChanges = 0; }, timeout);
+    ExecLaterTimer::call("pauseSaveToVaultTimer", this, [=]() { m_nrUnsavedChanges = 0; }, timeout);
 }
 
 void ScriteDocumentVault::prepareModel()

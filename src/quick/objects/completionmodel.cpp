@@ -283,7 +283,7 @@ void CompletionModel::filterStrings()
         else if (m_strings2.contains(m_completionPrefix, Qt::CaseInsensitive))
             fstrings.clear();
         else {
-            for (const QString &item : qAsConst(m_strings2)) {
+            for (const QString &item : std::as_const(m_strings2)) {
                 if (m_filterMode == StartsWithPrefix) {
                     if (item.startsWith(m_completionPrefix, Qt::CaseInsensitive))
                         fstrings.append(item);

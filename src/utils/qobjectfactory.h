@@ -53,7 +53,7 @@ public:
         } else
             keys.append(QByteArray(mo->className()));
         m_metaObjects.insert(mo, keys);
-        for (const QByteArray &key : qAsConst(keys))
+        for (const QByteArray &key : std::as_const(keys))
             m_keyMap[key].append(mo);
     }
     void remove(const QMetaObject *mo)

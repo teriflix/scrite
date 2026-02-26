@@ -488,10 +488,12 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     fieldMap[HeaderFooter::Website] = document->property("#website").toString();
     fieldMap[HeaderFooter::Comment] = document->property("#comment").toString();
     fieldMap[HeaderFooter::Watermark] = document->property("#watermark").toString();
-    fieldMap[HeaderFooter::Date] = QDate::currentDate().toString(Qt::SystemLocaleShortDate);
-    fieldMap[HeaderFooter::Time] = QTime::currentTime().toString(Qt::SystemLocaleShortDate);
+    fieldMap[HeaderFooter::Date] =
+            QLocale::system().toString(QDate::currentDate(), QLocale::ShortFormat);
+    fieldMap[HeaderFooter::Time] =
+            QLocale::system().toString(QTime::currentTime(), QLocale::ShortFormat);
     fieldMap[HeaderFooter::DateTime] =
-            QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate);
+            QLocale::system().toString(QDateTime::currentDateTime(), QLocale::ShortFormat);
     fieldMap[HeaderFooter::PageNumber] = QString::number(doc->pageCount()) + ".  ";
     fieldMap[HeaderFooter::PageNumberOfCount] =
             QString::number(doc->pageCount()) + "/" + QString::number(doc->pageCount()) + "  ";

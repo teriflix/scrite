@@ -270,7 +270,7 @@ void SyntaxHighlighter::setTextDocumentUndoRedoEnabled(bool val)
 
 void SyntaxHighlighter::highlightBlock(const QString &text)
 {
-    for (AbstractSyntaxHighlighterDelegate *delegate : qAsConst(m_sortedDelegates)) {
+    for (AbstractSyntaxHighlighterDelegate *delegate : std::as_const(m_sortedDelegates)) {
         if (delegate->isEnabled())
             delegate->highlightBlock(text);
     }
@@ -360,13 +360,13 @@ void SyntaxHighlighter::staticClearDelegates(
 
 AbstractSyntaxHighlighterDelegate *
 SyntaxHighlighter::staticDelegateAt(QQmlListProperty<AbstractSyntaxHighlighterDelegate> *list,
-                                    int index)
+                                    qsizetype index)
 {
     return reinterpret_cast<SyntaxHighlighter *>(list->data)->delegateAt(index);
 }
 
-int SyntaxHighlighter::staticDelegateCount(
-        QQmlListProperty<AbstractSyntaxHighlighterDelegate> *list)
+qsizetype
+SyntaxHighlighter::staticDelegateCount(QQmlListProperty<AbstractSyntaxHighlighterDelegate> *list)
 {
     return reinterpret_cast<SyntaxHighlighter *>(list->data)->delegateCount();
 }
@@ -437,13 +437,13 @@ SyntaxHighlighter::getBlockDelegateUserData(const QTextBlock &block,
 
 void SyntaxHighlighter::documentContentsChange(int from, int charsRemoved, int charsAdded)
 {
-    for (AbstractSyntaxHighlighterDelegate *delegate : qAsConst(m_sortedDelegates))
+    for (AbstractSyntaxHighlighterDelegate *delegate : std::as_const(m_sortedDelegates))
         delegate->documentsContentsChange(from, charsRemoved, charsAdded);
 }
 
 void SyntaxHighlighter::documentContentsChanged()
 {
-    for (AbstractSyntaxHighlighterDelegate *delegate : qAsConst(m_sortedDelegates))
+    for (AbstractSyntaxHighlighterDelegate *delegate : std::as_const(m_sortedDelegates))
         delegate->documentContentsChanged();
 }
 

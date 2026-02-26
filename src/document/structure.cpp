@@ -463,7 +463,7 @@ StructureElementStack::~StructureElementStack()
 
 StructureElement *StructureElementStack::stackLeader() const
 {
-    for (StructureElement *element : qAsConst(this->list()))
+    for (StructureElement *element : std::as_const(this->list()))
         if (element->isStackLeader())
             return element;
 
@@ -497,7 +497,7 @@ void StructureElementStack::moveToStack(StructureElementStack *other)
     if (other == nullptr || other == this)
         return;
 
-    for (StructureElement *element : qAsConst(this->list()))
+    for (StructureElement *element : std::as_const(this->list()))
         element->setStackId(other->stackId());
 }
 
@@ -706,7 +706,7 @@ void StructureElementStack::initialize()
         this->sortByScreenplayOccurance(screenplay);
 
     const QStringList groups = stackGroups.values();
-    for (StructureElement *element : qAsConst(this->list())) {
+    for (StructureElement *element : std::as_const(this->list())) {
         element->setX(x);
         element->setY(y);
         element->scene()->setGroups(groups);
@@ -736,12 +736,12 @@ void StructureElementStack::onStackLeaderChanged()
     if (!this->isEmpty()) {
         StructureElement *changedElement = qobject_cast<StructureElement *>(this->sender());
         if (changedElement->isStackLeader()) {
-            for (StructureElement *element : qAsConst(this->list())) {
+            for (StructureElement *element : std::as_const(this->list())) {
                 if (element != changedElement)
                     element->setStackLeader(false);
             }
         } else {
-            for (StructureElement *element : qAsConst(this->list())) {
+            for (StructureElement *element : std::as_const(this->list())) {
                 if (element->isStackLeader())
                     return;
             }
@@ -786,7 +786,7 @@ void StructureElementStack::onElementGroupChanged()
         return;
 
     const QStringList changedGroups = changedElement->scene()->groups();
-    for (StructureElement *element : qAsConst(this->list())) {
+    for (StructureElement *element : std::as_const(this->list())) {
         if (element != changedElement)
             element->scene()->setGroups(changedGroups);
     }
@@ -806,7 +806,7 @@ void StructureElementStack::onElementGeometryChanged()
     const qreal dx = changedElement->x() - m_geometry.x();
     const qreal dy = changedElement->y() - m_geometry.y();
     const QPointF dp(dx, dy);
-    for (StructureElement *element : qAsConst(this->list())) {
+    for (StructureElement *element : std::as_const(this->list())) {
         if (element != changedElement)
             element->setPosition(element->position() + dp);
     }
@@ -853,7 +853,7 @@ StructureElementStack *StructureElementStacks::findStackById(const QString &stac
     if (stackID.isEmpty())
         return nullptr;
 
-    for (StructureElementStack *stack : qAsConst(this->list())) {
+    for (StructureElementStack *stack : std::as_const(this->list())) {
         if (stack->stackId() == stackID)
             return stack;
     }
@@ -900,7 +900,7 @@ void StructureElementStacks::resetAllStacks()
     if (this->isEmpty())
         return;
 
-    for (StructureElementStack *stack : qAsConst(this->list()))
+    for (StructureElementStack *stack : std::as_const(this->list()))
         stack->deleteLater();
 }
 
@@ -943,7 +943,7 @@ void StructureElementStacks::evaluateStacks()
 
             while (it2 != end2) {
                 const QString id = Utils::SMath::createUniqueId();
-                for (StructureElement *element : qAsConst(it2.value()))
+                for (StructureElement *element : std::as_const(it2.value()))
                     element->setStackId(id);
 
                 ++it2;
@@ -956,7 +956,7 @@ void StructureElementStacks::evaluateStacks()
     m_evaluateTimer.stop();
 
     auto findOrCreateStack = [=](const QString &id) {
-        for (StructureElementStack *stack : qAsConst(this->list()))
+        for (StructureElementStack *stack : std::as_const(this->list()))
             if (stack->stackId() == id)
                 return stack;
         StructureElementStack *newStack = new StructureElementStack(this);
@@ -964,10 +964,10 @@ void StructureElementStacks::evaluateStacks()
         return newStack;
     };
 
-    for (StructureElementStack *stack : qAsConst(this->list()))
+    for (StructureElementStack *stack : std::as_const(this->list()))
         stack->setEnabled(false);
 
-    for (StructureElement *element : qAsConst(elementsWithStackId)) {
+    for (StructureElement *element : std::as_const(elementsWithStackId)) {
         const QString stackId = element->stackId();
         if (stackId.isEmpty())
             continue;
@@ -976,7 +976,7 @@ void StructureElementStacks::evaluateStacks()
         stack->append(element);
     }
 
-    for (StructureElementStack *stack : qAsConst(this->list())) {
+    for (StructureElementStack *stack : std::as_const(this->list())) {
         if (stack->isEmpty())
             stack->deleteLater();
         else {
@@ -2022,12 +2022,12 @@ void Character::staticClearRelationships(QQmlListProperty<Relationship> *list)
     reinterpret_cast<Character *>(list->data)->clearRelationships();
 }
 
-Relationship *Character::staticRelationshipAt(QQmlListProperty<Relationship> *list, int index)
+Relationship *Character::staticRelationshipAt(QQmlListProperty<Relationship> *list, qsizetype index)
 {
     return reinterpret_cast<Character *>(list->data)->relationshipAt(index);
 }
 
-int Character::staticRelationshipCount(QQmlListProperty<Relationship> *list)
+qsizetype Character::staticRelationshipCount(QQmlListProperty<Relationship> *list)
 {
     return reinterpret_cast<Character *>(list->data)->relationshipCount();
 }
@@ -2521,7 +2521,7 @@ void Annotation::createCopyOfFileAttributes()
             if (m_type == imageKey && attrName == imageKey) {
                 const QString base64Prefix = QStringLiteral("data://base64:");
                 if (fileName.startsWith(base64Prefix)) {
-                    QByteArray bytes = fileName.midRef(base64Prefix.length()).toLatin1();
+                    QByteArray bytes = fileName.mid(base64Prefix.length()).toLatin1();
                     bytes = QByteArray::fromBase64(bytes);
                     QBuffer buffer(&bytes);
                     buffer.open(QIODevice::ReadOnly);
@@ -2598,7 +2598,7 @@ void Annotation::onDfsAuction(const QString &filePath, int *claims)
     if (m_fileAttributes.isEmpty() || !filePath.startsWith(QStringLiteral("annotation/")))
         return;
 
-    for (const QString &fileAttr : qAsConst(m_fileAttributes)) {
+    for (const QString &fileAttr : std::as_const(m_fileAttributes)) {
         const QString attrFilePath = m_attributes.value(fileAttr).toString();
         if (attrFilePath == filePath)
             *claims = *claims + 1;
@@ -3140,7 +3140,7 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     std::sort(elementsToLayout.begin(), elementsToLayout.end(), lessThan);
 
     QRectF oldBoundingRect;
-    for (StructureElement *element : qAsConst(elementsToLayout))
+    for (StructureElement *element : std::as_const(elementsToLayout))
         oldBoundingRect |= QRectF(element->x(), element->y(), element->width(), element->height());
 
     const qreal verticalLayoutSpacing = m_canvasUIMode == IndexCardUI ? 100 : 50;
@@ -3369,7 +3369,7 @@ QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
 
         QString lastStackId;
         QRectF beatRect;
-        for (StructureElement *element : qAsConst(beat.second)) {
+        for (StructureElement *element : std::as_const(beat.second)) {
             const QString stackId = element->stackId();
             if (element != beat.second.first() && (stackId.isEmpty() || stackId != lastStackId))
                 elementRect.moveTopLeft(elementRect.topRight() + QPointF(xSpacing, 0));
@@ -3411,7 +3411,7 @@ QJsonObject Structure::evaluateEpisodeAndGroupBoxes(Screenplay *screenplay,
         QJsonArray sceneIndexes;
 
         QRectF groupBox;
-        for (StructureElement *element : qAsConst(group.second)) {
+        for (StructureElement *element : std::as_const(group.second)) {
             groupBox |= QRectF(element->x(), element->y(), element->width(), element->height());
             sceneIndexes.append(this->indexOfElement(element));
         }
@@ -3621,7 +3621,7 @@ Structure::evaluateGroupsImpl(Screenplay *screenplay, const QString &category) c
                       });
 
             QList<StructureElement *> bunch;
-            for (StructureElement *selement : qAsConst(selements)) {
+            for (StructureElement *selement : std::as_const(selements)) {
                 if (bunch.isEmpty()
                     || (sceneIndexMap.value(selement->scene())
                                         - sceneIndexMap.value(bunch.last()->scene())
@@ -5023,12 +5023,12 @@ void Structure::staticClearCharacters(QQmlListProperty<Character> *list)
     reinterpret_cast<Structure *>(list->data)->clearCharacters();
 }
 
-Character *Structure::staticCharacterAt(QQmlListProperty<Character> *list, int index)
+Character *Structure::staticCharacterAt(QQmlListProperty<Character> *list, qsizetype index)
 {
     return reinterpret_cast<Structure *>(list->data)->characterAt(index);
 }
 
-int Structure::staticCharacterCount(QQmlListProperty<Character> *list)
+qsizetype Structure::staticCharacterCount(QQmlListProperty<Character> *list)
 {
     return reinterpret_cast<Structure *>(list->data)->characterCount();
 }
@@ -5043,12 +5043,13 @@ void Structure::staticClearElements(QQmlListProperty<StructureElement> *list)
     reinterpret_cast<Structure *>(list->data)->clearElements();
 }
 
-StructureElement *Structure::staticElementAt(QQmlListProperty<StructureElement> *list, int index)
+StructureElement *Structure::staticElementAt(QQmlListProperty<StructureElement> *list,
+                                             qsizetype index)
 {
     return reinterpret_cast<Structure *>(list->data)->elementAt(index);
 }
 
-int Structure::staticElementCount(QQmlListProperty<StructureElement> *list)
+qsizetype Structure::staticElementCount(QQmlListProperty<StructureElement> *list)
 {
     return reinterpret_cast<Structure *>(list->data)->elementCount();
 }
@@ -5142,9 +5143,13 @@ void Structure::updateCharacterNamesShotsTransitionsAndTags()
     }
 
     const QStringList shots = [=]() {
-        QSet<QString> set = QSet<QString>::fromList(m_shotElementMap.shots());
-        set += QSet<QString>::fromList(Scrite::defaultShots());
-        QStringList ret = QStringList::fromSet(set);
+        const QStringList _shots = m_shotElementMap.shots();
+        QSet<QString> set(_shots.begin(), _shots.end());
+
+        const QStringList _defaultShorts = Scrite::defaultShots();
+        set += QSet<QString>(_defaultShorts.begin(), _defaultShorts.end());
+
+        QStringList ret(set.begin(), set.end());
         std::sort(ret.begin(), ret.end());
         return ret;
     }();
@@ -5154,9 +5159,13 @@ void Structure::updateCharacterNamesShotsTransitionsAndTags()
     }
 
     const QStringList transitions = [=]() {
-        QSet<QString> set = QSet<QString>::fromList(m_transitionElementMap.transitions());
-        set += QSet<QString>::fromList(Scrite::defaultTransitions());
-        QStringList ret = QStringList::fromSet(set);
+        const QStringList _transitions = m_transitionElementMap.transitions();
+        QSet<QString> set(_transitions.begin(), _transitions.end());
+
+        const QStringList _defaultTransitions = Scrite::defaultTransitions();
+        set += QSet<QString>(_defaultTransitions.begin(), _defaultTransitions.end());
+
+        QStringList ret(set.begin(), set.end());
         std::sort(ret.begin(), ret.end());
         return ret;
     }();
@@ -5176,7 +5185,7 @@ void Structure::updateSceneTags()
     QSet<QString> allTags;
 
     const QList<StructureElement *> elements = m_elements.list();
-    for (const StructureElement *element : qAsConst(elements)) {
+    for (const StructureElement *element : std::as_const(elements)) {
         const Scene *scene = element->scene();
         const QStringList tags = scene->tags();
         allTags += QSet<QString>(tags.begin(), tags.end());
@@ -5204,12 +5213,12 @@ void Structure::staticClearAnnotations(QQmlListProperty<Annotation> *list)
     reinterpret_cast<Structure *>(list->data)->clearAnnotations();
 }
 
-Annotation *Structure::staticAnnotationAt(QQmlListProperty<Annotation> *list, int index)
+Annotation *Structure::staticAnnotationAt(QQmlListProperty<Annotation> *list, qsizetype index)
 {
     return reinterpret_cast<Structure *>(list->data)->annotationAt(index);
 }
 
-int Structure::staticAnnotationCount(QQmlListProperty<Annotation> *list)
+qsizetype Structure::staticAnnotationCount(QQmlListProperty<Annotation> *list)
 {
     return reinterpret_cast<Structure *>(list->data)->annotationCount();
 }
@@ -5584,11 +5593,11 @@ void StructureElementConnector::computeConnectorShape()
     }
 
     const QString futureWatcherName = QStringLiteral("futureWatcher");
-    QFutureWatcher<QPainterPath> *futureWatcher = this->findChild<QFutureWatcher<QPainterPath> *>(
-            futureWatcherName, Qt::FindDirectChildrenOnly);
-    if (futureWatcher) {
-        futureWatcher->cancel();
-        futureWatcher->deleteLater();
+    QFutureWatcherBase *watcherBase =
+            this->findChild<QFutureWatcherBase *>(futureWatcherName, Qt::FindDirectChildrenOnly);
+    if (watcherBase) {
+        watcherBase->cancel();
+        watcherBase->deleteLater();
     }
 
     auto getElementRect = [=](StructureElement *e) {
@@ -5611,17 +5620,17 @@ void StructureElementConnector::computeConnectorShape()
      * are better off delegating the whole computation to a separate
      * thread.
      */
-    futureWatcher = new QFutureWatcher<QPainterPath>(this);
-    futureWatcher->setObjectName(futureWatcherName);
-    connect(futureWatcher, &QFutureWatcher<QPainterPath>::finished, this, [=]() {
-        if (!futureWatcher->isCanceled()) {
-            m_connectorShape = futureWatcher->result();
+    QFutureWatcher<QPainterPath> *watcher = new QFutureWatcher<QPainterPath>(this);
+    watcher->setObjectName(futureWatcherName);
+    connect(watcher, &QFutureWatcher<QPainterPath>::finished, this, [=]() {
+        if (!watcher->isCanceled()) {
+            m_connectorShape = watcher->result();
             this->update();
         }
-        futureWatcher->deleteLater();
+        watcher->deleteLater();
     });
-    futureWatcher->setFuture(QtConcurrent::run(&StructureElementConnector::curvedArrowPath, r1, r2,
-                                               arrowHeadSize, false));
+    watcher->setFuture(QtConcurrent::run(&StructureElementConnector::curvedArrowPath, r1, r2,
+                                         arrowHeadSize, false));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -149,9 +149,9 @@ private:
     void composePath();
 
 private:
-    static AbstractPathElement *elements_at(QQmlListProperty<AbstractPathElement> *, int);
+    static AbstractPathElement *elements_at(QQmlListProperty<AbstractPathElement> *, qsizetype);
     static void elements_append(QQmlListProperty<AbstractPathElement> *, AbstractPathElement *);
-    static int elements_count(QQmlListProperty<AbstractPathElement> *);
+    static qsizetype elements_count(QQmlListProperty<AbstractPathElement> *);
     static void elements_clear(QQmlListProperty<AbstractPathElement> *);
 
 private:

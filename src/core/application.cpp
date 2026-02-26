@@ -64,7 +64,6 @@
 #include <QtConcurrentMap>
 #include <QtConcurrentRun>
 #include <QOperatingSystemVersion>
-#include <QNetworkConfigurationManager>
 
 // #define ENABLE_SCRIPT_HOTKEY
 
@@ -234,7 +233,7 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     }();
 
     if (useSoftwareRenderer)
-        QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
+        QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
 
 #ifndef Q_OS_MAC
 #ifdef Q_OS_UNIX

@@ -843,7 +843,7 @@ void Screenplay::setRestartEpisodeScenesAtOne(bool val)
 
 void Screenplay::setSelectedElementsOmitStatus(OmitStatus val)
 {
-    for (ScreenplayElement *element : qAsConst(m_elements)) {
+    for (ScreenplayElement *element : std::as_const(m_elements)) {
         if (element->isSelected()) {
             switch (val) {
             case Omitted:
@@ -1065,7 +1065,7 @@ void Screenplay::removeElements(const QList<ScreenplayElement *> &givenElements)
     std::sort(elements.begin(), elements.end(), [=](ScreenplayElement *e1, ScreenplayElement *e2) {
         return m_elements.indexOf(e1) < m_elements.indexOf(e2);
     });
-    for (ScreenplayElement *element : qAsConst(elements)) {
+    for (ScreenplayElement *element : std::as_const(elements)) {
         const int elementIndex = m_elements.indexOf(element);
         leastIndex = qMin(elementIndex, leastIndex);
         Batch &lastBatch = batches.last();
@@ -1085,7 +1085,7 @@ void Screenplay::removeElements(const QList<ScreenplayElement *> &givenElements)
         }
     }
 
-    for (const Batch &batch : qAsConst(batches)) {
+    for (const Batch &batch : std::as_const(batches)) {
         if (!batch.isValid())
             continue;
         this->beginRemoveRows(QModelIndex(), batch.startIndex, batch.endIndex);
@@ -1517,7 +1517,7 @@ void Screenplay::removeSelectedElements()
 
     int firstSelectedIndex = -1;
     QList<ScreenplayElement *> selectedElements;
-    for (ScreenplayElement *element : qAsConst(m_elements)) {
+    for (ScreenplayElement *element : std::as_const(m_elements)) {
         if (element->isSelected()) {
             selectedElements.append(element);
             if (firstSelectedIndex < 0)
@@ -1531,7 +1531,7 @@ void Screenplay::removeSelectedElements()
         info->lock();
 
     ScreenplayRemoveElementsUndoCommand *cmd = new ScreenplayRemoveElementsUndoCommand(this);
-    for (ScreenplayElement *element : qAsConst(selectedElements))
+    for (ScreenplayElement *element : std::as_const(selectedElements))
         this->removeElement(element);
 
     if (UndoHub::active())
@@ -1548,7 +1548,7 @@ void Screenplay::removeSelectedElements()
 
 void Screenplay::omitSelectedElements()
 {
-    for (ScreenplayElement *element : qAsConst(m_elements)) {
+    for (ScreenplayElement *element : std::as_const(m_elements)) {
         if (element->isSelected())
             element->setOmitted(true);
     }
@@ -1556,7 +1556,7 @@ void Screenplay::omitSelectedElements()
 
 void Screenplay::includeSelectedElements()
 {
-    for (ScreenplayElement *element : qAsConst(m_elements)) {
+    for (ScreenplayElement *element : std::as_const(m_elements)) {
         if (element->isSelected())
             element->setOmitted(false);
     }
@@ -1564,7 +1564,7 @@ void Screenplay::includeSelectedElements()
 
 void Screenplay::clearSelection()
 {
-    for (ScreenplayElement *element : qAsConst(m_elements))
+    for (ScreenplayElement *element : std::as_const(m_elements))
         element->setSelected(false);
 }
 
@@ -1572,7 +1572,7 @@ QList<int> Screenplay::selectedElementIndexes() const
 {
     QList<int> ret;
 
-    for (ScreenplayElement *element : qAsConst(m_elements)) {
+    for (ScreenplayElement *element : std::as_const(m_elements)) {
         if (element->isSelected())
             ret << element->elementIndex();
     }
@@ -1602,7 +1602,7 @@ ScreenplayElement *Screenplay::elementAt(int index) const
 ScreenplayElement *Screenplay::elementWithIndex(int index) const
 {
     int sceneIndex = -1;
-    for (ScreenplayElement *element : qAsConst(m_elements)) {
+    for (ScreenplayElement *element : std::as_const(m_elements)) {
         if (element->elementType() == ScreenplayElement::SceneElementType) {
             ++sceneIndex;
             if (sceneIndex == index)
@@ -1656,7 +1656,7 @@ void UndoClearScreenplayCommand::undo()
 
     ScriteDocument *document = m_screenplay->scriteDocument();
     Structure *structure = document->structure();
-    for (const QString &sceneId : qAsConst(m_sceneIds)) {
+    for (const QString &sceneId : std::as_const(m_sceneIds)) {
         StructureElement *element = structure->findElementBySceneID(sceneId);
         if (element == nullptr)
             continue;
@@ -1736,7 +1736,7 @@ void Screenplay::gatherSelectedScenes(SceneGroup *into)
 {
     into->clearScenes();
 
-    for (ScreenplayElement *element : qAsConst(m_elements)) {
+    for (ScreenplayElement *element : std::as_const(m_elements)) {
         if (element->isSelected())
             into->addScene(element->scene());
     }
@@ -1822,7 +1822,7 @@ void SplitElementUndoCommand::undo()
     Scene *originalScene = pair.first->scene();
 
     // Reset our screenplay first, one of the scenes that it refers to is about to be destroyed.
-    for (int index : qAsConst(m_splitElementIndexes))
+    for (int index : std::as_const(m_splitElementIndexes))
         m_screenplay->removeElement(m_screenplay->elementAt(index));
 
     // Destroy the split scene
@@ -1881,7 +1881,7 @@ void SplitElementUndoCommand::redo()
     originalScene->resetFromByteArray(m_splitScenesData[0]);
 
     // Reset our screenplay now
-    for (int index : qAsConst(m_splitElementIndexes)) {
+    for (int index : std::as_const(m_splitElementIndexes)) {
         ScreenplayElement *element = new ScreenplayElement(m_screenplay);
         element->setElementType(ScreenplayElement::SceneElementType);
         element->setScene(splitScene);
@@ -2119,7 +2119,7 @@ QList<ScreenplayElement *> Screenplay::sceneElements(Scene *scene, int max) cons
     QList<ScreenplayElement *> elements;
 
     if (indexes.isEmpty()) {
-        for (ScreenplayElement *element : qAsConst(m_elements)) {
+        for (ScreenplayElement *element : std::as_const(m_elements)) {
             if (element->scene() == scene)
                 elements << element;
         }
@@ -2183,7 +2183,7 @@ QList<int> Screenplay::sceneElementsInBreak(ScreenplayElement *element) const
 int Screenplay::dialogueCount() const
 {
     int ret = 0;
-    for (const ScreenplayElement *element : qAsConst(m_elements)) {
+    for (const ScreenplayElement *element : std::as_const(m_elements)) {
         const Scene *scene = element->scene();
         if (scene == nullptr)
             continue;
@@ -2268,7 +2268,7 @@ void Screenplay::updateBreakTitles()
     int episodeOffset = 0;
     int actOffset = 0;
 
-    for (ScreenplayElement *e : qAsConst(m_elements)) {
+    for (ScreenplayElement *e : std::as_const(m_elements)) {
         if (e->elementType() != ScreenplayElement::BreakElementType) {
             if (episodeOffset == 0 && episodes.isEmpty() && e->scene()->heading()->isEnabled())
                 ++episodeOffset;
@@ -2431,7 +2431,7 @@ void Screenplay::evaluateWordCount()
 {
     int wordCount = 0;
 
-    for (const ScreenplayElement *element : qAsConst(m_elements)) {
+    for (const ScreenplayElement *element : std::as_const(m_elements)) {
         if (element->elementType() == ScreenplayElement::SceneElementType) {
             const Scene *scene = element->scene();
             if (scene)
@@ -2502,7 +2502,7 @@ void Screenplay::evaluateIfHeightHintsAreAvailable()
 {
     bool available = true;
 
-    for (const ScreenplayElement *element : qAsConst(m_elements)) {
+    for (const ScreenplayElement *element : std::as_const(m_elements)) {
         if (element->elementType() != ScreenplayElement::SceneElementType)
             continue;
 
@@ -2798,7 +2798,7 @@ void Screenplay::removeUserSceneNumbers()
 {
     SceneNumbersUndoCommand *cmd = new SceneNumbersUndoCommand;
 
-    for (ScreenplayElement *element : qAsConst(m_elements)) {
+    for (ScreenplayElement *element : std::as_const(m_elements)) {
         element->setUserSceneNumber(QString());
     }
     this->evaluateSceneNumbers(true);
@@ -2825,7 +2825,7 @@ void Screenplay::resetTextAlignment(Qt::Alignment newAlignment)
 {
     QScopedValueRollback<bool> rollback(UndoHub::blocked, true);
 
-    for (ScreenplayElement *element : qAsConst(m_elements)) {
+    for (ScreenplayElement *element : std::as_const(m_elements)) {
         Scene *scene = element->scene();
         if (scene) {
             for (int i = 0; i < scene->elementCount(); i++) {
@@ -2842,7 +2842,7 @@ bool Screenplay::polishText()
 
     Scene *previousScene = nullptr;
 
-    for (ScreenplayElement *element : qAsConst(m_elements)) {
+    for (ScreenplayElement *element : std::as_const(m_elements)) {
         if (element->elementType() == ScreenplayElement::SceneElementType) {
             Scene *scene = element->scene();
             if (scene) {
@@ -2861,7 +2861,7 @@ bool Screenplay::capitalizeSentences()
 {
     bool ret = false;
 
-    for (ScreenplayElement *element : qAsConst(m_elements)) {
+    for (ScreenplayElement *element : std::as_const(m_elements)) {
         if (element->elementType() == ScreenplayElement::SceneElementType) {
             Scene *scene = element->scene();
             if (scene)
@@ -2901,7 +2901,7 @@ void Screenplay::copySelection()
 
     Fountain::Body fBody;
 
-    for (const ScreenplayElement *element : qAsConst(m_elements)) {
+    for (const ScreenplayElement *element : std::as_const(m_elements)) {
         if (!element->isSelected())
             continue;
 
@@ -3017,7 +3017,7 @@ void ScreenplayPasteUndoCommand::undo()
     m_screenplayElements.clear();
 
     QList<StructureElement *> structureElements;
-    for (Scene *scene : qAsConst(m_scenes))
+    for (Scene *scene : std::as_const(m_scenes))
         structureElements.append(scene->structureElement());
     m_structure->removeElements(structureElements);
     m_scenes.clear();
@@ -3054,7 +3054,7 @@ ScreenplayPasteFromFountainUndoCommand::~ScreenplayPasteFromFountainUndoCommand(
 
 void ScreenplayPasteFromFountainUndoCommand::redo()
 {
-    for (const Fountain::Element &fElement : qAsConst(m_body)) {
+    for (const Fountain::Element &fElement : std::as_const(m_body)) {
         if (fElement.type == Fountain::Element::SceneHeading || m_scenes.isEmpty()) {
             StructureElement *newStructureElement = new StructureElement(m_structure);
             Scene *newScene = new Scene(newStructureElement);
@@ -3085,7 +3085,7 @@ void ScreenplayPasteFromFountainUndoCommand::undo()
     m_screenplayElements.clear();
 
     QList<StructureElement *> structureElements;
-    for (Scene *scene : qAsConst(m_scenes))
+    for (Scene *scene : std::as_const(m_scenes))
         structureElements.append(scene->structureElement());
     m_structure->removeElements(structureElements);
     m_scenes.clear();
@@ -3206,7 +3206,7 @@ void Screenplay::deserializeFromJson(const QJsonObject &json)
 
 #if 0
     if (!m_scriteDocument->isCreatedOnThisComputer()) {
-        for (ScreenplayElement *element : qAsConst(m_elements))
+        for (ScreenplayElement *element : std::as_const(m_elements))
             element->setHeightHint(0);
 
         this->setCurrentElementIndex(-1);
@@ -3583,13 +3583,13 @@ void Screenplay::evaluateSceneNumbers(bool minorAlso)
 
     QHash<Scene *, QList<int>> indexListMap;
 
-    for (ScreenplayElement *element : qAsConst(m_elements))
+    for (ScreenplayElement *element : std::as_const(m_elements))
         if (element->scene())
             indexListMap[element->scene()] = QList<int>();
 
     int index = -1;
     ScreenplayElement::SceneNumber sceneNumber;
-    for (ScreenplayElement *element : qAsConst(m_elements)) {
+    for (ScreenplayElement *element : std::as_const(m_elements)) {
         ++index;
 
         if (element->elementType() == ScreenplayElement::SceneElementType) {
@@ -3699,7 +3699,7 @@ void Screenplay::validateCurrentElementIndex()
 void Screenplay::evaluateParagraphCounts()
 {
     int min = -1, max = -1, avg = 0, total = 0, count = 0;
-    for (ScreenplayElement *element : qAsConst(m_elements)) {
+    for (ScreenplayElement *element : std::as_const(m_elements)) {
         Scene *scene = element->scene();
         if (scene == nullptr)
             continue;
@@ -3769,12 +3769,13 @@ void Screenplay::staticClearElements(QQmlListProperty<ScreenplayElement> *list)
     reinterpret_cast<Screenplay *>(list->data)->clearElements();
 }
 
-ScreenplayElement *Screenplay::staticElementAt(QQmlListProperty<ScreenplayElement> *list, int index)
+ScreenplayElement *Screenplay::staticElementAt(QQmlListProperty<ScreenplayElement> *list,
+                                               qsizetype index)
 {
     return reinterpret_cast<Screenplay *>(list->data)->elementAt(index);
 }
 
-int Screenplay::staticElementCount(QQmlListProperty<ScreenplayElement> *list)
+qsizetype Screenplay::staticElementCount(QQmlListProperty<ScreenplayElement> *list)
 {
     return reinterpret_cast<Screenplay *>(list->data)->elementCount();
 }
@@ -4080,7 +4081,7 @@ void ScreenplayTracks::refresh()
         if (m_includeOpenTags) {
             const QStringList tags = element->scene()->tags();
             if (!tags.isEmpty()) {
-                for (const QString &tag : qAsConst(tags)) {
+                for (const QString &tag : std::as_const(tags)) {
                     if (m_allowedOpenTags.isEmpty()
                         || m_allowedOpenTags.contains(tag, Qt::CaseInsensitive))
                         structureTagsMap[QString()][tag].append(element);
@@ -4176,7 +4177,7 @@ void ScreenplayTracks::refresh()
                                  trackKind](const ScreenplayTrackItem &newTrackItem) {
             for (ScreenplayTrack &distinctTrack : distinctTracks) {
                 bool intersectionFound = false;
-                for (const ScreenplayTrackItem &existingTrackItem : qAsConst(distinctTrack.items)) {
+                for (const ScreenplayTrackItem &existingTrackItem : std::as_const(distinctTrack.items)) {
                     intersectionFound = (existingTrackItem.startIndex <= newTrackItem.endIndex)
                             && (newTrackItem.startIndex <= existingTrackItem.endIndex);
                     if (intersectionFound)
@@ -4197,10 +4198,10 @@ void ScreenplayTracks::refresh()
             distinctTracks.append(newDistinctTrack);
         };
 
-        for (const ScreenplayTrackItem &trackItem : qAsConst(trackItems))
+        for (const ScreenplayTrackItem &trackItem : std::as_const(trackItems))
             includeTrackItem(trackItem);
 
-        for (const ScreenplayTrack &distinctTrack : qAsConst(distinctTracks))
+        for (const ScreenplayTrack &distinctTrack : std::as_const(distinctTracks))
             m_tracks.append(distinctTrack);
 
         ++it;

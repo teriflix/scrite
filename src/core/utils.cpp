@@ -378,7 +378,7 @@ QString Utils::Gui::portableShortcut(const QVariant &shortcut)
         if (ks.isEmpty() || ks.count() == 0)
             return false;
         for (int i = 0; i < ks.count(); i++) {
-            if (ks[i] == Qt::Key_unknown)
+            if (ks[i] == QKeyCombination(Qt::Key_unknown))
                 return false;
         }
         return true;

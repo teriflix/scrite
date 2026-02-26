@@ -88,7 +88,7 @@ void PeerAppLookup::update(UpdateMode mode)
 
         QStringList iids = info.keys();
         iids.removeAll(iid);
-        for (const QString &_iid : qAsConst(iids)) {
+        for (const QString &_iid : std::as_const(iids)) {
             const qint64 timestamp = info.value(_iid).toString().toLongLong();
             if (now - timestamp > 10 * updateInterval)
                 info.remove(_iid);

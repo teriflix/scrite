@@ -105,7 +105,7 @@ GuessLanguagePrivate::GuessLanguagePrivate() : MIN_LENGTH(5), m_maxItems(1), m_m
 
     s_knownDictionaries = Loader::openLoader()->languages().toSet();
     QSet<QString> dictionaryLanguages;
-    for (const QString &dictName : qAsConst(s_knownDictionaries)) {
+    for (const QString &dictName : std::as_const(s_knownDictionaries)) {
         QString languageName = QLocale(dictName).name();
         if (languageName.isEmpty()) {
             qCWarning(SONNET_LOG_CORE) << "Unable to parse name for dictionary" << dictName;
@@ -513,7 +513,7 @@ GuessLanguagePrivate::GuessLanguagePrivate() : MIN_LENGTH(5), m_maxItems(1), m_m
 
         { // Remove unknown languages
             QStringList pruned;
-            for (const QString &name : qAsConst(names)) {
+            for (const QString &name : std::as_const(names)) {
                 if (!dictionaryLanguages.contains(name)) {
                     continue;
                 }
@@ -526,7 +526,7 @@ GuessLanguagePrivate::GuessLanguagePrivate() : MIN_LENGTH(5), m_maxItems(1), m_m
             continue;
         }
 
-        for (const QString &name : qAsConst(names)) {
+        for (const QString &name : std::as_const(names)) {
             s_scriptLanguages.insert(script, name);
         }
     }

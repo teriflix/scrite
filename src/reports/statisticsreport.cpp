@@ -252,7 +252,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::dialogueDistribution() c
         auto end = dialogues.constEnd();
         while (it != end) {
             auto paragraphs = it.value();
-            for (auto paragraph : qAsConst(paragraphs)) {
+            for (auto paragraph : std::as_const(paragraphs)) {
                 Distribution &dist = map[it.key()];
                 dist.pixelLength += this->pixelLength(paragraph);
                 dist.count++;
@@ -365,7 +365,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::actDistribution() const
     QColor baseColor = screenplay->episodeCount() > 0 ? StatisticsReport::pickColor(episodeIndex)
                                                       : Qt::transparent;
     actIndex = 0;
-    for (auto actScenes : qAsConst(actScenesList)) {
+    for (auto actScenes : std::as_const(actScenesList)) {
         StatisticsReport::Distribution item;
         item.key = actScenes.first;
 
@@ -386,7 +386,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::actDistribution() const
                                           : baseColor.lighter(baseColorIsLight ? 120 : 200);
         }
 
-        for (Scene *scene : qAsConst(actScenes.second))
+        for (Scene *scene : std::as_const(actScenes.second))
             item.pixelLength += this->pixelLength(scene);
 
         this->polish(item);
@@ -435,12 +435,12 @@ QList<StatisticsReport::Distribution> StatisticsReport::episodeDistribution() co
     }
 
     int epIndex = 0;
-    for (auto episodeScenes : qAsConst(episodeScenesList)) {
+    for (auto episodeScenes : std::as_const(episodeScenesList)) {
         StatisticsReport::Distribution item;
         item.key = episodeScenes.first;
         item.color = StatisticsReport::pickColor(epIndex++, true, StatisticsReport::Episode);
 
-        for (Scene *scene : qAsConst(episodeScenes.second))
+        for (Scene *scene : std::as_const(episodeScenes.second))
             item.pixelLength += this->pixelLength(scene);
 
         this->polish(item);

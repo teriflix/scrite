@@ -185,8 +185,8 @@ private:
                                      AbstractSyntaxHighlighterDelegate *ptr);
     static void staticClearDelegates(QQmlListProperty<AbstractSyntaxHighlighterDelegate> *list);
     static AbstractSyntaxHighlighterDelegate *
-    staticDelegateAt(QQmlListProperty<AbstractSyntaxHighlighterDelegate> *list, int index);
-    static int staticDelegateCount(QQmlListProperty<AbstractSyntaxHighlighterDelegate> *list);
+    staticDelegateAt(QQmlListProperty<AbstractSyntaxHighlighterDelegate> *list, qsizetype index);
+    static qsizetype staticDelegateCount(QQmlListProperty<AbstractSyntaxHighlighterDelegate> *list);
 
     void sortDelegates();
 

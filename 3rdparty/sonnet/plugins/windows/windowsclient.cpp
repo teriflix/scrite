@@ -178,7 +178,7 @@ QString WindowsClient::defaultEnglishLanguage() const
     }
 
     // Pick any en- language.
-    for (QString lang : qAsConst(d->supportedLanguages)) {
+    for (QString lang : std::as_const(d->supportedLanguages)) {
         if (lang.startsWith(QStringLiteral("en-")))
             return lang;
     }

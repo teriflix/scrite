@@ -78,7 +78,7 @@ bool HtmlExporter::doExport(QIODevice *device)
     const qreal contentWidth = formatting->pageLayout()->contentWidth() * layoutScale;
 
     QTextStream ts(device);
-    ts.setCodec("utf-8");
+    ts.setEncoding(QStringConverter::Utf8);
     ts.setAutoDetectUnicode(true);
 
     ts << "<!DOCTYPE html>\n";

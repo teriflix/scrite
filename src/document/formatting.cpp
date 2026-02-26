@@ -771,7 +771,7 @@ void ScreenplayFormat::applyToAll(const SceneElementFormat *from,
     if (from == nullptr)
         return;
 
-    for (SceneElementFormat *format : qAsConst(m_elementFormats)) {
+    for (SceneElementFormat *format : std::as_const(m_elementFormats)) {
         if (from == format)
             continue;
 
@@ -1088,13 +1088,13 @@ void ScreenplayFormat::evaluateFontZoomLevels()
 }
 
 SceneElementFormat *
-ScreenplayFormat::staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index)
+ScreenplayFormat::staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, qsizetype index)
 {
     index = index % (SceneElement::Max + 1);
     return reinterpret_cast<ScreenplayFormat *>(list->data)->m_elementFormats.at(index);
 }
 
-int ScreenplayFormat::staticElementFormatCount(QQmlListProperty<SceneElementFormat> *list)
+qsizetype ScreenplayFormat::staticElementFormatCount(QQmlListProperty<SceneElementFormat> *list)
 {
     return reinterpret_cast<ScreenplayFormat *>(list->data)->m_elementFormats.size();
 }
@@ -1605,7 +1605,7 @@ void SceneDocumentBlockUserData::autoCapitalizeNow()
 
 void SceneDocumentBlockUserData::performPendingTasks()
 {
-    for (int task : qAsConst(m_pendingTasks)) {
+    for (int task : std::as_const(m_pendingTasks)) {
         if (task == PolishTextTask)
             this->polishTextNow();
         else if (task == AutoCapitalizeTask)
@@ -1679,7 +1679,7 @@ public:
 
         QStringList ret = m_misspelledFragment.languageSuggestions(activeLanguage);
         languages.removeAll(activeLanguage);
-        for (QLocale::Language lang : qAsConst(languages)) {
+        for (QLocale::Language lang : std::as_const(languages)) {
             ret += m_misspelledFragment.languageSuggestions(lang);
         }
         return ret;

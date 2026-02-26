@@ -231,8 +231,8 @@ private:
     void removeSearchAgent(SearchAgent *ptr);
     void sortSearchAgents();
     void sortSearchAgentsLater();
-    static SearchAgent *staticSearchAgentAt(QQmlListProperty<SearchAgent> *list, int index);
-    static int staticSearchAgentCount(QQmlListProperty<SearchAgent> *list);
+    static SearchAgent *staticSearchAgentAt(QQmlListProperty<SearchAgent> *list, qsizetype index);
+    static qsizetype staticSearchAgentCount(QQmlListProperty<SearchAgent> *list);
 
     void doSearch();
     void doSearchLater();

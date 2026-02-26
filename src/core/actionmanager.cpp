@@ -78,7 +78,7 @@ public:
     {
         if (object == qApp->focusWindow() && event->type() == QEvent::ShortcutOverride) {
             QKeyEvent *keyEvent = reinterpret_cast<QKeyEvent *>(event);
-            QKeySequence keySequence(keyEvent->modifiers() + keyEvent->key());
+            QKeySequence keySequence(int(keyEvent->modifiers()) + keyEvent->key());
             QObject *qmlAction = keySequence.isEmpty()
                     ? nullptr
                     : ActionManager::findActionForShortcut(keySequence.toString());
@@ -456,12 +456,12 @@ void ActionManager::staticClearActions(QQmlListProperty<QObject> *list)
     reinterpret_cast<ActionManager *>(list->data)->clearActions();
 }
 
-QObject *ActionManager::staticActionAt(QQmlListProperty<QObject> *list, int index)
+QObject *ActionManager::staticActionAt(QQmlListProperty<QObject> *list, qsizetype index)
 {
     return reinterpret_cast<ActionManager *>(list->data)->actionAt(index);
 }
 
-int ActionManager::staticActionCount(QQmlListProperty<QObject> *list)
+qsizetype ActionManager::staticActionCount(QQmlListProperty<QObject> *list)
 {
     return reinterpret_cast<ActionManager *>(list->data)->actionCount();
 }
@@ -653,7 +653,7 @@ void ActionManager::applySavedShortcuts()
     if (shortcutMap.isEmpty() || m_actions.isEmpty())
         return;
 
-    for (QObject *action : qAsConst(m_actions)) {
+    for (QObject *action : std::as_const(m_actions)) {
         if (shortcutMap.contains(action->objectName()))
             changeActionShortcut(action, shortcutMap[action->objectName()].toString());
     }
@@ -976,7 +976,7 @@ bool ActionHandlerAttached::triggerAll()
 {
     QList<ActionHandler *> handlers = ActionHandlers::instance()->findAll(m_action, true);
 
-    for (ActionHandler *handler : qAsConst(handlers))
+    for (ActionHandler *handler : std::as_const(handlers))
         emit handler->triggered(this->parent());
 
     return !handlers.isEmpty();
@@ -1276,7 +1276,7 @@ void ActionsModel::clear()
 
     QSet<QObject *> actionManagers;
 
-    for (const Item &item : qAsConst(m_items)) {
+    for (const Item &item : std::as_const(m_items)) {
         if (!item.actionManager.isNull())
             actionManagers.insert(item.actionManager);
     }

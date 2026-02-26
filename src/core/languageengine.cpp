@@ -600,7 +600,7 @@ void AbstractLanguagesModel::fromJson(const QJsonValue &value)
 void AbstractLanguagesModel::updateLanguageCodes()
 {
     QList<int> codes;
-    for (const Language &language : qAsConst(m_languages))
+    for (const Language &language : std::as_const(m_languages))
         codes << language.code;
 
     std::sort(codes.begin(), codes.end());
@@ -1192,7 +1192,7 @@ QString DefaultTransliteration::onParagraph(const QString &paragraph, int code)
             break;
 
         if (next - end >= 1)
-            ret += paragraph.midRef(end, next - end);
+            ret += paragraph.mid(end, next - end);
     }
 
     return ret;
@@ -1572,7 +1572,7 @@ void DictpressTransliterationEngine::processServiceResponse(const QJsonObject &r
         std::sort(matches.begin(), matches.end(),
                   [](const Match &a, const Match &b) { return a.weight > b.weight; });
 
-        for (const Match &match : qAsConst(matches)) {
+        for (const Match &match : std::as_const(matches)) {
             if (!suggestions.contains(match.word))
                 suggestions.append(match.word);
         }
@@ -2054,7 +2054,7 @@ LanguageEngine::LanguageEngine(QObject *parent) : QObject(parent)
     m_transliterators << new DictpressTransliterationEngine(QLocale::Kannada, this); // For Alar
     m_transliterators << new DictpressTransliterationEngine(QLocale::Malayalam, this); // For Olam
     m_transliterators << new FallbackTransliterationEngine(m_transliterators.first(), this);
-    for (AbstractTransliterationEngine *transliterator : qAsConst(m_transliterators))
+    for (AbstractTransliterationEngine *transliterator : std::as_const(m_transliterators))
         connect(transliterator, &AbstractTransliterationEngine::capacityChanged, this,
                 &LanguageEngine::transliterationOptionsUpdated);
 

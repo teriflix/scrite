@@ -537,7 +537,7 @@ private:
     QObjectProperty<QObject> m_injection;
     bool m_connectedToScreenplaySignals = false;
     bool m_connectedToFormattingSignals = false;
-    QPagedPaintDevice::PageSize m_paperSize = QPagedPaintDevice::Letter;
+    QPageSize::PageSizeId m_paperSize = QPageSize::Letter;
     QList<QPair<int, int>> m_pageBoundaries;
     QObjectProperty<Screenplay> m_screenplay;
     friend class ScreenplayTextDocumentUpdate;

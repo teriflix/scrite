@@ -223,7 +223,7 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
         else {
             QStringList epNrs;
             epNrs.reserve(m_episodeNumbers.size());
-            for (int nr : qAsConst(m_episodeNumbers))
+            for (int nr : std::as_const(m_episodeNumbers))
                 epNrs << QString::number(nr);
             subtitle += QStringLiteral(" [Episode ") + epNrs.join(", ") + QStringLiteral("]");
         }

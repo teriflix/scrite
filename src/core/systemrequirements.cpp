@@ -25,6 +25,7 @@
 #include <QMessageBox>
 #include <QHostAddress>
 #include <QStorageInfo>
+#include <QStandardPaths>
 #include <QOpenGLContext>
 #include <QProgressDialog>
 #include <QGuiApplication>

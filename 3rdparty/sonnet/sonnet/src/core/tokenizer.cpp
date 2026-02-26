@@ -22,6 +22,7 @@
 
 #include <QList>
 #include <QString>
+#include <QStringRef>
 
 #include "tokenizer_p.h"
 #include "textbreaks_p.h"
@@ -30,24 +31,19 @@ namespace Sonnet {
 class BreakTokenizerPrivate
 {
 public:
-    enum Type {
-        Words, Sentences
-    };
+    enum Type { Words, Sentences };
 
     BreakTokenizerPrivate(Type s)
-        : breakFinder(new TextBreaks)
-        , itemPosition(-1)
-        , cacheValid(false)
-        , type(s)
-        , inAddress(false)
-        , ignoreUppercase(false)
+        : breakFinder(new TextBreaks),
+          itemPosition(-1),
+          cacheValid(false),
+          type(s),
+          inAddress(false),
+          ignoreUppercase(false)
     {
     }
 
-    ~BreakTokenizerPrivate()
-    {
-        delete breakFinder;
-    }
+    ~BreakTokenizerPrivate() { delete breakFinder; }
 
     TextBreaks::Positions breaks() const;
     void invalidate();
@@ -87,7 +83,7 @@ void BreakTokenizerPrivate::invalidate()
 
 bool BreakTokenizerPrivate::hasNext() const
 {
-    if (itemPosition >= (breaks().size()-1)) {
+    if (itemPosition >= (breaks().size() - 1)) {
         return false;
     }
 
@@ -148,7 +144,7 @@ QStringRef BreakTokenizerPrivate::next()
 void BreakTokenizerPrivate::replace(int pos, int len, const QString &newWord)
 {
     buffer.replace(pos, len, newWord);
-    int offset = len-newWord.length();
+    int offset = len - newWord.length();
     if (cacheValid) {
         shiftBreaks(pos, offset);
     }
@@ -182,18 +178,18 @@ QStringRef WordTokenizer::next()
     QStringRef n = d->next();
 
     // end of address of url?
-    if (d->inAddress && n.position() > 0 && d->buffer[n.position()-1].isSpace()) {
+    if (d->inAddress && n.position() > 0 && d->buffer[n.position() - 1].isSpace()) {
         d->inAddress = false;
     }
 
     // check if this word starts an email address of url
     if (!d->inAddress || hasNext()) {
-        int pos = n.position()+n.length();
+        int pos = n.position() + n.length();
         if (d->buffer[pos] == QLatin1Char('@')) {
             d->inAddress = true;
         }
-        if (d->buffer[pos] == QLatin1Char(':') && d->buffer[pos+1] == QLatin1Char('/')
-            && d->buffer[pos+2] == QLatin1Char('/')) {
+        if (d->buffer[pos] == QLatin1Char(':') && d->buffer[pos + 1] == QLatin1Char('/')
+            && d->buffer[pos + 2] == QLatin1Char('/')) {
             d->inAddress = true;
         }
     }

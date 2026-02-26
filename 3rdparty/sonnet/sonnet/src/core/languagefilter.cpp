@@ -19,6 +19,7 @@
 */
 
 #include <QString>
+#include <QStringRef>
 
 #include "languagefilter_p.h"
 #include "guesslanguage.h"
@@ -38,10 +39,7 @@ public:
         gl.setLimits(MAX_ITEMS, MIN_RELIABILITY);
     }
 
-    ~LanguageFilterPrivate()
-    {
-        delete source;
-    }
+    ~LanguageFilterPrivate() { delete source; }
 
     QString mainLanguage() const;
 
@@ -59,9 +57,8 @@ public:
 QString LanguageFilterPrivate::mainLanguage() const
 {
     if (cachedMainLanguage.isNull()) {
-        cachedMainLanguage
-            = gl.identify(source->buffer(),
-                          QStringList(Loader::openLoader()->settings()->defaultLanguage()));
+        cachedMainLanguage = gl.identify(
+                source->buffer(), QStringList(Loader::openLoader()->settings()->defaultLanguage()));
     }
     return cachedMainLanguage;
 }
@@ -73,8 +70,8 @@ LanguageFilter::LanguageFilter(AbstractTokenizer *source) : d(new LanguageFilter
     d->prevLanguage = Loader::openLoader()->settings()->defaultLanguage();
 }
 
-LanguageFilter::LanguageFilter(const LanguageFilter &other) : d(new LanguageFilterPrivate(other.d->
-                                                                                          source))
+LanguageFilter::LanguageFilter(const LanguageFilter &other)
+    : d(new LanguageFilterPrivate(other.d->source))
 {
     d->lastToken = other.d->lastToken;
     d->lastLanguage = other.d->lastLanguage;
@@ -109,13 +106,14 @@ QStringRef LanguageFilter::next()
 QString LanguageFilter::language() const
 {
     if (d->lastLanguage.isNull()) {
-        d->lastLanguage = d->gl.identify(d->lastToken.toString(),
-                                         QStringList() << d->prevLanguage
-                                                       << Loader::openLoader()->settings()->defaultLanguage());
+        d->lastLanguage = d->gl.identify(
+                d->lastToken.toString(),
+                QStringList() << d->prevLanguage
+                              << Loader::openLoader()->settings()->defaultLanguage());
     }
     const QStringList available = d->sp.availableLanguages();
 
-    //FIXME: do something a little more smart here
+    // FIXME: do something a little more smart here
     if (!available.contains(d->lastLanguage)) {
         for (const QString &lang : available) {
             if (lang.startsWith(d->lastLanguage)) {
@@ -150,8 +148,8 @@ QString LanguageFilter::buffer() const
 void LanguageFilter::replace(int position, int len, const QString &newWord)
 {
     d->source->replace(position, len, newWord);
-    //FIXME: fix lastToken
-    // uncache language for current token - it may have changed
+    // FIXME: fix lastToken
+    //  uncache language for current token - it may have changed
     d->lastLanguage = QString();
 }
 }

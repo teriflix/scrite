@@ -132,7 +132,7 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
     // Lets compile a list of scene names.
     auto compileSceneTitles = [screenplayElements]() {
         QStringList ret;
-        for (const ScreenplayElement *element : qAsConst(screenplayElements)) {
+        for (const ScreenplayElement *element : std::as_const(screenplayElements)) {
             const Scene *scene = element->scene();
             if (scene) {
                 QString title = QStringLiteral("[") + element->resolvedSceneNumber()
@@ -196,7 +196,7 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
         if (!m_episodeNumbers.isEmpty()) {
             QStringList epNos;
             epNos.reserve(m_episodeNumbers.size());
-            for (int epno : qAsConst(m_episodeNumbers))
+            for (int epno : std::as_const(m_episodeNumbers))
                 epNos << QString::number(epno);
 
             cursor.insertText(QStringLiteral("Episode(s): ") + epNos.join(QStringLiteral(", ")));
@@ -280,7 +280,7 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
 
     // Mark cells
     int sceneNumber = 0;
-    for (const ScreenplayElement *element : qAsConst(screenplayElements)) {
+    for (const ScreenplayElement *element : std::as_const(screenplayElements)) {
         const Scene *scene = element->scene();
         if (scene) {
             const QStringList characters = scene->characterNames();
@@ -330,8 +330,8 @@ bool SceneCharacterMatrixReport::directExportToOdf(QIODevice *device)
     this->finalizeCharacterNames();
 
     QTextStream ts(device);
+    ts.setEncoding(QStringConverter::Utf8);
     ts.setAutoDetectUnicode(true);
-    ts.setCodec("utf-8");
 
     const int nrRows =
             m_type == SceneVsCharacter ? screenplayElements.size() : m_characterNames.size();

@@ -304,7 +304,7 @@ bool Scrite::doUnzip(const QFileInfo &zipFileInfo, const QTemporaryDir &dstDir)
         if (!qzip.getCurrentFileInfo(&qfileInfo))
             break;
 
-        const QFileInfo dstFileInfo = dstDir.filePath(qfileInfo.name);
+        const QFileInfo dstFileInfo(dstDir.filePath(qfileInfo.name));
         const QString dstFileName = dstFileInfo.absoluteFilePath();
         QDir().mkpath(dstFileInfo.absolutePath());
 

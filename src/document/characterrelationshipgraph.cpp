@@ -199,15 +199,14 @@ void CharacterRelationshipGraphEdge::evaluatePath()
         const QRectF box2 = m_relationship->direction() == Relationship::WithOf ? r1 : r2;
 
         const QString futureName = QStringLiteral("curvedArrowFuture");
-        QFutureWatcher<QPainterPath> *futureWatcher =
-                this->findChild<QFutureWatcher<QPainterPath> *>(futureName,
-                                                                Qt::FindDirectChildrenOnly);
-        if (futureWatcher) {
-            futureWatcher->cancel();
-            futureWatcher->deleteLater();
+        QFutureWatcherBase *futureWatcherBase =
+                this->findChild<QFutureWatcherBase *>(futureName, Qt::FindDirectChildrenOnly);
+        if (futureWatcherBase) {
+            futureWatcherBase->cancel();
+            futureWatcherBase->deleteLater();
         }
 
-        futureWatcher = new QFutureWatcher<QPainterPath>(this);
+        QFutureWatcher<QPainterPath> *futureWatcher = new QFutureWatcher<QPainterPath>(this);
         futureWatcher->setObjectName(futureName);
         connect(futureWatcher, &QFutureWatcher<QPainterPath>::finished, this, [=]() {
             if (futureWatcher->isCanceled())
@@ -562,7 +561,7 @@ void CharacterRelationshipGraph::load()
 
     QList<CharacterRelationshipGraphEdge *> edges = m_edges.list();
     m_edges.clear();
-    for (CharacterRelationshipGraphEdge *edge : qAsConst(edges)) {
+    for (CharacterRelationshipGraphEdge *edge : std::as_const(edges)) {
         disconnect(edge->relationship(), &Relationship::aboutToDelete, this,
                    &CharacterRelationshipGraph::loadLater);
         GarbageCollector::instance()->add(edge);
@@ -571,7 +570,7 @@ void CharacterRelationshipGraph::load()
 
     QList<CharacterRelationshipGraphNode *> nodes = m_nodes.list();
     m_nodes.clear();
-    for (CharacterRelationshipGraphNode *node : qAsConst(nodes)) {
+    for (CharacterRelationshipGraphNode *node : std::as_const(nodes)) {
         disconnect(node->character(), &Character::aboutToDelete, this,
                    &CharacterRelationshipGraph::loadLater);
         GarbageCollector::instance()->add(node);
@@ -654,7 +653,7 @@ void CharacterRelationshipGraph::load()
         // This is a character which has a relationship. We group it into a graph/group
         // in which this character has relationships. Otherwise, we create a new group.
         for (GraphLayout::Graph &graph : graphs) {
-            for (GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes)) {
+            for (GraphLayout::AbstractNode *agnode : std::as_const(graph.nodes)) {
                 CharacterRelationshipGraphNode *gnode =
                         qobject_cast<CharacterRelationshipGraphNode *>(agnode->containerObject());
                 if (character->isRelatedTo(gnode->character())) {
@@ -685,7 +684,7 @@ void CharacterRelationshipGraph::load()
 
         int col = 0;
         QPointF pos;
-        for (GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes)) {
+        for (GraphLayout::AbstractNode *agnode : std::as_const(graph.nodes)) {
             CharacterRelationshipGraphNode *node =
                     qobject_cast<CharacterRelationshipGraphNode *>(agnode->containerObject());
             node->move(pos);
@@ -704,7 +703,7 @@ void CharacterRelationshipGraph::load()
     // Lets now loop over all nodes within each graph (except for the first one, which only
     // constains lone character nodes) and bundle relationships.
     for (GraphLayout::Graph &graph : graphs) {
-        for (GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes)) {
+        for (GraphLayout::AbstractNode *agnode : std::as_const(graph.nodes)) {
             CharacterRelationshipGraphNode *node1 =
                     qobject_cast<CharacterRelationshipGraphNode *>(agnode->containerObject());
             Character *character = node1->character();
@@ -738,14 +737,14 @@ void CharacterRelationshipGraph::load()
     };
     QRectF boundingRect(m_leftMargin, m_topMargin, 0, 0);
     int graphIndex = 0;
-    for (const GraphLayout::Graph &graph : qAsConst(graphs)) {
+    for (const GraphLayout::Graph &graph : std::as_const(graphs)) {
         const int i = graphIndex++;
         if (graph.nodes.isEmpty())
             continue;
 
         if (i >= 1) {
             QString longestRelationshipName;
-            for (GraphLayout::AbstractEdge *agedge : qAsConst(graph.edges)) {
+            for (GraphLayout::AbstractEdge *agedge : std::as_const(graph.edges)) {
                 CharacterRelationshipGraphEdge *gedge =
                         qobject_cast<CharacterRelationshipGraphEdge *>(agedge->containerObject());
                 longestRelationshipName =
@@ -765,7 +764,7 @@ void CharacterRelationshipGraph::load()
 
         // Compute bounding rect of the nodes.
         QRectF graphRect;
-        for (GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes)) {
+        for (GraphLayout::AbstractNode *agnode : std::as_const(graph.nodes)) {
             CharacterRelationshipGraphNode *gnode =
                     qobject_cast<CharacterRelationshipGraphNode *>(agnode->containerObject());
 
@@ -788,7 +787,7 @@ void CharacterRelationshipGraph::load()
 
         // Move the nodes such that they are layed out in a row.
         const QPointF dp = -graphRect.topLeft() + boundingRect.topRight();
-        for (GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes)) {
+        for (GraphLayout::AbstractNode *agnode : std::as_const(graph.nodes)) {
             CharacterRelationshipGraphNode *gnode =
                     qobject_cast<CharacterRelationshipGraphNode *>(agnode->containerObject());
             if (gnode->m_placedByUser)
@@ -805,11 +804,11 @@ void CharacterRelationshipGraph::load()
             boundingRect.setRight(boundingRect.right() + 100);
     }
 
-    for (CharacterRelationshipGraphNode *node : qAsConst(nodes))
+    for (CharacterRelationshipGraphNode *node : std::as_const(nodes))
         connect(node->character(), &Character::aboutToDelete, this,
                 &CharacterRelationshipGraph::loadLater, Qt::UniqueConnection);
 
-    for (CharacterRelationshipGraphEdge *edge : qAsConst(edges)) {
+    for (CharacterRelationshipGraphEdge *edge : std::as_const(edges)) {
         connect(edge->relationship(), &Relationship::aboutToDelete, this,
                 &CharacterRelationshipGraph::loadLater, Qt::UniqueConnection);
         edge->setEvaluatePathAllowed(true);

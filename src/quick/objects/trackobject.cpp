@@ -355,12 +355,12 @@ void TrackerPack::staticClearTrackers(QQmlListProperty<AbstractObjectTracker> *l
 }
 
 AbstractObjectTracker *TrackerPack::staticTrackerAt(QQmlListProperty<AbstractObjectTracker> *list,
-                                                    int index)
+                                                    qsizetype index)
 {
     return reinterpret_cast<TrackerPack *>(list->data)->trackerAt(index);
 }
 
-int TrackerPack::staticTrackerCount(QQmlListProperty<AbstractObjectTracker> *list)
+qsizetype TrackerPack::staticTrackerCount(QQmlListProperty<AbstractObjectTracker> *list)
 {
     return reinterpret_cast<TrackerPack *>(list->data)->trackerCount();
 }

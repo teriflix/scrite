@@ -925,7 +925,7 @@ void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
 
     auto findTags = [tags](int pageNr) -> QVector<TagInfo> {
         QVector<TagInfo> ret;
-        for (const TagInfo &tag : qAsConst(tags)) {
+        for (const TagInfo &tag : std::as_const(tags)) {
             if (pageNr >= tag.fromPageNr && pageNr <= tag.toPageNr)
                 ret.append(tag);
         }
@@ -962,12 +962,12 @@ void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
     }
 
     // Now we go ahead and apply tags to each scene.
-    for (const _Episode &episode : qAsConst(episodes)) {
+    for (const _Episode &episode : std::as_const(episodes)) {
         if (episode.pageCount == 0)
             continue;
 
         const qreal pageScale = qreal(nrPages) / episode.pageCount;
-        for (const _SceneFrame &sceneFrame : qAsConst(episode.sceneFrames)) {
+        for (const _SceneFrame &sceneFrame : std::as_const(episode.sceneFrames)) {
             const int pageNr = 1 + floor(sceneFrame.startPage * pageScale);
             const QVector<TagInfo> sceneTags = findTags(pageNr);
             if (sceneTags.isEmpty())
@@ -2041,7 +2041,7 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para,
     ScreenplayTextDocumentUpdate update(this);
 
     QList<ScreenplayElement *> elements = m_screenplay->sceneElements(scene);
-    for (ScreenplayElement *element : qAsConst(elements)) {
+    for (ScreenplayElement *element : std::as_const(elements)) {
         QTextFrame *frame = this->findTextFrame(element);
 #ifdef QT_NO_DEBUG_OUTPUT
         // This will probably get updated in the next cycle. Trying to fix
@@ -2945,7 +2945,7 @@ void ScreenplayTextDocument::addToSceneResetList(Scene *scene)
     m_sceneResetTimer.start(100, this);
     if (!m_sceneResetHasTriggeredUpdateScheduled) {
         int nrBlocks = 0;
-        for (Scene *s : qAsConst(m_sceneResetList)) {
+        for (Scene *s : std::as_const(m_sceneResetList)) {
             const QList<int> sil = s->screenplayElementIndexList();
             for (int si : sil) {
                 ScreenplayElement *e = m_screenplay->elementAt(si);
@@ -3259,7 +3259,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
         QString loglineHtml;
         const QString openP = QLatin1String("<p>");
         const QString closeP = QLatin1String("</p>");
-        for (const QString &loglinePara : qAsConst(loglineParas)) {
+        for (const QString &loglinePara : std::as_const(loglineParas)) {
             const QString formattedLoglinePara = LanguageEngine::formattedInHtml(loglinePara);
             if (loglineHtml.isEmpty())
                 loglineHtml = openP + QLatin1String("<strong>Logline:</strong> ")
@@ -3453,7 +3453,7 @@ Q_GLOBAL_STATIC(QList<SceneElementBlockTextUpdater *>, SceneElementBlockTextUpda
 
 void SceneElementBlockTextUpdater::completeOthers(SceneElementBlockTextUpdater *than)
 {
-    for (SceneElementBlockTextUpdater *updater : qAsConst(*SceneElementBlockTextUpdaterList)) {
+    for (SceneElementBlockTextUpdater *updater : std::as_const(*SceneElementBlockTextUpdaterList)) {
         if (updater != than)
             updater->update();
     }
@@ -3529,7 +3529,7 @@ void SceneElementBlockTextUpdater::update()
                 // scene.
 
     QList<ScreenplayElement *> elements = screenplay->sceneElements(scene);
-    for (ScreenplayElement *element : qAsConst(elements)) {
+    for (ScreenplayElement *element : std::as_const(elements)) {
         QTextFrame *frame = m_document->findTextFrame(element);
         if (frame == nullptr)
             continue;

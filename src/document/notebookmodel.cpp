@@ -378,7 +378,7 @@ QStandardItem *createItemForNode(StoryNode *node)
         nodeItem->appendRow(nodeNotesItem);
     }
 
-    for (StoryNode *childNode : qAsConst(node->childNodes)) {
+    for (StoryNode *childNode : std::as_const(node->childNodes)) {
         QStandardItem *childNodeItem = createItemForNode(childNode);
         nodeItem->appendRow(childNodeItem);
     }
@@ -464,7 +464,7 @@ void NotebookModel::syncScenes()
         return;
 
     StoryNode *structureNode = nullptr, *screenplayNode = nullptr;
-    for (StoryNode *storyNode : qAsConst(storyNodes->childNodes)) {
+    for (StoryNode *storyNode : std::as_const(storyNodes->childNodes)) {
         if (storyNode->structure != nullptr)
             structureNode = storyNode;
         else if (storyNode->screenplay != nullptr)
@@ -518,7 +518,7 @@ void NotebookModel::syncCharacters()
         return a->priority() > b->priority();
     });
 
-    for (Character *character : qAsConst(characters)) {
+    for (Character *character : std::as_const(characters)) {
         Notes *characterNotes = character->notes();
 
         NotesItem *notesItem = new NotesItem(characterNotes);
@@ -725,7 +725,7 @@ void NotesItem::updateText()
         QList<int> indexes = m_notes->scene()->screenplayElementIndexList();
         QStringList idxStringList;
         Screenplay *screenplay = ScriteDocument::instance()->screenplay();
-        for (int val : qAsConst(indexes)) {
+        for (int val : std::as_const(indexes)) {
             ScreenplayElement *element = screenplay->elementAt(val);
             if (element)
                 idxStringList << element->resolvedSceneNumber();
@@ -892,7 +892,7 @@ StoryNode *StoryNode::create(ScriteDocument *document)
         structureNode->structure = structure;
         rootNode->childNodes.append(structureNode);
 
-        for (StructureElement *element : qAsConst(structureElements)) {
+        for (StructureElement *element : std::as_const(structureElements)) {
             StoryNode *unusedSceneNode = new StoryNode;
             unusedSceneNode->unusedScene = element;
             structureNode->childNodes.append(unusedSceneNode);

@@ -32,6 +32,7 @@
 #include <QTextDocumentWriter>
 #include <QThread>
 #include <QtMath>
+#include <QElapsedTimer>
 
 // These macros are only used for testing the functionality of the worker.
 // ---- DO NOT ENABLE THESE IN PRODUCTION CODE ---
@@ -595,7 +596,7 @@ void ScreenplayPaginatorWorker::syncDocument()
     QMap<int, BreakBlockExtent> breakBlockExtents;
     QTextBlock lastBlock;
 
-    for (const SceneContent &content : qAsConst(m_screenplayContent)) {
+    for (const SceneContent &content : std::as_const(m_screenplayContent)) {
         if (maybeAbort()) {
             paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime());
             return;
@@ -620,7 +621,7 @@ void ScreenplayPaginatorWorker::syncDocument()
         range.until = QTextBlock();
         range.sceneId = content.id;
 
-        for (const SceneParagraph &paragraph : qAsConst(content.paragraphs)) {
+        for (const SceneParagraph &paragraph : std::as_const(content.paragraphs)) {
             if (maybeAbort()) {
                 paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime());
                 return;
@@ -674,7 +675,7 @@ void ScreenplayPaginatorWorker::syncDocument()
     PaginatorDocumentInsights::BlockRange lastRecordBlockRange;
     records.reserve(m_screenplayContent.size());
 
-    for (const SceneContent &sceneContent : qAsConst(m_screenplayContent)) {
+    for (const SceneContent &sceneContent : std::as_const(m_screenplayContent)) {
         if (maybeAbort()) {
             paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime());
             return;
@@ -746,9 +747,10 @@ void ScreenplayPaginatorWorker::syncDocument()
         record.timeLength =
                 ScreenplayPaginator::pixelToTimeLength(record.pixelLength, m_format, m_document);
 
-        record.pixelOffset = breakBlockExtent.before.isValid() ? ScreenplayPaginator::pixelLength(
-                                     m_document->firstBlock(), breakBlockExtent.before, m_document)
-                                                               : 0;
+        record.pixelOffset = breakBlockExtent.before.isValid()
+                ? ScreenplayPaginator::pixelLength(m_document->firstBlock(),
+                                                   breakBlockExtent.before, m_document)
+                : 0;
         record.pageOffset = ScreenplayPaginator::pixelToPageLength(record.pixelOffset, m_document);
         record.timeOffset =
                 ScreenplayPaginator::pixelToTimeLength(record.pixelOffset, m_format, m_document);

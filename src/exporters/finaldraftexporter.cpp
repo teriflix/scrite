@@ -162,7 +162,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
             QDomElement textE = createTextElement();
             textE.appendChild(doc.createTextNode(text));
         } else {
-            for (const QTextLayout::FormatRange &format : qAsConst(mergedTextFormats)) {
+            for (const QTextLayout::FormatRange &format : std::as_const(mergedTextFormats)) {
                 const QString snippet = text.mid(format.start, format.length);
                 if (snippet.isEmpty())
                     continue;
@@ -338,7 +338,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     const QStringList characters = structure->allCharacterNames();
     QDomElement charactersE = doc.createElement("Characters");
     smartTypeE.appendChild(charactersE);
-    for (const QString &name : qAsConst(characters)) {
+    for (const QString &name : std::as_const(characters)) {
         QDomElement characterE = doc.createElement("Character");
         charactersE.appendChild(characterE);
         characterE.appendChild(doc.createTextNode(name));
@@ -351,7 +351,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     smartTypeE.appendChild(timesOfDayE);
     timesOfDayE.setAttribute(FDX_SeparatorAttr, " - ");
     std::sort(moments.begin(), moments.end());
-    for (const QString &moment : qAsConst(moments)) {
+    for (const QString &moment : std::as_const(moments)) {
         QDomElement timeOfDayE = doc.createElement("TimeOfDay");
         timesOfDayE.appendChild(timeOfDayE);
         timeOfDayE.appendChild(doc.createTextNode(moment));
@@ -361,7 +361,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     QDomElement sceneIntrosE = doc.createElement("SceneIntros");
     smartTypeE.appendChild(sceneIntrosE);
     sceneIntrosE.setAttribute(FDX_SeparatorAttr, ". ");
-    for (const QString &locationType : qAsConst(locationTypes)) {
+    for (const QString &locationType : std::as_const(locationTypes)) {
         QDomElement sceneIntroE = doc.createElement("SceneIntro");
         sceneIntrosE.appendChild(sceneIntroE);
         sceneIntroE.appendChild(doc.createTextNode(locationType));
@@ -370,7 +370,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     const QString xml = doc.toString(2);
 
     QTextStream ts(device);
-    ts.setCodec("utf-8");
+    ts.setEncoding(QStringConverter::Utf8);
     ts.setAutoDetectUnicode(true);
 
     ts << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";

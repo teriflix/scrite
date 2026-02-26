@@ -199,15 +199,13 @@ public:
     QString key;
 
     // clang-format off
-    Q_PROPERTY(QString value
+    Q_PROPERTY(int value
                MEMBER value)
     // clang-format on
-    QString value;
+    int value;
 
     ObjectConfigFieldChoice() { }
-    ObjectConfigFieldChoice(const QString &_key, const QString &_value) : key(_key), value(_value)
-    {
-    }
+    ObjectConfigFieldChoice(const QString &_key, int _value) : key(_key), value(_value) { }
     ObjectConfigFieldChoice(const ObjectConfigFieldChoice &other) { *this = other; }
     ObjectConfigFieldChoice &operator=(const ObjectConfigFieldChoice &other)
     {

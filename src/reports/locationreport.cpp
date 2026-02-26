@@ -149,13 +149,13 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
                                                                  it2.value().first()->text());
                 cursor.insertText(" (" + QString::number(it.value().size()) + ")");
 
-                for (SceneHeading *heading : qAsConst(it2.value())) {
+                for (SceneHeading *heading : std::as_const(it2.value())) {
                     Scene *scene = heading->scene();
 
                     QStringList sceneNumbers;
 
                     auto sceneIndexes = scene->screenplayElementIndexList();
-                    for (int sceneIndex : qAsConst(sceneIndexes)) {
+                    for (int sceneIndex : std::as_const(sceneIndexes)) {
                         int sceneNr = sceneIndex + 1;
                         ScreenplayElement *screenplayElement = screenplay->elementAt(sceneIndex);
                         if (screenplayElement->isOmitted())

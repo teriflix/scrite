@@ -386,8 +386,8 @@ public:
 private:
     static void staticAppendCall(QQmlListProperty<RestApiCall> *list, RestApiCall *ptr);
     static void staticClearCalls(QQmlListProperty<RestApiCall> *list);
-    static RestApiCall *staticCallAt(QQmlListProperty<RestApiCall> *list, int index);
-    static int staticCallCount(QQmlListProperty<RestApiCall> *list);
+    static RestApiCall *staticCallAt(QQmlListProperty<RestApiCall> *list, qsizetype index);
+    static qsizetype staticCallCount(QQmlListProperty<RestApiCall> *list);
 
 protected:
     void itemInsertEvent(RestApiCall *ptr);

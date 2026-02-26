@@ -64,6 +64,7 @@
 #include <QDateTime>
 #include <QClipboard>
 #include <QScopeGuard>
+#include <QBinaryJson>
 #include <QElapsedTimer>
 #include <QJsonDocument>
 #include <QFutureWatcher>
@@ -1709,7 +1710,7 @@ QJsonArray ScriteDocument::supportedExportFormats() const
         QList<QByteArray> keys = deviceIOFactories->ExporterFactory.keys();
         std::sort(keys.begin(), keys.end());
 
-        for (const QByteArray &key : qAsConst(keys)) {
+        for (const QByteArray &key : std::as_const(keys)) {
             const QString skey = QString::fromLatin1(key);
             const QStringList fields = skey.split("/");
             const QMetaObject *mo = deviceIOFactories->ExporterFactory.find(key);
@@ -2516,7 +2517,7 @@ bool ScriteDocument::load(const QString &fileName, bool anonymousLoad)
 
     const QJsonDocument jsonDoc = format == DocumentFileSystem::ZipFormat
             ? QJsonDocument::fromJson(m_docFileSystem.header())
-            : QJsonDocument::fromBinaryData(m_docFileSystem.header());
+            : QBinaryJson::fromBinaryData(m_docFileSystem.header());
 
 #ifndef QT_NO_DEBUG_OUTPUT
     {
@@ -2840,7 +2841,7 @@ void ScriteDocument::serializeToJson(QJsonObject &json) const
     json.insert(QStringLiteral("meta"), metaInfo);
 
     QJsonArray valueIndexLookups;
-    for (ValueIndexLookup *lookup : qAsConst(m_valueIndexLookups)) {
+    for (ValueIndexLookup *lookup : std::as_const(m_valueIndexLookups)) {
         if (!lookup->isEmpty()) {
             QJsonObject lookupJson;
             lookup->serializeToJson(lookupJson);

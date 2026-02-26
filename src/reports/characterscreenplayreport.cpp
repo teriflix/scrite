@@ -54,7 +54,7 @@ bool CharacterScreenplayReport::includeScreenplayElement(const ScreenplayElement
         return true;
 
     const QStringList sceneCharacters = scene->characterNames();
-    for (const QString &characterName : qAsConst(m_characterNames))
+    for (const QString &characterName : std::as_const(m_characterNames))
         if (sceneCharacters.contains(characterName))
             return true;
 

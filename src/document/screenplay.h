@@ -995,8 +995,9 @@ private:
     static void staticAppendElement(QQmlListProperty<ScreenplayElement> *list,
                                     ScreenplayElement *ptr);
     static void staticClearElements(QQmlListProperty<ScreenplayElement> *list);
-    static ScreenplayElement *staticElementAt(QQmlListProperty<ScreenplayElement> *list, int index);
-    static int staticElementCount(QQmlListProperty<ScreenplayElement> *list);
+    static ScreenplayElement *staticElementAt(QQmlListProperty<ScreenplayElement> *list,
+                                              qsizetype index);
+    static qsizetype staticElementCount(QQmlListProperty<ScreenplayElement> *list);
     QList<ScreenplayElement *>
             m_elements; // We dont use ObjectListPropertyModel<ScreenplayElement*> for this because
                         // the Screenplay class is already a list model of screenplay elements.

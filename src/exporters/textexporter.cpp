@@ -123,7 +123,7 @@ void TextExporter::setIncludeSceneSynopsis(bool val)
 bool TextExporter::doExport(QIODevice *device)
 {
     QTextStream ts(device);
-    ts.setCodec("utf-8");
+    ts.setEncoding(QStringConverter::Utf8);
     ts.setAutoDetectUnicode(true);
 
     ts << this->toString();
@@ -142,7 +142,7 @@ QString TextExporter::toString() const
     QString ret;
 
     QTextStream ts(&ret, QIODevice::WriteOnly);
-    ts.setCodec("utf-8");
+    ts.setEncoding(QStringConverter::Utf8);
     ts.setAutoDetectUnicode(true);
 
     auto writeParagraph = [&ts, maxChars, newline](const SceneElementFormat *format,

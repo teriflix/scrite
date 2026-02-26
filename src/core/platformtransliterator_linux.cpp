@@ -198,7 +198,7 @@ int LinuxIBusBackend::activateDefaultLanguage() const
 {
     if (!d->engines.isEmpty()) {
         int lang = QLocale::system().language();
-        for (IBusEngineDesc *engine : qAsConst(d->engines)) {
+        for (IBusEngineDesc *engine : std::as_const(d->engines)) {
             if (engine_language(engine) == lang) {
                 if (ibus_bus_set_global_engine(d->bus, ibus_engine_desc_get_name(engine)))
                     return lang;
@@ -225,7 +225,7 @@ LinuxIBusBackend::options(int lang, const PlatformTransliterationEngine *transli
 {
     QList<TransliterationOption> ret;
 
-    for (IBusEngineDesc *engine : qAsConst(d->engines)) {
+    for (IBusEngineDesc *engine : std::as_const(d->engines)) {
         if (engine_language(engine) == lang) {
             ret << TransliterationOption((QObject *)transliterator, lang, engine_id(engine),
                                          engine_name(engine), false);
@@ -309,7 +309,7 @@ bool LinuxIBusBackend::reload()
         d->engineIds = engineIds;
         d->engines.clear();
 
-        for (const QString &engineName : qAsConst(d->engineIds)) {
+        for (const QString &engineName : std::as_const(d->engineIds)) {
             auto it = std::find_if(d->allEngines.begin(), d->allEngines.end(),
                                    [engineName](IBusEngineDesc *engine) {
                                        return engine_id(engine) == engineName;

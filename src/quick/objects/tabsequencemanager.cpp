@@ -138,7 +138,7 @@ void TabSequenceManager::assumeFocusAt(int index)
 void TabSequenceManager::releaseFocus()
 {
     bool hadFocus = false;
-    for (TabSequenceItem *item : qAsConst(m_tabSequenceItems)) {
+    for (TabSequenceItem *item : std::as_const(m_tabSequenceItems)) {
         QQuickItem *qitem = qobject_cast<QQuickItem *>(item->parent());
         if (qitem) {
             hadFocus |= qitem->hasFocus();

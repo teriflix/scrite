@@ -152,7 +152,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
 
         const Structure *structure = this->document()->structure();
         int characterNr = 0;
-        for (const QString &characterName : qAsConst(m_characterNames)) {
+        for (const QString &characterName : std::as_const(m_characterNames)) {
             ++characterNr;
             blockFormat = defaultBlockFormat;
             blockFormat.setIndent(1);
@@ -403,7 +403,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                 continue;
 
             bool sceneHasSaidCharacters = false;
-            for (const QString &characterName : qAsConst(m_characterNames)) {
+            for (const QString &characterName : std::as_const(m_characterNames)) {
                 if (scene->characterNames().contains(characterName)) {
                     sceneCount[characterName] = sceneCount.value(characterName, 0) + 1;
 
@@ -516,7 +516,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
             cursor = detailFrame->lastCursorPosition();
 
             QStringList muteCharacters;
-            for (const QString &characterName : qAsConst(m_characterNames)) {
+            for (const QString &characterName : std::as_const(m_characterNames)) {
                 if (characterHasDialogue.value(characterName, false) == false
                     && scene->characterNames().contains(characterName)) {
                     muteCharacters << characterName;

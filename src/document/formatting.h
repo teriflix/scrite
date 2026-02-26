@@ -628,9 +628,9 @@ public:
 
     // clang-format off
     Q_PROPERTY(QColor hyperlinkTextColor
-                       READ hyperlinkTextColor
-                               WRITE setHyperlinkTextColor
-                                       NOTIFY hyperlinkTextColorChanged)
+               READ hyperlinkTextColor
+               WRITE setHyperlinkTextColor
+               NOTIFY hyperlinkTextColorChanged)
     // clang-format on
     void setHyperlinkTextColor(const QColor &val)
     {
@@ -707,8 +707,8 @@ private:
     ScreenplayPageLayout *m_pageLayout = new ScreenplayPageLayout(this);
 
     static SceneElementFormat *staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list,
-                                                     int index);
-    static int staticElementFormatCount(QQmlListProperty<SceneElementFormat> *list);
+                                                     qsizetype index);
+    static qsizetype staticElementFormatCount(QQmlListProperty<SceneElementFormat> *list);
     QList<SceneElementFormat *> m_elementFormats;
 };
 

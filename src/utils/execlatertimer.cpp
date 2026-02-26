@@ -26,7 +26,7 @@ Q_GLOBAL_STATIC(QList<ExecLaterTimer *>, ExecLaterTimerList)
 ExecLaterTimer *ExecLaterTimer::get(int timerId)
 {
 #ifndef QT_NO_DEBUG_OUTPUT
-    for (ExecLaterTimer *timer : qAsConst(*ExecLaterTimerList)) {
+    for (ExecLaterTimer *timer : std::as_const(*ExecLaterTimerList)) {
         if (timer->timerId() == timerId)
             return timer;
     }

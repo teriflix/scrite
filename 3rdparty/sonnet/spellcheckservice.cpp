@@ -109,7 +109,7 @@ public:
             return QStringList();
 
         QStringList ret;
-        for (const Item &item : qAsConst(wordScriptItems)) {
+        for (const Item &item : std::as_const(wordScriptItems)) {
             if (item.speller->isMisspelled(word)) {
                 const QStringList suggestions = item.speller->suggest(word);
                 ret += suggestions;
@@ -131,8 +131,7 @@ public:
             return false;
 
         if (word.endsWith("\'s", Qt::CaseInsensitive)) {
-            if (request.characterNames.contains(word.leftRef(word.length() - 2),
-                                                Qt::CaseInsensitive))
+            if (request.characterNames.contains(word.left(word.length() - 2), Qt::CaseInsensitive))
                 return false;
         }
 
@@ -144,7 +143,7 @@ public:
             return false;
 
         QMap<QLocale::Language, QStringList> languageSuggestions;
-        for (const Item &item : qAsConst(wordScriptItems)) {
+        for (const Item &item : std::as_const(wordScriptItems)) {
             if (item.speller->isMisspelled(word)) {
                 const QStringList suggestions = item.speller->suggest(word);
                 languageSuggestions[item.language] = suggestions;
@@ -297,9 +296,11 @@ public:
 
         setExpiryTimeout(-1);
         setMaxThreadCount(1);
-        QFuture<QList<int>> future = QtConcurrent::run(this, [supportedLanguageCodes]() {
-            return InitializeSpellCheckThread(supportedLanguageCodes);
-        });
+        QFuture<QList<int>> future = QtConcurrent::run(
+                static_cast<QThreadPool *>(this),
+                [supportedLanguageCodes]() {
+                    return InitializeSpellCheckThread(supportedLanguageCodes);
+                });
         future.waitForFinished();
 
         m_supportedLanguages = future.result();
@@ -452,7 +453,7 @@ void SpellCheckService::setMisspelledFragments(const QList<TextFragment> &val)
     m_misspelledFragments = val;
 
     QJsonArray json;
-    for (const TextFragment &textFrag : qAsConst(m_misspelledFragments)) {
+    for (const TextFragment &textFrag : std::as_const(m_misspelledFragments)) {
         QJsonObject item;
         item.insert("start", textFrag.start());
         item.insert("length", textFrag.length());

@@ -16,8 +16,6 @@
 #include "finaldraftimporter.h"
 #include "application.h"
 
-#include <QXmlSimpleReader>
-
 static QString FDX_Suffix = QStringLiteral("fdx");
 static QString FDX_RootTag = QStringLiteral("FinalDraft");
 static QString FDX_VersionAttr = QStringLiteral("Version");

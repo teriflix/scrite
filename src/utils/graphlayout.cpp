@@ -40,7 +40,7 @@ bool ForceDirectedLayout::layout(const Graph &graph)
     // If the graph contains nodes that are not part of edges within it,
     // then we must not even bother laying it out.
     QHash<AbstractNode *, int> refCountMap;
-    for (AbstractEdge *edge : qAsConst(graph.edges)) {
+    for (AbstractEdge *edge : std::as_const(graph.edges)) {
         const int i1 = graph.nodes.indexOf(edge->node1());
         const int i2 = graph.nodes.indexOf(edge->node2());
         if (i1 < 0 || i2 < 0)
@@ -49,7 +49,7 @@ bool ForceDirectedLayout::layout(const Graph &graph)
         refCountMap[edge->node2()]++;
     }
 
-    for (AbstractNode *node : qAsConst(graph.nodes)) {
+    for (AbstractNode *node : std::as_const(graph.nodes)) {
         if (refCountMap.value(node, 0) == 0)
             return false;
     }
@@ -62,7 +62,7 @@ bool ForceDirectedLayout::layout(const Graph &graph)
     const qreal angleStep = 2 * M_PI / qreal(graph.nodes.size());
     QSizeF maxSize(0, 0);
     qreal angle = 0;
-    for (AbstractNode *node : qAsConst(graph.nodes)) {
+    for (AbstractNode *node : std::as_const(graph.nodes)) {
         if (node->canBeMoved())
             node->setPosition(QPointF(qCos(angle), qSin(angle)));
 
@@ -100,8 +100,8 @@ bool ForceDirectedLayout::layout(const Graph &graph)
     // Now, lets find out the least space between any two nodes in the layed out
     // graph.
     qreal minNodeSpacing = 240000.0;
-    for (AbstractNode *n1 : qAsConst(graph.nodes)) {
-        for (AbstractNode *n2 : qAsConst(graph.nodes)) {
+    for (AbstractNode *n1 : std::as_const(graph.nodes)) {
+        for (AbstractNode *n2 : std::as_const(graph.nodes)) {
             if (n1 == n2)
                 continue;
             const qreal nodeSpacing = QLineF(n1->position(), n2->position()).length();
@@ -113,11 +113,11 @@ bool ForceDirectedLayout::layout(const Graph &graph)
     const qreal scale = minNodeSpacingPx / minNodeSpacing;
 
     // Apply the scaling
-    for (AbstractNode *node : qAsConst(graph.nodes))
+    for (AbstractNode *node : std::as_const(graph.nodes))
         node->setPosition(node->position() * scale);
 
     // Get the edges to compute their paths
-    for (AbstractEdge *edge : qAsConst(graph.edges))
+    for (AbstractEdge *edge : std::as_const(graph.edges))
         edge->evaluateEdge();
 
     return true;

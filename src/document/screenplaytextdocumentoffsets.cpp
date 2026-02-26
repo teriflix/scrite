@@ -884,9 +884,9 @@ void ScreenplayTextDocumentOffsets::loadOffsets()
     }
 
     QJsonArray offsets;
-    for (const Segment &segment : qAsConst(modelSegments)) {
+    for (const Segment &segment : std::as_const(modelSegments)) {
         offsets.append(segment.sceneOffset.json());
-        for (const OffsetItem &offset : qAsConst(segment.paragraphOffsets))
+        for (const OffsetItem &offset : std::as_const(segment.paragraphOffsets))
             offsets.append(offset.json());
     }
 
@@ -898,20 +898,9 @@ void ScreenplayTextDocumentOffsets::saveOffsets()
     if (m_fileName.isEmpty() || m_screenplay.isNull() || this->count() == 0)
         return;
 
-    // While we want to save offsets to file in a separate thread, we
-    // dont want multiple threads writing to the file. So, we use a custom
-    // thread-pool with exactly one thread in it.
-    static QThreadPool saveOffsetsThreadPool;
-    if (saveOffsetsThreadPool.maxThreadCount() != 1)
-        saveOffsetsThreadPool.setMaxThreadCount(1);
+    QFile file(m_fileName);
+    if (!file.open(QFile::WriteOnly))
+        return;
 
-    QtConcurrent::run(
-            &saveOffsetsThreadPool,
-            [](const QString &fileName, const QJsonArray &array) {
-                QFile file(fileName);
-                if (!file.open(QFile::WriteOnly))
-                    return;
-                file.write(QJsonDocument(array).toJson());
-            },
-            m_fileName, this->internalArray());
+    file.write(QJsonDocument(this->internalArray()).toJson());
 }
