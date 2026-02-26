@@ -15,11 +15,11 @@
 
 pragma Singleton
 
-import QtQuick 2.15
-import Qt.labs.settings 1.0
-import QtQuick.Controls.Material 2.15
+import QtQuick
+import Qt.labs.settings
+import QtQuick.Controls.Material
 
-import io.scrite.components 1.0
+import io.scrite.components
 
 Item {
     id: root

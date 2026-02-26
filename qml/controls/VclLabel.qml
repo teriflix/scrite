@@ -21,11 +21,11 @@
   For everything else, use VclLabel {}
   */
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Controls.Material 2.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.Material
 
-import io.scrite.components 1.0
+import io.scrite.components
 
 import "qrc:/qml/globals"
 

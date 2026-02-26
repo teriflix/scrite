@@ -13,11 +13,11 @@
 **
 ****************************************************************************/
 
-import QtQml 2.15
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
+import QtQml
+import QtQuick
+import QtQuick.Layouts
 
-import io.scrite.components 1.0
+import io.scrite.components
 
 
 import "qrc:/qml/globals"

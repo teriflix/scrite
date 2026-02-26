@@ -13,10 +13,10 @@
 **
 ****************************************************************************/
 
-import QtQml 2.15
-import QtQuick 2.15
+import QtQml
+import QtQuick
 
-import io.scrite.components 1.0
+import io.scrite.components
 
 import "qrc:/qml/notebookview"
 import "qrc:/qml/notebookview/helpers"
