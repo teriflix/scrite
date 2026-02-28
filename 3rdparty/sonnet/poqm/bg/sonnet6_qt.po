@@ -1,0 +1,548 @@
+# Copyright (C) YEAR This_file_is_part_of_KDE
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Zlatko Popov <zlatkopopov@fsa-bg.org>, 2006, 2007, 2008, 2009.
+# Yasen Pramatarov <yasen@lindeas.com>, 2009, 2010, 2011, 2012, 2013.
+# SPDX-FileCopyrightText: 2022, 2023, 2024 Mincho Kondarev <mkondarev@yahoo.de>
+msgid ""
+msgstr ""
+"Project-Id-Version: kdelibs4\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2014-03-23 01:50+0000\n"
+"PO-Revision-Date: 2024-07-05 15:58+0200\n"
+"Last-Translator: Mincho Kondarev <mkondarev@yahoo.de>\n"
+"Language-Team: Bulgarian <kde-i18n-doc@kde.org>\n"
+"Language: bg\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 24.05.1\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Qt-Contexts: true\n"
+
+#: core/loader.cpp:177
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "40"
+msgstr "40"
+
+#: core/loader.cpp:178
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "60"
+msgstr "60"
+
+#: core/loader.cpp:179
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "80"
+msgstr "80"
+
+#: core/loader.cpp:180
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "-ise suffixes"
+msgstr "-ise суфикси"
+
+#: core/loader.cpp:181
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "-ize suffixes"
+msgstr "-ize суфикси"
+
+#: core/loader.cpp:182
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "-ise suffixes and with accents"
+msgstr "-ise суфикси и с ударения"
+
+#: core/loader.cpp:183
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "-ise suffixes and without accents"
+msgstr "-ise суфикси и без ударения"
+
+#: core/loader.cpp:184
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "-ize suffixes and with accents"
+msgstr "-ize суфикси и с ударения"
+
+#: core/loader.cpp:185
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "-ize suffixes and without accents"
+msgstr "-ize суфикси и без ударения"
+
+#: core/loader.cpp:186
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "large"
+msgstr "голям"
+
+#: core/loader.cpp:187
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "medium"
+msgstr "средно"
+
+#: core/loader.cpp:188
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "small"
+msgstr "малък"
+
+#: core/loader.cpp:189
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "variant 0"
+msgstr "вариант 0"
+
+#: core/loader.cpp:190
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "variant 1"
+msgstr "вариант 1"
+
+#: core/loader.cpp:191
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "variant 2"
+msgstr "вариант 2"
+
+#: core/loader.cpp:192
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "without accents"
+msgstr "без ударения"
+
+#: core/loader.cpp:193
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "with accents"
+msgstr "с акценти"
+
+#: core/loader.cpp:194
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "with ye, modern russian"
+msgstr "с вас, съвременен руски"
+
+#: core/loader.cpp:195
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "with yeyo, modern and old russian"
+msgstr "с йейо, модерен и староруски"
+
+#: core/loader.cpp:196
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "with yo, old russian"
+msgstr "с йо, староруски"
+
+#: core/loader.cpp:197
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "extended"
+msgstr "удължен"
+
+#: core/loader.cpp:231
+#, qt-format
+msgctxt ""
+"Sonnet::Loader|dictionary name; %1 = language name, %2 = country name and %3 "
+"= language variant name"
+msgid "%1 (%2) [%3]"
+msgstr "%1 (%2) [%3]"
+
+#: core/loader.cpp:234
+#, qt-format
+msgctxt "Sonnet::Loader|dictionary name; %1 = language name, %2 = country name"
+msgid "%1 (%2)"
+msgstr "%1 (%2)"
+
+#: quick/spellcheckhighlighter.cpp:253 quick/spellcheckhighlighter.cpp:277
+msgctxt "SpellcheckHighlighter|"
+msgid "As-you-type spell checking enabled."
+msgstr "Проверката на правописа при писане е активирана."
+
+#: quick/spellcheckhighlighter.cpp:257
+msgctxt "SpellcheckHighlighter|"
+msgid "Too many misspelled words. As-you-type spell checking disabled."
+msgstr ""
+"Твърде много грешно написани думи. Проверката на правописа при въвеждане на "
+"текст е деактивирана."
+
+#: quick/spellcheckhighlighter.cpp:279
+msgctxt "SpellcheckHighlighter|"
+msgid "As-you-type spell checking disabled."
+msgstr "Проверката на правописа при писане е отменена."
+
+#: ui/configdialog.cpp:40
+msgctxt "Sonnet::ConfigDialog|"
+msgid "Spell Checking Configuration"
+msgstr "Конфигурация за проверка на правописа"
+
+#: ui/configui.ui:25
+msgctxt "SonnetConfigUI|"
+msgid "No backend like hunspell/aspell/myspell installed"
+msgstr "Не е инсталиран бекенд като hunspell/aspell/myspell"
+
+#: ui/configui.ui:35
+msgctxt "SonnetConfigUI|"
+msgid "Default language:"
+msgstr "Език по подразбиране:"
+
+#: ui/configui.ui:55
+msgctxt "SonnetConfigUI|"
+msgid "Preferred Languages"
+msgstr "Предпочитани езици"
+
+#: ui/configui.ui:79
+msgctxt "SonnetConfigUI|"
+msgid "Choose your preferred languages"
+msgstr "Изберете предпочитаните от вас езици"
+
+#: ui/configui.ui:89
+msgctxt "SonnetConfigUI|"
+msgid "Options"
+msgstr "Настройки"
+
+#: ui/configui.ui:113
+msgctxt "SonnetConfigUI|"
+msgid "Enable autodetection of &language"
+msgstr "Активиране на автоматичното откриване на &език"
+
+#: ui/configui.ui:120
+msgctxt "SonnetConfigUI|"
+msgid "Enable &background spellchecking"
+msgstr "Активиране на проверка на правописа на &заден план"
+
+#: ui/configui.ui:127
+msgctxt "SonnetConfigUI|"
+msgid "&Automatic spell checking enabled by default"
+msgstr "&Автоматична проверка на правописа активирана по подразбиране"
+
+#: ui/configui.ui:134
+msgctxt "SonnetConfigUI|"
+msgid "Skip all &uppercase words"
+msgstr "Пропускане всички думи в  &горен регистър"
+
+#: ui/configui.ui:141
+msgctxt "SonnetConfigUI|"
+msgid "S&kip run-together words"
+msgstr "Пропускане на &слети думи"
+
+#: ui/configui.ui:151
+msgctxt "SonnetConfigUI|"
+msgid "Ignored Words"
+msgstr "Игнорирани думи"
+
+#: ui/configui.ui:183
+msgctxt "SonnetConfigUI|"
+msgid "&Add"
+msgstr "&Добавяне"
+
+#: ui/configui.ui:195
+msgctxt "SonnetConfigUI|"
+msgid "&Remove"
+msgstr "&Премахване"
+
+#: ui/dialog.cpp:85 ui/dialog.cpp:194 ui/dialog.cpp:399
+msgctxt "Sonnet::Dialog|@title:window"
+msgid "Check Spelling"
+msgstr "Проверка на правописа"
+
+#: ui/dialog.cpp:193
+msgctxt "Sonnet::Dialog|@info:progress"
+msgid "Spell checking in progress…"
+msgstr "Извършва се проверка на правописа…"
+
+#: ui/dialog.cpp:214
+msgctxt "Sonnet::Dialog|"
+msgid "Spell check stopped."
+msgstr "Проверката на правописа спря."
+
+#: ui/dialog.cpp:224
+msgctxt "Sonnet::Dialog|"
+msgid "Spell check canceled."
+msgstr "Проверката на правописа е отменена."
+
+#: ui/dialog.cpp:396 ui/dialog.cpp:399
+msgctxt "Sonnet::Dialog|"
+msgid "Spell check complete."
+msgstr "Проверката на правописа е завършена."
+
+#: ui/highlighter.cpp:257 ui/highlighter.cpp:280
+msgctxt "Sonnet::Highlighter|"
+msgid "As-you-type spell checking enabled."
+msgstr "Проверката на правописа при въвеждане на текст е активирана."
+
+#: ui/highlighter.cpp:261
+msgctxt "Sonnet::Highlighter|"
+msgid "Too many misspelled words. As-you-type spell checking disabled."
+msgstr ""
+"Твърде много грешно написани думи. Проверката на правописа при въвеждане на "
+"текст е деактивирана."
+
+#: ui/highlighter.cpp:282
+msgctxt "Sonnet::Highlighter|"
+msgid "As-you-type spell checking disabled."
+msgstr "Проверката на правописа при въвеждане на текст е отменена."
+
+#: ui/sonnetui.ui:41 ui/sonnetui.ui:57
+msgctxt "SonnetUi|"
+msgid ""
+"<qt><p>This word was considered to be an \"unknown word\" because it does "
+"not match any entry in the dictionary currently in use. It may also be a "
+"word in a foreign language.</p>\n"
+"<p>If the word is not misspelled, you may add it to the dictionary by "
+"clicking <b>Add to Dictionary</b>. If you do not want to add the unknown "
+"word to the dictionary, but you want to leave it unchanged, click <b>Ignore</"
+"b> or <b>Ignore All</b>.</p>\n"
+"<p>However, if the word is misspelled, you can try to find the correct "
+"replacement in the list below. If you cannot find a replacement there, you "
+"may type it in the text box below, and click <b>Replace</b> or <b>Replace "
+"All</b>.</p>\n"
+"</qt>"
+msgstr ""
+"<qt><p> Тази дума се счита за\"неизвестна дума\", тъй като не отговаря на "
+"нито един запис в речника, който се използва в момента. Може да е и дума на "
+"чужд език.</p>\n"
+"<p> Ако думата не е грешно написана, можете да я добавите към речника чрез "
+"щракване върху <b>Добавяне към речник</b>. Ако не искате да добавите "
+"неизвестната дума към речника, но искате да я оставите непроменена, щракнете "
+"върху <b>Игнориране </b> или <b>Игнориране на всички</b>.</p>\n"
+"<p> Ако обаче думата е грешно написана, можете да опитате да намерите "
+"правилната замяна в списъка по-долу. Ако не можете да намерите заместител "
+"там, може да го напишете в текстовото поле по-долу и щракнете върху "
+"<b>Заместване</b> или <b>Заместване Всички</b>.</p>\n"
+"</qt>"
+
+#: ui/sonnetui.ui:47
+msgctxt "SonnetUi|"
+msgid "Unknown word:"
+msgstr "Неизвестна дума:"
+
+#: ui/sonnetui.ui:54
+msgctxt "SonnetUi|"
+msgid "Unknown word"
+msgstr "Неизвестна дума"
+
+#: ui/sonnetui.ui:63
+msgctxt "SonnetUi|"
+msgid "<b>misspelled</b>"
+msgstr "<b>с правописна грешка</b>"
+
+#: ui/sonnetui.ui:70 ui/sonnetui.ui:180
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>Select the language of the document you are proofing here.</p>\n"
+"</qt>"
+msgstr ""
+"<qt>\n"
+"<p>Изберете езика на документа, който проверявате тук.</p>\n"
+"</qt>"
+
+#: ui/sonnetui.ui:75
+msgctxt "SonnetUi|"
+msgid "&Language:"
+msgstr "&Език:"
+
+#: ui/sonnetui.ui:85
+msgctxt "SonnetUi|"
+msgid "Text excerpt showing the unknown word in its context."
+msgstr "Текстов откъс, показващ неизвестната дума в нейния контекст."
+
+#: ui/sonnetui.ui:88
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>Here you can see a text excerpt showing the unknown word in its context. "
+"If this information is not sufficient to choose the best replacement for the "
+"unknown word, you can click on the document you are proofing, read a larger "
+"part of the text and then return here to continue proofing.</p>\n"
+"</qt>"
+msgstr ""
+"<qt>\n"
+"<p>Тук можете да видите текстов откъс, показващ неизвестната дума в нейния "
+"контекст.Ако тази информация не е достатъчна, за да изберете най-добрия "
+"заместител на неизвестната дума, можете да щракнете върху документа, който "
+"проверявате, да прочетете по-голяма част от текста и след това се върнете "
+"тук, за да продължите проверката.</p>\n"
+"</qt>"
+
+#: ui/sonnetui.ui:96
+msgctxt "SonnetUi|"
+msgid "... the <b>misspelled</b> word shown in context ..."
+msgstr "... думата <b> с правописна грешка </b> показана в контекста..."
+
+#: ui/sonnetui.ui:106
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>The unknown word was detected and considered unknown because it is not "
+"included in the dictionary.<br>\n"
+"Click here if you consider the unknown word not to be misspelled, and you "
+"want to avoid wrongly detecting it again in the future. If you want to let "
+"it remain as is, but not add it to the dictionary, then click <b>Ignore</b> "
+"or <b>Ignore All</b> instead.</p>\n"
+"</qt>"
+msgstr ""
+"<qt>\n"
+"<p> Непознатата дума е открита и се смята за непозната, защото не е включена "
+"в речника. <br>\n"
+"Щракнете тук, ако смятате, че неизвестната дума не е грешно написана и "
+"искате да избегнете погрешно откриване в бъдеще. Ако искате да я оставите "
+"без промяна, но да не го добавяте към речника, тогава щракнете върху "
+"<b>Игнориране</b>или <b>Игнориране всички</b>.</p>"
+
+#: ui/sonnetui.ui:112
+msgctxt "SonnetUi|"
+msgid "<< Add to Dictionary"
+msgstr "<< Добавяне в речника"
+
+#: ui/sonnetui.ui:135
+msgctxt "SonnetUi|"
+msgid "Suggestion List"
+msgstr "Списък с предложения"
+
+#: ui/sonnetui.ui:138
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>If the unknown word is misspelled, you should check if the correction for "
+"it is available and if it is, click on it. If none of the words in this list "
+"is a good replacement you may type the correct word in the edit box above.</"
+"p>\n"
+"<p>To correct this word click <b>Replace</b> if you want to correct only "
+"this occurrence or <b>Replace All</b> if you want to correct all occurrences."
+"</p>\n"
+"</qt>"
+msgstr ""
+"<qt>\n"
+"<p> Ако неизвестната дума е грешно написана, трябва да проверите дали "
+"корекцията е налична и ако е, кликнете върху нея. Ако нито една от думите в "
+"този списък не е добър заместител, можете да въведете правилната дума в "
+"полето за редактиране по-горе.</p>\n"
+"<p> За да коригирате тази дума, щракнете върху <b> Заменяне </b>, ако искате "
+"да коригирате само това място или <b> Заменяне на всички </b>, ако искате да "
+"коригирате всички случаи.</p>\n"
+"</qt>"
+
+#: ui/sonnetui.ui:151 ui/sonnetui.ui:167
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>If the unknown word is misspelled, you should type the correction for "
+"your misspelled word here or select it from the list below.</p>\n"
+"<p>You can then click <b>Replace</b> if you want to correct only this "
+"occurrence of the word or <b>Replace All</b> if you want to correct all "
+"occurrences.</p>\n"
+"</qt>"
+msgstr ""
+"<qt>\n"
+"<p> Ако неизвестната дума е грешно написана, трябва да въведете корекцията "
+"за вашата грешно написана дума тук или я изберете от списъка по-долу.</p>\n"
+"<p> След това можете да щракнете върху <b> Заместване </b>, ако искате да "
+"коригирате само тази поява на думата или <b> Заместване всички </b>, ако "
+"искате да коригирате всички появявания.</p>\n"
+"</qt>"
+
+#: ui/sonnetui.ui:157
+msgctxt "SonnetUi|"
+msgid "Replace &with:"
+msgstr "Заместване &с:"
+
+#: ui/sonnetui.ui:177
+msgctxt "SonnetUi|"
+msgid "Language Selection"
+msgstr "Избор на език"
+
+#: ui/sonnetui.ui:206
+msgctxt "SonnetUi|"
+msgid "S&uggest"
+msgstr "&Предложения"
+
+#: ui/sonnetui.ui:213
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>Click here to replace this occurrence of the unknown text with the text "
+"in the edit box above (to the left).</p>\n"
+"</qt>"
+msgstr ""
+"<qt>\n"
+"<p>Щракнете тук, за да замените появата на неизвестния текст с текста в "
+"полето за редактиране по-горе (вляво).</p>\n"
+"</qt>"
+
+#: ui/sonnetui.ui:218
+msgctxt "SonnetUi|"
+msgid "&Replace"
+msgstr "&Заместване"
+
+#: ui/sonnetui.ui:225
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>Click here to replace all occurrences of the unknown text with the text "
+"in the edit box above (to the left).</p>\n"
+"</qt>"
+msgstr ""
+"<qt>\n"
+"<p> Щракнете тук, за да замените всички случаи на неизвестния текст с текста "
+"в полето за редактиране по-горе (вляво).</p>\n"
+"</qt>"
+
+#: ui/sonnetui.ui:230
+msgctxt "SonnetUi|"
+msgid "R&eplace All"
+msgstr "Заместване &всички"
+
+#: ui/sonnetui.ui:237
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>Click here to let this occurrence of the unknown word remain as is.</p>\n"
+"<p>This action is useful when the word is a name, an acronym, a foreign word "
+"or any other unknown word that you want to use but not add to the dictionary."
+"</p>\n"
+"</qt>"
+msgstr ""
+"<qt>\n"
+"<p> Щракнете тук, за да оставите тази поява на неизвестната дума такава, "
+"каквато е.</p>\n"
+"<p> Това действие е полезно, когато думата е име, съкращение, чужда дума или "
+"друга неизвестна дума, която искате да използвате, но не и да добавите към "
+"речника.</p>\n"
+"</qt>"
+
+#: ui/sonnetui.ui:243
+msgctxt "SonnetUi|"
+msgid "&Ignore"
+msgstr "&Игнориране"
+
+#: ui/sonnetui.ui:250 ui/sonnetui.ui:263
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>Click here to let all occurrences of the unknown word remain as they are."
+"</p>\n"
+"<p>This action is useful when the word is a name, an acronym, a foreign word "
+"or any other unknown word that you want to use but not add to the dictionary."
+"</p>\n"
+"</qt>"
+msgstr ""
+"<qt>\n"
+"<p> Щракнете тук, за да оставите всички появявания на неизвестната дума да "
+"останат такива, каквито са.</p>\n"
+"<p> Това действие е полезно, когато думата е име, съкращение, чужда дума или "
+"друга неизвестна дума, която искате да използвате, но не и да добавите към "
+"речника.</p>\n"
+"</qt>"
+
+#: ui/sonnetui.ui:256
+msgctxt "SonnetUi|"
+msgid "I&gnore All"
+msgstr "И&гнориране всички"
+
+#: ui/sonnetui.ui:269
+msgctxt "SonnetUi|"
+msgid "Autocorrect"
+msgstr "Автокорекция"
+
+#: ui/spellcheckdecorator.cpp:180
+#, qt-format
+msgctxt "Sonnet::SpellCheckDecorator|"
+msgid "No suggestions for %1"
+msgstr "Няма предложения за %1"
+
+#: ui/spellcheckdecorator.cpp:191
+msgctxt "Sonnet::SpellCheckDecorator|"
+msgid "Ignore"
+msgstr "Игнориране"
+
+#: ui/spellcheckdecorator.cpp:192
+msgctxt "Sonnet::SpellCheckDecorator|"
+msgid "Add to Dictionary"
+msgstr "Добавяне към речника"

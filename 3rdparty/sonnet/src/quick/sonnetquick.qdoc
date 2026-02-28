@@ -1,0 +1,6 @@
+/*!
+    \qmlmodule org.kde.sonnet
+    \title Sonnet QML Types
+
+    \brief Spell checking.
+*/

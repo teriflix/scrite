@@ -1,0 +1,11 @@
+/*!
+    \module SonnetCore
+    \title Sonnet Core C++ Classes
+    \ingroup modules
+    \cmakepackage KF6
+    \cmakecomponent Sonnet
+    \cmaketargetitem KF6::SonnetCore
+    \brief Sonnet is a plugin-based spell checking library for Qt-based applications.
+
+    It supports several different plugins, including HSpell, Enchant, ASpell and HUNSPELL.
+*/

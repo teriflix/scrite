@@ -1,0 +1,11 @@
+/*!
+    \module SonnetUi
+    \title Sonnet Ui C++ Classes
+    \ingroup modules
+    \cmakepackage KF6
+    \cmakecomponent Sonnet
+    \cmaketargetitem KF6::SonnetUi
+    \brief SonnetUi is a plugin-based spell checking library for Qt-based applications.
+
+    It supports several different plugins, including HSpell, Enchant, ASpell and HUNSPELL.
+*/

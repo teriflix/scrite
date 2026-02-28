@@ -1,0 +1,7897 @@
+# translation of kdelibs4.po to Occitan
+# Copyright (C) 2008 This_file_is_part_of_KDE
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Yannig Marchegay (Kokoyaya) <yannig@marchegay.org>, 2007, 2008.
+msgid ""
+msgstr ""
+"Project-Id-Version: kdelibs4\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2014-03-23 01:50+0000\n"
+"PO-Revision-Date: 2008-08-06 00:07+0200\n"
+"Last-Translator: \n"
+"Language-Team: Occitan <oc@li.org>\n"
+"Language: oc\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: KBabel 1.11.4\n"
+"X-Qt-Contexts: true\n"
+
+#: core/loader.cpp:177
+#, fuzzy
+#| msgctxt "dictionary variant"
+#| msgid "40"
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "40"
+msgstr "40"
+
+#: core/loader.cpp:178
+#, fuzzy
+#| msgctxt "dictionary variant"
+#| msgid "60"
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "60"
+msgstr "60"
+
+#: core/loader.cpp:179
+#, fuzzy
+#| msgctxt "dictionary variant"
+#| msgid "80"
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "80"
+msgstr "80"
+
+#: core/loader.cpp:180
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "-ise suffixes"
+msgstr ""
+
+#: core/loader.cpp:181
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "-ize suffixes"
+msgstr ""
+
+#: core/loader.cpp:182
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "-ise suffixes and with accents"
+msgstr ""
+
+#: core/loader.cpp:183
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "-ise suffixes and without accents"
+msgstr ""
+
+#: core/loader.cpp:184
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "-ize suffixes and with accents"
+msgstr ""
+
+#: core/loader.cpp:185
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "-ize suffixes and without accents"
+msgstr ""
+
+#: core/loader.cpp:186
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "large"
+msgstr ""
+
+#: core/loader.cpp:187
+#, fuzzy
+#| msgctxt "dictionary variant"
+#| msgid "medium"
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "medium"
+msgstr "mièja"
+
+#: core/loader.cpp:188
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "small"
+msgstr ""
+
+#: core/loader.cpp:189
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "variant 0"
+msgstr ""
+
+#: core/loader.cpp:190
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "variant 1"
+msgstr ""
+
+#: core/loader.cpp:191
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "variant 2"
+msgstr ""
+
+#: core/loader.cpp:192
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "without accents"
+msgstr ""
+
+#: core/loader.cpp:193
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "with accents"
+msgstr ""
+
+#: core/loader.cpp:194
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "with ye, modern russian"
+msgstr ""
+
+#: core/loader.cpp:195
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "with yeyo, modern and old russian"
+msgstr ""
+
+#: core/loader.cpp:196
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "with yo, old russian"
+msgstr ""
+
+#: core/loader.cpp:197
+msgctxt "Sonnet::Loader|dictionary variant"
+msgid "extended"
+msgstr ""
+
+#: core/loader.cpp:231
+#, fuzzy, qt-format
+#| msgctxt "dictionary name. %1-language, %2-country and %3 variant name"
+#| msgid "%1 (%2) [%3]"
+msgctxt ""
+"Sonnet::Loader|dictionary name; %1 = language name, %2 = country name and %3 "
+"= language variant name"
+msgid "%1 (%2) [%3]"
+msgstr "%1 (%2) [%3]"
+
+#: core/loader.cpp:234
+#, fuzzy, qt-format
+#| msgctxt "dictionary name. %1-language and %2-country name"
+#| msgid "%1 (%2)"
+msgctxt "Sonnet::Loader|dictionary name; %1 = language name, %2 = country name"
+msgid "%1 (%2)"
+msgstr "%1 (%2)"
+
+#: quick/spellcheckhighlighter.cpp:253 quick/spellcheckhighlighter.cpp:277
+#, fuzzy
+#| msgid "As-you-type spell checking enabled."
+msgctxt "SpellcheckHighlighter|"
+msgid "As-you-type spell checking enabled."
+msgstr "Verificacion ortografica al cors de la picada activada."
+
+#: quick/spellcheckhighlighter.cpp:257
+#, fuzzy
+#| msgid "Too many misspelled words. As-you-type spell checking disabled."
+msgctxt "SpellcheckHighlighter|"
+msgid "Too many misspelled words. As-you-type spell checking disabled."
+msgstr ""
+"Tròp de mots mal ortografiats. Verificacion ortografica al cors de la picada "
+"desactivada."
+
+#: quick/spellcheckhighlighter.cpp:279
+#, fuzzy
+#| msgid "As-you-type spell checking disabled."
+msgctxt "SpellcheckHighlighter|"
+msgid "As-you-type spell checking disabled."
+msgstr "Verificacion ortografica al cors de la picada desactivada."
+
+#: ui/configdialog.cpp:40
+#, fuzzy
+#| msgid "Send Confirmation"
+msgctxt "Sonnet::ConfigDialog|"
+msgid "Spell Checking Configuration"
+msgstr "Mandar una confirmacion"
+
+#: ui/configui.ui:25
+msgctxt "SonnetConfigUI|"
+msgid "No backend like hunspell/aspell/myspell installed"
+msgstr ""
+
+#: ui/configui.ui:35
+#, fuzzy
+#| msgid "Default language:"
+msgctxt "SonnetConfigUI|"
+msgid "Default language:"
+msgstr "Lenga per defaut :"
+
+#: ui/configui.ui:55
+#, fuzzy
+msgctxt "SonnetConfigUI|"
+msgid "Preferred Languages"
+msgstr "Preferéncias"
+
+#: ui/configui.ui:79
+msgctxt "SonnetConfigUI|"
+msgid "Choose your preferred languages"
+msgstr ""
+
+#: ui/configui.ui:89
+#, fuzzy
+#| msgid "Options"
+msgctxt "SonnetConfigUI|"
+msgid "Options"
+msgstr "Opcions"
+
+#: ui/configui.ui:113
+msgctxt "SonnetConfigUI|"
+msgid "Enable autodetection of &language"
+msgstr ""
+
+#: ui/configui.ui:120
+#, fuzzy
+#| msgid "Enable &background spellchecking"
+msgctxt "SonnetConfigUI|"
+msgid "Enable &background spellchecking"
+msgstr "Activar la verificacion ortografica en &rèire plan"
+
+#: ui/configui.ui:127
+#, fuzzy
+#| msgid "As-you-type spell checking enabled."
+msgctxt "SonnetConfigUI|"
+msgid "&Automatic spell checking enabled by default"
+msgstr "Verificacion ortografica al cors de la picada activada."
+
+#: ui/configui.ui:134
+#, fuzzy
+#| msgid "Skip all &uppercase words"
+msgctxt "SonnetConfigUI|"
+msgid "Skip all &uppercase words"
+msgstr "Ignorar los mots en maj&usculas"
+
+#: ui/configui.ui:141
+#, fuzzy
+#| msgid "S&kip run-together words"
+msgctxt "SonnetConfigUI|"
+msgid "S&kip run-together words"
+msgstr "Ignorar los mots aco&lats"
+
+#: ui/configui.ui:151
+#, fuzzy
+#| msgid "Suggested Words"
+msgctxt "SonnetConfigUI|"
+msgid "Ignored Words"
+msgstr "Mots prepausats"
+
+#: ui/configui.ui:183
+#, fuzzy
+#| msgid "&Add"
+msgctxt "SonnetConfigUI|"
+msgid "&Add"
+msgstr "&Apondre"
+
+#: ui/configui.ui:195
+#, fuzzy
+#| msgid "&Remove"
+msgctxt "SonnetConfigUI|"
+msgid "&Remove"
+msgstr "&Suprimir "
+
+#: ui/dialog.cpp:85 ui/dialog.cpp:194 ui/dialog.cpp:399
+#, fuzzy
+#| msgid "Check Spelling"
+msgctxt "Sonnet::Dialog|@title:window"
+msgid "Check Spelling"
+msgstr "Verificar l'ortografia"
+
+#: ui/dialog.cpp:193
+#, fuzzy
+#| msgid "Spell Checking"
+msgctxt "Sonnet::Dialog|@info:progress"
+msgid "Spell checking in progress…"
+msgstr "Verificar l'ortografia"
+
+#: ui/dialog.cpp:214
+#, fuzzy
+#| msgid "Spell Checker"
+msgctxt "Sonnet::Dialog|"
+msgid "Spell check stopped."
+msgstr "Verificator ortografic"
+
+#: ui/dialog.cpp:224
+#, fuzzy
+#| msgid "Spell Checker"
+msgctxt "Sonnet::Dialog|"
+msgid "Spell check canceled."
+msgstr "Verificator ortografic"
+
+#: ui/dialog.cpp:396 ui/dialog.cpp:399
+#, fuzzy
+#| msgid "Spell Checker"
+msgctxt "Sonnet::Dialog|"
+msgid "Spell check complete."
+msgstr "Verificator ortografic"
+
+#: ui/highlighter.cpp:257 ui/highlighter.cpp:280
+#, fuzzy
+#| msgid "As-you-type spell checking enabled."
+msgctxt "Sonnet::Highlighter|"
+msgid "As-you-type spell checking enabled."
+msgstr "Verificacion ortografica al cors de la picada activada."
+
+#: ui/highlighter.cpp:261
+#, fuzzy
+#| msgid "Too many misspelled words. As-you-type spell checking disabled."
+msgctxt "Sonnet::Highlighter|"
+msgid "Too many misspelled words. As-you-type spell checking disabled."
+msgstr ""
+"Tròp de mots mal ortografiats. Verificacion ortografica al cors de la picada "
+"desactivada."
+
+#: ui/highlighter.cpp:282
+#, fuzzy
+#| msgid "As-you-type spell checking disabled."
+msgctxt "Sonnet::Highlighter|"
+msgid "As-you-type spell checking disabled."
+msgstr "Verificacion ortografica al cors de la picada desactivada."
+
+#: ui/sonnetui.ui:41 ui/sonnetui.ui:57
+#, fuzzy
+#| msgid ""
+#| "<qt><p>This word was considered to be an \"unknown word\" because it does "
+#| "not match any entry in the dictionary currently in use. It may also be a "
+#| "word in a foreign language.</p>\n"
+#| "<p>If the word is not misspelled, you may add it to the dictionary by "
+#| "clicking <b>Add to Dictionary</b>. If you don't want to add the unknown "
+#| "word to the dictionary, but you want to leave it unchanged, click "
+#| "<b>Ignore</b> or <b>Ignore All</b>.</p>\n"
+#| "<p>However, if the word is misspelled, you can try to find the correct "
+#| "replacement in the list below. If you cannot find a replacement there, "
+#| "you may type it in the text box below, and click <b>Replace</b> or "
+#| "<b>Replace All</b>.</p>\n"
+#| "</qt>"
+msgctxt "SonnetUi|"
+msgid ""
+"<qt><p>This word was considered to be an \"unknown word\" because it does "
+"not match any entry in the dictionary currently in use. It may also be a "
+"word in a foreign language.</p>\n"
+"<p>If the word is not misspelled, you may add it to the dictionary by "
+"clicking <b>Add to Dictionary</b>. If you do not want to add the unknown "
+"word to the dictionary, but you want to leave it unchanged, click <b>Ignore</"
+"b> or <b>Ignore All</b>.</p>\n"
+"<p>However, if the word is misspelled, you can try to find the correct "
+"replacement in the list below. If you cannot find a replacement there, you "
+"may type it in the text box below, and click <b>Replace</b> or <b>Replace "
+"All</b>.</p>\n"
+"</qt>"
+msgstr ""
+"<qt><p>Aqueste mot es estat considerat coma « mot desconegut » perque "
+"correspond pas a una entrada del diccionari utilizat. Aquò tanben pòt èsser "
+"un mot dins una lenga estrangièra.</p><p>Se lo mot es pas mal ortografiat, "
+"lo podètz ajustar al diccionari en clicant sus <b>Ajustar al diccionari</b>. "
+"Se volètz pas ajustar lo mot desconegut al diccionari mas volètz lo daissar "
+"incambiat, clicatz sus <b>Ignorar</b> o <b>Ignorar tot</b>.</p><p>Çaquelà, "
+"se lo mot es mal ortografiat, podètz ensajar de trobar lo remplaçament "
+"corrècte dins la lista çaidejós. Se podètz pas trobar aicí un mot de "
+"remplaçament, lo podètz escriure dins la zòna de tèxt dejós, e clicar sus "
+"<b>Remplaçar</b> o <b>Remplaçar tot</b>.</p></qt>"
+
+#: ui/sonnetui.ui:47
+#, fuzzy
+#| msgid "Unknown word:"
+msgctxt "SonnetUi|"
+msgid "Unknown word:"
+msgstr "Mot desconegut :"
+
+#: ui/sonnetui.ui:54
+#, fuzzy
+#| msgid "Unknown word"
+msgctxt "SonnetUi|"
+msgid "Unknown word"
+msgstr "Mot desconegut"
+
+#: ui/sonnetui.ui:63
+#, fuzzy
+#| msgid "<b>misspelled</b>"
+msgctxt "SonnetUi|"
+msgid "<b>misspelled</b>"
+msgstr "<b>mal ortografiat</b>"
+
+#: ui/sonnetui.ui:70 ui/sonnetui.ui:180
+#, fuzzy
+#| msgid ""
+#| "<qt>\n"
+#| "<p>Select the language of the document you are proofing here.</p>\n"
+#| "</qt>"
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>Select the language of the document you are proofing here.</p>\n"
+"</qt>"
+msgstr ""
+"<qt>\n"
+"<p>Seleccionatz la lenga del document qu'esprovatz aicí.</p>\n"
+"</qt>"
+
+#: ui/sonnetui.ui:75
+#, fuzzy
+#| msgid "&Language:"
+msgctxt "SonnetUi|"
+msgid "&Language:"
+msgstr "&Lenga :"
+
+#: ui/sonnetui.ui:85
+#, fuzzy
+#| msgid "Text excerpt showing the unknown word in its context."
+msgctxt "SonnetUi|"
+msgid "Text excerpt showing the unknown word in its context."
+msgstr "Extrach del tèxt mostrant lo mot desconegut dins son contèxt."
+
+#: ui/sonnetui.ui:88
+#, fuzzy
+#| msgid ""
+#| "<qt>\n"
+#| "<p>Here you can see a text excerpt showing the unknown word in its "
+#| "context. If this information is not sufficient to choose the best "
+#| "replacement for the unknown word, you can click on the document you are "
+#| "proofing, read a larger part of the text and then return here to continue "
+#| "proofing.</p>\n"
+#| "</qt>"
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>Here you can see a text excerpt showing the unknown word in its context. "
+"If this information is not sufficient to choose the best replacement for the "
+"unknown word, you can click on the document you are proofing, read a larger "
+"part of the text and then return here to continue proofing.</p>\n"
+"</qt>"
+msgstr ""
+"<qt><p>Aicí, podètz veire un extrach del tèxt mostrant lo mot desconegut "
+"dins son contèxt. S'aquesta entresenha es pas sufisenta per causir lo "
+"remplaçant melhor pel mot desconegut, podètz clicar sul document que "
+"verificatz, ne legir una mai granda partida, puèi tornar aicí per contunhar "
+"la verificacion.</p></qt>"
+
+#: ui/sonnetui.ui:96
+#, fuzzy
+#| msgid "... the <b>misspelled</b> word shown in context ..."
+msgctxt "SonnetUi|"
+msgid "... the <b>misspelled</b> word shown in context ..."
+msgstr "... lo mot <b>mal ortografiat</b> afichat dins lo contèxt ..."
+
+#: ui/sonnetui.ui:106
+#, fuzzy
+#| msgid ""
+#| "<qt>\n"
+#| "<p>The unknown word was detected and considered unknown because it is not "
+#| "included in the dictionary.<br>\n"
+#| "Click here if you consider that the unknown word is not misspelled and "
+#| "you want to avoid wrongly detecting it again in the future. If you want "
+#| "to let it remain as is, but not add it to the dictionary, then click "
+#| "<b>Ignore</b> or <b>Ignore All</b> instead.</p>\n"
+#| "</qt>"
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>The unknown word was detected and considered unknown because it is not "
+"included in the dictionary.<br>\n"
+"Click here if you consider the unknown word not to be misspelled, and you "
+"want to avoid wrongly detecting it again in the future. If you want to let "
+"it remain as is, but not add it to the dictionary, then click <b>Ignore</b> "
+"or <b>Ignore All</b> instead.</p>\n"
+"</qt>"
+msgstr ""
+"<qt><p>Lo mot desconegut es estat detectat e considerat coma desconegut "
+"perque es pas inclús dins lo diccionari.<br>Clicatz aicí se consideratz que "
+"lo mot desconegut es pas mal ortografiat e que volètz evitar una deteccion "
+"d'error abusiva dins l'avenidor. Se lo volètz daissar tal coma es sens "
+"l'apondre al diccionari, clicatz sus <b>Ignorar</b> o <b>Ignorar tot</b></"
+"p></qt>"
+
+#: ui/sonnetui.ui:112
+#, fuzzy
+#| msgid "<< Add to Dictionary"
+msgctxt "SonnetUi|"
+msgid "<< Add to Dictionary"
+msgstr "<< Apondre al diccionari"
+
+#: ui/sonnetui.ui:135
+#, fuzzy
+#| msgid "Suggestion List"
+msgctxt "SonnetUi|"
+msgid "Suggestion List"
+msgstr "Tièra de suggestions"
+
+#: ui/sonnetui.ui:138
+#, fuzzy
+#| msgid ""
+#| "<qt>\n"
+#| "<p>If the unknown word is misspelled, you should check if the correction "
+#| "for it is available and if it is, click on it. If none of the words in "
+#| "this list is a good replacement you may type the correct word in the edit "
+#| "box above.</p>\n"
+#| "<p>To correct this word click <b>Replace</b> if you want to correct only "
+#| "this occurrence or <b>Replace All</b> if you want to correct all "
+#| "occurrences.</p>\n"
+#| "</qt>"
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>If the unknown word is misspelled, you should check if the correction for "
+"it is available and if it is, click on it. If none of the words in this list "
+"is a good replacement you may type the correct word in the edit box above.</"
+"p>\n"
+"<p>To correct this word click <b>Replace</b> if you want to correct only "
+"this occurrence or <b>Replace All</b> if you want to correct all occurrences."
+"</p>\n"
+"</qt>"
+msgstr ""
+"<qt><p>Se lo mot desconegut es mal ortografiat, deuriatz verificar se sa "
+"correccion es disponibla e s'es lo cas, clicatz dessús. Se cap de mots dins "
+"la tièra es pas un bon remplaçant, podètz escriure lo bon mot dins la zòna "
+"d'edicion çaidessús.</p><p>Per corregir aqueste mot, clicatz sus "
+"<b>Remplaçar</b> se ne volètz corregir pas qu'aquesta ocurréncia o sus "
+"<b>Remplaçar</b> se volètz corregir totas las ocurréncias.</p></qt>"
+
+#: ui/sonnetui.ui:151 ui/sonnetui.ui:167
+#, fuzzy
+#| msgid ""
+#| "<qt>\n"
+#| "<p>If the unknown word is misspelled, you should type the correction for "
+#| "your misspelled word here or select it from the list below.</p>\n"
+#| "<p>You can then click <b>Replace</b> if you want to correct only this "
+#| "occurrence of the word or <b>Replace All</b> if you want to correct all "
+#| "occurrences.</p>\n"
+#| "</qt>"
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>If the unknown word is misspelled, you should type the correction for "
+"your misspelled word here or select it from the list below.</p>\n"
+"<p>You can then click <b>Replace</b> if you want to correct only this "
+"occurrence of the word or <b>Replace All</b> if you want to correct all "
+"occurrences.</p>\n"
+"</qt>"
+msgstr ""
+"<qt><p>Se lo mot desconegut es mal ortografiat, deuretz escriure la "
+"correccion aicí o lo seleccionar dins la tièra çaidejós.</p><p>Podètz alara "
+"clicar sus <b>Remplaçar</b> se ne volètz corregir pas qu'aquesta ocurréncia "
+"del mot o <b>Remplaçar tot</b> se volètz corregir totas las ocurréncias.</"
+"p></qt>"
+
+#: ui/sonnetui.ui:157
+#, fuzzy
+#| msgid "Replace &with:"
+msgctxt "SonnetUi|"
+msgid "Replace &with:"
+msgstr "Remplaçar &per :"
+
+#: ui/sonnetui.ui:177
+#, fuzzy
+#| msgid "Language Selection"
+msgctxt "SonnetUi|"
+msgid "Language Selection"
+msgstr "Causida de la lenga"
+
+#: ui/sonnetui.ui:206
+#, fuzzy
+#| msgid "S&uggest"
+msgctxt "SonnetUi|"
+msgid "S&uggest"
+msgstr "S&uggerir"
+
+#: ui/sonnetui.ui:213
+#, fuzzy
+#| msgid ""
+#| "<qt>\n"
+#| "<p>Click here to replace this occurrence of the unknown text with the "
+#| "text in the edit box above (to the left).</p>\n"
+#| "</qt>"
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>Click here to replace this occurrence of the unknown text with the text "
+"in the edit box above (to the left).</p>\n"
+"</qt>"
+msgstr ""
+"<qt>\n"
+"<p>Clicatz aicí per remplaçar aquesta ocurréncia del tèxt desconegut pel "
+"tèxt dins la zòna d'edicion aldessús (a esquèrra).</p>\n"
+"</qt>"
+
+#: ui/sonnetui.ui:218
+#, fuzzy
+#| msgid "&Replace"
+msgctxt "SonnetUi|"
+msgid "&Replace"
+msgstr "&Remplaçar"
+
+#: ui/sonnetui.ui:225
+#, fuzzy
+#| msgid ""
+#| "<qt>\n"
+#| "<p>Click here to replace all occurrences of the unknown text with the "
+#| "text in the edit box above (to the left).</p>\n"
+#| "</qt>"
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>Click here to replace all occurrences of the unknown text with the text "
+"in the edit box above (to the left).</p>\n"
+"</qt>"
+msgstr ""
+"<qt>\n"
+"<p>Clicatz aicí per remplaçar totas las ocurréncias del tèxt desconegut pel "
+"tèxt dins la zòna d'edicion aldessús (a esquèrra).</p>\n"
+"</qt>"
+
+#: ui/sonnetui.ui:230
+#, fuzzy
+#| msgid "R&eplace All"
+msgctxt "SonnetUi|"
+msgid "R&eplace All"
+msgstr "Tot r&emplaçar"
+
+#: ui/sonnetui.ui:237
+#, fuzzy
+#| msgid ""
+#| "<qt>\n"
+#| "<p>Click here to let this occurrence of the unknown word remain as is.</"
+#| "p>\n"
+#| "<p>This action is useful when the word is a name, an acronym, a foreign "
+#| "word or any other unknown word that you want to use but not add to the "
+#| "dictionary.</p>\n"
+#| "</qt>"
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>Click here to let this occurrence of the unknown word remain as is.</p>\n"
+"<p>This action is useful when the word is a name, an acronym, a foreign word "
+"or any other unknown word that you want to use but not add to the dictionary."
+"</p>\n"
+"</qt>"
+msgstr ""
+"<qt>\n"
+"<p>Clicatz aicí per daissar aquesta ocurréncia del mot desconegut demorar "
+"tala coma es.</p>\n"
+"<p>Aquesta accion es utila quand lo mot es un nom, un acronim, un mot "
+"estrangièr o un mot que volètz utilizar qual que siá, que volètz ajustar pas "
+"al diccionari.</p>\n"
+"</qt>"
+
+#: ui/sonnetui.ui:243
+#, fuzzy
+#| msgid "&Ignore"
+msgctxt "SonnetUi|"
+msgid "&Ignore"
+msgstr "&Ignorar"
+
+#: ui/sonnetui.ui:250 ui/sonnetui.ui:263
+#, fuzzy
+#| msgid ""
+#| "<qt>\n"
+#| "<p>Click here to let all occurrences of the unknown word remain as they "
+#| "are.</p>\n"
+#| "<p>This action is useful when the word is a name, an acronym, a foreign "
+#| "word or any other unknown word that you want to use but not add to the "
+#| "dictionary.</p>\n"
+#| "</qt>"
+msgctxt "SonnetUi|"
+msgid ""
+"<qt>\n"
+"<p>Click here to let all occurrences of the unknown word remain as they are."
+"</p>\n"
+"<p>This action is useful when the word is a name, an acronym, a foreign word "
+"or any other unknown word that you want to use but not add to the dictionary."
+"</p>\n"
+"</qt>"
+msgstr ""
+"<qt><p>Clicatz aicí per daissar totas las ocurréncias del mot desconegut "
+"demorar talas coma son.</p><p>Aquesta accion es utila quand lo mot es un "
+"nom, un acronim, un mot estrangièr o un mot qual que siá que volètz "
+"utilizar, que volètz ajustar pas al diccionari.</p></qt>"
+
+#: ui/sonnetui.ui:256
+#, fuzzy
+#| msgid "I&gnore All"
+msgctxt "SonnetUi|"
+msgid "I&gnore All"
+msgstr "Tot i&gnorar"
+
+#: ui/sonnetui.ui:269
+#, fuzzy
+#| msgid "Autocorrect"
+msgctxt "SonnetUi|"
+msgid "Autocorrect"
+msgstr "Correction automatica"
+
+#: ui/spellcheckdecorator.cpp:180
+#, fuzzy, qt-format
+#| msgid "Suggestion List"
+msgctxt "Sonnet::SpellCheckDecorator|"
+msgid "No suggestions for %1"
+msgstr "Tièra de suggestions"
+
+#: ui/spellcheckdecorator.cpp:191
+#, fuzzy
+#| msgid "&Ignore"
+msgctxt "Sonnet::SpellCheckDecorator|"
+msgid "Ignore"
+msgstr "&Ignorar"
+
+#: ui/spellcheckdecorator.cpp:192
+#, fuzzy
+#| msgid "<< Add to Dictionary"
+msgctxt "Sonnet::SpellCheckDecorator|"
+msgid "Add to Dictionary"
+msgstr "<< Apondre al diccionari"
+
+#, fuzzy
+#~| msgid "Enable &background spellchecking"
+#~ msgctxt "SonnetConfigUI|"
+#~ msgid "No backend found for spell checking"
+#~ msgstr "Activar la verificacion ortografica en &rèire plan"
+
+#, fuzzy
+#~| msgid "Suggested Words"
+#~ msgctxt "SonnetUi|"
+#~ msgid "Suggested Words"
+#~ msgstr "Mots prepausats"
+
+#~ msgctxt "NAME OF TRANSLATORS"
+#~ msgid "Your names"
+#~ msgstr "Yannig Marchegay (Kokoyaya)"
+
+#~ msgctxt "EMAIL OF TRANSLATORS"
+#~ msgid "Your emails"
+#~ msgstr "yannig@marchegay.org"
+
+#~ msgid "Name"
+#~ msgstr "Nom"
+
+#~ msgid "Host"
+#~ msgstr "Òste"
+
+#, fuzzy
+#~ msgid "Port"
+#~ msgstr "Pòrt"
+
+#~ msgid "Editor Chooser"
+#~ msgstr "Selector d'editor"
+
+#, fuzzy
+#~ msgid ""
+#~ "Please choose the default text editing component that you wish to use in "
+#~ "this application. If you choose <B>System Default</B>, the application "
+#~ "will honor your changes in the System Settings. All other choices will "
+#~ "override that setting."
+#~ msgstr ""
+#~ "Causissètz lo compausant d'edicion de tèxt per defaut que desiratz "
+#~ "utilizar dins aquesta aplicacion. Se causissètz <B>Sistèma per defaut</"
+#~ "B>, l'aplicacion privilegiarà vòstras modificacions dins lo Centre "
+#~ "d'entresenhas. Tot autra causida anullarà aqueste reglatge."
+
+#, fuzzy
+#~ msgid "TETest"
+#~ msgstr "Tèst"
+
+#~ msgid "KConf Update"
+#~ msgstr "KConf Update"
+
+#~ msgid "Waldo Bastian"
+#~ msgstr "Waldo Bastian"
+
+#~ msgid "??"
+#~ msgstr "??"
+
+#~ msgid "&About"
+#~ msgstr "&A prepaus de"
+
+#~ msgid ""
+#~ "No information available.\n"
+#~ "The supplied KAboutData object does not exist."
+#~ msgstr ""
+#~ "Cap d'entresenha pas disponibla.\n"
+#~ "L'objècte KAboutData existís pas."
+
+#~ msgid "A&uthor"
+#~ msgstr "A&utor"
+
+#~ msgid "A&uthors"
+#~ msgstr "A&utors"
+
+#~ msgid ""
+#~ "Please use <a href=\"http://bugs.kde.org\">http://bugs.kde.org</a> to "
+#~ "report bugs.\n"
+#~ msgstr ""
+#~ "Utilizatz <a href=\"http://bugs.kde.org\">http://bugs.kde.org</a> per "
+#~ "senhalar de bògues.\n"
+
+#~ msgid "Please report bugs to <a href=\"mailto:%1\">%2</a>.\n"
+#~ msgstr "Senhalatz los bògues a <a href=\"mailto:%1\">%2</a>.\n"
+
+#~ msgid "&Thanks To"
+#~ msgstr "&Mercés a"
+
+#~ msgid "T&ranslation"
+#~ msgstr "&Traduccion"
+
+#~ msgid "&License Agreement"
+#~ msgstr "&Acòrdi de licéncia"
+
+#~ msgid "Author"
+#~ msgstr "Autor"
+
+#~ msgid "Email"
+#~ msgstr "Adreça electronica"
+
+#~ msgid "Homepage"
+#~ msgstr "Pagina Web"
+
+#~ msgid "Task"
+#~ msgstr "Prètzfach (Task)"
+
+#~ msgid "%1 %2, %3"
+#~ msgstr "%1 %2, %3"
+
+#~ msgid "Other Contributors:"
+#~ msgstr "Autres participants :"
+
+#~ msgid "(No logo available)"
+#~ msgstr "(Cap de lògo pas disponible)"
+
+#~ msgid "About %1"
+#~ msgstr "A prepaus de %1"
+
+#~ msgid "Undo: %1"
+#~ msgstr "Anullar : %1"
+
+#~ msgid "Redo: %1"
+#~ msgstr "Tornar far : %1"
+
+#~ msgid "&Undo"
+#~ msgstr "&Anullar"
+
+#~ msgid "&Redo"
+#~ msgstr "&Tornar far"
+
+#~ msgid "&Undo: %1"
+#~ msgstr "&Anullar : %1"
+
+#~ msgid "&Redo: %1"
+#~ msgstr "&Tornar far : %1"
+
+#~ msgid "Close"
+#~ msgstr "Tampar"
+
+#~ msgctxt "Dock this window"
+#~ msgid "Dock"
+#~ msgstr "Estacar"
+
+#~ msgid "Detach"
+#~ msgstr "_Prigondor :"
+
+#~ msgid "Hide %1"
+#~ msgstr "Amagar %1"
+
+#~ msgid "Show %1"
+#~ msgstr "Mostrar %1"
+
+#~ msgid "Search Columns"
+#~ msgstr "Recèrca dins las colomnas"
+
+#~ msgid "All Visible Columns"
+#~ msgstr "Totas las colomnas visiblas"
+
+#~ msgid "S&earch:"
+#~ msgstr "R&ecercar :"
+
+#~ msgid "&Password:"
+#~ msgstr "&Mot de pas :"
+
+#~ msgid "&Keep password"
+#~ msgstr "&Memorizar lo senhal"
+
+#~ msgid "&Verify:"
+#~ msgstr "&Verificar :"
+
+#~ msgid "Password strength meter:"
+#~ msgstr "Metrica de resisténcia dels senhals :"
+
+#~ msgid ""
+#~ "The password strength meter gives an indication of the security of the "
+#~ "password you have entered.  To improve the strength of the password, "
+#~ "try:\n"
+#~ " - using a longer password;\n"
+#~ " - using a mixture of upper- and lower-case letters;\n"
+#~ " - using numbers or symbols, such as #, as well as letters."
+#~ msgstr ""
+#~ "La barra de resisténcia dels senhals balha una indicacion sus la "
+#~ "seguretat del senhal qu'avètz picat. Per melhorar la resisténcia del "
+#~ "senhal, ensajatz :\n"
+#~ " - d'utilizar un senhal mai long ;\n"
+#~ " - d'utilizar una mescla de letras minusculas e majusculas ;\n"
+#~ " - d'utilizar de nombres o de simbòls, coma « # », tant plan coma de "
+#~ "letras."
+
+#~ msgid "Passwords do not match"
+#~ msgstr "Los senhals son pas los meteisses"
+
+#~ msgid "You entered two different passwords. Please try again."
+#~ msgstr "Avètz picat dos senhals diferents. Tornatz ensajar."
+
+#~ msgid ""
+#~ "The password you have entered has a low strength. To improve the strength "
+#~ "of the password, try:\n"
+#~ " - using a longer password;\n"
+#~ " - using a mixture of upper- and lower-case letters;\n"
+#~ " - using numbers or symbols as well as letters.\n"
+#~ "\n"
+#~ "Would you like to use this password anyway?"
+#~ msgstr ""
+#~ "Lo senhal qu'avètz picat possedís una resisténcia febla. Per melhorar la "
+#~ "resisténcia del senhal, ensajatz :\n"
+#~ " - d'utilizar un senhal mai long ;\n"
+#~ " - d'utilizar una mescla de letras minusculas e majusculas ;\n"
+#~ " - d'utilizar de nombres o de simbòls, coma « # », tant plan que de "
+#~ "letras."
+
+#~ msgid "Low Password Strength"
+#~ msgstr "Resisténcia del senhal febla"
+
+#~ msgid "Password is empty"
+#~ msgstr "Lo senhal es void"
+
+#~ msgid "Passwords match"
+#~ msgstr "Los senhals correspondon"
+
+#, fuzzy
+#~ msgctxt "@option:check"
+#~ msgid "Do Spellchecking"
+#~ msgstr "Verificar l'ortografia"
+
+#~ msgctxt "@option:check"
+#~ msgid "Create &root/affix combinations not in dictionary"
+#~ msgstr "Crear las combinasons &Radical/Afix absentas del diccionari"
+
+#~ msgctxt "@option:check"
+#~ msgid "Consider run-together &words as spelling errors"
+#~ msgstr "Consid&erar los mots acolats coma incorrèctes"
+
+#~ msgctxt "@label:listbox"
+#~ msgid "&Dictionary:"
+#~ msgstr "&Diccionari :"
+
+#~ msgctxt "@label:listbox"
+#~ msgid "&Encoding:"
+#~ msgstr "&Encodatge :"
+
+#~ msgctxt "@label:listbox"
+#~ msgid "&Client:"
+#~ msgstr "&Client :"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Hebrew"
+#~ msgstr "Ebrèu"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Turkish"
+#~ msgstr "Turc"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "English"
+#~ msgstr "Anglés"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Spanish"
+#~ msgstr "Castelhan"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Danish"
+#~ msgstr "Danés"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "German"
+#~ msgstr "Aleman"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "German (new spelling)"
+#~ msgstr "Alemand (ortografia novèla)"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Brazilian Portuguese"
+#~ msgstr "Portugués de Brasil"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Portuguese"
+#~ msgstr "Portugués"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Esperanto"
+#~ msgstr "Esperanto"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Norwegian"
+#~ msgstr "Norvegian"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Polish"
+#~ msgstr "Polonés"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Russian"
+#~ msgstr "Rus"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Slovenian"
+#~ msgstr "Eslovèn"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Slovak"
+#~ msgstr "Eslovac"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Czech"
+#~ msgstr "Chèc"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Swedish"
+#~ msgstr "Suedés"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Swiss German"
+#~ msgstr "Soís alemand"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Ukrainian"
+#~ msgstr "Ucraïnian"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Lithuanian"
+#~ msgstr "Lituanian"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "French"
+#~ msgstr "Francés"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Belarusian"
+#~ msgstr "Bielorus"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Hungarian"
+#~ msgstr "Ongrés"
+
+#~ msgctxt "@item Spelling dictionary"
+#~ msgid "Unknown"
+#~ msgstr "Desconegut"
+
+#~ msgid "You have to restart the dialog for changes to take effect"
+#~ msgstr ""
+#~ "Devètz tornar amodar lo dialòg per que los cambiaments prengan efièch"
+
+#~ msgid "&Finished"
+#~ msgstr "&Acabat"
+
+#~ msgid "Incremental Spellcheck"
+#~ msgstr "Verificacion d'ortografia incrementala"
+
+#~ msgid "Check Spelling..."
+#~ msgstr "Verificar l'ortografia..."
+
+#~ msgid "Auto Spell Check"
+#~ msgstr "Veificato ortografic automatic"
+
+#~ msgid "Allow Tabulations"
+#~ msgstr "Autorizar las tabulacions"
+
+#~ msgid "Spell Checking"
+#~ msgstr "Verificar l'ortografia"
+
+#~ msgid "&Back"
+#~ msgstr "&Precedent"
+
+#~ msgctxt "Opposite to Back"
+#~ msgid "&Next"
+#~ msgstr "&Seguent"
+
+#~ msgid ""
+#~ "A command-line application that can be used to run KUnitTest modules."
+#~ msgstr ""
+#~ "Una aplicacion en linha de comanda podent èsser utilizada per aviar de "
+#~ "moduls KUnitTest."
+
+#~ msgid "am"
+#~ msgstr "am"
+
+#~ msgid "pm"
+#~ msgstr "pm"
+
+#~ msgid "Configuration files"
+#~ msgstr "Fichièrs de configuracion"
+
+#~ msgid "HTML documentation"
+#~ msgstr "Documentacion HTML"
+
+#~ msgid "Icons"
+#~ msgstr "Icònas"
+
+#~ msgid "Libraries"
+#~ msgstr "Librariás"
+
+#~ msgid "Translation files for KLocale"
+#~ msgstr "Fichièrs de revirada per KLocale"
+
+#~ msgid "Mime types"
+#~ msgstr "Tipes MIME"
+
+#~ msgid "Qt plugins"
+#~ msgstr "Modules Qt"
+
+#~ msgid "Services"
+#~ msgstr "Servicis"
+
+#~ msgid "Service types"
+#~ msgstr "Tipes de servici"
+
+#~ msgid "Templates"
+#~ msgstr "Modèls"
+
+#~ msgid "%1 - unknown type\n"
+#~ msgstr "%1 - tipe desconegut\n"
+
+#~ msgid ""
+#~ "No licensing terms for this program have been specified.\n"
+#~ "Please check the documentation or the source for any\n"
+#~ "licensing terms.\n"
+#~ msgstr ""
+#~ "Cap de licéncia es pas estada especificada per aqueste programa.\n"
+#~ "Consultatz la documentacion o lo còde font\n"
+#~ "per trobar los tèrmes eventuals de la licéncia.\n"
+
+#~ msgid "This program is distributed under the terms of the %1."
+#~ msgstr "Aqueste programa es distribuit segon los tèrmes de la %1."
+
+#, fuzzy
+#~ msgctxt "@item license (short name)"
+#~ msgid "BSD License"
+#~ msgstr "Licéncia :"
+
+#~ msgctxt "@item license"
+#~ msgid "Custom"
+#~ msgstr "Personalizat"
+
+#~ msgctxt "@item license"
+#~ msgid "Not specified"
+#~ msgstr "Non especificat"
+
+#~ msgid "sets the default button color"
+#~ msgstr "definís la color per defaut dels botons"
+
+#~ msgid "sets the application name"
+#~ msgstr "definís lo nom del logicial"
+
+#~ msgid "set XIM server"
+#~ msgstr "definís lo servidor XIM"
+
+#~ msgid "disable XIM"
+#~ msgstr "desactivar XIM"
+
+#~ msgid "Qt"
+#~ msgstr "Qt"
+
+#~ msgid "KDE"
+#~ msgstr "KDE"
+
+#~ msgid "Unknown option '%1'."
+#~ msgstr "Opcion '%1' desconeguda."
+
+#~ msgctxt "the 2nd argument is a list of name+address, one on each line"
+#~ msgid ""
+#~ "%1 was written by\n"
+#~ "%2"
+#~ msgstr ""
+#~ "%1 foguèt escrich per\n"
+#~ "%2"
+
+#~ msgid "[options] "
+#~ msgstr "[opcions] "
+
+#~ msgid "[%1-options]"
+#~ msgstr "[opcions-%1]"
+
+#~ msgid "Usage: %1 %2\n"
+#~ msgstr "Sintaxi : %1 %2\n"
+
+#~ msgid "Show help about options"
+#~ msgstr "Visualizar l'ajuda sus las opcions"
+
+#~ msgid "Show all options"
+#~ msgstr "Visualizar totas las opcions"
+
+#~ msgid "Show author information"
+#~ msgstr "Visualizar las informacions de l'autor"
+
+#~ msgid "Show version information"
+#~ msgstr "Visualizar las informacions de version"
+
+#~ msgid "Show license information"
+#~ msgstr "Visualizar las informacions de licéncia"
+
+#~ msgid "End of options"
+#~ msgstr "Fin de las opcions"
+
+#~ msgid ""
+#~ "\n"
+#~ "Options:\n"
+#~ msgstr ""
+#~ "\n"
+#~ "Opcions :\n"
+
+#, fuzzy
+#~ msgid "Could not launch Mail Client"
+#~ msgstr ""
+#~ "Impossible d'aviar lo navegador :\n"
+#~ "\n"
+#~ "%1"
+
+#~ msgid ""
+#~ "Could not launch the browser:\n"
+#~ "\n"
+#~ "%1"
+#~ msgstr ""
+#~ "Impossible d'aviar lo navegador :\n"
+#~ "\n"
+#~ "%1"
+
+#, fuzzy
+#~ msgid "Could not launch Browser"
+#~ msgstr ""
+#~ "Impossible d'aviar lo navegador :\n"
+#~ "\n"
+#~ "%1"
+
+#, fuzzy
+#~ msgid "Could not launch Terminal Client"
+#~ msgstr ""
+#~ "Impossible d'aviar lo navegador :\n"
+#~ "\n"
+#~ "%1"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Western European"
+#~ msgstr "Europèu de l'oèst"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Central European"
+#~ msgstr "European central"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Baltic"
+#~ msgstr "Baltic"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Turkish"
+#~ msgstr "Turc"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Cyrillic"
+#~ msgstr "Cirillic"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Chinese Traditional"
+#~ msgstr "Chinés tradicional"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Chinese Simplified"
+#~ msgstr "Chinés simplificat"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Korean"
+#~ msgstr "Corean"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Japanese"
+#~ msgstr "Japonés"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Greek"
+#~ msgstr "Grèc"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Arabic"
+#~ msgstr "Arab"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Hebrew"
+#~ msgstr "Ebrèu"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Thai"
+#~ msgstr "Tailandés"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Unicode"
+#~ msgstr "Unicode"
+
+#~ msgctxt "@item Text character set"
+#~ msgid "Other"
+#~ msgstr "Autre"
+
+#~ msgctxt "@item %1 character set, %2 encoding"
+#~ msgid "%1 ( %2 )"
+#~ msgstr "%1 ( %2 )"
+
+#~ msgctxt "@item Text encoding: %1 character set, %2 encoding"
+#~ msgid "%1 ( %2 )"
+#~ msgstr "%1 ( %2 )"
+
+#, fuzzy
+#~ msgctxt "@item Text character set"
+#~ msgid "Disabled"
+#~ msgstr "desactivar XIM"
+
+#, fuzzy
+#~ msgctxt "@item Text character set"
+#~ msgid "Universal"
+#~ msgstr "Desinstallar"
+
+#, fuzzy
+#~ msgctxt "digit set"
+#~ msgid "Arabic-Indic"
+#~ msgstr "Arab"
+
+#, fuzzy
+#~ msgctxt "digit set"
+#~ msgid "Bengali"
+#~ msgstr "Bengalí"
+
+#, fuzzy
+#~ msgctxt "digit set"
+#~ msgid "Gujarati"
+#~ msgstr "Gujarati"
+
+#, fuzzy
+#~ msgctxt "digit set"
+#~ msgid "Gurmukhi"
+#~ msgstr "Gurmukhi"
+
+#, fuzzy
+#~ msgctxt "digit set"
+#~ msgid "Kannada"
+#~ msgstr "Kannadà"
+
+#, fuzzy
+#~ msgctxt "digit set"
+#~ msgid "Khmer"
+#~ msgstr "Khmer"
+
+#, fuzzy
+#~ msgctxt "digit set"
+#~ msgid "Malayalam"
+#~ msgstr "Malayalam"
+
+#, fuzzy
+#~ msgctxt "digit set"
+#~ msgid "Oriya"
+#~ msgstr "Oriyà"
+
+#, fuzzy
+#~ msgctxt "digit set"
+#~ msgid "Tamil"
+#~ msgstr "Tamil"
+
+#, fuzzy
+#~ msgctxt "digit set"
+#~ msgid "Telugu"
+#~ msgstr "Telugu"
+
+#, fuzzy
+#~ msgctxt "digit set"
+#~ msgid "Thai"
+#~ msgstr "Tailandés"
+
+#, fuzzy
+#~ msgctxt "digit set"
+#~ msgid "Arabic"
+#~ msgstr "Arab"
+
+#, fuzzy
+#~ msgctxt "size in bytes"
+#~ msgid "%1 B"
+#~ msgstr "%1 o"
+
+#, fuzzy
+#~ msgctxt "size in 1000 bytes"
+#~ msgid "%1 kB"
+#~ msgstr "%1 o"
+
+#, fuzzy
+#~ msgctxt "size in 10^6 bytes"
+#~ msgid "%1 MB"
+#~ msgstr "%1 Mo"
+
+#, fuzzy
+#~ msgctxt "size in 10^9 bytes"
+#~ msgid "%1 GB"
+#~ msgstr "%1 Go"
+
+#, fuzzy
+#~ msgctxt "size in 10^12 bytes"
+#~ msgid "%1 TB"
+#~ msgstr "%1 To"
+
+#, fuzzy
+#~ msgctxt "size in 10^15 bytes"
+#~ msgid "%1 PB"
+#~ msgstr "%1 o"
+
+#, fuzzy
+#~ msgctxt "size in 10^18 bytes"
+#~ msgid "%1 EB"
+#~ msgstr "%1 o"
+
+#, fuzzy
+#~ msgctxt "size in 10^21 bytes"
+#~ msgid "%1 ZB"
+#~ msgstr "%1 o"
+
+#, fuzzy
+#~ msgctxt "size in 10^24 bytes"
+#~ msgid "%1 YB"
+#~ msgstr "%1 o"
+
+#, fuzzy
+#~ msgctxt "memory size in 1024 bytes"
+#~ msgid "%1 KB"
+#~ msgstr "%1 ko"
+
+#, fuzzy
+#~ msgctxt "memory size in 2^20 bytes"
+#~ msgid "%1 MB"
+#~ msgstr "%1 Mo"
+
+#, fuzzy
+#~ msgctxt "memory size in 2^30 bytes"
+#~ msgid "%1 GB"
+#~ msgstr "%1 Go"
+
+#, fuzzy
+#~ msgctxt "memory size in 2^40 bytes"
+#~ msgid "%1 TB"
+#~ msgstr "%1 To"
+
+#, fuzzy
+#~ msgctxt "memory size in 2^50 bytes"
+#~ msgid "%1 PB"
+#~ msgstr "%1 o"
+
+#, fuzzy
+#~ msgctxt "memory size in 2^60 bytes"
+#~ msgid "%1 EB"
+#~ msgstr "%1 o"
+
+#, fuzzy
+#~ msgctxt "memory size in 2^70 bytes"
+#~ msgid "%1 ZB"
+#~ msgstr "%1 o"
+
+#, fuzzy
+#~ msgctxt "memory size in 2^80 bytes"
+#~ msgid "%1 YB"
+#~ msgstr "%1 o"
+
+#, fuzzy
+#~ msgctxt "size in 1024 bytes"
+#~ msgid "%1 KiB"
+#~ msgstr "%1 ko"
+
+#, fuzzy
+#~ msgctxt "size in 2^20 bytes"
+#~ msgid "%1 MiB"
+#~ msgstr "%1 Mo"
+
+#, fuzzy
+#~ msgctxt "size in 2^30 bytes"
+#~ msgid "%1 GiB"
+#~ msgstr "%1 Go"
+
+#, fuzzy
+#~ msgctxt "size in 2^40 bytes"
+#~ msgid "%1 TiB"
+#~ msgstr "%1 To"
+
+#, fuzzy
+#~ msgctxt "size in 2^50 bytes"
+#~ msgid "%1 PiB"
+#~ msgstr "%1 To"
+
+#, fuzzy
+#~ msgctxt "size in 2^60 bytes"
+#~ msgid "%1 EiB"
+#~ msgstr "%1 To"
+
+#, fuzzy
+#~ msgctxt "size in 2^70 bytes"
+#~ msgid "%1 ZiB"
+#~ msgstr "%1 To"
+
+#, fuzzy
+#~ msgctxt "size in 2^80 bytes"
+#~ msgid "%1 YiB"
+#~ msgstr "%1 To"
+
+#, fuzzy
+#~ msgctxt "@item:intext %1 is a real number, e.g. 1.23 days"
+#~ msgid "%1 days"
+#~ msgstr "%1 jorns"
+
+#, fuzzy
+#~ msgctxt "@item:intext %1 is a real number, e.g. 1.23 hours"
+#~ msgid "%1 hours"
+#~ msgstr "%1 oras"
+
+#, fuzzy
+#~ msgctxt "@item:intext %1 is a real number, e.g. 1.23 minutes"
+#~ msgid "%1 minutes"
+#~ msgstr "%1 minutas"
+
+#, fuzzy
+#~ msgctxt "@item:intext %1 is a real number, e.g. 1.23 seconds"
+#~ msgid "%1 seconds"
+#~ msgstr "%1 segondas"
+
+#, fuzzy
+#~ msgctxt "@item:intext"
+#~ msgid "%1 millisecond"
+#~ msgid_plural "%1 milliseconds"
+#~ msgstr[0] "%1 milisegondas"
+#~ msgstr[1] "%1 milisegondas"
+
+#, fuzzy
+#~ msgctxt "@item:intext"
+#~ msgid "1 day"
+#~ msgid_plural "%1 days"
+#~ msgstr[0] "%1 jorns"
+#~ msgstr[1] "%1 jorns"
+
+#, fuzzy
+#~ msgctxt "@item:intext"
+#~ msgid "1 hour"
+#~ msgid_plural "%1 hours"
+#~ msgstr[0] "%1 oras"
+#~ msgstr[1] "%1 oras"
+
+#, fuzzy
+#~ msgctxt "@item:intext"
+#~ msgid "1 minute"
+#~ msgid_plural "%1 minutes"
+#~ msgstr[0] "%1 minutas"
+#~ msgstr[1] "%1 minutas"
+
+#, fuzzy
+#~ msgctxt "@item:intext"
+#~ msgid "1 second"
+#~ msgid_plural "%1 seconds"
+#~ msgstr[0] "%1 segondas"
+#~ msgstr[1] "%1 segondas"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "@item:intext days and hours. This uses the previous item:intext messages. "
+#~ "If this does not fit the grammar of your language please contact the i18n "
+#~ "team to solve the problem"
+#~ msgid "%1 and %2"
+#~ msgstr "%1 %2"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "@item:intext hours and minutes. This uses the previous item:intext "
+#~ "messages. If this does not fit the grammar of your language please "
+#~ "contact the i18n team to solve the problem"
+#~ msgid "%1 and %2"
+#~ msgstr "%1 %2"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "@item:intext minutes and seconds. This uses the previous item:intext "
+#~ "messages. If this does not fit the grammar of your language please "
+#~ "contact the i18n team to solve the problem"
+#~ msgid "%1 and %2"
+#~ msgstr "%1 %2"
+
+#, fuzzy
+#~ msgctxt "Before Noon KLocale::NarrowName"
+#~ msgid "A"
+#~ msgstr "Av"
+
+#~ msgid "Today"
+#~ msgstr "Uèi"
+
+#~ msgid "Yesterday"
+#~ msgstr "Ièr"
+
+#~ msgctxt "concatenation of dates and time"
+#~ msgid "%1 %2"
+#~ msgstr "%1 %2"
+
+#~ msgctxt "concatenation of date/time and time zone"
+#~ msgid "%1 %2"
+#~ msgstr "%1 %2"
+
+#~ msgctxt "@title/plain"
+#~ msgid "== %1 =="
+#~ msgstr "== %1 =="
+
+#~ msgctxt "@subtitle/plain"
+#~ msgid "~ %1 ~"
+#~ msgstr "~ %1 ~"
+
+#~ msgctxt "@item/plain"
+#~ msgid "  * %1"
+#~ msgstr "  * %1"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "@note-with-label/plain\n"
+#~ "%1 is the note label, %2 is the text"
+#~ msgid "%1: %2"
+#~ msgstr "%1: %2"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "@warning-with-label/plain\n"
+#~ "%1 is the warning label, %2 is the text"
+#~ msgid "%1: %2"
+#~ msgstr "%1: %2"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "@link-with-description/plain\n"
+#~ "%1 is the URL, %2 is the descriptive text"
+#~ msgid "%2 (%1)"
+#~ msgstr "%1 (%2)"
+
+#~ msgctxt "@filename/plain"
+#~ msgid "‘%1’"
+#~ msgstr "‘%1’"
+
+#~ msgctxt "@application/plain"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#~ msgctxt "@application/rich"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#~ msgctxt "@command/plain"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "@command-with-section/plain\n"
+#~ "%1 is the command name, %2 is its man section"
+#~ msgid "%1(%2)"
+#~ msgstr "%1 (%2)"
+
+#~ msgctxt "@resource/plain"
+#~ msgid "“%1”"
+#~ msgstr "“%1”"
+
+#~ msgctxt "@resource/rich"
+#~ msgid "“%1”"
+#~ msgstr "“%1”"
+
+#~ msgctxt "@icode/plain"
+#~ msgid "“%1”"
+#~ msgstr "“%1”"
+
+#~ msgctxt "@shortcut/plain"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#~ msgctxt "@interface/plain"
+#~ msgid "|%1|"
+#~ msgstr "|%1|"
+
+#~ msgctxt "@emphasis/plain"
+#~ msgid "*%1*"
+#~ msgstr "*%1*"
+
+#, fuzzy
+#~ msgctxt "@emphasis-strong/plain"
+#~ msgid "**%1**"
+#~ msgstr "*%1*"
+
+#~ msgctxt "@envar/plain"
+#~ msgid "$%1"
+#~ msgstr "$%1"
+
+#~ msgctxt "@message/plain"
+#~ msgid "/%1/"
+#~ msgstr "/%1/"
+
+#, fuzzy
+#~ msgctxt "shortcut-key-delimiter/plain"
+#~ msgid "+"
+#~ msgstr "+"
+
+#, fuzzy
+#~ msgctxt "shortcut-key-delimiter/rich"
+#~ msgid "+"
+#~ msgstr "+"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Alt"
+#~ msgstr "Alt"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "AltGr"
+#~ msgstr "AltGr"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Backspace"
+#~ msgstr "Retorn enrèire"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Control"
+#~ msgstr "Contraròtle"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Ctrl"
+#~ msgstr "Ctrl"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Delete"
+#~ msgstr "Suprimir"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Down"
+#~ msgstr "Aval"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "End"
+#~ msgstr "Fin"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Esc"
+#~ msgstr "Esc"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Escape"
+#~ msgstr "Escap."
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Home"
+#~ msgstr "Repertòri personal"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Hyper"
+#~ msgstr "Iper"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Ins"
+#~ msgstr "Ins"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Insert"
+#~ msgstr "Inserir"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Left"
+#~ msgstr "Esquèrra"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Menu"
+#~ msgstr "Menut"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Meta"
+#~ msgstr "Meta"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Return"
+#~ msgstr "Retorn"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Right"
+#~ msgstr "Drecha"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Shift"
+#~ msgstr "Shift"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Space"
+#~ msgstr "Espaci"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Super"
+#~ msgstr "Super"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Tab"
+#~ msgstr "Onglet"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Up"
+#~ msgstr "Amont"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "Win"
+#~ msgstr "Victòria"
+
+#~ msgctxt "keyboard-key-name"
+#~ msgid "F%1"
+#~ msgstr "F%1"
+
+#~ msgid "no error"
+#~ msgstr "pas cap d'error"
+
+#~ msgid "temporary failure in name resolution"
+#~ msgstr "error temporària dins la resolucion de nom"
+
+#~ msgid "non-recoverable failure in name resolution"
+#~ msgstr "error fatala dins la resolucion de nom"
+
+#~ msgid "memory allocation failure"
+#~ msgstr "problèma d'allocacion memòria"
+
+#~ msgid "name or service not known"
+#~ msgstr "nom o servici desconegut"
+
+#~ msgid "unknown error"
+#~ msgstr "error desconeguda"
+
+#~ msgctxt "Socket error code NoError"
+#~ msgid "no error"
+#~ msgstr "pas cap d'error"
+
+#, fuzzy
+#~ msgid "The socket operation is not supported"
+#~ msgstr "« ai_socktype » pas autorizat"
+
+#, fuzzy
+#~ msgid "Connection refused"
+#~ msgstr "Contunhar"
+
+#~ msgid "Unknown error"
+#~ msgstr "Error desconeguda"
+
+#, fuzzy
+#~ msgid "Unknown socket error"
+#~ msgstr "Error desconeguda"
+
+#, fuzzy
+#~ msgid "Operation not supported"
+#~ msgstr "« ai_socktype » pas autorizat"
+
+#, fuzzy
+#~ msgctxt "SSL error"
+#~ msgid "No error"
+#~ msgstr "pas cap d'error"
+
+#, fuzzy
+#~ msgctxt "SSL error"
+#~ msgid "Unknown error"
+#~ msgstr "Error desconeguda"
+
+#~ msgid "address family for nodename not supported"
+#~ msgstr "familha d'adreças pas autorizada per nodename"
+
+#~ msgid "invalid value for 'ai_flags'"
+#~ msgstr "valor invalida de « ai_flags »"
+
+#~ msgid "'ai_family' not supported"
+#~ msgstr "« ai_family » pas autorizat"
+
+#~ msgid "no address associated with nodename"
+#~ msgstr "cap d'adreça associada a nodename"
+
+#~ msgid "servname not supported for ai_socktype"
+#~ msgstr "nom de serveire pas autorizat per ai_socktype"
+
+#~ msgid "'ai_socktype' not supported"
+#~ msgstr "« ai_socktype » pas autorizat"
+
+#~ msgid "system error"
+#~ msgstr "error sistèma"
+
+#~ msgctxt "dictionary name. %1-language and %2-country name"
+#~ msgid "%1 (%2)"
+#~ msgstr "%1 (%2)"
+
+#~ msgctxt "dictionary name. %1-language and %2-variant name"
+#~ msgid "%1 [%2]"
+#~ msgstr "%1 [%2]"
+
+#, fuzzy
+#~ msgid "Could not find plugin '%1' for application '%2'"
+#~ msgstr ""
+#~ "Impossible de trobar 'kdemain' dins '%1'.\n"
+#~ "%2"
+
+#~ msgid "KBuildSycoca"
+#~ msgstr "KBuildSycoca"
+
+#~ msgid "Rebuilds the system configuration cache."
+#~ msgstr "Reconstrusís l'amagatal de configuracion del sistèma."
+
+#~ msgid "David Faure"
+#~ msgstr "David Faure"
+
+#~ msgid "Do not signal applications to update"
+#~ msgstr "Senhalar pas las aplicacions de metre a jorn."
+
+#~ msgid "Disable incremental update, re-read everything"
+#~ msgstr "Desactivar la mesa a jorn incrementala, tornar legir tot"
+
+#~ msgid "Check file timestamps"
+#~ msgstr "Verificar l'orodatatge dels fichièrs"
+
+#~ msgid "Disable checking files (dangerous)"
+#~ msgstr "Desactivar la verificacion dels fichièrs (dangierós)"
+
+#~ msgid "Create global database"
+#~ msgstr "Crear une banca de donadas globala"
+
+#~ msgid "Perform menu generation test run only"
+#~ msgstr "Efectuar la generacion de menut pas qu'en tèst"
+
+#~ msgid "Track menu id for debug purposes"
+#~ msgstr "Traçar lo menut id dins la tòca de desbogar"
+
+#~ msgid "KDE Daemon"
+#~ msgstr "Demon de KDE"
+
+#~ msgid "KDE Daemon - triggers Sycoca database updates when needed"
+#~ msgstr ""
+#~ "Demon de KDE - desclava las mesas a jorn de la banca Sycoca se necessari"
+
+#~ msgid "Check Sycoca database only once"
+#~ msgstr "Verificar pas la banca de donadas de Sycoca qu'un còp"
+
+#, fuzzy
+#~ msgctxt "Encodings menu"
+#~ msgid "Default"
+#~ msgstr "Defaut"
+
+#~ msgctxt "Encodings menu"
+#~ msgid "Autodetect"
+#~ msgstr "Deteccion automatica"
+
+#, fuzzy
+#~ msgid "No Entries"
+#~ msgstr "Nòtas :"
+
+#, fuzzy
+#~ msgid "Clear List"
+#~ msgstr "Escafar la picada"
+
+#~ msgctxt "go back"
+#~ msgid "&Back"
+#~ msgstr "&Precedent"
+
+#~ msgctxt "show help"
+#~ msgid "&Help"
+#~ msgstr "&Ajuda"
+
+#~ msgid "Show &Menubar"
+#~ msgstr "Visualizar la barra de &menuts"
+
+#~ msgid "Show St&atusbar"
+#~ msgstr "Afichar la barra d'est&at"
+
+#~ msgid "&New"
+#~ msgstr "&Novèl "
+
+#, fuzzy
+#~ msgid "Create new document"
+#~ msgstr "Configurar los acorchis clavièr"
+
+#~ msgid "&Open..."
+#~ msgstr "&Dobrir..."
+
+#~ msgid "Open &Recent"
+#~ msgstr "Dobert(s) &Recentament"
+
+#~ msgid "&Save"
+#~ msgstr "&Enregistrar"
+
+#, fuzzy
+#~ msgid "Save document"
+#~ msgstr "Tampar lo document"
+
+#~ msgid "Save &As..."
+#~ msgstr "Enregistrar &jos..."
+
+#~ msgid "&Close"
+#~ msgstr "&Tampar"
+
+#, fuzzy
+#~ msgid "Close document"
+#~ msgstr "Tampar lo document"
+
+#~ msgid "&Print..."
+#~ msgstr "&Estampar..."
+
+#, fuzzy
+#~ msgid "Print document"
+#~ msgstr "Imprimir los imatges"
+
+#, fuzzy
+#~ msgid "Print Previe&w"
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#~ msgid "&Quit"
+#~ msgstr "&Sortir"
+
+#~ msgid "Quit application"
+#~ msgstr "Quitar l'aplicacion"
+
+#~ msgid "Re&do"
+#~ msgstr "&Tornar far"
+
+#, fuzzy
+#~ msgid "Redo last undone action"
+#~ msgstr "Documentacion HTML"
+
+#~ msgid "&Copy"
+#~ msgstr "&Copiar"
+
+#~ msgid "&Paste"
+#~ msgstr "&Pegar"
+
+#, fuzzy
+#~ msgid "Paste clipboard content"
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#~ msgid "C&lear"
+#~ msgstr "Netejar"
+
+#~ msgid "Select &All"
+#~ msgstr "&Tot seleccionar"
+
+#~ msgid "&Find..."
+#~ msgstr "&Recercar..."
+
+#~ msgid "Find &Next"
+#~ msgstr "&Perseguir la recèrca"
+
+#~ msgid "&Replace..."
+#~ msgstr "&Remplaçar..."
+
+#, fuzzy
+#~ msgid "Select zoom level"
+#~ msgstr "Seleccionatz una setmana"
+
+#, fuzzy
+#~ msgid "Redisplay document"
+#~ msgstr "Tot r&emplaçar"
+
+#~ msgid "&Previous Page"
+#~ msgstr "Pagina &precendenta"
+
+#, fuzzy
+#~ msgid "Go to previous page"
+#~ msgstr "Pagina &precendenta"
+
+#~ msgid "&Next Page"
+#~ msgstr "Pagina &seguenta"
+
+#, fuzzy
+#~ msgid "Go to next page"
+#~ msgstr "Anar a la linha"
+
+#~ msgid "&Go To..."
+#~ msgstr "&Anar a..."
+
+#~ msgid "&Go to Page..."
+#~ msgstr "&Anar a la pagina..."
+
+#~ msgid "&Go to Line..."
+#~ msgstr "&Anar a la linha..."
+
+#~ msgid "&First Page"
+#~ msgstr "&Primièra pagina"
+
+#, fuzzy
+#~ msgid "Go to first page"
+#~ msgstr "Anar a la linha"
+
+#~ msgid "&Last Page"
+#~ msgstr "&Darrièra pagina"
+
+#, fuzzy
+#~ msgid "Go to last page"
+#~ msgstr "&Anar a la pagina..."
+
+#, fuzzy
+#~ msgid "Go back in document"
+#~ msgstr "Recuolar d'una etapa"
+
+#, fuzzy
+#~ msgid "&Forward"
+#~ msgstr "Trasmetre"
+
+#, fuzzy
+#~ msgid "Go forward in document"
+#~ msgstr "Avançar d'una etapa"
+
+#~ msgid "&Add Bookmark"
+#~ msgstr "&Apondre un favorit"
+
+#, fuzzy
+#~ msgid "&Edit Bookmarks..."
+#~ msgstr "&Modificar los favorits"
+
+#~ msgid "&Spelling..."
+#~ msgstr "&Ortografia..."
+
+#, fuzzy
+#~ msgid "Check spelling in document"
+#~ msgstr "Verificar l'ortografia"
+
+#, fuzzy
+#~ msgid "Show or hide menubar"
+#~ msgstr "Visualizar la barra de &menuts"
+
+#~ msgid "Show &Toolbar"
+#~ msgstr "Afic&har la barra d'espleches"
+
+#, fuzzy
+#~ msgid "Show or hide toolbar"
+#~ msgstr "Afic&har la barra d'espleches"
+
+#, fuzzy
+#~ msgid "Show or hide statusbar"
+#~ msgstr "Afichar la barra d'est&at"
+
+#~ msgid "F&ull Screen Mode"
+#~ msgstr "&Mòde ecran complet"
+
+#~ msgid "&Configure %1..."
+#~ msgstr "&Configurar %1..."
+
+#~ msgid "%1 &Handbook"
+#~ msgstr "&Manual de : %1"
+
+#~ msgid "What's &This?"
+#~ msgstr "Qu'es &aquò ?"
+
+#~ msgid "&Report Bug..."
+#~ msgstr "&Rapòrt de bòg..."
+
+#~ msgid "&About %1"
+#~ msgstr "&A prepaus de %1"
+
+#~ msgid "About &KDE"
+#~ msgstr "A prepaus de KDE"
+
+#, fuzzy
+#~ msgctxt "@action:inmenu"
+#~ msgid "Exit F&ull Screen Mode"
+#~ msgstr "Sortir d&el mòde ecran complet"
+
+#, fuzzy
+#~ msgctxt "@action:intoolbar"
+#~ msgid "Exit Full Screen"
+#~ msgstr "Sortir d&el mòde ecran complet"
+
+#, fuzzy
+#~ msgctxt "@info:tooltip"
+#~ msgid "Exit full screen mode"
+#~ msgstr "Sortir d&el mòde ecran complet"
+
+#, fuzzy
+#~ msgctxt "@action:inmenu"
+#~ msgid "F&ull Screen Mode"
+#~ msgstr "&Mòde ecran complet"
+
+#, fuzzy
+#~ msgctxt "@action:intoolbar"
+#~ msgid "Full Screen"
+#~ msgstr "Ecran complet"
+
+#~ msgctxt "Custom color"
+#~ msgid "Custom..."
+#~ msgstr "Personalizat..."
+
+#~ msgid "Named Colors"
+#~ msgstr "Colors nomenadas"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "%1 is the number of paths, %2 is the list of paths (with newlines between "
+#~ "them)"
+#~ msgid ""
+#~ "Unable to read X11 RGB color strings. The following file location was "
+#~ "examined:\n"
+#~ "%2"
+#~ msgid_plural ""
+#~ "Unable to read X11 RGB color strings. The following file locations were "
+#~ "examined:\n"
+#~ "%2"
+#~ msgstr[0] ""
+#~ "Impossible de legir la configuracion de las cadenas de colors RVB de X11. "
+#~ "Los emplaçaments seguents son estats ensajats :\n"
+#~ msgstr[1] ""
+#~ "Impossible de legir la configuracion de las cadenas de colors RVB de X11. "
+#~ "Los emplaçaments seguents son estats ensajats :\n"
+
+#~ msgid "Select Color"
+#~ msgstr "Seleccionar una color"
+
+#~ msgid "Saturation:"
+#~ msgstr "Saturacion :"
+
+#, fuzzy
+#~ msgctxt "This is the V of HSV"
+#~ msgid "Value:"
+#~ msgstr "Valor :"
+
+#~ msgid "Red:"
+#~ msgstr "Roje :"
+
+#~ msgid "Green:"
+#~ msgstr "Vèrd :"
+
+#~ msgid "Blue:"
+#~ msgstr "Blau :"
+
+#~ msgid "&Add to Custom Colors"
+#~ msgstr "A&pondre a las colors personalizadas"
+
+#~ msgid "Name:"
+#~ msgstr "Nom :"
+
+#~ msgid "HTML:"
+#~ msgstr "HTML :"
+
+#~ msgid "Default color"
+#~ msgstr "Color per defaut"
+
+#~ msgid "-default-"
+#~ msgstr "- per defaut -"
+
+#~ msgid "-unnamed-"
+#~ msgstr "- anonim -"
+
+#~ msgid "License Agreement"
+#~ msgstr "Contracte de licéncia"
+
+#, fuzzy
+#~ msgctxt "Action to send an email to a contributor"
+#~ msgid "Email contributor"
+#~ msgstr "Autres participants :"
+
+#, fuzzy
+#~ msgid "Visit contributor's homepage"
+#~ msgstr "Pagina Web"
+
+#, fuzzy
+#~ msgctxt "Action to send an email to a contributor"
+#~ msgid ""
+#~ "Email contributor\n"
+#~ "%1"
+#~ msgstr "Autres participants :"
+
+#, fuzzy
+#~ msgid ""
+#~ "Visit contributor's homepage\n"
+#~ "%1"
+#~ msgstr "Pagina Web"
+
+#, fuzzy
+#~ msgid ""
+#~ "Visit contributor's page\n"
+#~ "%1"
+#~ msgstr "Pagina Web"
+
+#, fuzzy
+#~ msgid ""
+#~ "Visit contributor's blog\n"
+#~ "%1"
+#~ msgstr "Pagina Web"
+
+#, fuzzy
+#~ msgctxt "@item Contributor name in about dialog."
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#, fuzzy
+#~ msgctxt "City, Country"
+#~ msgid "%1, %2"
+#~ msgstr "%1 %2"
+
+#, fuzzy
+#~ msgctxt "A generic social network or homepage link of an unlisted type."
+#~ msgid "Other"
+#~ msgstr "Autre"
+
+#, fuzzy
+#~ msgctxt "A type of link."
+#~ msgid "Homepage"
+#~ msgstr "Pagina Web"
+
+#~ msgid "About KDE"
+#~ msgstr "A prepaus de KDE"
+
+#~ msgctxt "About KDE"
+#~ msgid "&About"
+#~ msgstr "&A prepaus de"
+
+#~ msgid "&Report Bugs or Wishes"
+#~ msgstr "Rapòrt de bògues e &desirs"
+
+#, fuzzy
+#~ msgid "&Join KDE"
+#~ msgstr "Re&jonhatz l'equipa de KDE"
+
+#~ msgid "&Support KDE"
+#~ msgstr "&Sostenètz KDE"
+
+#~ msgctxt "Opposite to Back"
+#~ msgid "Next"
+#~ msgstr "Seguent"
+
+#~ msgid "Finish"
+#~ msgstr "Terminar"
+
+#~ msgid "Submit Bug Report"
+#~ msgstr "Mandar un rapòrt de bòg"
+
+#~ msgid ""
+#~ "Your email address. If incorrect, use the Configure Email button to "
+#~ "change it"
+#~ msgstr ""
+#~ "Aquò es vòstra adreça electronica. Se es incorrècta, utilizatz lo boton "
+#~ "Adreça electronica per la modificar."
+
+#, fuzzy
+#~ msgctxt "Email sender address"
+#~ msgid "From:"
+#~ msgstr "Expedidor :"
+
+#~ msgid "Configure Email..."
+#~ msgstr "Configurar l'adreça electronica..."
+
+#~ msgid "The email address this bug report is sent to."
+#~ msgstr "L'adreça electronica a laquala aqueste rapòrt de bòg serà mandat."
+
+#, fuzzy
+#~ msgctxt "Email receiver address"
+#~ msgid "To:"
+#~ msgstr "Destinatari :"
+
+#~ msgid "&Send"
+#~ msgstr "&Enviar"
+
+#~ msgid "Send bug report."
+#~ msgstr "Mandar un rapòrt de bòg."
+
+#~ msgid "Send this bug report to %1."
+#~ msgstr "Mandar aqueste rapòrt de bòg a %1.."
+
+#~ msgid ""
+#~ "The application for which you wish to submit a bug report - if incorrect, "
+#~ "please use the Report Bug menu item of the correct application"
+#~ msgstr ""
+#~ "L'aplicacion per laquala desiratz un rapòrt de bòg. En cas d'error, "
+#~ "utilizatz l'element de menut Rapòrt de bòg de l'aplicacion correspondenta."
+
+#~ msgid "Application: "
+#~ msgstr "Aplicacion : "
+
+#~ msgid ""
+#~ "The version of this application - please make sure that no newer version "
+#~ "is available before sending a bug report"
+#~ msgstr ""
+#~ "La version d'aquesta aplicacion - Asseguratz-vos qu'existís pas de "
+#~ "version mai recenta abans de mandar un rapòrt de bòg."
+
+#~ msgid "Version:"
+#~ msgstr "Version :"
+
+#, fuzzy
+#~ msgid "no version set (programmer error)"
+#~ msgstr "pas de version definida (error del programaire !)"
+
+#~ msgid "OS:"
+#~ msgstr "Sistèma d'espleitacion :"
+
+#~ msgid "Compiler:"
+#~ msgstr "Compilator :"
+
+#~ msgid "Se&verity"
+#~ msgstr "Se&veritat"
+
+#~ msgid "Critical"
+#~ msgstr "Critic"
+
+#~ msgid "Grave"
+#~ msgstr "Grèva"
+
+#~ msgctxt "normal severity"
+#~ msgid "Normal"
+#~ msgstr "Normal"
+
+#~ msgid "Wishlist"
+#~ msgstr "Desirs"
+
+#~ msgid "Translation"
+#~ msgstr "Revirada"
+
+#~ msgid "S&ubject: "
+#~ msgstr "S&ubjècte : "
+
+#~ msgid ""
+#~ "Enter the text (in English if possible) that you wish to submit for the "
+#~ "bug report.\n"
+#~ "If you press \"Send\", a mail message will be sent to the maintainer of "
+#~ "this program.\n"
+#~ msgstr ""
+#~ "Picatz lo tèxt (en anglés se possible) de vòstre rapòrt de bòg.\n"
+#~ "Un clic sus « Mandar » manda un messatge electronic al mantenidor "
+#~ "d'aqueste programa.\n"
+
+#~ msgid "&Launch Bug Report Wizard"
+#~ msgstr "Aviar &l'assistent de rapòrt de bòg"
+
+#~ msgctxt "unknown program name"
+#~ msgid "unknown"
+#~ msgstr "desconegut"
+
+#~ msgid ""
+#~ "You must specify both a subject and a description before the report can "
+#~ "be sent."
+#~ msgstr ""
+#~ "Devètz indicar un subjècte e una descripcion del bòg abans de mandar lo "
+#~ "rapòrt."
+
+#, fuzzy
+#~ msgid ""
+#~ "<p>You chose the severity <b>Critical</b>. Please note that this severity "
+#~ "is intended only for bugs that:</p><ul><li>break unrelated software on "
+#~ "the system (or the whole system)</li><li>cause serious data loss</"
+#~ "li><li>introduce a security hole on the system where the affected package "
+#~ "is installed</li></ul>\n"
+#~ "<p>Does the bug you are reporting cause any of the above damage? If it "
+#~ "does not, please select a lower severity. Thank you.</p>"
+#~ msgstr ""
+#~ "<p>Avètz causit la severitat <b>critica</b>. Remarca : aqueste nivèl de "
+#~ "severitat deu èsser utilizat per de bògues qu'</p><ul><li>afectan de "
+#~ "logicials extèrnes sul sistèma (o lo sistèma entièr)</li><li>causant de "
+#~ "pèrdas de donadas grèvas</li><li>introdusent un trauc de seguretat sul "
+#~ "sistèma sulqual los paquetatges son installats</li></ul>\n"
+#~ "<p>Lo bòg qu'anatz senhalar provòca un dels problèmas çaisús ? S'es pas "
+#~ "lo cas, causissètz una severitat inferiora. Mercés !</p>"
+
+#, fuzzy
+#~ msgid ""
+#~ "<p>You chose the severity <b>Grave</b>. Please note that this severity is "
+#~ "intended only for bugs that:</p><ul><li>make the package in question "
+#~ "unusable or mostly so</li><li>cause data loss</li><li>introduce a "
+#~ "security hole allowing access to the accounts of users who use the "
+#~ "affected package</li></ul>\n"
+#~ "<p>Does the bug you are reporting cause any of the above damage? If it "
+#~ "does not, please select a lower severity. Thank you.</p>"
+#~ msgstr ""
+#~ "<p>Avètz causit la severitat <b>elevada</b>. Remarca : aqueste nivèl de "
+#~ "severitat deu èsser utilizat per de bògues que</p><ul><li>rendisson "
+#~ "l'aplicacion en question inutilizable o gaireben</li><li>causent de "
+#~ "pèrdas de donadas</li><li>introduissent un trauc de seguretat permetent "
+#~ "l'accès als comptes dels utilizaires emplegant l'aplicacion concernida</"
+#~ "li></ul>\n"
+#~ "<p>Lo bòg qu'anatz senhalar provòca un dels problèmas çaisús ? S'es pas "
+#~ "lo cas, causissètz una severitat inferiora. Mercés !</p>"
+
+#, fuzzy
+#~ msgid ""
+#~ "Unable to send the bug report.\n"
+#~ "Please submit a bug report manually....\n"
+#~ "See http://bugs.kde.org/ for instructions."
+#~ msgstr ""
+#~ "Impossible de mandar lo rapòrt de bòg.\n"
+#~ "Sometètz-lo manualament, o planhèm...\n"
+#~ "Consultatz « http://bugs.kde.org/ » per las instruccions."
+
+#~ msgid "Bug report sent, thank you for your input."
+#~ msgstr "Rapòrt de bòg mndat, mercés per vòstra contribucion."
+
+#~ msgid ""
+#~ "Close and discard\n"
+#~ "edited message?"
+#~ msgstr ""
+#~ "Tampar e abandonar\n"
+#~ "lo messatge editat ?"
+
+#~ msgid "Close Message"
+#~ msgstr "Tampar lo messatge"
+
+#~ msgid "Configure"
+#~ msgstr "Configurar"
+
+#~ msgid "Job"
+#~ msgstr "Prètzfach"
+
+#, fuzzy
+#~ msgid "Job Control"
+#~ msgstr "Contraròtl"
+
+#, fuzzy
+#~ msgid "Scheduled printing:"
+#~ msgstr "Clau utilizada per signar :"
+
+#, fuzzy
+#~ msgid "Billing information:"
+#~ msgstr "Entresenhas"
+
+#, fuzzy
+#~ msgid "Job Options"
+#~ msgstr "Opcions"
+
+#, fuzzy
+#~ msgid "Option"
+#~ msgstr "Opcion"
+
+#~ msgid "Value"
+#~ msgstr "Valor"
+
+#, fuzzy
+#~ msgid "Print Immediately"
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#, fuzzy
+#~ msgid "Pages"
+#~ msgstr "Paginas"
+
+#~ msgid "Pages Per Sheet"
+#~ msgstr "Fuèlha per fuèlha"
+
+#~ msgid "1"
+#~ msgstr "1"
+
+#~ msgid "6"
+#~ msgstr "6"
+
+#~ msgid "2"
+#~ msgstr "2"
+
+#~ msgid "9"
+#~ msgstr "9"
+
+#~ msgid "4"
+#~ msgstr "4"
+
+#, fuzzy
+#~ msgid "16"
+#~ msgstr "16"
+
+#, fuzzy
+#~ msgctxt "Banner page at start"
+#~ msgid "Start"
+#~ msgstr "Aviar"
+
+#, fuzzy
+#~ msgctxt "Banner page at end"
+#~ msgid "End"
+#~ msgstr "Fin"
+
+#, fuzzy
+#~ msgctxt "No border line"
+#~ msgid "None"
+#~ msgstr "Pas cap"
+
+#, fuzzy
+#~ msgid "Single Line"
+#~ msgstr "Enregistrar lo ligam coma"
+
+#, fuzzy
+#~ msgctxt "Banner page"
+#~ msgid "None"
+#~ msgstr "Pas cap"
+
+#, fuzzy
+#~ msgctxt "Banner page"
+#~ msgid "Standard"
+#~ msgstr "Estandard"
+
+#~ msgctxt "Banner page"
+#~ msgid "Unclassified"
+#~ msgstr "Pas classificat"
+
+#, fuzzy
+#~ msgctxt "Banner page"
+#~ msgid "Confidential"
+#~ msgstr "Confidencial"
+
+#~ msgctxt "Banner page"
+#~ msgid "Classified"
+#~ msgstr "Classificat"
+
+#~ msgctxt "Banner page"
+#~ msgid "Secret"
+#~ msgstr "Secret"
+
+#, fuzzy
+#~ msgid "All Pages"
+#~ msgstr "Paginas"
+
+#, fuzzy
+#~ msgid "Odd Pages"
+#~ msgstr "Paginas"
+
+#, fuzzy
+#~ msgid "Even Pages"
+#~ msgstr "Paginas"
+
+#, fuzzy
+#~ msgid "Page Set"
+#~ msgstr "Fuèlha per fuèlha"
+
+#, fuzzy
+#~ msgctxt "@title:window"
+#~ msgid "Print"
+#~ msgstr "Estampar"
+
+#~ msgid "&Try"
+#~ msgstr "&Ensajar"
+
+#~ msgid "modified"
+#~ msgstr "modificat"
+
+#~ msgid "&Details"
+#~ msgstr "&Detalhs"
+
+#~ msgid "Get help..."
+#~ msgstr "Obténer d'ajuda..."
+
+#~ msgid "--- separator ---"
+#~ msgstr "--- separator ---"
+
+#, fuzzy
+#~ msgid "Change Text"
+#~ msgstr "Recercar de tèxt"
+
+#, fuzzy
+#~ msgid "Icon te&xt:"
+#~ msgstr "Tèxt :"
+
+#~ msgid "Configure Toolbars"
+#~ msgstr "Configurar las barras d'espleches"
+
+#~ msgid ""
+#~ "Do you really want to reset all toolbars of this application to their "
+#~ "default? The changes will be applied immediately."
+#~ msgstr ""
+#~ "Volètz vertadièrament reïnicializar las barras d'espleches d'aquesta "
+#~ "aplicacion a lors contenguts per defaut ? Los cambiaments seràn aplicats "
+#~ "immediatament."
+
+#, fuzzy
+#~ msgid "Reset Toolbars"
+#~ msgstr "Reïnicializar las barras d'espleches"
+
+#~ msgid "Reset"
+#~ msgstr "Reinicializar"
+
+#~ msgid "&Toolbar:"
+#~ msgstr "&Barra d'espleches :"
+
+#~ msgid "A&vailable actions:"
+#~ msgstr "&Accions disponiblas :"
+
+#, fuzzy
+#~ msgid "Filter"
+#~ msgstr "Fichièr"
+
+#~ msgid "Curr&ent actions:"
+#~ msgstr "Accions en &cors :"
+
+#~ msgid "Change &Icon..."
+#~ msgstr "Cambiar l'icòna..."
+
+#, fuzzy
+#~ msgid "Change Te&xt..."
+#~ msgstr "Cambiar l'icòna..."
+
+#~ msgctxt "@item:intable Action name in toolbar editor"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#~ msgid ""
+#~ "This element will be replaced with all the elements of an embedded "
+#~ "component."
+#~ msgstr ""
+#~ "Aqueste element serà remplaçat per totes los elements d'un compausant "
+#~ "integrat."
+
+#~ msgid "<Merge>"
+#~ msgstr "<Fusion>"
+
+#~ msgid "<Merge %1>"
+#~ msgstr "<Fusion de %1>"
+
+#~ msgid "ActionList: %1"
+#~ msgstr "Tièra d'accions : %1"
+
+#~ msgctxt "@label Action tooltip in toolbar editor, below the action list"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#, fuzzy
+#~ msgid "Manage Link"
+#~ msgstr "Enregistrar lo ligam coma"
+
+#, fuzzy
+#~ msgid "Link Text:"
+#~ msgstr "Tèxt :"
+
+#, fuzzy
+#~ msgid "Link URL:"
+#~ msgstr "URL :"
+
+#~ msgctxt "@action:button filter-yes"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#~ msgctxt "@action:button filter-no"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#~ msgctxt "@action:button filter-continue"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#~ msgctxt "@action:button filter-cancel"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#~ msgctxt "@action:button post-filter"
+#~ msgid "."
+#~ msgstr "."
+
+#~ msgid "Details"
+#~ msgstr "Detalhs"
+
+#~ msgid "Question"
+#~ msgstr "Question"
+
+#~ msgid "Do not ask again"
+#~ msgstr "Repausar pas la question"
+
+#~ msgid "Warning"
+#~ msgstr "Alèrta"
+
+#~ msgid "Error"
+#~ msgstr "Error"
+
+#~ msgid "Sorry"
+#~ msgstr "O planhèm"
+
+#~ msgid "Information"
+#~ msgstr "Entresenhas"
+
+#~ msgid "Do not show this message again"
+#~ msgstr "Visualizar pas mai lo messatge"
+
+#~ msgid "Password:"
+#~ msgstr "Mot de pas :"
+
+#~ msgid "Password"
+#~ msgstr "Mot de pas"
+
+#, fuzzy
+#~ msgid "Use this password:"
+#~ msgstr "&Memorizar lo senhal"
+
+#~ msgid "Username:"
+#~ msgstr "Nom d'utilizaire :"
+
+#, fuzzy
+#~ msgid "Domain:"
+#~ msgstr "Adreça electronica"
+
+#~ msgid "Remember password"
+#~ msgstr "Se remembrar del mot de pas"
+
+#~ msgid "Select Region of Image"
+#~ msgstr "Causissètz una region de l'imatge"
+
+#~ msgid "Please click and drag on the image to select the region of interest:"
+#~ msgstr ""
+#~ "Clicatz e lisatz sus l'imatge per seleccionar la region que vos "
+#~ "interèssa :"
+
+#~ msgctxt "No shortcut defined"
+#~ msgid "None"
+#~ msgstr "Pas cap"
+
+#~ msgid "Custom:"
+#~ msgstr "Personalisat :"
+
+#, fuzzy
+#~ msgid "Shortcut Schemes"
+#~ msgstr "Acorchis"
+
+#, fuzzy
+#~ msgid "Current scheme:"
+#~ msgstr "Accions en &cors :"
+
+#, fuzzy
+#~ msgid "New..."
+#~ msgstr "..."
+
+#~ msgid "Delete"
+#~ msgstr "Suprimir"
+
+#, fuzzy
+#~ msgid "More Actions"
+#~ msgstr "Accion"
+
+#, fuzzy
+#~ msgid "Save as Scheme Defaults"
+#~ msgstr "Per &defaut"
+
+#, fuzzy
+#~ msgid "Name for new scheme:"
+#~ msgstr "Accions en &cors :"
+
+#, fuzzy
+#~ msgid "New Scheme"
+#~ msgstr "Accions en &cors :"
+
+#~ msgid "Configure Shortcuts"
+#~ msgstr "Configurar los acorchis clavièr"
+
+#~ msgid "Print"
+#~ msgstr "Estampar"
+
+#, fuzzy
+#~ msgid "Reset to Defaults"
+#~ msgstr "Per &defaut"
+
+#~ msgid ""
+#~ "Search interactively for shortcut names (e.g. Copy) or combination of "
+#~ "keys (e.g. Ctrl+C) by typing them here."
+#~ msgstr ""
+#~ "Cercar d'un biais interactiu los noms d'acorchis (per ex. Còpia) o las "
+#~ "combinasons de tòcas (per ex. Ctrl+C) en los picant aicí."
+
+#~ msgid ""
+#~ "Here you can see a list of key bindings, i.e. associations between "
+#~ "actions (e.g. 'Copy') shown in the left column and keys or combination of "
+#~ "keys (e.g. Ctrl+V) shown in the right column."
+#~ msgstr ""
+#~ "La tièra dels acorchis clavièr es afichada aicí, es a dire las "
+#~ "associacions entre las accions (exemple : « Copiar ») afichadas dins la "
+#~ "colomna d'esquèrra e de tòcas o combinasons de tòcas (exemple Ctrl-V) "
+#~ "afichadas dins la colomna de drecha."
+
+#~ msgid "Action"
+#~ msgstr "Accion"
+
+#~ msgid "Shortcut"
+#~ msgstr "Acorchi"
+
+#~ msgid "Alternate"
+#~ msgstr "Alternar"
+
+#~ msgid "Global"
+#~ msgstr "Global"
+
+#~ msgid "Unknown"
+#~ msgstr "Desconegut"
+
+#~ msgid "Key Conflict"
+#~ msgstr "Conflicte de tòca"
+
+#~ msgid "Reassign"
+#~ msgstr "Reatribuir"
+
+#, fuzzy
+#~ msgctxt "header for an applications shortcut list"
+#~ msgid "Shortcuts for %1"
+#~ msgstr "Acorchis"
+
+#, fuzzy
+#~ msgid "Action Name"
+#~ msgstr "Accion"
+
+#~ msgid "Shortcuts"
+#~ msgstr "Acorchis"
+
+#~ msgid "Description"
+#~ msgstr "Descripcion"
+
+#~ msgctxt "@item:intable Action name in shortcuts configuration"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#~ msgid "Primary language:"
+#~ msgstr "Lenga per defaut :"
+
+#~ msgid "Fallback language:"
+#~ msgstr "Lenga per defaut :"
+
+#~ msgid "Remove"
+#~ msgstr "Suprimir"
+
+#~ msgid "Tip of the Day"
+#~ msgstr "Astúcia del jorn"
+
+#~ msgid "Did you know...?\n"
+#~ msgstr "O sabiatz...?\n"
+
+#~ msgid "&Show tips on startup"
+#~ msgstr "Afic&har las astúcias a l'aviada"
+
+#~ msgid "&Previous"
+#~ msgstr "&Precedent"
+
+#~ msgctxt "Opposite to Previous"
+#~ msgid "&Next"
+#~ msgstr "&Seguent"
+
+#~ msgid "Find Next"
+#~ msgstr "Recercar lo seguent"
+
+#~ msgid "<qt>Find next occurrence of '<b>%1</b>'?</qt>"
+#~ msgstr "<qt>Cercar l'ocurréncia venenta de «<b>%1</b>» ?</qt>"
+
+#~ msgid "<qt>No matches found for '<b>%1</b>'.</qt>"
+#~ msgstr "<qt>Cap de correspondéncia pas trobada per «<b>%1</b>».</qt>"
+
+#~ msgid "No matches found for '<b>%1</b>'."
+#~ msgstr "Cap de correspondéncia pas trobada per « <b>%1</b> »."
+
+#~ msgid "Beginning of document reached."
+#~ msgstr "Lo començament del document es estat atent."
+
+#~ msgid "End of document reached."
+#~ msgstr "La fin del document es estada atenta."
+
+#~ msgid "Continue from the end?"
+#~ msgstr "Contunhar dempuèi la fin ?"
+
+#~ msgid "Continue from the beginning?"
+#~ msgstr "Contunhar dempuèi lo començament ?"
+
+#~ msgid "Find Text"
+#~ msgstr "Recercar de tèxt"
+
+#, fuzzy
+#~ msgctxt "@title:group"
+#~ msgid "Find"
+#~ msgstr "Recercar"
+
+#~ msgid "&Text to find:"
+#~ msgstr "&Tèxt de cercar :"
+
+#~ msgid "Regular e&xpression"
+#~ msgstr "E&xpression racionala"
+
+#~ msgid "&Edit..."
+#~ msgstr "&Edicion..."
+
+#~ msgid "Replace With"
+#~ msgstr "Remplaçar per"
+
+#~ msgid "Replace&ment text:"
+#~ msgstr "Tèxt &de remplaçament :"
+
+#~ msgid "Use p&laceholders"
+#~ msgstr "Utili&zar d'espacis reservats"
+
+#~ msgid "Insert Place&holder"
+#~ msgstr "Inserir un es&paci reservat"
+
+#~ msgid "C&ase sensitive"
+#~ msgstr "Téne&r compte de la cassa"
+
+#~ msgid "&Whole words only"
+#~ msgstr "Sonque los mots &entièrs"
+
+#~ msgid "From c&ursor"
+#~ msgstr "Demp&uèi lo cursor"
+
+#~ msgid "Find &backwards"
+#~ msgstr "Cercar en &rèire"
+
+#~ msgid "&Selected text"
+#~ msgstr "Tèxt &seleccionat"
+
+#~ msgid "&Prompt on replace"
+#~ msgstr "&Convit al moment d'un remplaçament"
+
+#~ msgid "Start replace"
+#~ msgstr "Aviar lo remplaçament"
+
+#~ msgid ""
+#~ "<qt>If you press the <b>Replace</b> button, the text you entered above is "
+#~ "searched for within the document and any occurrence is replaced with the "
+#~ "replacement text.</qt>"
+#~ msgstr ""
+#~ "<qt>S'accionatz lo boton <b>Remplaçar</b>, lo tèxt qu'avètz picat "
+#~ "aldessús es cercat dins lo document e tota occurréncia n'es remplaçada "
+#~ "pel tèxt de remplaçament.</qt>"
+
+#~ msgid "&Find"
+#~ msgstr "&Recercar"
+
+#~ msgid "Start searching"
+#~ msgstr "Començar la recèrca"
+
+#~ msgid ""
+#~ "<qt>If you press the <b>Find</b> button, the text you entered above is "
+#~ "searched for within the document.</qt>"
+#~ msgstr ""
+#~ "<qt>S'accionatz lo boton <b>Cercar</b>, lo tèxt qu'avètz picat aldessús "
+#~ "serà cercat dins lo document.</qt>"
+
+#~ msgid ""
+#~ "Enter a pattern to search for, or select a previous pattern from the list."
+#~ msgstr ""
+#~ "Picatz un motiu de recercar, o seleccionatz un motiu precedent de la "
+#~ "tièra."
+
+#~ msgid "If enabled, search for a regular expression."
+#~ msgstr "Se activat, recerca una expression racionala."
+
+#~ msgid "Click here to edit your regular expression using a graphical editor."
+#~ msgstr ""
+#~ "Clicatz aicí per modificar vòstra expression regulara en utilizant un "
+#~ "editor grafic."
+
+#~ msgid "Enter a replacement string, or select a previous one from the list."
+#~ msgstr ""
+#~ "Picatz una cadena de remplaçament, o seleccionatz-ne una precedenta dins "
+#~ "la tièra."
+
+#~ msgid "Click for a menu of available captures."
+#~ msgstr "Clicatz per un menut de las capturas disponiblas."
+
+#~ msgid "Require word boundaries in both ends of a match to succeed."
+#~ msgstr ""
+#~ "Necessita de limits de mots dins los dos senses d'una occurréncia per "
+#~ "capitar."
+
+#~ msgid ""
+#~ "Start searching at the current cursor location rather than at the top."
+#~ msgstr ""
+#~ "Aviar la recèrca a la posicion correnta del cursor puslèu qu'al "
+#~ "començament."
+
+#~ msgid "Only search within the current selection."
+#~ msgstr "Recercar sonque dins la seleccion correnta."
+
+#~ msgid ""
+#~ "Perform a case sensitive search: entering the pattern 'Joe' will not "
+#~ "match 'joe' or 'JOE', only 'Joe'."
+#~ msgstr ""
+#~ "Effectuar una recèrca tenent compte de la cassa : la picada del motiu "
+#~ "« Joe » trobarà pas ni « joe » ni « JOE », mas unicament « Joe »."
+
+#~ msgid "Search backwards."
+#~ msgstr "Cercar en rèire."
+
+#~ msgid "Ask before replacing each match found."
+#~ msgstr "Demandar abans de remplaçar cada correspondéncia trobada."
+
+#~ msgid "Any Character"
+#~ msgstr "Un caractèra quin que siá"
+
+#~ msgid "Start of Line"
+#~ msgstr "Començament de linha"
+
+#~ msgid "End of Line"
+#~ msgstr "Fin de linha"
+
+#~ msgid "Set of Characters"
+#~ msgstr "Jòc de caractèrs"
+
+#~ msgid "Repeats, Zero or More Times"
+#~ msgstr "Repetir, zèro o mantun còp"
+
+#~ msgid "Repeats, One or More Times"
+#~ msgstr "Repetir, un o mantun còp"
+
+#~ msgid "Optional"
+#~ msgstr "Opcional"
+
+#~ msgid "Escape"
+#~ msgstr "Escap."
+
+#~ msgid "TAB"
+#~ msgstr "TAB"
+
+#~ msgid "Newline"
+#~ msgstr "Saut de linha"
+
+#~ msgid "Carriage Return"
+#~ msgstr "Tòca Entrada"
+
+#~ msgid "White Space"
+#~ msgstr "Espaci"
+
+#~ msgid "Digit"
+#~ msgstr "Chifra"
+
+#~ msgid "Complete Match"
+#~ msgstr "Correspondéncia complèta"
+
+#~ msgid "Captured Text (%1)"
+#~ msgstr "Tèxt capturat (%1)"
+
+#~ msgid "You must enter some text to search for."
+#~ msgstr "Devètz picar de tèxt de recercar."
+
+#~ msgid "Invalid regular expression."
+#~ msgstr "Expression racionala pas valabla."
+
+#~ msgid "Replace"
+#~ msgstr "Remplaçar"
+
+#, fuzzy
+#~ msgctxt "@action:button Replace all occurrences"
+#~ msgid "&All"
+#~ msgstr "&Tot"
+
+#~ msgid "&Skip"
+#~ msgstr "&Ignorar"
+
+#~ msgid "Replace '%1' with '%2'?"
+#~ msgstr "Remplaçar '%1' per '%2' ?"
+
+#~ msgid "No text was replaced."
+#~ msgstr "Cap de tèxt es pas estat remplaçat."
+
+#~ msgid "1 replacement done."
+#~ msgid_plural "%1 replacements done."
+#~ msgstr[0] "%1 remplaçaments faches."
+#~ msgstr[1] "%1 remplaçaments faches."
+
+#~ msgid "Do you want to restart search from the end?"
+#~ msgstr "Volètz tornar començar la recèrca dempuèi lo començament ?"
+
+#~ msgid "Do you want to restart search at the beginning?"
+#~ msgstr "Volètz tornar començar la recèrca dempuèi lo començament ?"
+
+#, fuzzy
+#~ msgctxt "@action:button Restart find & replace"
+#~ msgid "Restart"
+#~ msgstr "Tornar lançar"
+
+#, fuzzy
+#~ msgctxt "@action:button Stop find & replace"
+#~ msgid "Stop"
+#~ msgstr "Arrestar"
+
+#~ msgid ""
+#~ "Your replacement string is referencing a capture greater than '\\%1', "
+#~ msgstr ""
+#~ "Vòstre cadena de remplaçament referencia una captura mai granda que '\\"
+#~ "%1', "
+
+#~ msgid "but your pattern defines no captures."
+#~ msgstr "mas vòstre motiu definís pas cap de captura"
+
+#~ msgid ""
+#~ "\n"
+#~ "Please correct."
+#~ msgstr ""
+#~ "\n"
+#~ "Corregissètz."
+
+#, fuzzy
+#~ msgctxt "@item Font name"
+#~ msgid "Serif"
+#~ msgstr "Serif"
+
+#~ msgctxt "@item Font name"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#~ msgctxt "@item Font name [foundry]"
+#~ msgid "%1 [%2]"
+#~ msgstr "%1 [%2]"
+
+#~ msgctxt "@info:whatsthis"
+#~ msgid "Here you can choose the font to be used."
+#~ msgstr "Podètz causir aicí la poliça de caractèrs d'utilizar."
+
+#~ msgid "Requested Font"
+#~ msgstr "Poliça causida"
+
+#~ msgctxt "@option:check"
+#~ msgid "Font"
+#~ msgstr "Poliça"
+
+#~ msgctxt "@info:whatsthis"
+#~ msgid "Enable this checkbox to change the font family settings."
+#~ msgstr ""
+#~ "Marcatz aquesta opcion per modificar la configuracion de la familha de "
+#~ "poliças."
+
+#~ msgctxt "@info:tooltip"
+#~ msgid "Change font family?"
+#~ msgstr "Cambiar la familha de poliça ?"
+
+#~ msgctxt "@label"
+#~ msgid "Font:"
+#~ msgstr "Poliça :"
+
+#~ msgctxt "@option:check"
+#~ msgid "Font style"
+#~ msgstr "Estil de poliça"
+
+#~ msgctxt "@info:whatsthis"
+#~ msgid "Enable this checkbox to change the font style settings."
+#~ msgstr ""
+#~ "Marcatz aquesta opcion per modificar la configuracion de l'estil de "
+#~ "poliça."
+
+#~ msgctxt "@info:tooltip"
+#~ msgid "Change font style?"
+#~ msgstr "Cambiar l'estil de poliça ?"
+
+#~ msgid "Font style:"
+#~ msgstr "Estil de poliça :"
+
+#~ msgctxt "@option:check"
+#~ msgid "Size"
+#~ msgstr "Talha"
+
+#~ msgctxt "@info:whatsthis"
+#~ msgid "Enable this checkbox to change the font size settings."
+#~ msgstr ""
+#~ "Marcatz aquesta opcion per modificar la configuracion de la talha de "
+#~ "poliça."
+
+#~ msgctxt "@info:tooltip"
+#~ msgid "Change font size?"
+#~ msgstr "Cambiar la talha de poliça ?"
+
+#~ msgctxt "@label:listbox Font size"
+#~ msgid "Size:"
+#~ msgstr "Talha :"
+
+#~ msgctxt "@info:whatsthis"
+#~ msgid "Here you can choose the font family to be used."
+#~ msgstr "Podètz causir aicí la familha de poliça d'utilizar."
+
+#~ msgctxt "@info:whatsthis"
+#~ msgid "Here you can choose the font style to be used."
+#~ msgstr "Podètz causir aicí l'estil de poliça d'utilizar."
+
+#~ msgctxt "@item font"
+#~ msgid "Italic"
+#~ msgstr "Italic"
+
+#~ msgctxt "@item font"
+#~ msgid "Bold"
+#~ msgstr "Gras"
+
+#~ msgctxt "@item font"
+#~ msgid "Bold Italic"
+#~ msgstr "Gras italic"
+
+#~ msgctxt "@item font size"
+#~ msgid "Relative"
+#~ msgstr "Relatiu"
+
+#~ msgid ""
+#~ "Here you can switch between fixed font size and font size to be "
+#~ "calculated dynamically and adjusted to changing environment (e.g. widget "
+#~ "dimensions, paper size)."
+#~ msgstr ""
+#~ "Podètz caplevar aicí entre de poliças de talha fixa e de poliças que la "
+#~ "talha es determinada automaticament e reajustada en foncion de "
+#~ "l'environament (talha dels objèctes, format de papièr)."
+
+#~ msgid "Here you can choose the font size to be used."
+#~ msgstr "Podètz causir aicí la talha de poliça d'utilizar."
+
+#~ msgid ""
+#~ "This sample text illustrates the current settings. You may edit it to "
+#~ "test special characters."
+#~ msgstr ""
+#~ "Aqueste tèxt illustra la configuracion actuala. Lo podètz modificar per "
+#~ "verificar que cèrtes caractèrs especials s'afichan corrèctament."
+
+#~ msgid "Actual Font"
+#~ msgstr "Poliça actuala"
+
+#~ msgctxt "@item Font style"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#, fuzzy
+#~ msgctxt "Numeric IDs of scripts for font previews"
+#~ msgid "1"
+#~ msgstr "1"
+
+#~ msgid "Select Font"
+#~ msgstr "Seleccionar una poliça"
+
+#~ msgid "Choose..."
+#~ msgstr "Causir..."
+
+#~ msgid "Click to select a font"
+#~ msgstr "Clicatz per seleccionar una poliça"
+
+#~ msgid "Preview of the selected font"
+#~ msgstr "Apercebut de la poliça seleccionada"
+
+#~ msgid ""
+#~ "This is a preview of the selected font. You can change it by clicking the "
+#~ "\"Choose...\" button."
+#~ msgstr ""
+#~ "Es un apercebut de la poliça seleccionada. La podètz cambiar en clicant "
+#~ "sul boton « Causir... »."
+
+#~ msgid "Preview of the \"%1\" font"
+#~ msgstr "Apercebut de la poliça « %1 »"
+
+#~ msgid ""
+#~ "This is a preview of the \"%1\" font. You can change it by clicking the "
+#~ "\"Choose...\" button."
+#~ msgstr ""
+#~ "Es un apercebut de la poliça « %1 ». La podètz cambiar en clicant sul "
+#~ "boton « Causir... »."
+
+#~ msgid "Search"
+#~ msgstr "Recercar"
+
+#~ msgid "Stop"
+#~ msgstr "Arrestar"
+
+#~ msgid " %1/s "
+#~ msgstr " %1/s "
+
+#, fuzzy
+#~ msgctxt "%1 is the label, we add a ':' to it"
+#~ msgid "%1:"
+#~ msgstr "%1"
+
+#~ msgid "%2 / %1 folder"
+#~ msgid_plural "%2 / %1 folders"
+#~ msgstr[0] "%2 / %1 repertòris"
+#~ msgstr[1] "%2 / %1 repertòris"
+
+#~ msgid "%2 / %1 file"
+#~ msgid_plural "%2 / %1 files"
+#~ msgstr[0] "%2 / %1 fichièrs"
+#~ msgstr[1] "%2 / %1 fichièrs"
+
+#, fuzzy
+#~ msgid "%1% of %2"
+#~ msgstr "%1 % sus %2 "
+
+#, fuzzy
+#~ msgid "%2% of 1 file"
+#~ msgid_plural "%2% of %1 files"
+#~ msgstr[0] "%2 / %1 fichièrs"
+#~ msgstr[1] "%2 / %1 fichièrs"
+
+#~ msgid "%1%"
+#~ msgstr "%1%"
+
+#, fuzzy
+#~ msgid "%2/s (%3 remaining)"
+#~ msgid_plural "%2/s (%3 remaining)"
+#~ msgstr[0] "%1/s (demòra %2)"
+#~ msgstr[1] "%1/s (demòra %2)"
+
+#~ msgctxt "speed in bytes per second"
+#~ msgid "%1/s"
+#~ msgstr "%1/s"
+
+#~ msgid "%1/s (done)"
+#~ msgstr "%1/s (acabat)"
+
+#, fuzzy
+#~ msgid "&Resume"
+#~ msgstr "Contunhar"
+
+#, fuzzy
+#~ msgid "&Pause"
+#~ msgstr "Pausa"
+
+#, fuzzy
+#~ msgctxt "The source url of a job"
+#~ msgid "Source:"
+#~ msgstr "Sorga :"
+
+#, fuzzy
+#~ msgctxt "The destination url of a job"
+#~ msgid "Destination:"
+#~ msgstr "Destinacion :"
+
+#~ msgid "%1 folder"
+#~ msgid_plural "%1 folders"
+#~ msgstr[0] "%1 repertòris"
+#~ msgstr[1] "%1 repertòris"
+
+#~ msgid "%1 file"
+#~ msgid_plural "%1 files"
+#~ msgstr[0] "%1 fichièrs"
+#~ msgstr[1] "%1 fichièrs"
+
+#, fuzzy
+#~ msgid "Unknown Application"
+#~ msgstr "Quitar l'aplicacion"
+
+#~ msgid "&Minimize"
+#~ msgstr "&Redusir"
+
+#, fuzzy
+#~ msgid "&Restore"
+#~ msgstr "Store"
+
+#~ msgid "<qt>Are you sure you want to quit <b>%1</b>?</qt>"
+#~ msgstr "<qt>Volètz vertadièrament quitar <b>%1</b> ?</qt>"
+
+#~ msgid "Confirm Quit From System Tray"
+#~ msgstr "Confirmar la tampadura dempuèi la bóstia de miniaturas"
+
+#~ msgid "Minimize"
+#~ msgstr "Minimizar"
+
+#~ msgctxt "@title:window"
+#~ msgid "Dr. Klash' Accelerator Diagnosis"
+#~ msgstr "Diagnostic de Dr. Klash pels accelerators"
+
+#~ msgctxt "@action:button"
+#~ msgid "Close"
+#~ msgstr "Tampar"
+
+#~ msgid "Conflict with Global Shortcut"
+#~ msgstr "Conflicte amb los acorchis clavièr globals"
+
+#, fuzzy
+#~ msgid "Conflict With Registered Global Shortcut"
+#~ msgstr "Conflicte amb los acorchis clavièr globals"
+
+#~ msgctxt "@action"
+#~ msgid "Open"
+#~ msgstr "Dobrir"
+
+#~ msgctxt "@action"
+#~ msgid "New"
+#~ msgstr "Novèl"
+
+#~ msgctxt "@action"
+#~ msgid "Close"
+#~ msgstr "Tampar"
+
+#~ msgctxt "@action"
+#~ msgid "Save"
+#~ msgstr "Enregistrar"
+
+#~ msgctxt "@action"
+#~ msgid "Print"
+#~ msgstr "Estampar"
+
+#~ msgctxt "@action"
+#~ msgid "Quit"
+#~ msgstr "Quitar"
+
+#~ msgctxt "@action"
+#~ msgid "Undo"
+#~ msgstr "Anullar"
+
+#~ msgctxt "@action"
+#~ msgid "Redo"
+#~ msgstr "Tornar far"
+
+#~ msgctxt "@action"
+#~ msgid "Cut"
+#~ msgstr "Talhar"
+
+#~ msgctxt "@action"
+#~ msgid "Copy"
+#~ msgstr "Copiar"
+
+#~ msgctxt "@action"
+#~ msgid "Paste"
+#~ msgstr "Pegar"
+
+#~ msgctxt "@action"
+#~ msgid "Paste Selection"
+#~ msgstr "Pegar la seleccion"
+
+#~ msgctxt "@action"
+#~ msgid "Select All"
+#~ msgstr "Tot seleccionar"
+
+#~ msgctxt "@action"
+#~ msgid "Find"
+#~ msgstr "Recercar"
+
+#~ msgctxt "@action"
+#~ msgid "Find Next"
+#~ msgstr "Recercar lo seguent"
+
+#~ msgctxt "@action"
+#~ msgid "Replace"
+#~ msgstr "Remplaçar"
+
+#~ msgctxt "@action Go to main page"
+#~ msgid "Home"
+#~ msgstr "Repertòri personal"
+
+#~ msgctxt "@action End of document"
+#~ msgid "End"
+#~ msgstr "Fin"
+
+#~ msgctxt "@action Opposite to Prior"
+#~ msgid "Next"
+#~ msgstr "Seguent"
+
+#~ msgctxt "@action"
+#~ msgid "Up"
+#~ msgstr "Amont"
+
+#~ msgctxt "@action"
+#~ msgid "Back"
+#~ msgstr "Precedent"
+
+#~ msgctxt "@action"
+#~ msgid "Forward"
+#~ msgstr "Trasmetre"
+
+#~ msgctxt "@action"
+#~ msgid "Reload"
+#~ msgstr "Tornar cargar"
+
+#~ msgctxt "@action"
+#~ msgid "End of Line"
+#~ msgstr "Fin de linha"
+
+#~ msgctxt "@action"
+#~ msgid "Go to Line"
+#~ msgstr "Anar a la linha"
+
+#~ msgctxt "@action"
+#~ msgid "Backward Word"
+#~ msgstr "Color de fons"
+
+#~ msgctxt "@action"
+#~ msgid "Forward Word"
+#~ msgstr "Mot seguent"
+
+#~ msgctxt "@action"
+#~ msgid "Add Bookmark"
+#~ msgstr "Apondre un favorit"
+
+#~ msgctxt "@action"
+#~ msgid "Zoom In"
+#~ msgstr "Agrandir lo zoom"
+
+#~ msgctxt "@action"
+#~ msgid "Zoom Out"
+#~ msgstr "Reduire el zoom"
+
+#~ msgctxt "@action"
+#~ msgid "Activate Next Tab"
+#~ msgstr "Activar l'onglet seguent"
+
+#~ msgctxt "@action"
+#~ msgid "Activate Previous Tab"
+#~ msgstr "Activar l'onglet precedent"
+
+#~ msgctxt "@action"
+#~ msgid "Help"
+#~ msgstr "Ajuda"
+
+#~ msgctxt "@action"
+#~ msgid "What's This"
+#~ msgstr "Qu'es aquò ?"
+
+#~ msgctxt "@action"
+#~ msgid "Text Completion"
+#~ msgstr "Autocomplètament de tèxt"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Open Recent"
+#~ msgstr "Dobert(s) &Recentament"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Save As"
+#~ msgstr "Enregistrar coma"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Revert"
+#~ msgstr "Suprimir"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Print Preview"
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Mail"
+#~ msgstr "Corrièl"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Clear"
+#~ msgstr "Netejar"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Actual Size"
+#~ msgstr "Poliça actuala"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Fit To Page"
+#~ msgstr "&Primièra pagina"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Zoom"
+#~ msgstr "Zoom"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Goto Page"
+#~ msgstr "Pausa"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Document Back"
+#~ msgstr "Encodatge del document :"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Document Forward"
+#~ msgstr "Trasmetre"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Edit Bookmarks"
+#~ msgstr "&Modificar los favorits"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Spelling"
+#~ msgstr "Verificar l'ortografia"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Show Toolbar"
+#~ msgstr "Afic&har la barra d'espleches"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Show Statusbar"
+#~ msgstr "Afichar la barra d'est&at"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Save Options"
+#~ msgstr "Opcions"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Configure Toolbars"
+#~ msgstr "Configurar las barras d'espleches"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Configure Notifications"
+#~ msgstr "Configurar los acorchis clavièr"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Tip Of Day"
+#~ msgstr "Astúcia del jorn"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Report Bug"
+#~ msgstr "&Rapòrt de bòg..."
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Switch Application Language"
+#~ msgstr "definís lo nom del logicial"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "About Application"
+#~ msgstr "Quitar l'aplicacion"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "About KDE"
+#~ msgstr "A prepaus de KDE"
+
+#~ msgctxt "@title:window"
+#~ msgid "Check Spelling"
+#~ msgstr "Verificar l'ortografia"
+
+#~ msgctxt "@action:button"
+#~ msgid "&Finished"
+#~ msgstr "&Acabat"
+
+#~ msgid "Backspace"
+#~ msgstr "Retorn enrèire"
+
+#~ msgid "Again"
+#~ msgstr "Tornamai"
+
+#~ msgid "Undo"
+#~ msgstr "Anullar"
+
+#~ msgid "Copy"
+#~ msgstr "Copiar"
+
+#~ msgid "Open"
+#~ msgstr "Dobrir"
+
+#~ msgid "Paste"
+#~ msgstr "Pegar"
+
+#~ msgid "Find"
+#~ msgstr "Recercar"
+
+#~ msgid "Cut"
+#~ msgstr "Talhar"
+
+#~ msgid "&OK"
+#~ msgstr "&Validar"
+
+#~ msgid "&Cancel"
+#~ msgstr "&Anullar"
+
+#~ msgid "&Yes"
+#~ msgstr "&Òc"
+
+#~ msgid "Yes"
+#~ msgstr "Òc"
+
+#~ msgid "&No"
+#~ msgstr "&Non"
+
+#~ msgid "No"
+#~ msgstr "Non"
+
+#~ msgid "&Discard"
+#~ msgstr "&Abandonar"
+
+#~ msgid "Discard changes"
+#~ msgstr "Abandonar las modificacions"
+
+#, fuzzy
+#~ msgid ""
+#~ "Pressing this button will discard all recent changes made in this dialog."
+#~ msgstr ""
+#~ "Un clic sus aqueste boton entraïnarà l'anullacion de totas las "
+#~ "modificacions recentas efectuadas dins aquesta bóstia de dialòg."
+
+#~ msgid "Save data"
+#~ msgstr "Enregistrar las donadas"
+
+#~ msgid "&Do Not Save"
+#~ msgstr "&Enregistrar pas"
+
+#~ msgid "Save file with another name"
+#~ msgstr "Enregistrar lo fichièr jos un autre nom"
+
+#~ msgid "&Apply"
+#~ msgstr "&Aplicar"
+
+#~ msgid "Apply changes"
+#~ msgstr "Aplicar las modificacions"
+
+#, fuzzy
+#~ msgid ""
+#~ "When you click <b>Apply</b>, the settings will be handed over to the "
+#~ "program, but the dialog will not be closed.\n"
+#~ "Use this to try different settings."
+#~ msgstr ""
+#~ "En clicant sus <b>Aplicar</b>, los paramètres seràn transmeses al "
+#~ "programa mas la bóstia de dialòg demorarà doberta.\n"
+#~ "D'utilizar per ensajar diferents paramètres."
+
+#~ msgid "Administrator &Mode..."
+#~ msgstr "&Mòde administrator..."
+
+#~ msgid "Enter Administrator Mode"
+#~ msgstr "Entrar dins lo mòde administrator"
+
+#, fuzzy
+#~ msgid ""
+#~ "When you click <b>Administrator Mode</b> you will be prompted for the "
+#~ "administrator (root) password in order to make changes which require root "
+#~ "privileges."
+#~ msgstr ""
+#~ "Se clicatz sus <b>Mòde administrator</b>, lo senhal d'administrator "
+#~ "(root) vos serà demandat, per efectuar las modificacions necessitant los "
+#~ "privilègis del superutilizaire."
+
+#~ msgid "Clear input"
+#~ msgstr "Escafar la picada"
+
+#~ msgid "Clear the input in the edit field"
+#~ msgstr "Escafar la picada dins lo camp d'edicion"
+
+#~ msgid "Show help"
+#~ msgstr "Afichar l'ajuda"
+
+#~ msgid "Close the current window or document"
+#~ msgstr "Tampar la fenèstra o lo document actual"
+
+#, fuzzy
+#~ msgid "&Close Window"
+#~ msgstr "Tampar la fenèstra ?"
+
+#, fuzzy
+#~ msgid "Close the current window."
+#~ msgstr "Tampar la fenèstra o lo document actual"
+
+#, fuzzy
+#~ msgid "&Close Document"
+#~ msgstr "Tampar lo document"
+
+#, fuzzy
+#~ msgid "Close the current document."
+#~ msgstr "Tampar la fenèstra o lo document actual"
+
+#~ msgid "&Defaults"
+#~ msgstr "Per &defaut"
+
+#~ msgid "Reset all items to their default values"
+#~ msgstr "Reïnicializar totes los elements a lor valor per defaut"
+
+#~ msgid "Go back one step"
+#~ msgstr "Recuolar d'una etapa"
+
+#~ msgid "Go forward one step"
+#~ msgstr "Avançar d'una etapa"
+
+#~ msgid "Opens the print dialog to print the current document"
+#~ msgstr "Dobrís la fenèstra d'impression per imprimir lo document en cors"
+
+#~ msgid "C&ontinue"
+#~ msgstr "C&ontunhar"
+
+#~ msgid "Continue operation"
+#~ msgstr "Perseguir l'operacion"
+
+#~ msgid "&Delete"
+#~ msgstr "&Suprimir"
+
+#~ msgid "Delete item(s)"
+#~ msgstr "Escafar lo(s) fichièr(s)"
+
+#~ msgid "Open file"
+#~ msgstr "Dobrir un fichièr"
+
+#~ msgid "&Reset"
+#~ msgstr "&Reïnicializar"
+
+#~ msgid "Reset configuration"
+#~ msgstr "Reïnicializar la configuracion"
+
+#~ msgctxt "Verb"
+#~ msgid "&Insert"
+#~ msgstr "&Inserir"
+
+#~ msgid "Confi&gure..."
+#~ msgstr "Confi&gurar..."
+
+#~ msgid "Add"
+#~ msgstr "Apondre"
+
+#~ msgid "Test"
+#~ msgstr "Tèst"
+
+#~ msgid "Properties"
+#~ msgstr "Propietats"
+
+#~ msgid "&Overwrite"
+#~ msgstr "&Espotir"
+
+#~ msgid "Redo"
+#~ msgstr "Tornar far"
+
+#~ msgid "&Available:"
+#~ msgstr "&Disponible :"
+
+#~ msgid "&Selected:"
+#~ msgstr "&Seleccionat :"
+
+#~ msgctxt "KCharSelect section name"
+#~ msgid "Symbols"
+#~ msgstr "Simbòls"
+
+#~ msgctxt "KCharSelect section name"
+#~ msgid "Other"
+#~ msgstr "Autre"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Basic Latin"
+#~ msgstr "Latin basic"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Cyrillic"
+#~ msgstr "Cirillic"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Armenian"
+#~ msgstr "Armenian"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Hebrew"
+#~ msgstr "Ebrèu"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Arabic"
+#~ msgstr "Arab"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Syriac"
+#~ msgstr "Serbian"
+
+#, fuzzy
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Samaritan"
+#~ msgstr "Ramadan"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Bengali"
+#~ msgstr "Bengalí"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Gurmukhi"
+#~ msgstr "Gurmukhi"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Gujarati"
+#~ msgstr "Gujarati"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Oriya"
+#~ msgstr "Oriyà"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Tamil"
+#~ msgstr "Tamil"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Telugu"
+#~ msgstr "Telugu"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Kannada"
+#~ msgstr "Kannadà"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Malayalam"
+#~ msgstr "Malayalam"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Thai"
+#~ msgstr "Tailandés"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Lao"
+#~ msgstr "Laossian"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Tibetan"
+#~ msgstr "Tibetan"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Myanmar"
+#~ msgstr "Panama"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Georgian"
+#~ msgstr "Georgian"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Ethiopic"
+#~ msgstr "Etiopian"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Cherokee"
+#~ msgstr "Cherokí"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Runic"
+#~ msgstr "Runic"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Tagalog"
+#~ msgstr "Tagalog"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Khmer"
+#~ msgstr "Khmer"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Mongolian"
+#~ msgstr "Mongolian"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Limbu"
+#~ msgstr "Litua"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Buginese"
+#~ msgstr "Chinès"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Balinese"
+#~ msgstr "Balinés"
+
+#, fuzzy
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Sundanese"
+#~ msgstr "Dimenge"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Arrows"
+#~ msgstr "Flèchas"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Coptic"
+#~ msgstr "Còpt"
+
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "CJK Compatibility"
+#~ msgstr "CJK Compatibilitat"
+
+#, fuzzy
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Lisu"
+#~ msgstr "Litua"
+
+#, fuzzy
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Bamum"
+#~ msgstr "Tamuz"
+
+#, fuzzy
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Javanese"
+#~ msgstr "Japonés"
+
+#, fuzzy
+#~ msgctxt "KCharselect unicode block name"
+#~ msgid "Cham"
+#~ msgstr "Kha"
+
+#, fuzzy
+#~ msgctxt "Goes to previous character"
+#~ msgid "Previous in History"
+#~ msgstr "mes passat"
+
+#, fuzzy
+#~ msgid "Previous Character in History"
+#~ msgstr "An passat"
+
+#, fuzzy
+#~ msgctxt "Goes to next character"
+#~ msgid "Next in History"
+#~ msgstr "Escafar l'&istoric"
+
+#, fuzzy
+#~ msgid "Next Character in History"
+#~ msgstr "Jòc de caractèrs"
+
+#~ msgid "Name: "
+#~ msgstr "Nom : "
+
+#~ msgid "Notes:"
+#~ msgstr "Nòtas :"
+
+#~ msgid "General Character Properties"
+#~ msgstr "Propietats generalas del caractèr"
+
+#~ msgid "UTF-8:"
+#~ msgstr "UTF-8 :"
+
+#, fuzzy
+#~ msgid "You are not allowed to save the configuration"
+#~ msgstr "Volètz tornar cargar la configuracion de KDE ?"
+
+#, fuzzy
+#~ msgctxt "@option next year"
+#~ msgid "Next Year"
+#~ msgstr "An que ven"
+
+#, fuzzy
+#~ msgctxt "@option next month"
+#~ msgid "Next Month"
+#~ msgstr "Mes que ven"
+
+#, fuzzy
+#~ msgctxt "@option next week"
+#~ msgid "Next Week"
+#~ msgstr "An que ven"
+
+#, fuzzy
+#~ msgctxt "@option today"
+#~ msgid "Today"
+#~ msgstr "Uèi"
+
+#, fuzzy
+#~ msgctxt "@option yesterday"
+#~ msgid "Yesterday"
+#~ msgstr "Ièr"
+
+#, fuzzy
+#~ msgctxt "@option last week"
+#~ msgid "Last Week"
+#~ msgstr "&Darrièra pagina"
+
+#, fuzzy
+#~ msgctxt "@option last month"
+#~ msgid "Last Month"
+#~ msgstr "Mes que ven"
+
+#, fuzzy
+#~ msgctxt "@option last year"
+#~ msgid "Last Year"
+#~ msgstr "&Darrièra pagina"
+
+#, fuzzy
+#~ msgctxt "@option do not specify a date"
+#~ msgid "No Date"
+#~ msgstr "Per data"
+
+#~ msgid "Week %1"
+#~ msgstr "Setmana %1"
+
+#~ msgid "Next year"
+#~ msgstr "An que ven"
+
+#~ msgid "Previous year"
+#~ msgstr "An passat"
+
+#~ msgid "Next month"
+#~ msgstr "Mes que ven"
+
+#~ msgid "Previous month"
+#~ msgstr "mes passat"
+
+#~ msgid "Select a week"
+#~ msgstr "Seleccionatz una setmana"
+
+#~ msgid "Select a month"
+#~ msgstr "Seleccionatz un mes"
+
+#~ msgid "Select a year"
+#~ msgstr "Seleccionatz una annada"
+
+#~ msgid "Select the current day"
+#~ msgstr "Seleccionatz lo jorn actual"
+
+#, fuzzy
+#~ msgctxt "No specific time zone"
+#~ msgid "Floating"
+#~ msgstr "Aviada de %1"
+
+#~ msgid "Move &Up"
+#~ msgstr "&Pujar"
+
+#~ msgid "Move &Down"
+#~ msgstr "&Davalar"
+
+#~ msgid "&Help"
+#~ msgstr "&Ajuda"
+
+#~ msgid "Clear &History"
+#~ msgstr "Escafar l'&istoric"
+
+#, fuzzy
+#~ msgid "No further items in the history."
+#~ msgstr "Pas d'element seguent dins l'istoric."
+
+#, fuzzy
+#~ msgctxt "%1 is the number of shortcuts with which there is a conflict"
+#~ msgid "Conflict with Registered Global Shortcut"
+#~ msgid_plural "Conflict with Registered Global Shortcuts"
+#~ msgstr[0] "Conflicte amb los acorchis clavièr globals"
+#~ msgstr[1] "Conflicte amb los acorchis clavièr globals"
+
+#, fuzzy
+#~ msgctxt "%1 is the number of conflicts"
+#~ msgid "Shortcut Conflict"
+#~ msgid_plural "Shortcut Conflicts"
+#~ msgstr[0] "Acorchis"
+#~ msgstr[1] "Acorchis"
+
+#, fuzzy
+#~ msgid "Shortcut '%1' for action '%2'\n"
+#~ msgstr "Acorchis"
+
+#, fuzzy
+#~ msgctxt "%1 is the number of ambigious shortcut clashes (hidden)"
+#~ msgid ""
+#~ "The \"%2\" shortcut is ambiguous with the following shortcut.\n"
+#~ "Do you want to assign an empty shortcut to this action?\n"
+#~ "%3"
+#~ msgid_plural ""
+#~ "The \"%2\" shortcut is ambiguous with the following shortcuts.\n"
+#~ "Do you want to assign an empty shortcut to these actions?\n"
+#~ "%3"
+#~ msgstr[0] ""
+#~ "La combinason de tòcas « %1 » ja es associada a l'accion «%2».\n"
+#~ "La volètz reassignar d'aquesta cap a l'accion correnta ?"
+#~ msgstr[1] ""
+#~ "La combinason de tòcas « %1 » ja es associada a l'accion «%2».\n"
+#~ "La volètz reassignar d'aquesta cap a l'accion correnta ?"
+
+#, fuzzy
+#~ msgid "Reserved Shortcut"
+#~ msgstr "Acorchi"
+
+#~ msgid "Conflict with Standard Application Shortcut"
+#~ msgstr "Conflicte amb un acorchi clavièr d'aplicacion estandarda"
+
+#~ msgctxt "What the user inputs now will be taken as the new shortcut"
+#~ msgid "Input"
+#~ msgstr "Entrada"
+
+#, fuzzy
+#~ msgctxt "Italic placeholder text in line edits: 0 no, 1 yes"
+#~ msgid "1"
+#~ msgstr "1"
+
+#, fuzzy
+#~ msgctxt "@title:menu"
+#~ msgid "Text Completion"
+#~ msgstr "Autocomplètament de tèxt"
+
+#, fuzzy
+#~ msgctxt "@item:inmenu Text Completion"
+#~ msgid "None"
+#~ msgstr "Pas cap"
+
+#, fuzzy
+#~ msgctxt "@item:inmenu Text Completion"
+#~ msgid "Manual"
+#~ msgstr "Manual"
+
+#, fuzzy
+#~ msgctxt "@item:inmenu Text Completion"
+#~ msgid "Automatic"
+#~ msgstr "Automatic"
+
+#~ msgctxt "@item:inmenu Text Completion"
+#~ msgid "Dropdown List"
+#~ msgstr "Tièra desenrotlanta"
+
+#, fuzzy
+#~ msgctxt "@item:inmenu Text Completion"
+#~ msgid "Short Automatic"
+#~ msgstr "Automatic cort"
+
+#~ msgctxt "@item:inmenu Text Completion"
+#~ msgid "Dropdown List && Automatic"
+#~ msgstr "Tièra desenrotlanta e automatica"
+
+#, fuzzy
+#~ msgctxt "@item:inmenu Text Completion"
+#~ msgid "Default"
+#~ msgstr "Defaut"
+
+#~ msgid "Image Operations"
+#~ msgstr "Operacions d'imatge"
+
+#~ msgid "&Rotate Clockwise"
+#~ msgstr "&Rotacion orària"
+
+#~ msgid "Rotate &Counterclockwise"
+#~ msgstr "Rotacion &antiorària"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Text &Color..."
+#~ msgstr "Seleccionar una color"
+
+#, fuzzy
+#~ msgctxt "@label stroke color"
+#~ msgid "Color"
+#~ msgstr "Color"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "&Font"
+#~ msgstr "&Pagina"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Font &Size"
+#~ msgstr "Talhas de las icònas"
+
+#, fuzzy
+#~ msgctxt "@action boldify selected text"
+#~ msgid "&Bold"
+#~ msgstr "Gras"
+
+#, fuzzy
+#~ msgctxt "@action italicize selected text"
+#~ msgid "&Italic"
+#~ msgstr "Italic"
+
+#~ msgctxt "@action underline selected text"
+#~ msgid "&Underline"
+#~ msgstr "&Soslinhar"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "&Strike Out"
+#~ msgstr "Sortir"
+
+#, fuzzy
+#~ msgctxt "@label left justify"
+#~ msgid "Left"
+#~ msgstr "Esquèrra"
+
+#, fuzzy
+#~ msgctxt "@label center justify"
+#~ msgid "Center"
+#~ msgstr "Centre"
+
+#, fuzzy
+#~ msgctxt "@label right justify"
+#~ msgid "Right"
+#~ msgstr "Drecha"
+
+#, fuzzy
+#~ msgctxt "@item:inmenu no list style"
+#~ msgid "None"
+#~ msgstr "Pas cap"
+
+#~ msgctxt "@item:inmenu disc list style"
+#~ msgid "Disc"
+#~ msgstr "es"
+
+#, fuzzy
+#~ msgctxt "@item:inmenu circle list style"
+#~ msgid "Circle"
+#~ msgstr "Cercle"
+
+#, fuzzy
+#~ msgctxt "@item:inmenu square list style"
+#~ msgid "Square"
+#~ msgstr "Carrat"
+
+#, fuzzy
+#~ msgctxt "@item:inmenu lowercase abc lists"
+#~ msgid "abc"
+#~ msgstr "abc"
+
+#~ msgctxt "@action"
+#~ msgid "Increase Indent"
+#~ msgstr "Aumentar l'alinèa"
+
+#~ msgctxt "@action"
+#~ msgid "Decrease Indent"
+#~ msgstr "Reduire l'alinèa"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Link"
+#~ msgstr "Ligam"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Subscript"
+#~ msgstr "S'inscriure"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "Superscript"
+#~ msgstr "Descripcion"
+
+#, fuzzy
+#~ msgid "Nothing to spell check."
+#~ msgstr "Res a suprimir"
+
+#, fuzzy
+#~ msgid "Speak Text"
+#~ msgstr "Tèxt :"
+
+#, fuzzy
+#~ msgctxt "Define an area in the time zone, like a town area"
+#~ msgid "Area"
+#~ msgstr "Crear"
+
+#, fuzzy
+#~ msgctxt "Time zone"
+#~ msgid "Region"
+#~ msgstr "Region"
+
+#~ msgid "Comment"
+#~ msgstr "Comentari"
+
+#, fuzzy
+#~ msgctxt "@title:menu"
+#~ msgid "Show Text"
+#~ msgstr "Afichar l'ajuda"
+
+#, fuzzy
+#~ msgctxt "@title:menu"
+#~ msgid "Toolbar Settings"
+#~ msgstr "Menut de la barra d'espleches"
+
+#, fuzzy
+#~ msgctxt "Toolbar orientation"
+#~ msgid "Orientation"
+#~ msgstr "Orientacion"
+
+#~ msgctxt "toolbar position string"
+#~ msgid "Top"
+#~ msgstr "Superior"
+
+#~ msgctxt "toolbar position string"
+#~ msgid "Left"
+#~ msgstr "Esquèrra"
+
+#~ msgctxt "toolbar position string"
+#~ msgid "Right"
+#~ msgstr "Drecha"
+
+#~ msgctxt "toolbar position string"
+#~ msgid "Bottom"
+#~ msgstr "Inferior"
+
+#~ msgid "Text Position"
+#~ msgstr "Posicion del tèxt"
+
+#~ msgid "Icons Only"
+#~ msgstr "Sonque icònas"
+
+#~ msgid "Text Only"
+#~ msgstr "Sonque tèxt"
+
+#~ msgid "Text Alongside Icons"
+#~ msgstr "Tèxt contra las icònas"
+
+#~ msgid "Text Under Icons"
+#~ msgstr "Tèxt jos las icònas"
+
+#~ msgid "Icon Size"
+#~ msgstr "Talhas de las icònas"
+
+#, fuzzy
+#~ msgctxt "@item:inmenu Icon size"
+#~ msgid "Default"
+#~ msgstr "Defaut"
+
+#~ msgid "Small (%1x%2)"
+#~ msgstr "Pichona (%1x%2)"
+
+#~ msgid "Medium (%1x%2)"
+#~ msgstr "Mejana (%1x%2)"
+
+#~ msgid "Large (%1x%2)"
+#~ msgstr "Granda (%1x%2)"
+
+#~ msgid "Huge (%1x%2)"
+#~ msgstr "Enòrme (%1x%2)"
+
+#~ msgctxt "@action:intoolbar Text label of toolbar button"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#~ msgctxt "@info:tooltip Tooltip of toolbar button"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#~ msgid "Desktop %1"
+#~ msgstr "Burèu %1"
+
+#, fuzzy
+#~ msgid "Toolbars Shown"
+#~ msgstr "Barras d'espleches"
+
+#~ msgid "&File"
+#~ msgstr "&Fichièr"
+
+#~ msgid "&Game"
+#~ msgstr "&Jòc"
+
+#~ msgid "&Edit"
+#~ msgstr "&Edicion"
+
+#~ msgctxt "@title:menu Game move"
+#~ msgid "&Move"
+#~ msgstr "&Desplaçar"
+
+#~ msgid "&View"
+#~ msgstr "Aficha&tge"
+
+#~ msgid "&Go"
+#~ msgstr "&Anar"
+
+#~ msgid "&Bookmarks"
+#~ msgstr "&Favorits"
+
+#~ msgid "&Tools"
+#~ msgstr "&Espleches"
+
+#~ msgid "&Settings"
+#~ msgstr "&Paramètres"
+
+#~ msgid "Main Toolbar"
+#~ msgstr "Barra d'espleches principala"
+
+#~ msgid "Builds Qt widget plugins from an ini style description file."
+#~ msgstr ""
+#~ "Construsís los moduls extèrnes grafics de QT a partir d'un fichièr de "
+#~ "descripcion d'estil ini."
+
+#~ msgid "Input file"
+#~ msgstr "Fichièr d'entrada"
+
+#~ msgid "Output file"
+#~ msgstr "Fichièr de sortida"
+
+#~ msgid "Name of the plugin class to generate"
+#~ msgstr "Nom de la classa de moduls extèrnes de generar"
+
+#~ msgid "Default widget group name to display in designer"
+#~ msgstr "Nom de grop d'elements grafics per defaut d'afichar dins designer"
+
+#~ msgid "makekdewidgets"
+#~ msgstr "Integrar de pixmaps a partir d'un dorsièr-font"
+
+#~ msgid "Daniel Molkentin"
+#~ msgstr "Daniel Molkentin"
+
+#~ msgid "Call Stack"
+#~ msgstr "Rampèl d'empilada"
+
+#~ msgid "Line"
+#~ msgstr "Linha"
+
+#~ msgid "Console"
+#~ msgstr "Consòla"
+
+#~ msgid "JavaScript Debugger"
+#~ msgstr "Desbogaire Javascript"
+
+#~ msgid "&Break at Next Statement"
+#~ msgstr "&Interrompre a l'instruccion venenta"
+
+#~ msgid "Continue"
+#~ msgstr "Contunhar"
+
+#~ msgid "Step Over"
+#~ msgstr "Step Over"
+
+#~ msgid "Step Into"
+#~ msgstr "Step Into"
+
+#~ msgid "Step Out"
+#~ msgstr "Sortir"
+
+#, fuzzy
+#~ msgid "Report Exceptions"
+#~ msgstr "Accion"
+
+#~ msgid "Ready"
+#~ msgstr "Prèst"
+
+#~ msgid "Parse error at %1 line %2"
+#~ msgstr "Error de sintaxi dins %1 linha %2"
+
+#~ msgid ""
+#~ "An error occurred while attempting to run a script on this page.\n"
+#~ "\n"
+#~ "%1 line %2:\n"
+#~ "%3"
+#~ msgstr ""
+#~ "Un problèma es subrevengut en ensajant d'aviar un escript sus aquesta "
+#~ "pagina.\n"
+#~ "\n"
+#~ "%1 linha %2 :\n"
+#~ "%3"
+
+#~ msgid "JavaScript Error"
+#~ msgstr "Error JavaScript"
+
+#~ msgid "&Do not show this message again"
+#~ msgstr "Afichar &pas mai lo messatge"
+
+#~ msgid "Reference"
+#~ msgstr "Preferéncias"
+
+#, fuzzy
+#~ msgid ""
+#~ "A script on this page is causing KHTML to freeze. If it continues to run, "
+#~ "other applications may become less responsive.\n"
+#~ "Do you want to stop the script?"
+#~ msgstr ""
+#~ "Un escript sus aquesta pagina entraïna lo gèl de KHTML. Se contunha de "
+#~ "s'executar, d'autras aplicacions pòdon venir mens receptivas.\n"
+#~ "Volètz interrompre l'escript ?"
+
+#~ msgid "JavaScript"
+#~ msgstr "JavaScript"
+
+#, fuzzy
+#~ msgid "&Stop Script"
+#~ msgstr "Descripcion"
+
+#~ msgid "Confirmation: JavaScript Popup"
+#~ msgstr "Confirmacion : Fenèstra Javascript novèla"
+
+#~ msgid ""
+#~ "This site is submitting a form which will open up a new browser window "
+#~ "via JavaScript.\n"
+#~ "Do you want to allow the form to be submitted?"
+#~ msgstr ""
+#~ "Aqueste sit somet un formulari que dobrirà una fenèstra de navegaire "
+#~ "novèla via JavaScript.\n"
+#~ "Volètz autorizar la somission del formulari ?"
+
+#~ msgid ""
+#~ "<qt>This site is submitting a form which will open <p>%1</p> in a new "
+#~ "browser window via JavaScript.<br />Do you want to allow the form to be "
+#~ "submitted?</qt>"
+#~ msgstr ""
+#~ "<qt>Aqueste sit somet un formulari qu'ensaja de dobrir <p>%1</p> dins una "
+#~ "fenèstra de navigacion novèla amb Javascript.<br />Volètz autorizar la "
+#~ "somission del formulari ?</qt>"
+
+#~ msgid "Allow"
+#~ msgstr "Autorizar"
+
+#~ msgid "Do Not Allow"
+#~ msgstr "Autorizar pas"
+
+#~ msgid ""
+#~ "This site is requesting to open up a new browser window via JavaScript.\n"
+#~ "Do you want to allow this?"
+#~ msgstr ""
+#~ "Aqueste site ensaja de dobrir una fenèstra del navegaire amb Javascript.\n"
+#~ "L'i volètz autorizar ?"
+
+#~ msgid ""
+#~ "<qt>This site is requesting to open<p>%1</p>in a new browser window via "
+#~ "JavaScript.<br />Do you want to allow this?</qt>"
+#~ msgstr ""
+#~ "<qt>Aqueste sit ensaja de dobrir <p>%1</p>dins una fenèstra de navigacion "
+#~ "novèla amb Javascript.<br />L'i volètz autorizar ?</qt>"
+
+#~ msgid "Close window?"
+#~ msgstr "Tampar la fenèstra ?"
+
+#~ msgid "Confirmation Required"
+#~ msgstr "Confirmacion necessària"
+
+#~ msgid ""
+#~ "Do you want a bookmark pointing to the location \"%1\" to be added to "
+#~ "your collection?"
+#~ msgstr ""
+#~ "Volètz apondre un marcapagina puntant vèrs l'emplaçament « %1 » a vòstra "
+#~ "colleccion ?"
+
+#~ msgid ""
+#~ "Do you want a bookmark pointing to the location \"%1\" titled \"%2\" to "
+#~ "be added to your collection?"
+#~ msgstr ""
+#~ "Volètz apondre un marcapagina puntant vèrs l'emplaçament « %1 » e "
+#~ "intitolat « %2 » a vòstra colleccion ?"
+
+#~ msgid "JavaScript Attempted Bookmark Insert"
+#~ msgstr "Temptativa d'insercion de signet JavaScript"
+
+#~ msgid "Insert"
+#~ msgstr "Inserir"
+
+#~ msgid "Disallow"
+#~ msgstr "Desactivar"
+
+#~ msgid ""
+#~ "The following files will not be uploaded because they could not be "
+#~ "found.\n"
+#~ "Do you want to continue?"
+#~ msgstr ""
+#~ "Los fichièrs seguents seràn pas mandats perque an pas pogut èsser "
+#~ "trobats.\n"
+#~ "Volètz contunhar ?"
+
+#~ msgid "Submit Confirmation"
+#~ msgstr "Mandar una confirmacion"
+
+#~ msgid "&Submit Anyway"
+#~ msgstr "&Sometre çaquelà"
+
+#~ msgid "Send Confirmation"
+#~ msgstr "Mandar una confirmacion"
+
+#, fuzzy
+#~ msgid "&Send File"
+#~ msgid_plural "&Send Files"
+#~ msgstr[0] "&Mandar los fichièrs"
+#~ msgstr[1] "&Mandar los fichièrs"
+
+#~ msgid "Submit"
+#~ msgstr "Sometre"
+
+#~ msgid ""
+#~ "No plugin found for '%1'.\n"
+#~ "Do you want to download one from %2?"
+#~ msgstr ""
+#~ "Cap de modul extèrn pas trobat per «%1».\n"
+#~ "Ne volètz telecargar un dempuèi %2 ?"
+
+#~ msgid "Missing Plugin"
+#~ msgstr "Modul extèrn mancant"
+
+#~ msgid "Download"
+#~ msgstr "Telecargar"
+
+#~ msgid "Do Not Download"
+#~ msgstr "Telecargar pas"
+
+#~ msgid "This is a searchable index. Enter search keywords: "
+#~ msgstr "Aquò es un indèx de recèrca. Picatz los mots claus de la recèrca : "
+
+#~ msgid "Document Information"
+#~ msgstr "Document d'informacion"
+
+#, fuzzy
+#~ msgctxt "@title:group Document information"
+#~ msgid "General"
+#~ msgstr "General"
+
+#~ msgid "URL:"
+#~ msgstr "URL :"
+
+#~ msgid "Title:"
+#~ msgstr "Títol:"
+
+#~ msgid "Last modified:"
+#~ msgstr "Darrièra modificacion :"
+
+#~ msgid "Document encoding:"
+#~ msgstr "Encodatge del document :"
+
+#~ msgid "HTTP Headers"
+#~ msgstr "Entèstas HTTP"
+
+#~ msgid "Property"
+#~ msgstr "Propietat"
+
+#~ msgid "Initializing Applet \"%1\"..."
+#~ msgstr "Inicializacion de l'applet « %1 »..."
+
+#~ msgid "Starting Applet \"%1\"..."
+#~ msgstr "Aviada de l'applet « %1 »..."
+
+#~ msgid "Applet \"%1\" started"
+#~ msgstr "Applet « %1 » aviada"
+
+#~ msgid "Applet \"%1\" stopped"
+#~ msgstr "Applet « %1 » arrestada"
+
+#~ msgid "Loading Applet"
+#~ msgstr "Cargament de l'applet"
+
+#~ msgid "Error: java executable not found"
+#~ msgstr "Problèma : impossible de trober l'executable java"
+
+#~ msgid "Security Alert"
+#~ msgstr "Alèrta de seguretat"
+
+#~ msgid "Do you grant Java applet with certificate(s):"
+#~ msgstr "Acceptatz los applets Java amb de certificats :"
+
+#~ msgid "the following permission"
+#~ msgstr "la permission seguenta"
+
+#~ msgid "&Reject All"
+#~ msgstr "&Refusar tot"
+
+#~ msgid "&Grant All"
+#~ msgstr "&Autorizar tot"
+
+#~ msgid "Applet Parameters"
+#~ msgstr "Paramètres de l'applet"
+
+#~ msgid "Parameter"
+#~ msgstr "Paramètre"
+
+#~ msgid "Class"
+#~ msgstr "Classa"
+
+#~ msgid "Base URL"
+#~ msgstr "URL de basa"
+
+#~ msgid "Archives"
+#~ msgstr "Archius"
+
+#~ msgid "KDE Java Applet Plugin"
+#~ msgstr "Modul d'applet Java de KDE"
+
+#~ msgid "HTML Toolbar"
+#~ msgstr "Barra d'espleches HTML"
+
+#~ msgid "&Copy Text"
+#~ msgstr "&Copiar lo tèxt"
+
+#~ msgid "Open '%1'"
+#~ msgstr "Dobrir « %1 »"
+
+#, fuzzy
+#~ msgid "&Copy Email Address"
+#~ msgstr "Copiar l'adreça electronica"
+
+#~ msgid "&Save Link As..."
+#~ msgstr "Enregistrar la cibla &jos..."
+
+#, fuzzy
+#~ msgid "&Copy Link Address"
+#~ msgstr "Copiar l'adreça electronica"
+
+#~ msgctxt "@title:menu HTML frame/iframe"
+#~ msgid "Frame"
+#~ msgstr "Encastre"
+
+#~ msgid "Open in New &Window"
+#~ msgstr "Dobrir dins una &fenèstra nòva"
+
+#~ msgid "Open in &This Window"
+#~ msgstr "Dobrir dins &la fenèstra"
+
+#~ msgid "Open in &New Tab"
+#~ msgstr "Dobrir dis un onglet &nòu"
+
+#~ msgid "Reload Frame"
+#~ msgstr "Tornar cargar lo quadre"
+
+#~ msgid "Print Frame..."
+#~ msgstr "Imprimir lo quadre..."
+
+#~ msgid "Save &Frame As..."
+#~ msgstr "Enregistrar lo &quadre jos..."
+
+#~ msgid "View Frame Source"
+#~ msgstr "Afichar lo còde font del quadre"
+
+#~ msgid "View Frame Information"
+#~ msgstr "Entresenhas suls quadres d'afichatge"
+
+#~ msgid "Block IFrame..."
+#~ msgstr "Blocar los « IQuadre »..."
+
+#~ msgid "Save Image As..."
+#~ msgstr "Enregistrar l'imatge jos..."
+
+#~ msgid "Send Image..."
+#~ msgstr "Mandar l'imatge..."
+
+#~ msgid "Copy Image"
+#~ msgstr "Copiar l'imatge"
+
+#~ msgid "Copy Image Location"
+#~ msgstr "Copiar l'emplaçament de l'imatge"
+
+#~ msgid "View Image (%1)"
+#~ msgstr "Afichar l'imatge (%1)"
+
+#~ msgid "Block Image..."
+#~ msgstr "Blocar l'imatge..."
+
+#~ msgid "Block Images From %1"
+#~ msgstr "Blocar los imatges de %1"
+
+#~ msgid "Stop Animations"
+#~ msgstr "Arrestar las animacions"
+
+#~ msgid "Search for '%1' with %2"
+#~ msgstr "Cercar « %1 » sus « %2 »"
+
+#~ msgid "Search for '%1' with"
+#~ msgstr "Cercar « %1 » sus"
+
+#~ msgid "Save Link As"
+#~ msgstr "Enregistrar lo ligam coma"
+
+#~ msgid "Save Image As"
+#~ msgstr "Enregistrar l'imatge coma"
+
+#~ msgid "Add URL to Filter"
+#~ msgstr "Apondre l'URL al filtre"
+
+#~ msgid "Enter the URL:"
+#~ msgstr "Picatz l'URL :"
+
+#~ msgid ""
+#~ "A file named \"%1\" already exists. Are you sure you want to overwrite it?"
+#~ msgstr "Un fichièr «%1» existís ja. Lo volètz vertadièrament l'espotir ?"
+
+#~ msgid "Overwrite File?"
+#~ msgstr "Remplaçar lo fichièr ?"
+
+#~ msgid "Overwrite"
+#~ msgstr "Remplaçar"
+
+#~ msgid "The Download Manager (%1) could not be found in your $PATH "
+#~ msgstr ""
+#~ "Impossible de trobar lo gestionari de telecargament (%1) dins vòstra "
+#~ "variabla $PATH. "
+
+#~ msgid "Default Font Size (100%)"
+#~ msgstr "Talha de poliça per defaut (100 %)"
+
+#~ msgid "KHTML"
+#~ msgstr "KHTML"
+
+#~ msgid "Embeddable HTML component"
+#~ msgstr "Compausant HTML integrable"
+
+#~ msgid "Lars Knoll"
+#~ msgstr "Lars Knoll"
+
+#~ msgid "Antti Koivisto"
+#~ msgstr "Antti Koivisto"
+
+#~ msgid "Dirk Mueller"
+#~ msgstr "Dirk Mueller"
+
+#~ msgid "Peter Kelly"
+#~ msgstr "Peter Kelly"
+
+#~ msgid "Torben Weis"
+#~ msgstr "Torben Weis"
+
+#~ msgid "Martin Jones"
+#~ msgstr "Martin Jones"
+
+#~ msgid "Simon Hausmann"
+#~ msgstr "Simon Hausmann"
+
+#~ msgid "Tobias Anton"
+#~ msgstr "Tobias Anton"
+
+#~ msgid "View Do&cument Source"
+#~ msgstr "Afichar lo còde font del do&cument"
+
+#~ msgid "View Document Information"
+#~ msgstr "Afichar las entresenhas del document"
+
+#~ msgid "Save &Background Image As..."
+#~ msgstr "Enregistrar l'imatge de &fons jos..."
+
+#~ msgid "SSL"
+#~ msgstr "SSL"
+
+#~ msgid "Print Rendering Tree to STDOUT"
+#~ msgstr "Imprimir l'arborescéncia de rendut dins STDOUT"
+
+#~ msgid "Print DOM Tree to STDOUT"
+#~ msgstr "Mandar l'arborescéncia DOM vèrs la sortida estandarda (stdout)"
+
+#, fuzzy
+#~ msgid "Print frame tree to STDOUT"
+#~ msgstr "Mandar l'arborescéncia DOM vèrs la sortida estandarda (stdout)"
+
+#~ msgid "Stop Animated Images"
+#~ msgstr "Arrestar los imatges animats"
+
+#~ msgid "Set &Encoding"
+#~ msgstr "Utilizar l'&encodatge"
+
+#~ msgid "Use S&tylesheet"
+#~ msgstr "Utilizar lo fuèlh d'est&il"
+
+#~ msgid "Enlarge Font"
+#~ msgstr "Augmentar la talha de las poliças"
+
+#~ msgid "Shrink Font"
+#~ msgstr "Redusir la talha de las poliças"
+
+#~ msgid "Find Text as You Type"
+#~ msgstr "Recèrca de tèxt al cors de la picada"
+
+#~ msgid "Find Links as You Type"
+#~ msgstr "Recèrca de ligams al cors de la picada"
+
+#~ msgid "Toggle Caret Mode"
+#~ msgstr "(Des)Activar lo mòde flècha"
+
+#~ msgid "The fake user-agent '%1' is in use."
+#~ msgstr "La faussa identitat del navegaire « %1 » es utilizada."
+
+#~ msgid "This web page contains coding errors."
+#~ msgstr "Aquesta pagina web conten d'errors de codatge."
+
+#~ msgid "&Hide Errors"
+#~ msgstr "&Amagar las errors"
+
+#~ msgid "&Disable Error Reporting"
+#~ msgstr "&Desactivar los rapòrts d'errors"
+
+#~ msgid "Display Images on Page"
+#~ msgstr "Visualizar los imatges sus la pagina"
+
+#~ msgid "The requested operation could not be completed"
+#~ msgstr "L'operacion demandada a pas pogut èsser acabada"
+
+#~ msgid "Technical Reason: "
+#~ msgstr "Rason tecnica : "
+
+#~ msgid "Details of the Request:"
+#~ msgstr "Detalhs de la requèsta :"
+
+#~ msgid "URL: %1"
+#~ msgstr "URL : %1"
+
+#~ msgid "Date and Time: %1"
+#~ msgstr "Data e ora : %1"
+
+#~ msgid "Additional Information: %1"
+#~ msgstr "Entresenhas suplementàrias : %1"
+
+#~ msgid "Description:"
+#~ msgstr "Descripcion :"
+
+#~ msgid "Possible Causes:"
+#~ msgstr "Causas possiblas :"
+
+#~ msgid "Possible Solutions:"
+#~ msgstr "Solucions possiblas :"
+
+#~ msgid "Page loaded."
+#~ msgstr "Pagina cargada."
+
+#~ msgid "%1 Image of %2 loaded."
+#~ msgid_plural "%1 Images of %2 loaded."
+#~ msgstr[0] "%1 imatges cargats sus %2."
+#~ msgstr[1] "%1 imatges cargats sus %2."
+
+#~ msgid "Automatic Detection"
+#~ msgstr "Deteccion automatica"
+
+#~ msgid " (In new window)"
+#~ msgstr " (dins una fenèstra novèla)"
+
+#~ msgid "Symbolic Link"
+#~ msgstr "Ligam simbolic"
+
+#~ msgid "%1 (Link)"
+#~ msgstr "%1 (ligam)"
+
+#, fuzzy
+#~ msgid "%2 (%1 byte)"
+#~ msgid_plural "%2 (%1 bytes)"
+#~ msgstr[0] "%2 (%1 octets)"
+#~ msgstr[1] "%2 (%1 octets)"
+
+#~ msgid "%2 (%1 K)"
+#~ msgstr "%2 (%1 ko)"
+
+#~ msgid " (In other frame)"
+#~ msgstr " (dins un autre quadre)"
+
+#~ msgid "Email to: "
+#~ msgstr "Corriè eectronic a : "
+
+#~ msgid " - Subject: "
+#~ msgstr " - Subjècte : "
+
+#~ msgid " - CC: "
+#~ msgstr " - CC : "
+
+#~ msgid " - BCC: "
+#~ msgstr " - Bcc : "
+
+#~ msgid "Save As"
+#~ msgstr "Enregistrar coma"
+
+#~ msgid "Follow"
+#~ msgstr "Seguir"
+
+#~ msgid "Frame Information"
+#~ msgstr "Entresenhas suls quadres"
+
+#~ msgid "   <a href=\"%1\">[Properties]</a>"
+#~ msgstr "   <a href=\"%1\">[Proprietats]</a>"
+
+#, fuzzy
+#~ msgctxt "HTML rendering mode (see http://en.wikipedia.org/wiki/Quirks_mode)"
+#~ msgid "Quirks"
+#~ msgstr "Turc"
+
+#, fuzzy
+#~ msgctxt "HTML rendering mode (see http://en.wikipedia.org/wiki/Quirks_mode)"
+#~ msgid "Strict"
+#~ msgstr "Aviar"
+
+#~ msgid "Save Background Image As"
+#~ msgstr "Enregistrar l'imatge de rèireplan jos"
+
+#~ msgid "Save Frame As"
+#~ msgstr "Enregistrar lo quadre jos"
+
+#~ msgid "&Find in Frame..."
+#~ msgstr "&Cercar dins lo quadre..."
+
+#~ msgid ""
+#~ "Warning:  This is a secure form but it is attempting to send your data "
+#~ "back unencrypted.\n"
+#~ "A third party may be able to intercept and view this information.\n"
+#~ "Are you sure you wish to continue?"
+#~ msgstr ""
+#~ "Avertiment : aquò es un formulari securizat, çaquelà ensaja de mandar "
+#~ "vòstras donadas sens las criptar.\n"
+#~ "Una tèrça partida es susceptibla d'interceptar e de veire aquestas "
+#~ "informacions.\n"
+#~ "Volètz vertadièrament contunhar ?"
+
+#~ msgid "Network Transmission"
+#~ msgstr "Transmission ret"
+
+#~ msgid "&Send Unencrypted"
+#~ msgstr "&Mandar non criptat"
+
+#~ msgid ""
+#~ "Warning: Your data is about to be transmitted across the network "
+#~ "unencrypted.\n"
+#~ "Are you sure you wish to continue?"
+#~ msgstr ""
+#~ "Avertiment : vòstras donadas van èsser transmesas via la ret sens èsser "
+#~ "criptadas.\n"
+#~ "Volètz vertadièrament contunhar ?"
+
+#~ msgid ""
+#~ "This site is attempting to submit form data via email.\n"
+#~ "Do you want to continue?"
+#~ msgstr ""
+#~ "Aqueste sit ensaja de mandar de donadas de formularis per corrièr "
+#~ "electronic.\n"
+#~ "Volètz contunar ?"
+
+#~ msgid "&Send Email"
+#~ msgstr "&Mandar lo corrièr electronic"
+
+#~ msgid ""
+#~ "This site attempted to attach a file from your computer in the form "
+#~ "submission. The attachment was removed for your protection."
+#~ msgstr ""
+#~ "Aqueste sit a ensajat de jónher un fichièr dempuèi vòstre ordenador al "
+#~ "moment del mandadís de formulari. La pèça junta es estada suprimida per "
+#~ "vòstra proteccion."
+
+#~ msgid "(%1/s)"
+#~ msgstr "(%1/s)"
+
+#~ msgid "Security Warning"
+#~ msgstr "Avertiment de seguretat"
+
+#~ msgid "The wallet '%1' is open and being used for form data and passwords."
+#~ msgstr ""
+#~ "Lo pòrtafuèlha « %1 » es dobert e utilizat per las donadas de formularis "
+#~ "e los senhals."
+
+#~ msgid "&Close Wallet"
+#~ msgstr "&Tampar lo pòrtafuèlha"
+
+#~ msgid "JavaScript &Debugger"
+#~ msgstr "&Desbogaire Javascript"
+
+#~ msgid "This page was prevented from opening a new window via JavaScript."
+#~ msgstr ""
+#~ "Aquesta pagina es estada empachada de dobrir una fenèstra novèla via "
+#~ "JavaScript."
+
+#~ msgid "Popup Window Blocked"
+#~ msgstr "Fenèstra popup blocada"
+
+#~ msgid ""
+#~ "This page has attempted to open a popup window but was blocked.\n"
+#~ "You can click on this icon in the status bar to control this behavior\n"
+#~ "or to open the popup."
+#~ msgstr ""
+#~ "Aquesta pagina a ensajat de dobrir una fenèstra popup mas es estada "
+#~ "blocada.\n"
+#~ "Podètz clicar sus aquesta icòna dins la barra d'estat per modificar\n"
+#~ "aqueste comportament o per dobrir lo popup."
+
+#~ msgid "Show Blocked Window Passive Popup &Notification"
+#~ msgstr ""
+#~ "Afichar la &notificacion de blocatge de las fenèstras popup passivas"
+
+#~ msgid "&Configure JavaScript New Window Policies..."
+#~ msgstr "&Configurar JavaScript sus la gestion de las fenèstras novèlas..."
+
+#~ msgid ""
+#~ "<qt><p><strong>'Print images'</strong></p><p>If this checkbox is enabled, "
+#~ "images contained in the HTML page will be printed. Printing may take "
+#~ "longer and use more ink or toner.</p><p>If this checkbox is disabled, "
+#~ "only the text of the HTML page will be printed, without the included "
+#~ "images. Printing will be faster and use less ink or toner.</p> </qt>"
+#~ msgstr ""
+#~ "<qt><p><strong>« Imprimir los imatges »</strong></p><p>S'aquesta casa es "
+#~ "seleccionada, los imatges contenguts dins la pagina HTML seràn imprimits. "
+#~ "L'impression serà de segur mai lenta e utilizarà mai de tinta o de toner."
+#~ "</p><p>S'aquesta casa es deseleccionada, sol lo tèxt de la pagina HTML "
+#~ "serà imprimit sens los imatges. L'impression serà mai rapida e utilizarà "
+#~ "mens de tinta o de toner.</p> </qt>"
+
+#~ msgid ""
+#~ "<qt><p><strong>'Print header'</strong></p><p>If this checkbox is enabled, "
+#~ "the printout of the HTML document will contain a header line at the top "
+#~ "of each page. This header contains the current date, the location URL of "
+#~ "the printed page and the page number.</p><p>If this checkbox is disabled, "
+#~ "the printout of the HTML document will not contain such a header line.</"
+#~ "p> </qt>"
+#~ msgstr ""
+#~ "<qt><p><strong>« Imprimir l'entèsta »</strong></p><p>S'aquesta causida es "
+#~ "seleccionada, la sortida del document HTML contendrà una linha d'entèsta "
+#~ "en naut de cada pagina.</p><p>S'aquesta causida es deseleccionada, la "
+#~ "sortida del document HTML contendrà pas aqueste tipe de linha d'entèsta.</"
+#~ "p> </qt>"
+
+#, fuzzy
+#~ msgid ""
+#~ "<qt><p><strong>'Printerfriendly mode'</strong></p><p>If this checkbox is "
+#~ "enabled, the printout of the HTML document will be black and white only, "
+#~ "and all colored background will be converted into white. Printout will be "
+#~ "faster and use less ink or toner.</p><p>If this checkbox is disabled, the "
+#~ "printout of the HTML document will happen in the original color settings "
+#~ "as you see in your application. This may result in areas of full-page "
+#~ "color (or grayscale, if you use a black+white printer). Printout will "
+#~ "possibly happen more slowly and will probably use more toner or ink.</p> "
+#~ "</qt>"
+#~ msgstr ""
+#~ "<qt><p><strong>« Mòde compatible amb l'impression »</strong></"
+#~ "p><p>S'aquesta causida es seleccionada, la sortida del document HTML serà "
+#~ "en negre e blanc unicament, e totes los rèires plans colorats seràn "
+#~ "convertits en blanc.</p><p>S'aquesta causida es deseleccionada, la "
+#~ "sortida del document HTML possedirà las colors originalas talas coma lo "
+#~ "podètz veire dins vòstra aplicacion .</p>Aquò pòt entraïnar de zònas "
+#~ "entièras de pagina coloradas (o en nivèl de grises, s'utilizatz una "
+#~ "imprimenta negre e blanc). La sortida tanben pòt prendre mai de temps e "
+#~ "utilizarà mai de tinta o de toner.</qt>"
+
+#~ msgid "HTML Settings"
+#~ msgstr "Configuracion HTML"
+
+#~ msgid "Printer friendly mode (black text, no background)"
+#~ msgstr ""
+#~ "Mòde compatible amb l'impression (tèxt en negre, pas d'imatge de fons)"
+
+#~ msgid "Print images"
+#~ msgstr "Imprimir los imatges"
+
+#~ msgid "Print header"
+#~ msgstr "Imprimir l'entèsta"
+
+#, fuzzy
+#~ msgid "Inactive"
+#~ msgstr "Relatiu"
+
+#~ msgid "%1 (%2 - %3x%4 Pixels)"
+#~ msgstr "%1 (%2 - %3x%4 pixels)"
+
+#~ msgid "%1 - %2x%3 Pixels"
+#~ msgstr "%1 - %2x%3 pixels"
+
+#~ msgid "%1 (%2x%3 Pixels)"
+#~ msgstr "%1 (%2x%3 pixels)"
+
+#~ msgid "Image - %1x%2 Pixels"
+#~ msgstr "Imatge - %1 x %2 pixels"
+
+#~ msgid "Done."
+#~ msgstr "Terminat."
+
+#~ msgid "Access Keys activated"
+#~ msgstr "Tòcas d'accès activadas"
+
+#~ msgid "JavaScript Errors"
+#~ msgstr "Errors JavaScript"
+
+#~ msgid ""
+#~ "This dialog provides you with notification and details of scripting "
+#~ "errors that occur on web pages.  In many cases it is due to an error in "
+#~ "the web site as designed by its author.  In other cases it is the result "
+#~ "of a programming error in Konqueror.  If you suspect the former, please "
+#~ "contact the webmaster of the site in question.  Conversely if you suspect "
+#~ "an error in Konqueror, please file a bug report at http://bugs.kde.org/.  "
+#~ "A test case which illustrates the problem will be appreciated."
+#~ msgstr ""
+#~ "Aquesta bóstia de dialòg vos provesís las notificacions e detalhs de las "
+#~ "errors d'escriptatge que subrevenon sus las paginas web. Dins de cases "
+#~ "nombroses, son degudas a una error sul sit web. Dins d'autres cases, es "
+#~ "una error de programacion de Konqueror. Se suspeitatz lo primièr cas, "
+#~ "contactatz lo webmaster del sit en question. Se suspeitatz una error dins "
+#~ "Konqueror, emplenatz un rapòrt de bòg a « http://bugs.kde.org/ ». Un "
+#~ "document de testar qu'illustrariá lo problèma seriá apreciat."
+
+#~ msgid "KMultiPart"
+#~ msgstr "KMultiPart"
+
+#~ msgid "Embeddable component for multipart/mixed"
+#~ msgstr "Compausant integrable pel tipe multipart/mixed"
+
+#~ msgid "Pause"
+#~ msgstr "Pausa"
+
+#, fuzzy
+#~ msgid "New Web Shortcut"
+#~ msgstr "Acorchi"
+
+#, fuzzy
+#~ msgid "UR&I shortcuts:"
+#~ msgstr "Acorchis"
+
+#, fuzzy
+#~ msgid "Create Web Shortcut"
+#~ msgstr "Configurar los acorchis clavièr"
+
+#~ msgid "0"
+#~ msgstr "0"
+
+#, fuzzy
+#~ msgid "Output to File..."
+#~ msgstr "Fichièr de sortida"
+
+#~ msgid "Settings"
+#~ msgstr "Paramètres"
+
+#, fuzzy
+#~ msgid "Find &links only"
+#~ msgstr "Recèrca de ligams al cors de la picada"
+
+#, fuzzy
+#~ msgid "F&ind:"
+#~ msgstr "Recercar"
+
+#, fuzzy
+#~ msgid "&Next"
+#~ msgstr "&Seguent"
+
+#, fuzzy
+#~ msgid "Opt&ions"
+#~ msgstr "Opcions"
+
+#, fuzzy
+#~ msgid "Do you want to store this password?"
+#~ msgstr "Volètz tornar començar la recèrca dempuèi lo començament ?"
+
+#, fuzzy
+#~ msgid "Do you want to store this password for %1?"
+#~ msgstr "Volètz tornar començar la recèrca dempuèi lo començament ?"
+
+#, fuzzy
+#~ msgid "&Store"
+#~ msgstr "Store"
+
+#, fuzzy
+#~ msgid "Ne&ver store for this site"
+#~ msgstr "Pas &jamai per aqueste sit"
+
+#, fuzzy
+#~ msgid "Do &not store this time"
+#~ msgstr "Visualizar pas mai lo messatge"
+
+#~ msgid "Basic Page Style"
+#~ msgstr "Estil de pagina basic"
+
+#~ msgid "the document is not in the correct file format"
+#~ msgstr "lo format del fichièr es pas corrècte"
+
+#~ msgid "fatal parsing error: %1 in line %2, column %3"
+#~ msgstr "problèma grèu al moment de l'analisi : %1 a la linha %2, colomna %3"
+
+#~ msgid "XML parsing error"
+#~ msgstr "Problèma al moment de l'analisi du XML"
+
+#~ msgid ""
+#~ "Unable to start new process.\n"
+#~ "The system may have reached the maximum number of open files possible or "
+#~ "the maximum number of open files that you are allowed to use has been "
+#~ "reached."
+#~ msgstr ""
+#~ "Impossible d'aviar un processús novèl.\n"
+#~ "Lo sistèma a probablement atent lo nombre maximal de fichièrs doberts o "
+#~ "lo maximum que sètz autorizat a dobrir."
+
+#~ msgid ""
+#~ "Unable to create new process.\n"
+#~ "The system may have reached the maximum number of processes possible or "
+#~ "the maximum number of processes that you are allowed to use has been "
+#~ "reached."
+#~ msgstr ""
+#~ "Impossible de crear un processús novèl.\n"
+#~ "Lo sistèma a probablement atent lo nombre maximal de processús creats o "
+#~ "lo maximum que sètz autorizat a crear."
+
+#~ msgid "Could not find '%1' executable."
+#~ msgstr "Impossible de trobar l'executabla «%1»."
+
+#~ msgid ""
+#~ "Could not open library '%1'.\n"
+#~ "%2"
+#~ msgstr ""
+#~ "Impossible de dobrir la bibliotèca « %1 ».\n"
+#~ "%2"
+
+#~ msgid ""
+#~ "Could not find 'kdemain' in '%1'.\n"
+#~ "%2"
+#~ msgstr ""
+#~ "Impossible de trobar 'kdemain' dins '%1'.\n"
+#~ "%2"
+
+#, fuzzy
+#~ msgid "KDEInit could not launch '%1'"
+#~ msgstr "KDEInit pòt pas aviar « %1 »."
+
+#~ msgid "Could not find service '%1'."
+#~ msgstr "Impossible de trobar lo servici '%1'."
+
+#~ msgid "Service '%1' is malformatted."
+#~ msgstr "Lo servici «%1» es mal formatat"
+
+#~ msgid "Launching %1"
+#~ msgstr "Aviada de %1"
+
+#~ msgid "Unknown protocol '%1'.\n"
+#~ msgstr "Protocòl «%1» desconegut.\n"
+
+#~ msgid "Error loading '%1'.\n"
+#~ msgstr "Problèma de cargament de «%1».\n"
+
+#~ msgid "Evaluation error"
+#~ msgstr "Error d'evaluacion"
+
+#~ msgid "Range error"
+#~ msgstr "Error de plaja de valors"
+
+#~ msgid "Reference error"
+#~ msgstr "Error de referéncia"
+
+#~ msgid "Syntax error"
+#~ msgstr "Error de sintaxi"
+
+#~ msgid "Type error"
+#~ msgstr "Error de tipe"
+
+#~ msgid "URI error"
+#~ msgstr "Error d'URI"
+
+#, fuzzy
+#~ msgctxt "addition"
+#~ msgid "+"
+#~ msgstr "+"
+
+#, fuzzy
+#~ msgctxt "subtraction"
+#~ msgid "-"
+#~ msgstr "-"
+
+#, fuzzy
+#~ msgctxt "evaluation"
+#~ msgid "="
+#~ msgstr "="
+
+#~ msgid "5"
+#~ msgstr "5"
+
+#~ msgid "3"
+#~ msgstr "3"
+
+#~ msgid "7"
+#~ msgstr "7"
+
+#~ msgid "8"
+#~ msgstr "8"
+
+#~ msgid "Execute"
+#~ msgstr "Executar"
+
+#~ msgid "File"
+#~ msgstr "Fichièr"
+
+#~ msgid "Ctrl+O"
+#~ msgstr "Ctrl+O"
+
+#~ msgid "Quit"
+#~ msgstr "Quitar"
+
+#~ msgid "Run"
+#~ msgstr "Executar"
+
+#~ msgid "Step"
+#~ msgstr "Pas"
+
+#, fuzzy
+#~ msgid "Alert"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Confirm"
+#~ msgstr "Configurar"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "%1 is 'the slot asked for foo arguments', %2 is 'but there are only bar "
+#~ "available'"
+#~ msgid "%1, %2."
+#~ msgstr "%1 %2"
+
+#, fuzzy
+#~ msgid "loading %1"
+#~ msgstr "Aviada de %1"
+
+#, fuzzy
+#~ msgctxt "describes the feed of the latest posted entries"
+#~ msgid "Latest"
+#~ msgstr "Darrièr"
+
+#~ msgid "Highest Rated"
+#~ msgstr "Los mièlhs notats"
+
+#~ msgid "Most Downloads"
+#~ msgstr "Los mai telecargats"
+
+#~ msgid ""
+#~ "<qt>Cannot start <i>gpg</i> and retrieve the available keys. Make sure "
+#~ "that <i>gpg</i> is installed, otherwise verification of downloaded "
+#~ "resources will not be possible.</qt>"
+#~ msgstr ""
+#~ "<qt>Impossible d'amodar <i>gpg</i> per i recuperar la tièra de las claus "
+#~ "disponiblas. Asseguratz-vos que lo programa <i>gpg</i> es installat, "
+#~ "siquenon la verificacion de las ressorsas telecargadas serà pas possibla."
+#~ "</qt>"
+
+#~ msgid ""
+#~ "<qt>Cannot start <i>gpg</i> and check the validity of the file. Make sure "
+#~ "that <i>gpg</i> is installed, otherwise verification of downloaded "
+#~ "resources will not be possible.</qt>"
+#~ msgstr ""
+#~ "<qt>Impossible d'amodar <i>gpg</i> per verificar la validitat d'aqueste "
+#~ "fichièr. Asseguratz-vos que lo programa <i>gpg</i> es installat, siquenon "
+#~ "la verificacion de las ressorsas telecargadas serà pas possibla.</qt>"
+
+#~ msgid "Select Signing Key"
+#~ msgstr "Cauisissètz la clau de signatura"
+
+#~ msgid "Key used for signing:"
+#~ msgstr "Clau utilizada per signar :"
+
+#~ msgid ""
+#~ "<qt>Cannot start <i>gpg</i> and sign the file. Make sure that <i>gpg</i> "
+#~ "is installed, otherwise signing of the resources will not be possible.</"
+#~ "qt>"
+#~ msgstr ""
+#~ "<qt>Impossible d'amodar <i>gpg</i> per signar lo fichièr. Asseguratz-vos "
+#~ "que lo programa <i>gpg</i> es installat, siquenon la signatura de las "
+#~ "ressorsas serà pas possibla.</qt>"
+
+#~ msgid "Get Hot New Stuff"
+#~ msgstr "Recuperar de novetats"
+
+#~ msgid "Add Comment"
+#~ msgstr "Apondre un comentari"
+
+#, fuzzy
+#~ msgid "View Comments"
+#~ msgstr "Comentaris"
+
+#, fuzzy
+#~ msgid "Re: %1"
+#~ msgstr "Roje :"
+
+#, fuzzy
+#~ msgid "<br />Version: %1"
+#~ msgstr "Version %1"
+
+#, fuzzy
+#~ msgid "&Source:"
+#~ msgstr "Sorga :"
+
+#~ msgid "?"
+#~ msgstr "?"
+
+#, fuzzy
+#~ msgid "Collaborate"
+#~ msgstr "Tampar"
+
+#, fuzzy
+#~ msgid "Downloads: "
+#~ msgstr "Descargar"
+
+#~ msgid "Install"
+#~ msgstr "Installar"
+
+#~ msgid "Uninstall"
+#~ msgstr "Desinstallar"
+
+#, fuzzy
+#~ msgid "<p>No Downloads</p>"
+#~ msgstr "Descargar"
+
+#, fuzzy
+#~ msgid "<p>Downloads: %1</p>\n"
+#~ msgstr "Descargar"
+
+#~ msgid "Update"
+#~ msgstr "Actualizar"
+
+#, fuzzy
+#~ msgid "Rating: %1"
+#~ msgstr "Aviada de %1"
+
+#, fuzzy
+#~ msgid "No Preview"
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#, fuzzy
+#~ msgid "Loading Preview"
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#~ msgid "Comments"
+#~ msgstr "Comentaris"
+
+#~ msgid "Translate"
+#~ msgstr "Revirar"
+
+#~ msgid "Subscribe"
+#~ msgstr "S'inscriure"
+
+#~ msgid "Version %1"
+#~ msgstr "Version %1"
+
+#, fuzzy
+#~ msgid "Download New Stuff..."
+#~ msgstr "Telecargar las novetats"
+
+#~ msgid "Hot New Stuff Providers"
+#~ msgstr "Provesidors de novetats"
+
+#~ msgid "Please select one of the providers listed below:"
+#~ msgstr "Seleccionatz un dels provesidors listats çaijós :"
+
+#~ msgid "No provider selected."
+#~ msgstr "Cap de provesidor pas seleccionat."
+
+#~ msgid "Share Hot New Stuff"
+#~ msgstr "Partejar de novetats"
+
+#~ msgid "Please put in a name."
+#~ msgstr "Picatz un nom."
+
+#~ msgid "Old upload information found, fill out fields?"
+#~ msgstr "Entresenhas de mandadís ancianas troba&das, emplenar los camps ?"
+
+#~ msgid "Fill Out"
+#~ msgstr "Emplenar"
+
+#~ msgid "Do Not Fill Out"
+#~ msgstr "Emplenar pas"
+
+#~ msgid "Author:"
+#~ msgstr "Autor :"
+
+#, fuzzy
+#~ msgid "Email address:"
+#~ msgstr "Adreça electronica :"
+
+#~ msgid "License:"
+#~ msgstr "Licéncia :"
+
+#~ msgid "GPL"
+#~ msgstr "GPL"
+
+#~ msgid "LGPL"
+#~ msgstr "LGPL"
+
+#~ msgid "BSD"
+#~ msgstr "BSD"
+
+#~ msgid "Preview URL:"
+#~ msgstr "URL de l'apercebut :"
+
+#~ msgid "Language:"
+#~ msgstr "Lenga :"
+
+#~ msgid "Summary:"
+#~ msgstr "Resumit:"
+
+#, fuzzy
+#~ msgctxt "voting for an item (good/bad)"
+#~ msgid "Your vote was recorded."
+#~ msgstr "Cap de tèxt es pas estat remplaçat."
+
+#, fuzzy
+#~ msgid "Initializing"
+#~ msgstr "Installar"
+
+#, fuzzy
+#~ msgid "Configuration file not found: \"%1\""
+#~ msgstr "Fichièrs de configuracion"
+
+#, fuzzy
+#~ msgid "Configuration file is invalid: \"%1\""
+#~ msgstr "Fichièrs de configuracion"
+
+#, fuzzy
+#~ msgid "Loading provider information"
+#~ msgstr "Entresenhas suls quadres d'afichatge"
+
+#, fuzzy
+#~ msgid "Loading data"
+#~ msgstr "Cargament de l'applet"
+
+#, fuzzy
+#~ msgid "Loading one preview"
+#~ msgid_plural "Loading %1 previews"
+#~ msgstr[0] "Previsualizacion de l'estampatge"
+#~ msgstr[1] "Previsualizacion de l'estampatge"
+
+#, fuzzy
+#~ msgid "Installing"
+#~ msgstr "Installar"
+
+#, fuzzy
+#~ msgid "Invalid item."
+#~ msgstr "URL invalida"
+
+#, fuzzy
+#~ msgid "Overwrite existing file?"
+#~ msgstr "Remplaçar lo fichièr ?"
+
+#, fuzzy
+#~ msgid "Download File"
+#~ msgstr "Telecargar"
+
+#, fuzzy
+#~ msgid "All Providers"
+#~ msgstr "Paginas"
+
+#, fuzzy
+#~ msgid "All Categories"
+#~ msgstr "Paginas"
+
+#, fuzzy
+#~ msgid "Provider:"
+#~ msgstr "Servicis"
+
+#, fuzzy
+#~ msgid "Newest"
+#~ msgstr "Novèl"
+
+#, fuzzy
+#~ msgid "Rating"
+#~ msgstr "Aviada de %1"
+
+#, fuzzy
+#~ msgid "Most downloads"
+#~ msgstr "Los mai telecargats"
+
+#, fuzzy
+#~ msgid "Installed"
+#~ msgstr "Installar"
+
+#, fuzzy
+#~ msgid "Search:"
+#~ msgstr "R&ecercar :"
+
+#, fuzzy
+#~ msgid "Details for %1"
+#~ msgstr "Tièra de suggestions"
+
+#, fuzzy
+#~ msgid "Changelog:"
+#~ msgstr "Anullar"
+
+#, fuzzy
+#~ msgctxt "A link to the description of this Get Hot New Stuff item"
+#~ msgid "Homepage"
+#~ msgstr "Pagina Web"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "A link to make a donation for a Get Hot New Stuff item (opens a web "
+#~ "browser)"
+#~ msgid "Make a donation"
+#~ msgstr "Documentacion HTML"
+
+#, fuzzy
+#~ msgctxt "Tooltip for a link in a dialog"
+#~ msgid "Opens in a browser window"
+#~ msgstr "Dobrir dins una &fenèstra nòva"
+
+#, fuzzy
+#~ msgid "Rating: %1%"
+#~ msgstr "Aviada de %1"
+
+#, fuzzy
+#~ msgid "1 download"
+#~ msgid_plural "%1 downloads"
+#~ msgstr[0] "Telecargar"
+#~ msgstr[1] "Telecargar"
+
+#, fuzzy
+#~ msgid "Updating"
+#~ msgstr "Actualizar"
+
+#, fuzzy
+#~ msgid "Install Again"
+#~ msgstr "Installar"
+
+#, fuzzy
+#~ msgid "Checking login..."
+#~ msgstr "Verificar l'ortografia..."
+
+#, fuzzy
+#~ msgid "Fetching your previously updated content..."
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#, fuzzy
+#~ msgid "Could not verify login, please try again."
+#~ msgstr "Enregistrar las entresenhas d'identificant"
+
+#, fuzzy
+#~ msgid "File not found: %1"
+#~ msgstr "Ligam pas trobat : \"%1\"."
+
+#, fuzzy
+#~ msgid "Upload Failed"
+#~ msgstr "Telecargar"
+
+#, fuzzy
+#~ msgid "Select preview image"
+#~ msgstr "Causissètz una region de l'imatge"
+
+#, fuzzy
+#~ msgid "Uploading Failed"
+#~ msgstr "Telecargar"
+
+#, fuzzy
+#~ msgid "Authentication error."
+#~ msgstr "Error d'evaluacion"
+
+#, fuzzy
+#~ msgid "Upload failed: %1"
+#~ msgstr "Telecargar"
+
+#, fuzzy
+#~ msgid "File to upload:"
+#~ msgstr "Pagina cargada."
+
+#, fuzzy
+#~ msgid "New Upload"
+#~ msgstr "Tornar cargar"
+
+#, fuzzy
+#~ msgid "Preview Images"
+#~ msgstr "URL de l'apercebut :"
+
+#, fuzzy
+#~ msgid "Select Preview..."
+#~ msgstr "Causissètz una region de l'imatge"
+
+#, fuzzy
+#~ msgid "Set a price for this item"
+#~ msgstr "Pas &jamai per aqueste sit"
+
+#, fuzzy
+#~ msgid "Price"
+#~ msgstr "Sorga :"
+
+#, fuzzy
+#~ msgid "Price:"
+#~ msgstr "Sorga :"
+
+#, fuzzy
+#~ msgid "Upload content"
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#, fuzzy
+#~ msgid "Upload first preview"
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#, fuzzy
+#~ msgid "Upload second preview"
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#, fuzzy
+#~ msgid "Upload third preview"
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#, fuzzy
+#~ msgid "Start Upload"
+#~ msgstr "Aviar lo remplaçament"
+
+#, fuzzy
+#~ msgid "Speak Event Name"
+#~ msgstr "Tèxt :"
+
+#, fuzzy
+#~ msgid "Speak Custom Text"
+#~ msgstr "Tèxt :"
+
+#~ msgctxt "State of the notified event"
+#~ msgid "State"
+#~ msgstr "Estat"
+
+#~ msgctxt "Title of the notified event"
+#~ msgid "Title"
+#~ msgstr "Títol"
+
+#~ msgctxt "Description of the notified event"
+#~ msgid "Description"
+#~ msgstr "Descripcion"
+
+#~ msgid "Internet Search"
+#~ msgstr "Recèrca sus internet"
+
+#~ msgid "&Search"
+#~ msgstr "&Recercar"
+
+#, fuzzy
+#~ msgctxt "@label Type of file"
+#~ msgid "Type: %1"
+#~ msgstr "Roje :"
+
+#, fuzzy
+#~ msgctxt "@label:checkbox"
+#~ msgid "Remember action for files of this type"
+#~ msgstr "Visualizar pas mai lo messatge"
+
+#, fuzzy
+#~ msgctxt "@label:button"
+#~ msgid "&Open with %1"
+#~ msgstr "&Dobrir amb '%1'"
+
+#, fuzzy
+#~ msgctxt "@action:inmenu"
+#~ msgid "Open &with %1"
+#~ msgstr "&Dobrir amb '%1'"
+
+#, fuzzy
+#~ msgctxt "@info"
+#~ msgid "Open '%1'?"
+#~ msgstr "Dobrir « %1 »"
+
+#, fuzzy
+#~ msgctxt "@label:button"
+#~ msgid "&Open with..."
+#~ msgstr "&Dobrir amb..."
+
+#, fuzzy
+#~ msgctxt "@label:button"
+#~ msgid "&Open with"
+#~ msgstr "&Dobrir amb..."
+
+#, fuzzy
+#~ msgctxt "@label:button"
+#~ msgid "&Open"
+#~ msgstr "&Dobrir"
+
+#, fuzzy
+#~ msgctxt "@label File name"
+#~ msgid "Name: %1"
+#~ msgstr "Nom : "
+
+#~ msgid "Execute File?"
+#~ msgstr "Executar lo fichièr ?"
+
+#~ msgid "Accept"
+#~ msgstr "Acceptar"
+
+#~ msgid "Untitled"
+#~ msgstr "Sens nom"
+
+#~ msgid ""
+#~ "The document \"%1\" has been modified.\n"
+#~ "Do you want to save your changes or discard them?"
+#~ msgstr ""
+#~ "Lo document «%1» es estat modificat.\n"
+#~ "Lo volètz enregistrar ?"
+
+#~ msgid "Close Document"
+#~ msgstr "Tampar lo document"
+
+#, fuzzy
+#~ msgid "Cancel?"
+#~ msgstr "Anullar"
+
+#~ msgid "Text:"
+#~ msgstr "Tèxt :"
+
+#~ msgid "Comment:"
+#~ msgstr "Comentari :"
+
+#~ msgid "Icon:"
+#~ msgstr "Icòna :"
+
+#~ msgid "File:"
+#~ msgstr "Fichièr :"
+
+#~ msgid "Edit..."
+#~ msgstr "Editar..."
+
+#~ msgid "Add..."
+#~ msgstr "Apondre..."
+
+#~ msgid "Add a new script."
+#~ msgstr "Apondre un escript novèl."
+
+#~ msgid "Edit"
+#~ msgstr "Edicion"
+
+#, fuzzy
+#~ msgctxt "@title:group Script properties"
+#~ msgid "General"
+#~ msgstr "General"
+
+#~ msgid "The module %1 could not be found."
+#~ msgstr "Impossible de trobar lo modul « %1 »."
+
+#~ msgid "The module %1 is not a valid configuration module."
+#~ msgstr "Lo modul « %1 » es pas un modul de configuracion valable."
+
+#~ msgid "There was an error loading the module."
+#~ msgstr "I a agut una error al moment de cargar lo modul."
+
+#, fuzzy
+#~ msgid ""
+#~ "The settings of the current module have changed.\n"
+#~ "Do you want to apply the changes or discard them?"
+#~ msgstr ""
+#~ "Lo document «%1» es estat modificat.\n"
+#~ "Lo volètz enregistrar ?"
+
+#, fuzzy
+#~ msgid "Apply Settings"
+#~ msgstr "Paramètres"
+
+#~ msgid "Show hidden files"
+#~ msgstr "Visualizar los fichièrs amagats"
+
+#~ msgid ", "
+#~ msgstr ", "
+
+#, fuzzy
+#~ msgid "Search Plugins"
+#~ msgstr "Recercar"
+
+#, fuzzy
+#~ msgctxt "Used only for plugins"
+#~ msgid "About %1"
+#~ msgstr "A prepaus de %1"
+
+#~ msgid "Print Preview"
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#~ msgid "Select Components"
+#~ msgstr "Seleccionatz de compausants"
+
+#~ msgid "Success"
+#~ msgstr "Succès"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "Boolean AND keyword in desktop search strings. You can add several "
+#~ "variants separated by spaces, e.g. retain the English one alongside the "
+#~ "translation; keywords are not case sensitive. Make sure there is no "
+#~ "conflict with the OR keyword."
+#~ msgid "and"
+#~ msgstr "Esfand"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "Boolean OR keyword in desktop search strings. You can add several "
+#~ "variants separated by spaces, e.g. retain the English one alongside the "
+#~ "translation; keywords are not case sensitive. Make sure there is no "
+#~ "conflict with the AND keyword."
+#~ msgid "or"
+#~ msgstr "Mor"
+
+#, fuzzy
+#~ msgid "Tobias Koenig"
+#~ msgstr "Tobias Anton"
+
+#, fuzzy
+#~ msgctxt "@title:window"
+#~ msgid "Change Tags"
+#~ msgstr "Recercar de tèxt"
+
+#, fuzzy
+#~ msgctxt "@title:window"
+#~ msgid "Add Tags"
+#~ msgstr "Paginas"
+
+#, fuzzy
+#~ msgctxt "@info"
+#~ msgid "Delete tag"
+#~ msgstr "Suprimir"
+
+#, fuzzy
+#~ msgctxt "@title"
+#~ msgid "Delete tag"
+#~ msgstr "Suprimir"
+
+#, fuzzy
+#~ msgctxt "@action:button"
+#~ msgid "Delete"
+#~ msgstr "Suprimir"
+
+#, fuzzy
+#~ msgctxt "@action:button"
+#~ msgid "Cancel"
+#~ msgstr "Anullar"
+
+#, fuzzy
+#~ msgctxt "@label"
+#~ msgid "Show all tags..."
+#~ msgstr "Visualizar totas las opcions"
+
+#, fuzzy
+#~ msgctxt "@label"
+#~ msgid "Add Tags..."
+#~ msgstr "Apondre..."
+
+#, fuzzy
+#~ msgctxt "@label"
+#~ msgid "Change..."
+#~ msgstr "Cambiar l'icòna..."
+
+#, fuzzy
+#~ msgctxt ""
+#~ "referring to a filter on the modification and usage date of files/"
+#~ "resources"
+#~ msgid "Today"
+#~ msgstr "Uèi"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "referring to a filter on the modification and usage date of files/"
+#~ "resources"
+#~ msgid "Yesterday"
+#~ msgstr "Ièr"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "referring to a filter on the modification and usage date of files/"
+#~ "resources"
+#~ msgid "Last Week"
+#~ msgstr "&Darrièra pagina"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "referring to a filter on the modification and usage date of files/"
+#~ "resources"
+#~ msgid "Last Month"
+#~ msgstr "Mes que ven"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "referring to a filter on the modification and usage date of files/"
+#~ "resources"
+#~ msgid "Last Year"
+#~ msgstr "&Darrièra pagina"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "referring to a filter on the modification and usage date of files/"
+#~ "resources that will open a dialog to choose a date range"
+#~ msgid "Custom..."
+#~ msgstr "Personalizat..."
+
+#, fuzzy
+#~ msgid "Before"
+#~ msgstr "Store"
+
+#, fuzzy
+#~ msgid "After"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "@option:check An item in a list of resources that allows to query for "
+#~ "more resources to put in the list"
+#~ msgid "More..."
+#~ msgstr "Causir..."
+
+#, fuzzy
+#~ msgctxt "@option:check A filter on file type"
+#~ msgid "Documents"
+#~ msgstr "Encodatge del document :"
+
+#, fuzzy
+#~ msgctxt "@option:check A filter on file type - media video"
+#~ msgid "Video"
+#~ msgstr "Aficha&tge"
+
+#, fuzzy
+#~ msgctxt "@option:check A filter on file type"
+#~ msgid "Images"
+#~ msgstr "Paginas"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "@option:radio A filter on prioritizing/sorting a selection of resources"
+#~ msgid "No priority"
+#~ msgstr "pas cap d'error"
+
+#, fuzzy
+#~ msgctxt ""
+#~ "@option:radio A filter on prioritizing/sorting a selection of resources"
+#~ msgid "Last modified"
+#~ msgstr "Darrièra modificacion :"
+
+#, fuzzy
+#~ msgctxt "@option:radio A filter on the rating of a resource"
+#~ msgid "Any Rating"
+#~ msgstr "Aviada de %1"
+
+#, fuzzy
+#~ msgctxt "@option:radio A filter on the rating of a resource"
+#~ msgid "Max Rating"
+#~ msgstr "Aviada de %1"
+
+#, fuzzy
+#~ msgctxt "@title:column The Nepomuk resource label and icon"
+#~ msgid "Resource"
+#~ msgstr "Store"
+
+#, fuzzy
+#~ msgctxt "@title:column The Nepomuk resource's RDF type"
+#~ msgid "Resource Type"
+#~ msgstr "Tipes de servici"
+
+#, fuzzy
+#~ msgid "Enter Search Terms..."
+#~ msgstr "Recèrca sus internet"
+
+#, fuzzy
+#~ msgctxt "@option:check A filter on resource type"
+#~ msgid "Contacts"
+#~ msgstr "Comentaris"
+
+#, fuzzy
+#~ msgctxt "@option:check A filter on resource type"
+#~ msgid "Emails"
+#~ msgstr "Adreça electronica"
+
+#, fuzzy
+#~ msgctxt "@option:check A filter on resource type"
+#~ msgid "Tasks"
+#~ msgstr "Prètzfach (Task)"
+
+#, fuzzy
+#~ msgctxt "@option:check A filter on resource type"
+#~ msgid "Tags"
+#~ msgstr "Prètzfach (Task)"
+
+#, fuzzy
+#~ msgctxt "@option:check Do filter on type - show only files"
+#~ msgid "Files"
+#~ msgstr "Fichièr"
+
+#, fuzzy
+#~ msgctxt "@option:check Do filter on type - show everything but files"
+#~ msgid "Other"
+#~ msgstr "Autre"
+
+#~ msgid "Start"
+#~ msgstr "Aviar"
+
+#~ msgid "Cancel"
+#~ msgstr "Anullar"
+
+#~ msgid "Suspend"
+#~ msgstr "Suspendre"
+
+#~ msgid "Anonymous"
+#~ msgstr "Anonim"
+
+#~ msgctxt "@item font"
+#~ msgid "Regular"
+#~ msgstr "Regulièr"
+
+#~ msgid "What's &This"
+#~ msgstr "Qu'es &aquò ?"
+
+#, fuzzy
+#~ msgctxt "@option next week"
+#~ msgid "Next week"
+#~ msgstr "An que ven"
+
+#, fuzzy
+#~ msgctxt "@option last week"
+#~ msgid "Last week"
+#~ msgstr "&Darrièra pagina"
+
+#, fuzzy
+#~ msgctxt "@info/plain"
+#~ msgid "today"
+#~ msgstr "Uèi"
+
+#, fuzzy
+#~ msgid "Hide Menubar"
+#~ msgstr "Visualizar la barra de &menuts"
+
+#, fuzzy
+#~ msgid "Hide Statusbar"
+#~ msgstr "Afichar la barra d'est&at"
+
+#, fuzzy
+#~ msgctxt "option:check A filter on resource type"
+#~ msgid "Files"
+#~ msgstr "Fichièr"
+
+#, fuzzy
+#~ msgctxt "@item Author name in about dialog"
+#~ msgid "%1"
+#~ msgstr "%1"
+
+#, fuzzy
+#~ msgctxt "option:check A filter on file type - media files"
+#~ msgid "Media"
+#~ msgstr "Meta"
+
+#, fuzzy
+#~ msgid "Hide Toolbar"
+#~ msgstr "Barra d'espleches HTML"
+
+#~ msgid "..."
+#~ msgstr "..."
+
+#~ msgid "action1"
+#~ msgstr "accion1"
+
+#~ msgid "Find stopped."
+#~ msgstr "Recèrca arrestada"
+
+#~ msgid "Starting -- find links as you type"
+#~ msgstr "Començament -- trobar los ligams al cors de la picada"
+
+#~ msgid "Starting -- find text as you type"
+#~ msgstr "Començament -- trobar de tèxt al cors de la picada"
+
+#~ msgid "Link found: \"%1\"."
+#~ msgstr "Ligam trobat : \"%1\"."
+
+#~ msgid "Link not found: \"%1\"."
+#~ msgstr "Ligam pas trobat : \"%1\"."
+
+#~ msgid "Text found: \"%1\"."
+#~ msgstr "Tèxt trobat : \"%1\"."
+
+#~ msgid "Text not found: \"%1\"."
+#~ msgstr "Tèxt pas trobar : \"%1\"."
+
+#~ msgid "Additional domains for browsing"
+#~ msgstr "Domenis suplementaris per la navigacion"
+
+#~ msgid "List of 'wide-area' (non link-local) domains that should be browsed."
+#~ msgstr ""
+#~ "Lista dels domenis distants (ligams non locals) devent èsser percorruts."
+
+#, fuzzy
+#~ msgid "I agree"
+#~ msgstr "&Ignorar"
+
+#, fuzzy
+#~ msgid "Upload Your Own Files..."
+#~ msgstr "Telecargar"
+
+#, fuzzy
+#~ msgid "Details..."
+#~ msgstr "Detalhs"
+
+#, fuzzy
+#~ msgid "Loading preview..."
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#~ msgid "Error: HOME environment variable not set.\n"
+#~ msgstr "Error : la variabla d'environament « HOME » es pas definida.\n"
+
+#~ msgid "Error: DISPLAY environment variable not set.\n"
+#~ msgstr "Error : la variabla d'environament « DISPLAY » es pas definida.\n"
+
+#~ msgid "KDontChangeTheHostName"
+#~ msgstr "KCambiatzPasLoNomdÒste"
+
+#~ msgid "Informs KDE about a change in hostname"
+#~ msgstr "Informa KDE d'un cambiament de nom d'òste"
+
+#~ msgid "Old hostname"
+#~ msgstr "Nom d'òste ancian"
+
+#~ msgid "New hostname"
+#~ msgstr "Nom d'òste novèl"
+
+#, fuzzy
+#~ msgid "description"
+#~ msgstr "Descripcion"
+
+#, fuzzy
+#~ msgid "Autor Name"
+#~ msgstr "Accion"
+
+#, fuzzy
+#~ msgid "Voting failed."
+#~ msgstr "Telecargar"
+
+#, fuzzy
+#~ msgid "Previews"
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#, fuzzy
+#~ msgid "Community"
+#~ msgstr "Comentari"
+
+#, fuzzy
+#~ msgid "Preview"
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#, fuzzy
+#~ msgid "USD"
+#~ msgstr "BSD"
+
+#, fuzzy
+#~ msgid "Uploading preview image and content..."
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#, fuzzy
+#~ msgid "Server:"
+#~ msgstr "Servicis"
+
+#, fuzzy
+#~ msgid "Upload..."
+#~ msgstr "&Remplaçar..."
+
+#, fuzzy
+#~ msgid "Fetching provider information..."
+#~ msgstr "Visualizar las informacions de version"
+
+#, fuzzy
+#~ msgid "Please fill out the name field."
+#~ msgstr "Escafar la picada dins lo camp d'edicion"
+
+#, fuzzy
+#~ msgctxt "memory size in 2^40 bytes"
+#~ msgid "%1 PB"
+#~ msgstr "%1 o"
+
+#, fuzzy
+#~ msgctxt "memory size in 2^50 bytes"
+#~ msgid "%1 EB"
+#~ msgstr "%1 o"
+
+#, fuzzy
+#~ msgctxt "memory size in 2^60 bytes"
+#~ msgid "%1 ZB"
+#~ msgstr "%1 o"
+
+#, fuzzy
+#~ msgctxt "memory size in 2^70 bytes"
+#~ msgid "%1 YB"
+#~ msgstr "%1 o"
+
+#~ msgid ""
+#~ "Error creating database '%1'.\n"
+#~ "Check that the permissions are correct on the directory and the disk is "
+#~ "not full.\n"
+#~ msgstr ""
+#~ "Error al moment de la creacion de la banca de donadas « %1 ».\n"
+#~ "Verificatz que las permissions sul dorsièr son corrèctas e que lo disc es "
+#~ "pas plen.\n"
+
+#~ msgid ""
+#~ "Error writing database '%1'.\n"
+#~ "Check that the permissions are correct on the directory and the disk is "
+#~ "not full.\n"
+#~ msgstr ""
+#~ "Error al moment de l'escritura de la banca de donadas « %1 ».\n"
+#~ "Verificatz que las permissions sul dorsièr son corrèctas e que lo disc es "
+#~ "pas plen.\n"
+
+#~ msgid "Silent - work without windows and stderr"
+#~ msgstr "Silenciós - trabalha sens fenèstra e sortida d'errors"
+
+#~ msgid "Show progress information (even if 'silent' mode is on)"
+#~ msgstr ""
+#~ "Afichar las entresenhas sus la progression (quitament se lo mòde "
+#~ "silenciós es activat)"
+
+#~ msgid "Reloading KDE configuration, please wait..."
+#~ msgstr "Recargament de la configuracion de KDE, pacientatz..."
+
+#~ msgid "KDE Configuration Manager"
+#~ msgstr "Gestionari de configuracion de KDE"
+
+#~ msgid "Do you want to reload KDE configuration?"
+#~ msgstr "Volètz tornar cargar la configuracion de KDE ?"
+
+#~ msgctxt "Reload KDE configuration messagebox"
+#~ msgid "Reload"
+#~ msgstr "Tornar cargar"
+
+#~ msgid "Do Not Reload"
+#~ msgstr "Tornar cargar pas"
+
+#~ msgid "Configuration information reloaded successfully."
+#~ msgstr "Entresenhas de configuracion recargadas amb succès."
+
+#, fuzzy
+#~ msgid "Form"
+#~ msgstr "Expedidor :"
+
+#~ msgid "of January"
+#~ msgstr "de genièr"
+
+#~ msgid "of February"
+#~ msgstr "de febrièr"
+
+#~ msgid "of March"
+#~ msgstr "de març"
+
+#~ msgid "of April"
+#~ msgstr "d'abril"
+
+#~ msgid "of June"
+#~ msgstr "de junh"
+
+#~ msgid "of July"
+#~ msgstr "de julhet"
+
+#~ msgid "of August"
+#~ msgstr "d'agost"
+
+#~ msgid "of September"
+#~ msgstr "de setembre"
+
+#~ msgid "of October"
+#~ msgstr "d'octobre"
+
+#~ msgid "of November"
+#~ msgstr "de novembre"
+
+#~ msgid "of December"
+#~ msgstr "de decembre"
+
+#~ msgctxt "January"
+#~ msgid "Jan"
+#~ msgstr "Gen"
+
+#~ msgctxt "February"
+#~ msgid "Feb"
+#~ msgstr "Feb"
+
+#~ msgctxt "March"
+#~ msgid "Mar"
+#~ msgstr "Mar"
+
+#~ msgctxt "April"
+#~ msgid "Apr"
+#~ msgstr "abr"
+
+#~ msgctxt "May short"
+#~ msgid "May"
+#~ msgstr "Mai"
+
+#~ msgctxt "June"
+#~ msgid "Jun"
+#~ msgstr "Jun"
+
+#~ msgctxt "August"
+#~ msgid "Aug"
+#~ msgstr "Ago"
+
+#~ msgctxt "September"
+#~ msgid "Sep"
+#~ msgstr "Set"
+
+#~ msgctxt "December"
+#~ msgid "Dec"
+#~ msgstr "Dec"
+
+#~ msgid "January"
+#~ msgstr "Genièr"
+
+#~ msgid "February"
+#~ msgstr "Febrièr"
+
+#~ msgctxt "March long"
+#~ msgid "March"
+#~ msgstr "Març"
+
+#~ msgid "April"
+#~ msgstr "Abril"
+
+#~ msgctxt "May long"
+#~ msgid "May"
+#~ msgstr "Mai"
+
+#~ msgid "June"
+#~ msgstr "Junh"
+
+#~ msgid "July"
+#~ msgstr "Julhet"
+
+#~ msgctxt "August long"
+#~ msgid "August"
+#~ msgstr "Agost"
+
+#~ msgid "September"
+#~ msgstr "Setembre"
+
+#~ msgid "October"
+#~ msgstr "Octòbre"
+
+#~ msgid "November"
+#~ msgstr "Novembre"
+
+#~ msgid "December"
+#~ msgstr "Decembre"
+
+#~ msgctxt "Monday"
+#~ msgid "Mon"
+#~ msgstr "Dil"
+
+#~ msgctxt "Tuesday"
+#~ msgid "Tue"
+#~ msgstr "Mar"
+
+#~ msgctxt "Wednesday"
+#~ msgid "Wed"
+#~ msgstr "Mèc"
+
+#~ msgctxt "Thursday"
+#~ msgid "Thu"
+#~ msgstr "Dij"
+
+#~ msgctxt "Friday"
+#~ msgid "Fri"
+#~ msgstr "Ven"
+
+#~ msgctxt "Saturday"
+#~ msgid "Sat"
+#~ msgstr "Sab"
+
+#~ msgctxt "Sunday"
+#~ msgid "Sun"
+#~ msgstr "Sun"
+
+#~ msgid "Monday"
+#~ msgstr "Diluns"
+
+#~ msgid "Tuesday"
+#~ msgstr "Dimars"
+
+#~ msgid "Wednesday"
+#~ msgstr "Dimècres"
+
+#~ msgid "Thursday"
+#~ msgstr "Dijòus"
+
+#~ msgid "Friday"
+#~ msgstr "Divendres"
+
+#~ msgid "Saturday"
+#~ msgstr "Dissabte"
+
+#~ msgid "Sunday"
+#~ msgstr "Dimenge"
+
+#, fuzzy
+#~ msgctxt "Indian National month 1 - ShortNamePossessive"
+#~ msgid "of Cha"
+#~ msgstr "de Sha`ban"
+
+#, fuzzy
+#~ msgctxt "Indian National month 3 - ShortNamePossessive"
+#~ msgid "of Jya"
+#~ msgstr "de julhet"
+
+#, fuzzy
+#~ msgctxt "Indian National month 5 - ShortNamePossessive"
+#~ msgid "of Shr"
+#~ msgstr "de Safar"
+
+#, fuzzy
+#~ msgctxt "Indian National month 9 - ShortNamePossessive"
+#~ msgid "of Agr"
+#~ msgstr "d'abril"
+
+#, fuzzy
+#~ msgctxt "Indian National month 10 - ShortNamePossessive"
+#~ msgid "of Pau"
+#~ msgstr "de genièr"
+
+#, fuzzy
+#~ msgctxt "Indian National month 1 - LongNamePossessive"
+#~ msgid "of Chaitra"
+#~ msgstr "de Muharram"
+
+#, fuzzy
+#~ msgctxt "Indian National month 5 - LongNamePossessive"
+#~ msgid "of Shrāvana"
+#~ msgstr "de Sha`ban"
+
+#, fuzzy
+#~ msgctxt "Indian National month 9 - LongNamePossessive"
+#~ msgid "of Agrahayana"
+#~ msgstr "de Sha`ban"
+
+#, fuzzy
+#~ msgctxt "Indian National month 10 - LongNamePossessive"
+#~ msgid "of Paush"
+#~ msgstr "de març"
+
+#, fuzzy
+#~ msgctxt "Indian National month 11 - LongNamePossessive"
+#~ msgid "of Māgh"
+#~ msgstr "de març"
+
+#, fuzzy
+#~ msgctxt "Indian National month 1 - ShortName"
+#~ msgid "Cha"
+#~ msgstr "Kha"
+
+#, fuzzy
+#~ msgctxt "Indian National month 3 - ShortName"
+#~ msgid "Jya"
+#~ msgstr "Gen"
+
+#, fuzzy
+#~ msgctxt "Indian National month 5 - ShortName"
+#~ msgid "Shr"
+#~ msgstr "XChat"
+
+#, fuzzy
+#~ msgctxt "Indian National month 9 - ShortName"
+#~ msgid "Agr"
+#~ msgstr "Arb"
+
+#, fuzzy
+#~ msgctxt "Indian National month 10 - ShortName"
+#~ msgid "Pau"
+#~ msgstr "Pausa"
+
+#, fuzzy
+#~ msgctxt "Indian National month 10 - LongName"
+#~ msgid "Paush"
+#~ msgstr "Pausa"
+
+#, fuzzy
+#~ msgctxt "Indian National weekday 1 - ShortDayName"
+#~ msgid "Som"
+#~ msgstr "Jom"
+
+#, fuzzy
+#~ msgctxt "Indian National weekday 5 - ShortDayName"
+#~ msgid "Suk"
+#~ msgstr "Sun"
+
+#, fuzzy
+#~ msgctxt "Indian National weekday 6 - ShortDayName"
+#~ msgid "San"
+#~ msgstr "Sivan"
+
+#~ msgid "of Muharram"
+#~ msgstr "de Muharram"
+
+#~ msgid "of Safar"
+#~ msgstr "de Safar"
+
+#~ msgid "of R. Awal"
+#~ msgstr "de R. Awal"
+
+#~ msgid "of R. Thaani"
+#~ msgstr "de R. Thaani"
+
+#~ msgid "of J. Awal"
+#~ msgstr "de J. Awal"
+
+#~ msgid "of J. Thaani"
+#~ msgstr "de J. Thaani"
+
+#~ msgid "of Rajab"
+#~ msgstr "de Rajab"
+
+#~ msgid "of Sha`ban"
+#~ msgstr "de Sha`ban"
+
+#~ msgid "of Ramadan"
+#~ msgstr "de Ramadan"
+
+#~ msgid "of Shawwal"
+#~ msgstr "de Shawwal"
+
+#~ msgid "of Qi`dah"
+#~ msgstr "de Qi`dah"
+
+#~ msgid "of Hijjah"
+#~ msgstr "de Hijjah"
+
+#~ msgid "of Rabi` al-Awal"
+#~ msgstr "de Rabi` al-Awal"
+
+#~ msgid "of Rabi` al-Thaani"
+#~ msgstr "de Rabi` al-Thaani"
+
+#~ msgid "of Jumaada al-Awal"
+#~ msgstr "de Jumaada al-Awal"
+
+#~ msgid "of Jumaada al-Thaani"
+#~ msgstr "de Jumaada al-Thaani"
+
+#~ msgid "of Thu al-Qi`dah"
+#~ msgstr "de Thu al-Qi`dah"
+
+#~ msgid "of Thu al-Hijjah"
+#~ msgstr "de Thu al-Hijjah"
+
+#~ msgid "Muharram"
+#~ msgstr "Muharram"
+
+#~ msgid "Safar"
+#~ msgstr "Safar"
+
+#~ msgid "R. Awal"
+#~ msgstr "R. Awal"
+
+#~ msgid "R. Thaani"
+#~ msgstr "R. Thaani"
+
+#~ msgid "J. Awal"
+#~ msgstr "J. Awal"
+
+#~ msgid "J. Thaani"
+#~ msgstr "J. Thaani"
+
+#~ msgid "Rajab"
+#~ msgstr "Rajab"
+
+#~ msgid "Sha`ban"
+#~ msgstr "Sha`ban"
+
+#~ msgid "Ramadan"
+#~ msgstr "Ramadan"
+
+#~ msgid "Shawwal"
+#~ msgstr "Shawwal"
+
+#~ msgid "Qi`dah"
+#~ msgstr "Qi`dah"
+
+#~ msgid "Hijjah"
+#~ msgstr "Hijjah"
+
+#~ msgid "Rabi` al-Awal"
+#~ msgstr "Rabi` al-Awal"
+
+#~ msgid "Rabi` al-Thaani"
+#~ msgstr "Rabi` al-Thaani"
+
+#~ msgid "Jumaada al-Awal"
+#~ msgstr "Jumaada al-Awal"
+
+#~ msgid "Jumaada al-Thaani"
+#~ msgstr "Jumaada al-Thaani"
+
+#~ msgid "Thu al-Qi`dah"
+#~ msgstr "Thu al-Qi`dah"
+
+#~ msgid "Thu al-Hijjah"
+#~ msgstr "Thu al-Hijjah"
+
+#~ msgid "Ith"
+#~ msgstr "Ith"
+
+#~ msgid "Thl"
+#~ msgstr "Thl"
+
+#~ msgid "Arb"
+#~ msgstr "Arb"
+
+#~ msgid "Kha"
+#~ msgstr "Kha"
+
+#~ msgid "Jum"
+#~ msgstr "Jum"
+
+#~ msgid "Sab"
+#~ msgstr "Sab"
+
+#~ msgid "Ahd"
+#~ msgstr "Ahd"
+
+#~ msgid "Yaum al-Ithnain"
+#~ msgstr "Yaum al-Ithnain"
+
+#~ msgid "Yau al-Thulatha"
+#~ msgstr "Yau al-Thulatha"
+
+#~ msgid "Yaum al-Arbi'a"
+#~ msgstr "Yaum al-Arbi'a"
+
+#~ msgid "Yaum al-Khamees"
+#~ msgstr "Yaum al-Khamees"
+
+#~ msgid "Yaum al-Jumma"
+#~ msgstr "Yaum al-Jumma"
+
+#~ msgid "Yaum al-Sabt"
+#~ msgstr "Yaum al-Sabt"
+
+#~ msgid "Yaum al-Ahad"
+#~ msgstr "Yaum al-Ahad"
+
+#~ msgctxt "Farvardin short"
+#~ msgid "Far"
+#~ msgstr "Far"
+
+#~ msgctxt "Ordibehesht short"
+#~ msgid "Ord"
+#~ msgstr "Ord"
+
+#~ msgctxt "Khordad short"
+#~ msgid "Kho"
+#~ msgstr "Kho"
+
+#~ msgctxt "Tir short"
+#~ msgid "Tir"
+#~ msgstr "Tir"
+
+#~ msgctxt "Mordad short"
+#~ msgid "Mor"
+#~ msgstr "Mor"
+
+#~ msgctxt "Shahrivar short"
+#~ msgid "Sha"
+#~ msgstr "XChat"
+
+#~ msgctxt "Mehr short"
+#~ msgid "Meh"
+#~ msgstr "Meh"
+
+#~ msgctxt "Aban short"
+#~ msgid "Aba"
+#~ msgstr "Aba"
+
+#~ msgctxt "Azar short"
+#~ msgid "Aza"
+#~ msgstr "Aza"
+
+#~ msgctxt "Dei short"
+#~ msgid "Dei"
+#~ msgstr "Dei"
+
+#~ msgctxt "Bahman short"
+#~ msgid "Bah"
+#~ msgstr "Bah"
+
+#~ msgctxt "Esfand"
+#~ msgid "Esf"
+#~ msgstr "Esf"
+
+#~ msgid "Farvardin"
+#~ msgstr "Farvardin"
+
+#~ msgid "Ordibehesht"
+#~ msgstr "Ordibehesht"
+
+#~ msgid "Khordad"
+#~ msgstr "Khordad"
+
+#~ msgctxt "Tir long"
+#~ msgid "Tir"
+#~ msgstr "Tir"
+
+#~ msgid "Mordad"
+#~ msgstr "Mordad"
+
+#~ msgid "Shahrivar"
+#~ msgstr "Shahrivar"
+
+#~ msgid "Mehr"
+#~ msgstr "Mehr"
+
+#~ msgid "Aban"
+#~ msgstr "Aban"
+
+#~ msgid "Azar"
+#~ msgstr "Azar"
+
+#~ msgctxt "Dei long"
+#~ msgid "Dei"
+#~ msgstr "Dei"
+
+#~ msgid "Bahman"
+#~ msgstr "Bahman"
+
+#~ msgid "Esfand"
+#~ msgstr "Esfand"
+
+#~ msgctxt "Do shanbe short"
+#~ msgid "2sh"
+#~ msgstr "2sh"
+
+#~ msgctxt "Se shanbe short"
+#~ msgid "3sh"
+#~ msgstr "3sh"
+
+#~ msgctxt "Chahar shanbe short"
+#~ msgid "4sh"
+#~ msgstr "4sh"
+
+#~ msgctxt "Panj shanbe short"
+#~ msgid "5sh"
+#~ msgstr "5sh"
+
+#~ msgctxt "Jumee short"
+#~ msgid "Jom"
+#~ msgstr "Jom"
+
+#~ msgctxt "Shanbe short"
+#~ msgid "shn"
+#~ msgstr "shn"
+
+#~ msgctxt "Yek-shanbe short"
+#~ msgid "1sh"
+#~ msgstr "1sh"
+
+#~ msgid "Do shanbe"
+#~ msgstr "Do shanbe"
+
+#~ msgid "Se shanbe"
+#~ msgstr "Se shanbe"
+
+#~ msgid "Chahar shanbe"
+#~ msgstr "Chahar shanbe"
+
+#~ msgid "Panj shanbe"
+#~ msgstr "Panj shanbe"
+
+#~ msgid "Jumee"
+#~ msgstr "Jumee"
+
+#~ msgid "Shanbe"
+#~ msgstr "Shanbe"
+
+#~ msgid "Yek-shanbe"
+#~ msgstr "Yek-shanbe"
+
+#~ msgid "Tishrey"
+#~ msgstr "Tishrey"
+
+#~ msgid "Heshvan"
+#~ msgstr "Heshvan"
+
+#~ msgid "Kislev"
+#~ msgstr "Kislev"
+
+#~ msgid "Tevet"
+#~ msgstr "Tevet"
+
+#~ msgid "Shvat"
+#~ msgstr "Shvat"
+
+#~ msgid "Adar"
+#~ msgstr "Adar"
+
+#~ msgid "Nisan"
+#~ msgstr "Nisan"
+
+#~ msgid "Iyar"
+#~ msgstr "Iyar"
+
+#~ msgid "Sivan"
+#~ msgstr "Sivan"
+
+#~ msgid "Tamuz"
+#~ msgstr "Tamuz"
+
+#~ msgid "Elul"
+#~ msgstr "Elul"
+
+#~ msgid "Adar I"
+#~ msgstr "Adar I"
+
+#~ msgid "Adar II"
+#~ msgstr "Adar II"
+
+#, fuzzy
+#~ msgctxt "@item Calendar system"
+#~ msgid "Coptic"
+#~ msgstr "Còpt"
+
+#, fuzzy
+#~ msgctxt "@item Calendar system"
+#~ msgid "Ethiopian"
+#~ msgstr "Etiopian"
+
+#~ msgctxt "@item Calendar system"
+#~ msgid "Hebrew"
+#~ msgstr "Ebrèu"
+
+#, fuzzy
+#~ msgctxt "@item Calendar system"
+#~ msgid "Julian"
+#~ msgstr "Gen"
+
+#, fuzzy
+#~ msgctxt "Coptic month 1 - ShortNamePossessive"
+#~ msgid "of Tho"
+#~ msgstr "de Sha`ban"
+
+#, fuzzy
+#~ msgctxt "Coptic month 2 - ShortNamePossessive"
+#~ msgid "of Pao"
+#~ msgstr "de genièr"
+
+#, fuzzy
+#~ msgctxt "Coptic month 3 - ShortNamePossessive"
+#~ msgid "of Hat"
+#~ msgstr "de Hijjah"
+
+#, fuzzy
+#~ msgctxt "Coptic month 4 - ShortNamePossessive"
+#~ msgid "of Kia"
+#~ msgstr "de Qi`dah"
+
+#, fuzzy
+#~ msgctxt "Coptic month 5 - ShortNamePossessive"
+#~ msgid "of Tob"
+#~ msgstr "d'octobre"
+
+#, fuzzy
+#~ msgctxt "Coptic month 6 - ShortNamePossessive"
+#~ msgid "of Mes"
+#~ msgstr "de junh"
+
+#, fuzzy
+#~ msgctxt "Coptic month 7 - ShortNamePossessive"
+#~ msgid "of Par"
+#~ msgstr "de genièr"
+
+#, fuzzy
+#~ msgctxt "Coptic month 8 - ShortNamePossessive"
+#~ msgid "of Pam"
+#~ msgstr "de genièr"
+
+#, fuzzy
+#~ msgctxt "Coptic month 9 - ShortNamePossessive"
+#~ msgid "of Pas"
+#~ msgstr "de març"
+
+#, fuzzy
+#~ msgctxt "Coptic month 10 - ShortNamePossessive"
+#~ msgid "of Pan"
+#~ msgstr "de genièr"
+
+#, fuzzy
+#~ msgctxt "Coptic month 11 - ShortNamePossessive"
+#~ msgid "of Epe"
+#~ msgstr "de junh"
+
+#, fuzzy
+#~ msgctxt "Coptic month 12 - ShortNamePossessive"
+#~ msgid "of Meo"
+#~ msgstr "de junh"
+
+#, fuzzy
+#~ msgctxt "Coptic month 13 - ShortNamePossessive"
+#~ msgid "of Kou"
+#~ msgstr "de genièr"
+
+#, fuzzy
+#~ msgctxt "Coptic month 2 - LongNamePossessive"
+#~ msgid "of Paope"
+#~ msgstr "de genièr"
+
+#, fuzzy
+#~ msgctxt "Coptic month 3 - LongNamePossessive"
+#~ msgid "of Hathor"
+#~ msgstr "de Hijjah"
+
+#, fuzzy
+#~ msgctxt "Coptic month 4 - LongNamePossessive"
+#~ msgid "of Kiahk"
+#~ msgstr "de Qi`dah"
+
+#, fuzzy
+#~ msgctxt "Coptic month 5 - LongNamePossessive"
+#~ msgid "of Tobe"
+#~ msgstr "d'octobre"
+
+#, fuzzy
+#~ msgctxt "Coptic month 6 - LongNamePossessive"
+#~ msgid "of Meshir"
+#~ msgstr "de Safar"
+
+#, fuzzy
+#~ msgctxt "Coptic month 8 - LongNamePossessive"
+#~ msgid "of Parmoute"
+#~ msgstr "de genièr"
+
+#, fuzzy
+#~ msgctxt "Coptic month 9 - LongNamePossessive"
+#~ msgid "of Pashons"
+#~ msgstr "de març"
+
+#, fuzzy
+#~ msgctxt "Coptic month 10 - LongNamePossessive"
+#~ msgid "of Paone"
+#~ msgstr "de genièr"
+
+#, fuzzy
+#~ msgctxt "Coptic month 1 - ShortName"
+#~ msgid "Tho"
+#~ msgstr "Thl"
+
+#, fuzzy
+#~ msgctxt "Coptic month 2 - ShortName"
+#~ msgid "Pao"
+#~ msgstr "Pausa"
+
+#, fuzzy
+#~ msgctxt "Coptic month 3 - ShortName"
+#~ msgid "Hat"
+#~ msgstr "Sab"
+
+#, fuzzy
+#~ msgctxt "Coptic month 4 - ShortName"
+#~ msgid "Kia"
+#~ msgstr "Kha"
+
+#, fuzzy
+#~ msgctxt "Coptic month 5 - ShortName"
+#~ msgid "Tob"
+#~ msgstr "Prètzfach"
+
+#, fuzzy
+#~ msgctxt "Coptic month 6 - ShortName"
+#~ msgid "Mes"
+#~ msgstr "Òc"
+
+#, fuzzy
+#~ msgctxt "Coptic month 7 - ShortName"
+#~ msgid "Par"
+#~ msgstr "Mar"
+
+#, fuzzy
+#~ msgctxt "Coptic month 8 - ShortName"
+#~ msgid "Pam"
+#~ msgstr "am"
+
+#, fuzzy
+#~ msgctxt "Coptic month 9 - ShortName"
+#~ msgid "Pas"
+#~ msgstr "Paginas"
+
+#, fuzzy
+#~ msgctxt "Coptic month 10 - ShortName"
+#~ msgid "Pan"
+#~ msgstr "Gen"
+
+#, fuzzy
+#~ msgctxt "Coptic month 11 - ShortName"
+#~ msgid "Epe"
+#~ msgstr "Escap."
+
+#, fuzzy
+#~ msgctxt "Coptic month 12 - ShortName"
+#~ msgid "Meo"
+#~ msgstr "Dil"
+
+#, fuzzy
+#~ msgctxt "Coptic month 13 - ShortName"
+#~ msgid "Kou"
+#~ msgstr "Kho"
+
+#, fuzzy
+#~ msgctxt "Coptic month 1 - LongName"
+#~ msgid "Thoout"
+#~ msgstr "Dij"
+
+#, fuzzy
+#~ msgctxt "Coptic month 2 - LongName"
+#~ msgid "Paope"
+#~ msgstr "Propietat"
+
+#, fuzzy
+#~ msgctxt "Coptic month 3 - LongName"
+#~ msgid "Hathor"
+#~ msgstr "Autor"
+
+#, fuzzy
+#~ msgctxt "Coptic month 6 - LongName"
+#~ msgid "Meshir"
+#~ msgstr "Mehr"
+
+#, fuzzy
+#~ msgctxt "Coptic month 7 - LongName"
+#~ msgid "Paremhotep"
+#~ msgstr "Paramètre"
+
+#, fuzzy
+#~ msgctxt "Coptic month 8 - LongName"
+#~ msgid "Parmoute"
+#~ msgstr "Paramètre"
+
+#, fuzzy
+#~ msgctxt "Coptic month 9 - LongName"
+#~ msgid "Pashons"
+#~ msgstr "Pausa"
+
+#, fuzzy
+#~ msgctxt "Coptic month 10 - LongName"
+#~ msgid "Paone"
+#~ msgstr "Pas cap"
+
+#, fuzzy
+#~ msgctxt "Coptic month 11 - LongName"
+#~ msgid "Epep"
+#~ msgstr "Escap."
+
+#, fuzzy
+#~ msgctxt "Coptic weekday 1 - ShortDayName"
+#~ msgid "Pes"
+#~ msgstr "Paginas"
+
+#, fuzzy
+#~ msgctxt "Coptic weekday 2 - ShortDayName"
+#~ msgid "Psh"
+#~ msgstr "Pausa"
+
+#, fuzzy
+#~ msgctxt "Coptic weekday 6 - ShortDayName"
+#~ msgid "Psa"
+#~ msgstr "Pausa"
+
+#, fuzzy
+#~ msgctxt "Coptic weekday 1 - LongDayName"
+#~ msgid "Pesnau"
+#~ msgstr "Pausa"
+
+#, fuzzy
+#~ msgctxt "Coptic weekday 2 - LongDayName"
+#~ msgid "Pshoment"
+#~ msgstr "Comentari"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 1 - ShortNamePossessive"
+#~ msgid "of Mes"
+#~ msgstr "de junh"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 2 - ShortNamePossessive"
+#~ msgid "of Teq"
+#~ msgstr "de junh"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 3 - ShortNamePossessive"
+#~ msgid "of Hed"
+#~ msgstr "de junh"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 4 - ShortNamePossessive"
+#~ msgid "of Tah"
+#~ msgstr "de març"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 5 - ShortNamePossessive"
+#~ msgid "of Ter"
+#~ msgstr "de Safar"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 6 - ShortNamePossessive"
+#~ msgid "of Yak"
+#~ msgstr "de Sha`ban"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 7 - ShortNamePossessive"
+#~ msgid "of Mag"
+#~ msgstr "de març"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 8 - ShortNamePossessive"
+#~ msgid "of Miy"
+#~ msgstr "de julhet"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 9 - ShortNamePossessive"
+#~ msgid "of Gen"
+#~ msgstr "de junh"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 10 - ShortNamePossessive"
+#~ msgid "of Sen"
+#~ msgstr "de Safar"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 11 - ShortNamePossessive"
+#~ msgid "of Ham"
+#~ msgstr "de Hijjah"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 12 - ShortNamePossessive"
+#~ msgid "of Neh"
+#~ msgstr "de Sha`ban"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 13 - ShortNamePossessive"
+#~ msgid "of Pag"
+#~ msgstr "de genièr"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 3 - LongNamePossessive"
+#~ msgid "of Hedar"
+#~ msgstr "de febrièr"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 4 - LongNamePossessive"
+#~ msgid "of Tahsas"
+#~ msgstr "de Sha`ban"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 5 - LongNamePossessive"
+#~ msgid "of Ter"
+#~ msgstr "de Safar"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 7 - LongNamePossessive"
+#~ msgid "of Magabit"
+#~ msgstr "de Rajab"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 8 - LongNamePossessive"
+#~ msgid "of Miyazya"
+#~ msgstr "de julhet"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 10 - LongNamePossessive"
+#~ msgid "of Sene"
+#~ msgstr "de junh"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 12 - LongNamePossessive"
+#~ msgid "of Nehase"
+#~ msgstr "de Sha`ban"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 13 - LongNamePossessive"
+#~ msgid "of Pagumen"
+#~ msgstr "de genièr"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 1 - ShortName"
+#~ msgid "Mes"
+#~ msgstr "Òc"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 2 - ShortName"
+#~ msgid "Teq"
+#~ msgstr "Mar"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 3 - ShortName"
+#~ msgid "Hed"
+#~ msgstr "Mèc"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 4 - ShortName"
+#~ msgid "Tah"
+#~ msgstr "Banasta"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 5 - ShortName"
+#~ msgid "Ter"
+#~ msgstr "Mar"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 7 - ShortName"
+#~ msgid "Mag"
+#~ msgstr "Mar"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 8 - ShortName"
+#~ msgid "Miy"
+#~ msgstr "Mai"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 9 - ShortName"
+#~ msgid "Gen"
+#~ msgstr "Vèrd :"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 10 - ShortName"
+#~ msgid "Sen"
+#~ msgstr "&Enviar"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 11 - ShortName"
+#~ msgid "Ham"
+#~ msgstr "am"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 12 - ShortName"
+#~ msgid "Neh"
+#~ msgstr "Meh"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 13 - ShortName"
+#~ msgid "Pag"
+#~ msgstr "Paginas"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 2 - LongName"
+#~ msgid "Tequemt"
+#~ msgstr "Tevet"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 3 - LongName"
+#~ msgid "Hedar"
+#~ msgstr "Adar"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 4 - LongName"
+#~ msgid "Tahsas"
+#~ msgstr "Prètzfach (Task)"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 5 - LongName"
+#~ msgid "Ter"
+#~ msgstr "Mar"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 10 - LongName"
+#~ msgid "Sene"
+#~ msgstr "&Enviar"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 11 - LongName"
+#~ msgid "Hamle"
+#~ msgstr "Nom"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 12 - LongName"
+#~ msgid "Nehase"
+#~ msgstr "Nom"
+
+#, fuzzy
+#~ msgctxt "Ethiopian month 13 - LongName"
+#~ msgid "Pagumen"
+#~ msgstr "Paginas"
+
+#, fuzzy
+#~ msgctxt "Ethiopian weekday 1 - ShortDayName"
+#~ msgid "Seg"
+#~ msgstr "Set"
+
+#, fuzzy
+#~ msgctxt "Ethiopian weekday 2 - ShortDayName"
+#~ msgid "Mak"
+#~ msgstr "Mar"
+
+#, fuzzy
+#~ msgctxt "Ethiopian weekday 3 - ShortDayName"
+#~ msgid "Rob"
+#~ msgstr "Prètzfach"
+
+#, fuzzy
+#~ msgctxt "Ethiopian weekday 4 - ShortDayName"
+#~ msgid "Ham"
+#~ msgstr "am"
+
+#, fuzzy
+#~ msgctxt "Ethiopian weekday 5 - ShortDayName"
+#~ msgid "Arb"
+#~ msgstr "Arb"
+
+#, fuzzy
+#~ msgctxt "Ethiopian weekday 6 - ShortDayName"
+#~ msgid "Qed"
+#~ msgstr "Mèc"
+
+#, fuzzy
+#~ msgctxt "Ethiopian weekday 7 - ShortDayName"
+#~ msgid "Ehu"
+#~ msgstr "Dij"
+
+#, fuzzy
+#~ msgctxt "Ethiopian weekday 1 - LongDayName"
+#~ msgid "Segno"
+#~ msgstr "&Enviar"
+
+#, fuzzy
+#~ msgctxt "Ethiopian weekday 3 - LongDayName"
+#~ msgid "Rob"
+#~ msgstr "Prètzfach"
+
+#, fuzzy
+#~ msgctxt "Ethiopian weekday 4 - LongDayName"
+#~ msgid "Hamus"
+#~ msgstr "Pausa"
+
+#, fuzzy
+#~ msgctxt "Ethiopian weekday 5 - LongDayName"
+#~ msgid "Arb"
+#~ msgstr "Arb"
+
+#, fuzzy
+#~ msgctxt "Ethiopian weekday 6 - LongDayName"
+#~ msgid "Qedame"
+#~ msgstr "Nom"
+
+#, fuzzy
+#~ msgctxt "Sorting order of the list of items in get hot new stuff"
+#~ msgid "Most Downloads"
+#~ msgstr "Los mai telecargats"
+
+#, fuzzy
+#~ msgctxt "Sorting order of the list of items in get hot new stuff"
+#~ msgid "Installed only"
+#~ msgstr "Installar"
+
+#, fuzzy
+#~ msgid "Download New Stuff"
+#~ msgstr "Telecargar las novetats"
+
+#~ msgid "Download New %1"
+#~ msgstr "Telecargar lo %1 novèl"
+
+#, fuzzy
+#~ msgid "Conflict With Registered Global Shortcut(s)"
+#~ msgstr "Conflicte amb los acorchis clavièr globals"
+
+#, fuzzy
+#~ msgid "Save"
+#~ msgstr "Enregistrar"
+
+#, fuzzy
+#~ msgid "Long Action"
+#~ msgstr "Accion"
+
+#, fuzzy
+#~ msgctxt "The open file menu entry"
+#~ msgid "Open"
+#~ msgstr "Dobrir"
+
+#, fuzzy
+#~ msgid "KIdleTest"
+#~ msgstr "Tèst"
+
+#, fuzzy
+#~ msgid "Dario Freddi"
+#~ msgstr "David Faure"
+
+#~ msgid ""
+#~ "Open '%2'?\n"
+#~ "Type: %1"
+#~ msgstr "Dobrir '%2' ?Tipe : %1"
+
+#~ msgid ""
+#~ "Open '%3'?\n"
+#~ "Name: %2\n"
+#~ "Type: %1"
+#~ msgstr "Dobrir '%3' ?Nom : %2Tipe : %1"
+
+#~ msgid "&Abort"
+#~ msgstr "&Abandonar"
+
+#~ msgid "Abort?"
+#~ msgstr "Abandonar ?"
+
+#~ msgctxt ""
+#~ "Dear Translator! Translate this string to the string 'LTR' in left-to-"
+#~ "right languages (as English) or to 'RTL' in right-to-left languages (such "
+#~ "as Hebrew and Arabic) to get proper widget layout."
+#~ msgid "LTR"
+#~ msgstr "LTR"
+
+#, fuzzy
+#~ msgid "Do &Not Store"
+#~ msgstr "Conservar pas"
+
+#, fuzzy
+#~ msgctxt "Goes to previous character"
+#~ msgid "Back"
+#~ msgstr "Precedent"
+
+#, fuzzy
+#~ msgctxt "Goes to next character"
+#~ msgid "Forward"
+#~ msgstr "Trasmetre"
+
+#, fuzzy
+#~ msgid "Add Elements"
+#~ msgstr "Apondre un comentari"
+
+#, fuzzy
+#~ msgid "Sample KFormula application"
+#~ msgstr "Quitar l'aplicacion"
+
+#, fuzzy
+#~ msgid "&Options"
+#~ msgstr "Opcions"
+
+#~ msgid "Call stack"
+#~ msgstr "Apelar la pila"
+
+#~ msgid "JavaScript console"
+#~ msgstr "Consòla JavaScript"
+
+#~ msgctxt "Next breakpoint"
+#~ msgid "&Next"
+#~ msgstr "&Seguent"
+
+#~ msgid "&Step"
+#~ msgstr "A&vançar"
+
+#~ msgid "&Continue"
+#~ msgstr "&Contunhar"
+
+#~ msgid "St&op"
+#~ msgstr "&Arrestar"
+
+#~ msgctxt "Next breakpoint"
+#~ msgid "Next"
+#~ msgstr "Seguent"
+
+#~ msgid ""
+#~ "An error occurred while attempting to run a script on this page.\n"
+#~ "\n"
+#~ "%1"
+#~ msgstr ""
+#~ "Un problèma es subrevengut en ensajant d'aviar un escript sus aquesta "
+#~ "pagina.\n"
+#~ "\n"
+#~ "%1"
+
+#~ msgid "%1 %"
+#~ msgstr "%1 %"
+
+#~ msgid "Already open."
+#~ msgstr "Ja dobèrt."
+
+#~ msgid "Error opening file."
+#~ msgstr "Error al moment de dobrir lo fichièr."
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "SaveAs"
+#~ msgstr "Enregistrar coma"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "PrintPreview"
+#~ msgstr "Previsualizacion de l'estampatge"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "EditBookmarks"
+#~ msgstr "Favorits"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "ShowToolbar"
+#~ msgstr "Barras d'espleches"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "ConfigureToolbars"
+#~ msgstr "Configurar"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "AboutApp"
+#~ msgstr "A prepaus de"
+
+#, fuzzy
+#~ msgctxt "@action"
+#~ msgid "AboutKDE"
+#~ msgstr "A prepaus de KDE"
+
+#~ msgid "English"
+#~ msgstr "Anglés"
+
+#, fuzzy
+#~ msgctxt "@action:inmenu"
+#~ msgid "Empty Trash"
+#~ msgstr "Voidar la banasta"
+
+#, fuzzy
+#~ msgctxt "@action:button"
+#~ msgid "Empty Trash"
+#~ msgstr "Voidar la banasta"
+
+#~ msgid "Bookmarks"
+#~ msgstr "Marca-paginas"
+
+#~ msgctxt "Home Directory"
+#~ msgid "Home"
+#~ msgstr "Repertòri personal"
+
+#~ msgid "Network"
+#~ msgstr "Ret"
+
+#~ msgid "Root"
+#~ msgstr "Raiç"
+
+#~ msgid "New Folder"
+#~ msgstr "Repertòri novèl"
+
+#, fuzzy
+#~ msgctxt "@title:window"
+#~ msgid "New Folder"
+#~ msgstr "Repertòri novèl"
+
+#, fuzzy
+#~ msgctxt "@title:window"
+#~ msgid "Select Folder"
+#~ msgstr "Seleccionar un repertòri"
+
+#, fuzzy
+#~ msgctxt "@action:button"
+#~ msgid "New Folder..."
+#~ msgstr "Repertòri novèl"
+
+#, fuzzy
+#~ msgctxt "@action:inmenu"
+#~ msgid "New Folder..."
+#~ msgstr "Repertòri novèl"
+
+#, fuzzy
+#~ msgctxt "@option:check"
+#~ msgid "Show Hidden Folders"
+#~ msgstr "Visualizar los fichièrs amagats"
+
+#~ msgid "&Description:"
+#~ msgstr "&Descripcion :"
+
+#, fuzzy
+#~ msgid "Show Hidden Folders"
+#~ msgstr "Visualizar los fichièrs amagats"
+
+#~ msgid "Nothing to Delete"
+#~ msgstr "Res a suprimir"
+
+#~ msgid "Delete File"
+#~ msgstr "Suprimir lo fichièr"
+
+#~ msgid "Menu"
+#~ msgstr "Menut"
+
+#~ msgid "Home Folder"
+#~ msgstr "Repertòri personal"
+
+#~ msgid "Move to Trash"
+#~ msgstr "Desplaçar dins la banasta"
+
+#~ msgid "Sorting"
+#~ msgstr "A s'ordenar"
+
+#~ msgid "By Name"
+#~ msgstr "Per nom"
+
+#~ msgid "By Size"
+#~ msgstr "Per talha"
+
+#~ msgid "By Type"
+#~ msgstr "Per tipe"
+
+#~ msgid "Descending"
+#~ msgstr "Descreissent"
+
+#~ msgid "Navigate"
+#~ msgstr "Navigar"
+
+#, fuzzy
+#~ msgctxt "@item Text character set"
+#~ msgid "Chinese"
+#~ msgstr "Chinès"

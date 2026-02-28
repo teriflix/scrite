@@ -1,0 +1,33 @@
+include($KDE_DOCS/global/qt-module-defaults.qdocconf)
+
+project = SonnetUi
+description = Spelling framework for Qt
+
+documentationinheaders = true
+
+headerdirs += .
+sourcedirs += .
+
+imagedirs = ../docs/pics
+
+outputformats = HTML
+
+navigation.landingpage = "Sonnet"
+
+depends +=  kde qtwidgets qtquick qtcore sonnetcore
+
+qhp.projects            = SonnetUi
+
+qhp.SonnetUi.file                = sonnetui.qhp
+qhp.SonnetUi.namespace           = org.kde.sonnetui.$QT_VERSION_TAG
+qhp.SonnetUi.virtualFolder       = sonnetui
+qhp.SonnetUi.indexTitle          = Sonnet UI
+qhp.SonnetUi.indexRoot           =
+
+qhp.SonnetUi.subprojects         = classes
+qhp.SonnetUi.subprojects.classes.title = C++ Classes
+qhp.SonnetUi.subprojects.classes.indexTitle = Sonnet UI C++ Classes
+qhp.SonnetUi.subprojects.classes.selectors = class fake:headerfile
+qhp.SonnetUi.subprojects.classes.sortPages = true
+
+tagfile = sonnetui.tags

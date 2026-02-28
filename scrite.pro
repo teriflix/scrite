@@ -125,6 +125,7 @@ HEADERS += \
     src/quick/objects/resetonchange.h \
     src/quick/objects/focustracker.h \
     src/quick/objects/standardpaths.h \
+    src/quick/objects/spellcheckservice.h \
     src/quick/objects/aggregation.h \
     src/quick/items/textshapeitem.h \
     src/quick/items/ruleritem.h \
@@ -263,6 +264,7 @@ SOURCES += \
     src/quick/objects/trackobject.cpp \
     src/quick/objects/errorreport.cpp \
     src/quick/objects/standardpaths.cpp \
+    src/quick/objects/spellcheckservice.cpp \
     src/quick/objects/polygontesselator.cpp \
     src/quick/objects/searchengine.cpp \
     src/quick/items/gridbackgrounditem.cpp \

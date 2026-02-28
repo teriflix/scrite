@@ -1,0 +1,35 @@
+include($KDE_DOCS/global/qt-module-defaults.qdocconf)
+
+project = SonnetQuick
+description = Spell checking
+
+documentationinheaders = true
+
+headerdirs += .
+sourcedirs += .
+
+outputformats = HTML
+
+navigation.landingpage = "Sonnet"
+
+depends += \
+    kde \
+    qtcore \
+    qtqml \
+    sonnetcore
+
+qhp.projects            = SonnetQuick
+
+qhp.SonnetQuick.file                = sonnetquick.qhp
+qhp.SonnetQuick.namespace           = org.kde.sonnetquick.$QT_VERSION_TAG
+qhp.SonnetQuick.virtualFolder       = sonnetquick
+qhp.SonnetQuick.indexTitle          = Sonnet QML
+qhp.SonnetQuick.indexRoot           =
+
+qhp.SonnetQuick.subprojects         = qmltypes
+qhp.SonnetQuick.subprojects.qmltypes.title = QML Types
+qhp.SonnetQuick.subprojects.qmltypes.indexTitle = Sonnet QML Types
+qhp.SonnetQuick.subprojects.qmltypes.selectors = qmltype
+qhp.SonnetQuick.subprojects.qmltypes.sortPages = true
+
+tagfile = sonnetquick.tags

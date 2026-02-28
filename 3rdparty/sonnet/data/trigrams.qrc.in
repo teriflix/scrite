@@ -1,0 +1,6 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource prefix="/org.kde.sonnet">
+<file alias="trigrams.map">@PROJECT_BINARY_DIR@/data/trigrams.map</file>
+</qresource>
+</RCC>
