@@ -1,0 +1,8 @@
+#ifndef SONNET_LOG_CORE_CORE_DEBUG_H
+#define SONNET_LOG_CORE_CORE_DEBUG_H
+
+#include <QLoggingCategory>
+
+Q_DECLARE_LOGGING_CATEGORY(SONNET_LOG_CORE)
+
+#endif

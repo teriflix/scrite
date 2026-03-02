@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>CourierPrime-Bold.ttf</file>
+        <file>CourierPrime-BoldItalic.ttf</file>
+        <file>CourierPrime-Italic.ttf</file>
+        <file>CourierPrime-Regular.ttf</file>
+    </qresource>
+</RCC>

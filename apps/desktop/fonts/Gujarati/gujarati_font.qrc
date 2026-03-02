@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>HindVadodara-Bold.ttf</file>
+        <file>HindVadodara-Regular.ttf</file>
+    </qresource>
+</RCC>

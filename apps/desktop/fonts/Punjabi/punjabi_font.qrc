@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>BalooPaaji2-Bold.ttf</file>
+        <file>BalooPaaji2-Regular.ttf</file>
+    </qresource>
+</RCC>

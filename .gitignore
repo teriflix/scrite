@@ -58,6 +58,7 @@ compile_commands.json
 ~$*.docx
 ~$*.pdf
 
+binary/*
 build/*
 
 # Language Server

@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Mukta-Bold.ttf</file>
+        <file>Mukta-Regular.ttf</file>
+    </qresource>
+</RCC>

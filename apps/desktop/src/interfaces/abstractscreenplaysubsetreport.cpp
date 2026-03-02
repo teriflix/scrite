@@ -1,0 +1,370 @@
+/****************************************************************************
+**
+** Copyright (C) 2020 Prashanth N Udupa
+** Author: Prashanth N Udupa (prashanth@scrite.io,
+**                            prashanth.udupa@gmail.com,
+**                            prashanth@vcreatelogic.com)
+**
+** This code is distributed under GPL v3. Complete text of the license
+** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/
+
+#include "abstractscreenplaysubsetreport.h"
+#include "qtextdocumentpagedprinter.h"
+#include "screenplaytextdocument.h"
+#include "application.h"
+#include "scene.h"
+#include "screenplay.h"
+#include "structure.h"
+#include "scritedocument.h"
+
+AbstractScreenplaySubsetReport::AbstractScreenplaySubsetReport(QObject *parent)
+    : AbstractReportGenerator(parent)
+{
+}
+
+AbstractScreenplaySubsetReport::~AbstractScreenplaySubsetReport() { }
+
+void AbstractScreenplaySubsetReport::setGenerateTitlePage(bool val)
+{
+    if (m_generateTitlePage == val)
+        return;
+
+    m_generateTitlePage = val;
+    emit generateTitlePageChanged();
+}
+
+void AbstractScreenplaySubsetReport::setIncludeLogline(bool val)
+{
+    if (m_includeLogline == val)
+        return;
+
+    m_includeLogline = val;
+    emit includeLoglineChanged();
+}
+
+void AbstractScreenplaySubsetReport::setListSceneCharacters(bool val)
+{
+    if (m_listSceneCharacters == val)
+        return;
+
+    m_listSceneCharacters = val;
+    emit listSceneCharactersChanged();
+}
+
+void AbstractScreenplaySubsetReport::setIncludeSceneSynopsis(bool val)
+{
+    if (m_includeSceneSynopsis == val)
+        return;
+
+    m_includeSceneSynopsis = val;
+    emit includeSceneSynopsisChanged();
+}
+
+void AbstractScreenplaySubsetReport::setIncludeSceneFeaturedImage(bool val)
+{
+    if (m_includeSceneFeaturedImage == val)
+        return;
+
+    m_includeSceneFeaturedImage = val;
+    emit includeSceneFeaturedImageChanged();
+}
+
+void AbstractScreenplaySubsetReport::setIncludeSceneComments(bool val)
+{
+    if (m_includeSceneComments == val)
+        return;
+
+    m_includeSceneComments = val;
+    emit includeSceneCommentsChanged();
+}
+
+void AbstractScreenplaySubsetReport::setIncludeSceneContents(bool val)
+{
+    if (m_includeSceneContents == val)
+        return;
+
+    m_includeSceneContents = val;
+    emit includeSceneContentsChanged();
+}
+
+void AbstractScreenplaySubsetReport::setIncludeSceneNumbers(bool val)
+{
+    if (m_includeSceneNumbers == val)
+        return;
+
+    m_includeSceneNumbers = val;
+    emit includeSceneNumbersChanged();
+}
+
+void AbstractScreenplaySubsetReport::setUseSceneColors(bool val)
+{
+    if (m_useSceneColors == val)
+        return;
+
+    m_useSceneColors = val;
+    emit useSceneColorsChanged();
+}
+
+void AbstractScreenplaySubsetReport::setIncludeSceneIcons(bool val)
+{
+    if (m_includeSceneIcons == val)
+        return;
+
+    m_includeSceneIcons = val;
+    emit includeSceneIconsChanged();
+}
+
+void AbstractScreenplaySubsetReport::setPrintEachSceneOnANewPage(bool val)
+{
+    if (m_printEachSceneOnANewPage == val)
+        return;
+
+    m_printEachSceneOnANewPage = val;
+    emit printEachSceneOnANewPageChanged();
+}
+
+void AbstractScreenplaySubsetReport::setIncludeActBreaks(bool val)
+{
+    if (m_includeActBreaks == val)
+        return;
+
+    m_includeActBreaks = val;
+    emit includeActBreaksChanged();
+}
+
+void AbstractScreenplaySubsetReport::setIgnorePageBreaks(bool val)
+{
+    if (m_ignorePageBreaks == val)
+        return;
+
+    m_ignorePageBreaks = val;
+    emit ignorePageBreaksChanged();
+}
+
+void AbstractScreenplaySubsetReport::setCapitalizeSentences(bool val)
+{
+    if (m_capitalizeSentences == val)
+        return;
+
+    m_capitalizeSentences = val;
+    emit capitalizeSentencesChanged();
+}
+
+void AbstractScreenplaySubsetReport::setPolishParagraphs(bool val)
+{
+    if (m_polishParagraphs == val)
+        return;
+
+    m_polishParagraphs = val;
+    emit polishParagraphsChanged();
+}
+
+void AbstractScreenplaySubsetReport::setEpisodeNumbers(const QList<int> &val)
+{
+    if (m_episodeNumbers == val)
+        return;
+
+    m_episodeNumbers = val;
+    emit episodeNumbersChanged();
+}
+
+void AbstractScreenplaySubsetReport::setTags(const QStringList &val)
+{
+    if (m_tags == val)
+        return;
+
+    m_tags = val;
+    emit tagsChanged();
+}
+
+void AbstractScreenplaySubsetReport::setKeywords(const QStringList &val)
+{
+    if (m_keywords == val)
+        return;
+
+    m_keywords = val;
+    emit keywordsChanged();
+}
+
+bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
+{
+    ScriteDocument *document = this->document();
+    Screenplay *screenplay = document->screenplay();
+
+    this->progress()->setProgressStep(0.25);
+
+    this->progress()->setProgressText("Polishing text ...");
+
+    if (m_capitalizeSentences)
+        screenplay->capitalizeSentences();
+    if (m_polishParagraphs)
+        screenplay->polishText();
+
+    if (m_screenplaySubset)
+        delete m_screenplaySubset;
+
+    this->progress()->setProgressText("Filtering scenes ...");
+    this->progress()->tick();
+
+    const bool hasEpisodes = screenplay->episodeCount() > 0;
+
+    QString subtitle = this->screenplaySubtitle();
+    if (hasEpisodes) {
+        if (m_episodeNumbers.isEmpty()) {
+            if (screenplay->episodeCount() > 1)
+                subtitle += QStringLiteral(" [All %1 Episodes]").arg(screenplay->episodeCount());
+            else
+                subtitle += QStringLiteral(" [Episode 1]");
+        } else if (m_episodeNumbers.size() == 1)
+            subtitle += QStringLiteral(" [Episode ") + QString::number(m_episodeNumbers.first())
+                    + QStringLiteral("]");
+        else {
+            QStringList epNrs;
+            epNrs.reserve(m_episodeNumbers.size());
+            for (int nr : std::as_const(m_episodeNumbers))
+                epNrs << QString::number(nr);
+            subtitle += QStringLiteral(" [Episode ") + epNrs.join(", ") + QStringLiteral("]");
+        }
+    }
+
+    m_screenplaySubset = new Screenplay(this);
+    m_screenplaySubset->setEmail(screenplay->email());
+    m_screenplaySubset->setTitle(screenplay->title());
+    m_screenplaySubset->setAuthor(screenplay->author());
+    m_screenplaySubset->setAddress(screenplay->address());
+    m_screenplaySubset->setBasedOn(screenplay->basedOn());
+    m_screenplaySubset->setContact(screenplay->contact());
+    m_screenplaySubset->setVersion(screenplay->version());
+    m_screenplaySubset->setLogline(screenplay->logline());
+    m_screenplaySubset->setSubtitle(subtitle);
+    m_screenplaySubset->setPhoneNumber(screenplay->phoneNumber());
+    m_screenplaySubset->setProperty("#useDocumentScreenplayForCoverPagePhoto", true);
+    m_screenplaySubset->setProperty("#avoidUpdateBreakTitles", true);
+
+    int episodeNr = 0; // Episode number is 1+episodeIndex
+    for (int i = 0; i < screenplay->elementCount(); i++) {
+        ScreenplayElement *element = screenplay->elementAt(i);
+        if (hasEpisodes && !m_episodeNumbers.isEmpty()) {
+            if (element->elementType() == ScreenplayElement::BreakElementType
+                && element->breakType() == Screenplay::Episode)
+                ++episodeNr;
+            else if (i == 0)
+                ++episodeNr;
+
+            if (!m_episodeNumbers.contains(episodeNr))
+                continue;
+        }
+
+        if (!m_tags.isEmpty() && element->elementType() == ScreenplayElement::SceneElementType
+            && element->scene() != nullptr) {
+            if (!Utils::SMath::doListsIntersect(element->scene()->groups(), m_tags))
+                continue;
+        }
+
+        if (!m_keywords.isEmpty() && element->elementType() == ScreenplayElement::SceneElementType
+            && element->scene() != nullptr) {
+            if (!Utils::SMath::doListsIntersect(element->scene()->tags(), m_keywords))
+                continue;
+        }
+
+        if ((element->elementType() == ScreenplayElement::BreakElementType)
+            || (element->scene() != nullptr && this->includeScreenplayElement(element))) {
+            ScreenplayElement *element2 = new ScreenplayElement(m_screenplaySubset);
+            element2->setElementType(element->elementType());
+            if (element->elementType() == ScreenplayElement::BreakElementType) {
+                element2->setBreakType(element->breakType());
+                element2->setBreakTitle(element->breakTitle());
+                element2->setBreakSubtitle(element->breakSubtitle());
+                element2->setEpisodeIndex(element->episodeIndex());
+                element2->setActIndex(element->actIndex());
+
+                if (element->breakType() == Screenplay::Episode) {
+                    ScreenplayElement *lastElement =
+                            m_screenplaySubset->elementAt(m_screenplaySubset->elementCount() - 1);
+                    if (lastElement
+                        && lastElement->elementType() == ScreenplayElement::BreakElementType
+                        && lastElement->breakType() == Screenplay::Episode)
+                        m_screenplaySubset->removeElement(lastElement);
+                }
+            } else {
+                element2->setScene(element->scene());
+                element2->setProperty("#sceneNumber", element->sceneNumber());
+                element2->setUserSceneNumber(element->userSceneNumber());
+            }
+
+            if (!m_ignorePageBreaks) {
+                element2->setPageBreakBefore(element->isPageBreakBefore());
+                element2->setPageBreakAfter(element->isPageBreakAfter());
+            }
+
+            m_screenplaySubset->addElement(element2);
+        }
+    }
+
+    ScreenplayElement *lastElement =
+            m_screenplaySubset->elementAt(m_screenplaySubset->elementCount() - 1);
+    if (lastElement && lastElement->elementType() == ScreenplayElement::BreakElementType
+        && lastElement->breakType() == Screenplay::Episode)
+        m_screenplaySubset->removeElement(lastElement);
+
+    this->progress()->setProgressText("Preparing document ...");
+    this->progress()->tick();
+
+    ScreenplayTextDocument stDoc;
+    stDoc.setTitlePage(this->format() == PdfFormat ? m_generateTitlePage : false);
+    stDoc.setIncludeLoglineInTitlePage(stDoc.hasTitlePage() ? m_includeLogline : false);
+    stDoc.setSceneNumbers(m_includeSceneNumbers);
+    stDoc.setSceneIcons(this->format() == PdfFormat ? m_includeSceneIcons : false);
+    stDoc.setSceneColors(m_useSceneColors);
+    stDoc.setListSceneCharacters(m_listSceneCharacters);
+    stDoc.setPrintEachSceneOnANewPage(this->format() == PdfFormat ? m_printEachSceneOnANewPage
+                                                                  : false);
+    stDoc.setSyncEnabled(false);
+    if (this->format() == PdfFormat)
+        stDoc.setPurpose(ScreenplayTextDocument::ForPrinting);
+    else
+        stDoc.setPurpose(ScreenplayTextDocument::ForDisplay);
+    stDoc.setScreenplay(m_screenplaySubset);
+    stDoc.setFormatting(document->printFormat());
+    stDoc.setTextDocument(textDocument);
+    stDoc.setIncludeSceneSynopsis(m_includeSceneSynopsis);
+    stDoc.setIncludeSceneFeaturedImage(m_includeSceneFeaturedImage);
+    stDoc.setIncludeSceneComments(m_includeSceneComments);
+    stDoc.setIncludeActBreaks(m_includeActBreaks);
+    stDoc.setInjection(this);
+    this->configureScreenplayTextDocument(stDoc);
+
+    this->progress()->setProgressText("Paginating content ...");
+    this->progress()->tick();
+
+    stDoc.syncNow();
+
+    this->progress()->setProgressText("Done!");
+    this->progress()->tick();
+
+    return true;
+}
+
+void AbstractScreenplaySubsetReport::configureTextDocumentPrinter(
+        QTextDocumentPagedPrinter *printer, const QTextDocument *)
+{
+    printer->header()->setVisibleFromPageOne(!m_generateTitlePage);
+    printer->footer()->setVisibleFromPageOne(!m_generateTitlePage);
+    printer->watermark()->setVisibleFromPageOne(!m_generateTitlePage);
+}
+
+void AbstractScreenplaySubsetReport::inject(
+        QTextCursor &, AbstractScreenplayTextDocumentInjectionInterface::InjectLocation)
+{
+    // Incase we need to plug something in.
+}
+
+bool AbstractScreenplaySubsetReport::filterSceneElement() const
+{
+    return !m_includeSceneContents;
+}

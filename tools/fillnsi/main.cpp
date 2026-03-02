@@ -137,7 +137,7 @@ int main(int argc, char **argv)
     }
 
     const QStringList fileList =
-            QString::fromLatin1(listFile.readAll()).split("\r\n", QString::SkipEmptyParts);
+            QString::fromLatin1(listFile.readAll()).split("\r\n", Qt::SkipEmptyParts);
     if (fileList.isEmpty()) {
         qWarning("No files were listed in '%s'.", qPrintable(listFileName));
         return -1;

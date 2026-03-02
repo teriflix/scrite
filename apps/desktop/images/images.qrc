@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+        <file>appicon.png</file>
+        <file>aboutbox.jpg</file>
+        <file>library.png</file>
+        <file>library_inverted.png</file>
+        <file>library_woicon.png</file>
+        <file>library_woicon_inverted.png</file>
+        <file>sample_scene.png</file>
+        <file>white-paper-texture.jpg</file>
+        <file>scrited_closing_frame.png</file>
+        <file>scrite_logo_for_report_header.png</file>
+        <file>scrite_discord_button.png</file>
+        <file>feature_locked.png</file>
+        <file>banner_logo_overlay.png</file>
+        <file>homescreen_banner.png</file>
+        <file>homescreen_scriptalay_banner.png</file>
+        <file>useraccountdialogbg.png</file>
+        <file>prodicon.png</file>
+        <file>exclprodicon.png</file>
+        <file>splash.png</file>
+    </qresource>
+</RCC>

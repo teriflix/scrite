@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Rubik-BoldItalic.ttf</file>
+        <file>Rubik-Regular.ttf</file>
+        <file>Rubik-Italic.ttf</file>
+        <file>Rubik-Bold.ttf</file>
+    </qresource>
+</RCC>

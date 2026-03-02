@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>font/Gujarati/HindVadodara-Bold.ttf</file>
-        <file>font/Gujarati/HindVadodara-Regular.ttf</file>
-    </qresource>
-</RCC>
