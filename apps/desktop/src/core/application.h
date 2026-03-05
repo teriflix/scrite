@@ -192,8 +192,6 @@ public:
     // clang-format on
     Forms *forms() const;
 
-    static QFontDatabase &fontDatabase();
-
     // TODO: Move this to Platform.fontInfo() ...
     Q_INVOKABLE static QJsonObject systemFontInfo();
 

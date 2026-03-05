@@ -949,7 +949,7 @@ QVariantMap QObjectSerializer::cacheDefaultPropertyValues(const QObject *object,
                 ret.insert(propName, QString::fromLatin1(propEnum.valueToKeys(propValue.toInt())));
             } else if (propType.flags() & QMetaType::PointerToQObject) {
                 continue;
-            } else if (propValue.canConvert(QMetaType::QJsonValue)) {
+            } else if (propValue.canConvert(QMetaType(QMetaType::QJsonValue))) {
                 ret.insert(propName, propValue.toJsonValue());
             } else {
                 const QObjectSerializer::Helper *helper = ::Helpers()->findHelper(prop.userType());

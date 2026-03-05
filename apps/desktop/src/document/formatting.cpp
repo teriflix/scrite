@@ -361,7 +361,7 @@ QTextCharFormat SceneElementFormat::createCharFormat(const qreal *givenPageWidth
     // It turns out that format.setFont()
     // doesnt actually do all of the below.
     // So, we will have to do it explicitly
-    format.setFontFamily(font.family());
+    format.setFontFamilies({ font.family() });
     format.setFontStretch(font.stretch());
     format.setFontOverline(font.overline());
     format.setFontPointSize(font.pointSize());
@@ -1017,7 +1017,7 @@ void ScreenplayFormat::evaluateFontPointSizeDelta()
 void ScreenplayFormat::evaluateFontZoomLevels()
 {
     const QFont defaultFont = this->defaultFont();
-    const QList<int> defaultFontPointSizes = QFontDatabase().pointSizes(defaultFont.family());
+    const QList<int> defaultFontPointSizes = QFontDatabase::pointSizes(defaultFont.family());
 
     QFont font2 = defaultFont;
     font2.setPointSize([=]() {
@@ -3026,7 +3026,7 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
                 continue;
 
             QTextCharFormat format;
-            format.setFontFamily(boundary.fontFamily());
+            format.setFontFamilies({ boundary.fontFamily() });
             this->mergeFormat(boundary.start, boundary.end - boundary.start + 1, format);
         }
 

@@ -56,11 +56,12 @@ bool HtmlImporter::importFrom(const QByteArray &bytes)
     int errCol = -1;
 
     QDomDocument htmlDoc;
-    if (!htmlDoc.setContent(bytes, &errMsg, &errLine, &errCol)) {
+    QDomDocument::ParseResult parseResult = htmlDoc.setContent(bytes);
+    if (!parseResult) {
         const QString msg = QString("Parse Error: %1 at Line %2, Column %3")
-                                    .arg(errMsg)
-                                    .arg(errLine)
-                                    .arg(errCol);
+                                    .arg(parseResult.errorMessage)
+                                    .arg(parseResult.errorLine)
+                                    .arg(parseResult.errorColumn);
         this->error()->setErrorMessage(msg);
         return false;
     }

@@ -91,7 +91,7 @@ void ScreenplaySubsetReport::inject(
     QTextBlockFormat defaultBlockFormat;
 
     QTextCharFormat defaultCharFormat;
-    defaultCharFormat.setFontFamily(defaultFont.family());
+    defaultCharFormat.setFontFamilies({ defaultFont.family() });
     defaultCharFormat.setFontPointSize(12);
 
     QTextBlockFormat blockFormat = defaultBlockFormat;

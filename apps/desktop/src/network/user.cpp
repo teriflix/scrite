@@ -51,20 +51,15 @@ inline bool DeepCopyGadget(const QMetaObject *mo, const void *from, void *to)
 
 inline bool DeepCompareGadget(const QMetaObject *mo, const void *a, const void *b)
 {
-    for (int i = 0; i < mo->propertyCount(); i++) {
+    for (int i = 0; i < mo->propertyCount(); ++i) {
         const QMetaProperty prop = mo->property(i);
         const QVariant aValue = prop.readOnGadget(a);
         const QVariant bValue = prop.readOnGadget(b);
-        int result = 0;
-        bool compareSuccess = QMetaType::compare(aValue.constData(), bValue.constData(),
-                                                 prop.userType(), &result);
-        if (compareSuccess) {
-            if (result != 0)
-                return false;
-        } else {
-            if (aValue != bValue)
-                return false;
-        }
+        const QPartialOrdering ord = QVariant::compare(aValue, bValue);
+        if (ord == QPartialOrdering::Less || ord == QPartialOrdering::Greater)
+            return false;
+        if (ord == QPartialOrdering::Unordered && aValue != bValue)
+            return false;
     }
 
     return true;

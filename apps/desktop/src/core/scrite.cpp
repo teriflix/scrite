@@ -108,8 +108,8 @@ Locale Scrite::locale()
 
     ret.currency.code = locale.currencySymbol(QLocale::CurrencyIsoCode).toLower();
     ret.currency.symbol = locale.currencySymbol(QLocale::CurrencySymbol);
-    ret.country.code = locale.countryToString(locale.country());
-    ret.country.name = locale.nativeCountryName();
+    ret.country.code = locale.territoryToString(locale.territory());
+    ret.country.name = locale.nativeTerritoryName();
 
     return ret;
 }

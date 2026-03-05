@@ -86,7 +86,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
     QTextBlockFormat defaultBlockFormat;
 
     QTextCharFormat defaultCharFormat;
-    defaultCharFormat.setFontFamily(defaultFont.family());
+    defaultCharFormat.setFontFamilies({ defaultFont.family() });
     defaultCharFormat.setFontPointSize(12);
 
     this->progress()->setProgressStepFromCount(screenplay->elementCount() + 2);

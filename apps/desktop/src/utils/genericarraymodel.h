@@ -143,8 +143,8 @@ public:
 
     QHash<int, QByteArray> roleNames() const;
 
-    Q_INVOKABLE void refilter() { this->invalidateFilter(); }
-    Q_INVOKABLE void resort() { this->invalidate(); }
+    Q_INVOKABLE void refilter();
+    Q_INVOKABLE void resort();
 
 signals:
     void filterRow(int source_row, BooleanResult *result);

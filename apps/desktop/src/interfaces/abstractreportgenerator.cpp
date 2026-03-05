@@ -352,12 +352,9 @@ void AbstractReportGenerator::polishOdtContent(const QString &fileName)
             return;
 
         QDomDocument contentXmlDom;
-
-        QString errMsg;
-        int errLine = -1, errCol = -1;
-        if (!contentXmlDom.setContent(&contentXmlFile, &errMsg, &errLine, &errCol)) {
+        QDomDocument::ParseResult parseResult = contentXmlDom.setContent(&contentXmlFile);
+        if (!parseResult)
             return;
-        }
 
         contentXmlFile.close();
 

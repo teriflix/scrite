@@ -301,9 +301,10 @@ void LibraryServiceOpenRecordTask::recordFetched(const QString &name, const QByt
 
     QTemporaryFile tmpFile;
     tmpFile.setAutoRemove(true);
-    tmpFile.open();
-    tmpFile.write(bytes);
-    tmpFile.close();
+    if (tmpFile.open()) {
+        tmpFile.write(bytes);
+        tmpFile.close();
+    }
 
     connect(ScriteDocument::instance(), &ScriteDocument::justReset, this,
             &LibraryServiceOpenRecordTask::onDocumentAboutToOpen);

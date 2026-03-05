@@ -215,18 +215,19 @@ bool PdfExporter::doExport(QIODevice *device)
         const QString pdfFileName = qprinter->outputFileName();
         if (success) {
             QFile pdfFile(pdfFileName);
-            pdfFile.open(QFile::ReadOnly);
+            success = pdfFile.open(QFile::ReadOnly);
 
-            const int bufferSize = 65535;
-            while (1) {
-                const QByteArray bytes = pdfFile.read(bufferSize);
-                if (bytes.isEmpty())
-                    break;
-                device->write(bytes);
+            if (success) {
+                const int bufferSize = 65535;
+                while (1) {
+                    const QByteArray bytes = pdfFile.read(bufferSize);
+                    if (bytes.isEmpty())
+                        break;
+                    device->write(bytes);
+                }
+                QFile::remove(pdfFileName);
             }
         }
-
-        QFile::remove(pdfFileName);
     }
 
     return success;

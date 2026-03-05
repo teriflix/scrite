@@ -125,8 +125,6 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     QFontDatabase::addApplicationFont(QStringLiteral(":font/Rubik/Rubik-Bold.ttf"));
     this->setFont(QFont(QStringLiteral("Rubik")));
 
-    connect(this, &QGuiApplication::fontChanged, this, &Application::applicationFontChanged);
-
     this->setWindowIcon(QIcon(":/images/appicon.png"));
     this->setBaseWindowTitle(Application::applicationName() + " "
                              + Application::applicationVersion());
@@ -187,13 +185,14 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 
     m_settings->sync();
 
-    QtConcurrent::run(&Application::systemFontInfo);
+    auto systemFonts = QtConcurrent::run(&Application::systemFontInfo);
+    Q_UNUSED(systemFonts)
 
     this->setWindowIcon(QIcon(QStringLiteral(":/images/appicon.png")));
 
     m_customFontPointSize = [=]() -> int {
         const QVariant val = m_settings->value(QLatin1String("Application/customFontPointSize"));
-        if (val.isValid() && !val.isNull() && val.canConvert(QMetaType::Int))
+        if (val.isValid() && !val.isNull() && val.canConvert(QMetaType(QMetaType::Int)))
             return val.toInt();
         return 0;
     }();
@@ -489,17 +488,9 @@ void Application::setBaseWindowTitle(const QString &val)
     emit baseWindowTitleChanged();
 }
 
-QFontDatabase &Application::fontDatabase()
-{
-    static QFontDatabase theGlobalFontDatabase;
-    return theGlobalFontDatabase;
-}
-
 QJsonObject Application::systemFontInfo()
 {
     HourGlass hourGlass;
-
-    QFontDatabase &fontdb = Application::fontDatabase();
 
     static QJsonObject ret;
 
@@ -508,16 +499,16 @@ QJsonObject Application::systemFontInfo()
 
     if (ret.isEmpty()) {
         // Load all fonts, we will need it at some point anyway
-        fontdb.families();
+        QFontDatabase::families();
 
-        const QStringList allFamilies = fontdb.families();
+        const QStringList allFamilies = QFontDatabase::families();
         QStringList families;
         std::copy_if(allFamilies.begin(), allFamilies.end(), std::back_inserter(families),
-                     [fontdb](const QString &family) { return !fontdb.isPrivateFamily(family); });
+                     [](const QString &family) { return !QFontDatabase::isPrivateFamily(family); });
         ret.insert("families", QJsonArray::fromStringList(families));
 
         QJsonArray sizes;
-        const QList<int> stdSizes = fontdb.standardSizes();
+        const QList<int> stdSizes = QFontDatabase::standardSizes();
         for (int stdSize : stdSizes)
             sizes.append(QJsonValue(stdSize));
         ret.insert("standardSizes", sizes);
@@ -682,6 +673,9 @@ bool Application::notify(QObject *object, QEvent *event)
             QtApplicationClass::notify(childObject, &parentChangeEvent);
         }
     }
+
+    if (event->type() == QEvent::ApplicationFontChange)
+        this->applicationFontChanged();
 
     return ret;
 }

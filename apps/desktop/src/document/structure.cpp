@@ -2334,8 +2334,8 @@ bool AnnotationMetaData::update(const QString &type, const QJsonObject &attribut
 void AnnotationMetaData::save()
 {
     QFile file(m_metaDataFile);
-    file.open(QFile::WriteOnly);
-    file.write(QJsonDocument(m_metaData).toJson());
+    if (file.open(QFile::WriteOnly))
+        file.write(QJsonDocument(m_metaData).toJson());
 }
 
 Q_GLOBAL_STATIC(AnnotationMetaData, GlobalAnnotationMetaData)
@@ -4069,11 +4069,12 @@ void Structure::loadDefaultGroupsData()
 
     if (!QFile::exists(groupsListFileName)) {
         QFile inFile(QStringLiteral(":/misc/structure_groups.lst"));
-        inFile.open(QFile::ReadOnly);
-        const QByteArray inFileData = inFile.readAll();
-        QFile outFile(groupsListFileName);
-        if (outFile.open(QFile::WriteOnly))
-            outFile.write(inFileData);
+        if (inFile.open(QFile::ReadOnly)) {
+            const QByteArray inFileData = inFile.readAll();
+            QFile outFile(groupsListFileName);
+            if (outFile.open(QFile::WriteOnly))
+                outFile.write(inFileData);
+        }
     }
 
     auto reloadGroupsListFile = [=]() {
@@ -5431,8 +5432,9 @@ QPainterPath StructureElementConnector::curvedArrowPath(const QRectF &rect1, con
     QPainterPath path;
     static QString getBoxToBoxArrowJs = []() {
         QFile file(QStringLiteral(":/dragonman225-curved-arrows/getBoxToBoxArrow.js"));
-        file.open(QFile::ReadOnly);
-        return file.readAll();
+        if (file.open(QFile::ReadOnly))
+            return QString::fromUtf8(file.readAll());
+        return QString();
     }();
 
     QString fnCallCode;
@@ -5834,7 +5836,8 @@ void StructureCanvasViewportFilterModel::invalidateSelf()
             ? nullptr
             : qobject_cast<AbstractQObjectListModel *>(this->sourceModel());
     if (model == nullptr || m_computeStrategy == OnDemandComputeStrategy) {
-        this->invalidateFilter();
+        this->beginFilterChange();
+        this->endFilterChange();
         return;
     }
 
@@ -5855,7 +5858,8 @@ void StructureCanvasViewportFilterModel::invalidateSelf()
         }
     }
 
-    this->invalidateFilter();
+    this->beginFilterChange();
+    this->endFilterChange();
 }
 
 void StructureCanvasViewportFilterModel::invalidateSelfLater()

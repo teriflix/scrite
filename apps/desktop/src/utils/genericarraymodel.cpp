@@ -299,6 +299,16 @@ QHash<int, QByteArray> GenericArraySortFilterProxyModel::roleNames() const
     return m_arrayModel->roleNames();
 }
 
+void GenericArraySortFilterProxyModel::refilter()
+{
+    this->beginFilterChange(); this->endFilterChange();
+}
+
+void GenericArraySortFilterProxyModel::resort()
+{
+    this->invalidate();
+}
+
 bool GenericArraySortFilterProxyModel::filterAcceptsRow(int source_row,
                                                         const QModelIndex &source_parent) const
 {

@@ -607,7 +607,7 @@ void AttachmentsDropArea::denyDrop()
 
 void AttachmentsDropArea::dragEnterEvent(QDragEnterEvent *de)
 {
-    this->setMouse(de->posF());
+    this->setMouse(de->position());
 
     const QMimeData *mimeData = de->mimeData();
     if (de->proposedAction() == Qt::CopyAction && this->prepareAttachmentFromMimeData(mimeData)) {
@@ -619,7 +619,7 @@ void AttachmentsDropArea::dragEnterEvent(QDragEnterEvent *de)
 
 void AttachmentsDropArea::dragMoveEvent(QDragMoveEvent *de)
 {
-    this->setMouse(de->posF());
+    this->setMouse(de->position());
 
     if (de->proposedAction() == Qt::CopyAction && m_attachment != nullptr) {
         de->setDropAction(Qt::CopyAction);
@@ -649,7 +649,7 @@ void AttachmentsDropArea::dropEvent(QDropEvent *de)
             qmlWindow->raise();
         }
 
-        this->setMouse(de->posF());
+        this->setMouse(de->position());
         m_allowDrop = true;
 
         emit dropped();

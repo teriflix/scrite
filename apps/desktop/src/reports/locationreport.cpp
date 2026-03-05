@@ -41,7 +41,7 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
     QTextBlockFormat defaultBlockFormat;
 
     QTextCharFormat defaultCharFormat;
-    defaultCharFormat.setFontFamily(defaultFont.family());
+    defaultCharFormat.setFontFamilies({ defaultFont.family() });
     defaultCharFormat.setFontPointSize(12);
 
     // Report Title

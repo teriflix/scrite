@@ -1568,8 +1568,8 @@ void ScriteDocument::saveAs(const QString &givenFileName)
         const QFileInfo fi(fileName);
         const QString fileName2 = fi.absolutePath() + "/" + fi.completeBaseName() + ".json";
         QFile file2(fileName2);
-        file2.open(QFile::WriteOnly);
-        file2.write(bytes);
+        if (file2.open(QFile::WriteOnly))
+            file2.write(bytes);
     }
 
     if (m_autoSaveMode) {

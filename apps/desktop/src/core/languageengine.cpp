@@ -1987,8 +1987,8 @@ QImage LanguageIconProvider::requestImage(const QString &id, QSize *size,
                 return QColor(value.toString());
             if (value.userType() == QMetaType::QColor)
                 return value.value<QColor>();
-            if (value.canConvert(QMetaType::QColor)) {
-                value.convert(QMetaType::QColor);
+            if (value.canConvert(QMetaType(QMetaType::QColor))) {
+                value.convert(QMetaType(QMetaType::QColor));
                 return value.value<QColor>();
             }
         }
@@ -2148,7 +2148,7 @@ bool LanguageEngine::setScriptFontFamily(QChar::Script script, const QString &fo
     if (m_scriptFontFamily.value(script) == fontFamily || fontFamily.isEmpty())
         return false;
 
-    if (!Application::fontDatabase().hasFamily(fontFamily))
+    if (!QFontDatabase::hasFamily(fontFamily))
         return false;
 
     m_scriptFontFamily[script] = fontFamily;
@@ -2172,14 +2172,13 @@ QString LanguageEngine::scriptFontFamily(QChar::Script script) const
     if (writingSystem == QFontDatabase::Any || writingSystem == QFontDatabase::Latin)
         return safeDefault;
 
-    const QStringList aptFontFamilies = Application::fontDatabase().families(writingSystem);
+    const QStringList aptFontFamilies = QFontDatabase::families(writingSystem);
     if (aptFontFamilies.isEmpty())
         return safeDefault;
 
-    const auto it = std::find_if(aptFontFamilies.begin(), aptFontFamilies.end(),
-                                 [=](const QString &fontFamily) {
-                                     return Application::fontDatabase().isFixedPitch(fontFamily);
-                                 });
+    const auto it = std::find_if(
+            aptFontFamilies.begin(), aptFontFamilies.end(),
+            [=](const QString &fontFamily) { return QFontDatabase::isFixedPitch(fontFamily); });
     if (it != aptFontFamilies.end())
         return *it;
 
@@ -2206,13 +2205,11 @@ QStringList LanguageEngine::scriptFontFamilies(QChar::Script script) const
     if (writingSystem == QFontDatabase::Any || writingSystem == QFontDatabase::Latin)
         includeFontFamily(safeDefault);
 
-    QFontDatabase &fontDb = Application::fontDatabase();
-
-    const QStringList availableFontFamilies = fontDb.families(writingSystem);
+    const QStringList availableFontFamilies = QFontDatabase::families(writingSystem);
     if (!availableFontFamilies.isEmpty()) {
         // For some reason, std::copy_if() was crashing
         for (const QString &fontFamily : availableFontFamilies) {
-            if (script != QChar::Script_Latin || fontDb.isFixedPitch(fontFamily))
+            if (script != QChar::Script_Latin || QFontDatabase::isFixedPitch(fontFamily))
                 includeFontFamily(fontFamily);
         }
     }
@@ -2387,7 +2384,7 @@ void LanguageEngine::determineBoundariesAndInsertText(QTextCursor &cursor, const
     const QList<ScriptBoundary> items = determineBoundaries(paragraph);
     for (const ScriptBoundary &item : items) {
         QTextCharFormat format = defaultFormat;
-        format.setFontFamily(LanguageEngine::instance()->scriptFontFamily(item.script));
+        format.setFontFamilies({ LanguageEngine::instance()->scriptFontFamily(item.script) });
         cursor.insertText(item.text, format);
     }
 }
@@ -2521,7 +2518,8 @@ LanguageEngine::mergeTextFormats(const QList<ScriptBoundary> &boundaries,
             cursor.setPosition(boundary.end, QTextCursor::KeepAnchor);
 
             QTextCharFormat charFormat;
-            charFormat.setFontFamily(LanguageEngine::instance()->scriptFontFamily(boundary.script));
+            charFormat.setFontFamilies(
+                    { LanguageEngine::instance()->scriptFontFamily(boundary.script) });
             charFormat.setProperty(QTextCharFormat::UserProperty, boundary.script);
             cursor.setCharFormat(charFormat);
             cursor.clearSelection();
@@ -2620,7 +2618,7 @@ void LanguageEngine::loadConfiguration()
                 const QJsonObject scriptFont = scriptFontsItem.toObject();
 
                 const QString fontFamily = scriptFont.value("font-family").toString();
-                if (fontFamily.isEmpty() || !Application::fontDatabase().hasFamily(fontFamily))
+                if (fontFamily.isEmpty() || !QFontDatabase::hasFamily(fontFamily))
                     continue;
 
                 const int key = scriptFont.value("key").toInt();

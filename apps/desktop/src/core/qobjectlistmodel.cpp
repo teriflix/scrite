@@ -68,7 +68,7 @@ void SortFilterObjectListModel::setFilterByProperty(const QByteArray &val)
     m_filterByProperty = val;
     emit filterByPropertyChanged();
 
-    this->invalidateFilter();
+    this->beginFilterChange(); this->endFilterChange();
 }
 
 void SortFilterObjectListModel::setFilterValues(const QVariantList &val)
@@ -79,7 +79,7 @@ void SortFilterObjectListModel::setFilterValues(const QVariantList &val)
     m_filterValues = val;
     emit filterValuesChanged();
 
-    this->invalidateFilter();
+    this->beginFilterChange(); this->endFilterChange();
 }
 
 void SortFilterObjectListModel::setFilterMode(FilterMode val)
@@ -90,7 +90,7 @@ void SortFilterObjectListModel::setFilterMode(FilterMode val)
     m_filterMode = val;
     emit filterModeChanged();
 
-    this->invalidateFilter();
+    this->beginFilterChange(); this->endFilterChange();
 }
 
 void SortFilterObjectListModel::setSortFunction(const QJSValue &val)

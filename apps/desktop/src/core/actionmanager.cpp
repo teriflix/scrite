@@ -395,7 +395,7 @@ QObject *ActionManager::findByShortcut(const QString &shortcut) const
     auto it = std::find_if(m_actions.begin(), m_actions.end(), [shortcut](QObject *action) {
         const QVariant actionShortcutVariant = action->property(_QQuickActionShortcutProperty);
         if (actionShortcutVariant.isValid()) {
-            if (actionShortcutVariant.canConvert(QMetaType::QString)) {
+            if (actionShortcutVariant.canConvert(QMetaType(QMetaType::QString))) {
                 const QString actionShortcut =
                         action->property(_QQuickActionShortcutProperty).toString();
                 return actionShortcut == shortcut;
@@ -1432,7 +1432,8 @@ void ActionsModelFilter::setActionManagerTitle(const QString &val)
     m_actionManagerTitleFilter = val;
     emit actionManagerTitleChanged();
 
-    this->invalidateFilter();
+    this->beginFilterChange();
+    this->endFilterChange();
 }
 
 void ActionsModelFilter::setActionText(const QString &val)
@@ -1443,7 +1444,8 @@ void ActionsModelFilter::setActionText(const QString &val)
     m_actionTextFilter = val;
     emit actionTextChanged();
 
-    this->invalidateFilter();
+    this->beginFilterChange();
+    this->endFilterChange();
 }
 
 void ActionsModelFilter::setFilters(Filters val)
@@ -1454,7 +1456,8 @@ void ActionsModelFilter::setFilters(Filters val)
     m_filters = val;
     emit filtersChanged();
 
-    this->invalidateFilter();
+    this->beginFilterChange();
+    this->endFilterChange();
 }
 
 void ActionsModelFilter::setCustomFilterMode(bool val)
@@ -1517,7 +1520,8 @@ int ActionsModelFilter::restoreAllActionShortcuts()
 
 void ActionsModelFilter::filter()
 {
-    this->invalidateFilter();
+    this->beginFilterChange();
+    this->endFilterChange();
 }
 
 ActionManager *ActionsModelFilter::actionManagerOf(QObject *action) const

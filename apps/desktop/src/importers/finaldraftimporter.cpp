@@ -97,11 +97,12 @@ bool FinalDraftImporter::doImport(QIODevice *device)
     const QByteArray xml = device->readAll();
 
     QDomDocument doc;
-    if (!doc.setContent(xml, true, &errMsg, &errLine, &errCol)) {
+    QDomDocument::ParseResult parseResult = doc.setContent(xml);
+    if (!parseResult) {
         const QString msg = QStringLiteral("Parse Error: %1 at Line %2, Column %3")
-                                    .arg(errMsg)
-                                    .arg(errLine)
-                                    .arg(errCol);
+                                    .arg(parseResult.errorMessage)
+                                    .arg(parseResult.errorLine)
+                                    .arg(parseResult.errorColumn);
         this->error()->setErrorMessage(msg);
         return false;
     }

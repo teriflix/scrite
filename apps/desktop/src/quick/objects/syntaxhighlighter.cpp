@@ -506,7 +506,7 @@ void LanguageFontSyntaxHighlighterDelegate::highlightBlock(const QString &text)
             continue;
 
         QTextCharFormat format;
-        format.setFontFamily(boundary.fontFamily());
+        format.setFontFamilies({ boundary.fontFamily() });
         this->mergeFormat(boundary.start, boundary.end - boundary.start + 1, format);
     }
 }

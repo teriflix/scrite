@@ -259,7 +259,7 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
 
         QTextCharFormat format = eformat->createCharFormat();
         format.clearProperty(QTextFormat::FontPointSize);
-        format.setFontFamily(document->defaultFont().family());
+        format.setFontFamilies({ document->defaultFont().family() });
         format.setFontPointSize(document->defaultFont().pointSize());
         if (bgColor.alpha() > 0)
             format.setBackground(QBrush(bgColor));
