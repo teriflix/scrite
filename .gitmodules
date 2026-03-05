@@ -1,0 +1,6 @@
+[submodule "thirdparty/dynamic/sonnet/sonnet"]
+	path = thirdparty/dynamic/sonnet/sonnet
+	url = https://invent.kde.org/frameworks/sonnet.git
+[submodule "thirdparty/static/quazip/quazip"]
+	path = thirdparty/static/quazip/quazip
+	url = https://github.com/stachenov/quazip.git

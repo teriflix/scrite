@@ -28,12 +28,12 @@
 #include <QRandomGenerator>
 #include <QCoreApplication>
 
-#include "thirdparty/dynamic/sonnet/src/core/speller.h"
-#include "thirdparty/dynamic/sonnet/src/core/loader_p.h"
-#include "thirdparty/dynamic/sonnet/src/core/textbreaks_p.h"
+#include "sonnet/src/core/speller.h"
+#include "sonnet/src/core/loader_p.h"
+#include "sonnet/src/core/textbreaks_p.h"
 
 // #ifdef Q_OS_MAC
-// #include "thirdparty/dynamic/sonnet/src/plugins/nsspellchecker/nsspellcheckerclient.h"
+// #include "sonnet/src/plugins/nsspellchecker/nsspellcheckerclient.h"
 // #endif
 
 class EnglishLanguageSpeller : public Sonnet::Speller

@@ -1,4 +1,0 @@
-#include "nsspellcheckerdebug.h"
-
-Q_LOGGING_CATEGORY(SONNET_NSSPELLCHECKER, "SONNET_NSSPELLCHECKER")
-
