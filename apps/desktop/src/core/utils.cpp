@@ -319,23 +319,24 @@ Utils::KeyCombinations Utils::Gui::keyCombinations(const QString &shortcut)
     const QKeySequence keySequence = QKeySequence::fromString(shortcut);
 
     for (int i = 0; i < keySequence.count(); i++) {
-        const int key = keySequence[i];
+        const QKeyCombination kc = keySequence[i];
         if (i == 0) {
-            if (key & Qt::ControlModifier)
+            const Qt::KeyboardModifiers modifiers = kc.keyboardModifiers();
+            if (modifiers.testFlag(Qt::ControlModifier))
                 result.controlModifier = true;
-            if (key & Qt::AltModifier)
+            if (modifiers.testFlag(Qt::AltModifier))
                 result.altModifier = true;
-            if (key & Qt::ShiftModifier)
+            if (modifiers.testFlag(Qt::ShiftModifier))
                 result.shiftModifier = true;
-            if (key & Qt::MetaModifier)
+            if (modifiers.testFlag(Qt::MetaModifier))
                 result.metaModifier = true;
             // Note: Qt::KeypadModifier and Qt::GroupSwitchModifier are not handled in the struct
         }
 
-        const int keyOnly = key & ~Qt::KeyboardModifierMask;
-        if (keyOnly > 0) {
-            result.keyCodes.append(static_cast<Qt::Key>(keyOnly));
-            result.keys.append(QKeySequence(keyOnly).toString(QKeySequence::PortableText));
+        const Qt::Key key = kc.key();
+        if (key > 0) {
+            result.keyCodes.append(key);
+            result.keys.append(QKeySequence(key).toString(QKeySequence::PortableText));
         }
     }
 
@@ -999,9 +1000,8 @@ QString Utils::Object::enumKey(QObject *object, const QString &enumName, int val
 
 QString Utils::Object::typeEnumKey(const QString &typeName, const QString &enumName, int value)
 {
-    const int typeId = QMetaType::type(qPrintable(typeName + "*"));
-    const QMetaObject *mo =
-            typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
+    const QMetaType type = QMetaType::fromName(typeName.toLatin1() + "*");
+    const QMetaObject *mo = type.metaObject();
     if (mo)
         return ::enumerationKey(mo, enumName, value);
 
@@ -1022,9 +1022,8 @@ QAbstractListModel *Utils::Object::enumModel(QObject *object, const QString &enu
 QAbstractListModel *Utils::Object::typeEnumModel(const QString &typeName, const QString &enumName,
                                                  QObject *parent)
 {
-    const int typeId = QMetaType::type(qPrintable(typeName + "*"));
-    const QMetaObject *mo =
-            typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
+    const QMetaType type = QMetaType::fromName(typeName.toLatin1() + "*");
+    const QMetaObject *mo = type.metaObject();
     if (mo)
         return new EnumerationModel(mo, enumName, parent);
 
@@ -1038,7 +1037,7 @@ QVariant Utils::Object::convertToPropertyType(const QVariant &value, const QMeta
 
     QVariant value2 = value;
     if (value2.userType() != prop.userType()) {
-        if (!value2.convert(prop.userType())) {
+        if (!value2.convert(QMetaType(prop.userType()))) {
             if (prop.userType() == qMetaTypeId<QList<int>>()) {
                 const QVariantList list = value.toList();
                 QList<int> intList;

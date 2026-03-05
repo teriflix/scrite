@@ -263,7 +263,7 @@ void SimpleTabBarItem::mousePressEvent(QMouseEvent *event)
 {
     event->ignore();
 
-    const QPointF pt = event->localPos();
+    const QPointF pt = event->position();
     for (int i = 0; i < m_tabInfos.size(); i++) {
         const TabInfo &item = m_tabInfos.at(i);
         if (item.path.contains(pt)) {

@@ -1961,7 +1961,7 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
                                             int textPosition)
 {
     ScreenplayElement *ret = nullptr;
-    QScopedPointer<SplitElementUndoCommand> undoCommand(new SplitElementUndoCommand(ptr));
+    std::unique_ptr<SplitElementUndoCommand> undoCommand(new SplitElementUndoCommand(ptr));
 
     {
         QScopedValueRollback<bool> undoLock(UndoHub::blocked, true);
@@ -2011,7 +2011,7 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
 
     if (ret != nullptr && UndoHub::active() != nullptr) {
         undoCommand->commit(ret->scene());
-        undoCommand.take();
+        undoCommand.release();
     }
 
     this->evaluateSceneNumbers(true);

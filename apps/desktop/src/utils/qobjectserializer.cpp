@@ -261,7 +261,7 @@ QJsonObject QObjectSerializer::toJson(const QObject *object)
 
                 ret.insert(propName, propValue.toString());
             } else if (propType.flags() & QMetaType::PointerToQObject) {
-                propValue.convert(QMetaType::QObjectStar);
+                propValue.convert(QMetaType(QMetaType::QObjectStar));
 
                 const QObject *propObject = propValue.value<QObject *>();
                 if (propObject != nullptr) {
@@ -438,10 +438,10 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
                 QObject *propObject = propValue.value<QObject *>();
                 if (propObject == nullptr) {
                     if (factory == nullptr) {
-                        stopGapFactory.add(QMetaType::metaObjectForType(prop.userType()));
+                        stopGapFactory.add(QMetaType(prop.userType()).metaObject());
                         usableFactory = &stopGapFactory;
                     } else
-                        factory->add(QMetaType::metaObjectForType(prop.userType()));
+                        factory->add(QMetaType(prop.userType()).metaObject());
 
                     if (prop.isWritable() && usableFactory != nullptr) {
                         const QByteArray className = QByteArray(prop.typeName()).replace('*', "");
@@ -724,7 +724,7 @@ QVariant QRealHelper::fromJson(const QJsonValue &value, int type) const
     const double val = value.toDouble();
 
     QVariant ret(val);
-    ret.convert(type);
+    ret.convert(QMetaType(type));
     return ret;
 }
 

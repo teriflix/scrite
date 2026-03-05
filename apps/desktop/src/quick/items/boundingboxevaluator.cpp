@@ -14,7 +14,6 @@
 ****************************************************************************/
 
 #include "application.h"
-#include "utils.h"
 #include "boundingboxevaluator.h"
 #include "boundingboxevaluator.h"
 
@@ -247,7 +246,7 @@ QPicture BoundingBoxEvaluator::createPreviewPicture(const QList<QJsonObject> &it
         const QByteArray base64 = value.toString().toLatin1();
         QByteArray bytes = QByteArray::fromBase64(base64);
         QBuffer buffer(&bytes);
-        buffer.open(QFile::ReadOnly);
+        buffer.open(QIODevice::ReadOnly);
 
         QImage ret;
         ret.load(&buffer, "PNG");
@@ -366,7 +365,7 @@ QRectF BoundingBoxItem::boundingRect() const
             && (m_itemRect.userType() == QMetaType::QRect
                 || m_itemRect.userType() == QMetaType::QRectF)) {
             QVariant itemRect = m_itemRect;
-            itemRect.convert(QMetaType::QRectF);
+            itemRect.convert(QMetaType(QMetaType::QRectF));
             return itemRect.toRectF();
         }
 

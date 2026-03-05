@@ -159,8 +159,8 @@ bool EventFilter::forwardEventTo(QObject *object)
     if (object == nullptr || object == m_target)
         return false;
 
-        // We have to create a duplicate copy of the event and
-        // put it into the queue.
+    // We have to create a duplicate copy of the event and
+    // put it into the queue.
 #ifdef POST_CLONED_EVENTS_WHILE_FORWARDING
     if (m_currentEvent->type() == QEvent::NativeGesture)
         return qApp->sendEvent(object, m_currentEvent);
@@ -195,11 +195,11 @@ inline void packIntoJson(QMouseEvent *event, QJsonObject &object)
     object.insert("button", int(event->button()));
     object.insert("buttons", int(event->buttons()));
     object.insert("flags", int(event->flags()));
-    object.insert("globalPos", pointToJson(event->globalPos()));
-    object.insert("localPos", pointToJson(event->localPos()));
-    object.insert("screenPos", pointToJson(event->screenPos()));
+    object.insert("globalPos", pointToJson(event->globalPosition()));
+    object.insert("localPos", pointToJson(event->position()));
+    object.insert("screenPos", pointToJson(event->globalPosition()));
     object.insert("pos", pointToJson(event->pos()));
-    object.insert("windowPos", pointToJson(event->windowPos()));
+    object.insert("windowPos", pointToJson(event->scenePosition()));
     object.insert("source", int(event->source()));
     object.insert("modifiers", int(event->modifiers()));
     object.insert("controlModifier", event->modifiers() & Qt::ControlModifier ? true : false);
@@ -264,8 +264,8 @@ inline void packIntoJson(QHoverEvent *event, QJsonObject &object)
         return ret;
     };
 
-    object.insert("pos", pointToJson(event->posF()));
-    object.insert("oldPos", pointToJson(event->pos()));
+    object.insert("pos", pointToJson(event->position()));
+    object.insert("oldPos", pointToJson(event->oldPosF()));
 }
 
 inline void packDropEventIntoJson(QDropEvent *event, QJsonObject &object)
@@ -277,7 +277,7 @@ inline void packDropEventIntoJson(QDropEvent *event, QJsonObject &object)
         return ret;
     };
 
-    object.insert("pos", pointToJson(event->posF()));
+    object.insert("pos", pointToJson(event->position()));
 
     const QMimeData *mimeData = event->mimeData();
     const QStringList formats = mimeData->formats();

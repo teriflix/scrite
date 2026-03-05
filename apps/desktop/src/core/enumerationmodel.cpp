@@ -49,9 +49,9 @@ void EnumerationModel::setIgnoreList(QList<int> val)
 
 void EnumerationModel::setClassName(const QString &val)
 {
-    const int typeId = QMetaType::type(qPrintable(val + "*"));
-    const QMetaObject *mo =
-            typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
+    const QByteArray typeName = val.toLatin1() + "*";
+    const QMetaType metaType = QMetaType::fromName(typeName);
+    const QMetaObject *mo = metaType.metaObject();
     if (mo != m_metaObject || m_object != nullptr) {
         if (m_object)
             QObject::disconnect(m_object, &QObject::destroyed, this,
