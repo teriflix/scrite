@@ -222,9 +222,9 @@ QJsonObject QObjectSerializer::toJson(const QObject *object)
             // cant be unserialized, whats the point of storing them.
             // The only exception to this rule is if the property is returning a QObject
             // type. In which case, we have to serialize it.
+            const QByteArray propTypeName(prop.typeName());
             const bool isQObjectPointer = (propType.flags() & QMetaType::PointerToQObject);
-            const bool isQQmlListProperty =
-                    QByteArray(prop.typeName()).startsWith("QQmlListProperty");
+            const bool isQQmlListProperty = propTypeName.startsWith("QQmlListProperty");
             if (!prop.isWritable() && !isQObjectPointer && !isQQmlListProperty)
                 continue;
 
@@ -236,6 +236,20 @@ QJsonObject QObjectSerializer::toJson(const QObject *object)
                 QJsonArray list;
 
                 QQmlListReference listRef(const_cast<QObject *>(object), prop.name());
+
+#if 0
+                const QMetaObject *listElementType = listRef.listElementType();
+                if (listElementType == nullptr) {
+                    QByteArray listElementTypeName = propTypeName;
+                    listElementTypeName =
+                            listElementTypeName.mid(listElementTypeName.indexOf('<') + 1);
+                    listElementTypeName =
+                            listElementTypeName.left(listElementTypeName.lastIndexOf('>'));
+                    listElementTypeName += "*";
+                    listElementType = QMetaType::fromName(listElementTypeName).metaObject();
+                }
+#endif
+
                 for (int i = 0; i < listRef.count(); i++) {
                     const QObject *listItem = listRef.at(i);
                     if (listItem == nullptr)
@@ -365,9 +379,9 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
             if (!prop.isStored())
                 continue;
 
+            const QByteArray propTypeName(prop.typeName());
             const bool isQObjectPointer = (propType.flags() & QMetaType::PointerToQObject);
-            const bool isQQmlListProperty =
-                    QByteArray(prop.typeName()).startsWith("QQmlListProperty");
+            const bool isQQmlListProperty = propTypeName.startsWith("QQmlListProperty");
             if (!prop.isWritable() && !isQObjectPointer && !isQQmlListProperty)
                 continue;
 
@@ -381,13 +395,24 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
                 const QJsonArray list = jsonPropValue.toArray();
 
                 QQmlListReference listRef(const_cast<QObject *>(object), prop.name());
+                const QMetaObject *listElementType = listRef.listElementType();
+                if (listElementType == nullptr) {
+                    QByteArray listElementTypeName = propTypeName;
+                    listElementTypeName =
+                            listElementTypeName.mid(listElementTypeName.indexOf('<') + 1);
+                    listElementTypeName =
+                            listElementTypeName.left(listElementTypeName.lastIndexOf('>'));
+                    listElementTypeName += "*";
+                    listElementType = QMetaType::fromName(listElementTypeName).metaObject();
+                }
+
                 const bool canAddObjects =
                         interface && interface->canSetPropertyFromObjectList(propName)
                         && listRef.canAppend();
 
                 QObjectFactory listItemFactory;
-                const QByteArray className(listRef.listElementType()->className());
-                listItemFactory.add(listRef.listElementType());
+                const QByteArray className(listElementType->className());
+                listItemFactory.add(listElementType);
 
                 QList<QObject *> propertyObjects;
                 if (canAddObjects)

@@ -96,6 +96,7 @@ target_compile_definitions(Scrite PRIVATE
 
 target_include_directories(Scrite PRIVATE
   "${CMAKE_SOURCE_DIR}"
+  "${CMAKE_SOURCE_DIR}/../apikeys"
   "${CMAKE_CURRENT_SOURCE_DIR}/src"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/core"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/network"
@@ -242,6 +243,19 @@ if(SCRITE_WITH_CRASHPAD AND SCRITE_CRASHPAD_ROOT)
                 "$<TARGET_FILE_DIR:Scrite>/crashpad_handler"
       )
     endif()
+    foreach(_var
+      CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS
+      CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS
+      CMAKE_SHARED_MODULE_CREATE_C_FLAGS
+      CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS
+    )
+      if(DEFINED ${_var})
+        string(REPLACE "-Wl,-single_module" "" ${_var} "${${_var}}")
+        string(REPLACE "-single_module" "" ${_var} "${${_var}}")
+        string(REPLACE "-Wl,-multiply_defined,suppress" "" ${_var} "${${_var}}")
+        string(REPLACE "-multiply_defined suppress" "" ${_var} "${${_var}}")
+      endif()
+    endforeach()
   endif()
 endif()
 

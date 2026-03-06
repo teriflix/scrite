@@ -22,7 +22,6 @@
 #include "undoredo.h"
 #include "fountain.h"
 #include "hourglass.h"
-#include "callgraph.h"
 #include "filelocker.h"
 #include "restapicall.h"
 #include "aggregation.h"
@@ -2529,8 +2528,8 @@ bool ScriteDocument::load(const QString &fileName, bool anonymousLoad)
         const QFileInfo fi(fileName);
         const QString fileName2 = fi.absolutePath() + "/" + fi.completeBaseName() + ".json";
         QFile file2(fileName2);
-        file2.open(QFile::WriteOnly);
-        file2.write(jsonDoc.toJson());
+        if (file2.open(QFile::WriteOnly))
+            file2.write(jsonDoc.toJson());
     }
 #endif
 
