@@ -41,6 +41,7 @@ ApplicationWindow {
 
     width: 1366
     height: 700
+    visible: true
     visibility: ApplicationWindow.Maximized
 
     color: Runtime.colors.primary.windowColor

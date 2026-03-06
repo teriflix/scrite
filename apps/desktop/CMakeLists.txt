@@ -35,7 +35,7 @@ set(SCRITE_DESKTOP_SOURCES
 )
 
 set(SCRITE_DESKTOP_RESOURCES
-  "${CMAKE_CURRENT_SOURCE_DIR}/ui.qrc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/qml.qrc"
   "${CMAKE_CURRENT_SOURCE_DIR}/misc/misc.qrc"
   "${CMAKE_CURRENT_SOURCE_DIR}/images/images.qrc"
   "${CMAKE_CURRENT_SOURCE_DIR}/icons/icons.qrc"
