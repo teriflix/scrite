@@ -54,6 +54,28 @@ set(SCRITE_DESKTOP_RESOURCES
   "${CMAKE_CURRENT_SOURCE_DIR}/fonts/Telugu/telugu_font.qrc"
 )
 
+# Keep qml.qrc as the single source of truth for module QML files.
+set(SCRITE_QML_QRC_FILE "${CMAKE_CURRENT_SOURCE_DIR}/qml.qrc")
+file(READ "${SCRITE_QML_QRC_FILE}" SCRITE_QML_QRC_CONTENT)
+string(REGEX MATCHALL "<file[^>]*>[^<]+</file>" SCRITE_QML_QRC_ENTRIES "${SCRITE_QML_QRC_CONTENT}")
+set(SCRITE_QML_FILES_FROM_QRC)
+foreach(_qrc_entry IN LISTS SCRITE_QML_QRC_ENTRIES)
+  string(REGEX REPLACE "^<file[^>]*>([^<]+)</file>$" "\\1" _qrc_file_path "${_qrc_entry}")
+  if(_qrc_file_path MATCHES "\\.qml$")
+    list(APPEND SCRITE_QML_FILES_FROM_QRC "${_qrc_file_path}")
+  endif()
+endforeach()
+list(REMOVE_DUPLICATES SCRITE_QML_FILES_FROM_QRC)
+
+set(SCRITE_QML_REGISTRATION_SOURCES)
+foreach(_qml_scan_file IN LISTS SCRITE_DESKTOP_H SCRITE_DESKTOP_CPP)
+  file(READ "${_qml_scan_file}" _qml_scan_content)
+  if(_qml_scan_content MATCHES "(^|[^A-Za-z0-9_])QML_[A-Z_]+([^A-Za-z0-9_]|$)")
+    list(APPEND SCRITE_QML_REGISTRATION_SOURCES "${_qml_scan_file}")
+  endif()
+endforeach()
+list(REMOVE_DUPLICATES SCRITE_QML_REGISTRATION_SOURCES)
+
 find_package(Qt6 6.8 REQUIRED COMPONENTS
   Core
   Gui
@@ -79,6 +101,27 @@ if(APPLE)
 else()
   qt_add_executable(Scrite)
 endif()
+
+if(SCRITE_QML_FILES_FROM_QRC)
+  set(SCRITE_QML_MODULE_QML_FILES_ARG QML_FILES ${SCRITE_QML_FILES_FROM_QRC})
+else()
+  set(SCRITE_QML_MODULE_QML_FILES_ARG)
+  message(WARNING "No .qml files found in ${SCRITE_QML_QRC_FILE}; QML module will be generated without QML_FILES.")
+endif()
+
+if(SCRITE_QML_REGISTRATION_SOURCES)
+  set(SCRITE_QML_MODULE_SOURCES_ARG SOURCES ${SCRITE_QML_REGISTRATION_SOURCES})
+else()
+  set(SCRITE_QML_MODULE_SOURCES_ARG)
+  message(WARNING "No QML_* macro sources found under ${SCRITE_DESKTOP_SRC_DIR}.")
+endif()
+
+qt_add_qml_module(Scrite
+  URI io.scrite.components
+  VERSION 1.0
+  ${SCRITE_QML_MODULE_QML_FILES_ARG}
+  ${SCRITE_QML_MODULE_SOURCES_ARG}
+)
 
 target_sources(Scrite PRIVATE
   ${SCRITE_DESKTOP_SOURCES}

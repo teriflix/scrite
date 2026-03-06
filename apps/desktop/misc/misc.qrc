@@ -1,9 +1,9 @@
 <RCC>
     <qresource prefix="/dragonman225-curved-arrows">
-        <file alias="getBoxToBoxArrow.js">js/getBoxToBoxArrow.js</file>
+        <file alias="getBoxToBoxArrow.js">../js/getBoxToBoxArrow.js</file>
     </qresource>
     <qresource prefix="/">
-        <file alias="LICENSE.txt">../../LICENSE.txt</file>
+        <file alias="LICENSE.txt">../../../LICENSE.txt</file>
         <file>annotations_metadata.json</file>
         <file>fetchogattribs.js</file>
         <file>structure_groups.lst</file>
