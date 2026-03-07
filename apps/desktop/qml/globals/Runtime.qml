@@ -16,7 +16,7 @@
 pragma Singleton
 
 import QtQuick
-import Qt.labs.settings
+import QtCore
 import QtQuick.Controls.Material
 
 import io.scrite.components
@@ -112,14 +112,14 @@ Item {
         property string userOnboardingStatus: "unknown"
 
         category: "UserAccountDialog"
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
     }
 
     readonly property Settings scrollAreaSettings: Settings {
         property real zoomFactor: 0.05
 
         category: "ScrollArea"
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
     }
 
     readonly property Settings structureCanvasSettings: Settings {
@@ -146,7 +146,7 @@ Item {
         }
 
         category: "Structure Tab"
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
 
     }
 
@@ -157,12 +157,12 @@ Item {
         property string textMode: "HeadingOrTitle"
 
         category: "Timeline View"
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
     }
 
     readonly property Settings screenplayEditorSettings: Settings {
         category: "Screenplay Editor"
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
 
         ObjectRegister.name: "screenplayEditorSettings"
 
@@ -225,7 +225,7 @@ Item {
 
     readonly property Settings screenplayTracksSettings: Settings {
         category: "ScreenplayTracks"
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
 
         property bool displayTracks: true
         property bool displayStacks: true
@@ -237,11 +237,11 @@ Item {
         property bool usePdfDriver: true
 
         category: "PdfExport"
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
     }
 
     readonly property Settings titlePageSettings: Settings {
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
         category: "TitlePage"
 
         property bool includeTimestamp: false
@@ -258,7 +258,7 @@ Item {
         property bool languageNoteShown: false
 
         category: "Rich Text Editor"
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
     }
 
     readonly property Settings sceneListPanelSettings: Settings {
@@ -269,7 +269,7 @@ Item {
         property string sceneTextMode: "HEADING" // can be SUMMARY also
 
         category: "Scene List Panel"
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
     }
 
     readonly property Settings markupToolsSettings: Settings {
@@ -277,7 +277,7 @@ Item {
         property real contentY: 20
 
         category: "Markup Tools"
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
     }
 
     readonly property Settings scritedSettings: Settings {
@@ -290,7 +290,7 @@ Item {
         property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
 
         category: "Scrited"
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
     }
 
     readonly property Settings helpNotificationSettings: Settings {
@@ -316,7 +316,7 @@ Item {
             tipsShown = ts.join(",")
         }
 
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
         category: "Help"
     }
 
@@ -332,12 +332,12 @@ Item {
         property bool richTextNotesEnabled: true
         property bool showAllFormQuestions: true
 
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
         category: "Notebook"
     }
 
     readonly property Settings workspaceSettings: Settings {
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
         category: "Workspace"
 
         property var customColors: []
@@ -391,7 +391,7 @@ Item {
         }
 
         category: "Application"
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
     }
 
     // Global undo-redo stack
@@ -979,7 +979,7 @@ Item {
         property alias preferTitleVersionText: _recentFiles.preferTitleVersionText
 
         category: "RecentFiles"
-        fileName: Platform.settingsFile
+        location: Platform.settingsLocation
     }
 
     SequentialAnimation {

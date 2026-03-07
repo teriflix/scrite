@@ -586,6 +586,13 @@ public:
     // clang-format on
     static QString settingsFile(); // Complete path to settings.ini file
 
+    // clang-format off
+    Q_PROPERTY(QUrl settingsLocation
+               READ settingsLocation
+               CONSTANT )
+    // clang-format on
+    static QUrl settingsLocation(); // URL form of settingsFile() for QML APIs expecting urls
+
     Q_INVOKABLE static QString configPath(const QString &relativeName);
 
     Q_INVOKABLE static QString modifierDescription(int modifier);

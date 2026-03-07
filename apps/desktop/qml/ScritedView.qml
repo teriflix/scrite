@@ -18,7 +18,6 @@ import QtQuick
 import QtMultimedia
 import QtQuick.Dialogs
 import QtQuick.Layouts
-import Qt.labs.settings
 import QtQuick.Controls
 import QtQuick.Controls.Material
 

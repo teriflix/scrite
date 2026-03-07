@@ -17,7 +17,6 @@ import QtQml
 import QtQuick
 import QtQuick.Dialogs
 import QtQuick.Window
-import Qt.labs.settings
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material

@@ -16,7 +16,6 @@
 pragma Singleton
 
 import QtQuick
-import Qt.labs.settings
 import QtQuick.Controls.Material
 
 import io.scrite.components

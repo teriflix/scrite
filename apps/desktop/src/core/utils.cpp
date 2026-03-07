@@ -242,6 +242,14 @@ QString Utils::Platform::settingsFile()
 }
 
 /**
+ * Returns complete URL of the settings.ini on this platform
+ */
+QUrl Utils::Platform::settingsLocation()
+{
+    return QUrl::fromLocalFile(Utils::Platform::settingsFile());
+}
+
+/**
  * Returns complete path for the relative name supplied here, such that it shows up
  * in the same folder as settings.ini file for this platform.
  */

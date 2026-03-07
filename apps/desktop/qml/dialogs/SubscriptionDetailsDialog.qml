@@ -18,7 +18,6 @@ pragma Singleton
 import QtQml
 import QtQuick
 import QtQuick.Window
-import Qt.labs.settings
 import QtQuick.Layouts
 import QtQuick.Controls
 import Qt.labs.qmlmodels

@@ -19,7 +19,6 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 import QtWebEngine
 import QtWebChannel
-import Qt.labs.settings
 
 import io.scrite.components
 
