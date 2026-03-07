@@ -21,12 +21,12 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/screenplayeditor"
-import "qrc:/qml/timelineview"
+import "./globals"
+import "./controls"
+import "./helpers"
+import "./dialogs"
+import "./screenplayeditor"
+import "./timelineview"
 
 Item {
     id: root

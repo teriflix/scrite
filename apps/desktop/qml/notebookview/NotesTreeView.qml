@@ -24,15 +24,45 @@ import QtQuick.Controls as OldControls
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/controls"
-import "qrc:/qml/notebookview"
-import "qrc:/qml/structureview"
-import "qrc:/qml/notifications"
-import "qrc:/qml/notebookview/menus"
+import "../globals"
+import "../helpers"
+import "../dialogs"
+import "../controls"
+import "."
+import "../structureview"
+import "../notifications"
+import "./menus"
 
+Item {
+    id: root
+
+    required property NotebookModel notebookModel
+
+    property var currentData: undefined
+
+    property bool activatingScreenplayElement: false
+
+    property Note currentNote: currentData.notebookItemType === NotebookModel.NoteType ? currentData.notebookItemObject : null
+
+    property Notes currentNotes: {
+        if(currentData.notebookItemType === NotebookModel.NotesType)
+            return currentData.notebookItemObject
+        if(currentData.notebookItemType === NotebookModel.NoteType)
+            return currentData.notebookItemObject.notes
+        if(currentData.notebookItemType === NotebookModel.CategoryType &&
+                currentData.notebookItemCategory === NotebookModel.ScreenplayCategory)
+            return Scrite.document.structure.notes
+        return null
+    }
+
+    property Character currentCharacter: currentNotes && currentNotes.ownerType === Notes.CharacterOwner ? currentNotes.character : null
+
+    signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
+    signal deleteCharacterRequest(Character character)
+    signal deleteNoteRequest(Note note)
+}
+
+/*
 OldControls.TreeView {
     id: root
 
@@ -216,4 +246,4 @@ OldControls.TreeView {
         }
     }
 }
-
+*/

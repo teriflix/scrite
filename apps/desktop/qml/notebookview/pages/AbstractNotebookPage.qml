@@ -19,9 +19,9 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
-import "qrc:/qml/notebookview/helpers"
+import "../../globals"
+import "../../controls"
+import "../helpers"
 
 FocusScope {
     id: root

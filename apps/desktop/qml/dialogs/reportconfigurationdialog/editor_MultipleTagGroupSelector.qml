@@ -20,9 +20,9 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
-import "qrc:/qml/helpers"
+import "../../globals"
+import "../../controls"
+import "../../helpers"
 
 ColumnLayout {
     property var fieldInfo

@@ -20,9 +20,9 @@ import QtQuick.Controls
 import io.scrite.components
 
 
-import "qrc:/qml/globals"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/controls"
+import "../../globals"
+import ".."
+import "../../controls"
 
 Item {
     readonly property bool modal: true

@@ -18,9 +18,9 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/controls"
+import "../../helpers"
+import "../../dialogs"
+import "../../controls"
 
 AbstractSelection {
     id: root

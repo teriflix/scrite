@@ -16,6 +16,7 @@
 #include "user.h"
 #include "utils.h"
 #include "scrite.h"
+#include "undoredo.h"
 #include "appwindow.h"
 #include "application.h"
 #include "languageengine.h"
@@ -57,7 +58,7 @@ int main(int argc, char **argv)
 
     QQmlApplicationEngine qmlEngine;
     scriteApp.initialize(&qmlEngine);
-    qmlEngine.load(QUrl("qrc:/main.qml"));
+    qmlEngine.load(QUrl("qrc:/io/scrite/components/main.qml"));
 
     return scriteApp.exec();
 }

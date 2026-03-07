@@ -23,9 +23,9 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/tasks"
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
+import "../tasks"
+import "../helpers"
+import "../dialogs"
 
 Item {
     id: root

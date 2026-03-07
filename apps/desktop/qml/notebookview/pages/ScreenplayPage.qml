@@ -21,12 +21,12 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/notebookview"
-import "qrc:/qml/notebookview/tabs"
+import "../../globals"
+import "../../dialogs"
+import "../../helpers"
+import "../../controls"
+import ".."
+import "../tabs"
 
 AbstractNotebookPage {
     id: root

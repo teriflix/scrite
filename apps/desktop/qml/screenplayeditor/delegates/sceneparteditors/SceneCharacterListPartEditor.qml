@@ -21,10 +21,10 @@ import QtQuick.Controls
 import io.scrite.components
 
 
-import "qrc:/qml/helpers"
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
-import "qrc:/qml/screenplayeditor"
+import "../../../helpers"
+import "../../../globals"
+import "../../../controls"
+import "../.."
 
 AbstractScenePartEditor {
     id: root

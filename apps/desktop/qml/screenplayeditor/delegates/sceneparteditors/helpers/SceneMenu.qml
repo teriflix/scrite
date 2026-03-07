@@ -21,12 +21,12 @@ import QtQuick.Controls
 import io.scrite.components
 
 
-import "qrc:/qml/helpers"
-import "qrc:/qml/globals"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/controls"
-import "qrc:/qml/structureview"
-import "qrc:/qml/screenplayeditor"
+import "../../../../helpers"
+import "../../../../globals"
+import "../../../../dialogs"
+import "../../../../controls"
+import "../../../../structureview"
+import "../../.."
 
 MenuLoader {
     id: root

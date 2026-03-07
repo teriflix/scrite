@@ -20,9 +20,9 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/"
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
+import ".."
+import "../globals"
+import "../helpers"
 
 ToolBar {
     id: root

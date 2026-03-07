@@ -22,9 +22,9 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
-import "qrc:/qml/floatingdockpanels"
+import "../../globals"
+import "../../controls"
+import "../../floatingdockpanels"
 
 FloatingDock {
     id: root

@@ -16,7 +16,7 @@
 import QtQml
 import QtQuick
 
-import "qrc:/qml/controls"
+import "../../controls"
 
 AbstractNotebookPage {
     id: root

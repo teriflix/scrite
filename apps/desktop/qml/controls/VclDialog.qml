@@ -39,8 +39,8 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
+import "../globals"
+import "../helpers"
 
 Dialog {
     id: root

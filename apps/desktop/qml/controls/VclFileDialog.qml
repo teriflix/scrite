@@ -20,14 +20,14 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
+import "../globals"
 
 FileDialog {
     id: root
 
-    selectFolder: false
-    selectMultiple: false
-    sidebarVisible: true
+    // selectFolder: false
+    // selectMultiple: false
+    // sidebarVisible: true
 
     Component.onCompleted: {
         const action = root["dirUpAction"]

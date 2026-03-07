@@ -20,13 +20,13 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/"
-import "qrc:/qml/tasks"
-import "qrc:/qml/globals"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/notifications"
+import ".."
+import "../tasks"
+import "../globals"
+import "../dialogs"
+import "../helpers"
+import "../controls"
+import "../notifications"
 
 VclDialog {
     id: root

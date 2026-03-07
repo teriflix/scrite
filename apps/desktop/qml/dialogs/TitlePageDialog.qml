@@ -23,9 +23,9 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
+import "../globals"
+import "../helpers"
+import "../controls"
 
 DialogLauncher {
     id: root
@@ -189,18 +189,16 @@ DialogLauncher {
 
                     VclFileDialog {
                         id: fileDialog
+
+                        currentFolder: Runtime.workspaceSettings.lastOpenPhotosFolderUrl
                         nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
-                        selectFolder: false
-                        selectMultiple: false
-                        sidebarVisible: true
-                        selectExisting: true
-                         // The default Ctrl+U interfers with underline
+
                         onAccepted: {
-                            if(fileUrl != "")
-                            Scrite.document.screenplay.setCoverPagePhoto(Url.toPath(fileUrl))
+                            if(selectedFile != "")
+                            Scrite.document.screenplay.setCoverPagePhoto(Url.toPath(selectedFile))
                         }
-                        folder: Runtime.workspaceSettings.lastOpenPhotosFolderUrl
-                        onFolderChanged: Runtime.workspaceSettings.lastOpenPhotosFolderUrl = folder
+
+                        onCurrentFolderChanged: Runtime.workspaceSettings.lastOpenPhotosFolderUrl = folder
                     }
                 }
 

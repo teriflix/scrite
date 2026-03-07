@@ -18,9 +18,9 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/structureview"
+import "../../helpers"
+import "../../controls"
+import ".."
 
 SequentialAnimation {
     id: root

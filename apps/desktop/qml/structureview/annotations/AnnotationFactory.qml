@@ -21,10 +21,10 @@ import QtQuick
 import io.scrite.components
 
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/structureview/annotations"
+import "../../globals"
+import "../../helpers"
+import "../../controls"
+import "."
 
 QtObject {
     id: root

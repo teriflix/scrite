@@ -19,8 +19,8 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
+import "../globals"
+import "../controls"
 
 Item {
     id: fileSelector
@@ -43,17 +43,16 @@ Item {
 
     VclFileDialog {
         id: folderPathDialog
-        folder: {
+
+        currentFolder: {
             if(fileInfo.absolutePath !== "") {
                 if(fileInfo.exists)
                     return Url.fromPath(fileInfo.absolutePath)
             }
             return Url.fromPath(StandardPaths.writableLocation(StandardPaths.DownloadFolder))
         }
-        selectFolder: true
-        selectMultiple: false
-        selectExisting: true
-        onAccepted: fileInfo.absolutePath = Url.toPath(fileUrl)
+
+        onAccepted: fileInfo.absolutePath = Url.toPath(selectedFile)
          // The default Ctrl+U interfers with underline
     }
 

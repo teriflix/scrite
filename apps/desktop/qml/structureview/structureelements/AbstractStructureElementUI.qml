@@ -17,7 +17,7 @@ import QtQuick
 
 import io.scrite.components
 
-import "qrc:/qml/structureview"
+import ".."
 
 FocusScope {
     id: root

@@ -23,10 +23,10 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/dialogs/settingsdialog"
+import "../globals"
+import "../helpers"
+import "../controls"
+import "./settingsdialog"
 
 DialogLauncher {
     id: root

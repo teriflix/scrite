@@ -19,6 +19,7 @@
 #include "application.h"
 #include "languageengine.h"
 #include "scritedocument.h"
+#include "garbagecollector.h"
 #include "qobjectserializer.h"
 #include "qobjectserializer.h"
 

@@ -19,7 +19,7 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
+import "../globals"
 
 /**
 ToolButton from QtQuick.Controls is what we normally use in Scrite.

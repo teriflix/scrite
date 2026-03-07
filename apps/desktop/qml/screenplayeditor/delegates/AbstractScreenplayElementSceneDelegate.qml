@@ -19,8 +19,8 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/screenplayeditor/delegates/scenedelegate"
+import "../../globals"
+import "./scenedelegate"
 
 AbstractScreenplayElementDelegate {
     id: root

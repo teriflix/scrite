@@ -24,16 +24,16 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/tasks"
+import "./tasks"
 
-import "qrc:/qml/globals"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/mainwindow"
-import "qrc:/qml/notifications"
-import "qrc:/qml/screenplayeditor"
-import "qrc:/qml/floatingdockpanels"
+import "./globals"
+import "./dialogs"
+import "./helpers"
+import "./controls"
+import "./mainwindow"
+import "./notifications"
+import "./screenplayeditor"
+import "./floatingdockpanels"
 
 Item {
     id: root

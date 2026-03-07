@@ -21,14 +21,14 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/screenplayeditor/delegates"
-import "qrc:/qml/screenplayeditor/delegates/sidepanel"
-import "qrc:/qml/screenplayeditor/delegates/sceneparteditors"
-import "qrc:/qml/screenplayeditor/delegates/sceneparteditors/helpers"
+import "../../../globals"
+import "../../../dialogs"
+import "../../../helpers"
+import "../../../controls"
+import ".."
+import "../sidepanel"
+import "../sceneparteditors"
+import "../sceneparteditors/helpers"
 
 Item {
     id: root

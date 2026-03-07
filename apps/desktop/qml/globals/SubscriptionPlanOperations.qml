@@ -22,8 +22,8 @@ import QtQuick.Controls.Material
 import io.scrite.components
 
 
-import "qrc:/qml/controls"
-import "qrc:/qml/dialogs"
+import "../controls"
+import "../dialogs"
 
 Item {
     id: root

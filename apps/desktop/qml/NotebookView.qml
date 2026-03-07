@@ -24,14 +24,14 @@ import QtQuick.Controls as OldControls
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/controls"
-import "qrc:/qml/notebookview"
-import "qrc:/qml/notebookview/pages"
-import "qrc:/qml/structureview"
-import "qrc:/qml/notifications"
+import "./globals"
+import "./helpers"
+import "./dialogs"
+import "./controls"
+import "./notebookview"
+import "./notebookview/pages"
+import "./structureview"
+import "./notifications"
 
 Item {
     id: root

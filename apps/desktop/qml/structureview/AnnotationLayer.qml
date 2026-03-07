@@ -21,12 +21,12 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/overlays"
-import "qrc:/qml/structureview/annotations"
+import "../globals"
+import "../controls"
+import "../helpers"
+import "../dialogs"
+import "../overlays"
+import "./annotations"
 
 Item {
     id: root

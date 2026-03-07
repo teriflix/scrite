@@ -32,10 +32,9 @@
 #include <QFontDatabase>
 #include <QVersionNumber>
 
-#include "undoredo.h"
 #include "errorreport.h"
 
-typedef QApplication QtApplicationClass;
+#define QtApplicationClass QApplication
 
 class Forms;
 class QSettings;

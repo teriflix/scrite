@@ -20,11 +20,11 @@ import QtQuick.Controls
 import io.scrite.components
 
 
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/notifications"
+import "../globals"
+import "../controls"
+import "../helpers"
+import "../dialogs"
+import "../notifications"
 
 VclMenu {
     id: root

@@ -146,7 +146,6 @@ private:
 class ActionManagerAttached : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
     QML_ANONYMOUS
 
 public:
@@ -288,8 +287,6 @@ private:
 class ActionHandlerAttached : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
-    QML_ANONYMOUS
 
 public:
     virtual ~ActionHandlerAttached();

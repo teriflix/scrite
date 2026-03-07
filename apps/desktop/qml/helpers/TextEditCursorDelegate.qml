@@ -17,7 +17,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import "qrc:/qml/globals"
+import "../globals"
 
 Item {
     id: root

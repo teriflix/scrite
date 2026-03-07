@@ -27,7 +27,7 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
+import "../globals"
 
 Label {
     Material.primary: Runtime.colors.primary.key

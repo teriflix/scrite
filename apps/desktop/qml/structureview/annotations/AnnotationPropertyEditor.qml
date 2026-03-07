@@ -21,10 +21,10 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
+import "../../globals"
+import "../../dialogs"
+import "../../helpers"
+import "../../controls"
 
 Item {
     id: root
@@ -494,17 +494,14 @@ Item {
 
             VclFileDialog {
                 id: fileDialog
+
                 nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
-                selectFolder: false
-                selectMultiple: false
-                sidebarVisible: true
-                selectExisting: true
-                 // The default Ctrl+U interfers with underline
+
                 onAccepted: {
-                    if(fileUrl != "") {
+                    if(selectedFile !== "") {
                         if(propertyValue != "")
                             annotation.removeImage(propertyValue)
-                        var newImageName = annotation.addImage(Url.toPath(fileUrl))
+                        var newImageName = annotation.addImage(Url.toPath(selectedFile))
                         changePropertyValue(newImageName)
                     }
                 }

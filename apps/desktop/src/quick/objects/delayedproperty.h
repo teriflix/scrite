@@ -99,7 +99,6 @@ private:
 class DelayedPropertyAttached : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
     QML_ANONYMOUS
 
 public:

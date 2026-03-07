@@ -21,9 +21,9 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
-import "qrc:/qml/helpers"
+import "../globals"
+import "../controls"
+import "."
 
 Item {
     id: sceneFeaturedPhotoItem
@@ -172,11 +172,8 @@ Item {
         VclFileDialog {
             id: featuredAttachmentFileDialog
             nameFilters: sceneAttachments ? sceneAttachments.nameFilters : []
-            selectMultiple: false
-            selectExisting: true
-             // The default Ctrl+U interfers with underline
             onAccepted: {
-                const attachment = sceneAttachments.includeAttachment( Url.toPath(fileUrl) )
+                const attachment = sceneAttachments.includeAttachment( Url.toPath(selectedFile) )
                 if(attachment)
                     attachment.featured = true
             }

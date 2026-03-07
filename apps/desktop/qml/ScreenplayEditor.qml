@@ -24,14 +24,14 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/notifications"
-import "qrc:/qml/structureview"
-import "qrc:/qml/screenplayeditor"
-import "qrc:/qml/floatingdockpanels"
+import "./globals"
+import "./dialogs"
+import "./helpers"
+import "./controls"
+import "./notifications"
+import "./structureview"
+import "./screenplayeditor"
+import "./floatingdockpanels"
 
 Rectangle {
     id: root

@@ -21,11 +21,11 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-import "qrc:/qml/tasks"
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
+import "../../tasks"
+import "../../globals"
+import "../../controls"
+import "../../helpers"
+import ".."
 
 Item {
     id: root
@@ -200,8 +200,8 @@ Item {
 
                         onTextEdited: userInfoFields.needsSaving = true
 
-                        validator: RegExpValidator {
-                            regExp: /^\+?(\d{1,3})?[\s\-]?\(?\d{1,4}\)?[\s\-]?\d{1,4}[\s\-]?\d{1,4}$/
+                        validator: RegularExpressionValidator {
+                            regularExpression: /^\+?(\d{1,3})?[\s\-]?\(?\d{1,4}\)?[\s\-]?\d{1,4}[\s\-]?\d{1,4}$/
                         }
                     }
                 }

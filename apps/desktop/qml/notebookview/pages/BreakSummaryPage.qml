@@ -20,11 +20,11 @@ import QtQuick.Layouts
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/notebookview"
+import "../../globals"
+import "../../helpers"
+import "../../controls"
+import "../../dialogs"
+import ".."
 
 AbstractNotebookPage {
     id: root

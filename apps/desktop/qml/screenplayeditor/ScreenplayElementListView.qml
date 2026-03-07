@@ -23,12 +23,12 @@ import Qt.labs.qmlmodels
 import io.scrite.components
 
 
-import "qrc:/qml/globals"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/screenplayeditor"
-import "qrc:/qml/screenplayeditor/delegates"
+import "../globals"
+import "../dialogs"
+import "../helpers"
+import "../controls"
+import "."
+import "./delegates"
 
 ListView {
     id: root

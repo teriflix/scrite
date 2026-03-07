@@ -21,8 +21,8 @@ import QtQuick
 import io.scrite.components
 
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
+import "../../globals"
+import "../../helpers"
 
 QtObject {
     id: root

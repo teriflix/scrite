@@ -20,12 +20,12 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-import "qrc:/qml/tasks"
+import "../../tasks"
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/controls"
+import "../../globals"
+import "../../helpers"
+import ".."
+import "../../controls"
 
 Item {
     id: root
@@ -1233,20 +1233,17 @@ Item {
 
                 VclFileDialog {
                     id: importFileDialog
+
                     title: "Import Screenplay"
                     objectName: "Import Dialog Box"
                     nameFilters: ["*.scrite *.fdx *.fountain *.txt *.html"]
-                    selectFolder: false
-                    selectMultiple: false
-                    sidebarVisible: true
-                    selectExisting: true
-                    folder: Runtime.workspaceSettings.lastOpenImportFolderUrl
-                     // The default Ctrl+U interfers with underline
-                    onFolderChanged: Runtime.workspaceSettings.lastOpenImportFolderUrl = folder
+                    currentFolder: Runtime.workspaceSettings.lastOpenImportFolderUrl
+
+                    onCurrentFolderChanged: Runtime.workspaceSettings.lastOpenImportFolderUrl = folder
 
                     onAccepted: {
-                        if(fileUrl != "")
-                            fileToImport.path = Url.toPath(fileUrl)
+                        if(selectedFile !== "")
+                            fileToImport.path = Url.toPath(selectedFile)
                     }
                 }
 
@@ -1455,21 +1452,17 @@ Item {
 
         title: "Open Scrite Document"
         nameFilters: ["Scrite Documents (*.scrite)"]
-        selectFolder: false
-        selectMultiple: false
         objectName: "Open File Dialog"
+        currentFolder: Runtime.workspaceSettings.lastOpenFolderUrl
 
-        folder: Runtime.workspaceSettings.lastOpenFolderUrl
-        onFolderChanged: Runtime.workspaceSettings.lastOpenFolderUrl = folder
-        sidebarVisible: true
-        selectExisting: true
+        onCurrentFolderChanged: Runtime.workspaceSettings.lastOpenFolderUrl = folder
 
         onAccepted: {
             Runtime.workspaceSettings.lastOpenFolderUrl = folder
 
-            const path = Url.toPath(fileUrl)
+            const path = Url.toPath(selectedFile)
 
-            var task = OpenFileTask.open(path)
+            let task = OpenFileTask.open(path)
             task.finished.connect(closeRequest)
         }
     }

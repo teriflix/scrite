@@ -21,10 +21,10 @@ import QtQuick.Controls
 import io.scrite.components
 
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/structureview"
+import "../../globals"
+import "../../helpers"
+import "../../controls"
+import ".."
 
 AbstractStructureElementUI {
     id: root

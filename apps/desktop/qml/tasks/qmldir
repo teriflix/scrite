@@ -1,3 +1,0 @@
-singleton OpenFileTask 1.0 OpenFileTask.qml
-singleton OpenFromLibraryTask 1.0 OpenFromLibraryTask.qml
-singleton SaveFileTask 1.0 SaveFileTask.qml

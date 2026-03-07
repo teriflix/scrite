@@ -17,6 +17,7 @@
 #include "timeprofiler.h"
 #include "application.h"
 
+#include <QTimer>
 #include <QKeyEvent>
 #include <QtConcurrentRun>
 #include <QGuiApplication>

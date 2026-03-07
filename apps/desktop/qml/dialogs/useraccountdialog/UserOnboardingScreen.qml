@@ -22,11 +22,11 @@ import Qt.labs.qmlmodels
 
 import io.scrite.components
 
-import "qrc:/qml/tasks"
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
+import "../../tasks"
+import "../../globals"
+import "../../controls"
+import "../../helpers"
+import ".."
 
 Item {
     id: root
@@ -348,8 +348,8 @@ Item {
 
             text: parent.value !== null && typeof parent.value === "string" ? parent.value : ""
             maximumLength: 25
-            validator: RegExpValidator {
-                regExp: /^\+?(\d{1,3})?[\s\-]?\(?\d{1,4}\)?[\s\-]?\d{1,4}[\s\-]?\d{1,4}$/
+            validator: RegularExpressionValidator {
+                regularExpression: /^\+?(\d{1,3})?[\s\-]?\(?\d{1,4}\)?[\s\-]?\d{1,4}[\s\-]?\d{1,4}$/
             }
 
             onTextEdited: if(parent.mandatory) Qt.callLater(_submit.determineEnabled)

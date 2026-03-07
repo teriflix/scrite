@@ -21,15 +21,15 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml"
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/controls"
-import "qrc:/qml/overlays"
-import "qrc:/qml/commandcenter"
-import "qrc:/qml/notifications"
-import "qrc:/qml/floatingdockpanels"
+import "./qml"
+import "./qml/globals"
+import "./qml/helpers"
+import "./qml/dialogs"
+import "./qml/controls"
+import "./qml/overlays"
+import "./qml/commandcenter"
+import "./qml/notifications"
+import "./qml/floatingdockpanels"
 
 ApplicationWindow {
     id: root

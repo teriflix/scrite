@@ -23,11 +23,11 @@ import QtQuick.Controls
 import io.scrite.components
 
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/controls"
-import "qrc:/qml/notifications"
+import "../globals"
+import "../helpers"
+import "../dialogs"
+import "../controls"
+import "../notifications"
 
 Item {
     id: root
@@ -186,19 +186,15 @@ Item {
         VclFileDialog {
             title: "Save Scrite Document As"
             nameFilters: ["Scrite Documents (*.scrite)"]
-            selectFolder: false
-            selectMultiple: false
             objectName: "Save File Dialog"
             
-            folder: Runtime.workspaceSettings.lastOpenFolderUrl
-            onFolderChanged: Runtime.workspaceSettings.lastOpenFolderUrl = folder
-            sidebarVisible: true
-            selectExisting: false
+            currentFolder: Runtime.workspaceSettings.lastOpenFolderUrl
+            onCurrentFolderChanged: Runtime.workspaceSettings.lastOpenFolderUrl = folder
 
             signal finished(bool success)
 
             onAccepted: {
-                const path = Url.toPath(fileUrl)
+                const path = Url.toPath(selectedFile)
                 if(Scrite.document.canBeBackupFileName(path)) {
                     _private.reportSaveAsBackupNotPossible()
                     finished(false)

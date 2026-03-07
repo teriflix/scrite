@@ -18,8 +18,8 @@ import QtQuick
 
 import io.scrite.components
 
-import "qrc:/qml/notebookview"
-import "qrc:/qml/notebookview/helpers"
+import ".."
+import "../helpers"
 
 AbstractNotePage {
     id: root

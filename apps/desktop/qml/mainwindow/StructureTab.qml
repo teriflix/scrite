@@ -20,11 +20,11 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/"
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/notifications"
+import ".."
+import "../globals"
+import "../helpers"
+import "../controls"
+import "../notifications"
 
 Item {
     id: root

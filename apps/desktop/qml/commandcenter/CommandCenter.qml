@@ -22,10 +22,10 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
-import "qrc:/qml/controls"
+import "../globals"
+import "../helpers"
+import "../dialogs"
+import "../controls"
 
 Popup {
     id: root

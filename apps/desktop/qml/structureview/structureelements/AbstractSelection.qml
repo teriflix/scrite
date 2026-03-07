@@ -17,7 +17,7 @@ import QtQuick
 
 import io.scrite.components
 
-import "qrc:/qml/helpers"
+import "../../helpers"
 
 Item {
     id: root

@@ -23,9 +23,9 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
+import "../globals"
+import "."
+import "../controls"
 
 Item {
     id: root
@@ -361,15 +361,11 @@ Item {
         id: _saveFileDialog
 
         nameFilters: ["PDF Files (*.pdf)"]
-        folder: Url.fromPath(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
-        selectFolder: false
-        selectMultiple: false
-        selectExisting: false
-        sidebarVisible: true
+        currentFolder: Url.fromPath(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
 
          // The default Ctrl+U interfers with underline
         onAccepted: {
-            const targetFilePath = Url.toPath(_saveFileDialog.fileUrl)
+            const targetFilePath = Url.toPath(selectedFile)
             const downloadedFilePath = File.copyToFolder( Url.toPath(_pdfDoc.source), targetFilePath )
             if(downloadedFilePath !== "")
                 File.revealOnDesktop(downloadedFilePath)

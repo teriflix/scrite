@@ -21,12 +21,12 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/notebookview"
-import "qrc:/qml/notebookview/helpers"
-import "qrc:/qml/notebookview/dialogs"
+import "../../globals"
+import "../../helpers"
+import "../../controls"
+import ".."
+import "../helpers"
+import "../dialogs"
 
 Item {
     id: root

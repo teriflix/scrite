@@ -24,10 +24,10 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
+import "../globals"
+import "../controls"
+import "../helpers"
+import "."
 
 Item {
     id: root

@@ -1,4 +1,0 @@
-singleton AutoUpdateNotifications 1.0 AutoUpdateNotifications.qml
-HelpTipNotification 1.0 HelpTipNotification.qml
-singleton NotificationsLayer 1.0 NotificationsLayer.qml
-singleton NotificationsView 1.0 NotificationsView.qml

@@ -19,9 +19,9 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/overlays"
-import "qrc:/qml/controls"
+import "../globals"
+import "../overlays"
+import "../controls"
 
 QtObject {
     id: root

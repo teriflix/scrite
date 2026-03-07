@@ -17,8 +17,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
+import "../globals"
+import "../helpers"
 
 ToolButton {
     id: root

@@ -21,10 +21,10 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/notebookview"
+import "../../globals"
+import "../../helpers"
+import "../../controls"
+import ".."
 
 Item {
     id: root
@@ -512,19 +512,14 @@ Item {
                         VclFileDialog {
                             id: _fileDialog
 
-                            folder: Runtime.workspaceSettings.lastOpenPhotosFolderUrl
+                            currentFolder: Runtime.workspaceSettings.lastOpenPhotosFolderUrl
                             nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
-                            selectExisting: true
-                            selectFolder: false
-                            selectMultiple: false
-                            sidebarVisible: true
 
-                            // The default Ctrl+U interfers with underline
-                            onFolderChanged: Runtime.workspaceSettings.lastOpenPhotosFolderUrl = folder
+                            onCurrentFolderChanged: Runtime.workspaceSettings.lastOpenPhotosFolderUrl = folder
 
                             onAccepted: {
                                 if(fileUrl != "") {
-                                    root.character.addPhoto(Url.toPath(fileUrl))
+                                    root.character.addPhoto(Url.toPath(selectedFile))
                                     _photoSlideView.currentIndex = root.character.photos.length - 1
                                 }
                             }

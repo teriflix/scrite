@@ -19,7 +19,7 @@ import QtQuick
 import io.scrite.components
 
 
-import "qrc:/qml/globals"
+import "../../../globals"
 
 FocusScope {
     id: root

@@ -19,9 +19,9 @@ import QtQuick.Layouts
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
+import "../globals"
+import "../helpers"
+import "../controls"
 
 // For use from within StructureView only!!!!
 

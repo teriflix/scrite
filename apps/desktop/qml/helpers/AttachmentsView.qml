@@ -19,8 +19,8 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
+import "../globals"
+import "../controls"
 
 ListView {
     id: root
@@ -150,17 +150,13 @@ ListView {
         id: _fileDialog
 
         nameFilters: attachments ? attachments.nameFilters : ["All Types (*.*)"]
-        selectExisting: true
-        selectFolder: false
-        selectMultiple: false
-        sidebarVisible: true
 
          // The default Ctrl+U interfers with underline
         onAccepted: {
             if(attachments === null)
                 return
-            if(fileUrl !== "")
-                attachments.includeAttachmentFromFileUrl(fileUrl)
+            if(selectedFile !== "")
+                attachments.includeAttachmentFromFileUrl(selectedFile)
         }
     }
 

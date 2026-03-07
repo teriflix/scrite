@@ -19,8 +19,8 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
+import "../globals"
+import "../controls"
 
 VclLabel {
     property alias containsMouse: _mouseArea.containsMouse

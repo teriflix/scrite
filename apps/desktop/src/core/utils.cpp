@@ -18,9 +18,11 @@
 #include "application.h"
 #include "qobjectlistmodel.h"
 #include "enumerationmodel.h"
+#include "qobjectserializer.h"
 
 #include <QDir>
 #include <QtMath>
+#include <QTimer>
 #include <QLocale>
 #include <QHostInfo>
 #include <QSettings>

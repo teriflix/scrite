@@ -1,80 +1,8 @@
 set(SCRITE_DESKTOP_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-
-file(GLOB_RECURSE SCRITE_DESKTOP_CPP CONFIGURE_DEPENDS
-  "${SCRITE_DESKTOP_SRC_DIR}/*.cpp"
-)
-file(GLOB_RECURSE SCRITE_DESKTOP_H CONFIGURE_DEPENDS
-  "${SCRITE_DESKTOP_SRC_DIR}/*.h"
-)
-file(GLOB_RECURSE SCRITE_DESKTOP_MM CONFIGURE_DEPENDS
-  "${SCRITE_DESKTOP_SRC_DIR}/*.mm"
-)
-
-# Exclude files that qmake explicitly excluded or are platform-specific.
-list(REMOVE_ITEM SCRITE_DESKTOP_CPP
-  "${SCRITE_DESKTOP_SRC_DIR}/reports/locationscreenplayreport.cpp"
-  "${SCRITE_DESKTOP_SRC_DIR}/core/platformtransliterator_linux.cpp"
-  "${SCRITE_DESKTOP_SRC_DIR}/core/platformtransliterator_windows.cpp"
-  "${SCRITE_DESKTOP_SRC_DIR}/crashpad/crashpadmodule_mac.cpp"
-  "${SCRITE_DESKTOP_SRC_DIR}/crashpad/crashpadmodule_win.cpp"
-)
-list(REMOVE_ITEM SCRITE_DESKTOP_H
-  "${SCRITE_DESKTOP_SRC_DIR}/reports/locationscreenplayreport.h"
-  "${SCRITE_DESKTOP_SRC_DIR}/core/platformtransliterator_linux.h"
-  "${SCRITE_DESKTOP_SRC_DIR}/core/platformtransliterator_windows.h"
-  "${SCRITE_DESKTOP_SRC_DIR}/core/platformtransliterator_macos.h"
-)
-list(REMOVE_ITEM SCRITE_DESKTOP_MM
-  "${SCRITE_DESKTOP_SRC_DIR}/core/platformtransliterator_macos.mm"
-)
-
-set(SCRITE_DESKTOP_SOURCES
-  "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
-  ${SCRITE_DESKTOP_CPP}
-  ${SCRITE_DESKTOP_H}
-)
-
-set(SCRITE_DESKTOP_RESOURCES
-  "${CMAKE_CURRENT_SOURCE_DIR}/qml.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/misc/misc.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/images/images.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/icons/icons.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fonts/Bengali/bengali_font.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fonts/English/english_font.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fonts/Gujarati/gujarati_font.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fonts/Hindi/hindi_font.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fonts/Kannada/kannada_font.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fonts/Malayalam/malayalam_font.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fonts/Marathi/marathi_font.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fonts/Oriya/oriya_font.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fonts/Punjabi/punjabi_font.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fonts/Rubik/rubik_font.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fonts/Sanskrit/sanskrit_font.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fonts/Tamil/tamil_font.qrc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fonts/Telugu/telugu_font.qrc"
-)
-
-# Keep qml.qrc as the single source of truth for module QML files.
-set(SCRITE_QML_QRC_FILE "${CMAKE_CURRENT_SOURCE_DIR}/qml.qrc")
-file(READ "${SCRITE_QML_QRC_FILE}" SCRITE_QML_QRC_CONTENT)
-string(REGEX MATCHALL "<file[^>]*>[^<]+</file>" SCRITE_QML_QRC_ENTRIES "${SCRITE_QML_QRC_CONTENT}")
-set(SCRITE_QML_FILES_FROM_QRC)
-foreach(_qrc_entry IN LISTS SCRITE_QML_QRC_ENTRIES)
-  string(REGEX REPLACE "^<file[^>]*>([^<]+)</file>$" "\\1" _qrc_file_path "${_qrc_entry}")
-  if(_qrc_file_path MATCHES "\\.qml$")
-    list(APPEND SCRITE_QML_FILES_FROM_QRC "${_qrc_file_path}")
-  endif()
-endforeach()
-list(REMOVE_DUPLICATES SCRITE_QML_FILES_FROM_QRC)
-
-set(SCRITE_QML_REGISTRATION_SOURCES)
-foreach(_qml_scan_file IN LISTS SCRITE_DESKTOP_H SCRITE_DESKTOP_CPP)
-  file(READ "${_qml_scan_file}" _qml_scan_content)
-  if(_qml_scan_content MATCHES "(^|[^A-Za-z0-9_])QML_[A-Z_]+([^A-Za-z0-9_]|$)")
-    list(APPEND SCRITE_QML_REGISTRATION_SOURCES "${_qml_scan_file}")
-  endif()
-endforeach()
-list(REMOVE_DUPLICATES SCRITE_QML_REGISTRATION_SOURCES)
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DesktopQmlSources.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DesktopPlatformSources.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DesktopGenericSources.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DesktopQmlAndAssetFiles.cmake")
 
 find_package(Qt6 6.8 REQUIRED COMPONENTS
   Core
@@ -102,31 +30,29 @@ else()
   qt_add_executable(Scrite)
 endif()
 
-if(SCRITE_QML_FILES_FROM_QRC)
-  set(SCRITE_QML_MODULE_QML_FILES_ARG QML_FILES ${SCRITE_QML_FILES_FROM_QRC})
-else()
-  set(SCRITE_QML_MODULE_QML_FILES_ARG)
-  message(WARNING "No .qml files found in ${SCRITE_QML_QRC_FILE}; QML module will be generated without QML_FILES.")
-endif()
-
-if(SCRITE_QML_REGISTRATION_SOURCES)
-  set(SCRITE_QML_MODULE_SOURCES_ARG SOURCES ${SCRITE_QML_REGISTRATION_SOURCES})
-else()
-  set(SCRITE_QML_MODULE_SOURCES_ARG)
-  message(WARNING "No QML_* macro sources found under ${SCRITE_DESKTOP_SRC_DIR}.")
-endif()
+set_source_files_properties(${SCRITE_DESKTOP_SINGLETON_QML_FILES}
+  PROPERTIES QT_QML_SINGLETON_TYPE TRUE
+)
 
 qt_add_qml_module(Scrite
   URI io.scrite.components
+  RESOURCE_PREFIX "/"
   VERSION 1.0
-  ${SCRITE_QML_MODULE_QML_FILES_ARG}
-  ${SCRITE_QML_MODULE_SOURCES_ARG}
+  QML_FILES
+    ${SCRITE_DESKTOP_QML_FILES}
+    ${SCRITE_DESKTOP_SINGLETON_QML_FILES}
+  SOURCES
+    ${SCRITE_DESKTOP_QML_SOURCES}
+  RESOURCES
+    ${SCRITE_DESKTOP_ICON_FILES}
+    ${SCRITE_DESKTOP_IMAGE_FILES}
 )
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DesktopMiscAndFontsResources.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DesktopIconsAndImages.cmake")
 
 target_sources(Scrite PRIVATE
   ${SCRITE_DESKTOP_SOURCES}
-  ${SCRITE_DESKTOP_MM}
-  ${SCRITE_DESKTOP_RESOURCES}
   "${CMAKE_CURRENT_SOURCE_DIR}/src/crashpad/CrashRecoveryDialog.ui"
 )
 
@@ -230,24 +156,6 @@ if(UNIX AND NOT APPLE)
   endif()
 endif()
 
-if(APPLE)
-  # Only include this on macOS; it requires Objective-C++.
-  target_sources(Scrite PRIVATE
-    "${SCRITE_DESKTOP_SRC_DIR}/core/platformtransliterator_macos.mm"
-    "${SCRITE_DESKTOP_SRC_DIR}/core/platformtransliterator_macos.h"
-  )
-elseif(WIN32)
-  target_sources(Scrite PRIVATE
-    "${SCRITE_DESKTOP_SRC_DIR}/core/platformtransliterator_windows.cpp"
-    "${SCRITE_DESKTOP_SRC_DIR}/core/platformtransliterator_windows.h"
-  )
-else()
-  target_sources(Scrite PRIVATE
-    "${SCRITE_DESKTOP_SRC_DIR}/core/platformtransliterator_linux.cpp"
-    "${SCRITE_DESKTOP_SRC_DIR}/core/platformtransliterator_linux.h"
-  )
-endif()
-
 # Optional crashpad integration (off by default).
 option(SCRITE_WITH_CRASHPAD "Enable Crashpad integration (requires SDK)" OFF)
 set(SCRITE_CRASHPAD_ROOT "$ENV{SCRITE_CRASHPAD_ROOT}" CACHE PATH "Crashpad SDK root (SCRITE_CRASHPAD_ROOT)")
@@ -262,7 +170,7 @@ if(SCRITE_WITH_CRASHPAD AND SCRITE_CRASHPAD_ROOT)
       )
       target_link_directories(Scrite PRIVATE "${SCRITE_CRASHPAD_ROOT}/lib")
       target_link_libraries(Scrite PRIVATE common client util base Advapi32)
-      target_sources(Scrite PRIVATE "${SCRITE_DESKTOP_SRC_DIR}/crashpad/crashpadmodule_win.cpp")
+      target_sources(Scrite PRIVATE ${SCRITE_DESKTOP_WIN_CRASHPAD_PLATFORM_SOURCES})
       add_custom_command(TARGET Scrite POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different
                 "${SCRITE_CRASHPAD_ROOT}/bin/crashpad_handler.exe"
@@ -279,7 +187,7 @@ if(SCRITE_WITH_CRASHPAD AND SCRITE_CRASHPAD_ROOT)
       )
       target_link_directories(Scrite PRIVATE "${SCRITE_CRASHPAD_ROOT}/lib")
       target_link_libraries(Scrite PRIVATE common client util base mig_output bsm "-framework AppKit" "-framework Security")
-      target_sources(Scrite PRIVATE "${SCRITE_DESKTOP_SRC_DIR}/crashpad/crashpadmodule_mac.cpp")
+      target_sources(Scrite PRIVATE ${SCRITE_DESKTOP_MAC_CRASHPAD_PLATFORM_SOURCES})
       add_custom_command(TARGET Scrite POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different
                 "${SCRITE_CRASHPAD_ROOT}/bin/crashpad_handler"

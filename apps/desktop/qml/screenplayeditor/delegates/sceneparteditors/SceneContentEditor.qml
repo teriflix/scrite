@@ -20,14 +20,14 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-import "qrc:/qml/dialogs"
-import "qrc:/qml/helpers"
-import "qrc:/qml/globals"
-import "qrc:/qml/controls"
-import "qrc:/qml/structureview"
-import "qrc:/qml/screenplayeditor"
-import "qrc:/qml/floatingdockpanels"
-import "qrc:/qml/screenplayeditor/delegates/sceneparteditors/helpers"
+import "../../../dialogs"
+import "../../../helpers"
+import "../../../globals"
+import "../../../controls"
+import "../../../structureview"
+import "../.."
+import "../../../floatingdockpanels"
+import "./helpers"
 
 AbstractScenePartEditor {
     id: root
