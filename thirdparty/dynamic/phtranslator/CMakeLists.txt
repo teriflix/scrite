@@ -14,6 +14,10 @@ target_include_directories(phtranslator
     "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
+if(WIN32)
+  target_compile_definitions(phtranslator PRIVATE PHTRANSLATELIB_EXPORTS)
+endif()
+
 if(APPLE OR UNIX)
   target_compile_definitions(phtranslator PUBLIC PHTRANSLATE_STATICLIB)
   # Symbols in this legacy library are exported via plain C linkage names.
