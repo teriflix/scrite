@@ -1,0 +1,22 @@
+{
+  "name": "scrite-quazip-deps",
+  "version-string": "1.0.0",
+  "dependencies": [
+    "zlib",
+    "bzip2"
+  ],
+  "vcpkg-configuration": {
+    "default-registry": {
+      "kind": "git",
+      "baseline": "1e199d32ad53aab1defda61ce41c380302e3f95c",
+      "repository": "https://github.com/microsoft/vcpkg"
+    },
+    "registries": [
+      {
+        "kind": "artifact",
+        "location": "https://github.com/microsoft/vcpkg-ce-catalog/archive/refs/heads/main.zip",
+        "name": "microsoft"
+      }
+    ]
+  }
+}
