@@ -15,6 +15,21 @@ endif()
 
 add_subdirectory(sonnet)
 
+# On Windows, Sonnet's trigram generation runs `parsetrigrams6.exe` during
+# build. Since `parsetrigrams` is created in a subdirectory, use a custom
+# target here and wire it as a dependency of KF6SonnetCore.
+if(WIN32 AND TARGET parsetrigrams AND TARGET KF6SonnetCore)
+  add_custom_target(scrite_sonnet_parsetrigrams_runtime
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      $<TARGET_RUNTIME_DLLS:parsetrigrams>
+      $<TARGET_FILE_DIR:parsetrigrams>
+    DEPENDS parsetrigrams
+    COMMAND_EXPAND_LISTS
+    VERBATIM
+  )
+  add_dependencies(KF6SonnetCore scrite_sonnet_parsetrigrams_runtime)
+endif()
+
 # Export include root for consumers that use direct source includes
 # like "sonnet/src/core/speller.h".
 set(SCRITE_SONNET_INCLUDE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "Scrite Sonnet include root")
