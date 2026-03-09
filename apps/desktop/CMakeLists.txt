@@ -129,7 +129,7 @@ target_link_libraries(Scrite PRIVATE
   poly2tri
   simplecrypt
   phtranslator
-  "$<TARGET_FILE:KF6SonnetCore>"
+  KF6::SonnetCore
 )
 
 if(APPLE)
