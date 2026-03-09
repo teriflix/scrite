@@ -45,7 +45,7 @@ public:
                  PlatformTransliterationEngine *transliterator);
 
     bool eventFilter(QObject *object, QEvent *event);
-    bool nativeEventFilter(const QByteArray &eventType, void *message, long *result);
+    bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result);
 
 signals:
     void activeLanguageChanged();

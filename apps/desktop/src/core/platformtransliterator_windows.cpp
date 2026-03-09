@@ -241,7 +241,7 @@ bool WindowsBackend::eventFilter(QObject *object, QEvent *event)
     return false;
 }
 
-bool WindowsBackend::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+bool WindowsBackend::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
 {
     Q_UNUSED(eventType)
     Q_UNUSED(result)
