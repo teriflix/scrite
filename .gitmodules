@@ -4,3 +4,6 @@
 [submodule "thirdparty/static/quazip/quazip"]
 	path = thirdparty/static/quazip/quazip
 	url = https://github.com/stachenov/quazip.git
+[submodule "thirdparty/source/ecm"]
+	path = thirdparty/source/ecm
+	url = https://github.com/KDE/extra-cmake-modules.git

@@ -4,6 +4,15 @@ set(SONNET_USE_WIDGETS OFF CACHE BOOL "" FORCE)
 set(SONNET_USE_QML OFF CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
 
+if(DEFINED SCRITE_VENDORED_ECM_CONFIG_DIR AND EXISTS "${SCRITE_VENDORED_ECM_CONFIG_DIR}/ECMConfig.cmake")
+  set(ECM_DIR "${SCRITE_VENDORED_ECM_CONFIG_DIR}" CACHE PATH "Scrite vendored ECM config directory" FORCE)
+endif()
+
+# Sonnet's ecm_setup_version(PROJECT ...) requires this policy in NEW mode.
+if(POLICY CMP0048)
+  cmake_policy(SET CMP0048 NEW)
+endif()
+
 add_subdirectory(sonnet)
 
 # Export include root for consumers that use direct source includes
