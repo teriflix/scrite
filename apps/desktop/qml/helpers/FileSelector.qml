@@ -27,7 +27,7 @@ Item {
 
     property string label: "Select a file to export into"
     property alias absoluteFilePath: fileInfo.absoluteFilePath
-    property alias folder: folderPathDialog.folder
+    property alias folder: folderPathDialog.currentFolder
     property var allowedExtensions: []
     property var selectedExtension
     property string filePathPrefix: "File will be saved as: "
@@ -49,7 +49,7 @@ Item {
                 if(fileInfo.exists)
                     return Url.fromPath(fileInfo.absolutePath)
             }
-            return Url.fromPath(StandardPaths.writableLocation(StandardPaths.DownloadFolder))
+            return Url.fromPath(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
         }
 
         onAccepted: fileInfo.absolutePath = Url.toPath(selectedFile)
@@ -76,7 +76,7 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: parent.linkAt(mouseX, mouseY) === "change" ? Qt.PointingHandCursor : Qt.ArrowCursor
-                onClicked: {
+                onClicked: (mouse) => {
                     if(parent.linkAt(mouse.x, mouse.y) === "change")
                         folderPathDialog.open()
                 }
