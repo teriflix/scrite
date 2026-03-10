@@ -194,7 +194,7 @@ Item {
         enabled: !Scrite.document.readOnly && Scrite.document.screenplay.canPaste
 
         onTriggered: (source) => {
-                         Scrite.document.screenplay.pasteAfter(Scrite.document.currentIndex)
+                         Scrite.document.screenplay.pasteAfter(Scrite.document.sreenplay.currentElementIndex)
                      }
     }
 
@@ -204,7 +204,7 @@ Item {
 
         onTriggered: (source) => {
                          if(_private.sceneGroup.sceneCount <= 1)
-                             Scrite.document.screenplay.removeElement(Scrite.document.currentElement)
+                             Scrite.document.screenplay.removeElement(Scrite.document.screenplay.elementAt(Scrite.document.screenplay.currentElementIndex))
                          else
                              Scrite.document.screenplay.removeSelectedElements();
                      }
