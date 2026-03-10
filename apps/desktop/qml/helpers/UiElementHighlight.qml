@@ -21,7 +21,6 @@ import QtQuick.Controls
 import io.scrite.components
 
 import "../globals"
-import "."
 import "../controls"
 
 /**

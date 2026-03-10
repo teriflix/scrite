@@ -27,7 +27,6 @@ import "../globals"
 import "../dialogs"
 import "../helpers"
 import "../controls"
-import "."
 import "./delegates"
 
 ListView {

@@ -24,7 +24,6 @@ import "../globals"
 import "../helpers"
 import "../dialogs"
 import "../controls"
-import "."
 import "./annotations"
 import "./structureelements"
 

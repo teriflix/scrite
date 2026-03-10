@@ -22,7 +22,6 @@ import io.scrite.components
 
 import "../globals"
 import "../controls"
-import "."
 
 Flickable {
     id: root

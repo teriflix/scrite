@@ -24,7 +24,6 @@ import io.scrite.components
 import "../../globals"
 import "../../helpers"
 import "../../controls"
-import "."
 
 Item {
     id: root

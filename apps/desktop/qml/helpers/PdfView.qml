@@ -24,7 +24,6 @@ import QtQuick.Controls.Material
 import io.scrite.components
 
 import "../globals"
-import "."
 import "../controls"
 
 Item {

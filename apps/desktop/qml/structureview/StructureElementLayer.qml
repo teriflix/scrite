@@ -26,7 +26,6 @@ import "../controls"
 import "../helpers"
 import "../dialogs"
 import "../overlays"
-import "."
 import "./structureelements"
 
 Item {

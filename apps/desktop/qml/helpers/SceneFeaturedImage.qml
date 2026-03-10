@@ -23,7 +23,6 @@ import io.scrite.components
 
 import "../globals"
 import "../controls"
-import "."
 
 Item {
     id: sceneFeaturedPhotoItem
