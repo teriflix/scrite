@@ -22,15 +22,15 @@ import "../controls"
 Item {
     id: root
 
-    property alias tabsArray: _tabRepeater.model
-    property alias content: _contentLoader.sourceComponent
-    property alias contentItem: _contentLoader.item
-    property alias currentIndex: _tabBar.currentIndex
+    property alias tabsArray: tabRepeater.model
+    property alias content: contentLoader.sourceComponent
+    property alias contentItem: contentLoader.item
+    property alias currentIndex: tabBar.currentIndex
     property string tabTitleRole: "title"
     property string tabTooltipRole: "tooltip"
 
     Row {
-        id: _tabBar
+        id: tabBar
 
         property int currentIndex: 0
 
@@ -38,7 +38,7 @@ Item {
         anchors.left: parent.left
 
         Repeater {
-            id: _tabRepeater
+            id: tabRepeater
 
             model: 0
 
@@ -46,10 +46,10 @@ Item {
                 required property int index
                 required property var modelData
 
-                property bool selected: _tabBar.currentIndex === index
+                property bool selected: tabBar.currentIndex === index
 
-                width: _tabText.contentWidth + 40
-                height: _tabText.contentHeight + 30
+                width: tabText.contentWidth + 40
+                height: tabText.contentHeight + 30
                 color: selected ? "white" : Qt.rgba(0,0,0,0)
 
                 Rectangle {
@@ -62,7 +62,7 @@ Item {
                 }
 
                 VclLabel {
-                    id: _tabText
+                    id: tabText
                     anchors.centerIn: parent
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     text: tabTitleRole === "" ? modelData : modelData[tabTitleRole]
@@ -70,7 +70,7 @@ Item {
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: _tabBar.currentIndex = index
+                    onClicked: tabBar.currentIndex = index
                     hoverEnabled: true
 
                     ToolTipPopup {
@@ -83,15 +83,15 @@ Item {
     }
 
     Rectangle {
-        id: _contentPanel
-        anchors.top: _tabBar.bottom
+        id: contentPanel
+        anchors.top: tabBar.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         clip: true
 
         Loader {
-            id: _contentLoader
+            id: contentLoader
             anchors.fill: parent
         }
     }

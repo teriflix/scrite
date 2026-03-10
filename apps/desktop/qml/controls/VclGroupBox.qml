@@ -22,7 +22,7 @@ import io.scrite.components
 import "../globals"
 
 GroupBox {
-    id: root
+    id: control
 
     property color labelBackground: Runtime.colors.accent.c500.background
     property color labelText: Runtime.colors.accent.c500.text
@@ -31,16 +31,16 @@ GroupBox {
 
     label: Rectangle {
         // x: control.leftPadding
-        width: Math.min(_labelItem.width, availableWidth)
-        height: _labelItem.height
-        color: root.labelBackground
+        width: Math.min(labelItem.width, availableWidth)
+        height: labelItem.height
+        color: control.labelBackground
 
         VclLabel {
-            id: _labelItem
+            id: labelItem
             padding: 5
-            text: root.title
+            text: control.title
             font.bold: true
-            color: root.labelText
+            color: control.labelText
         }
     }
 }

@@ -27,7 +27,7 @@ import "../controls"
 import "../overlays"
 
 Rectangle {
-    id: root
+    id: _workspace
 
     function reset() { _workspaceLoader.reset() }
 

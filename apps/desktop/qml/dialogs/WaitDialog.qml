@@ -40,7 +40,7 @@ Item {
         if(progressReport && Object.isOfType(progressReport, "ProgressReport"))
             initialProps.progressReport = progressReport
 
-        var dlg = _dialogComponent.createObject(root, initialProps)
+        var dlg = dialogComponent.createObject(root, initialProps)
         if(dlg) {
             dlg.closed.connect(dlg.destroy)
             dlg.open()
@@ -52,10 +52,10 @@ Item {
     }
 
     Component {
-        id: _dialogComponent
+        id: dialogComponent
 
         VclDialog {
-            id: _dialog
+            id: dialog
 
             property string message
             property ProgressReport progressReport
@@ -75,9 +75,9 @@ Item {
                 VclLabel {
                     Layout.fillWidth: true
 
-                    text: _dialog.message
-                    elide: _dialog.progressReport ? Text.ElideMiddle : Text.ElideRight
-                    wrapMode: _dialog.progressReport ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere
+                    text: dialog.message
+                    elide: dialog.progressReport ? Text.ElideMiddle : Text.ElideRight
+                    wrapMode: dialog.progressReport ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere
                     padding: 16
                     maximumLineCount: 5
                     verticalAlignment: Text.AlignVCenter
@@ -91,17 +91,17 @@ Item {
 
                     to: 1
                     from: 0
-                    value: _dialog.progressReport ? _dialog.progressReport.progress : 0
-                    visible: _dialog.progressReport !== null
+                    value: dialog.progressReport ? dialog.progressReport.progress : 0
+                    visible: dialog.progressReport !== null
                 }
 
                 VclLabel {
                     Layout.fillWidth: true
 
-                    text: _dialog.progressReport ? (_dialog.progressReport.progressText + " (" + Math.round(_dialog.progressReport.progress*100,0) + "%)") : " - "
+                    text: dialog.progressReport ? (dialog.progressReport.progressText + " (" + Math.round(dialog.progressReport.progress*100,0) + "%)") : " - "
                     elide: Text.ElideMiddle
                     padding: 8
-                    visible: _dialog.progressReport !== null
+                    visible: dialog.progressReport !== null
                     bottomPadding: 16
                     horizontalAlignment: Text.AlignHCenter
                 }

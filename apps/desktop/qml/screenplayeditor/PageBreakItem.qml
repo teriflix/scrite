@@ -36,21 +36,21 @@ Rectangle {
     property color foreground: defaultForeground
 
     implicitWidth: 100
-    implicitHeight: _loader.height * (fullSize ? 1.2 : 1.1)
+    implicitHeight: loader.height * (fullSize ? 1.2 : 1.1)
 
     color: defaultColor
 
     Loader {
-        id: _loader
+        id: loader
 
         y: placement === Qt.TopEdge ? (root.height-height) : 0
         width: parent.width
 
-        sourceComponent: root.fullSize ? fullSizeVariant : _miniSizeVariant
+        sourceComponent: root.fullSize ? fullSizeVariant : miniSizeVariant
     }
 
     Component {
-        id: _fullSizeVariant
+        id: fullSizeVariant
 
         RowLayout {
             DashedLine {
@@ -73,7 +73,7 @@ Rectangle {
     }
 
     Component {
-        id: _miniSizeVariant
+        id: miniSizeVariant
 
         DashedLine {
             height: 8
@@ -81,7 +81,7 @@ Rectangle {
     }
 
     component DashedLine : Shape {
-        id: _shape
+        id: shape
 
         implicitHeight: 2
 
@@ -90,8 +90,8 @@ Rectangle {
             strokeWidth: 1
             strokeStyle: ShapePath.DashLine
             dashPattern: [3,5]
-            startX: 0; startY: _shape.height/2
-            PathLine { x: _shape.width; y: _shape.height/2 }
+            startX: 0; startY: shape.height/2
+            PathLine { x: shape.width; y: shape.height/2 }
         }
     }
 }

@@ -29,7 +29,7 @@ Item {
 
     // Public properties
     property string title: "Floating Dock"
-    property real titleBarHeight: _titleBar.height
+    property real titleBarHeight: titleBar.height
     property Component content: Item { }
 
     // Public signals
@@ -72,14 +72,14 @@ Item {
 
     // Titlebar
     Rectangle {
-        id: _titleBar
+        id: titleBar
         width: root.width
-        height: _dialogHeaderLayout.height
+        height: dialogHeaderLayout.height
 
         color: Runtime.colors.accent.c600.background
 
         MouseArea {
-            id: _dragArea
+            id: dragArea
             anchors.fill: parent
             drag.target: root
             drag.axis: Drag.XAndYAxis
@@ -87,14 +87,14 @@ Item {
         }
 
         RowLayout {
-            id: _dialogHeaderLayout
+            id: dialogHeaderLayout
 
             width: parent.width
 
             spacing: 2
 
             VclLabel {
-                id: _titleText
+                id: titleText
 
                 Layout.alignment: Qt.AlignVCenter
                 Layout.fillWidth: true
@@ -110,8 +110,8 @@ Item {
             Image {
                 Layout.alignment: Qt.AlignVCenter
 
-                Layout.preferredWidth: Runtime.idealFontMetrics.height + _titleText.padding*2
-                Layout.preferredHeight: Runtime.idealFontMetrics.height + _titleText.padding*2
+                Layout.preferredWidth: Runtime.idealFontMetrics.height + titleText.padding*2
+                Layout.preferredHeight: Runtime.idealFontMetrics.height + titleText.padding*2
 
                 source: "qrc:/icons/action/dialog_close_button.png"
                 smooth: true; mipmap: true
@@ -133,9 +133,9 @@ Item {
     // Content
     Loader {
         width: root.width
-        height: root.height - _titleBar.height
+        height: root.height - titleBar.height
 
-        y: _titleBar.height
+        y: titleBar.height
 
         active: root.visible
         clip: true

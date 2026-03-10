@@ -29,10 +29,10 @@ import "../../controls"
 Item {
     id: root
 
-    height: _layout.height+20
+    height: layout.height+20
 
     GridLayout {
-        id: _layout
+        id: layout
 
         y: 10
         width: parent.width-20
@@ -42,7 +42,7 @@ Item {
 
         GroupBox {
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
+            Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
 
             label: VclLabel { text: "Paper Size" }
 
@@ -62,7 +62,7 @@ Item {
 
         GroupBox {
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
+            Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
 
             label: VclLabel { text: "Time Per Page" }
 
@@ -88,7 +88,7 @@ Item {
 
         GroupBox {
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
+            Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
 
             label: VclLabel { text: "Header" }
 
@@ -157,7 +157,7 @@ Item {
 
         GroupBox {
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
+            Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
 
             label: VclLabel { text: "Footer" }
 
@@ -226,13 +226,13 @@ Item {
 
         GroupBox {
             Layout.columnSpan: 2
-            Layout.preferredWidth: _layout.width
-            Layout.preferredHeight: _watermarkOptionsLayout.height+50 // !!!
+            Layout.preferredWidth: layout.width
+            Layout.preferredHeight: watermarkOptionsLayout.height+50 // !!!
 
             label: VclLabel { text: "Watermark" }
 
             GridLayout {
-                id: _watermarkOptionsLayout
+                id: watermarkOptionsLayout
                 width: parent.width
                 columns: 4
                 columnSpacing: 10
@@ -259,13 +259,13 @@ Item {
                 }
 
                 VclButton {
-                    id: _fontFamilyButton
+                    id: fontFamilyButton
                     Layout.preferredWidth: 250
 
                     text: _private.pageSetupSettings.watermarkFont
 
                     contentItem: VclLabel {
-                        text: _fontFamilyButton.text
+                        text: fontFamilyButton.text
                         elide: Text.ElideRight
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter

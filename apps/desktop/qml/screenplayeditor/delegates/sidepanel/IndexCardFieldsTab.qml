@@ -70,7 +70,7 @@ AbstractScenePartEditor {
             }
 
             VclToolButton {
-                id: _icfEditButton
+                id: icfEditButton
 
                 Layout.fillWidth: true
 

@@ -75,7 +75,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: _dialog
+        id: dialog
 
         property var language: Runtime.language.available.findLanguage(languageCode)
         property int languageCode: QtLocale.English
@@ -97,13 +97,13 @@ DialogLauncher {
                 result.filter = true
 
                 if(event.key === Qt.Key_Up)
-                    _fontList.currentIndex = Math.max(0, _fontList.currentIndex-1)
+                    fontList.currentIndex = Math.max(0, fontList.currentIndex-1)
                 else if(event.key === Qt.Key_Down)
-                    _fontList.currentIndex = Math.min(_fontList.count-1, _fontList.currentIndex+1)
+                    fontList.currentIndex = Math.min(fontList.count-1, fontList.currentIndex+1)
                 else if(event.key === Qt.Key_PageUp)
-                    _fontList.currentIndex = Math.max(0, _fontList.currentIndex-10)
+                    fontList.currentIndex = Math.max(0, fontList.currentIndex-10)
                 else if(event.key === Qt.Key_PageDown)
-                    _fontList.currentIndex = Math.min(_fontList.count-1, _fontList.currentIndex+10)
+                    fontList.currentIndex = Math.min(fontList.count-1, fontList.currentIndex+10)
                 else {
                     result.acceptEvent = false
                     result.filter = false
@@ -111,18 +111,18 @@ DialogLauncher {
             }
 
             GenericArrayModel {
-                id: _fontFamiliesModel
+                id: fontFamiliesModel
 
                 array: {
                     const allFonts = LanguageEngine.scriptFontFamilies(QtChar.Script_Latin)
-                    const languageSpecificFonts = _dialog.languageUsesLatinScript ? [] : _dialog.language.fontFamilies()
+                    const languageSpecificFonts = dialog.languageUsesLatinScript ? [] : dialog.language.fontFamilies()
 
                     let ret = []
                     languageSpecificFonts.forEach( (font) => {
                                                     ret.push( {"category": "Suggested Fonts", "family": font} )
                                                   })
 
-                    const cat = _dialog.languageUsesLatinScript ? "Available Fonts" : "Other Fonts"
+                    const cat = dialog.languageUsesLatinScript ? "Available Fonts" : "Other Fonts"
                     allFonts.forEach( (font) => {
                                                     if(languageSpecificFonts.indexOf(font) >= 0)
                                                         return
@@ -132,7 +132,7 @@ DialogLauncher {
 
                     initialIndex = -1
                     for(let i=0; i<ret.length; i++) {
-                        if(ret[i].family === _dialog.initialFontFamily) {
+                        if(ret[i].family === dialog.initialFontFamily) {
                             initialIndex = i
                             break
                         }
@@ -146,15 +146,15 @@ DialogLauncher {
             }
 
             GenericArraySortFilterProxyModel {
-                id: _fontFamiliesFilterModel
-                arrayModel: _fontFamiliesModel
+                id: fontFamiliesFilterModel
+                arrayModel: fontFamiliesModel
                 onFilterRow: (source_row, result) => {
-                    if(_fontFilter.length == 0) {
+                    if(fontFilter.length == 0) {
                         result.value = true
                     } else {
-                        let filter = _fontFilter.text.toLowerCase()
+                        let filter = fontFilter.text.toLowerCase()
 
-                        let familyName = "" + _fontFamiliesModel.get(source_row).family
+                        let familyName = "" + fontFamiliesModel.get(source_row).family
                         familyName = familyName.toLowerCase()
 
                         result.value = familyName.indexOf(filter) == 0
@@ -169,7 +169,7 @@ DialogLauncher {
                 spacing: 10
 
                 TextField {
-                    id: _fontFilter
+                    id: fontFilter
 
                     Layout.fillWidth: true
 
@@ -179,9 +179,9 @@ DialogLauncher {
                     placeholderText: "Search for a font"
 
                     onTextEdited: {
-                        _fontList.currentIndex = -1
-                        _fontFamiliesFilterModel.refilter()
-                        Qt.callLater( () => { _fontList.currentIndex = 0 } )
+                        fontList.currentIndex = -1
+                        fontFamiliesFilterModel.refilter()
+                        Qt.callLater( () => { fontList.currentIndex = 0 } )
                     }
                 }
 
@@ -193,17 +193,17 @@ DialogLauncher {
                     border.color: Runtime.colors.primary.borderColor
 
                     Component {
-                        id: _fontListSectionDelegate
+                        id: fontListSectionDelegate
 
                         Rectangle {
                             required property string section
 
-                            width: _fontList.width - (_fontList.ScrollBar.vertical.needed ? 17 : 0)
+                            width: fontList.width - (fontList.ScrollBar.vertical.needed ? 17 : 0)
                             height: Runtime.idealFontMetrics.lineSpacing+15
                             color: Runtime.colors.accent.highlight.background
 
                             VclText {
-                                id: _sectionLabel
+                                id: sectionLabel
 
                                 anchors.centerIn: parent
 
@@ -218,7 +218,7 @@ DialogLauncher {
                     }
 
                     ListView {
-                        id: _fontList
+                        id: fontList
 
                         anchors.fill: parent
                         anchors.margins: 1
@@ -226,7 +226,7 @@ DialogLauncher {
                         ScrollBar.vertical: VclScrollBar { }
 
                         clip: true
-                        model: _fontFamiliesFilterModel
+                        model: fontFamiliesFilterModel
                         spacing: 5
                         currentIndex: -1
                         keyNavigationEnabled: false
@@ -244,17 +244,17 @@ DialogLauncher {
 
                         section.property: "category"
                         section.criteria: ViewSection.FullString
-                        section.delegate: _dialog.languageUsesLatinScript ? null : _fontListSectionDelegate
+                        section.delegate: dialog.languageUsesLatinScript ? null : fontListSectionDelegate
 
                         delegate: Item {
                             required property int index
                             required property string family
 
-                            width: _fontList.width - (_fontList.ScrollBar.vertical.needed ? 17 : 0)
-                            height: _delegateLayout.height
+                            width: fontList.width - (fontList.ScrollBar.vertical.needed ? 17 : 0)
+                            height: delegateLayout.height
 
                             RowLayout {
-                                id: _delegateLayout
+                                id: delegateLayout
 
                                 width: parent.width-10
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -262,7 +262,7 @@ DialogLauncher {
                                 VclLabel {
                                     Layout.preferredWidth: parent.width * 0.5
 
-                                    text: (_dialog.initialFontFamily === family ? "* " : "") + family
+                                    text: (dialog.initialFontFamily === family ? "* " : "") + family
                                     elide: Text.ElideRight
                                     padding: 3
                                 }
@@ -270,7 +270,7 @@ DialogLauncher {
                                 VclLabel {
                                     Layout.fillWidth: true
 
-                                    text: _dialog.previewText
+                                    text: dialog.previewText
                                     elide: Text.ElideRight
                                     padding: 3
                                     wrapMode: Text.NoWrap
@@ -280,13 +280,13 @@ DialogLauncher {
 
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: _fontList.currentIndex = index
+                                onClicked: fontList.currentIndex = index
                             }
                         }
 
                         Component.onCompleted: {
-                            positionViewAtIndex(_fontFamiliesModel.initialIndex, ListView.Contain)
-                            currentIndex = _fontFamiliesModel.initialIndex
+                            positionViewAtIndex(fontFamiliesModel.initialIndex, ListView.Contain)
+                            currentIndex = fontFamiliesModel.initialIndex
                         }
                     }
                 }
@@ -295,12 +295,12 @@ DialogLauncher {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Select"
-                    enabled: _fontList.currentIndex >= 0
+                    enabled: fontList.currentIndex >= 0
 
                     onClicked: {
                         _private.fontWasSelected = true
-                        _dialog.fontSelected(_fontList.currentItem.family)
-                        Qt.callLater(_dialog.close)
+                        dialog.fontSelected(fontList.currentItem.family)
+                        Qt.callLater(dialog.close)
                     }
                 }
             }

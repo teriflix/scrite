@@ -36,7 +36,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: _dialog
+        id: dialog
 
         property Relationship relationship
         property Character ofCharacter: relationship ? (relationship.direction === Relationship.OfWith ? relationship.ofCharacter : relationship.withCharacter) : null
@@ -48,13 +48,13 @@ DialogLauncher {
 
         content: Item {
             Component.onCompleted: {
-                Runtime.execLater(_dialogLayout, 100, function() {
-                    _txtRelationshipName.forceActiveFocus()
+                Runtime.execLater(dialogLayout, 100, function() {
+                    txtRelationshipName.forceActiveFocus()
                 })
             }
 
             ColumnLayout {
-                id: _dialogLayout
+                id: dialogLayout
                 width: parent.width-40
                 anchors.centerIn: parent
                 spacing: 20
@@ -72,15 +72,15 @@ DialogLauncher {
                             Layout.preferredHeight: 150
                             Layout.alignment: Qt.AlignHCenter
 
-                            color: _dialog.ofCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
+                            color: dialog.ofCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
                             border.width: 1
                             border.color: "black"
 
                             Image {
                                 anchors.fill: parent
                                 source: {
-                                    if(_dialog.ofCharacter.hasKeyPhoto > 0)
-                                    return "file:///" + _dialog.ofCharacter.keyPhoto
+                                    if(dialog.ofCharacter.hasKeyPhoto > 0)
+                                    return "file:///" + dialog.ofCharacter.keyPhoto
                                     return "qrc:/icons/content/character_icon.png"
                                 }
                                 fillMode: Image.PreserveAspectCrop
@@ -97,24 +97,24 @@ DialogLauncher {
                             maximumLineCount: 2
                             horizontalAlignment: Text.AlignHCenter
 
-                            text: SMath.titleCased(_dialog.ofCharacter.name)
+                            text: SMath.titleCased(dialog.ofCharacter.name)
                         }
                     }
 
                     VclTextField {
-                        id: _txtRelationshipName
+                        id: txtRelationshipName
 
                         Layout.fillWidth: true
 
                         focus: true
-                        text: _dialog.relationship.name
+                        text: dialog.relationship.name
                         label: "Relationship:"
                         maximumLength: 50
                         placeholderText: "husband of, wife of, friends with, reports to ..."
 
                         readOnly: Scrite.document.readOnly
                         enableTransliteration: true
-                        onReturnPressed: _doneButton.click()
+                        onReturnPressed: doneButton.click()
                     }
 
                     ColumnLayout {
@@ -132,8 +132,8 @@ DialogLauncher {
                             Image {
                                 anchors.fill: parent
                                 source: {
-                                    if(_dialog.withCharacter.hasKeyPhoto > 0)
-                                    return "file:///" + _dialog.withCharacter.keyPhoto
+                                    if(dialog.withCharacter.hasKeyPhoto > 0)
+                                    return "file:///" + dialog.withCharacter.keyPhoto
                                     return "qrc:/icons/content/character_icon.png"
                                 }
                                 fillMode: Image.PreserveAspectCrop
@@ -150,7 +150,7 @@ DialogLauncher {
                             maximumLineCount: 2
                             horizontalAlignment: Text.AlignHCenter
 
-                            text: SMath.titleCased(_dialog.withCharacter.name)
+                            text: SMath.titleCased(dialog.withCharacter.name)
                         }
                     }
                 }
@@ -160,20 +160,20 @@ DialogLauncher {
                     spacing: 20
 
                     VclButton {
-                        id: _revertButton
+                        id: revertButton
                         text: "Revert"
-                        enabled: _txtRelationshipName.text !== _dialog.relationship.name
-                        onClicked: _txtRelationshipName.text = _dialog.relationship.name
+                        enabled: txtRelationshipName.text !== dialog.relationship.name
+                        onClicked: txtRelationshipName.text = dialog.relationship.name
                     }
 
                     VclButton {
-                        id: _doneButton
+                        id: doneButton
                         text: "Change"
-                        enabled: _txtRelationshipName.length > 0
+                        enabled: txtRelationshipName.length > 0
                         onClicked: click()
                         function click() {
-                            _dialog.relationship.name = _txtRelationshipName.text.trim()
-                            _dialog.close()
+                            dialog.relationship.name = txtRelationshipName.text.trim()
+                            dialog.close()
                         }
                     }
                 }

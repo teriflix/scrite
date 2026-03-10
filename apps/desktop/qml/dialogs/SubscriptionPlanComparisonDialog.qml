@@ -51,7 +51,7 @@ DialogLauncher {
     }
 
     dialogComponent: VclDialog {
-        id: _dialog
+        id: dialog
 
         width: Math.max(500, Math.min( Math.min(_private.maxDialogWidth,_private.idealColumnSize*(plans.length+1)), Scrite.window.width * 0.8))
         height: Math.min(_private.maxDialogHeight,Scrite.window.height * 0.8)
@@ -61,7 +61,7 @@ DialogLauncher {
         titleBarCloseButtonVisible: true
 
         content: Item {
-            Component.onCompleted: SubscriptionPlanOperations.populateComparisonTableModel(_dialog.plans, _comparisonTableModel)
+            Component.onCompleted: SubscriptionPlanOperations.populateComparisonTableModel(dialog.plans, comparisonTableModel)
 
             Rectangle {
                 anchors.fill: parent
@@ -70,41 +70,41 @@ DialogLauncher {
             }
 
             ListModel {
-                id: _comparisonTableModel
+                id: comparisonTableModel
             }
 
             Flickable {
-                id: _comparisionTableView
+                id: comparisionTableView
 
                 anchors.fill: parent
 
                 clip: true
 
-                contentWidth: _comparisonTable.width
-                contentHeight: _comparisonTable.height
+                contentWidth: comparisonTable.width
+                contentHeight: comparisonTable.height
                 boundsBehavior: Flickable.StopAtBounds
                 boundsMovement: Flickable.StopAtBounds
 
                 ScrollBar.vertical: VclScrollBar {
-                    id: _verticialScrollBar
-                    flickable: _comparisionTableView
+                    id: verticialScrollBar
+                    flickable: comparisionTableView
                 }
                 ScrollBar.horizontal: VclScrollBar {
-                    flickable: _verticialScrollBar
+                    flickable: verticialScrollBar
                 }
 
                 GridLayout {
-                    id: _comparisonTable
+                    id: comparisonTable
 
-                    columns: 1 + _dialog.plans.length
+                    columns: 1 + dialog.plans.length
                     rowSpacing: 0
                     columnSpacing: -1
 
-                    property real idealColumnWidth: (_comparisionTableView.width/_comparisonTable.columns)
+                    property real idealColumnWidth: (comparisionTableView.width/comparisonTable.columns)
                     property real columnWidth: Math.max(_private.idealColumnSize, idealColumnWidth)
 
                     Repeater {
-                        model: _comparisonTableModel
+                        model: comparisonTableModel
 
                         DelegateChooser {
                             role: "kind"
@@ -117,9 +117,9 @@ DialogLauncher {
                                     required property var attributes
 
                                     Layout.fillHeight: true
-                                    Layout.minimumWidth: _comparisonTable.columnWidth
-                                    Layout.maximumWidth: _comparisonTable.columnWidth
-                                    Layout.preferredWidth: _comparisonTable.columnWidth
+                                    Layout.minimumWidth: comparisonTable.columnWidth
+                                    Layout.maximumWidth: comparisonTable.columnWidth
+                                    Layout.preferredWidth: comparisonTable.columnWidth
 
                                     text: attributes.text
                                     font.pointSize: attributes.font.pointSize
@@ -145,9 +145,9 @@ DialogLauncher {
                                     required property var attributes
 
                                     Layout.fillHeight: true
-                                    Layout.minimumWidth: _comparisonTable.columnWidth
-                                    Layout.maximumWidth: _comparisonTable.columnWidth
-                                    Layout.preferredWidth: _comparisonTable.columnWidth
+                                    Layout.minimumWidth: comparisonTable.columnWidth
+                                    Layout.maximumWidth: comparisonTable.columnWidth
+                                    Layout.preferredWidth: comparisonTable.columnWidth
 
                                     text: attributes.text + " ⓘ"
                                     font.pointSize: attributes.font.pointSize
@@ -186,9 +186,9 @@ DialogLauncher {
                                     required property var attributes
 
                                     Layout.fillHeight: true
-                                    Layout.minimumWidth: _comparisonTable.columnWidth
-                                    Layout.maximumWidth: _comparisonTable.columnWidth
-                                    Layout.preferredWidth: _comparisonTable.columnWidth
+                                    Layout.minimumWidth: comparisonTable.columnWidth
+                                    Layout.maximumWidth: comparisonTable.columnWidth
+                                    Layout.preferredWidth: comparisonTable.columnWidth
 
                                     text: attributes.text
                                     padding: 8
@@ -201,7 +201,7 @@ DialogLauncher {
 
                                     onClicked: {
                                         SubscriptionPlanOperations.subscribeTo(attributes.plan)
-                                        _dialog.close()
+                                        dialog.close()
                                     }
                                 }
                             }
@@ -210,7 +210,7 @@ DialogLauncher {
 
                     VclLabel {
                         Layout.fillWidth: true
-                        Layout.columnSpan: _comparisonTable.columns
+                        Layout.columnSpan: comparisonTable.columns
 
                         padding: 12
                         color: Runtime.colors.accent.c600.text

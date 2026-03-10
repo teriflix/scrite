@@ -38,7 +38,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: _dialog
+        id: dialog
 
         title: "Modify Recent Files"
         width: 640
@@ -59,13 +59,13 @@ DialogLauncher {
                     border.color: Runtime.colors.primary.borderColor
 
                     ListView {
-                        id: _recentFilesView
+                        id: recentFilesView
 
                         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
                         ScrollBar.vertical: VclScrollBar {
-                            id: _recentFilesViewVScrollBar
-                            flickable: _recentFilesView
+                            id: recentFilesViewVScrollBar
+                            flickable: recentFilesView
                         }
 
                         anchors.fill: parent
@@ -86,22 +86,22 @@ DialogLauncher {
                             required property int index
                             required property var fileInfo
 
-                            width: _recentFilesView.width
-                            height: _delegateLayout.height+20
+                            width: recentFilesView.width
+                            height: delegateLayout.height+20
 
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: _recentFilesView.currentIndex = index
+                                onClicked: recentFilesView.currentIndex = index
                             }
 
                             RowLayout {
-                                id: _delegateLayout
+                                id: delegateLayout
 
                                 anchors.left: parent.left
                                 anchors.leftMargin: 10
                                 anchors.verticalCenter: parent.verticalCenter
 
-                                width: parent.width-(_recentFilesViewVScrollBar.needed ? 30 : 15)
+                                width: parent.width-(recentFilesViewVScrollBar.needed ? 30 : 15)
                                 spacing: 10
 
                                 Rectangle {
@@ -162,7 +162,7 @@ DialogLauncher {
                                         enabled: !Platform.isLinuxDesktop
                                         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                         onClicked: {
-                                            _recentFilesView.currentIndex = index
+                                            recentFilesView.currentIndex = index
                                             File.revealOnDesktop(fileInfo.filePath)
                                             Scrite.notifications.dismissNotification(0)
                                         }

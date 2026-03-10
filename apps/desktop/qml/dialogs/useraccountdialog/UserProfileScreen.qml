@@ -47,7 +47,7 @@ Item {
     }
 
     PageView {
-        id: _userProfilePageView
+        id: userProfilePageView
         anchors.fill: parent
 
         Announcement.onIncoming: (type, data) => {
@@ -62,7 +62,7 @@ Item {
             if(pagesArray.length < 2)
                 return 120
 
-            let textMetrics = Qt.createQmlObject("import QtQuick 2.15; TextMetrics { }", _userProfilePageView)
+            let textMetrics = Qt.createQmlObject("import QtQuick 2.15; TextMetrics { }", userProfilePageView)
             textMetrics.font.pointSize = Runtime.idealFontMetrics.font.pointSize
             textMetrics.text = ( () => {
                                     const options = pagesArray
@@ -80,13 +80,13 @@ Item {
             return ret
         }
         pageContent: {
-            switch(_userProfilePageView.currentIndex) {
-            case 1: return _userSubscriptionsPageComponent
-            case 2: return _userInstallationsPageComponent
-            case 3: return _userNotificationsPageComponent
+            switch(userProfilePageView.currentIndex) {
+            case 1: return userSubscriptionsPageComponent
+            case 2: return userInstallationsPageComponent
+            case 3: return userNotificationsPageComponent
             default: break
             }
-            return _userProfilePageComponent
+            return userProfilePageComponent
         }
         cornerContent: Item {
             Image {
@@ -102,12 +102,12 @@ Item {
                 mipmap: true
 
                 MouseArea {
-                    id: _discordButtonMouseArea
+                    id: discordButtonMouseArea
                     anchors.fill: parent
 
                     ToolTipPopup {
                         text: "Ask questions, post feedback, request features and connect with other Scrite users."
-                        visible: _discordButtonMouseArea.hovered
+                        visible: discordButtonMouseArea.hovered
                     }
 
                     cursorShape: Qt.PointingHandCursor
@@ -120,20 +120,20 @@ Item {
     }
 
     Component {
-        id: _userProfilePageComponent
+        id: userProfilePageComponent
 
         Item {
-            id: _userProfilePage
+            id: userProfilePage
 
-            height: _userProfilePageView.availablePageContentHeight
+            height: userProfilePageView.availablePageContentHeight
 
             property var userInfo: Scrite.user.info
             property RestApiCallList callList : RestApiCallList {
-                calls: [_refreshUserCall, _deactivateDeviceCall, _saveUserCall]
+                calls: [refreshUserCall, deactivateDeviceCall, saveUserCall]
             }
 
             TabSequenceManager {
-                id: _userInfoFields
+                id: userInfoFields
 
                 property bool needsSaving: false
             }
@@ -141,11 +141,11 @@ Item {
             Connections {
                 target: Scrite.user
 
-                function onBusyChanged() { _userInfoFields.needsSaving = false }
+                function onBusyChanged() { userInfoFields.needsSaving = false }
             }
 
             ColumnLayout {
-                id: _layout
+                id: layout
 
                 anchors.fill: parent
                 anchors.margins: 20
@@ -153,12 +153,12 @@ Item {
 
                 spacing: 20
                 opacity: enabled ? 1 : 0.5
-                enabled: !_userProfilePage.callList.busy
+                enabled: !userProfilePage.callList.busy
 
                 VclLabel {
                     Layout.fillWidth: true
 
-                    text: "You're logged in via <b>" + _userProfilePage.userInfo.email + "</b>."
+                    text: "You're logged in via <b>" + userProfilePage.userInfo.email + "</b>."
                 }
 
                 Item {
@@ -170,35 +170,35 @@ Item {
                     Layout.fillWidth: true
 
                     VclTextField {
-                        id: _nameField
+                        id: nameField
 
                         Layout.fillWidth: true
 
-                        TabSequenceItem.manager: _userInfoFields
+                        TabSequenceItem.manager: userInfoFields
                         TabSequenceItem.sequence: 0
 
-                        text: _userProfilePage.userInfo.fullName
+                        text: userProfilePage.userInfo.fullName
                         maximumLength: 128
                         placeholderText: "Name"
                         undoRedoEnabled: true
 
-                        onTextEdited: _userInfoFields.needsSaving = true
+                        onTextEdited: userInfoFields.needsSaving = true
                     }
 
                     VclTextField {
-                        id: _phoneField
+                        id: phoneField
 
                         Layout.fillWidth: true
 
-                        TabSequenceItem.manager: _userInfoFields
+                        TabSequenceItem.manager: userInfoFields
                         TabSequenceItem.sequence: 1
 
-                        text: _userProfilePage.userInfo.phone
+                        text: userProfilePage.userInfo.phone
                         maximumLength: 128
                         placeholderText: "Phone (optional)"
                         undoRedoEnabled: true
 
-                        onTextEdited: _userInfoFields.needsSaving = true
+                        onTextEdited: userInfoFields.needsSaving = true
 
                         validator: RegularExpressionValidator {
                             regularExpression: /^\+?(\d{1,3})?[\s\-]?\(?\d{1,4}\)?[\s\-]?\d{1,4}[\s\-]?\d{1,4}$/
@@ -208,14 +208,14 @@ Item {
 
 
                 VclTextField {
-                    id: _experienceField
+                    id: experienceField
 
                     Layout.fillWidth: true
 
-                    TabSequenceItem.manager: _userInfoFields
+                    TabSequenceItem.manager: userInfoFields
                     TabSequenceItem.sequence: 2
 
-                    text: _userProfilePage.userInfo.experience
+                    text: userProfilePage.userInfo.experience
                     maximumLength: 128
                     maxVisibleItems: 6
                     placeholderText: "Experience (optional)"
@@ -229,48 +229,48 @@ Item {
                     maxCompletionItems: -1
                     minimumCompletionPrefixLength: 0
 
-                    onTextEdited: _userInfoFields.needsSaving = true
+                    onTextEdited: userInfoFields.needsSaving = true
                 }
 
                 RowLayout {
                     Layout.fillWidth: true
 
                     VclTextField {
-                        id: _cityField
+                        id: cityField
 
                         Layout.fillWidth: true
 
-                        TabSequenceItem.manager: _userInfoFields
+                        TabSequenceItem.manager: userInfoFields
                         TabSequenceItem.sequence: 3
 
-                        text: _userProfilePage.userInfo.city
+                        text: userProfilePage.userInfo.city
                         maximumLength: 128
                         placeholderText: "City"
                         undoRedoEnabled: true
 
-                        onTextEdited: _userInfoFields.needsSaving = true
+                        onTextEdited: userInfoFields.needsSaving = true
                     }
 
                     VclTextField {
-                        id: _countryField
+                        id: countryField
 
                         Layout.fillWidth: true
 
                         placeholderText: "Country"
-                        text: _userProfilePage.userInfo.country
+                        text: userProfilePage.userInfo.country
                         readOnly: true
                     }
                 }
 
                 VclTextField {
-                    id: _wdyhasField
+                    id: wdyhasField
 
                     Layout.fillWidth: true
 
-                    TabSequenceItem.manager: _userInfoFields
+                    TabSequenceItem.manager: userInfoFields
                     TabSequenceItem.sequence: 4
 
-                    text: _userProfilePage.userInfo.wdyhas
+                    text: userProfilePage.userInfo.wdyhas
                     placeholderText: "Where did you hear about Scrite? (optional)"
                     maximumLength: 128
                     completionStrings: [
@@ -291,7 +291,7 @@ Item {
                     maxVisibleItems: 6
                     undoRedoEnabled: true
 
-                    onTextEdited: _userInfoFields.needsSaving = true
+                    onTextEdited: userInfoFields.needsSaving = true
                 }
 
                 RowLayout {
@@ -300,29 +300,29 @@ Item {
                     spacing: 25
 
                     VclCheckBox {
-                        id: _chkAnalyticsConsent
+                        id: chkAnalyticsConsent
 
-                        TabSequenceItem.manager: _userInfoFields
+                        TabSequenceItem.manager: userInfoFields
                         TabSequenceItem.sequence: 5
 
                         text: "Send analytics data."
-                        checked: _userProfilePage.userInfo.consentToActivityLog
+                        checked: userProfilePage.userInfo.consentToActivityLog
                         padding: 0
 
-                        onToggled: _userInfoFields.needsSaving = true
+                        onToggled: userInfoFields.needsSaving = true
                     }
 
                     VclCheckBox {
-                        id: _chkEmailConsent
+                        id: chkEmailConsent
 
-                        TabSequenceItem.manager: _userInfoFields
+                        TabSequenceItem.manager: userInfoFields
                         TabSequenceItem.sequence: 6
 
                         text: "Send marketing email."
-                        checked: _userProfilePage.userInfo.consentToEmail
+                        checked: userProfilePage.userInfo.consentToEmail
                         padding: 0
 
-                        onToggled: _userInfoFields.needsSaving = true
+                        onToggled: userInfoFields.needsSaving = true
                     }
                 }
 
@@ -332,7 +332,7 @@ Item {
                 }
 
                 StackLayout {
-                    currentIndex: _userInfoFields.needsSaving ? 1 : 0
+                    currentIndex: userInfoFields.needsSaving ? 1 : 0
 
                     Layout.fillWidth: true
 
@@ -343,10 +343,10 @@ Item {
 
                         VclButton {
                             text: "Refresh"
-                            onClicked: _refreshUserCall.call()
+                            onClicked: refreshUserCall.call()
 
                             UserMeRestApiCall {
-                                id: _refreshUserCall
+                                id: refreshUserCall
                             }
                         }
 
@@ -367,13 +367,13 @@ Item {
                             onClicked: {
                                 SaveFileTask.save( () => {
                                                       Scrite.document.reset()
-                                                      _deactivateDeviceCall.call()
+                                                      deactivateDeviceCall.call()
                                                   })
 
                             }
 
                             InstallationDeactivateRestApiCall {
-                                id: _deactivateDeviceCall
+                                id: deactivateDeviceCall
 
                                 onFinished: {
                                     if(!hasError)
@@ -396,7 +396,7 @@ Item {
                             text: "Save"
 
                             onClicked: {
-                                var names = _nameField.text.trim().split(' ')
+                                var names = nameField.text.trim().split(' ')
 
                                 const _lastName = names.length > 1 ? names[names.length-1] : ""
                                 if(names.length > 1)
@@ -407,25 +407,25 @@ Item {
                                 const newInfo = {
                                     firstName: _firstName,
                                     lastName: _lastName,
-                                    experience: _experienceField.text.trim(),
-                                    phone: _phoneField.text.trim(),
-                                    city: _cityField.text.trim(),
+                                    experience: experienceField.text.trim(),
+                                    phone: phoneField.text.trim(),
+                                    city: cityField.text.trim(),
                                     country: locale.country.name,
                                     currency: locale.currency.code,
-                                    wdyhas: _wdyhasField.text.trim(),
-                                    consentToActivityLog: _chkAnalyticsConsent.checked,
-                                    consentToEmail: _chkEmailConsent.checked,
+                                    wdyhas: wdyhasField.text.trim(),
+                                    consentToActivityLog: chkAnalyticsConsent.checked,
+                                    consentToEmail: chkEmailConsent.checked,
                                 }
 
-                                _saveUserCall.updatedFields = newInfo
-                                _saveUserCall.call()
+                                saveUserCall.updatedFields = newInfo
+                                saveUserCall.call()
                             }
 
                             UserMeRestApiCall {
-                                id: _saveUserCall
+                                id: saveUserCall
                                 onFinished: {
                                     updatedFields = {}
-                                    _userInfoFields.needsSaving = false
+                                    userInfoFields.needsSaving = false
                                 }
                             }
                         }
@@ -436,18 +436,18 @@ Item {
             BusyIndicator {
                 anchors.centerIn: parent
 
-                running: _userProfilePage.callList.busy
+                running: userProfilePage.callList.busy
             }
         }
     }
 
     Component {
-        id: _userNotificationsPageComponent
+        id: userNotificationsPageComponent
 
         Item {
-            id: _userNotificationsPage
+            id: userNotificationsPage
 
-            height: _userProfilePageView.availablePageContentHeight
+            height: userProfilePageView.availablePageContentHeight
 
             Component.onDestruction: Scrite.user.markMessagesAsRead()
 
@@ -460,7 +460,7 @@ Item {
             }
 
             ListView {
-                id: _userMessagesView
+                id: userMessagesView
 
                 anchors.fill: parent
 
@@ -476,7 +476,7 @@ Item {
                 boundsBehavior: Flickable.StopAtBounds
 
                 header: VclLabel {
-                    width: _userMessagesView.width
+                    width: userMessagesView.width
                     padding: 10
 
                     font.bold: true
@@ -504,7 +504,7 @@ Item {
                 }
 
                 footer: Item {
-                    width: _userMessagesView.width
+                    width: userMessagesView.width
                     height: 20
                 }
 
@@ -512,16 +512,16 @@ Item {
                     required property int index
                     required property var modelData
 
-                    width: _userMessagesView.width
-                    height: _messageRect.height
+                    width: userMessagesView.width
+                    height: messageRect.height
 
                     Rectangle {
-                        id: _messageRect
+                        id: messageRect
 
                         anchors.centerIn: parent
 
                         width: 450
-                        height: _messageLayout.implicitHeight + 30
+                        height: messageLayout.implicitHeight + 30
                         border {
                             width: modelData.read ? 1 : 2
                             color: Runtime.colors.primary.borderColor
@@ -530,7 +530,7 @@ Item {
                         color: Runtime.colors.primary.c200.background
 
                         ColumnLayout {
-                            id: _messageLayout
+                            id: messageLayout
 
                             anchors.centerIn: parent
 
@@ -568,9 +568,9 @@ Item {
                                 MouseArea {
                                     anchors.fill: parent
 
-                                    enabled: _buttonsRepeater.count === 1
+                                    enabled: buttonsRepeater.count === 1
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: _buttonsRepeater.itemAt(0).handleClick()
+                                    onClicked: buttonsRepeater.itemAt(0).handleClick()
                                 }
                             }
 
@@ -591,7 +591,7 @@ Item {
                             }
 
                             Repeater {
-                                id: _buttonsRepeater
+                                id: buttonsRepeater
                                 model: modelData.buttons
 
                                 delegate: Link {
@@ -642,31 +642,31 @@ Item {
     }
 
     Component {
-        id: _userSubscriptionsPageComponent
+        id: userSubscriptionsPageComponent
 
         Item {
-            id: _userSubscriptionsPage
+            id: userSubscriptionsPage
 
-            height: Math.max(_userSubsView.height, _userProfilePageView.availablePageContentHeight)
+            height: Math.max(userSubsView.height, userProfilePageView.availablePageContentHeight)
 
             property RestApiCallList callList: RestApiCallList {
-                calls: [_queryUserSubsCall]
+                calls: [queryUserSubsCall]
             }
 
             Item {
-                id: _userSubsView
+                id: userSubsView
                 width: parent.width
-                height: _userSubsLayout.height + 40
+                height: userSubsLayout.height + 40
 
-                enabled: !_userSubscriptionsPage.callList.busy
+                enabled: !userSubscriptionsPage.callList.busy
                 opacity: enabled ? 1 : 0.5
 
                 ColumnLayout {
-                    id: _userSubsLayout
+                    id: userSubsLayout
 
                     y: 20
                     width: parent.width-20
-                    visible: !_queryUserSubsCall.hasError
+                    visible: !queryUserSubsCall.hasError
 
                     spacing: 30
 
@@ -674,14 +674,14 @@ Item {
                     Loader {
                         Layout.fillWidth: true
 
-                        active: _queryUserSubsCall.activeSubscription !== undefined
+                        active: queryUserSubsCall.activeSubscription !== undefined
                         visible: active
 
                         sourceComponent: VclGroupBox {
                             title: "Active Subscription"
 
                             PlanCard {
-                                property var activeSub: _queryUserSubsCall.activeSubscription
+                                property var activeSub: queryUserSubsCall.activeSubscription
 
                                 width: parent.width
 
@@ -702,14 +702,14 @@ Item {
                     Loader {
                         Layout.fillWidth: true
 
-                        active: _queryUserSubsCall.upcomingSubscription !== undefined
+                        active: queryUserSubsCall.upcomingSubscription !== undefined
                         visible: active
 
                         sourceComponent: VclGroupBox {
                             title: "Upcoming Subscription"
 
                             PlanCard {
-                                property var upcomingSub: _queryUserSubsCall.upcomingSubscription
+                                property var upcomingSub: queryUserSubsCall.upcomingSubscription
 
                                 width: parent.width
 
@@ -728,52 +728,52 @@ Item {
 
                     // Available Plans (if any)
                     Loader {
-                        id: _availablePlansLoader
+                        id: availablePlansLoader
                         Layout.fillWidth: true
 
-                        active: _queryUserSubsCall.availablePlans.length > 0
+                        active: queryUserSubsCall.availablePlans.length > 0
                         visible: active
 
                         sourceComponent: VclGroupBox {
-                            id: _availablePlansGroupBox
+                            id: availablePlansGroupBox
 
                             title: "Available Plans"
 
                             readonly property Component referralCodeLink : Link {
                                 anchors.right: parent.right
                                 anchors.bottom: parent.top
-                                anchors.bottomMargin: _availablePlansGroupBox.topPadding/3
+                                anchors.bottomMargin: availablePlansGroupBox.topPadding/3
 
-                                text: _queryUserSubsCall.responseData.referralCodeText + " »"
+                                text: queryUserSubsCall.responseData.referralCodeText + " »"
                                 font.bold: true
 
-                                onClicked: _referralCodeDialog.open()
+                                onClicked: referralCodeDialog.open()
 
                                 VclDialog {
-                                    id: _referralCodeDialog
+                                    id: referralCodeDialog
 
                                     width: 400
                                     height: 240
-                                    title: _queryUserSubsCall.responseData.referralCodeText
+                                    title: queryUserSubsCall.responseData.referralCodeText
 
                                     content: Item {
                                         ColumnLayout {
                                             anchors.centerIn: parent
 
-                                            enabled: !_referralCodeApi.busy
+                                            enabled: !referralCodeApi.busy
                                             opacity: enabled ? 1 : 0.5
 
                                             width: parent.width-50
                                             spacing: 20
 
                                             TextField {
-                                                id: _txtReferralCode
+                                                id: txtReferralCode
 
                                                 Layout.fillWidth: true
 
                                                 focus: true
-                                                maximumLength: Runtime.bounded(_queryUserSubsCall.responseData.minReferralCodeLength, _queryUserSubsCall.responseData.maxReferralCodeLength, 128)
-                                                placeholderText: _queryUserSubsCall.responseData.referralCodeText
+                                                maximumLength: Runtime.bounded(queryUserSubsCall.responseData.minReferralCodeLength, queryUserSubsCall.responseData.maxReferralCodeLength, 128)
+                                                placeholderText: queryUserSubsCall.responseData.referralCodeText
                                                 horizontalAlignment: Text.AlignHCenter
                                             }
 
@@ -781,24 +781,24 @@ Item {
                                                 Layout.alignment: Qt.AlignHCenter
 
                                                 text: "Submit"
-                                                enabled: _txtReferralCode.length >= _queryUserSubsCall.responseData.minReferralCodeLength
+                                                enabled: txtReferralCode.length >= queryUserSubsCall.responseData.minReferralCodeLength
 
                                                 onClicked: {
-                                                    _referralCodeApi.code = _txtReferralCode.text.toUpperCase().trim()
-                                                    _referralCodeApi.call()
+                                                    referralCodeApi.code = txtReferralCode.text.toUpperCase().trim()
+                                                    referralCodeApi.call()
                                                 }
                                             }
                                         }
 
                                         BusyIndicator {
                                             anchors.centerIn: parent
-                                            running: _referralCodeApi.busy
+                                            running: referralCodeApi.busy
                                         }
 
                                         SubscriptionReferralCodeRestApiCall {
-                                            id: _referralCodeApi
+                                            id: referralCodeApi
 
-                                            onBusyChanged: _referralCodeDialog.titleBarCloseButtonVisible = !busy
+                                            onBusyChanged: referralCodeDialog.titleBarCloseButtonVisible = !busy
 
                                             onFinished: {
                                                 if(hasError) {
@@ -807,8 +807,8 @@ Item {
                                                 }
 
                                                 if(hasResponse) {
-                                                    _queryUserSubsCall.go()
-                                                    _referralCodeDialog.close()
+                                                    queryUserSubsCall.go()
+                                                    referralCodeDialog.close()
                                                 }
                                             }
                                         }
@@ -817,7 +817,7 @@ Item {
                             }
 
                             Component.onCompleted: {
-                                if(_queryUserSubsCall.responseData.acceptingReferralCode === true)
+                                if(queryUserSubsCall.responseData.acceptingReferralCode === true)
                                     referralCodeLink.createObject(background)
                             }
 
@@ -826,7 +826,7 @@ Item {
                                 spacing: 20
 
                                 Repeater {
-                                    model: _queryUserSubsCall.availablePlans
+                                    model: queryUserSubsCall.availablePlans
 
                                     delegate: PlanCard {
                                         required property int index
@@ -857,7 +857,7 @@ Item {
                     RowLayout {
                         Layout.fillWidth: true
 
-                        visible: _queryUserSubsCall.availablePlans.length > 0
+                        visible: queryUserSubsCall.availablePlans.length > 0
 
                         VclLabel {
                             Layout.fillWidth: true
@@ -868,12 +868,12 @@ Item {
 
                         Link {
                             enabled: SubscriptionPlanOperations.taxonomy !== undefined
-                            text: _queryUserSubsCall.availablePlans.length > 1 ? "Compare Plans »" : "Feature Details »"
+                            text: queryUserSubsCall.availablePlans.length > 1 ? "Compare Plans »" : "Feature Details »"
                             font.bold: true
                             onClicked: {
                                 const name = Scrite.user.info.fullName === "" ? Scrite.user.info.email : Scrite.user.info.fullName
-                                const title = (_queryUserSubsCall.availablePlans.length > 1 ? "Plan Comparison for " : "Plan Details for ") + name
-                                SubscriptionPlanComparisonDialog.launch(_queryUserSubsCall.availablePlans, title)
+                                const title = (queryUserSubsCall.availablePlans.length > 1 ? "Plan Comparison for " : "Plan Details for ") + name
+                                SubscriptionPlanComparisonDialog.launch(queryUserSubsCall.availablePlans, title)
                             }
                         }
                     }
@@ -882,7 +882,7 @@ Item {
                     Loader {
                         Layout.fillWidth: true
 
-                        active: _queryUserSubsCall.pastSubscriptions.length > 0
+                        active: queryUserSubsCall.pastSubscriptions.length > 0
                         visible: active
 
                         sourceComponent: VclGroupBox {
@@ -893,7 +893,7 @@ Item {
                                 spacing: 20
 
                                 Repeater {
-                                    model: _queryUserSubsCall.pastSubscriptions
+                                    model: queryUserSubsCall.pastSubscriptions
 
                                     delegate: PlanCard {
                                         required property int index
@@ -921,26 +921,26 @@ Item {
                     anchors.centerIn: parent
 
                     text: "Reload"
-                    visible: _queryUserSubsCall.hasError
-                    onClicked: _queryUserSubsCall.go()
+                    visible: queryUserSubsCall.hasError
+                    onClicked: queryUserSubsCall.go()
                 }
             }
 
             BusyIndicator {
                 anchors.centerIn: parent
-                running: !_queryUserSubsCall.ready || _queryUserSubsCall.busy
+                running: !queryUserSubsCall.ready || queryUserSubsCall.busy
             }
 
             Connections {
                 target: Scrite.restApi
 
                 function onSessionTokenAvailable() {
-                    _queryUserSubsCall.go()
+                    queryUserSubsCall.go()
                 }
             }
 
             SubscriptionPlansRestApiCall {
-                id: _queryUserSubsCall
+                id: queryUserSubsCall
 
                 property bool ready: false
                 property var activeSubscription
@@ -950,7 +950,7 @@ Item {
 
                 onFinished: {
                     if(hasError) {
-                        MessageBox.information("Error", errorMessage, () => { _userProfilePageView.currentIndex = 0 })
+                        MessageBox.information("Error", errorMessage, () => { userProfilePageView.currentIndex = 0 })
                         return
                     }
 
@@ -979,7 +979,7 @@ Item {
 
                     ready = call()
                     if(!ready)
-                        Runtime.execLater(_queryUserSubsCall, 500, go)
+                        Runtime.execLater(queryUserSubsCall, 500, go)
                 }
 
                 Component.onCompleted: go()
@@ -988,15 +988,15 @@ Item {
     }
 
     Component {
-        id: _userInstallationsPageComponent
+        id: userInstallationsPageComponent
 
         Item {
-            id: _userInstallationsPage
+            id: userInstallationsPage
 
-            height: _userProfilePageView.availablePageContentHeight
+            height: userProfilePageView.availablePageContentHeight
 
             ColumnLayout {
-                id: _userInstallationsPageLayout
+                id: userInstallationsPageLayout
 
                 anchors.fill: parent
                 anchors.margins: 20
@@ -1023,16 +1023,16 @@ Item {
                     Layout.fillHeight: true
 
                     color: Runtime.colors.transparent
-                    border.width: _devicesFlickable.contentHeight > _devicesFlickable.height ? 1 : 0
+                    border.width: devicesFlickable.contentHeight > devicesFlickable.height ? 1 : 0
                     border.color: Runtime.colors.primary.borderColor
 
                     Flickable {
-                        id: _devicesFlickable
+                        id: devicesFlickable
 
                         anchors.fill: parent
                         anchors.margins: clip ? 2 : 0
 
-                        enabled: !_deactivateOtherCall.busy && !Scrite.user.busy
+                        enabled: !deactivateOtherCall.busy && !Scrite.user.busy
                         opacity: enabled ? 1 : 0.5
 
                         ScrollBar.vertical: VclScrollBar { }
@@ -1040,12 +1040,12 @@ Item {
 
                         clip: contentHeight > height
                         contentWidth: width
-                        contentHeight: _devicesFlow.height
+                        contentHeight: devicesFlow.height
 
                         Flow {
-                            id: _devicesFlow
+                            id: devicesFlow
 
-                            width: _devicesFlickable.width - (_devicesFlickable.clip ? 20 : 0)
+                            width: devicesFlickable.width - (devicesFlickable.clip ? 20 : 0)
                             spacing: 10
 
                             Repeater {
@@ -1055,15 +1055,15 @@ Item {
                                     required property int index
                                     required property var modelData
 
-                                    width: Math.min(450, (_devicesFlow.width - _devicesFlow.spacing) / 2 - 1)
-                                    height: _deviceCardLayout.implicitHeight + 40
+                                    width: Math.min(450, (devicesFlow.width - devicesFlow.spacing) / 2 - 1)
+                                    height: deviceCardLayout.implicitHeight + 40
 
                                     color: Runtime.colors.primary.c10.background
                                     border.width: modelData.isCurrent ? 3 : 1
                                     border.color: modelData.isCurrent ? Runtime.colors.accent.c600.background : Runtime.colors.primary.borderColor
 
                                     ColumnLayout {
-                                        id: _deviceCardLayout
+                                        id: deviceCardLayout
 
                                         anchors.fill: parent
                                         anchors.margins: 20
@@ -1142,14 +1142,14 @@ Item {
                                                     Rectangle {
                                                         visible: modelData.isCurrent
 
-                                                        Layout.preferredHeight: _thisDeviceLabel.implicitHeight + 8
-                                                        Layout.preferredWidth: _thisDeviceLabel.implicitWidth + 12
+                                                        Layout.preferredHeight: thisDeviceLabel.implicitHeight + 8
+                                                        Layout.preferredWidth: thisDeviceLabel.implicitWidth + 12
 
                                                         color: Runtime.colors.accent.c500.background
                                                         radius: 4
 
                                                         VclLabel {
-                                                            id: _thisDeviceLabel
+                                                            id: thisDeviceLabel
                                                             anchors.centerIn: parent
 
                                                             text: "THIS DEVICE"
@@ -1210,8 +1210,8 @@ Item {
                                                 icon.height: 16
 
                                                 onClicked: {
-                                                    _deactivateOtherCall.installationId = modelData.id
-                                                    _deactivateOtherCall.call()
+                                                    deactivateOtherCall.installationId = modelData.id
+                                                    deactivateOtherCall.call()
                                                 }
                                             }
                                         }
@@ -1225,11 +1225,11 @@ Item {
 
             BusyIndicator {
                 anchors.centerIn: parent
-                running: _deactivateOtherCall.busy || Scrite.user.busy
+                running: deactivateOtherCall.busy || Scrite.user.busy
             }
 
             InstallationDeactivateOtherRestApiCall {
-                id: _deactivateOtherCall
+                id: deactivateOtherCall
             }
         }
     }

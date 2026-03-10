@@ -26,7 +26,6 @@ import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
-    id: root
     property var fieldInfo
     property AbstractReportGenerator report
 

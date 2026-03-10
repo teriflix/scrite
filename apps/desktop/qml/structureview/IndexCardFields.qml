@@ -35,7 +35,7 @@ Item {
     property int startTabSequence
     signal fieldAboutToReceiveFocus(int index)
 
-    property bool hasFields: _indexCardFieldsModel.count > 0
+    property bool hasFields: indexCardFieldsModel.count > 0
 
     property int lod: LodLoader.LOD.Low
 
@@ -43,15 +43,15 @@ Item {
 
     property int wrapMode: TextInput.WordWrap
 
-    implicitHeight: hasFields ? _layout.height : 0
+    implicitHeight: hasFields ? layout.height : 0
 
     GridLayout {
-        id: _layout
+        id: layout
 
         width: parent.width-20
         anchors.horizontalCenter: parent.horizontalCenter
 
-        rows: _indexCardFieldsModel.count
+        rows: indexCardFieldsModel.count
         flow: GridLayout.TopToBottom
         visible: rows > 0
         columns: 2
@@ -59,7 +59,7 @@ Item {
         columnSpacing: 10
 
         Repeater {
-            model: _indexCardFieldsModel
+            model: indexCardFieldsModel
 
             delegate: VclLabel {
                 required property int index
@@ -73,7 +73,7 @@ Item {
         }
 
         Repeater {
-            model: _indexCardFieldsModel
+            model: indexCardFieldsModel
 
             delegate: LodLoader {
                 required property int index
@@ -93,8 +93,8 @@ Item {
 
                 lod: root.lod
                 sanctioned: root.sanctioned
-                lowDetailComponent: _viewerField
-                highDetailComponent: _editorField
+                lowDetailComponent: viewerField
+                highDetailComponent: editorField
 
                 onItemChanged: Qt.callLater(initializeItem)
 
@@ -115,7 +115,7 @@ Item {
     }
 
     Component {
-        id: _viewerField
+        id: viewerField
 
         VclLabel {
             property int index
@@ -131,7 +131,7 @@ Item {
     }
 
     Component {
-        id: _editorField
+        id: editorField
 
         VclTextField {
             property int index
@@ -155,7 +155,7 @@ Item {
     }
 
     GenericArrayModel {
-        id: _indexCardFieldsModel
+        id: indexCardFieldsModel
         array: Scrite.document.structure.indexCardFields
         objectMembers: ["name", "description"]
     }
@@ -170,13 +170,13 @@ Item {
         }
 
         function setFieldValue(index, value) {
-            if(index < 0 || index >= _indexCardFieldsModel.count)
+            if(index < 0 || index >= indexCardFieldsModel.count)
                 return
 
-            var newValues = fieldValues.length === _indexCardFieldsModel.count ? fieldValues : []
+            var newValues = fieldValues.length === indexCardFieldsModel.count ? fieldValues : []
 
             if(newValues.length === 0) {
-                for(var i=0; i<_indexCardFieldsModel.count; i++) {
+                for(var i=0; i<indexCardFieldsModel.count; i++) {
                     if(i === index)
                         newValues.push(value)
                     else

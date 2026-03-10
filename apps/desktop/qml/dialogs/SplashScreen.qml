@@ -36,7 +36,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: Dialog {
-        id: _dialog
+        id: dialog
 
         parent: Overlay.overlay
         anchors.centerIn: parent
@@ -69,13 +69,13 @@ DialogLauncher {
         }
 
         contentItem: Image {
-            id: _splashImage
+            id: splashImage
             source: "qrc:/images/splash.png"
             smooth: true; mipmap: true
             asynchronous: false
 
             VclText {
-                id: _versionText
+                id: versionText
 
                 anchors.top: parent.top
                 anchors.right: parent.right
@@ -93,7 +93,7 @@ DialogLauncher {
                 running: Runtime.applicationSettings.enableAnimations
 
                 NumberAnimation {
-                    target: _versionText
+                    target: versionText
                     property: "opacity"
                     duration: 500
                     easing.type: Easing.OutBack
@@ -101,7 +101,7 @@ DialogLauncher {
                 }
 
                 NumberAnimation {
-                    target: _versionText
+                    target: versionText
                     property: "font.letterSpacing"
                     duration: 1500
                     easing.type: Easing.OutBack
@@ -111,10 +111,10 @@ DialogLauncher {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: _dialog.close()
+                onClicked: dialog.close()
             }
 
-            Component.onCompleted: Runtime.execLater(_splashImage, 5000, _dialog.close)
+            Component.onCompleted: Runtime.execLater(splashImage, 5000, dialog.close)
         }
 
         QtObject {

@@ -36,7 +36,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: _dialog
+        id: dialog
 
         width: 640
         height: 550
@@ -71,7 +71,7 @@ DialogLauncher {
                     }
 
                     Switch {
-                        id: _protectionSwitch
+                        id: protectionSwitch
                         Layout.alignment: Qt.AlignVCenter
 
                         checked: Scrite.document.hasCollaborators
@@ -105,14 +105,14 @@ DialogLauncher {
                     }
 
                     ListView {
-                        id: _collaboratorsList
+                        id: collaboratorsList
                         anchors.fill: parent
                         anchors.margins: 5
                         anchors.leftMargin: 10
                         clip: true
                         property real viewportWidth: contentHeight > height ? width-20 : width-1
                         ScrollBar.vertical: VclScrollBar {
-                            flickable: _collaboratorsList
+                            flickable: collaboratorsList
                         }
                         header: Scrite.document.canModifyCollaborators ? collaboratorsListHeader : null
 
@@ -125,17 +125,17 @@ DialogLauncher {
                             required property string collaboratorName
                             required property string collaboratorEmail
 
-                            width: _collaboratorsList.viewportWidth
-                            height: _delegateLayout.height + 4
+                            width: collaboratorsList.viewportWidth
+                            height: delegateLayout.height + 4
 
                             MouseArea {
-                                id: _delegateMouseArea
+                                id: delegateMouseArea
                                 anchors.fill: parent
                                 hoverEnabled: true
                             }
 
                             RowLayout {
-                                id: _delegateLayout
+                                id: delegateLayout
                                 spacing: 5
                                 width: parent.width-5
                                 anchors.centerIn: parent
@@ -151,11 +151,11 @@ DialogLauncher {
                                 }
 
                                 FlatToolButton {
-                                    id: _deleteIcon
+                                    id: deleteIcon
 
                                     Layout.alignment: Qt.AlignVCenter
 
-                                    opacity: _delegateMouseArea.containsMouse || containsMouse ? (enabled ? 1 : 0.5) : 0
+                                    opacity: delegateMouseArea.containsMouse || containsMouse ? (enabled ? 1 : 0.5) : 0
                                     iconSource: "qrc:/icons/action/close.png"
                                     enabled: Scrite.document.canModifyCollaborators
 
@@ -166,15 +166,15 @@ DialogLauncher {
                     }
 
                     Component {
-                        id: _collaboratorsListHeader
+                        id: collaboratorsListHeader
 
                         RowLayout {
-                            width: _collaboratorsList.width
+                            width: collaboratorsList.width
                             enabled: Scrite.document.canModifyCollaborators
                             opacity: enabled ? 1 : 0.5
 
                             TextField {
-                                id: _newCollaboratorEmail
+                                id: newCollaboratorEmail
 
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
@@ -200,13 +200,13 @@ DialogLauncher {
                             }
 
                             FlatToolButton {
-                                id: _addCollaboratorButton
+                                id: addCollaboratorButton
 
                                 Layout.alignment: Qt.AlignVCenter
 
                                 iconSource: "qrc:/icons/content/add_box.png"
-                                onClicked: _newCollaboratorEmail.addCollaborator()
-                                enabled: _newCollaboratorEmail.acceptableInput
+                                onClicked: newCollaboratorEmail.addCollaborator()
+                                enabled: newCollaboratorEmail.acceptableInput
                             }
                         }
                     }

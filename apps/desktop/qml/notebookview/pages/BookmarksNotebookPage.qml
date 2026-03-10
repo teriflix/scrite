@@ -50,11 +50,11 @@ AbstractNotebookPage {
 
         highlight: Item {
             BoxShadow {
-                anchors.fill: _highlightedItem
+                anchors.fill: highlightedItem
                 opacity: 0.5
             }
             Item {
-                id: _highlightedItem
+                id: highlightedItem
                 anchors.fill: parent
                 anchors.leftMargin: 12
                 anchors.topMargin: 12

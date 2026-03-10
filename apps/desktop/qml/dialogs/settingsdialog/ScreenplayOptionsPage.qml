@@ -27,10 +27,10 @@ import "../../helpers"
 
 Item {
     id: root
-    height: _layout.height+30
+    height: layout.height+30
 
     ColumnLayout {
-        id: _layout
+        id: layout
 
         y: 10
         width: parent.width-20

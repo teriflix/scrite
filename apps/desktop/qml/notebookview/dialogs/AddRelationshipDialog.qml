@@ -39,7 +39,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: _dialog
+        id: dialog
 
         property Character character
 
@@ -54,7 +54,7 @@ DialogLauncher {
                 spacing: 10
 
                 SearchBar {
-                    id: _searchBar
+                    id: searchBar
 
                     Layout.fillWidth: true
 
@@ -68,11 +68,11 @@ DialogLauncher {
                     color: Runtime.colors.primary.c100.background
 
                     TabSequenceManager {
-                        id: _characterListTabManager
+                        id: characterListTabManager
                     }
 
                     ListView {
-                        id: _charactersListView
+                        id: charactersListView
                         anchors.fill: parent
                         anchors.margins: 1
                         anchors.leftMargin: 5
@@ -87,37 +87,37 @@ DialogLauncher {
                         highlightMoveDuration: 0
                         highlightResizeDuration: 0
 
-                        model: _dialog.character.unrelatedCharacterNames()
+                        model: dialog.character.unrelatedCharacterNames()
                         delegate: Rectangle {
-                            id: _characterRowItem
+                            id: characterRowItem
 
                             required property int index
                             required property string modelData
 
                             property string thisCharacterName: SMath.titleCased(character.name)
                             property string otherCharacterName: modelData
-                            property bool   checked: _relationshipName.length > 0
-                            property string relationship: _relationshipName.text
+                            property bool   checked: relationshipName.length > 0
+                            property string relationship: relationshipName.text
 
                             property bool  highlight: false
                             property color backgroundColor: highlight ? Runtime.colors.accent.c100.background : Runtime.colors.primary.c10.background
                             property color foregroundColor: highlight ? Runtime.colors.accent.c100.text : Runtime.colors.primary.c10.text
 
-                            width: _charactersListView.width
-                            height: _characterRow.height*1.15
+                            width: charactersListView.width
+                            height: characterRow.height*1.15
                             color: backgroundColor
 
-                            SearchAgent.engine: _searchBar.searchEngine
+                            SearchAgent.engine: searchBar.searchEngine
                             SearchAgent.onSearchRequest: {
                                 SearchAgent.searchResultCount = SearchAgent.indexesOf(string, otherCharacterName).length > 0 ? 1 : 0
                             }
                             SearchAgent.onCurrentSearchResultIndexChanged: {
                                 highlight = SearchAgent.currentSearchResultIndex >= 0
-                                _charactersListView.currentIndex = index
+                                charactersListView.currentIndex = index
                             }
 
                             RowLayout {
-                                id: _characterRow
+                                id: characterRow
                                 width: parent.width-20
                                 spacing: 10
 
@@ -126,7 +126,7 @@ DialogLauncher {
                                     Layout.preferredHeight: 24
 
                                     source: "qrc:/icons/navigation/check.png"
-                                    opacity: _relationshipName.length > 0 ? 1 : 0.05
+                                    opacity: relationshipName.length > 0 ? 1 : 0.05
                                 }
 
                                 VclLabel {
@@ -135,14 +135,14 @@ DialogLauncher {
                                 }
 
                                 VclTextField {
-                                    id: _relationshipName
+                                    id: relationshipName
 
                                     Layout.fillWidth: true
 
                                     Material.background: backgroundColor
                                     Material.foreground: foregroundColor
 
-                                    TabSequenceItem.manager: _characterListTabManager
+                                    TabSequenceItem.manager: characterListTabManager
                                     TabSequenceItem.sequence: index
 
                                     label: ""
@@ -153,7 +153,7 @@ DialogLauncher {
 
                                     onActiveFocusChanged: {
                                         if(activeFocus)
-                                            _charactersListView.currentIndex = index
+                                            charactersListView.currentIndex = index
                                     }
                                 }
 
@@ -179,10 +179,10 @@ DialogLauncher {
 
                     text: "Create Relationships"
 
-                    onClicked: _createRelationshipsJob.start()
+                    onClicked: createRelationshipsJob.start()
 
                     ActionHandler {
-                        action: _dialog.acceptAction
+                        action: dialog.acceptAction
 
                         onTriggered: parent.clicked()
                     }
@@ -190,7 +190,7 @@ DialogLauncher {
             }
 
             SequentialAnimation {
-                id: _createRelationshipsJob
+                id: createRelationshipsJob
 
                 running: false
 
@@ -207,9 +207,9 @@ DialogLauncher {
                 ScriptAction {
                     script: {
                         let nrRelationshipsAdded = 0
-                        for(let i=0; i<_charactersListView.count; i++) {
-                            _charactersListView.positionViewAtIndex(i, ListView.Visible)
-                            let item = _charactersListView.itemAtIndex(i)
+                        for(let i=0; i<charactersListView.count; i++) {
+                            charactersListView.positionViewAtIndex(i, ListView.Visible)
+                            let item = charactersListView.itemAtIndex(i)
                             if(item.checked) {
                                 let otherCharacter = Scrite.document.structure.addCharacter(item.otherCharacterName)
                                 if(otherCharacter) {
@@ -226,7 +226,7 @@ DialogLauncher {
                         _private.waitDialog.close()
                         _private.waitDialog = null
 
-                        Qt.callLater(_dialog.close)
+                        Qt.callLater(dialog.close)
                     }
                 }
             }

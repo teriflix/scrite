@@ -34,7 +34,7 @@ Button {
 
     Component.onCompleted: {
         if(!Scrite.app.usingMaterialTheme) {
-            background = _backgroundComponent.createObject(root)
+            background = backgroundComponent.createObject(root)
             font.pointSize = Runtime.idealFontMetrics.font.pointSize
         }
     }
@@ -45,7 +45,7 @@ Button {
     implicitHeight: Math.max(_private.textRect.height + 20, 50)
 
     Component {
-        id: _backgroundComponent
+        id: backgroundComponent
 
         Rectangle {
             implicitWidth: 120

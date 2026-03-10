@@ -40,7 +40,7 @@ Rectangle {
     }
 
     Rectangle {
-        anchors.fill: _contentsFlick
+        anchors.fill: contentsFlick
         anchors.leftMargin: -20
         anchors.rightMargin: -20
 
@@ -50,19 +50,19 @@ Rectangle {
     }
 
     Flickable {
-        id: _contentsFlick
+        id: contentsFlick
         anchors.centerIn: parent
         width: Math.min(parent.width * 0.8, 350)
-        height: Math.min(_contents.height, parent.height)
+        height: Math.min(contents.height, parent.height)
         contentWidth: width
-        contentHeight: _contents.height
+        contentHeight: contents.height
 
-        ScrollBar.vertical: _vscrollBar
+        ScrollBar.vertical: vscrollBar
 
         ColumnLayout {
-            id: _contents
+            id: contents
 
-            width: _contentsFlick.width
+            width: contentsFlick.width
             spacing: 10
 
             Item {
@@ -76,7 +76,7 @@ Rectangle {
                 spacing: 10
 
                 Image {
-                    id: _icon
+                    id: icon
 
                     Layout.alignment: Qt.AlignHCenter
                     Layout.preferredWidth: 24
@@ -100,7 +100,7 @@ Rectangle {
             }
 
             VclLabel {
-                id: _reasonSuggestion
+                id: reasonSuggestion
 
                 Layout.fillWidth: true
 
@@ -129,8 +129,8 @@ Rectangle {
     }
 
     VclScrollBar {
-        id: _vscrollBar
-        flickable: _contentsFlick
+        id: vscrollBar
+        flickable: contentsFlick
         orientation: Qt.Vertical
         anchors.right: parent.right
         anchors.top: parent.top

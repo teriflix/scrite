@@ -23,7 +23,6 @@ import "../../globals"
 import "../../controls"
 
 Item {
-    id: root
     readonly property bool modal: true
     readonly property string title: "Greetings!"
 
@@ -95,7 +94,7 @@ Item {
             Layout.alignment: Qt.AlignRight
 
             text: "Next »"
-            enabled: !_root_2.busy
+            enabled: !_welcomeTextApi.busy
 
             onClicked: {
                 Runtime.userAccountDialogSettings.welcomeScreenShown = true
@@ -106,11 +105,11 @@ Item {
 
     BusyIndicator {
         anchors.centerIn: parent
-        running: _root_2.busy
+        running: _welcomeTextApi.busy
     }
 
     AppWelcomeTextApiCall {
-        id: _root_2
+        id: _welcomeTextApi
 
         onFinished: {
             if(hasResponse && !hasError) {

@@ -24,7 +24,6 @@ import "../../globals"
 import ".."
 
 Item {
-    id: root
     readonly property bool modal: true
     readonly property string title: "Fetching Profile Data ..."
 
@@ -32,12 +31,12 @@ Item {
         target: Scrite.user
 
         function onLoggedInChanged() {
-            if(_root_2.timer && _root_2.timer.running) {
-                _root_2.timer.stop()
-                _root_2.timer.destroy()
+            if(_private.timer && _private.timer.running) {
+                _private.timer.stop()
+                _private.timer.destroy()
             }
 
-            _root_2.maybeShowUserProfileScreen()
+            _private.maybeShowUserProfileScreen()
         }
     }
 
@@ -47,11 +46,11 @@ Item {
     }
 
     Component.onCompleted: {
-        _root_2.timer = Runtime.execLater(_root_2, 100, _root_2.maybeShowUserProfileScreen)
+        _private.timer = Runtime.execLater(_private, 100, _private.maybeShowUserProfileScreen)
     }
 
     QtObject {
-        id: _root_2
+        id: _private
 
         property Timer timer
 

@@ -35,12 +35,12 @@ Loader {
 
     focus: true
     active: sanctioned
-    sourceComponent: _private._defaultDetailComponent
+    sourceComponent: _private.defaultDetailComponent
 
     onLodChanged: _private.loadLodComponent()
 
     Component {
-        id: _defaultDetailComponent
+        id: defaultDetailComponent
 
         Item { }
     }
@@ -54,11 +54,11 @@ Loader {
             root.active = false
 
             if(lod === LodLoader.LOD.Low)
-                root.sourceComponent = root.lowDetailComponent ? root.lowDetailComponent : _defaultDetailComponent
+                root.sourceComponent = root.lowDetailComponent ? root.lowDetailComponent : defaultDetailComponent
             else if(lod === LodLoader.LOD.High)
-                root.sourceComponent = root.highDetailComponent ? root.highDetailComponent : _defaultDetailComponent
+                root.sourceComponent = root.highDetailComponent ? root.highDetailComponent : defaultDetailComponent
             else
-                root.sourceComponent = _defaultDetailComponent
+                root.sourceComponent = defaultDetailComponent
 
             if(root.resetWidthBeforeLodChange) {
                 Object.resetProperty(root, "width")

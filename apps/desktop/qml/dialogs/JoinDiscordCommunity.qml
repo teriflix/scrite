@@ -40,7 +40,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: _dialog
+        id: dialog
 
         title: "Join us on Discord"
 
@@ -49,7 +49,7 @@ DialogLauncher {
 
         content: Item {
             AppFeature {
-                id: _emailSupport
+                id: emailSupport
                 featureName: "support/email"
             }
 
@@ -90,7 +90,7 @@ DialogLauncher {
                     spacing: 20
 
                     VclText {
-                        id: _discordInviteLink
+                        id: discordInviteLink
                         font.family: "Courier New"
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                         text: root.inviteUrl
@@ -99,14 +99,14 @@ DialogLauncher {
                     ToolButton {
                         icon.source: "qrc:/icons/content/content_copy.png"
                         onClicked: {
-                            _clipboard.text = root.inviteUrl
+                            clipboard.text = root.inviteUrl
                             MessageBox.information("Copy Successful",
                                                    "The invite link was copied to clipboard",
                                                    () => { })
                         }
 
                         SystemClipboard {
-                            id: _clipboard
+                            id: clipboard
                         }
                     }
                 }
@@ -115,7 +115,7 @@ DialogLauncher {
                     Layout.preferredWidth: 450
                     Layout.alignment: Qt.AlignHCenter
 
-                    visible: !_emailSupport.enabled
+                    visible: !emailSupport.enabled
                     text: "Please note: There is <b>no phone or email support</b> available for Scrite."
                     color: Runtime.colors.primary.c600.background
                     wrapMode: Text.WordWrap
@@ -133,8 +133,8 @@ DialogLauncher {
                         onClicked: {
                             Qt.openUrlExternally(root.infoUrl)
                             root.infoUrlOpened = true
-                            if(_dialog.titleBarCloseButtonVisible)
-                                Qt.callLater(_dialog.close)
+                            if(dialog.titleBarCloseButtonVisible)
+                                Qt.callLater(dialog.close)
                         }
                     }
 
@@ -142,8 +142,8 @@ DialogLauncher {
                         text: "Open Discord"
                         onClicked: {
                             Qt.openUrlExternally(root.inviteUrl)
-                            if(_dialog.titleBarCloseButtonVisible)
-                                Qt.callLater(_dialog.close)
+                            if(dialog.titleBarCloseButtonVisible)
+                                Qt.callLater(dialog.close)
                         }
                     }
                 }

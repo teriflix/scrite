@@ -25,7 +25,6 @@ import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
-    id: root
     property var fieldInfo
     property AbstractReportGenerator report
 
@@ -67,7 +66,7 @@ ColumnLayout {
         border.color: Runtime.colors.primary.borderColor
 
         Flickable {
-            id: _root_2
+            id: _keywordsFlick
 
             ScrollBar.vertical: VclScrollBar { }
 
@@ -81,7 +80,7 @@ ColumnLayout {
             Flow {
                 id: _keywordsLayout
 
-                width: _root_2.width-20
+                width: _keywordsFlick.width-20
 
                 spacing: 20
 

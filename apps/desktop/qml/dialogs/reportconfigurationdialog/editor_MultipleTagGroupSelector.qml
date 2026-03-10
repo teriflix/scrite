@@ -25,7 +25,6 @@ import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
-    id: root
     property var fieldInfo
     property AbstractReportGenerator report
 
@@ -60,7 +59,7 @@ ColumnLayout {
         }
 
         ListView {
-            id: _root_2
+            id: groupsView
 
             property var checkedTags: report.getConfigurationValue(fieldInfo.name)
 
@@ -78,7 +77,7 @@ ColumnLayout {
             section.delegate: Item {
                 required property string section
 
-                width: _root_2.width
+                width: groupsView.width
                 height: 40
 
                 Rectangle {
@@ -101,15 +100,15 @@ ColumnLayout {
                 required property string label
 
                 text: label
-                checked: _root_2.checkedTags.indexOf(name) >= 0
+                checked: groupsView.checkedTags.indexOf(name) >= 0
 
                 onToggled: {
-                    var tags = _root_2.checkedTags
+                    var tags = groupsView.checkedTags
                     if(checked)
                         tags.push(name)
                     else
                         tags.splice(tags.indexOf(name), 1)
-                    _root_2.checkedTags = tags
+                    groupsView.checkedTags = tags
                     report.setConfigurationValue(fieldInfo.name, tags)
                 }
             }

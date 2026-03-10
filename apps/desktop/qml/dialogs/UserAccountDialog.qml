@@ -35,18 +35,18 @@ Item {
 
     function init(_parent) { parent = _parent }
     function launch(profileScreen) {
-        _userAccountDialog.screenName = Scrite.user.loggedIn ? (Runtime.requiresUserOnboarding() ? "UserOnboardingScreen" : "UserProfileScreen") : _private.startScreen
-        _userAccountDialog.open()
+        userAccountDialog.screenName = Scrite.user.loggedIn ? (Runtime.requiresUserOnboarding() ? "UserOnboardingScreen" : "UserProfileScreen") : _private.startScreen
+        userAccountDialog.open()
 
         if(Scrite.user.loggedIn && profileScreen && profileScreen !== "" && !Runtime.requiresUserOnboarding()) {
-            Runtime.execLater(_userAccountDialog, 500, () => {
+            Runtime.execLater(userAccountDialog, 500, () => {
                                 Runtime.shoutout(Runtime.announcementIds.userProfileScreenPage, profileScreen)
                             })
         }
     }
 
     VclDialog {
-        id: _userAccountDialog
+        id: userAccountDialog
 
         property string screenName: _private.startScreen
         property Item screenItem: contentInstance ? contentInstance.item : null
@@ -67,7 +67,7 @@ Item {
 
         titleBarCloseButtonVisible: screenItem ? !screenItem.modal : Runtime.allowAppUsage
         content: Loader {
-            source: "qrc:/qml/dialogs/useraccountdialog/" + _userAccountDialog.screenName + ".qml"
+            source: "qrc:/qml/dialogs/useraccountdialog/" + userAccountDialog.screenName + ".qml"
         }
 
         Announcement.onIncoming: (type, data) => {
@@ -78,7 +78,7 @@ Item {
                     screenName = _private.startScreen
 
                 if(!visible)
-                    _userAccountDialog.open()
+                    userAccountDialog.open()
             } else if(type === Runtime.announcementIds.userAccountDialogScreen) {
                 if(data && data !== "")
                     screenName = data
@@ -86,7 +86,7 @@ Item {
                     screenName = Scrite.user.loggedIn ? (Runtime.requiresUserOnboarding() ? "UserOnboardingScreen" : "UserProfileScreen") : _private.startScreen
 
                 if(!visible)
-                    _userAccountDialog.open()
+                    userAccountDialog.open()
             }
         }
     }
@@ -114,8 +114,8 @@ Item {
             function onFreshActivationRequired() {
                 MessageBox.discardMessageBoxes()
 
-                if(_userAccountDialog.visible)
-                    _userAccountDialog.screenName = _private.startScreen
+                if(userAccountDialog.visible)
+                    userAccountDialog.screenName = _private.startScreen
                 else
                     MessageBox.information("Activation Required", "Please activate this installation of Scrite again.", () => {
                                                root.launch()

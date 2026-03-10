@@ -22,7 +22,6 @@ import io.scrite.components
 import "../globals"
 
 CheckBox {
-    id: root
     Material.primary: Runtime.colors.primary.key
     Material.accent: Runtime.colors.accent.key
     Material.theme: Runtime.colors.theme

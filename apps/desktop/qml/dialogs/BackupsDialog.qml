@@ -37,7 +37,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: _dialog
+        id: dialog
 
         title: "Select a Backup to Load"
         width: 640
@@ -58,14 +58,14 @@ DialogLauncher {
                     border.color: Runtime.colors.primary.borderColor
 
                     ListView {
-                        id: _backupFilesView
+                        id: backupFilesView
                         clip: true
                         anchors.fill: parent
                         anchors.margins: 1
                         model: Scrite.document.backupFilesModel
                         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                         currentIndex: -1
-                        ScrollBar.vertical: VclScrollBar { flickable: _backupFilesView }
+                        ScrollBar.vertical: VclScrollBar { flickable: backupFilesView }
                         highlight: Rectangle {
                             color: Runtime.colors.primary.highlight.background
                         }
@@ -84,11 +84,11 @@ DialogLauncher {
                             required property string fileName
                             required property string filePath
 
-                            width: _backupFilesView.width
-                            height: _rowLayout.height + 10
+                            width: backupFilesView.width
+                            height: rowLayout.height + 10
 
                             Row {
-                                id: _rowLayout
+                                id: rowLayout
                                 width: parent.width-20
                                 anchors.verticalCenter: parent.verticalCenter
 
@@ -127,8 +127,8 @@ DialogLauncher {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    _backupFilesView.currentBackupFilePath = filePath
-                                    _backupFilesView.currentIndex = index
+                                    backupFilesView.currentBackupFilePath = filePath
+                                    backupFilesView.currentIndex = index
                                 }
                             }
                         }
@@ -141,29 +141,29 @@ DialogLauncher {
 
                     VclButton {
                         text: "Open in This Window"
-                        enabled: _backupFilesView.currentIndex >= 0
+                        enabled: backupFilesView.currentIndex >= 0
                         hoverEnabled: true
                         toolTipText: "Closes the current document and loads the selected backup."
 
                         onClicked: {
-                            var task = OpenFileTask.openAnonymously(_backupFilesView.currentBackupFilePath)
-                            task.finished.connect(_dialog.close)
+                            var task = OpenFileTask.openAnonymously(backupFilesView.currentBackupFilePath)
+                            task.finished.connect(dialog.close)
                         }
                     }
 
                     VclButton {
                         text: "Open in New Window"
-                        enabled: _backupFilesView.currentIndex >= 0
+                        enabled: backupFilesView.currentIndex >= 0
                         hoverEnabled: true
                         toolTipText: "Loads the selected backup in a new window."
 
                         onClicked: {
-                            const filePath = _backupFilesView.currentBackupFilePath
+                            const filePath = backupFilesView.currentBackupFilePath
 
                             var waitDialog = WaitDialog.launch()
                             Scrite.app.launchNewInstanceAndOpenAnonymously(Scrite.window, filePath)
-                            Runtime.execLater(_dialog, 1500, () => {
-                                                Qt.callLater(_dialog.close)
+                            Runtime.execLater(dialog, 1500, () => {
+                                                Qt.callLater(dialog.close)
                                                 if(waitDialog)
                                                 waitDialog.close()
                                             } )

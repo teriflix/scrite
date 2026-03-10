@@ -28,13 +28,12 @@ import "../../helpers"
 import ".."
 
 Item {
-    id: root
     readonly property bool modal: true
     readonly property string title: "Activation"
     readonly property bool checkForRestartRequest: false
     readonly property bool checkForSessionStatus: false
 
-    Component.onCompleted: Qt.callLater(_activationCodeField.forceActiveFocus)
+    Component.onCompleted: Qt.callLater(activationCodeField.forceActiveFocus)
 
     Image {
         anchors.fill: parent
@@ -50,13 +49,13 @@ Item {
         anchors.bottomMargin: 50
 
         ColumnLayout {
-            id: _activationForm
+            id: activationForm
 
             anchors.centerIn: parent
 
             width: parent.width
             spacing: 50
-            enabled: !_activateCall.busy && !_sendActivationCodeCall.busy
+            enabled: !activateCall.busy && !sendActivationCodeCall.busy
             opacity: enabled ? 1 : 0.5
 
             VclLabel {
@@ -68,7 +67,7 @@ Item {
             }
 
             TextField {
-                id: _activationCodeField
+                id: activationCodeField
 
                 Layout.fillWidth: true
 
@@ -79,20 +78,20 @@ Item {
                 placeholderText: "Verification Code"
                 horizontalAlignment: Text.AlignHCenter
 
-                Keys.onReturnPressed: if(_activateButton.enabled) _activateButton.clicked()
+                Keys.onReturnPressed: if(activateButton.enabled) activateButton.clicked()
             }
 
             RowLayout {
                 Layout.fillWidth: true
 
                 VclButton {
-                    text: "Resend" + (_resendTimer.running ? " (" + _resendTimer.secondsLeft + ")" : "")
-                    enabled: !_resendTimer.running
+                    text: "Resend" + (resendTimer.running ? " (" + resendTimer.secondsLeft + ")" : "")
+                    enabled: !resendTimer.running
 
-                    onClicked: _sendActivationCodeCall.call()
+                    onClicked: sendActivationCodeCall.call()
 
                     Timer {
-                        id: _resendTimer
+                        id: resendTimer
 
                         property int secondsLeft: 30
 
@@ -116,42 +115,42 @@ Item {
                     VclButton {
                         anchors.centerIn: parent
 
-                        visible: _root_2.text.length === 20
+                        visible: clipboard.text.length === 20
 
                         text: "Paste"
 
                         onClicked: {
-                            _activationCodeField.text = _root_2.text
-                            _root_2.text = ""
+                            activationCodeField.text = clipboard.text
+                            clipboard.text = ""
                         }
                     }
                 }
 
                 VclButton {
-                    id: _activateButton
+                    id: activateButton
 
                     text: "Verify »"
-                    enabled: _activationCodeField.text.length == 20
+                    enabled: activationCodeField.text.length == 20
 
-                    onClicked: _activateCall.call()
+                    onClicked: activateCall.call()
                 }
             }
         }
 
         BusyIndicator {
             anchors.centerIn: parent
-            running: _activateCall.busy || _sendActivationCodeCall.busy
+            running: activateCall.busy || sendActivationCodeCall.busy
         }
     }
 
     SystemClipboard {
-        id: _root_2
+        id: clipboard
     }
 
     AppActivateDeviceRestApiCall {
-        id: _activateCall
+        id: activateCall
 
-        activationCode: _activationCodeField.text.trim()
+        activationCode: activationCodeField.text.trim()
 
         onFinished: {
             if(hasError) {
@@ -175,7 +174,7 @@ Item {
     }
 
     AppRequestActivationCodeRestApiCall {
-        id: _sendActivationCodeCall
+        id: sendActivationCodeCall
         onFinished: {
             if(hasError) {
                 MessageBox.information("Error", errorMessage)
@@ -188,8 +187,8 @@ Item {
             }
 
             MessageBox.information("Verification Code", responseText, () => {
-                                        _resendTimer.secondsLeft = 30
-                                        _resendTimer.start()
+                                        resendTimer.secondsLeft = 30
+                                        resendTimer.start()
                                    })
         }
     }

@@ -29,10 +29,10 @@ import ".."
 Item {
     id: root
 
-    height: _layout.height + 2*_layout.margin
+    height: layout.height + 2*layout.margin
 
     GridLayout {
-        id: _layout
+        id: layout
 
         readonly property real margin: 10
 
@@ -48,12 +48,12 @@ Item {
             spacing: 10
 
             VclLabel {
-                id: _themeLabel
+                id: themeLabel
                 text: "Theme: "
             }
 
             VclComboBox {
-                id: _themesComboBox
+                id: themesComboBox
 
                 readonly property int materialStyleIndex: Scrite.app.availableThemes.indexOf("Material");
 

@@ -39,7 +39,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: _dialog
+        id: dialog
 
         title: "Language Settings"
         width: Math.min(Scrite.window.width-80, 830)

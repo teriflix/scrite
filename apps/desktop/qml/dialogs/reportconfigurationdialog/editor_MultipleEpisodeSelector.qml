@@ -26,12 +26,11 @@ import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
-    id: root
     property var fieldInfo
     property AbstractReportGenerator report
 
     function getReady() {
-        _root_2.model = Scrite.document.screenplay.episodeInfoList
+        episodeListView.model = Scrite.document.screenplay.episodeInfoList
     }
 
     spacing: 5
@@ -76,7 +75,7 @@ ColumnLayout {
         }
 
         ListView {
-            id: _root_2
+            id: episodeListView
 
             property var episodeNumbers: fieldInfo ? report.getConfigurationValue(fieldInfo.name) : []
 
@@ -109,12 +108,12 @@ ColumnLayout {
                 property int episodeNumber: modelData.number
                 property string episodeName: modelData.title + ": " + modelData.subtitle
 
-                width: _root_2.width-1
+                width: episodeListView.width-1
 
                 text: episodeName
-                checked: _root_2.episodeNumbers.indexOf(episodeNumber) >= 0
+                checked: episodeListView.episodeNumbers.indexOf(episodeNumber) >= 0
 
-                onToggled: _root_2.select(episodeNumber, checked)
+                onToggled: episodeListView.select(episodeNumber, checked)
             }
         }
     }

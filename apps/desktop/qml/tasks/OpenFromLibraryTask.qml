@@ -38,7 +38,7 @@ QtObject {
     }
 
     readonly property Component theTask: QtObject {
-        id: _theTaskInstance
+        id: theTaskInstance
 
         property int index
         property string mode // can be one of ["template", "screenplay"]
@@ -50,9 +50,9 @@ QtObject {
         signal finished()
 
         Component.onCompleted: {
-            firstHalfTask = theFirstHalfTask.createObject(_theTaskInstance, {"index": index, "libraryService": libraryService, "mode": mode})
+            firstHalfTask = theFirstHalfTask.createObject(theTaskInstance, {"index": index, "libraryService": libraryService, "mode": mode})
 
-            secondHalfTask = theSecondHalfTask.createObject(_theTaskInstance)
+            secondHalfTask = theSecondHalfTask.createObject(theTaskInstance)
             secondHalfTask.finished.connect(finished)
             secondHalfTask.finished.connect(cleanupLater)
 
@@ -75,7 +75,7 @@ QtObject {
     }
 
     readonly property Component theFirstHalfTask: SequentialAnimation {
-        id: _theFirstHalfTaskInstance
+        id: theFirstHalfTaskInstance
 
         property int index
         property string mode // can be one of ["template", "screenplay"]
@@ -92,7 +92,7 @@ QtObject {
         ScriptAction {
             script: {
                 Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
-                _theFirstHalfTaskInstance.waitDialog = WaitDialog.launch()
+                theFirstHalfTaskInstance.waitDialog = WaitDialog.launch()
             }
         }
 
@@ -113,14 +113,14 @@ QtObject {
         ScriptAction {
             script: {
                 const modes = ["template", "screenplay"]
-                const modeIndex = modes.indexOf(_theFirstHalfTaskInstance.mode)
+                const modeIndex = modes.indexOf(theFirstHalfTaskInstance.mode)
 
                 switch(modeIndex) {
                 case 0:
-                    _theFirstHalfTaskInstance.libraryService.openTemplateAt(_theFirstHalfTaskInstance.index)
+                    theFirstHalfTaskInstance.libraryService.openTemplateAt(theFirstHalfTaskInstance.index)
                     break
                 case 1:
-                    _theFirstHalfTaskInstance.libraryService.openScreenplayAt(_theFirstHalfTaskInstance.index)
+                    theFirstHalfTaskInstance.libraryService.openScreenplayAt(theFirstHalfTaskInstance.index)
                     break
                 }
             }
@@ -128,7 +128,7 @@ QtObject {
     }
 
     readonly property Component theSecondHalfTask : SequentialAnimation {
-        id: _theSecondHalfTaskInstance
+        id: theSecondHalfTaskInstance
 
         running: false
 

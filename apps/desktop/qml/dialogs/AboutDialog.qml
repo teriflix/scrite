@@ -36,7 +36,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: _dialog
+        id: dialog
 
         title: "About Scrite"
         width: {
@@ -49,7 +49,7 @@ DialogLauncher {
         }
 
         content: Item {
-            implicitHeight: _aboutInfoLayout.implicitHeight + 40
+            implicitHeight: aboutInfoLayout.implicitHeight + 40
 
             Image {
                 anchors.fill: parent
@@ -59,13 +59,13 @@ DialogLauncher {
             }
 
             VclLabel {
-                id: _versionText
+                id: versionText
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.margins: 30
 
                 text: Scrite.app.versionAsString + (Scrite.app.versionType !== "" ? "-" + Scrite.app.versionType : "") + " for " + [Platform.typeString, Platform.osVersionString].join("-")
-                width: Math.min(Runtime.idealFontMetrics.advanceWidth(text), _dialog.width*0.5)
+                width: Math.min(Runtime.idealFontMetrics.advanceWidth(text), dialog.width*0.5)
                 elide: Text.ElideLeft
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
@@ -80,13 +80,13 @@ DialogLauncher {
             }
 
             ColumnLayout {
-                id: _aboutInfoLayout
+                id: aboutInfoLayout
                 spacing: 10
                 anchors.centerIn: parent
 
                 Image {
                     Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: _dialog.width * 0.3
+                    Layout.preferredWidth: dialog.width * 0.3
                     Layout.preferredHeight: sourceSize.height * Layout.preferredWidth/sourceSize.width
 
                     source: "../../images/scrite_logo_for_report_header.png"
@@ -147,14 +147,14 @@ DialogLauncher {
 
                 Rectangle {
                     Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: _dialog.width * 0.5
-                    Layout.preferredHeight: (Runtime.minimumFontMetrics.height+_creditsView.spacing) * (_creditsView.model.count+1) + _creditsView.anchors.topMargin + _creditsView.anchors.bottomMargin
+                    Layout.preferredWidth: dialog.width * 0.5
+                    Layout.preferredHeight: (Runtime.minimumFontMetrics.height+creditsView.spacing) * (creditsView.model.count+1) + creditsView.anchors.topMargin + creditsView.anchors.bottomMargin
 
                     // color: creditsView.ScrollBar.vertical.needed ? Runtime.colors.primary.c100.background : Qt.rgba(0,0,0,0)
 
                     // Refactoring QML TODO: Add ScrollBar back to this.
                     ListView {
-                        id: _creditsView
+                        id: creditsView
                         anchors.fill: parent
                         anchors.margins: 3
                         spacing: 7
@@ -216,16 +216,16 @@ DialogLauncher {
                             required property string credits
                             required property url url
 
-                            id: _creditLabel
+                            id: creditLabel
                             text: credits
-                            color: _creditLabelMouseArea.containsMouse ? "blue" : "black"
-                            width: _creditsView.width // - (creditsView.ScrollBar.vertical.needed ? 20 : 0)
+                            color: creditLabelMouseArea.containsMouse ? "blue" : "black"
+                            width: creditsView.width // - (creditsView.ScrollBar.vertical.needed ? 20 : 0)
                             wrapMode: Text.WordWrap
                             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                             horizontalAlignment: Text.AlignHCenter
 
                             MouseArea {
-                                id: _creditLabelMouseArea
+                                id: creditLabelMouseArea
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: Qt.openUrlExternally(url)

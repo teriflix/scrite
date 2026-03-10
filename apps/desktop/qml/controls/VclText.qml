@@ -30,6 +30,5 @@ import io.scrite.components
 import "../globals"
 
 Text {
-    id: root
     color: Runtime.colors.primary.regular.text
 }

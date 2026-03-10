@@ -23,21 +23,20 @@ import "../globals"
 import "../controls"
 
 VclLabel {
-    id: root
-    property alias containsMouse: _root_2.containsMouse
+    property alias containsMouse: _mouseArea.containsMouse
 
     property color hoverColor: enabled ? Runtime.colors.accent.c700.background : Runtime.colors.primary.c700.background
     property color defaultColor: enabled ? Runtime.colors.accent.c500.background : Runtime.colors.primary.c500.background
 
     signal clicked()
 
-    color: _root_2.containsMouse ? hoverColor : defaultColor
+    color: _mouseArea.containsMouse ? hoverColor : defaultColor
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
     font.underline: true
 
     MouseArea {
-        id: _root_2
+        id: _mouseArea
 
         anchors.fill: parent
 

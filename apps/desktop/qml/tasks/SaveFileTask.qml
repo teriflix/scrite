@@ -49,11 +49,11 @@ Item {
             return false
         }
 
-        return _documentSaveAs.createObject(root, {"callback": callback})
+        return documentSaveAs.createObject(root, {"callback": callback})
     }
 
     component AbstractSaveFileTask : Item {
-        id: _saveFileTaskItem
+        id: saveFileTaskItem
 
         property bool silent: false
         property var callback
@@ -72,10 +72,10 @@ Item {
     }
 
     Component {
-        id: _documentIsEmptyOrHasNoChanges
+        id: documentIsEmptyOrHasNoChanges
 
         AbstractSaveFileTask {
-            id: _documentIsEmptyOrHasNoChangesTask
+            id: documentIsEmptyOrHasNoChangesTask
 
             // Since there is nothing to save, we can finish up by invoking the callback
             // and destroying self.
@@ -86,10 +86,10 @@ Item {
     }
 
     Component {
-        id: _documentNotEvenSavedOnce
+        id: documentNotEvenSavedOnce
 
         AbstractSaveFileTask {
-            id: _documentNotEvenSavedOnceTask
+            id: documentNotEvenSavedOnceTask
 
             // The document has not been saved even once, so we will need to save it now.
             Component.onCompleted: {
@@ -104,7 +104,7 @@ Item {
 
             function questionAnswered(answer) {
                 if(answer === "Yes") {
-                    var saveDlg = _saveFileDialog.createObject(root)
+                    var saveDlg = saveFileDialog.createObject(root)
                     saveDlg.finished.connect(finish)
                     saveDlg.finished.connect(saveDlg.destroy)
                     saveDlg.open()
@@ -117,13 +117,13 @@ Item {
     }
 
     Component {
-        id: _documentSaveAs
+        id: documentSaveAs
 
         AbstractSaveFileTask {
-            id: _documentSaveAsTask
+            id: documentSaveAsTask
 
             Component.onCompleted: {
-                var saveDlg = _saveFileDialog.createObject(root)
+                var saveDlg = saveFileDialog.createObject(root)
                 saveDlg.finished.connect(finish)
                 saveDlg.finished.connect(saveDlg.destroy)
                 saveDlg.open()
@@ -132,10 +132,10 @@ Item {
     }
 
     Component {
-        id: _autoSaveIsEnabled
+        id: autoSaveIsEnabled
 
         AbstractSaveFileTask {
-            id: _autoSaveIsEnabledItem
+            id: autoSaveIsEnabledItem
 
             // The document has already been saved to disk, and auto save is enabled.
             // So we simply auto-save the document and move on.
@@ -148,15 +148,15 @@ Item {
     }
 
     Component {
-        id: _documentSavedButHasChanges
+        id: documentSavedButHasChanges
 
         AbstractSaveFileTask {
-            id: _documentSavedButHasChangesItem
+            id: documentSavedButHasChangesItem
 
             property BasicFileInfo fileInfo
 
             Component.onCompleted: {
-                fileInfo = Qt.createQmlObject("import io.scrite.components 1.0; BasicFileInfo { }", _documentSavedButHasChangesItem)
+                fileInfo = Qt.createQmlObject("import io.scrite.components 1.0; BasicFileInfo { }", documentSavedButHasChangesItem)
                 fileInfo.absoluteFilePath = Scrite.document.fileName
 
                 if(silent)
@@ -181,7 +181,7 @@ Item {
     }
 
     Component {
-        id: _saveFileDialog
+        id: saveFileDialog
 
         VclFileDialog {
             title: "Save Scrite Document As"
@@ -220,15 +220,15 @@ Item {
 
         function getTaskComponent() {
             if(Scrite.document.empty || !Scrite.document.modified || Scrite.document.readOnly)
-                return _documentIsEmptyOrHasNoChanges
+                return documentIsEmptyOrHasNoChanges
 
             if(Scrite.document.fileName === "")
-                return _documentNotEvenSavedOnce
+                return documentNotEvenSavedOnce
 
             if(Scrite.document.autoSave)
-                return _autoSaveIsEnabled
+                return autoSaveIsEnabled
 
-            return _documentSavedButHasChanges
+            return documentSavedButHasChanges
         }
 
         function reportSaveAsBackupNotPossible() {

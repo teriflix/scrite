@@ -26,19 +26,18 @@ import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
-    id: root
     property var fieldInfo
     property AbstractReportGenerator report
 
-    property alias characterNames: _characterNameListView.selectedCharacters
+    property alias characterNames: characterNameListView.selectedCharacters
     onCharacterNamesChanged: {
         if(fieldInfo)
             report.setConfigurationValue(fieldInfo.name, characterNames)
     }
 
     onFieldInfoChanged: {
-        _characterNameListView.selectedCharacters = report.getConfigurationValue(fieldInfo.name)
-        _characterNameListView.visible = _characterNameListView.selectedCharacters.length === 0
+        characterNameListView.selectedCharacters = report.getConfigurationValue(fieldInfo.name)
+        characterNameListView.visible = characterNameListView.selectedCharacters.length === 0
     }
 
     spacing: 10
@@ -54,7 +53,7 @@ ColumnLayout {
     }
 
     Loader {
-        id: _root_2
+        id: fieldTitleText
 
         Layout.fillWidth: true
         Layout.rightMargin: 30
@@ -64,7 +63,7 @@ ColumnLayout {
             flow: Flow.LeftToRight
 
             VclLabel {
-                id: _charactersPrefix
+                id: charactersPrefix
                 text: characterNames.length === 0 ? "No Characters Selected" : "»"
                 topPadding: 0
                 bottomPadding: 5
@@ -91,25 +90,25 @@ ColumnLayout {
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     closable: true
                     onCloseRequest: {
-                        var list = _characterNameListView.selectedCharacters
+                        var list = characterNameListView.selectedCharacters
                         list.splice( list.indexOf(text), 1 )
-                        _characterNameListView.selectedCharacters = list
+                        characterNameListView.selectedCharacters = list
                     }
                 }
             }
 
             Image {
                 source: "qrc:/icons/content/add_box.png"
-                width: _charactersPrefix.height
-                height: _charactersPrefix.height
+                width: charactersPrefix.height
+                height: charactersPrefix.height
                 opacity: 0.5
-                visible: !_characterNameListView.visible
+                visible: !characterNameListView.visible
 
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
                     onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
-                    onClicked: _characterNameListView.visible = true
+                    onClicked: characterNameListView.visible = true
 
                     ToolTipPopup {
                         container: parent
@@ -121,10 +120,10 @@ ColumnLayout {
 
             Image {
                 source: "qrc:/icons/content/clear_all.png"
-                width: _charactersPrefix.height
-                height: _charactersPrefix.height
+                width: charactersPrefix.height
+                height: charactersPrefix.height
                 opacity: 0.5
-                visible: _characterNameListView.selectedCharacters.length > 0
+                visible: characterNameListView.selectedCharacters.length > 0
 
                 MouseArea {
                     anchors.fill: parent
@@ -132,8 +131,8 @@ ColumnLayout {
 
                     onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
                     onClicked: {
-                        _characterNameListView.selectedCharacters = []
-                        _characterNameListView.visible = true
+                        characterNameListView.selectedCharacters = []
+                        characterNameListView.visible = true
                     }
 
                     ToolTipPopup {
@@ -147,7 +146,7 @@ ColumnLayout {
     }
 
     CharactersView {
-        id: _characterNameListView
+        id: characterNameListView
 
         Layout.fillWidth: true
         Layout.leftMargin: 5
