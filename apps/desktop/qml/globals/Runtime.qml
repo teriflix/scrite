@@ -775,10 +775,10 @@ Item {
     }
 
     function estimateTypeSize(itemNameOrCode, imports) {
-        const defaultImports = ["QtQuick 2.15",
-                                "QtQuick.Controls 2.15",
-                                "QtQuick.Controls.Material 2.15",
-                                "io.scrite.components 1.0",
+        const defaultImports = ["QtQuick",
+                                "QtQuick.Controls",
+                                "QtQuick.Controls.Material",
+                                "io.scrite.components",
                                 "\"../globals\"",
                                 "\"../helpers\"",
                                 "\"../controls\""]

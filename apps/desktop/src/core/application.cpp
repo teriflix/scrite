@@ -120,10 +120,10 @@ Application *Application::instance()
 Application::Application(int &argc, char **argv, const QVersionNumber &version)
     : QtApplicationClass(argc, argv), m_versionNumber(version)
 {
-    QFontDatabase::addApplicationFont(QStringLiteral(":font/Rubik/Rubik-BoldItalic.ttf"));
-    QFontDatabase::addApplicationFont(QStringLiteral(":font/Rubik/Rubik-Regular.ttf"));
-    QFontDatabase::addApplicationFont(QStringLiteral(":font/Rubik/Rubik-Italic.ttf"));
-    QFontDatabase::addApplicationFont(QStringLiteral(":font/Rubik/Rubik-Bold.ttf"));
+    QFontDatabase::addApplicationFont(QStringLiteral(":/font/Rubik/Rubik-BoldItalic.ttf"));
+    QFontDatabase::addApplicationFont(QStringLiteral(":/font/Rubik/Rubik-Regular.ttf"));
+    QFontDatabase::addApplicationFont(QStringLiteral(":/font/Rubik/Rubik-Italic.ttf"));
+    QFontDatabase::addApplicationFont(QStringLiteral(":/font/Rubik/Rubik-Bold.ttf"));
     this->setFont(QFont(QStringLiteral("Rubik")));
 
     this->setWindowIcon(QIcon(":/images/appicon.png"));
