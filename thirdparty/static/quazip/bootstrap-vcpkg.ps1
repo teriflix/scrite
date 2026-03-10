@@ -6,6 +6,11 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+Write-Host "Scrite QuaZip vcpkg bootstrap (Windows-only helper)"
+if ($env:OS -ne "Windows_NT") {
+    throw "This helper is Windows-only. On macOS/Linux, do not run this script; use the platform's normal dependency setup."
+}
+
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $vcpkgDir = Join-Path $scriptDir ".vcpkg"
 $bootstrapScript = Join-Path $vcpkgDir "bootstrap-vcpkg.bat"
@@ -52,7 +57,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host ""
-Write-Host "QuaZip local vcpkg setup complete."
+Write-Host "QuaZip local vcpkg setup complete (Windows)."
 Write-Host "Toolchain: $vcpkgDir\scripts\buildsystems\vcpkg.cmake"
 Write-Host "Manifest:  $scriptDir\vcpkg.json"
 Write-Host "Packages:  $installRoot\$Triplet"
