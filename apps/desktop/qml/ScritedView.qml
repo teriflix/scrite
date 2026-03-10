@@ -13,8 +13,6 @@
 **
 ****************************************************************************/
 
-pragma ComponentBehavior: Bound
-
 import QtQml
 import QtQuick
 import QtMultimedia

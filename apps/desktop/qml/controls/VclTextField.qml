@@ -13,8 +13,6 @@
 **
 ****************************************************************************/
 
-pragma ComponentBehavior: Bound
-
 /**
   We this kind of a heavy TextField implementation because, we have to add
 
