@@ -22,9 +22,9 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
+import "../"
 import "../../globals"
 import "../../helpers"
-import ".."
 import "../../controls"
 
 FocusScope {
@@ -154,6 +154,8 @@ FocusScope {
                 }
 
                 delegate: Item {
+                    id: _delegate
+
                     required property int index
                     required property var qmlAction
                     required property var actionManager
@@ -170,7 +172,7 @@ FocusScope {
                     MouseArea {
                         anchors.fill: parent
 
-                        onClicked: _actionsView.currentIndex = index
+                        onClicked: _actionsView.currentIndex = _delegate.index
                     }
 
                     RowLayout {
@@ -186,7 +188,7 @@ FocusScope {
                             Layout.preferredWidth: _nameLabel.height * 0.5
 
                             fillMode: Image.PreserveAspectFit
-                            source: qmlAction.icon.source !== "" ? qmlAction.icon.source : "qrc:/icons/content/blank.png"
+                            source: _delegate.qmlAction.icon.source !== "" ? _delegate.qmlAction.icon.source : "qrc:/icons/content/blank.png"
                         }
 
                         ColumnLayout {
@@ -206,7 +208,7 @@ FocusScope {
                                 color: Runtime.colors.primary.regular.text
                                 elide: Text.ElideRight
                                 font: Runtime.idealFontMetrics.font
-                                text: qmlAction.text + (qmlAction.checkable & qmlAction.checked ? " ✔" : "")
+                                text: _delegate.qmlAction.text + (_delegate.qmlAction.checkable & _delegate.qmlAction.checked ? " ✔" : "")
                             }
 
                             VclLabel {
@@ -223,7 +225,7 @@ FocusScope {
                                 elide: Text.ElideRight
                                 font: Runtime.minimumFontMetrics.font
                                 maximumLineCount: 3
-                                text: qmlAction.tooltip !== undefined ? qmlAction.tooltip.trim() : ""
+                                text: _delegate.qmlAction.tooltip !== undefined ? _delegate.qmlAction.tooltip.trim() : ""
                                 visible: text !== ""
                                 wrapMode: Text.WordWrap
                             }
@@ -236,34 +238,34 @@ FocusScope {
                             Layout.topMargin: 10
                             Layout.preferredWidth: _delegateLayout.width * 0.3
 
-                            enabled: shortcutIsEditable
+                            enabled: _delegate.shortcutIsEditable
                             opacity: enabled ? 1 : 0.5
-                            description: "Shortcut for <b>" + actionManager.title + "</b> » <i>" + qmlAction.text + "</i>"
-                            portableShortcut: qmlAction.shortcut !== undefined ? qmlAction.shortcut : ""
-                            placeholderText: qmlAction.defaultShortcut !== undefined && qmlAction.defaultShortcut !== "" ?
-                                                 ("Default: " + Gui.nativeShortcut(qmlAction.defaultShortcut)) :
-                                                 (qmlAction.allowShortcut === true ? "None Set" : "")
+                            description: "Shortcut for <b>" + _delegate.actionManager.title + "</b> » <i>" + _delegate.qmlAction.text + "</i>"
+                            portableShortcut: _delegate.qmlAction.shortcut !== undefined ? _delegate.qmlAction.shortcut : ""
+                            placeholderText: _delegate.qmlAction.defaultShortcut !== undefined && _delegate.qmlAction.defaultShortcut !== "" ?
+                                                 ("Default: " + Gui.nativeShortcut(_delegate.qmlAction.defaultShortcut)) :
+                                                 (_delegate.qmlAction.allowShortcut === true ? "None Set" : "")
 
                             onActiveFocusChanged: {
                                 if(activeFocus) {
-                                    _actionsView.currentIndex = index
+                                    _actionsView.currentIndex = _delegate.index
                                 }
                             }
 
                             onShortcutEdited: (newShortcut) => {
-                                                  ActionHub.assignShortcut(qmlAction, newShortcut)
+                                                  ActionHub.assignShortcut(_delegate.qmlAction, newShortcut)
                                               }
                         }
 
                         ToolButton {
                             flat: true
 
-                            enabled: visible && shortcutIsEditable && Gui.nativeShortcut(qmlAction.defaultShortcut) !== Gui.nativeShortcut(qmlAction.shortcut)
-                            opacity: enabled ? 1 : (shortcutIsEditable ? 0.5 : 0)
+                            enabled: visible && _delegate.shortcutIsEditable && Gui.nativeShortcut(_delegate.qmlAction.defaultShortcut) !== Gui.nativeShortcut(_delegate.qmlAction.shortcut)
+                            opacity: enabled ? 1 : (_delegate.shortcutIsEditable ? 0.5 : 0)
                             icon.source: "qrc:/icons/content/undo.png"
 
                             onClicked: {
-                                _actionsModel.restoreActionShortcut(qmlAction)
+                                _actionsModel.restoreActionShortcut(_delegate.qmlAction)
                             }
                         }
                     }

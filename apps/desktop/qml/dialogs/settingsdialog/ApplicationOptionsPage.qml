@@ -20,18 +20,18 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
+import "../"
 import "../../globals"
 import "../../helpers"
-import ".."
 import "../../controls"
 
 Item {
     id: root
 
-    height: layout.height+50
+    height: _layout.height+50
 
     GridLayout {
-        id: layout
+        id: _layout
 
         y: 10
         width: parent.width-20
@@ -41,7 +41,7 @@ Item {
 
         GroupBox {
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
+            Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
             Layout.fillHeight: true
 
             label: VclLabel { text: "Graphics" }
@@ -99,7 +99,7 @@ Item {
 
         GroupBox {
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
+            Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
             Layout.fillHeight: true
 
             label: VclLabel { text: "Display" }
@@ -179,7 +179,7 @@ Item {
 
         GroupBox {
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
+            Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
             Layout.fillHeight: true
 
             label: VclLabel { text: "Window Tabs" }
@@ -237,7 +237,7 @@ Item {
 
         GroupBox {
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
+            Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
             Layout.fillHeight: true
             Layout.rowSpan: 2
 
@@ -311,7 +311,7 @@ Item {
 
         GroupBox {
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
+            Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
             Layout.fillHeight: true
 
             label: VclLabel { text: Platform.isMacOSDesktop ? "Scroll/Flick Speed (Windows/Linux Only)" : "Scroll/Flick Speed" }
@@ -322,7 +322,7 @@ Item {
                 width: parent.width
 
                 Slider {
-                    id: flickSpeedSlider
+                    id: _flickSpeedSlider
                     Layout.fillWidth: true
 
                     from: 0.1
@@ -340,7 +340,7 @@ Item {
                 }
 
                 VclLabel {
-                    text: Math.round( flickSpeedSlider.value*100 ) + "%"
+                    text: Math.round( _flickSpeedSlider.value*100 ) + "%"
                 }
 
                 FlatToolButton {

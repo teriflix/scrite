@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
@@ -26,18 +28,20 @@ import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
+    id: root
+
     property var fieldInfo
     property AbstractReportGenerator report
 
-    property alias characterNames: characterNameListView.selectedCharacters
+    property alias characterNames: _characterNameListView.selectedCharacters
     onCharacterNamesChanged: {
         if(fieldInfo)
             report.setConfigurationValue(fieldInfo.name, characterNames)
     }
 
     onFieldInfoChanged: {
-        characterNameListView.selectedCharacters = report.getConfigurationValue(fieldInfo.name)
-        characterNameListView.visible = characterNameListView.selectedCharacters.length === 0
+        _characterNameListView.selectedCharacters = report.getConfigurationValue(fieldInfo.name)
+        _characterNameListView.visible = _characterNameListView.selectedCharacters.length === 0
     }
 
     spacing: 10
@@ -53,7 +57,7 @@ ColumnLayout {
     }
 
     Loader {
-        id: fieldTitleText
+        id: _fieldTitleText
 
         Layout.fillWidth: true
         Layout.rightMargin: 30
@@ -63,7 +67,7 @@ ColumnLayout {
             flow: Flow.LeftToRight
 
             VclLabel {
-                id: charactersPrefix
+                id: _charactersPrefix
                 text: characterNames.length === 0 ? "No Characters Selected" : "»"
                 topPadding: 0
                 bottomPadding: 5
@@ -73,6 +77,7 @@ ColumnLayout {
                 model: characterNames
 
                 delegate: TagText {
+                    id: _characterTag
                     required property int index
                     required property string modelData
 
@@ -82,7 +87,7 @@ ColumnLayout {
                     border.color: colors.text
                     color: colors.background
                     textColor: colors.text
-                    text: modelData
+                    text: _characterTag.modelData
                     leftPadding: 10
                     rightPadding: 10
                     topPadding: 2
@@ -90,25 +95,25 @@ ColumnLayout {
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     closable: true
                     onCloseRequest: {
-                        var list = characterNameListView.selectedCharacters
+                        var list = _characterNameListView.selectedCharacters
                         list.splice( list.indexOf(text), 1 )
-                        characterNameListView.selectedCharacters = list
+                        _characterNameListView.selectedCharacters = list
                     }
                 }
             }
 
             Image {
                 source: "qrc:/icons/content/add_box.png"
-                width: charactersPrefix.height
-                height: charactersPrefix.height
+                width: _charactersPrefix.height
+                height: _charactersPrefix.height
                 opacity: 0.5
-                visible: !characterNameListView.visible
+                visible: !_characterNameListView.visible
 
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
                     onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
-                    onClicked: characterNameListView.visible = true
+                    onClicked: _characterNameListView.visible = true
 
                     ToolTipPopup {
                         container: parent
@@ -120,10 +125,10 @@ ColumnLayout {
 
             Image {
                 source: "qrc:/icons/content/clear_all.png"
-                width: charactersPrefix.height
-                height: charactersPrefix.height
+                width: _charactersPrefix.height
+                height: _charactersPrefix.height
                 opacity: 0.5
-                visible: characterNameListView.selectedCharacters.length > 0
+                visible: _characterNameListView.selectedCharacters.length > 0
 
                 MouseArea {
                     anchors.fill: parent
@@ -131,8 +136,8 @@ ColumnLayout {
 
                     onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
                     onClicked: {
-                        characterNameListView.selectedCharacters = []
-                        characterNameListView.visible = true
+                        _characterNameListView.selectedCharacters = []
+                        _characterNameListView.visible = true
                     }
 
                     ToolTipPopup {
@@ -146,7 +151,7 @@ ColumnLayout {
     }
 
     CharactersView {
-        id: characterNameListView
+        id: _characterNameListView
 
         Layout.fillWidth: true
         Layout.leftMargin: 5

@@ -26,6 +26,7 @@ import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
+    id: root
     property var fieldInfo
     property AbstractExporter exporter
     property TabSequenceManager tabSequence

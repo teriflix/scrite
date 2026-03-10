@@ -23,6 +23,8 @@ import "../../globals"
 import "../../controls"
 
 Item {
+    id: root
+
     readonly property bool modal: true
     readonly property string title: "Greetings!"
 

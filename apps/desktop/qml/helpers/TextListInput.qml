@@ -59,9 +59,9 @@ Flow {
     }
 
     function configureTexts() {
-        const nrTexts = _texts.count
+        const nrTexts = _tagTexts.count
         for(let i=0; i<nrTexts; i++) {
-            let text = _texts.itemAt(i)
+            let text = _tagTexts.itemAt(i)
             text.configure()
         }
     }
@@ -104,12 +104,12 @@ Flow {
     }
 
     Repeater {
-        id: _texts
+        id: _tagTexts
 
         model: root.textList
 
         delegate: TagText {
-            id: _text
+            id: _tagText
 
             required property int index
             required property string modelData
@@ -134,17 +134,17 @@ Flow {
             font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
             font.capitalization: root.font.capitalization
 
-            onClicked: root.textClicked(modelData, _text)
+            onClicked: root.textClicked(modelData, _tagText)
 
             onCloseRequest: {
                 if(!root.readOnly) {
                     _newInputLoader.active = false
-                    root.textCloseRequest(modelData, _text)
+                    root.textCloseRequest(modelData, _tagText)
                 }
             }
 
             function configure() {
-                root.configureTextRequest(modelData, _text)
+                root.configureTextRequest(modelData, _tagText)
             }
         }
     }

@@ -47,7 +47,7 @@ Item {
         id: _uiElementPosition
 
         to: root
-        from: uiElement
+        from: root.uiElement
     }
 
     Item {
@@ -55,8 +55,8 @@ Item {
 
         x: _uiElementPosition.mappedPosition.x
         y: _uiElementPosition.mappedPosition.y
-        width: root.uiElement ? (root.uiElement.width * uiElement.scale) : 0
-        height: root.uiElement ? (root.uiElement.height * uiElement.scale) : 0
+        width: root.uiElement ? (root.uiElement.width * root.uiElement.scale) : 0
+        height: root.uiElement ? (root.uiElement.height * root.uiElement.scale) : 0
 
         Rectangle {
             anchors.fill: parent
@@ -86,7 +86,7 @@ Item {
             VclLabel {
                 id: _descLabel
 
-                text: description
+                text: root.description
                 color: Runtime.colors.accent.highlight.text
 
                 font.bold: true

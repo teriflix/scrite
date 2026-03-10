@@ -52,6 +52,7 @@ ToolBar {
             model: root.actionManager.visibleActions
 
             delegate: ActionToolButton {
+                id: _delegate
                 required property int index
                 required property var modelData
 

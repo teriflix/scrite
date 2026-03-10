@@ -74,7 +74,7 @@ Flickable {
                 property var items: track.items
                 property string name: track.name
 
-                property int offset: index * _private.trackSize
+                property int offset: _track.index * _private.trackSize
 
                 x: _private.isHorizontalTrack ? 0 : offset
                 y: _private.isHorizontalTrack ? offset : 0

@@ -33,21 +33,21 @@ VclDialog {
     width: Scrite.window.width - 51
     height: Scrite.window.height - 50
 
-    property alias source: pdfView.source
-    property alias pagesPerRow: pdfView.pagesPerRow
-    property alias saveFilePath: pdfView.saveFilePath
-    property alias saveFileName: pdfView.saveFileName
-    property alias closable: pdfView.closable
-    property alias allowFileSave: pdfView.allowFileSave
-    property alias allowFileReveal: pdfView.allowFileReveal
-    property alias saveFeatureDisabled: pdfView.saveFeatureDisabled
-    property alias displayRefreshButton: pdfView.displayRefreshButton
+    property alias source: _pdfView.source
+    property alias pagesPerRow: _pdfView.pagesPerRow
+    property alias saveFilePath: _pdfView.saveFilePath
+    property alias saveFileName: _pdfView.saveFileName
+    property alias closable: _pdfView.closable
+    property alias allowFileSave: _pdfView.allowFileSave
+    property alias allowFileReveal: _pdfView.allowFileReveal
+    property alias saveFeatureDisabled: _pdfView.saveFeatureDisabled
+    property alias displayRefreshButton: _pdfView.displayRefreshButton
 
     signal closeRequest()
     signal refreshRequest()
 
     contentItem: PdfView {
-        id: pdfView
+        id: _pdfView
 
         width: root.width
         height: root.height - root.header.height

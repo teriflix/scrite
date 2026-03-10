@@ -19,12 +19,13 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-
+import "../"
 import "../../globals"
-import ".."
 import "../../controls"
 
 Item {
+    id: root
+
     readonly property bool modal: true
     readonly property string title: "Welcome to Scrite!"
 
@@ -52,28 +53,28 @@ Item {
             VclLabel {
                 Layout.fillWidth: true
 
-                text: sendActivationCodeCall.busy ? "Requesting activation code ..." : "Click the button below to request activation code."
+                text: _sendActivationCodeCall.busy ? "Requesting activation code ..." : "Click the button below to request activation code."
             }
 
             VclButton {
-                visible: !sendActivationCodeCall.hasError && !sendActivationCodeCall.busy
+                visible: !_sendActivationCodeCall.hasError && !_sendActivationCodeCall.busy
 
                 text: "Request Activation Code"
 
-                onClicked: sendActivationCodeCall.call()
+                onClicked: _sendActivationCodeCall.call()
             }
         }
 
-        Component.onCompleted: sendActivationCodeCall.call()
+        Component.onCompleted: _sendActivationCodeCall.call()
     }
 
     BusyIndicator {
         anchors.centerIn: parent
-        running: sendActivationCodeCall.busy
+        running: _sendActivationCodeCall.busy
     }
 
     AppRequestActivationCodeRestApiCall {
-        id: sendActivationCodeCall
+        id: _sendActivationCodeCall
 
         onFinished: {
             if(hasError || !hasResponse) {

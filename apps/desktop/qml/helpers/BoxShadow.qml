@@ -16,6 +16,8 @@
 import QtQuick
 
 BorderImage {
+    id: root
+
     source: "qrc:/icons/content/shadow.png"
     horizontalTileMode: BorderImage.Stretch
     verticalTileMode: BorderImage.Stretch

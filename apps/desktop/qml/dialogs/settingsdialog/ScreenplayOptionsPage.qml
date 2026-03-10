@@ -20,17 +20,16 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../controls"
 import "../../helpers"
 
 Item {
     id: root
-    height: layout.height+30
+    height: _layout.height+30
 
     ColumnLayout {
-        id: layout
+        id: _layout
 
         y: 10
         width: parent.width-20
@@ -58,6 +57,8 @@ Item {
                 }
 
                 VclCheckBox {
+                    id: _singleClickAutoComplete
+
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
                     text: "Auto Complete on Single Click"
@@ -67,12 +68,14 @@ Item {
 
                     ToolTipPopup {
                         text: "If checked, single click on an option in auto-complete popup will apply it in the screenplay editor."
-                        visible: container.hovered
+                        visible: _singleClickAutoComplete.hovered
                     }
 
                 }
 
                 VclCheckBox {
+                    id: _enableAutoCapitalizeSentences
+
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
                     text: "Capitalize Sentences"
@@ -81,12 +84,14 @@ Item {
                     hoverEnabled: true
 
                     ToolTipPopup {
-                        visible: container.hovered
+                        visible: _enableAutoCapitalizeSentences.hovered
                         text: "If checked, it automatically capitalizes first letter of every sentence while typing."
                     }
                 }
 
                 VclCheckBox {
+                    id: _enableAutoPolishParagraphs
+
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
                     text: "Add/Remove CONT'D"
@@ -95,12 +100,14 @@ Item {
                     hoverEnabled: true
 
                     ToolTipPopup {
-                        visible: container.hovered
                         text: "If checked, CONT'D will be automatically added/removed appropriately."
+                        visible: _enableAutoPolishParagraphs.hovered
                     }
                 }
 
                 VclCheckBox {
+                    id: _captureInvisibleCharacters
+
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
                     text: "Capture Invisible Characters"
@@ -110,11 +117,13 @@ Item {
 
                     ToolTipPopup {
                         text: "In a scene if a dialogues are only written in parenthesis (eg: VO, OS, etc..), then the character will be captured as invisible."
-                        visible: container.hovered
+                        visible: _captureInvisibleCharacters.hovered
                     }
                 }
 
                 VclCheckBox {
+                    id: _autoAdjustEditorWidthInScreenplayEditor
+
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
                     text: "Auto Adjust Editor Width"
@@ -124,7 +133,7 @@ Item {
 
                     ToolTipPopup {
                         text: "If checked, the editor width is automatically adjusted when you first launch Scrite or switch back to the screenplay tab."
-                        visible: container.hovered
+                        visible: _autoAdjustEditorWidthInScreenplayEditor.hovered
                     }
                 }
 
@@ -145,6 +154,8 @@ Item {
                     }
 
                     SpinBox {
+                        id: _slpSynopsisLineCount
+
                         Layout.fillWidth: true
 
                         value: Runtime.screenplayEditorSettings.slpSynopsisLineCount
@@ -155,7 +166,7 @@ Item {
 
                         ToolTipPopup {
                             text: "Max lines to show on the scene list panel. Range: " + parent.from + "-" + parent.to
-                            visible: container.hovered
+                            visible: _slpSynopsisLineCount.hovered
                         }
                     }
                 }
@@ -197,6 +208,8 @@ Item {
                     }
 
                     SpinBox {
+                        id: _placeholderInterval
+
                         Layout.fillWidth: true
 
                         value: Runtime.screenplayEditorSettings.placeholderInterval
@@ -207,7 +220,7 @@ Item {
                         onValueChanged: Runtime.screenplayEditorSettings.placeholderInterval = Runtime.bounded(from, value, to)
 
                         ToolTipPopup {
-                            visible: container.hovered
+                            visible: _placeholderInterval.hovered
                             text: "Delay in ms after which scene content is loaded while scrolling. Range: " + parent.from + "-" + parent.to
                         }
                     }
@@ -290,6 +303,8 @@ Item {
                 }
 
                 VclCheckBox {
+                    id: _pasteByLinkingScenesWhenPossible
+
                     Layout.fillWidth: true
 
                     text: "When possible, link scenes while pasting."
@@ -301,7 +316,7 @@ Item {
 
                     ToolTipPopup {
                         text: "Copy/pasting within the screenplay editor links scenes, without creating duplicates. Uncheck this to allow creation of duplicate scenes."
-                        visible: container.hovered
+                        visible: _pasteByLinkingScenesWhenPossible.hovered
                     }
                 }
             }

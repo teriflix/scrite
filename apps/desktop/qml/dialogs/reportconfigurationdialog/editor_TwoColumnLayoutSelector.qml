@@ -46,6 +46,7 @@ RowLayout {
         ]
 
         delegate: ColumnLayout {
+            id: _layoutOptionDelegate
             required property int index
             required property var modelData
 
@@ -63,23 +64,23 @@ RowLayout {
                     fillMode: Image.PreserveAspectFit
                     smooth: true
                     mipmap: true
-                    source: "qrc:/icons/reports/" + modelData.icon
+                    source: "qrc:/icons/reports/" + _layoutOptionDelegate.modelData.icon
                 }
 
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
 
-                    onClicked: report.layout = modelData.value
+                    onClicked: report.layout = _layoutOptionDelegate.modelData.value
                 }
             }
 
             VclRadioButton {
                 Layout.alignment: Qt.AlignHCenter
 
-                text: modelData.title
-                checked: report.layout === modelData.value
-                onToggled: report.layout = modelData.value
+                text: _layoutOptionDelegate.modelData.title
+                checked: report.layout === _layoutOptionDelegate.modelData.value
+                onToggled: report.layout = _layoutOptionDelegate.modelData.value
             }
         }
     }

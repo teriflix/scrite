@@ -24,11 +24,11 @@ import Qt.labs.qmlmodels
 
 import io.scrite.components
 
+import "../"
 import "../../tasks"
 import "../../globals"
 import "../../controls"
 import "../../helpers"
-import ".."
 
 Item {
     id: root
@@ -289,6 +289,8 @@ Item {
     }
 
     component TextFormField: ColumnLayout {
+        id: _textFormField
+
         required property int index
         required property var metaData
         required property var value
@@ -301,7 +303,7 @@ Item {
         VclLabel {
             Layout.fillWidth: true
 
-            text: parent.label + (parent.mandatory ? " *" : "")
+            text: _textFormField.label + (_textFormField.mandatory ? " *" : "")
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
         }
 
@@ -312,10 +314,10 @@ Item {
 
             TabSequenceItem.manager: _tabSequence
 
-            text: parent.value !== null && typeof parent.value === "string" ? parent.value : ""
+            text: _textFormField.value !== null && typeof _textFormField.value === "string" ? _textFormField.value : ""
             maximumLength: 128
 
-            onTextEdited: if(parent.mandatory) Qt.callLater(_submit.determineEnabled)
+            onTextEdited: if(_textFormField.mandatory) Qt.callLater(_submit.determineEnabled)
         }
 
         function updateFormData(formData) {
@@ -325,6 +327,8 @@ Item {
     }
 
     component PhoneFormField: ColumnLayout {
+        id: _phFormField
+
         required property int index
         required property var metaData
         required property var value
@@ -337,7 +341,7 @@ Item {
         VclLabel {
             Layout.fillWidth: true
 
-            text: parent.label + (parent.mandatory ? " *" : "")
+            text: _phFormField.label + (_phFormField.mandatory ? " *" : "")
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
         }
 
@@ -348,13 +352,13 @@ Item {
 
             TabSequenceItem.manager: _tabSequence
 
-            text: parent.value !== null && typeof parent.value === "string" ? parent.value : ""
+            text: _phFormField.value !== null && typeof _phFormField.value === "string" ? _phFormField.value : ""
             maximumLength: 25
             validator: RegularExpressionValidator {
                 regularExpression: /^\+?(\d{1,3})?[\s\-]?\(?\d{1,4}\)?[\s\-]?\d{1,4}[\s\-]?\d{1,4}$/
             }
 
-            onTextEdited: if(parent.mandatory) Qt.callLater(_submit.determineEnabled)
+            onTextEdited: if(_phFormField.mandatory) Qt.callLater(_submit.determineEnabled)
         }
 
         function updateFormData(formData) {
@@ -378,7 +382,7 @@ Item {
         VclLabel {
             Layout.fillWidth: true
 
-            text: parent.label + (parent.mandatory ? " *" : "")
+            text: _binaryField.label + (_binaryField.mandatory ? " *" : "")
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
         }
 
@@ -396,7 +400,7 @@ Item {
 
                 checked: text === _binaryField.value
 
-                onToggled: if(parent.mandatory) Qt.callLater(_submit.determineEnabled)
+                onToggled: if(_binaryField.mandatory) Qt.callLater(_submit.determineEnabled)
             }
 
             VclRadioButton {
@@ -408,7 +412,7 @@ Item {
 
                 checked: text === _binaryField.value
 
-                onToggled: if(parent.mandatory) Qt.callLater(_submit.determineEnabled)
+                onToggled: if(_binaryField.mandatory) Qt.callLater(_submit.determineEnabled)
             }
         }
 
@@ -419,6 +423,8 @@ Item {
     }
 
     component SingleSelectFormField: ColumnLayout {
+        id: _ssFormField
+
         required property int index
         required property var metaData
         required property var value
@@ -434,7 +440,7 @@ Item {
         VclLabel {
             Layout.fillWidth: true
 
-            text: parent.label + (parent.mandatory ? " *" : "")
+            text: _ssFormField.label + (_ssFormField.mandatory ? " *" : "")
             wrapMode: Text.WordWrap
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
         }
@@ -448,19 +454,19 @@ Item {
 
             TabSequenceItem.manager: _tabSequence
 
-            model: parent.choices
+            model: _ssFormField.choices
             currentIndex: {
-                if(parent.value !== null && typeof parent.value === "string" && parent.value !== "") {
-                    const idx = parent.metaData.choices.indexOf(parent.value)
+                if(_ssFormField.value !== null && typeof _ssFormField.value === "string" && _ssFormField.value !== "") {
+                    const idx = _ssFormField.metaData.choices.indexOf(_ssFormField.value)
                     if(idx < 0)
-                        return parent.other === true ? count-1 : -1
+                        return _ssFormField.other === true ? count-1 : -1
                     return idx
                 }
                 return -1
             }
             displayText: currentIndex < 0 ? "--- select ---" : currentText
 
-            onActivated: if(parent.mandatory) Qt.callLater(_submit.determineEnabled)
+            onActivated: if(_ssFormField.mandatory) Qt.callLater(_submit.determineEnabled)
         }
 
         VclTextField {
@@ -473,13 +479,13 @@ Item {
             TabSequenceItem.manager: _tabSequence
             TabSequenceItem.enabled: visible
 
-            visible: parent.other && _ssChoices.currentIndex === _ssChoices.count-1
+            visible: _ssFormField.other && _ssChoices.currentIndex === _ssChoices.count-1
             label: ""
-            text: parent.value !== null && typeof parent.value === "string" ? parent.value : ""
+            text: _ssFormField.value !== null && typeof _ssFormField.value === "string" ? _ssFormField.value : ""
             maximumLength: 128
             placeholderText: "Please specify"
 
-            onTextEdited: if(parent.mandatory) Qt.callLater(_submit.determineEnabled)
+            onTextEdited: if(_ssFormField.mandatory) Qt.callLater(_submit.determineEnabled)
         }
 
         function updateFormData(formData) {
@@ -509,7 +515,7 @@ Item {
         VclLabel {
             Layout.fillWidth: true
 
-            text: parent.label + (parent.mandatory ? " *" : "")
+            text: _msFormField.label + (_msFormField.mandatory ? " *" : "")
             wrapMode: Text.WordWrap
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
         }
@@ -517,7 +523,7 @@ Item {
         Flow {
             Layout.fillWidth: true
             Layout.leftMargin: 20
-            Layout.rightMargin: parent.width * 0.25
+            Layout.rightMargin: _msFormField.width * 0.25
 
             spacing: 10
 
@@ -526,16 +532,18 @@ Item {
                 model: _msFormField.choices
 
                 delegate: VclCheckBox {
+                    id: _delegate
+
                     required property int index
                     required property string modelData
 
                     TabSequenceItem.manager: _tabSequence
 
-                    text: modelData
+                    text: _delegate.modelData
                     checked: _msFormField.checkedValues.indexOf(text) >= 0
                     padding: 0
 
-                    onToggled: if(parent.mandatory) Qt.callLater(_submit.determineEnabled)
+                    onToggled: if(_msFormField.mandatory) Qt.callLater(_submit.determineEnabled)
                 }
             }
         }

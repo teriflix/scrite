@@ -28,8 +28,8 @@ Item {
     id: root
 
     // Public properties
+    property real titleBarHeight: _titleBar.height
     property string title: "Floating Dock"
-    property real titleBarHeight: titleBar.height
     property Component content: Item { }
 
     // Public signals
@@ -67,34 +67,39 @@ Item {
     // Background
     Rectangle {
         anchors.fill: parent
+
         color: Runtime.colors.primary.c100.background
     }
 
     // Titlebar
     Rectangle {
-        id: titleBar
+        id: _titleBar
+
         width: root.width
-        height: dialogHeaderLayout.height
+        height: _dialogHeaderLayout.height
 
         color: Runtime.colors.accent.c600.background
 
         MouseArea {
-            id: dragArea
+            id: _dragArea
+
             anchors.fill: parent
+
             drag.target: root
             drag.axis: Drag.XAndYAxis
+
             onPressed: _private.raise()
         }
 
         RowLayout {
-            id: dialogHeaderLayout
+            id: _dialogHeaderLayout
 
             width: parent.width
 
             spacing: 2
 
             VclLabel {
-                id: titleText
+                id: _titleText
 
                 Layout.alignment: Qt.AlignVCenter
                 Layout.fillWidth: true
@@ -110,15 +115,18 @@ Item {
             Image {
                 Layout.alignment: Qt.AlignVCenter
 
-                Layout.preferredWidth: Runtime.idealFontMetrics.height + titleText.padding*2
-                Layout.preferredHeight: Runtime.idealFontMetrics.height + titleText.padding*2
+                Layout.preferredWidth: Runtime.idealFontMetrics.height + _titleText.padding*2
+                Layout.preferredHeight: Runtime.idealFontMetrics.height + _titleText.padding*2
 
                 source: "qrc:/icons/action/dialog_close_button.png"
-                smooth: true; mipmap: true
+                smooth: true
+                mipmap: true
 
                 MouseArea {
                     anchors.fill: parent
+
                     hoverEnabled: true
+
                     onEntered: parent.scale = 1.2
                     onExited: parent.scale = 1
                     onClicked: {
@@ -133,13 +141,13 @@ Item {
     // Content
     Loader {
         width: root.width
-        height: root.height - titleBar.height
+        height: root.height - _titleBar.height
 
-        y: titleBar.height
+        y: _titleBar.height
 
         active: root.visible
         clip: true
-        sourceComponent: content
+        sourceComponent: root.content
     }
 
     // Private section

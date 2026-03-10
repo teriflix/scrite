@@ -20,7 +20,6 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../controls"
 import "../../helpers"
@@ -29,7 +28,7 @@ Item {
     id: root
 
     GridLayout {
-        id: layout
+        id: _layout
 
         anchors.left: parent.left
         anchors.top: parent.top
@@ -42,7 +41,7 @@ Item {
         columnSpacing: 10
 
         GroupBox {
-            Layout.preferredWidth: (layout.width-(layout.columns-1)*layout.columnSpacing)/layout.columns
+            Layout.preferredWidth: (_layout.width-(_layout.columns-1)*_layout.columnSpacing)/_layout.columns
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
@@ -123,7 +122,7 @@ Item {
         }
 
         GroupBox {
-            Layout.preferredWidth: (layout.width-(layout.columns-1)*layout.columnSpacing)/layout.columns
+            Layout.preferredWidth: (_layout.width-(_layout.columns-1)*_layout.columnSpacing)/_layout.columns
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
@@ -167,7 +166,7 @@ Item {
         }
 
         GroupBox {
-            Layout.preferredWidth: (layout.width-(layout.columns-1)*layout.columnSpacing)/layout.columns
+            Layout.preferredWidth: (_layout.width-(_layout.columns-1)*_layout.columnSpacing)/_layout.columns
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
@@ -201,7 +200,7 @@ Item {
         }
 
         GroupBox {
-            Layout.preferredWidth: (layout.width-(layout.columns-1)*layout.columnSpacing)/layout.columns
+            Layout.preferredWidth: (_layout.width-(_layout.columns-1)*_layout.columnSpacing)/_layout.columns
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
@@ -235,7 +234,7 @@ Item {
         }
 
         GroupBox {
-            Layout.preferredWidth: (layout.width-(layout.columns-1)*layout.columnSpacing)/layout.columns
+            Layout.preferredWidth: (_layout.width-(_layout.columns-1)*_layout.columnSpacing)/_layout.columns
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
@@ -263,11 +262,11 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: defaultSceneColorMenu.open()
+                        onClicked: _defaultSceneColorMenu.open()
                     }
 
                     ColorMenu {
-                        id: defaultSceneColorMenu
+                        id: _defaultSceneColorMenu
                         onMenuItemClicked: (color) => { Runtime.workspaceSettings.defaultSceneColor = color }
                     }
                 }
@@ -285,7 +284,7 @@ Item {
         }
 
         GroupBox {
-            Layout.preferredWidth: (layout.width-(layout.columns-1)*layout.columnSpacing)/layout.columns
+            Layout.preferredWidth: (_layout.width-(_layout.columns-1)*_layout.columnSpacing)/_layout.columns
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 

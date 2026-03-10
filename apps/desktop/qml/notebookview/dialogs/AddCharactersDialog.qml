@@ -13,6 +13,7 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
 pragma Singleton
 
 import QtQuick
@@ -21,7 +22,6 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 
 import io.scrite.components
-
 
 import "../../globals"
 import "../../controls"
@@ -37,7 +37,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         width: Math.min(750, Scrite.window.width*0.8)
         height: Math.min(600, Scrite.window.height*0.9)
@@ -66,7 +66,7 @@ DialogLauncher {
                 function reportAllCharactersAlreadyAdded() {
                     MessageBox.information("No characters to add",
                                            "All existing characters have already been added to the notebook.",
-                                           () => { Qt.callLater(dialog.close) })
+                                           () => { Qt.callLater(_dialog.close) })
                 }
             }
 
@@ -177,11 +177,11 @@ DialogLauncher {
                             if(count > 0) {
                                 MessageBox.information("Characters Added",
                                                        "A total of " + (count === 1 ? "one character was" : count + " characters were") + " added.",
-                                                       dialog.close)
+                                                       _dialog.close)
                             } else {
                                 MessageBox.information("No Characters Added",
                                                        "No characters were added.",
-                                                       dialog.close)
+                                                       _dialog.close)
                             }
 
                             let notebookView = ObjectRegistry.find("notebookView")

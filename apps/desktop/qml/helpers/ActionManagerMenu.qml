@@ -74,7 +74,7 @@ VclMenu {
             ToolTipPopup {
                 container: _menuItem
 
-                text: qmlAction.tooltip !== undefined ? qmlAction.tooltip : ""
+                text: _menuItem.qmlAction.tooltip !== undefined ? _menuItem.qmlAction.tooltip : ""
                 visible: text !== "" && _menuItem.hovered
             }
         }

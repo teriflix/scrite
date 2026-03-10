@@ -36,26 +36,28 @@ VclMenu {
 
     VclMenuItem {
         width: root.width
-        height: colorGrid.height
+        height: _colorGrid.height
 
         background: Item { }
         contentItem: Grid {
-            id: colorGrid
-            width: root.width
-            property int currentIndex: -1
+            id: _colorGrid
 
+            property int currentIndex: -1
             property real cellSize: width / columns
-            columns: Math.floor(width / minCellSize)
+
+            width: root.width
+
+            columns: Math.floor(width / root.minCellSize)
 
             Repeater {
                 model: SceneColors.palette.concat(Runtime.workspaceSettings.customColors)
-                delegate: colorItemDelegate
+                delegate: _colorItemDelegate
             }
 
             VclToolButton {
                 icon.source: "qrc:/icons/content/add_circle_outline.png"
-                suggestedWidth: colorGrid.cellSize
-                suggestedHeight: colorGrid.cellSize
+                suggestedWidth: _colorGrid.cellSize
+                suggestedHeight: _colorGrid.cellSize
                 toolTipText: "Pick a custom color"
 
                 onClicked: {
@@ -66,7 +68,7 @@ VclMenu {
                         colors.pop()
                     Runtime.workspaceSettings.customColors = colors
 
-                    root.menuItemClicked(modelData)
+                    root.menuItemClicked(color)
                     root.close()
                 }
             }
@@ -74,40 +76,42 @@ VclMenu {
     }
 
     Component {
-        id: colorItemDelegate
+        id: _colorItemDelegate
 
         Rectangle {
+            id: _colorDelegateItem
+
             required property int index
             required property color modelData
 
             Component.onCompleted: {
-                if(modelData == selectedColor)
-                    colorGrid.currentIndex = index
+                if(modelData == root.selectedColor)
+                    _colorGrid.currentIndex = index
             }
 
-            width: parent.cellSize
-            height: parent.cellSize
-            color: (colorGrid.currentIndex === index) ? Color.translucent(Scrite.app.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
+            width: _colorGrid.cellSize
+            height: _colorGrid.cellSize
+            color: (_colorGrid.currentIndex === index) ? Color.translucent(Runtime.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
 
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: 4
                 border {
-                    width: (colorGrid.currentIndex === index) ? 3 : 1;
-                    color: Qt.darker(modelData)
+                    width: (_colorGrid.currentIndex === _colorDelegateItem.index) ? 3 : 1;
+                    color: Qt.darker(_colorDelegateItem.modelData)
                 }
-                color: modelData
+                color: _colorDelegateItem.modelData
             }
 
             MouseArea {
-                id: mouseArea
+                id: _mouseArea
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
-                    root.menuItemClicked(modelData)
+                    root.menuItemClicked(_colorDelegateItem.modelData)
                     root.close()
                 }
-                onEntered: colorGrid.currentIndex = index
+                onEntered: _colorGrid.currentIndex = _colorDelegateItem.index
             }
         }
     }

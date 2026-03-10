@@ -20,7 +20,6 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-
 import "../../../globals"
 import "../../../helpers"
 import "../../../dialogs"
@@ -70,7 +69,7 @@ AbstractScenePartEditor {
             }
 
             VclToolButton {
-                id: icfEditButton
+                id: _icfEditButton
 
                 Layout.fillWidth: true
 

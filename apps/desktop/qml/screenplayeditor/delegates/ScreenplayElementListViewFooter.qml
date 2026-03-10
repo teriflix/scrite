@@ -96,7 +96,7 @@ Loader {
             }
         }
 
-        readonly property UiElementHighlight footerButtonsHighlighterComponent: UiElementHighlight {
+        readonly property Component footerButtonsHighlighterComponent: UiElementHighlight {
             description: "Use these buttons to add new a scene, act or episode."
             uiElementBoxVisible: true
             descriptionPosition: Item.Bottom

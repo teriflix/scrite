@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Dialogs
@@ -25,7 +27,7 @@ import "../globals"
 import "../controls"
 
 Item {
-    id: sceneFeaturedPhotoItem
+    id: root
 
     required property Scene scene
 
@@ -39,6 +41,7 @@ Item {
 
     Image {
         anchors.fill: parent
+
         fillMode: {
             if(!featuredImage)
                 return defaultFillMode
@@ -49,16 +52,18 @@ Item {
         }
         source: featuredImage ? featuredImage.fileSource : ""
         visible: featuredImage
-        mipmap: sceneFeaturedPhotoItem.mipmap
+        mipmap: root.mipmap
 
         RoundButton {
-            icon.source: parent.fillMode === Image.PreserveAspectCrop ? "qrc:/icons/navigation/zoom_fit.png" : "qrc:/icons/navigation/zoom_one.png"
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.margins: 5
+
+            enabled: !_removeFeaturedImageDialog.active
             hoverEnabled: true
+            icon.source: parent.fillMode === Image.PreserveAspectCrop ? "qrc:/icons/navigation/zoom_fit.png" : "qrc:/icons/navigation/zoom_one.png"
             opacity: hovered ? 1 : 0.5
-            enabled: !removeFeaturedImageDialog.active
+
             onClicked: {
                 if(parent.fillMode === Image.PreserveAspectFit)
                     parent.fillMode = Image.PreserveAspectCrop
@@ -72,21 +77,26 @@ Item {
         }
 
         RoundButton {
-            icon.source: "qrc:/icons/action/delete.png"
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin: 5
             anchors.rightMargin: 10
+
+            enabled: !_removeFeaturedImageDialog.active
             hoverEnabled: true
+            icon.source: "qrc:/icons/action/delete.png"
             opacity: hovered ? 1 : 0.5
-            onClicked: removeFeaturedImageDialog.active = true
-            enabled: !removeFeaturedImageDialog.active
+
+            onClicked: _removeFeaturedImageDialog.active = true
         }
 
         Loader {
-            id: removeFeaturedImageDialog
+            id: _removeFeaturedImageDialog
+
             anchors.fill: parent
+
             active: false
+
             sourceComponent: Rectangle {
                 color: Color.translucent(Runtime.colors.primary.c600.background,0.85)
 
@@ -100,26 +110,30 @@ Item {
                     spacing: 40
 
                     VclLabel {
+                        width: parent.width
+
+                        color: Runtime.colors.primary.c600.text
+                        horizontalAlignment: Text.AlignHCenter
                         text: "Are you sure you want to remove this photo?"
+                        wrapMode: Text.WordWrap
+
                         font.bold: true
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                        width: parent.width
-                        horizontalAlignment: Text.AlignHCenter
-                        wrapMode: Text.WordWrap
-                        color: Runtime.colors.primary.c600.text
                     }
 
                     Row {
                         anchors.horizontalCenter: parent.horizontalCenter
+
                         spacing: 20
 
                         VclButton {
                             text: "Yes"
                             focusPolicy: Qt.NoFocus
+
                             onClicked: {
                                 Qt.callLater( () => {
-                                                 sceneAttachments.removeAttachment(featuredImage)
-                                                 removeFeaturedImageDialog.active = false
+                                                 root.sceneAttachments.removeAttachment(featuredImage)
+                                                 _removeFeaturedImageDialog.active = false
                                              } )
                             }
                         }
@@ -127,7 +141,8 @@ Item {
                         VclButton {
                             text: "No"
                             focusPolicy: Qt.NoFocus
-                            onClicked: removeFeaturedImageDialog.active = false
+
+                            onClicked: _removeFeaturedImageDialog.active = false
                         }
                     }
                 }
@@ -137,42 +152,52 @@ Item {
 
     AttachmentsDropArea {
         anchors.fill: parent
+
         allowedType: Attachments.PhotosOnly
-        target: sceneAttachments
+        target: root.sceneAttachments
+        visible: !featuredAttachment
+        attachmentNoticeSuffix: "Drop this photo to tag it as featured image for this root.scene."
+
         onDropped: {
             attachment.featured = true
             allowDrop()
         }
-        visible: !featuredAttachment
-        attachmentNoticeSuffix: "Drop this photo to tag it as featured image for this scene."
 
         Column {
-            width: parent.width - 20
             anchors.centerIn: parent
+
+            width: parent.width - 20
+
             spacing: 10
             visible: !parent.active
 
             VclLabel {
                 width: parent.width
+
                 horizontalAlignment: Text.AlignHCenter
+                text: root.height > 150 ? "Drag & Drop a Photo\n\n-- OR --" : "Drag & Drop a Photo"
                 wrapMode: Text.WordWrap
+
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                text: sceneFeaturedPhotoItem.height > 150 ? "Drag & Drop a Photo\n\n-- OR --" : "Drag & Drop a Photo"
             }
 
             VclButton {
-                text: "Select Photo"
                 anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: featuredAttachmentFileDialog.open()
-                visible: sceneFeaturedPhotoItem.height > 150
+
+                text: "Select Photo"
+                visible: root.height > 150
+
+                onClicked: _featuredAttachmentFileDialog.open()
             }
         }
 
         VclFileDialog {
-            id: featuredAttachmentFileDialog
-            nameFilters: sceneAttachments ? sceneAttachments.nameFilters : []
+            id: _featuredAttachmentFileDialog
+
+            nameFilters: root.sceneAttachments ? root.sceneAttachments.nameFilters : []
+
             onAccepted: {
-                const attachment = sceneAttachments.includeAttachment( Url.toPath(selectedFile) )
+                const attachment = root.sceneAttachments.includeAttachment( Url.toPath(selectedFile) )
                 if(attachment)
                     attachment.featured = true
             }

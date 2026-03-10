@@ -62,6 +62,9 @@ Popup {
             currentIndex: transliterator.currentSuggestionIndex
 
             delegate: Label {
+                id: _delegate
+
+                required property int index
                 required property string modelData
 
                 width: _suggestionsList.width

@@ -92,7 +92,7 @@ TextField {
         }
     }
 
-    Keys.onPressed: {
+    Keys.onPressed: (event) => {
         if(event.text !== "")
             userTypedSomeText = true
     }

@@ -103,7 +103,7 @@ Item {
                     function onStackInitialized() { _tabBarItem.updateTabAttributes() } // ???
                 }
 
-                onAttributeRequest: {
+                onAttributeRequest: (index, attr) => {
                     if(index === activeTabIndex)
                         return
 

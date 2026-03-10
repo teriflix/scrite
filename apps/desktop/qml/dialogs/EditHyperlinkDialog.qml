@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Dialogs
@@ -43,7 +44,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         property string selectedText
         property string existingLink
@@ -65,8 +66,8 @@ DialogLauncher {
                 VclLabel {
                     Layout.fillWidth: true
 
-                    text: (dialog.existingLink === "" ? "Add hyperlink for " : "Edit hyper link to ") +
-                          "<b>" + dialog.selectedText + "</b>"
+                    text: (_dialog.existingLink === "" ? "Add hyperlink for " : "Edit hyper link to ") +
+                          "<b>" + _dialog.selectedText + "</b>"
                     wrapMode: Text.WordWrap
                     elide: Text.ElideRight
                     maximumLineCount: 3
@@ -77,7 +78,7 @@ DialogLauncher {
 
                     Layout.fillWidth: true
 
-                    text: dialog.existingLink
+                    text: _dialog.existingLink
                 }
 
                 Item {
@@ -88,11 +89,11 @@ DialogLauncher {
                 RowLayout {
                     VclButton {
                         text: "Remove Link"
-                        visible: dialog.existingLink !== ""
+                        visible: _dialog.existingLink !== ""
 
                         onClicked: {
-                            dialog.updateLinkRequest("")
-                            Qt.callLater(dialog.close)
+                            _dialog.updateLinkRequest("")
+                            Qt.callLater(_dialog.close)
                         }
                     }
 
@@ -103,16 +104,16 @@ DialogLauncher {
                     VclButton {
                         id: _acceptButton
 
-                        text: dialog.existingLink === "" ? "Insert Link" : "Update Link"
-                        enabled: _hyperlinkField.text !== "" && (dialog.existingLink === "" || dialog.existingLink !== _hyperlinkField.text)
+                        text: _dialog.existingLink === "" ? "Insert Link" : "Update Link"
+                        enabled: _hyperlinkField.text !== "" && (_dialog.existingLink === "" || _dialog.existingLink !== _hyperlinkField.text)
 
                         onClicked: {
-                            dialog.updateLinkRequest(_hyperlinkField.text)
-                            Qt.callLater(dialog.close)
+                            _dialog.updateLinkRequest(_hyperlinkField.text)
+                            Qt.callLater(_dialog.close)
                         }
 
                         ActionHandler {
-                            action: dialog.acceptAction
+                            action: _dialog.acceptAction
 
                             onTriggered: (source) => { _acceptButton.clicked() }
                         }

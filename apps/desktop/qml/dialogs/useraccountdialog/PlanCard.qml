@@ -131,12 +131,14 @@ RowLayout {
         maximumLineCount: 2
 
         MouseArea {
+            id: _labelWithTooltipMouseArea
+
             anchors.fill: parent
 
             hoverEnabled: true
 
             ToolTipPopup {
-                visible: parent.containsMouse
+                visible: _labelWithTooltipMouseArea.containsMouse
                 text: _labelWithTooltip.text
             }
         }

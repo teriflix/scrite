@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
@@ -37,7 +38,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         title: "Select a Backup to Load"
         width: 640
@@ -58,14 +59,14 @@ DialogLauncher {
                     border.color: Runtime.colors.primary.borderColor
 
                     ListView {
-                        id: backupFilesView
+                        id: _backupFilesView
                         clip: true
                         anchors.fill: parent
                         anchors.margins: 1
                         model: Scrite.document.backupFilesModel
                         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                         currentIndex: -1
-                        ScrollBar.vertical: VclScrollBar { flickable: backupFilesView }
+                        ScrollBar.vertical: VclScrollBar { flickable: _backupFilesView }
                         highlight: Rectangle {
                             color: Runtime.colors.primary.highlight.background
                         }
@@ -73,6 +74,8 @@ DialogLauncher {
                         highlightResizeDuration: 0
                         property string currentBackupFilePath
                         delegate: Item {
+                            id: _backupFilesViewDelegate
+
                             required property int index
                             required property int timestamp
                             required property int fileSize
@@ -84,17 +87,17 @@ DialogLauncher {
                             required property string fileName
                             required property string filePath
 
-                            width: backupFilesView.width
-                            height: rowLayout.height + 10
+                            width: _backupFilesView.width
+                            height: _rowLayout.height + 10
 
                             Row {
-                                id: rowLayout
+                                id: _rowLayout
                                 width: parent.width-20
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 VclLabel {
                                     width: parent.width * 0.75
-                                    text: relativeTime + "<br/><font size=\"-2\">" + timestampAsString + "</font>"
+                                    text: relativeTime + "<br/><font size=\"-2\">" + _backupFilesViewDelegate.timestampAsString + "</font>"
                                     padding: 5
                                     leftPadding: 12
                                     elide: Text.ElideRight
@@ -106,15 +109,15 @@ DialogLauncher {
                                     width: parent.width * 0.25
                                     anchors.top: parent.top
                                     property string fileSizeInfo: {
-                                        if(fileSize < 1024)
-                                        return fileSize + " B"
-                                        if(fileSize < 1024*1024)
-                                        return Math.round(fileSize / 1024, 2) + " KB"
-                                        return Math.round(fileSize / (1024*1024), 2) + " MB"
+                                        if(_backupFilesViewDelegate.fileSize < 1024)
+                                            return _backupFilesViewDelegate.fileSize + " B"
+                                        if(_backupFilesViewDelegate.fileSize < 1024*1024)
+                                            return Math.round(_backupFilesViewDelegate.fileSize / 1024, 2) + " KB"
+                                        return Math.round(_backupFilesViewDelegate.fileSize / (1024*1024), 2) + " MB"
                                     }
                                     property string metaDataInfo: {
-                                        if(metaData.loaded)
-                                        return metaData.sceneCount + (metaData.sceneCount === 1 ? " Scene" : " Scenes");
+                                        if(_backupFilesViewDelegate.metaData.loaded)
+                                            return _backupFilesViewDelegate.metaData.sceneCount + (_backupFilesViewDelegate.metaData.sceneCount === 1 ? " Scene" : " Scenes");
                                         return "Loading metadata ..."
                                     }
                                     text: metaDataInfo + "<br/><font size=\"-2\">" + fileSizeInfo + "</font>"
@@ -127,8 +130,8 @@ DialogLauncher {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    backupFilesView.currentBackupFilePath = filePath
-                                    backupFilesView.currentIndex = index
+                                    _backupFilesView.currentBackupFilePath = _backupFilesViewDelegate.filePath
+                                    _backupFilesView.currentIndex = _backupFilesViewDelegate.index
                                 }
                             }
                         }
@@ -141,29 +144,29 @@ DialogLauncher {
 
                     VclButton {
                         text: "Open in This Window"
-                        enabled: backupFilesView.currentIndex >= 0
+                        enabled: _backupFilesView.currentIndex >= 0
                         hoverEnabled: true
                         toolTipText: "Closes the current document and loads the selected backup."
 
                         onClicked: {
-                            var task = OpenFileTask.openAnonymously(backupFilesView.currentBackupFilePath)
-                            task.finished.connect(dialog.close)
+                            var task = OpenFileTask.openAnonymously(_backupFilesView.currentBackupFilePath)
+                            task.finished.connect(_dialog.close)
                         }
                     }
 
                     VclButton {
                         text: "Open in New Window"
-                        enabled: backupFilesView.currentIndex >= 0
+                        enabled: _backupFilesView.currentIndex >= 0
                         hoverEnabled: true
                         toolTipText: "Loads the selected backup in a new window."
 
                         onClicked: {
-                            const filePath = backupFilesView.currentBackupFilePath
+                            const filePath = _backupFilesView.currentBackupFilePath
 
                             var waitDialog = WaitDialog.launch()
                             Scrite.app.launchNewInstanceAndOpenAnonymously(Scrite.window, filePath)
-                            Runtime.execLater(dialog, 1500, () => {
-                                                Qt.callLater(dialog.close)
+                            Runtime.execLater(_dialog, 1500, () => {
+                                                Qt.callLater(_dialog.close)
                                                 if(waitDialog)
                                                 waitDialog.close()
                                             } )

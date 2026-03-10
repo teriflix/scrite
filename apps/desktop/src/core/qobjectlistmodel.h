@@ -27,6 +27,8 @@
 class AbstractQObjectListModel : public QAbstractListModel
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Base class")
 
 public:
     explicit AbstractQObjectListModel(QObject *parent = nullptr);
@@ -56,6 +58,8 @@ public:
 template<class T>
 class QObjectListModel : public AbstractQObjectListModel
 {
+    QML_ANONYMOUS
+
 public:
     explicit QObjectListModel(QObject *parent = nullptr) : AbstractQObjectListModel(parent) { }
     ~QObjectListModel() { }

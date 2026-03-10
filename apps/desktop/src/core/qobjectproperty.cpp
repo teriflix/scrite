@@ -54,7 +54,13 @@ void QObjectPropertyBase::setPointer(QObject *pointer)
 
 void QObjectPropertyBase::objectDestroyed(QObject *ptr)
 {
+    // TODO: This is a horrible implementation.
+    // Get rid of this. It is not serving any purpose.
+    // We might as well use a QPointer<> for this.
     if (ptr == m_pointer) {
+        this->resetPointer();
+        m_pointer = nullptr;
+
         if (!m_notify.isNull() && m_resettableProperty.isValid()) {
             if (m_resettableProperty.isResettable())
                 m_resettableProperty.reset(m_notify);
@@ -62,9 +68,6 @@ void QObjectPropertyBase::objectDestroyed(QObject *ptr)
                 m_resettableProperty.write(m_notify,
                                            QVariant(QMetaType(QMetaType::Nullptr), nullptr));
         }
-
-        this->resetPointer();
-        m_pointer = nullptr;
 
         if (!m_notify.isNull() && m_resettableProperty.isValid()) {
             if (!m_resettableProperty.isResettable() && !m_resettableProperty.isWritable()) {

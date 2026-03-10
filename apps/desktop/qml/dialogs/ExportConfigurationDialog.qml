@@ -33,7 +33,7 @@ Item {
 
     function launch(exporter) {
         if(_private.dialogComponent.status !== Component.Ready) {
-            console.log("ExportConfigurationDialog is not ready!")
+            console.log("ExportConfigurationDialog is not ready! " + _private.dialogComponent.errorString())
             return null
         }
 

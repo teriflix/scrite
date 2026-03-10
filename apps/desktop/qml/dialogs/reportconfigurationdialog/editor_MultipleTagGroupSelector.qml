@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
@@ -25,6 +27,8 @@ import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
+    id: root
+
     property var fieldInfo
     property AbstractReportGenerator report
 
@@ -59,7 +63,7 @@ ColumnLayout {
         }
 
         ListView {
-            id: groupsView
+            id: _groupsView
 
             property var checkedTags: report.getConfigurationValue(fieldInfo.name)
 
@@ -75,9 +79,10 @@ ColumnLayout {
             section.property: "category"
             section.criteria: ViewSection.FullString
             section.delegate: Item {
+                id: _sectionDelegate
                 required property string section
 
-                width: groupsView.width
+                width: _groupsView.width
                 height: 40
 
                 Rectangle {
@@ -85,7 +90,7 @@ ColumnLayout {
                     anchors.margins: 3
                     color: Runtime.colors.primary.windowColor
                     VclLabel {
-                        text: section
+                        text: _sectionDelegate.section
                         topPadding: 5
                         bottomPadding: 5
                         anchors.centerIn: parent
@@ -95,20 +100,21 @@ ColumnLayout {
             }
 
             delegate: VclCheckBox {
+                id: _tagGroupDelegate
                 required property int index
                 required property string name
                 required property string label
 
-                text: label
-                checked: groupsView.checkedTags.indexOf(name) >= 0
+                text: _tagGroupDelegate.label
+                checked: _groupsView.checkedTags.indexOf(_tagGroupDelegate.name) >= 0
 
                 onToggled: {
-                    var tags = groupsView.checkedTags
+                    var tags = _groupsView.checkedTags
                     if(checked)
-                        tags.push(name)
+                        tags.push(_tagGroupDelegate.name)
                     else
-                        tags.splice(tags.indexOf(name), 1)
-                    groupsView.checkedTags = tags
+                        tags.splice(tags.indexOf(_tagGroupDelegate.name), 1)
+                    _groupsView.checkedTags = tags
                     report.setConfigurationValue(fieldInfo.name, tags)
                 }
             }

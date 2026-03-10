@@ -343,16 +343,27 @@ Rectangle {
             focus: false
             closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
 
+            onClosed: {
+                Object.resetProperty(_alphabetMappingsLoader, "width")
+                Object.resetProperty(_alphabetMappingsLoader, "height")
+            }
+
             Loader {
                 id: _alphabetMappingsLoader
-
-                width: item ? item.width : 0
-                height: item ? item.height : 0
 
                 active: parent.visible
 
                 sourceComponent: AlphabetMappingsView {
                     language: Runtime.language.active
+
+                    EventFilter.target: Scrite.app
+                    EventFilter.events: [EventFilter.KeyPress]
+                    EventFilter.onFilter: (watched, event, result) => {
+                        result.acceptEvent = event.key == Qt.Key_Escape
+                        result.filter = event.key == Qt.Key_Escape
+                        if(event.key === Qt.Key_Escape)
+                            _alphabetMappingsPopup.close()
+                    }
                 }
             }
         }

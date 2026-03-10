@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
@@ -23,74 +25,83 @@ import "../globals"
 import "../controls"
 
 Item {
-    id: tabView
+    id: root
 
     property var tabNames: ["Default"]
-    property real cornerItemSpace: cornerLoader.width
+    property real cornerItemSpace: _cornerLoader.width
     property color tabColor: Runtime.colors.primary.windowColor
-    property alias currentTabIndex: tabBar.currentIndex
-    property alias currentTabContent: tabContentLoader.sourceComponent
-    property alias tabBarVisible: tabBar.visible
-    property alias cornerItem: cornerLoader.sourceComponent
-    property alias currentTabItem: tabContentLoader.item
-    property alias tabContentBorderVisible: tabContentLoaderBorder.visible
+    property alias currentTabIndex: _tabBar.currentIndex
+    property alias currentTabContent: _tabContentLoader.sourceComponent
+    property alias tabBarVisible: _tabBar.visible
+    property alias cornerItem: _cornerLoader.sourceComponent
+    property alias currentTabItem: _tabContentLoader.item
+    property alias tabContentBorderVisible: _tabContentLoaderBorder.visible
 
     Row {
-        id: tabBar
-        anchors.left: parent.left
-        anchors.leftMargin: 20
-        spacing: -height*0.4
+        id: _tabBar
+
         property int currentIndex: 0
 
-        Repeater {
-            id: tabRepeater
+        anchors.left: parent.left
+        anchors.leftMargin: 20
 
-            model: tabBar.visible ? tabNames : 0
+        spacing: -height*0.4
+
+        Repeater {
+            id: _tabRepeater
+
+            model: _tabBar.visible ? tabNames : 0
 
             delegate: TrapeziumTab {
+                id: _delegate
+
                 required property int index
                 required property string modelData
 
-                tabFillColor: active ? tabColor : Runtime.colors.tint(tabColor, Runtime.colors.sceneControlTint)
+                currentTabIndex: _tabBar.currentIndex
                 tabBorderColor: Color.isVeryLight(tabColor) ? Runtime.colors.primary.borderColor : tabColor
                 tabBorderWidth: 1
-                text: modelData
-                tabIndex: index
                 tabCount: 2
+                tabFillColor: active ? tabColor : Runtime.colors.tint(tabColor, Runtime.colors.sceneControlTint)
+                tabIndex: index
+                text: modelData
                 textColor: active ? Color.textColorFor(tabColor) : Runtime.colors.primary.regular.text
-                currentTabIndex: tabBar.currentIndex
-                onRequestActivation: tabBar.currentIndex = index
+
+                onRequestActivation: _tabBar.currentIndex = index
             }
         }
     }
 
     Loader {
-        id: cornerLoader
-        anchors.left: tabBar.right
+        id: _cornerLoader
+
+        anchors.left: _tabBar.right
         anchors.right: parent.right
-        height: tabBar.height
-        active: tabBar.visible
+
+        height: _tabBar.height
+
+        active: _tabBar.visible
         visible: active
     }
 
     Rectangle {
-        anchors.top: tabBar.visible ? tabBar.bottom : parent.top
+        anchors.top: _tabBar.visible ? _tabBar.bottom : parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
 
-        color: tabContentLoaderBorder.visible ? Qt.rgba(1,1,1,0.25) : Qt.rgba(0,0,0,0)
+        color: _tabContentLoaderBorder.visible ? Qt.rgba(1,1,1,0.25) : Qt.rgba(0,0,0,0)
         border.width: 0
 
         Loader {
-            id: tabContentLoader
+            id: _tabContentLoader
             anchors.fill: parent
         }
 
         Rectangle {
-            id: tabContentLoaderBorder
+            id: _tabContentLoaderBorder
 
-            anchors.fill: tabContentLoader
+            anchors.fill: _tabContentLoader
 
             color: Qt.rgba(0,0,0,0)
 
@@ -101,57 +112,60 @@ Item {
 
     // Refactor aliases in this...
     component TrapeziumTab : Item {
-        id: tabBarTab
+        id: _tabBarTab
 
-        width: implicitTabSize
-        height: Runtime.idealFontMetrics.font.pointSize + 16
-
-        readonly property real tabTextWidth: tabText.width
         readonly property real implicitTabSize: tabTextWidth*1.1 + 2*_private.tabShapeOffset
-        property string text
-        property color textColor: Runtime.colors.primary.regular.text
-        property color tabFillColor
-        property color tabBorderColor
-        property real tabBorderWidth
-
-        property bool hoverEnabled: false
-        property int tabCount: 1
-        property int tabIndex: 0
-        property int currentTabIndex: -1
-        property bool active: currentTabIndex === tabIndex
-
-        z: active ? tabCount+1 : (currentTabIndex < tabIndex ? tabCount-tabIndex-1 : tabIndex)
+        readonly property real tabTextWidth: _tabText.width
 
         property int alignment: Qt.AlignTop
+        property int currentTabIndex: -1
+        property int tabCount: 1
+        property int tabIndex: 0
+
+        property bool active: currentTabIndex === tabIndex
+        property bool hoverEnabled: false
+
+        property real tabBorderWidth
+
+        property color tabBorderColor
+        property color tabFillColor
+        property color textColor: Runtime.colors.primary.regular.text
+
+        property string text
 
         signal requestActivation()
         signal requestContextMenu()
 
+        z: active ? tabCount+1 : (currentTabIndex < tabIndex ? tabCount-tabIndex-1 : tabIndex)
+
+        width: implicitTabSize
+        height: Runtime.idealFontMetrics.font.pointSize + 16
+
         PainterPathItem {
-            id: tabShapeItem
+            id: _tabShapeItem
 
             anchors.fill: parent
-            anchors.topMargin: active ? 0 : parent.height*0.1
+            anchors.topMargin: _tabBarTab.active ? 0 : parent.height*0.1
 
-            fillColor: tabBarTab.tabFillColor
-            outlineColor: tabBarTab.tabBorderColor
-            outlineWidth: tabBarTab.tabBorderWidth
+            fillColor: _tabBarTab.tabFillColor
+            outlineColor: _tabBarTab.tabBorderColor
+            outlineWidth: _tabBarTab.tabBorderWidth
             renderingMechanism: PainterPathItem.UseAntialiasedQPainter
-            painterPath: tabBarTab.alignment === Qt.AlignRight ? rightPainterPath.createObject(tabShapeItem) : topPainterPath.createObject(tabShapeItem)
+            painterPath: _tabBarTab.alignment === Qt.AlignRight ? _rightPainterPath.createObject(_tabShapeItem) : _topPainterPath.createObject(_tabShapeItem)
 
             VclLabel {
-                id: tabText
+                id: _tabText
 
                 anchors.centerIn: parent
-                anchors.horizontalCenterOffset: tabBarTab.alignment === Qt.AlignRight ? -tabText.height*0.1 : 0
+                anchors.horizontalCenterOffset: _tabBarTab.alignment === Qt.AlignRight ? -_tabText.height*0.1 : 0
 
-                text: tabBarTab.text
-                color: tabBarTab.textColor
+                text: _tabBarTab.text
+                color: _tabBarTab.textColor
 
-                font.bold: tabBarTab.active
+                font.bold: _tabBarTab.active
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-                rotation: tabBarTab.alignment === Qt.AlignRight ? 90 : 0
+                rotation: _tabBarTab.alignment === Qt.AlignRight ? 90 : 0
                 Behavior on font.pixelSize {
                     enabled: Runtime.applicationSettings.enableAnimations
                     NumberAnimation { duration: Runtime.stdAnimationDuration }
@@ -166,32 +180,33 @@ Item {
                 readonly property real margin: _private.tabShapeOffset*0.15
                 readonly property real size: parent.outlineWidth
                 x: margin
-                y: tabBarTab.alignment === Qt.AlignTop ? parent.height - height : margin
-                width: tabBarTab.alignment === Qt.AlignTop ? parent.width-2*margin : size
-                height: tabBarTab.alignment === Qt.AlignTop ? size : parent.height-2*margin
+                y: _tabBarTab.alignment === Qt.AlignTop ? parent.height - height : margin
+                width: _tabBarTab.alignment === Qt.AlignTop ? parent.width-2*margin : size
+                height: _tabBarTab.alignment === Qt.AlignTop ? size : parent.height-2*margin
                 color: parent.fillColor
-                visible: size > 0 && tabBarTab.active
+                visible: size > 0 && _tabBarTab.active
             }
         }
 
         MouseArea {
-            id: tabMouseArea
+            id: _tabMouseArea
             hoverEnabled: parent.hoverEnabled
             anchors.fill: parent
-            onClicked: {
+            onClicked: (mouse) => {
                 if(mouse.button === Qt.RightButton)
-                    tabBarTab.requestContextMenu()
+                    _tabBarTab.requestContextMenu()
                 else
-                    tabBarTab.requestActivation()
+                    _tabBarTab.requestActivation()
             }
         }
     }
 
     Component {
-        id: topPainterPath
+        id: _topPainterPath
 
         PainterPath {
-            id: tabPath
+            id: _tabPath
+
             readonly property real radius: _private.tabShapeRadius // Math.min(itemRect.width, itemRect.height)*0.2
             readonly property real offset: _private.tabShapeOffset // itemRect.width*0.1
 
@@ -205,21 +220,22 @@ Item {
             property point p5: pointInLine(c2, p6, radius, true)
             property point p6: Qt.point(itemRect.right-1, itemRect.bottom)
 
-            MoveTo { x: tabPath.p1.x; y: tabPath.p1.y }
-            LineTo { x: tabPath.p2.x; y: tabPath.p2.y }
-            QuadTo { controlPoint: tabPath.c1; endPoint: tabPath.p3 }
-            LineTo { x: tabPath.p4.x; y: tabPath.p4.y }
-            QuadTo { controlPoint: tabPath.c2; endPoint: tabPath.p5 }
-            LineTo { x: tabPath.p6.x; y: tabPath.p6.y }
+            MoveTo { x: _tabPath.p1.x; y: _tabPath.p1.y }
+            LineTo { x: _tabPath.p2.x; y: _tabPath.p2.y }
+            QuadTo { controlPoint: _tabPath.c1; endPoint: _tabPath.p3 }
+            LineTo { x: _tabPath.p4.x; y: _tabPath.p4.y }
+            QuadTo { controlPoint: _tabPath.c2; endPoint: _tabPath.p5 }
+            LineTo { x: _tabPath.p6.x; y: _tabPath.p6.y }
             CloseSubpath { }
         }
     }
 
     Component {
-        id: rightPainterPath
+        id: _rightPainterPath
 
         PainterPath {
-            id: tabPath
+            id: _tabPath
+
             readonly property real radius: _private.tabShapeRadius // Math.min(itemRect.width, itemRect.height)*0.2
             readonly property real offset: _private.tabShapeOffset // itemRect.height*0.1
 
@@ -233,12 +249,12 @@ Item {
             property point p5: pointInLine(c2, p6, radius, true)
             property point p6: Qt.point(itemRect.left, itemRect.bottom)
 
-            MoveTo { x: tabPath.p1.x; y: tabPath.p1.y }
-            LineTo { x: tabPath.p2.x; y: tabPath.p2.y }
-            QuadTo { controlPoint: tabPath.c1; endPoint: tabPath.p3 }
-            LineTo { x: tabPath.p4.x; y: tabPath.p4.y }
-            QuadTo { controlPoint: tabPath.c2; endPoint: tabPath.p5 }
-            LineTo { x: tabPath.p6.x; y: tabPath.p6.y }
+            MoveTo { x: _tabPath.p1.x; y: _tabPath.p1.y }
+            LineTo { x: _tabPath.p2.x; y: _tabPath.p2.y }
+            QuadTo { controlPoint: _tabPath.c1; endPoint: _tabPath.p3 }
+            LineTo { x: _tabPath.p4.x; y: _tabPath.p4.y }
+            QuadTo { controlPoint: _tabPath.c2; endPoint: _tabPath.p5 }
+            LineTo { x: _tabPath.p6.x; y: _tabPath.p6.y }
             CloseSubpath { }
         }
     }

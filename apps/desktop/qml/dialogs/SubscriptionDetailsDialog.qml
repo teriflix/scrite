@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQml
 import QtQuick
@@ -24,10 +25,11 @@ import Qt.labs.qmlmodels
 
 import io.scrite.components
 
-
 import "../globals"
 import "../controls"
 import "../helpers"
+
+// TODO: Needs to be reviewed and tested.
 
 DialogLauncher {
     id: root
@@ -48,7 +50,7 @@ DialogLauncher {
     }
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         property var subscription
 
@@ -57,32 +59,32 @@ DialogLauncher {
         title: "Subscription Details"
 
         content: Item {
-            Component.onCompleted: SubscriptionPlanOperations.populateFeatureListTableModel(dialog.subscription, featureModel)
+            Component.onCompleted: SubscriptionPlanOperations.populateFeatureListTableModel(_dialog.subscription, _featureModel)
 
             ListModel {
-                id: featureModel
+                id: _featureModel
             }
 
             Flickable {
-                id: detailsView
+                id: _detailsView
 
                 anchors.fill: parent
 
                 clip: true
 
                 contentWidth: width
-                contentHeight: detailsViewLayout.height
+                contentHeight: _detailsViewLayout.height
                 boundsBehavior: Flickable.StopAtBounds
                 boundsMovement: Flickable.StopAtBounds
 
                 ScrollBar.vertical: VclScrollBar {
-                    flickable: detailsView
+                    flickable: _detailsView
                 }
 
                 ColumnLayout {
-                    id: detailsViewLayout
+                    id: _detailsViewLayout
 
-                    width: detailsView.width - 20
+                    width: _detailsView.width - 20
                     spacing: 10
 
                     Item {
@@ -93,7 +95,7 @@ DialogLauncher {
                     VclLabel {
                         Layout.fillWidth: true
 
-                        text: dialog.subscription.plan.title
+                        text: _dialog.subscription.plan.title
                         wrapMode: Text.WordWrap
                         color: Runtime.colors.accent.c600.background
                         font.bold: true
@@ -104,7 +106,7 @@ DialogLauncher {
                     VclLabel {
                         Layout.fillWidth: true
 
-                        text: dialog.subscription.plan.subtitle
+                        text: _dialog.subscription.plan.subtitle
                         font.italic: true
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignHCenter
@@ -115,10 +117,10 @@ DialogLauncher {
                         Layout.preferredWidth: parent.width * 0.65
 
                         text: {
-                            let ret = dialog.subscription.hasExpired ? "Was used for " : (dialog.subscription.isUpcoming ? "Will be valid for " : "Valid for ")
-                            ret += "<b>" + Runtime.daysSpanAsString(dialog.subscription.plan.duration) + "</b>"
-                            ret += " from <b>" + Runtime.formatDateIncludingYear(new Date(dialog.subscription.from)) + "</b> until <b>" + Runtime.formatDateIncludingYear(new Date(dialog.subscription.until)) + "</b>"
-                            ret += ", with activation limit of <b>" + dialog.subscription.plan.devices + "</b> device(s)."
+                            let ret = _dialog.subscription.hasExpired ? "Was used for " : (_dialog.subscription.isUpcoming ? "Will be valid for " : "Valid for ")
+                            ret += "<b>" + Runtime.daysSpanAsString(_dialog.subscription.plan.duration) + "</b>"
+                            ret += " from <b>" + Runtime.formatDateIncludingYear(new Date(_dialog.subscription.from)) + "</b> until <b>" + Runtime.formatDateIncludingYear(new Date(_dialog.subscription.until)) + "</b>"
+                            ret += ", with activation limit of <b>" + _dialog.subscription.plan.devices + "</b> device(s)."
                             return ret
                         }
                         wrapMode: Text.WordWrap
@@ -130,11 +132,11 @@ DialogLauncher {
 
                         text: {
                             let ret = "Status: "
-                            if(dialog.subscription.isActive)
+                            if(_dialog.subscription.isActive)
                                 ret += "<b>Active</b>"
-                            else if(dialog.subscription.isUpcoming)
+                            else if(_dialog.subscription.isUpcoming)
                                 ret += "Upcoming"
-                            else if(dialog.subscription.hasExpired)
+                            else if(_dialog.subscription.hasExpired)
                                 ret += "Expired"
                             else
                                 ret += "Unknown"
@@ -148,10 +150,10 @@ DialogLauncher {
                     Link {
                         Layout.alignment: Qt.AlignHCenter
 
-                        text: "Order #" + dialog.subscription.wc_order_id + " »"
-                        visible: dialog.subscription.wc_order_id !== undefined && dialog.subscription.wc_order_id !== ""
+                        text: "Order #" + _dialog.subscription.wc_order_id + " »"
+                        visible: _dialog.subscription.wc_order_id !== undefined && _dialog.subscription.wc_order_id !== ""
 
-                        onClicked: Qt.openUrlExternally(dialog.subscription.detailsUrl)
+                        onClicked: Qt.openUrlExternally(_dialog.subscription.detailsUrl)
                     }
 
                     Item {
@@ -160,7 +162,7 @@ DialogLauncher {
                     }
 
                     GridLayout {
-                        id: featureTable
+                        id: _featureTable
 
                         Layout.alignment: Qt.AlignHCenter
 
@@ -169,7 +171,7 @@ DialogLauncher {
                         columnSpacing: 0
 
                         Repeater {
-                            model: featureModel
+                            model: _featureModel
 
                             DelegateChooser {
                                 role: "kind"
@@ -178,23 +180,24 @@ DialogLauncher {
                                     roleValue: "label"
 
                                     delegate: VclLabel {
+                                        id: _labelDelegate
                                         required property int index
                                         required property var attributes
 
                                         Layout.fillHeight: true
-                                        Layout.minimumWidth: (index%2 === 0) ? 200 : 0
-                                        Layout.maximumWidth: (index%2 === 0) ? 200 : 100
-                                        Layout.preferredWidth: (index%2 === 0) ? 200 : 100
+                                        Layout.minimumWidth: (_labelDelegate.index%2 === 0) ? 200 : 0
+                                        Layout.maximumWidth: (_labelDelegate.index%2 === 0) ? 200 : 100
+                                        Layout.preferredWidth: (_labelDelegate.index%2 === 0) ? 200 : 100
 
-                                        text: attributes.text
-                                        font.pointSize: attributes.font.pointSize
-                                        font.weight: attributes.font.weight
-                                        font.italic: attributes.font.italic
+                                        text: _labelDelegate.attributes.text
+                                        font.pointSize: _labelDelegate.attributes.font.pointSize
+                                        font.weight: _labelDelegate.attributes.font.weight
+                                        font.italic: _labelDelegate.attributes.font.italic
                                         background: Rectangle {
-                                            color: attributes.background
+                                            color: _labelDelegate.attributes.background
                                         }
-                                        color: attributes.color
-                                        horizontalAlignment: attributes.horizontalAlignment
+                                        color: _labelDelegate.attributes.color
+                                        horizontalAlignment: _labelDelegate.attributes.horizontalAlignment
                                         verticalAlignment: Text.AlignVCenter
                                         leftPadding: 8; rightPadding: 8
                                         topPadding: 6; bottomPadding: 6
@@ -206,23 +209,24 @@ DialogLauncher {
                                     roleValue: "labelWithTooltip"
 
                                     delegate: VclLabel {
+                                        id: _labelWithTooltipDelegate
                                         required property int index
                                         required property var attributes
 
                                         Layout.fillHeight: true
-                                        Layout.minimumWidth: (index%2 === 0) ? 200 : 0
-                                        Layout.maximumWidth: (index%2 === 0) ? 200 : 100
-                                        Layout.preferredWidth: (index%2 === 0) ? 200 : 100
+                                        Layout.minimumWidth: (_labelWithTooltipDelegate.index%2 === 0) ? 200 : 0
+                                        Layout.maximumWidth: (_labelWithTooltipDelegate.index%2 === 0) ? 200 : 100
+                                        Layout.preferredWidth: (_labelWithTooltipDelegate.index%2 === 0) ? 200 : 100
 
-                                        text: attributes.text + " ⓘ"
-                                        font.pointSize: attributes.font.pointSize
-                                        font.weight: attributes.font.weight
-                                        font.italic: attributes.font.italic
+                                        text: _labelWithTooltipDelegate.attributes.text + " ⓘ"
+                                        font.pointSize: _labelWithTooltipDelegate.attributes.font.pointSize
+                                        font.weight: _labelWithTooltipDelegate.attributes.font.weight
+                                        font.italic: _labelWithTooltipDelegate.attributes.font.italic
                                         background: Rectangle {
-                                            color: attributes.background
+                                            color: _labelWithTooltipDelegate.attributes.background
                                         }
-                                        color: attributes.color
-                                        horizontalAlignment: attributes.horizontalAlignment
+                                        color: _labelWithTooltipDelegate.attributes.color
+                                        horizontalAlignment: _labelWithTooltipDelegate.attributes.horizontalAlignment
                                         verticalAlignment: Text.AlignVCenter
                                         leftPadding: 8; rightPadding: 8
                                         topPadding: 6; bottomPadding: 6
@@ -238,7 +242,7 @@ DialogLauncher {
                                         ToolTipPopup {
                                             container: _featureLabelMouseArea
 
-                                            text: attributes.tooltip
+                                            text: _labelWithTooltipDelegate.attributes.tooltip
                                             visible: _featureLabelMouseArea.containsMouse
                                         }
                                     }

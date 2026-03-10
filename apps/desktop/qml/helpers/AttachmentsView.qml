@@ -55,10 +55,10 @@ ListView {
         required property int index
         required property var objectItem
 
-        property bool isSelected: root.currentIndex === index
+        property bool isSelected: root.currentIndex === _delegate.index
 
         ToolTipPopup {
-            text: objectItem.originalFileName
+            text: _delegate.objectItem.originalFileName
             visible: _delegateMouseArea.containsMouse
         }
 
@@ -79,7 +79,7 @@ ListView {
 
                 fillMode: Image.PreserveAspectFit
                 mipmap: true
-                source: "image://fileIcon/" + objectItem.filePath
+                source: "image://fileIcon/" + _delegate.objectItem.filePath
             }
 
             VclLabel {
@@ -87,12 +87,12 @@ ListView {
 
                 width: parent.width
 
-                color: isSelected ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
+                color: _delegate.isSelected ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
                 elide: Text.ElideMiddle
                 horizontalAlignment: Text.AlignHCenter
                 maximumLineCount: 1
                 padding: 2
-                text: objectItem.originalFileName
+                text: _delegate.objectItem.originalFileName
 
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize/2
             }
@@ -103,12 +103,12 @@ ListView {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             hoverEnabled: true
-            onClicked: {
-                root.currentIndex = index
-                if(mouse.button === Qt.RightButton && !readonly)
+            onClicked: (mouse) => {
+                root.currentIndex = _delegate.index
+                if(mouse.button === Qt.RightButton && !root.readonly)
                     _attachmentContextMenu.popup()
             }
-            onDoubleClicked: objectItem.openAttachmentAnonymously()
+            onDoubleClicked: _delegate.objectItem.openAttachmentAnonymously()
         }
     }
 
@@ -119,8 +119,8 @@ ListView {
         FlatToolButton {
             iconSource: "qrc:/icons/action/attach_file.png"
             anchors.centerIn: parent
-            onClicked: if(!readonly) _fileDialog.open()
-            visible: !readonly
+            onClicked: if(!root.readonly) _fileDialog.open()
+            visible: !root.readonly
         }
     }
 

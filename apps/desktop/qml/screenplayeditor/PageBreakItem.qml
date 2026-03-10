@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -36,21 +38,21 @@ Rectangle {
     property color foreground: defaultForeground
 
     implicitWidth: 100
-    implicitHeight: loader.height * (fullSize ? 1.2 : 1.1)
+    implicitHeight: _loader.height * (fullSize ? 1.2 : 1.1)
 
     color: defaultColor
 
     Loader {
-        id: loader
+        id: _loader
 
-        y: placement === Qt.TopEdge ? (root.height-height) : 0
+        y: root.placement === Qt.TopEdge ? (root.height-height) : 0
         width: parent.width
 
-        sourceComponent: root.fullSize ? fullSizeVariant : miniSizeVariant
+        sourceComponent: root.fullSize ? _fullSizeVariant : _miniSizeVariant
     }
 
     Component {
-        id: fullSizeVariant
+        id: _fullSizeVariant
 
         RowLayout {
             DashedLine {
@@ -73,7 +75,7 @@ Rectangle {
     }
 
     Component {
-        id: miniSizeVariant
+        id: _miniSizeVariant
 
         DashedLine {
             height: 8
@@ -81,7 +83,7 @@ Rectangle {
     }
 
     component DashedLine : Shape {
-        id: shape
+        id: _dashedLine
 
         implicitHeight: 2
 
@@ -90,8 +92,8 @@ Rectangle {
             strokeWidth: 1
             strokeStyle: ShapePath.DashLine
             dashPattern: [3,5]
-            startX: 0; startY: shape.height/2
-            PathLine { x: shape.width; y: shape.height/2 }
+            startX: 0; startY: _dashedLine.height/2
+            PathLine { x: _dashedLine.width; y: _dashedLine.height/2 }
         }
     }
 }

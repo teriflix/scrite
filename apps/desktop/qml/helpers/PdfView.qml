@@ -87,9 +87,11 @@ Item {
                 reuseItems: false
 
                 delegate: Item {
+                    id: _pdfViewDelegate
+
                     required property int index
 
-                    property int startPageIndex: index*_pdfView.pdfPagesPerRow
+                    property int startPageIndex: index * _pdfView.pdfPagesPerRow
                     property int endPageIndex: Math.min(startPageIndex+_pdfView.pdfPagesPerRow-1, _pdfDoc.pageCount-1)
 
                     width: _pdfView.width
@@ -103,9 +105,11 @@ Item {
                         spacing: _pdfView.spacing
 
                         Repeater {
-                            model: Math.max(1,(endPageIndex-startPageIndex)+1)
+                            model: Math.max(1,(_pdfViewDelegate.endPageIndex-_pdfViewDelegate.startPageIndex)+1)
 
                             delegate: Rectangle {
+                                id: _pdfPageDelegate
+
                                 required property int index
 
                                 width: _pdfView.pdfPageWidth
@@ -128,12 +132,12 @@ Item {
                                     anchors.fill: parent
 
                                     asynchronous: true
-                                    currentFrame: startPageIndex+index
+                                    currentFrame: _pdfViewDelegate.startPageIndex+_pdfPageDelegate.index
                                     fillMode: Image.PreserveAspectFit
                                     mipmap: true
                                     smooth: true
                                     source: _pdfDoc.source
-                                    sourceSize { width: _pdfDoc.maPageWidth;  height: _pdfDoc.maxPageHeight }
+                                    sourceSize { width: _pdfDoc.maxPageWidth;  height: _pdfDoc.maxPageHeight }
 
                                     Connections {
                                         target: _pageScaleSlider
@@ -248,7 +252,6 @@ Item {
             }
 
             VclToolButton {
-
                 text: "Save PDF"
                 down: _saveMenu.visible
                 visible: (allowFileSave || saveFeatureDisabled)
@@ -361,6 +364,7 @@ Item {
     VclFileDialog {
         id: _saveFileDialog
 
+        fileMode: FileDialog.SaveFile
         nameFilters: ["PDF Files (*.pdf)"]
         currentFolder: Url.fromPath(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
 

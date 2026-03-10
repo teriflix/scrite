@@ -20,7 +20,6 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-
 import "../globals"
 import "../dialogs"
 import "../controls"
@@ -40,7 +39,7 @@ Rectangle {
     }
 
     Rectangle {
-        anchors.fill: contentsFlick
+        anchors.fill: _contentsFlick
         anchors.leftMargin: -20
         anchors.rightMargin: -20
 
@@ -50,19 +49,22 @@ Rectangle {
     }
 
     Flickable {
-        id: contentsFlick
-        anchors.centerIn: parent
-        width: Math.min(parent.width * 0.8, 350)
-        height: Math.min(contents.height, parent.height)
-        contentWidth: width
-        contentHeight: contents.height
+        id: _contentsFlick
 
-        ScrollBar.vertical: vscrollBar
+        ScrollBar.vertical: _vscrollBar
+
+        anchors.centerIn: parent
+
+        width: Math.min(parent.width * 0.8, 350)
+        height: Math.min(_contents.height, parent.height)
+
+        contentWidth: width
+        contentHeight: _contents.height
 
         ColumnLayout {
-            id: contents
+            id: _contents
 
-            width: contentsFlick.width
+            width: _contentsFlick.width
             spacing: 10
 
             Item {
@@ -76,7 +78,7 @@ Rectangle {
                 spacing: 10
 
                 Image {
-                    id: icon
+                    id: _icon
 
                     Layout.alignment: Qt.AlignHCenter
                     Layout.preferredWidth: 24
@@ -100,7 +102,7 @@ Rectangle {
             }
 
             VclLabel {
-                id: reasonSuggestion
+                id: _reasonSuggestion
 
                 Layout.fillWidth: true
 
@@ -129,11 +131,13 @@ Rectangle {
     }
 
     VclScrollBar {
-        id: vscrollBar
-        flickable: contentsFlick
-        orientation: Qt.Vertical
-        anchors.right: parent.right
+        id: _vscrollBar
+
         anchors.top: parent.top
+        anchors.right: parent.right
         anchors.bottom: parent.bottom
+
+        flickable: _contentsFlick
+        orientation: Qt.Vertical
     }
 }

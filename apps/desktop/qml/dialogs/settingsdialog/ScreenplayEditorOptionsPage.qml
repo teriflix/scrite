@@ -97,10 +97,12 @@ Item {
                         model: ActionHub.screenplayEditorOptions.visibleActions
 
                         delegate: VclCheckBox {
+                            id: _delegate
+
                             required property int index
                             required property var modelData
 
-                            property var qmlAction: modelData
+                            property var qmlAction: _delegate.modelData
 
                             width: (_grid.width-_grid.columnSpacing)/_grid.columns
 
@@ -108,14 +110,14 @@ Item {
 
                             ToolTipPopup {
                                 text: {
-                                    const sc = Gui.nativeShortcut(qmlAction.shortcut)
+                                    const sc = Gui.nativeShortcut(_delegate.qmlAction.shortcut)
                                     if(sc === "")
-                                        return qmlAction.tooltip !== undefined ? qmlAction.tooltip : ""
+                                        return _delegate.qmlAction.tooltip !== undefined ? _delegate.qmlAction.tooltip : ""
 
-                                    const tt = qmlAction.tooltip !== undefined ? qmlAction.tooltip : qmlAction.text
+                                    const tt = _delegate.qmlAction.tooltip !== undefined ? _delegate.qmlAction.tooltip : _delegate.qmlAction.text
                                     return tt + " (" + sc + " )"
                                 }
-                                visible: text !== "" && parent.hovered
+                                visible: text !== "" && _delegate.hovered
                             }
                         }
                     }

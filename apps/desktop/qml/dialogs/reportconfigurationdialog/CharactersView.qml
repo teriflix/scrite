@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
@@ -24,35 +26,37 @@ import "../../controls"
 import "../../helpers"
 
 Rectangle {
+    id: root
+
     property bool showFilterBox: true
-    property alias selectedCharacters: charactersModel.selectedCharacters
+    property alias selectedCharacters: _charactersModel.selectedCharacters
     property int sortFilterRole: 0
-    property alias filterTags: charactersModel.tags
+    property alias filterTags: _charactersModel.tags
 
     color: Runtime.colors.primary.c10.background
     border { width: 1; color: Runtime.colors.primary.borderColor }
-    implicitWidth: charactersListLayout.width
+    implicitWidth: _charactersListLayout.width
 
     CharacterNamesModel {
-        id: charactersModel
+        id: _charactersModel
         structure: Scrite.document.structure
     }
 
     Row {
-        id: searchBarRow
+        id: _searchBarRow
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
 
         FlatToolButton {
-            id: filterButton
+            id: _filterButton
 
-            down: tagsMenu.visible
-            enabled: charactersModel.availableTags.length > 0
+            down: _tagsMenu.visible
+            enabled: _charactersModel.availableTags.length > 0
             iconSource: "qrc:/icons/action/filter.png"
             toolTipText: "Filter character names by their tags."
 
-            onClicked: tagsMenu.open()
+            onClicked: _tagsMenu.open()
 
             VclText {
                 anchors.right: parent.right
@@ -63,7 +67,7 @@ Rectangle {
                 font.pixelSize: parent.height * 0.2
                 color: Runtime.colors.primary.highlight.text
 
-                text: charactersModel.tags.length > 0 ? charactersModel.tags.length : ""
+                text: _charactersModel.tags.length > 0 ? _charactersModel.tags.length : ""
             }
 
             Item {
@@ -74,19 +78,20 @@ Rectangle {
                 height: 1
 
                 VclMenu {
-                    id: tagsMenu
+                    id: _tagsMenu
 
                     Repeater {
-                        model: charactersModel.availableTags
+                        model: _charactersModel.availableTags
 
                         delegate: VclMenuItem {
+                            id: _tagMenuItemDelegate
                             required property int index
                             required property string modelData
 
-                            text: modelData
+                            text: _tagMenuItemDelegate.modelData
                             checkable: true
-                            checked: charactersModel.hasTag(modelData)
-                            onToggled: charactersModel.toggleTag(modelData)
+                            checked: _charactersModel.hasTag(_tagMenuItemDelegate.modelData)
+                            onToggled: _charactersModel.toggleTag(_tagMenuItemDelegate.modelData)
                         }
                     }
                 }
@@ -94,14 +99,14 @@ Rectangle {
         }
 
         SearchBar {
-            id: searchBar
+            id: _searchBar
             searchEngine.objectName: "Characters Search Engine"
-            width: parent.width - filterButton.width - parent.spacing
+            width: parent.width - _filterButton.width - parent.spacing
         }
     }
 
     Flickable {
-        id: charactersListView
+        id: _charactersListView
 
         function ensureItemVisible(item) {
             const viewportRect = Qt.rect(contentX, contentY, width, height)
@@ -114,66 +119,65 @@ Rectangle {
 
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: searchBarRow.bottom
-        anchors.bottom: buttonsRow.top
+        anchors.top: _searchBarRow.bottom
+        anchors.bottom: _buttonsRow.top
         anchors.bottomMargin: 8
 
         clip: true
-        contentWidth: charactersListLayout.width
+        contentWidth: _charactersListLayout.width
         contentHeight: height
         interactive: false
 
         Flow {
-            id: charactersListLayout
+            id: _charactersListLayout
 
             property real columnWidth: 100
 
-            height: charactersListView.height - 4
+            height: _charactersListView.height - 4
 
             flow: Flow.TopToBottom
 
             Repeater {
-                model: charactersModel
+                model: _charactersModel
 
                 delegate: VclCheckBox {
+                    id: _characterCheckBox
                     required property int index
                     required property string modelData
 
-                    id: characterCheckBox
-
                     property bool highlight: false
 
-                    Component.onCompleted: charactersListLayout.columnWidth = Math.max(charactersListLayout.columnWidth, implicitWidth)
+                    Component.onCompleted: _charactersListLayout.columnWidth = Math.max(_charactersListLayout.columnWidth, implicitWidth)
 
                     Material.background: highlight ? Runtime.colors.accent.c300.background : Runtime.colors.primary.c10.background
                     Material.foreground: highlight ? Runtime.colors.accent.c300.text : Runtime.colors.primary.c10.text
 
-                    SearchAgent.engine: searchBar.searchEngine
+                    SearchAgent.engine: _searchBar.searchEngine
                     SearchAgent.onSearchRequest: {
-                        SearchAgent.searchResultCount = SearchAgent.indexesOf(string, characterCheckBox.text).length > 0 ? 1 : 0
+                        SearchAgent.searchResultCount = SearchAgent.indexesOf(string, _characterCheckBox.text).length > 0 ? 1 : 0
                     }
                     SearchAgent.onCurrentSearchResultIndexChanged: {
-                        characterCheckBox.highlight = SearchAgent.currentSearchResultIndex >= 0
-                        charactersListView.ensureItemVisible(characterCheckBox,1,10)
+                        _characterCheckBox.highlight = SearchAgent.currentSearchResultIndex >= 0
+                        _charactersListView.ensureItemVisible(_characterCheckBox,1,10)
                     }
-                    SearchAgent.onClearSearchRequest: characterCheckBox.font.bold = false
+                    SearchAgent.onClearSearchRequest: _characterCheckBox.font.bold = false
 
-                    width: charactersListLayout.columnWidth
+                    width: _charactersListLayout.columnWidth
                     checkable: true
-                    checked: charactersModel.isInSelection(modelData)
-                    text: modelData
+                    checked: _charactersModel.isInSelection(_characterCheckBox.modelData)
+                    text: _characterCheckBox.modelData
 
-                    onToggled: charactersModel.toggleSelection(modelData)
+                    onToggled: _charactersModel.toggleSelection(_characterCheckBox.modelData)
 
                     background: Rectangle {
-                        color: characterCheckBox.Material.background
+                        color: _characterCheckBox.Material.background
                     }
 
                     Connections {
-                        target: charactersModel
+                        target: _charactersModel
 
                         function onSelectedCharactersChanged() {
-                            characterCheckBox.checked = charactersModel.isInSelection(characterCheckBox.text)
+                            _characterCheckBox.checked = _charactersModel.isInSelection(_characterCheckBox.text)
                         }
                     }
                 }
@@ -182,7 +186,7 @@ Rectangle {
     }
 
     Row {
-        id: buttonsRow
+        id: _buttonsRow
         spacing: 20
         anchors.left: parent.left
         anchors.bottom: parent.bottom
@@ -191,14 +195,14 @@ Rectangle {
 
         VclButton {
             text: "Select All"
-            enabled: charactersModel.count > 0
-            onClicked: charactersModel.selectAll()
+            enabled: _charactersModel.count > 0
+            onClicked: _charactersModel.selectAll()
         }
 
         VclButton {
             text: "Unselect All"
-            enabled: charactersModel.count > 0
-            onClicked: charactersModel.unselectAll()
+            enabled: _charactersModel.count > 0
+            onClicked: _charactersModel.unselectAll()
         }
     }
 }

@@ -24,6 +24,7 @@ import QtQuick
 import io.scrite.components
 
 QtObject {
+    id: root
     // Public API
     property Item item: null
     property bool valid: item !== null

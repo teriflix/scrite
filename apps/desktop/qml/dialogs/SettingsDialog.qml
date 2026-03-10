@@ -29,7 +29,10 @@ import "../helpers"
 DialogLauncher {
     id: root
 
-    function launch(activeTab) { return doLaunch({"activeTab": activeTab}) }
+    function launch(activeTab) {
+        const props = activeTab && typeof activeTab === "string" && activeTab !== "" ? {"activeTab": activeTab} : undefined
+        return doLaunch(props)
+    }
 
     name: "SettingsDialog"
     singleInstanceOnly: true

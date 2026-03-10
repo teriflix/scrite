@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
@@ -48,7 +50,7 @@ GridLayout {
         MouseArea {
             anchors.fill: parent
 
-            onClicked: colorPicked(Runtime.colors.transparent)
+            onClicked: root.colorPicked(Runtime.colors.transparent)
         }
     }
 
@@ -58,6 +60,8 @@ GridLayout {
         model: Runtime.colors.forDocument
 
         Item {
+            id: _colorsViewDelegate
+
             required property int index
             required property color modelData
 
@@ -68,16 +72,16 @@ GridLayout {
                 anchors.fill: parent
                 anchors.margins: 3
 
-                color: modelData
+                color: _colorsViewDelegate.modelData
 
-                border.width: root.selectedColor === modelData ? 3 : 0.5
+                border.width: root.selectedColor === _colorsViewDelegate.modelData ? 3 : 0.5
                 border.color: "black"
             }
 
             MouseArea {
                 anchors.fill: parent
 
-                onClicked: colorPicked(modelData)
+                onClicked: root.colorPicked(_colorsViewDelegate.modelData)
             }
         }
     }

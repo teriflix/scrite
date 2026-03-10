@@ -517,7 +517,7 @@ Item {
                             currentFolder: Runtime.workspaceSettings.lastOpenPhotosFolderUrl
                             nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
 
-                            onCurrentFolderChanged: Runtime.workspaceSettings.lastOpenPhotosFolderUrl = folder
+                            onCurrentFolderChanged: Runtime.workspaceSettings.lastOpenPhotosFolderUrl = currentFolder
 
                             onAccepted: {
                                 if(fileUrl != "") {

@@ -47,7 +47,7 @@ ColumnLayout {
     }
 
     SplitView {
-        id: splitView
+        id: _splitView
 
         Layout.fillWidth: true
         Layout.leftMargin: 10
@@ -60,22 +60,22 @@ ColumnLayout {
         orientation: Qt.Horizontal
 
         Rectangle {
-            SplitView.minimumWidth: splitView.availableWidth * splitView.minLeftColumnWidth
-            SplitView.maximumWidth: splitView.availableWidth * (1.0 - splitView.minLeftColumnWidth)
-            SplitView.preferredWidth: splitView.availableWidth * splitView.leftColumnWidth
+            SplitView.minimumWidth: _splitView.availableWidth * _splitView.minLeftColumnWidth
+            SplitView.maximumWidth: _splitView.availableWidth * (1.0 - _splitView.minLeftColumnWidth)
+            SplitView.preferredWidth: _splitView.availableWidth * _splitView.leftColumnWidth
 
             border.width: 1
             border.color: Runtime.colors.primary.borderColor
             color: Runtime.colors.primary.c200.background
 
             VclTextField {
-                id: leftColumnWidthEditor
+                id: _leftColumnWidthEditor
 
                 anchors.centerIn: parent
 
                 width: Runtime.idealFontMetrics.averageCharacterWidth * 4
 
-                text: Math.round(splitView.leftColumnWidth*100) + "%"
+                text: Math.round(_splitView.leftColumnWidth*100) + "%"
                 validator: IntValidator {
                     bottom: 20
                     top: 80
@@ -84,13 +84,13 @@ ColumnLayout {
                 onTextEdited: {
                     const v = parseInt(text)/100
                     if(v >= 0.2 && v <= 0.8) {
-                        splitView.leftColumnWidth = v
+                        _splitView.leftColumnWidth = v
 
                     }
                 }
             }
 
-            onWidthChanged: splitView.leftColumnWidth = width/splitView.availableWidth
+            onWidthChanged: _splitView.leftColumnWidth = width/_splitView.availableWidth
         }
 
         Rectangle {
@@ -101,12 +101,12 @@ ColumnLayout {
             VclText {
                 anchors.centerIn: parent
 
-                text: Math.round((1-splitView.leftColumnWidth)*100) + "%"
+                text: Math.round((1-_splitView.leftColumnWidth)*100) + "%"
             }
         }
 
         onLeftColumnWidthChanged: {
-            if( (resizing || leftColumnWidthEditor.activeFocus) && report)
+            if( (resizing || _leftColumnWidthEditor.activeFocus) && report)
                 report.setConfigurationValue(fieldInfo.name, leftColumnWidth)
         }
     }

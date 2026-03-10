@@ -13,24 +13,28 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 
 import "../globals"
 import "../controls"
 
+// TODO: Delete this, since we don't use it anyway.
+
 Item {
     id: root
 
-    property alias tabsArray: tabRepeater.model
-    property alias content: contentLoader.sourceComponent
-    property alias contentItem: contentLoader.item
-    property alias currentIndex: tabBar.currentIndex
+    property alias tabsArray: _tabRepeater.model
+    property alias content: _contentLoader.sourceComponent
+    property alias contentItem: _contentLoader.item
+    property alias currentIndex: _tabBar.currentIndex
     property string tabTitleRole: "title"
     property string tabTooltipRole: "tooltip"
 
     Row {
-        id: tabBar
+        id: _tabBar
 
         property int currentIndex: 0
 
@@ -38,18 +42,20 @@ Item {
         anchors.left: parent.left
 
         Repeater {
-            id: tabRepeater
+            id: _tabRepeater
 
             model: 0
 
             delegate: Rectangle {
+                id: _tabRepeaterDelegate
+
                 required property int index
                 required property var modelData
 
-                property bool selected: tabBar.currentIndex === index
+                property bool selected: _tabBar.currentIndex === _tabRepeaterDelegate.index
 
-                width: tabText.contentWidth + 40
-                height: tabText.contentHeight + 30
+                width: _tabText.contentWidth + 40
+                height: _tabText.contentHeight + 30
                 color: selected ? "white" : Qt.rgba(0,0,0,0)
 
                 Rectangle {
@@ -62,20 +68,24 @@ Item {
                 }
 
                 VclLabel {
-                    id: tabText
+                    id: _tabText
                     anchors.centerIn: parent
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                    text: tabTitleRole === "" ? modelData : modelData[tabTitleRole]
+                    text: tabTitleRole === "" ? _tabRepeaterDelegate.modelData : _tabRepeaterDelegate.modelData[tabTitleRole]
                 }
 
                 MouseArea {
+                    id: _tabMouseArea
+
                     anchors.fill: parent
-                    onClicked: tabBar.currentIndex = index
+
                     hoverEnabled: true
 
+                    onClicked: _tabBar.currentIndex = _tabRepeaterDelegate.index
+
                     ToolTipPopup {
-                        text: tabTooltipRole === "" ? modelData : modelData[tabTooltipRole]
-                        visible: container.containsMouse
+                        text: tabTooltipRole === "" ? _tabRepeaterDelegate.modelData : _tabRepeaterDelegate.modelData[tabTooltipRole]
+                        visible: _tabMouseArea.containsMouse
                     }
                 }
             }
@@ -83,15 +93,18 @@ Item {
     }
 
     Rectangle {
-        id: contentPanel
-        anchors.top: tabBar.bottom
+        id: _contentPanel
+
+        anchors.top: _tabBar.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
+
         clip: true
 
         Loader {
-            id: contentLoader
+            id: _contentLoader
+
             anchors.fill: parent
         }
     }

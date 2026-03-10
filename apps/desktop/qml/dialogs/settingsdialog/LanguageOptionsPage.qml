@@ -72,6 +72,8 @@ Item {
                         highlightFollowsCurrentItem: true
 
                         delegate: Item {
+                            id: _supportedLanguageDelegate
+
                             required property int index
                             required property var language
 
@@ -81,7 +83,7 @@ Item {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    _listView.currentIndex = index
+                                    _listView.currentIndex = _supportedLanguageDelegate.index
                                     parent.forceActiveFocus()
                                 }
                             }
@@ -100,7 +102,7 @@ Item {
 
                                     fillMode: Image.PreserveAspectFit
                                     mipmap: true
-                                    source: language.iconSource
+                                    source: _supportedLanguageDelegate.language.iconSource
                                 }
 
                                 VclLabel {
@@ -108,8 +110,8 @@ Item {
 
                                     Layout.fillWidth: true
 
-                                    text: language.name
-                                    color: _listView.currentIndex === index ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c100.text
+                                    text: _supportedLanguageDelegate.language.name
+                                    color: _listView.currentIndex === _supportedLanguageDelegate.index ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c100.text
                                     elide: Text.ElideMiddle
                                     padding: 10
                                 }
@@ -118,13 +120,13 @@ Item {
                                     suggestedWidth: _delegateLabel.height
                                     suggestedHeight: _delegateLabel.height
 
-                                    visible: _listView.count > 1 && language.code !== QtLocale.English
+                                    visible: _listView.count > 1 && _supportedLanguageDelegate.language.code !== QtLocale.English
                                     opacity: hovered ? 1 : 0.5
                                     hoverEnabled: true
 
                                     icon.source: "qrc:/icons/action/delete.png"
 
-                                    onClicked: _private.deleteLanguage(language)
+                                    onClicked: _private.deleteLanguage(_supportedLanguageDelegate.language)
                                 }
                             }
                         }

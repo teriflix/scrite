@@ -27,6 +27,8 @@ import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
+    id: root
+
     property var fieldInfo
     property AbstractReportGenerator report
 
@@ -94,20 +96,21 @@ ColumnLayout {
                     model: Scrite.document.structure.sceneTags
 
                     delegate: VclCheckBox {
+                        id: _keywordDelegate
                         required property int index
                         required property string modelData
 
                         width: Math.min(parent.width * 0.8, implicitWidth)
 
-                        text: modelData
-                        checked: _keywordsView.keywords.indexOf(modelData) >= 0
+                        text: _keywordDelegate.modelData
+                        checked: _keywordsView.keywords.indexOf(_keywordDelegate.modelData) >= 0
 
                         onToggled: {
                             let keywords = _keywordsView.keywords
                             if(checked)
-                                keywords.push(modelData)
+                                keywords.push(_keywordDelegate.modelData)
                             else
-                                keywords.splice(keywords.indexOf(modelData), 1)
+                                keywords.splice(keywords.indexOf(_keywordDelegate.modelData), 1)
 
                             if(report.setConfigurationValue(fieldInfo.name, keywords))
                                 _keywordsView.keywords = keywords

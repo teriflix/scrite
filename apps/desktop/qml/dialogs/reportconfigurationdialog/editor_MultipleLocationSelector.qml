@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
@@ -26,6 +28,8 @@ import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
+    id: root
+
     property var fieldInfo
     property AbstractReportGenerator report
 
@@ -65,7 +69,7 @@ ColumnLayout {
         border.color: Runtime.colors.primary.c50.text
 
         ListView {
-            id: locationListView
+            id: _locationListView
 
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
             ScrollBar.vertical: VclScrollBar { }
@@ -77,21 +81,22 @@ ColumnLayout {
             clip: true
 
             delegate: VclCheckBox {
+                id: _locationDelegate
                 required property int index
                 required property var modelData
 
-                text: modelData
-                width: locationListView.width-1
-                checked: selectedLocations.indexOf(modelData) >= 0
+                text: _locationDelegate.modelData
+                width: _locationListView.width-1
+                checked: selectedLocations.indexOf(_locationDelegate.modelData) >= 0
 
                 font.family: Scrite.document.formatting.defaultFont.family
 
                 onToggled: {
                     var locs = selectedLocations
                     if(checked)
-                        locs.push(modelData)
+                        locs.push(_locationDelegate.modelData)
                     else
-                        locs.splice(locs.indexOf(modelData), 1)
+                        locs.splice(locs.indexOf(_locationDelegate.modelData), 1)
                     selectedLocations = locs
                     report.setConfigurationValue(fieldInfo.name, locs)
                 }

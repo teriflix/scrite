@@ -20,10 +20,9 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
+import "../"
 import "../../globals"
 import "../../helpers"
-import ".."
 import "../../controls"
 
 Item {

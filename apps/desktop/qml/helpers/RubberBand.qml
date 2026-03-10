@@ -45,47 +45,53 @@ Item {
         width: rectangle.width
         height: rectangle.height
 
-        color: Color.translucent(Scrite.app.palette.highlight,0.2)
-        border { width: 2; color: Scrite.app.palette.highlight }
+        color: Color.translucent(Runtime.palette.highlight,0.2)
+        border { width: 2; color: Runtime.palette.highlight }
         visible: root.active
     }
 
     MouseArea {
         anchors.fill: parent
-        acceptedButtons: Qt.LeftButton
-        onPressed: {
-            if(mouse.modifiers & Qt.ControlModifier || parent.selectionMode) {
-                var pos = Qt.point(mouse.x, mouse.y)
-                root.tryStart(pos)
 
-                if(root.active) {
-                    _selection.from = pos
-                    _selection.to = _selection.from
-                    selecting = true
-                    mouse.accepted = true
-                } else
-                    mouse.accepted = false
-            } else {
-                _rubberband.active = false
-                mouse.accepted = false
-            }
-        }
-        onPositionChanged: {
-            if(root.active) {
-                _selection.to = Qt.point(mouse.x, mouse.y)
-                mouse.accepted = true
-            } else
-                mouse.accepted = false
-        }
-        onReleased: {
-            if(root.active) {
-                _selection.to = Qt.point(mouse.x, mouse.y)
-                root.select(_selection.rectangle)
-                selecting = false
-                root.active = false
-                mouse.accepted = true
-            } else
-                mouse.accepted = false
-        }
+        acceptedButtons: Qt.LeftButton
+
+        onPressed: (mouse) => {
+                       if(mouse.modifiers & Qt.ControlModifier || parent.selectionMode) {
+                           let pos = Qt.point(mouse.x, mouse.y)
+                           root.tryStart(pos)
+
+                           if(root.active) {
+                               _selection.from = pos
+                               _selection.to = _selection.from
+                               selecting = true
+                               mouse.accepted = true
+                           } else {
+                               mouse.accepted = false
+                           }
+                       } else {
+                           _rubberband.active = false
+                           mouse.accepted = false
+                       }
+                   }
+
+        onPositionChanged: (mouse) => {
+                               if(root.active) {
+                                   _selection.to = Qt.point(mouse.x, mouse.y)
+                                   mouse.accepted = true
+                               } else
+                               mouse.accepted = false
+                           }
+
+        onReleased:  (mouse) => {
+                         if(root.active) {
+                             _selection.to = Qt.point(mouse.x, mouse.y)
+                             root.select(_selection.rectangle)
+                             selecting = false
+                             root.active = false
+                             mouse.accepted = true
+                         } else {
+                             mouse.accepted = false
+                         }
+                     }
     }
 }

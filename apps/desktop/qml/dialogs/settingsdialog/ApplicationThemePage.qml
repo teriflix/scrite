@@ -22,19 +22,18 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
+import "../"
 import "../../globals"
 import "../../controls"
 import "../../helpers"
-import ".."
 
 Item {
     id: root
 
-    height: layout.height + 2*layout.margin
+    height: _layout.height + 2*_layout.margin
 
     GridLayout {
-        id: layout
+        id: _layout
 
         readonly property real margin: 10
 
@@ -50,12 +49,12 @@ Item {
             spacing: 10
 
             VclLabel {
-                id: themeLabel
+                id: _themeLabel
                 text: "Theme: "
             }
 
             VclComboBox {
-                id: themesComboBox
+                id: _themesComboBox
 
                 readonly property int materialStyleIndex: Scrite.app.availableThemes.indexOf("Material");
 
@@ -78,9 +77,9 @@ Item {
                 }
 
                 ToolTipPopup {
-                    container: parent
+                    container: _themesComboBox
                     text: "Scrite's UI is designed for use with Material theme and with software rendering disabled. If the UI is not rendering properly on your computer, then switching to a different theme may help."
-                    visible: parent.hovered
+                    visible: _themesComboBox.hovered
                 }
             }
         }
@@ -113,6 +112,8 @@ Item {
                         model: _private.availableColorOptions
 
                         delegate: Rectangle {
+                            id: _availableColorOptionDelegate
+
                             required property int modelData
 
                             implicitWidth: _private.colorSelectorSize
@@ -124,14 +125,14 @@ Item {
                                 anchors.centerIn: parent
                                 text: "✓"
                                 color: Color.textColorFor(parent.color)
-                                visible: Runtime.colors.accent.key === modelData
+                                visible: Runtime.colors.accent.key === _availableColorOptionDelegate.modelData
                             }
 
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    Runtime.colors.accent.key = modelData
-                                    Runtime.applicationSettings.accentColor = modelData
+                                    Runtime.colors.accent.key = _availableColorOptionDelegate.modelData
+                                    Runtime.applicationSettings.accentColor = _availableColorOptionDelegate.modelData
                                 }
                             }
                         }

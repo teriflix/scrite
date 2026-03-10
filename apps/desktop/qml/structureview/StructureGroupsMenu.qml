@@ -21,7 +21,6 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-
 import "../globals"
 import "../controls"
 import "../helpers"
@@ -45,7 +44,7 @@ VclMenu {
     closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
 
     HelpTipNotification {
-        id: htn
+        id: _htn
 
         tipName: "story_beat_tagging"
         enabled: false
@@ -75,13 +74,13 @@ VclMenu {
                     opacity: enabled ? 1 : 0.5
 
                     Rectangle {
-                        anchors.fill: innerTitleText
+                        anchors.fill: _innerTitleText
                         color: Runtime.colors.primary.c700.background
-                        visible: innerTitleText.visible
+                        visible: _innerTitleText.visible
                     }
 
                     VclLabel {
-                        id: innerTitleText
+                        id: _innerTitleText
 
                         anchors.top: parent.top
                         anchors.margins: 3
@@ -110,9 +109,9 @@ VclMenu {
                     }
 
                     ListView {
-                        id: groupsView
+                        id: _groupsView
 
-                        property bool scrollBarVisible: groupsView.height < groupsView.contentHeight
+                        property bool scrollBarVisible: _groupsView.height < _groupsView.contentHeight
                         property bool showingFilteredItems: sceneGroup.hasSceneActs && sceneGroup.hasGroupActs
 
                         function adjustScrolling() {
@@ -139,34 +138,36 @@ VclMenu {
                         }
 
                         function adjustScrollingLater() {
-                            Runtime.execLater(groupsView, 50, adjustScrolling)
+                            Runtime.execLater(_groupsView, 50, adjustScrolling)
                         }
 
-                        ScrollBar.vertical: VclScrollBar { flickable: groupsView }
+                        ScrollBar.vertical: VclScrollBar { flickable: _groupsView }
                         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
                         anchors.left: parent.left
-                        anchors.top: innerTitleText.visible ? innerTitleText.bottom : parent.top
+                        anchors.top: _innerTitleText.visible ? _innerTitleText.bottom : parent.top
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         anchors.margins: 5
 
                         clip: true
-                        model: sceneGroup
+                        model: root.sceneGroup
                         keyNavigationEnabled: false
+                        boundsBehavior: ListView.StopAtBounds
+                        boundsMovement: ListView.StopAtBounds
 
                         section.property: "category"
                         section.criteria: ViewSection.FullString
                         section.delegate: Rectangle {
                             required property string section
 
-                            width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
+                            width: _groupsView.width - (_groupsView.scrollBarVisible ? 20 : 1)
                             height: 30
                             color: Runtime.colors.primary.windowColor
 
                             VclLabel {
-                                id: categoryLabel
-                                text: section
+                                id: _categoryLabel
+                                text: parent.section
                                 topPadding: 5
                                 bottomPadding: 5
                                 anchors.centerIn: parent
@@ -176,17 +177,19 @@ VclMenu {
                         }
 
                         delegate: Rectangle {
+                            id: _groupsViewDelegate
+
                             required property int index
                             required property var arrayItem
 
                             property bool doesNotBelongToAnyAct: arrayItem.act === ""
                             property bool filtered: doesNotBelongToAnyAct || sceneGroup.sceneActs.indexOf(arrayItem.act) >= 0
 
-                            width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
+                            width: _groupsView.width - (_groupsView.scrollBarVisible ? 20 : 1)
                             height: 30
 
                             color: groupItemMouseArea.containsMouse ? Runtime.colors.primary.button.background : Qt.rgba(0,0,0,0)
-                            opacity: groupsView.showingFilteredItems ? (filtered ? 1 : 0.5) : 1
+                            opacity: _groupsView.showingFilteredItems ? (filtered ? 1 : 0.5) : 1
 
                             Row {
                                 anchors.fill: parent
@@ -202,7 +205,7 @@ VclMenu {
 
                                     source: "qrc:/icons/navigation/check.png"
                                     opacity: {
-                                        switch(arrayItem.checked) {
+                                        switch(_groupsViewDelegate.arrayItem.checked) {
                                         case "no": return 0
                                         case "partial": return 0.25
                                         case "yes": return 1
@@ -216,11 +219,11 @@ VclMenu {
 
                                     width: parent.width - parent.spacing - 24
 
-                                    text: arrayItem.label
+                                    text: _groupsViewDelegate.arrayItem.label
                                     elide: Text.ElideRight
-                                    leftPadding: arrayItem.type > 0 ? 20 : 0
+                                    leftPadding: _groupsViewDelegate.arrayItem.type > 0 ? 20 : 0
 
-                                    font.bold: groupsView.showingFilteredItems ? filtered : doesNotBelongToAnyAct
+                                    font.bold: _groupsView.showingFilteredItems ? filtered : doesNotBelongToAnyAct
                                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 }
                             }
@@ -233,9 +236,9 @@ VclMenu {
                                 hoverEnabled: true
 
                                 onClicked: {
-                                    sceneGroup.toggle(index)
-                                    root.toggled(index, arrayItem.name)
-                                    Scrite.user.logActivity2("structure", "tag: " + arrayItem.name)
+                                    sceneGroup.toggle(_groupsViewDelegate.index)
+                                    root.toggled(_groupsViewDelegate.index, _groupsViewDelegate.arrayItem.name)
+                                    Scrite.user.logActivity2("structure", "tag: " + _groupsViewDelegate.arrayItem.name)
                                 }
                             }
                         }
@@ -264,5 +267,5 @@ VclMenu {
         }
     }
 
-    onOpened: htn.enabled = true
+    onOpened: _htn.enabled = true
 }

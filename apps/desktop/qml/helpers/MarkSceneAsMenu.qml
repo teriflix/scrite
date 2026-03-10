@@ -40,6 +40,8 @@ VclMenu {
         }
 
         delegate: VclMenuItem {
+            id: _delegate
+
             required property int index
             required property int enumValue
             required property string enumKey

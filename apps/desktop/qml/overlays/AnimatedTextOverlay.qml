@@ -22,7 +22,6 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../globals"
 import "../helpers"
 import "../controls"
@@ -48,7 +47,7 @@ QtObject {
     }
 
     readonly property Component overlayComponent: Item {
-        id: overlay
+        id: _overlay
 
         required property string text
 
@@ -86,7 +85,7 @@ QtObject {
             }
 
             ScriptAction {
-                script: overlay.done()
+                script: _overlay.done()
             }
         }
     }

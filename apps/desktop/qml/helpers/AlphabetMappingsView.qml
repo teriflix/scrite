@@ -45,13 +45,15 @@ Rectangle {
             model: _private.mappingModels
 
             delegate: Column {
+                id: _delegate
+
                 required property int index
                 required property var modelData
 
                 spacing: 0
 
                 Rectangle {
-                    width: parent.width
+                    width: _symbolGrid.width
                     height: 30
 
                     color: Runtime.colors.primary.c600.background
@@ -59,7 +61,7 @@ Rectangle {
                     VclLabel {
                         anchors.centerIn: parent
 
-                        text: modelData.heading
+                        text: _delegate.modelData.heading
                         color: Runtime.colors.primary.c600.text
                         padding: 8
 
@@ -68,15 +70,19 @@ Rectangle {
                 }
 
                 Grid {
+                    id: _symbolGrid
+
                     flow: Grid.TopToBottom
                     rows: 10
-                    columns: Math.ceil(modelData.array.length/rows)
+                    columns: Math.ceil(_delegate.modelData.array.length/rows)
                     columnSpacing: 10
 
                     Repeater {
-                        model: modelData.array
+                        model: _delegate.modelData.array
 
                         delegate: Row {
+                            id: _delegate2
+
                             required property int index
                             required property var modelData
 
@@ -86,7 +92,7 @@ Rectangle {
 
                                 width: _private.textCellWidth
 
-                                text: modelData.latin
+                                text: _delegate2.modelData.latin
                                 font: _normalFontMetrics.font
                                 padding: 8
                                 verticalAlignment: Text.AlignVCenter
@@ -98,7 +104,7 @@ Rectangle {
 
                                 width: _private.textCellWidth
 
-                                text: modelData.unicode
+                                text: _delegate2.modelData.unicode
                                 font: _languageFontMetrics.font
                                 padding: 8
                                 verticalAlignment: Text.AlignVCenter

@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Dialogs
@@ -21,7 +22,6 @@ import QtQuick.Layouts
 import QtQuick.Controls
 
 import io.scrite.components
-
 
 import "../globals"
 import "../helpers"
@@ -49,11 +49,11 @@ Item {
             return false
         }
 
-        return documentSaveAs.createObject(root, {"callback": callback})
+        return _documentSaveAs.createObject(root, {"callback": callback})
     }
 
     component AbstractSaveFileTask : Item {
-        id: saveFileTaskItem
+        id: _saveFileTaskItem
 
         property bool silent: false
         property var callback
@@ -72,10 +72,10 @@ Item {
     }
 
     Component {
-        id: documentIsEmptyOrHasNoChanges
+        id: _documentIsEmptyOrHasNoChanges
 
         AbstractSaveFileTask {
-            id: documentIsEmptyOrHasNoChangesTask
+            id: _documentIsEmptyOrHasNoChangesTask
 
             // Since there is nothing to save, we can finish up by invoking the callback
             // and destroying self.
@@ -86,10 +86,10 @@ Item {
     }
 
     Component {
-        id: documentNotEvenSavedOnce
+        id: _documentNotEvenSavedOnce
 
         AbstractSaveFileTask {
-            id: documentNotEvenSavedOnceTask
+            id: _documentNotEvenSavedOnceTask
 
             // The document has not been saved even once, so we will need to save it now.
             Component.onCompleted: {
@@ -104,7 +104,7 @@ Item {
 
             function questionAnswered(answer) {
                 if(answer === "Yes") {
-                    var saveDlg = saveFileDialog.createObject(root)
+                    var saveDlg = _saveFileDialog.createObject(root)
                     saveDlg.finished.connect(finish)
                     saveDlg.finished.connect(saveDlg.destroy)
                     saveDlg.open()
@@ -117,13 +117,13 @@ Item {
     }
 
     Component {
-        id: documentSaveAs
+        id: _documentSaveAs
 
         AbstractSaveFileTask {
-            id: documentSaveAsTask
+            id: _documentSaveAsTask
 
             Component.onCompleted: {
-                var saveDlg = saveFileDialog.createObject(root)
+                var saveDlg = _saveFileDialog.createObject(root)
                 saveDlg.finished.connect(finish)
                 saveDlg.finished.connect(saveDlg.destroy)
                 saveDlg.open()
@@ -132,10 +132,10 @@ Item {
     }
 
     Component {
-        id: autoSaveIsEnabled
+        id: _autoSaveIsEnabled
 
         AbstractSaveFileTask {
-            id: autoSaveIsEnabledItem
+            id: _autoSaveIsEnabledItem
 
             // The document has already been saved to disk, and auto save is enabled.
             // So we simply auto-save the document and move on.
@@ -148,15 +148,15 @@ Item {
     }
 
     Component {
-        id: documentSavedButHasChanges
+        id: _documentSavedButHasChanges
 
         AbstractSaveFileTask {
-            id: documentSavedButHasChangesItem
+            id: _documentSavedButHasChangesItem
 
             property BasicFileInfo fileInfo
 
             Component.onCompleted: {
-                fileInfo = Qt.createQmlObject("import io.scrite.components 1.0; BasicFileInfo { }", documentSavedButHasChangesItem)
+                fileInfo = Qt.createQmlObject("import io.scrite.components 1.0; BasicFileInfo { }", _documentSavedButHasChangesItem)
                 fileInfo.absoluteFilePath = Scrite.document.fileName
 
                 if(silent)
@@ -181,15 +181,16 @@ Item {
     }
 
     Component {
-        id: saveFileDialog
+        id: _saveFileDialog
 
         VclFileDialog {
             title: "Save Scrite Document As"
+            fileMode: FileDialog.SaveFile
             nameFilters: ["Scrite Documents (*.scrite)"]
             objectName: "Save File Dialog"
             
             currentFolder: Runtime.workspaceSettings.lastOpenFolderUrl
-            onCurrentFolderChanged: Runtime.workspaceSettings.lastOpenFolderUrl = folder
+            onCurrentFolderChanged: Runtime.workspaceSettings.lastOpenFolderUrl = currentFolder
 
             signal finished(bool success)
 
@@ -204,7 +205,7 @@ Item {
                 Scrite.document.saveAs(path)
 
                 const fileInfo = File.info(path)
-                Runtime.workspaceSettings.lastOpenFolderUrl = folder
+                Runtime.workspaceSettings.lastOpenFolderUrl = currentFolder
 
                 finished(true)
 
@@ -220,15 +221,15 @@ Item {
 
         function getTaskComponent() {
             if(Scrite.document.empty || !Scrite.document.modified || Scrite.document.readOnly)
-                return documentIsEmptyOrHasNoChanges
+                return _documentIsEmptyOrHasNoChanges
 
             if(Scrite.document.fileName === "")
-                return documentNotEvenSavedOnce
+                return _documentNotEvenSavedOnce
 
             if(Scrite.document.autoSave)
-                return autoSaveIsEnabled
+                return _autoSaveIsEnabled
 
-            return documentSavedButHasChanges
+            return _documentSavedButHasChanges
         }
 
         function reportSaveAsBackupNotPossible() {

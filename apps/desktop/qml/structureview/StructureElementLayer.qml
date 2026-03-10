@@ -109,7 +109,7 @@ Item {
 
         z: active ? 1000 : -1
 
-        onSelect: {
+        onSelect: (rectangle) => {
             _selection.init(_elementItems, rectangle)
             root.selectionModeOffRequest()
         }

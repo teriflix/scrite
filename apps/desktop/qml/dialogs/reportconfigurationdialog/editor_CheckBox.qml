@@ -26,6 +26,7 @@ import "../../controls"
 import "../../helpers"
 
 VclCheckBox {
+    id: root
     property var fieldInfo
     property AbstractReportGenerator report
 

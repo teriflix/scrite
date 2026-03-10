@@ -174,7 +174,7 @@ Item {
         enabled: _tightRect.visible
         acceptedButtons: Qt.LeftButton
 
-        onPressed: {
+        onPressed: (mouse) => {
             root.clear()
             mouse.accepted = false
         }
@@ -185,8 +185,8 @@ Item {
 
         property point topLeft: Qt.point(0,0)
 
-        color: Color.translucent(Scrite.app.palette.highlight,0.2)
-        border { width: 2; color: Scrite.app.palette.highlight }
+        color: Color.translucent(Runtime.palette.highlight,0.2)
+        border { width: 2; color: Runtime.palette.highlight }
         visible: parent.items.length > 0
 
         MouseArea {
@@ -200,7 +200,7 @@ Item {
             enabled: parent.visible
             acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-            onClicked: {
+            onClicked: (mouse) => {
                 if(_selectionMenu.menu && mouse.button === Qt.RightButton)
                     _selectionMenu.popup()
             }

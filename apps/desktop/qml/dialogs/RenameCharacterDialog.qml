@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
@@ -42,7 +43,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         property Character character
 
@@ -53,7 +54,7 @@ DialogLauncher {
         title: "Rename/Merge Character: " + _private.orignalCharacterName
 
         content: Item {
-            Component.onCompleted: Qt.callLater(newNameField.forceActiveFocus)
+            Component.onCompleted: Qt.callLater(_newNameField.forceActiveFocus)
 
             ColumnLayout {
                 anchors.fill: parent
@@ -61,7 +62,7 @@ DialogLauncher {
                 spacing: 20
 
                 VclTextField {
-                    id: newNameField
+                    id: _newNameField
 
                     Layout.fillWidth: true
 
@@ -72,8 +73,8 @@ DialogLauncher {
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                     font.capitalization: Font.AllUppercase
                     onReturnPressed: {
-                        if(renameButton.enabled)
-                            renameButton.clicked()
+                        if(_renameButton.enabled)
+                            _renameButton.clicked()
                     }
                 }
 
@@ -82,7 +83,7 @@ DialogLauncher {
                     spacing: 20
 
                     VclCheckBox {
-                        id: chkNotice
+                        id: _chkNotice
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignVCenter
                         padding: 0
@@ -90,13 +91,13 @@ DialogLauncher {
                     }
 
                     VclButton {
-                        id: renameButton
+                        id: _renameButton
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignVCenter
                         text: "Rename"
-                        enabled: chkNotice.checked && newNameField.length > 0 && newNameField.text.toUpperCase() !== character.name
+                        enabled: _chkNotice.checked && _newNameField.length > 0 && _newNameField.text.toUpperCase() !== character.name
                         onClicked: {
-                            _private.newCharacterName = newNameField.text.toUpperCase()
+                            _private.newCharacterName = _newNameField.text.toUpperCase()
 
                             const allCharacterNames = Scrite.document.structure.allCharacterNames()
                             if(allCharacterNames.indexOf(_private.newCharacterName) >= 0) {
@@ -156,20 +157,20 @@ DialogLauncher {
                                                     ["Yes", "No", "Cancel"],
                                                     (answer) => {
                                                         if(answer === "Yes")
-                                                        renameJob.start()
+                                                        _renameJob.start()
                                                         else if(answer === "Cancel")
-                                                        Qt.callLater(dialog.close)
+                                                        Qt.callLater(_dialog.close)
                                                     })
                             }
                             else
-                            renameJob.start()
+                            _renameJob.start()
                         }
                     }
                 }
             }
 
             SequentialAnimation {
-                id: renameJob
+                id: _renameJob
 
                 running: false
 
@@ -188,8 +189,8 @@ DialogLauncher {
                 // Perform the rename ...
                 ScriptAction {
                     script: {
-                        dialog.character.clearRenameError()
-                        _private.renameWasSuccessful = dialog.character.rename(_private.newCharacterName)
+                        _dialog.character.clearRenameError()
+                        _private.renameWasSuccessful = _dialog.character.rename(_private.newCharacterName)
                     }
                 }
 
@@ -211,11 +212,11 @@ DialogLauncher {
                                 characterNotes.characterName = _private.newCharacterName
                                 characterNotes.trigger()
                             }
-                            Qt.callLater(dialog.close)
+                            Qt.callLater(_dialog.close)
                         } else {
-                            MessageBox.information("Rename Error", dialog.character.renameError, () => {
-                                                       dialog.character.clearRenameError()
-                                                       Qt.callLater(dialog.close)
+                            MessageBox.information("Rename Error", _dialog.character.renameError, () => {
+                                                       _dialog.character.clearRenameError()
+                                                       Qt.callLater(_dialog.close)
                                                    } )
                         }
                     }
@@ -224,10 +225,11 @@ DialogLauncher {
         }
 
         onCharacterChanged: {
-            if(character)
-            _private.orignalCharacterName = character.name
-            else
-            _private.orignalCharacterName = "<unknown>"
+            if(character) {
+                _private.orignalCharacterName = character.name
+            } else {
+                _private.orignalCharacterName = "<unknown>"
+            }
             _private.newCharacterName = ""
         }
 

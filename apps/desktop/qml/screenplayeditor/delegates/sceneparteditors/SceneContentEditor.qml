@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
@@ -114,7 +116,7 @@ AbstractScenePartEditor {
         bottomPadding: Runtime.sceneEditorFontMetrics.height
 
         font: Scrite.document.displayFormat.defaultFont2
-        palette: Scrite.app.palette
+        palette: Runtime.palette
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         placeholderText: activeFocus ? "" : "Click here to type your scene content..."
 

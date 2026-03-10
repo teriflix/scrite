@@ -19,11 +19,12 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-
+import "../"
 import "../../globals"
-import ".."
 
 Item {
+    id: root
+
     readonly property bool modal: true
     readonly property string title: "Fetching Profile Data ..."
 

@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Dialogs
 import QtQuick.Window
@@ -30,25 +32,26 @@ Item {
     id: root
 
     required property Annotation annotation
-
     required property BoundingBoxEvaluator canvasItemsBoundingBox
 
     Flickable {
-        id: propertyEditorView
+        id: _propertyEditorView
+
         clip: true
         anchors.fill: parent
         anchors.leftMargin: 10
         anchors.rightMargin: scrollBarVisible ? 0 : 10
-        contentWidth: propertyEditorItems.width
-        contentHeight: propertyEditorItems.height
+        contentWidth: _propertyEditorItems.width
+        contentHeight: _propertyEditorItems.height
         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
         property bool scrollBarVisible: contentHeight > height
-        ScrollBar.vertical: VclScrollBar { flickable: propertyEditorView }
+        ScrollBar.vertical: VclScrollBar { flickable: _propertyEditorView }
 
         Column {
-            id: propertyEditorItems
-            width: propertyEditorView.width - (propertyEditorView.scrollBarVisible ? 20 : 0)
+            id: _propertyEditorItems
+
+            width: _propertyEditorView.width - (_propertyEditorView.scrollBarVisible ? 20 : 0)
             spacing: 20
 
             Column {
@@ -61,7 +64,7 @@ Item {
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
                     padding: 10
-                    text: annotation ? annotation.type.toUpperCase() : ""
+                    text: root.annotation ? root.annotation.type.toUpperCase() : ""
                 }
 
                 VclLabel {
@@ -69,10 +72,10 @@ Item {
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     horizontalAlignment: Text.AlignHCenter
                     text: {
-                        if(annotation)
-                            return "<b>Position:</b> " + Math.round(annotation.geometry.x-root.canvasItemsBoundingBox.left) + ", " +
-                                                         Math.round(annotation.geometry.y-root.canvasItemsBoundingBox.top) + ". <b>Size:</b> " +
-                                                         Math.round(annotation.geometry.width) + " x " + Math.round(annotation.geometry.height)
+                        if(root.annotation)
+                            return "<b>Position:</b> " + Math.round(root.annotation.geometry.x-root.canvasItemsBoundingBox.left) + ", " +
+                                                         Math.round(root.annotation.geometry.y-root.canvasItemsBoundingBox.top) + ". <b>Size:</b> " +
+                                                         Math.round(root.annotation.geometry.width) + " x " + Math.round(root.annotation.geometry.height)
                         return ""
                     }
                 }
@@ -86,19 +89,19 @@ Item {
             }
 
             Repeater {
-                model: annotation ? annotation.metaData : 0
+                model: root.annotation ? root.annotation.metaData : 0
 
                 delegate: Column {
-                    id: editorDelegate
+                    id: _editorDelegate
 
                     required property int index
                     required property var modelData
 
                     property var propertyInfo: modelData
-                    property var propertyValue: annotation.attributes[ propertyInfo.name ]
+                    property var propertyValue: root.annotation.attributes[ propertyInfo.name ]
 
                     spacing: 3
-                    width: propertyEditorView.width - (propertyEditorView.scrollBarVisible ? 20 : 0)
+                    width: _propertyEditorView.width - (_propertyEditorView.scrollBarVisible ? 20 : 0)
                     visible: propertyInfo.visible === true
 
                     VclLabel {
@@ -109,16 +112,16 @@ Item {
                     }
 
                     Loader {
-                        id: editorLoader
+                        id: _editorLoader
 
-                        property alias propertyInfo: editorDelegate.propertyInfo
-                        property alias propertyValue: editorDelegate.propertyValue
+                        property alias propertyInfo: _editorDelegate.propertyInfo
+                        property alias propertyValue: _editorDelegate.propertyValue
 
                         function changePropertyValue(newValue) {
-                            var attrs = annotation.attributes
+                            var attrs = root.annotation.attributes
                             attrs[propertyInfo.name] = newValue
-                            annotation.attributes = attrs
-                            annotation.saveAttributesAsDefault()
+                            root.annotation.attributes = attrs
+                            root.annotation.saveAttributesAsDefault()
                         }
 
                         width: parent.width - 20
@@ -128,18 +131,18 @@ Item {
                         active: propertyInfo.visible === true
                         sourceComponent: {
                             switch(propertyInfo.type) {
-                            case "color": return colorEditor
-                            case "number": return numberEditor
-                            case "boolean": return booleanEditor
-                            case "text": return textEditor
-                            case "url": return urlEditor
-                            case "fontFamily": return fontFamilyEditor
-                            case "fontStyle": return fontStyleEditor
-                            case "hAlign": return hAlignEditor
-                            case "vAlign": return vAlignEditor
-                            case "image": return imageEditor
+                            case "color": return _colorEditorComponent
+                            case "number": return _numberEditorComponent
+                            case "boolean": return _booleanEditorComponent
+                            case "text": return _textEditorComponent
+                            case "url": return _urlEditorComponent
+                            case "fontFamily": return _fontFamilyEditorComponent
+                            case "fontStyle": return _fontStyleEditorComponent
+                            case "hAlign": return _hAlignEditorComponent
+                            case "vAlign": return _vAlignEditorComponent
+                            case "_imageEditorImage": return _imageEditorComponent
                             }
-                            return unknownEditor
+                            return _unknownEditorComponent
                         }
                     }
                 }
@@ -159,18 +162,18 @@ Item {
                 VclButton {
                     text: "Bring To Front"
                     onClicked: {
-                        // var a = annotationGripLoader.annotation
+                        // var a = annotationGripLoader.root.annotation
                         // annotationGripLoader.reset()
-                        Scrite.document.structure.bringToFront(annotation)
+                        Scrite.document.structure.bringToFront(root.annotation)
                     }
                 }
 
                 VclButton {
                     text: "Send To Back"
                     onClicked: {
-                        // var a = annotationGripLoader.annotation
+                        // var a = annotationGripLoader.root.annotation
                         // annotationGripLoader.reset()
-                        Scrite.document.structure.sendToBack(annotation)
+                        Scrite.document.structure.sendToBack(root.annotation)
                     }
                 }
             }
@@ -179,9 +182,9 @@ Item {
                 text: "Delete Annotation"
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
-                    // var a = annotationGripLoader.annotation
+                    // var a = annotationGripLoader.root.annotation
                     // annotationGripLoader.reset()
-                    Scrite.document.structure.removeAnnotation(annotation)
+                    Scrite.document.structure.removeAnnotation(root.annotation)
                 }
             }
 
@@ -193,11 +196,14 @@ Item {
     }
 
     Component {
-        id: colorEditor
+        id: _colorEditorComponent
 
         Row {
+            id: _colorEditor
+
             property var propertyInfo: parent.propertyInfo
             property var propertyValue: parent.propertyValue
+            function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
 
             height: 40
             spacing: 10
@@ -251,11 +257,14 @@ Item {
     }
 
     Component {
-        id: numberEditor
+        id: _numberEditorComponent
 
         Row {
+            id: _numberEditor
+
             property var propertyInfo: parent.propertyInfo
             property var propertyValue: parent.propertyValue
+            function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
 
             SpinBox {
                 value: propertyValue
@@ -269,11 +278,14 @@ Item {
     }
 
     Component {
-        id: booleanEditor
+        id: _booleanEditorComponent
 
         VclCheckBox {
+            id: _booleanEditor
+
             property var propertyInfo: parent.propertyInfo
             property var propertyValue: parent.propertyValue
+            function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
 
             text: propertyInfo.text
             checked: propertyValue
@@ -283,13 +295,14 @@ Item {
     }
 
     Component {
-        id: textEditor
+        id: _textEditorComponent
 
         TextArea {
-            id: _textArea
+            id: _textEditor
 
             property var propertyInfo: parent.propertyInfo
             property var propertyValue: parent.propertyValue
+            function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
 
             function commitTextChanges() {
                 changePropertyValue(text)
@@ -298,7 +311,7 @@ Item {
             SyntaxHighlighter.delegates: [
                 LanguageFontSyntaxHighlighterDelegate {
                     enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
-                    defaultFont: _textArea.font
+                    defaultFont: _textEditor.font
                 }
             ]
             SyntaxHighlighter.textDocument: textDocument
@@ -306,7 +319,7 @@ Item {
             DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
 
             LanguageTransliterator.popup: LanguageTransliteratorPopup {
-                editorFont: _textArea.font
+                editorFont: _textEditor.font
             }
             LanguageTransliterator.option: Runtime.language.activeTransliterationOption
             LanguageTransliterator.enabled: !readOnly
@@ -331,22 +344,25 @@ Item {
 
             onCursorRectangleChanged: {
                 if(activeFocus) {
-                    var pt = mapToItem(propertyEditorItems, cursorRectangle.x, cursorRectangle.y)
-                    if(pt.y < propertyEditorView.contentY)
-                        propertyEditorView.contentY = Math.max(pt.y-10, 0)
-                    else if(pt.y + cursorRectangle.height > propertyEditorView.contentY + propertyEditorView.height)
-                        propertyEditorView.contentY = (pt.y + cursorRectangle.height + 10 - propertyEditorView.height)
+                    var pt = mapToItem(_propertyEditorItems, cursorRectangle.x, cursorRectangle.y)
+                    if(pt.y < _propertyEditorView.contentY)
+                        _propertyEditorView.contentY = Math.max(pt.y-10, 0)
+                    else if(pt.y + cursorRectangle.height > _propertyEditorView.contentY + _propertyEditorView.height)
+                        _propertyEditorView.contentY = (pt.y + cursorRectangle.height + 10 - _propertyEditorView.height)
                 }
             }
         }
     }
 
     Component {
-        id: urlEditor
+        id: _urlEditorComponent
 
         Column {
+            id: _urlEditor
+
             property var propertyInfo: parent.propertyInfo
             property var propertyValue: parent.propertyValue
+            function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
 
             TextField {
                 id: urlField
@@ -366,13 +382,14 @@ Item {
     }
 
     Component {
-        id: fontFamilyEditor
+        id: _fontFamilyEditorComponent
 
         VclButton {
-            id: fontFamilyButton
+            id: _fontFamilyEditor
 
             property var propertyInfo: parent.propertyInfo
             property var propertyValue: parent.propertyValue
+            function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
 
             Layout.fillWidth: true
 
@@ -381,14 +398,14 @@ Item {
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
             contentItem: VclLabel {
-                text: fontFamilyButton.text
-                font: fontFamilyButton.font
+                text: _fontFamilyEditor.text
+                font: _fontFamilyEditor.font
                 elide: Text.ElideRight
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
             }
 
-            onClicked: FontSelectionDialog.launchWithTitle("Select a font for annotation", (family) => {
+            onClicked: FontSelectionDialog.launchWithTitle("Select a font for root.annotation", (family) => {
                                                                if(family !== "")
                                                                    changePropertyValue(family)
                                                            }, propertyValue)
@@ -396,11 +413,14 @@ Item {
     }
 
     Component {
-        id: fontStyleEditor
+        id: _fontStyleEditorComponent
 
         Row {
+            id: _fontStyleEditor
+
             property var propertyInfo: parent.propertyInfo
             property var propertyValue: parent.propertyValue
+            function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
 
             spacing: 5
 
@@ -431,11 +451,14 @@ Item {
     }
 
     Component {
-        id: hAlignEditor
+        id: _hAlignEditorComponent
 
         Row {
+            id: _hAlignEditor
+
             property var propertyInfo: parent.propertyInfo
             property var propertyValue: parent.propertyValue
+            function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
 
             spacing: 5
 
@@ -456,11 +479,12 @@ Item {
     }
 
     Component {
-        id: vAlignEditor
+        id: _vAlignEditorComponent
 
         Row {
             property var propertyInfo: parent.propertyInfo
             property var propertyValue: parent.propertyValue
+            function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
 
             spacing: 5
 
@@ -481,11 +505,14 @@ Item {
     }
 
     Component {
-        id: imageEditor
+        id: _imageEditorComponent
 
         Rectangle {
+            id: _imageEditor
+
             property var propertyInfo: parent.propertyInfo
             property var propertyValue: parent.propertyValue
+            function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
 
             height: (width/16)*9
             color: Runtime.colors.primary.c100.background
@@ -493,26 +520,26 @@ Item {
             border.color: Runtime.colors.primary.borderColor
 
             VclFileDialog {
-                id: fileDialog
+                id: _imageEditorFileDialog
 
                 nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
 
                 onAccepted: {
                     if(selectedFile !== "") {
                         if(propertyValue != "")
-                            annotation.removeImage(propertyValue)
-                        var newImageName = annotation.addImage(Url.toPath(selectedFile))
+                            root.annotation.removeImage(propertyValue)
+                        var newImageName = root.annotation.addImage(Url.toPath(selectedFile))
                         changePropertyValue(newImageName)
                     }
                 }
             }
 
             Image {
-                id: image
+                id: _imageEditorImage
                 anchors.fill: parent
                 anchors.margins: 1
                 fillMode: Image.PreserveAspectFit
-                source: annotation.imageUrl(propertyValue)
+                source: root.annotation.imageUrl(propertyValue)
                 asynchronous: true
             }
 
@@ -524,7 +551,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
-                onContainsMouseChanged: image.opacity = containsMouse ? 0.25 : 1
+                onContainsMouseChanged: _imageEditorImage.opacity = containsMouse ? 0.25 : 1
             }
 
             Row {
@@ -539,7 +566,7 @@ Item {
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: fileDialog.open()
+                        onClicked: _imageEditorFileDialog.open()
                         cursorShape: Qt.PointingHandCursor
                     }
                 }
@@ -556,7 +583,7 @@ Item {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             if(propertyValue != "")
-                                annotation.removeImage(propertyValue)
+                                root.annotation.removeImage(propertyValue)
                             changePropertyValue("")
                         }
                     }
@@ -566,11 +593,12 @@ Item {
     }
 
     Component {
-        id: unknownEditor
+        id: _unknownEditorComponent
 
         Item {
             property var propertyInfo: parent.propertyInfo
             property var propertyValue: parent.propertyValue
+            function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
         }
     }
 }

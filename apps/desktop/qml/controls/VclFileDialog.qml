@@ -29,6 +29,7 @@ FileDialog {
     // selectMultiple: false
     // sidebarVisible: true
 
+    // TODO: Get rid of this.
     Component.onCompleted: {
         const action = root["dirUpAction"]
         if(action)

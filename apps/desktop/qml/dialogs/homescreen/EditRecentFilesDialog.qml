@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
@@ -38,7 +39,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         title: "Modify Recent Files"
         width: 640
@@ -59,13 +60,13 @@ DialogLauncher {
                     border.color: Runtime.colors.primary.borderColor
 
                     ListView {
-                        id: recentFilesView
+                        id: _recentFilesView
 
                         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
                         ScrollBar.vertical: VclScrollBar {
-                            id: recentFilesViewVScrollBar
-                            flickable: recentFilesView
+                            id: _recentFilesViewVScrollBar
+                            flickable: _recentFilesView
                         }
 
                         anchors.fill: parent
@@ -83,25 +84,26 @@ DialogLauncher {
                         highlightResizeDuration: 0
 
                         delegate: Item {
+                            id: _recentFileDelegate
                             required property int index
                             required property var fileInfo
 
-                            width: recentFilesView.width
-                            height: delegateLayout.height+20
+                            width: _recentFilesView.width
+                            height: _delegateLayout.height+20
 
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: recentFilesView.currentIndex = index
+                                onClicked: _recentFilesView.currentIndex = _recentFileDelegate.index
                             }
 
                             RowLayout {
-                                id: delegateLayout
+                                id: _delegateLayout
 
                                 anchors.left: parent.left
                                 anchors.leftMargin: 10
                                 anchors.verticalCenter: parent.verticalCenter
 
-                                width: parent.width-(recentFilesViewVScrollBar.needed ? 30 : 15)
+                                width: parent.width-(_recentFilesViewVScrollBar.needed ? 30 : 15)
                                 spacing: 10
 
                                 Rectangle {
@@ -116,7 +118,7 @@ DialogLauncher {
                                         anchors.fill: parent
                                         anchors.margins: 1
 
-                                        currentIndex: fileInfo.hasCoverPage ? 1 : 0
+                                        currentIndex: _recentFileDelegate.fileInfo.hasCoverPage ? 1 : 0
 
                                         Image {
                                             source: "qrc:/icons/filetype/document.png"
@@ -124,7 +126,7 @@ DialogLauncher {
                                         }
 
                                         QImageItem {
-                                            image: fileInfo.hasCoverPage ? fileInfo.coverPageImage : Gui.emptyQImage
+                                            image: _recentFileDelegate.fileInfo.hasCoverPage ? _recentFileDelegate.fileInfo.coverPageImage : Gui.emptyQImage
                                             fillMode: QImageItem.PreserveAspectFit
                                             useSoftwareRenderer: Runtime.currentUseSoftwareRenderer
                                         }
@@ -139,8 +141,8 @@ DialogLauncher {
 
                                         font.bold: true
                                         text: {
-                                            const title = fileInfo.title === "" ? "Untitled Screenplay" : fileInfo.title + ""
-                                            const version = fileInfo.version
+                                            const title = _recentFileDelegate.fileInfo.title === "" ? "Untitled Screenplay" : _recentFileDelegate.fileInfo.title + ""
+                                            const version = _recentFileDelegate.fileInfo.version
                                             return version === "" ? title : (title + " <font size=\"-1\">(" + version + ")</font>")
                                         }
                                         elide: Text.ElideRight
@@ -150,20 +152,20 @@ DialogLauncher {
                                         Layout.fillWidth: true
 
                                         font.italic: true
-                                        text: fontInfo.author === "" ? "<Unknown Authors>" : fileInfo.author
+                                        text: fontInfo.author === "" ? "<Unknown Authors>" : _recentFileDelegate.fileInfo.author
                                         elide: Text.ElideRight
                                     }
 
                                     Link {
                                         Layout.fillWidth: true
 
-                                        text: fileInfo.filePath
+                                        text: _recentFileDelegate.fileInfo.filePath
                                         elide: Text.ElideMiddle
                                         enabled: !Platform.isLinuxDesktop
                                         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                         onClicked: {
-                                            recentFilesView.currentIndex = index
-                                            File.revealOnDesktop(fileInfo.filePath)
+                                            _recentFilesView.currentIndex = _recentFileDelegate.index
+                                            File.revealOnDesktop(_recentFileDelegate.fileInfo.filePath)
                                             Scrite.notifications.dismissNotification(0)
                                         }
                                     }
@@ -174,7 +176,7 @@ DialogLauncher {
                                     hoverEnabled: true
                                     opacity: hovered ? 1 : 0.25
 
-                                    onClicked: Runtime.recentFiles.removeAt(index)
+                                    onClicked: Runtime.recentFiles.removeAt(_recentFileDelegate.index)
                                 }
                             }
                         }

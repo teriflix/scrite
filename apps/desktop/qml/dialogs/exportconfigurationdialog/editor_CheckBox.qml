@@ -20,18 +20,19 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
+    id: root
+
     property var fieldInfo
     property AbstractExporter exporter
     property TabSequenceManager tabSequence
 
     VclCheckBox {
-        id: checkBox
+        id: _checkBox
 
         Layout.fillWidth: true
 
@@ -52,7 +53,7 @@ ColumnLayout {
         color: Runtime.colors.primary.c600.background
         visible: text !== ""
         wrapMode: Text.WordWrap
-        leftPadding: 2*checkBox.leftPadding + checkBox.implicitIndicatorWidth
+        leftPadding: 2*_checkBox.leftPadding + _checkBox.implicitIndicatorWidth
         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
         text: fieldInfo.note

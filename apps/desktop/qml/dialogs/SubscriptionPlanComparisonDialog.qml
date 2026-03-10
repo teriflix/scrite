@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQml
 import QtQuick
@@ -24,10 +25,11 @@ import Qt.labs.qmlmodels
 
 import io.scrite.components
 
-
 import "../globals"
 import "../controls"
 import "../helpers"
+
+// TODO: Needs to be reviewed and tested.
 
 DialogLauncher {
     id: root
@@ -51,7 +53,7 @@ DialogLauncher {
     }
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         width: Math.max(500, Math.min( Math.min(_private.maxDialogWidth,_private.idealColumnSize*(plans.length+1)), Scrite.window.width * 0.8))
         height: Math.min(_private.maxDialogHeight,Scrite.window.height * 0.8)
@@ -61,7 +63,7 @@ DialogLauncher {
         titleBarCloseButtonVisible: true
 
         content: Item {
-            Component.onCompleted: SubscriptionPlanOperations.populateComparisonTableModel(dialog.plans, comparisonTableModel)
+            Component.onCompleted: SubscriptionPlanOperations.populateComparisonTableModel(_dialog.plans, _comparisonTableModel)
 
             Rectangle {
                 anchors.fill: parent
@@ -70,41 +72,41 @@ DialogLauncher {
             }
 
             ListModel {
-                id: comparisonTableModel
+                id: _comparisonTableModel
             }
 
             Flickable {
-                id: comparisionTableView
+                id: _comparisionTableView
 
                 anchors.fill: parent
 
                 clip: true
 
-                contentWidth: comparisonTable.width
-                contentHeight: comparisonTable.height
+                contentWidth: _comparisonTable.width
+                contentHeight: _comparisonTable.height
                 boundsBehavior: Flickable.StopAtBounds
                 boundsMovement: Flickable.StopAtBounds
 
                 ScrollBar.vertical: VclScrollBar {
-                    id: verticialScrollBar
-                    flickable: comparisionTableView
+                    id: _verticialScrollBar
+                    flickable: _comparisionTableView
                 }
                 ScrollBar.horizontal: VclScrollBar {
-                    flickable: verticialScrollBar
+                    flickable: _verticialScrollBar
                 }
 
                 GridLayout {
-                    id: comparisonTable
+                    id: _comparisonTable
 
-                    columns: 1 + dialog.plans.length
+                    columns: 1 + _dialog.plans.length
                     rowSpacing: 0
                     columnSpacing: -1
 
-                    property real idealColumnWidth: (comparisionTableView.width/comparisonTable.columns)
+                    property real idealColumnWidth: (_comparisionTableView.width/_comparisonTable.columns)
                     property real columnWidth: Math.max(_private.idealColumnSize, idealColumnWidth)
 
                     Repeater {
-                        model: comparisonTableModel
+                        model: _comparisonTableModel
 
                         DelegateChooser {
                             role: "kind"
@@ -113,23 +115,24 @@ DialogLauncher {
                                 roleValue: "label"
 
                                 delegate: VclLabel {
+                                    id: _labelDelegate
                                     required property int index
                                     required property var attributes
 
                                     Layout.fillHeight: true
-                                    Layout.minimumWidth: comparisonTable.columnWidth
-                                    Layout.maximumWidth: comparisonTable.columnWidth
-                                    Layout.preferredWidth: comparisonTable.columnWidth
+                                    Layout.minimumWidth: _comparisonTable.columnWidth
+                                    Layout.maximumWidth: _comparisonTable.columnWidth
+                                    Layout.preferredWidth: _comparisonTable.columnWidth
 
-                                    text: attributes.text
-                                    font.pointSize: attributes.font.pointSize
-                                    font.weight: attributes.font.weight
-                                    font.italic: attributes.font.italic
+                                    text: _labelDelegate.attributes.text
+                                    font.pointSize: _labelDelegate.attributes.font.pointSize
+                                    font.weight: _labelDelegate.attributes.font.weight
+                                    font.italic: _labelDelegate.attributes.font.italic
                                     background: Rectangle {
-                                        color: attributes.background
+                                        color: _labelDelegate.attributes.background
                                     }
-                                    color: attributes.color
-                                    horizontalAlignment: attributes.horizontalAlignment
+                                    color: _labelDelegate.attributes.color
+                                    horizontalAlignment: _labelDelegate.attributes.horizontalAlignment
                                     verticalAlignment: Text.AlignVCenter
                                     leftPadding: 8; rightPadding: 8
                                     topPadding: 6; bottomPadding: 6
@@ -141,23 +144,24 @@ DialogLauncher {
                                 roleValue: "labelWithTooltip"
 
                                 delegate: VclLabel {
+                                    id: _labelWithTooltipDelegate
                                     required property int index
                                     required property var attributes
 
                                     Layout.fillHeight: true
-                                    Layout.minimumWidth: comparisonTable.columnWidth
-                                    Layout.maximumWidth: comparisonTable.columnWidth
-                                    Layout.preferredWidth: comparisonTable.columnWidth
+                                    Layout.minimumWidth: _comparisonTable.columnWidth
+                                    Layout.maximumWidth: _comparisonTable.columnWidth
+                                    Layout.preferredWidth: _comparisonTable.columnWidth
 
-                                    text: attributes.text + " ⓘ"
-                                    font.pointSize: attributes.font.pointSize
-                                    font.weight: attributes.font.weight
-                                    font.italic: attributes.font.italic
+                                    text: _labelWithTooltipDelegate.attributes.text + " ⓘ"
+                                    font.pointSize: _labelWithTooltipDelegate.attributes.font.pointSize
+                                    font.weight: _labelWithTooltipDelegate.attributes.font.weight
+                                    font.italic: _labelWithTooltipDelegate.attributes.font.italic
                                     background: Rectangle {
-                                        color: attributes.background
+                                        color: _labelWithTooltipDelegate.attributes.background
                                     }
-                                    color: attributes.color
-                                    horizontalAlignment: attributes.horizontalAlignment
+                                    color: _labelWithTooltipDelegate.attributes.color
+                                    horizontalAlignment: _labelWithTooltipDelegate.attributes.horizontalAlignment
                                     verticalAlignment: Text.AlignVCenter
                                     leftPadding: 8; rightPadding: 8
                                     topPadding: 6; bottomPadding: 6
@@ -173,7 +177,7 @@ DialogLauncher {
                                     ToolTipPopup {
                                         container: _comparisonLabelMouseArea
 
-                                        text: attributes.tooltip
+                                        text: _labelWithTooltipDelegate.attributes.tooltip
                                         visible: _comparisonLabelMouseArea.containsMouse
                                     }
                                 }
@@ -183,25 +187,26 @@ DialogLauncher {
                                 roleValue: "link"
 
                                 Link {
+                                    id: _linkDelegate
                                     required property var attributes
 
                                     Layout.fillHeight: true
-                                    Layout.minimumWidth: comparisonTable.columnWidth
-                                    Layout.maximumWidth: comparisonTable.columnWidth
-                                    Layout.preferredWidth: comparisonTable.columnWidth
+                                    Layout.minimumWidth: _comparisonTable.columnWidth
+                                    Layout.maximumWidth: _comparisonTable.columnWidth
+                                    Layout.preferredWidth: _comparisonTable.columnWidth
 
-                                    text: attributes.text
+                                    text: _linkDelegate.attributes.text
                                     padding: 8
                                     font.bold: true
                                     background: Rectangle {
-                                        color: attributes.background
+                                        color: _linkDelegate.attributes.background
                                     }
                                     verticalAlignment: Text.AlignVCenter
                                     horizontalAlignment: Text.AlignHCenter
 
                                     onClicked: {
-                                        SubscriptionPlanOperations.subscribeTo(attributes.plan)
-                                        dialog.close()
+                                        SubscriptionPlanOperations.subscribeTo(_linkDelegate.attributes.plan)
+                                        _dialog.close()
                                     }
                                 }
                             }
@@ -210,7 +215,7 @@ DialogLauncher {
 
                     VclLabel {
                         Layout.fillWidth: true
-                        Layout.columnSpan: comparisonTable.columns
+                        Layout.columnSpan: _comparisonTable.columns
 
                         padding: 12
                         color: Runtime.colors.accent.c600.text
@@ -232,3 +237,4 @@ DialogLauncher {
         property var taxonomy: SubscriptionPlanOperations.taxonomy
     }
 }
+

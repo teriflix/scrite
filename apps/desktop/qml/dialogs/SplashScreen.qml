@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
@@ -36,7 +37,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: Dialog {
-        id: dialog
+        id: _dialog
 
         parent: Overlay.overlay
         anchors.centerIn: parent
@@ -69,13 +70,13 @@ DialogLauncher {
         }
 
         contentItem: Image {
-            id: splashImage
+            id: _splashImage
             source: "qrc:/images/splash.png"
             smooth: true; mipmap: true
             asynchronous: false
 
             VclText {
-                id: versionText
+                id: _versionText
 
                 anchors.top: parent.top
                 anchors.right: parent.right
@@ -93,7 +94,7 @@ DialogLauncher {
                 running: Runtime.applicationSettings.enableAnimations
 
                 NumberAnimation {
-                    target: versionText
+                    target: _versionText
                     property: "opacity"
                     duration: 500
                     easing.type: Easing.OutBack
@@ -101,7 +102,7 @@ DialogLauncher {
                 }
 
                 NumberAnimation {
-                    target: versionText
+                    target: _versionText
                     property: "font.letterSpacing"
                     duration: 1500
                     easing.type: Easing.OutBack
@@ -111,10 +112,10 @@ DialogLauncher {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: dialog.close()
+                onClicked: _dialog.close()
             }
 
-            Component.onCompleted: Runtime.execLater(splashImage, 5000, dialog.close)
+            Component.onCompleted: Runtime.execLater(_splashImage, 5000, _dialog.close)
         }
 
         QtObject {

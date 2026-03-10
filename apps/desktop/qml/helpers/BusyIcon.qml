@@ -36,7 +36,7 @@ Item {
         mipmap: true
         smooth: true
         fillMode: Image.PreserveAspectFit
-        source: forDarkBackground ? "qrc:/icons/content/time_inverted.png" : "qrc:/icons/content/time.png"
+        source: root.forDarkBackground ? "qrc:/icons/content/time_inverted.png" : "qrc:/icons/content/time.png"
 
         RotationAnimator {
             duration: 500

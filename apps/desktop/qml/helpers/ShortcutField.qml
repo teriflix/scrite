@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Controls
@@ -68,6 +70,7 @@ Item {
             model: keyCombinations.modifiers
 
             delegate: KeyboardKey {
+                id: _delegate
                 required property int index
                 required property string modelData
 
@@ -75,7 +78,7 @@ Item {
                 Layout.minimumWidth: __minimumKeyWidth
                 Layout.minimumHeight: __minimumKeyHeight
 
-                text: modelData
+                text: _delegate.modelData
             }
         }
 
@@ -83,6 +86,7 @@ Item {
             model: keyCombinations.keys
 
             delegate: KeyboardKey {
+                id: _delegate2
                 required property int index
                 required property string modelData
 
@@ -90,7 +94,7 @@ Item {
                 Layout.minimumWidth: __minimumKeyWidth
                 Layout.minimumHeight: __minimumKeyHeight
 
-                text: modelData
+                text: _delegate2.modelData
             }
         }
 

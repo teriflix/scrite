@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
@@ -21,7 +22,6 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 
 import io.scrite.components
-
 
 import "../globals"
 import "../controls"
@@ -36,7 +36,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         title: "About Scrite"
         width: {
@@ -49,23 +49,23 @@ DialogLauncher {
         }
 
         content: Item {
-            implicitHeight: aboutInfoLayout.implicitHeight + 40
+            implicitHeight: _aboutInfoLayout.implicitHeight + 40
 
             Image {
                 anchors.fill: parent
-                source: "../../images/aboutbox.jpg"
+                source: "qrc:/images/aboutbox.jpg"
                 fillMode: Image.PreserveAspectCrop
                 smooth: true; mipmap: true
             }
 
             VclLabel {
-                id: versionText
+                id: _versionText
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.margins: 30
 
                 text: Scrite.app.versionAsString + (Scrite.app.versionType !== "" ? "-" + Scrite.app.versionType : "") + " for " + [Platform.typeString, Platform.osVersionString].join("-")
-                width: Math.min(Runtime.idealFontMetrics.advanceWidth(text), dialog.width*0.5)
+                width: Math.min(Runtime.idealFontMetrics.advanceWidth(text), _dialog.width*0.5)
                 elide: Text.ElideLeft
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
@@ -80,16 +80,16 @@ DialogLauncher {
             }
 
             ColumnLayout {
-                id: aboutInfoLayout
+                id: _aboutInfoLayout
                 spacing: 10
                 anchors.centerIn: parent
 
                 Image {
                     Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: dialog.width * 0.3
+                    Layout.preferredWidth: _dialog.width * 0.3
                     Layout.preferredHeight: sourceSize.height * Layout.preferredWidth/sourceSize.width
 
-                    source: "../../images/scrite_logo_for_report_header.png"
+                    source: "qrc:/images/scrite_logo_for_report_header.png"
                     fillMode: Image.PreserveAspectFit
                     mipmap: true; smooth: true
                 }
@@ -147,14 +147,14 @@ DialogLauncher {
 
                 Rectangle {
                     Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: dialog.width * 0.5
-                    Layout.preferredHeight: (Runtime.minimumFontMetrics.height+creditsView.spacing) * (creditsView.model.count+1) + creditsView.anchors.topMargin + creditsView.anchors.bottomMargin
+                    Layout.preferredWidth: _dialog.width * 0.5
+                    Layout.preferredHeight: (Runtime.minimumFontMetrics.height+_creditsView.spacing) * (_creditsView.model.count+1) + _creditsView.anchors.topMargin + _creditsView.anchors.bottomMargin
 
-                    // color: creditsView.ScrollBar.vertical.needed ? Runtime.colors.primary.c100.background : Qt.rgba(0,0,0,0)
+                    // color: _creditsView.ScrollBar.vertical.needed ? Runtime.colors.primary.c100.background : Qt.rgba(0,0,0,0)
 
                     // Refactoring QML TODO: Add ScrollBar back to this.
                     ListView {
-                        id: creditsView
+                        id: _creditsView
                         anchors.fill: parent
                         anchors.margins: 3
                         spacing: 7
@@ -212,23 +212,24 @@ DialogLauncher {
                         }
                         ScrollBar.vertical: ScrollBar { }
                         delegate: VclLabel {
+                            id: _creditsViewDelegate
+
                             required property int index
                             required property string credits
                             required property url url
 
-                            id: creditLabel
                             text: credits
-                            color: creditLabelMouseArea.containsMouse ? "blue" : "black"
-                            width: creditsView.width // - (creditsView.ScrollBar.vertical.needed ? 20 : 0)
+                            color: _creditLabelMouseArea.containsMouse ? "blue" : "black"
+                            width: _creditsView.width // - (_creditsView.ScrollBar.vertical.needed ? 20 : 0)
                             wrapMode: Text.WordWrap
                             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                             horizontalAlignment: Text.AlignHCenter
 
                             MouseArea {
-                                id: creditLabelMouseArea
+                                id: _creditLabelMouseArea
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: Qt.openUrlExternally(url)
+                                onClicked: Qt.openUrlExternally(_creditsViewDelegate.url)
                                 hoverEnabled: true
                             }
                         }
@@ -248,7 +249,7 @@ DialogLauncher {
                         Layout.preferredWidth: 24
                         Layout.preferredHeight: 24
 
-                        source: "../../icons/action/share.png"
+                        source: "qrc:/icons/action/share.png"
                     }
 
                     VclLabel {
@@ -268,7 +269,7 @@ DialogLauncher {
 
                             flat: true
                             toolTipText: "Post about Scrite on your Facebook page."
-                            icon.source: "../../icons/action/share_on_facebook.png"
+                            icon.source: "qrc:/icons/action/share_on_facebook.png"
 
                             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_facebook")
                         }
@@ -279,7 +280,7 @@ DialogLauncher {
 
                             flat: true
                             toolTipText: "Post about Scrite on your LinkedIn page."
-                            icon.source: "../../icons/action/share_on_linkedin.png"
+                            icon.source: "qrc:/icons/action/share_on_linkedin.png"
 
                             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_linkedin")
                         }
@@ -290,7 +291,7 @@ DialogLauncher {
 
                             flat: true
                             toolTipText: "Tweet about Scrite from your handle."
-                            icon.source: "../../icons/action/share_on_twitter.png"
+                            icon.source: "qrc:/icons/action/share_on_twitter.png"
 
                             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_twitter")
                         }
@@ -303,7 +304,7 @@ DialogLauncher {
 
                             flat: true
                             toolTipText: "Send an email about Scrite."
-                            icon.source: "../../icons/action/share_on_email.png"
+                            icon.source: "qrc:/icons/action/share_on_email.png"
 
                             onClicked: Qt.openUrlExternally(url)
                         }

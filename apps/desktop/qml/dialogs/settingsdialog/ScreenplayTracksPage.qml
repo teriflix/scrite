@@ -149,17 +149,18 @@ Item {
                                     model: Scrite.document.structure.sceneTags
 
                                     delegate: VclCheckBox {
+                                        id: _delegate
                                         required property int index
                                         required property string modelData
 
-                                        text: Runtime.idealFontMetrics.elidedText(modelData, Qt.ElideRight, _keywordsFlick.width*0.6, 0)
-                                        checked: _private.keywords.indexOf(modelData) >= 0
+                                        text: Runtime.idealFontMetrics.elidedText(_delegate.modelData, Qt.ElideRight, _keywordsFlick.width*0.6, 0)
+                                        checked: _private.keywords.indexOf(_delegate.modelData) >= 0
 
                                         onToggled: {
                                             if(checked)
-                                                _private.addKeyword(modelData)
+                                                _private.addKeyword(_delegate.modelData)
                                             else
-                                                _private.removeKeyword(modelData)
+                                                _private.removeKeyword(_delegate.modelData)
                                         }
                                     }
                                 }

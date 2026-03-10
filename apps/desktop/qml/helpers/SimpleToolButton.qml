@@ -22,12 +22,13 @@ import "../globals"
 Rectangle {
     id: root
 
-    property bool down: false
     property bool checked: false
-    property alias pressed: mouseArea.pressed
-    property alias hoverEnabled: mouseArea.hoverEnabled
-    property alias containsMouse: mouseArea.containsMouse
-    property alias iconSource: icon.source
+    property bool down: false
+
+    property alias containsMouse: _mouseArea.containsMouse
+    property alias hoverEnabled: _mouseArea.hoverEnabled
+    property alias iconSource: _icon.source
+    property alias pressed: _mouseArea.pressed
 
     signal clicked()
 
@@ -38,18 +39,22 @@ Rectangle {
 
     radius: 4
     opacity: enabled ? 1 : 0.5
-    color: mouseArea.pressed || down ? Runtime.colors.primary.button.background : (checked ? Runtime.colors.primary.highlight.background : Qt.rgba(0,0,0,0))
+    color: _mouseArea.pressed || down ? Runtime.colors.primary.button.background : (checked ? Runtime.colors.primary.highlight.background : Qt.rgba(0,0,0,0))
 
     Image {
-        id: icon
+        id: _icon
+
         anchors.fill: parent
         anchors.margins: 4
+
         mipmap: true
     }
 
     MouseArea {
-        id: mouseArea
+        id: _mouseArea
+
         anchors.fill: parent
+
         onClicked: parent.clicked()
     }
 }

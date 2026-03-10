@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
@@ -26,11 +28,13 @@ import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
+    id: root
+
     property var fieldInfo
     property AbstractReportGenerator report
 
     function getReady() {
-        episodeListView.model = Scrite.document.screenplay.episodeInfoList
+        _episodeListView.model = Scrite.document.screenplay.episodeInfoList
     }
 
     spacing: 5
@@ -75,7 +79,7 @@ ColumnLayout {
         }
 
         ListView {
-            id: episodeListView
+            id: _episodeListView
 
             property var episodeNumbers: fieldInfo ? report.getConfigurationValue(fieldInfo.name) : []
 
@@ -102,18 +106,19 @@ ColumnLayout {
             clip: true
 
             delegate: VclCheckBox {
+                id: _episodeDelegate
                 required property int index
                 required property var modelData // This is a gadget of type ScreenplayBreakInfo
 
-                property int episodeNumber: modelData.number
-                property string episodeName: modelData.title + ": " + modelData.subtitle
+                property int episodeNumber: _episodeDelegate.modelData.number
+                property string episodeName: _episodeDelegate.modelData.title + ": " + _episodeDelegate.modelData.subtitle
 
-                width: episodeListView.width-1
+                width: _episodeListView.width-1
 
                 text: episodeName
-                checked: episodeListView.episodeNumbers.indexOf(episodeNumber) >= 0
+                checked: _episodeListView.episodeNumbers.indexOf(episodeNumber) >= 0
 
-                onToggled: episodeListView.select(episodeNumber, checked)
+                onToggled: _episodeListView.select(episodeNumber, checked)
             }
         }
     }

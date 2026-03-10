@@ -64,7 +64,7 @@ TextArea {
         _contextMenu.popup()
     }
 
-    palette: Scrite.app.palette
+    palette: Runtime.palette
     selectByMouse: true
     selectByKeyboard: true
 

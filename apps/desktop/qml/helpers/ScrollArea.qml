@@ -19,7 +19,6 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-
 import "../globals"
 import "../controls"
 
@@ -38,9 +37,9 @@ Flickable {
     property real initialContentWidth: 100
     property real initialContentHeight: 100
 
-    property alias handlePinchZoom: pinchHandler.enabled
-    property alias minimumScale: pinchHandler.minimumScale
-    property alias maximumScale: pinchHandler.maximumScale
+    property alias handlePinchZoom: _pinchHandler.enabled
+    property alias minimumScale: _pinchHandler.minimumScale
+    property alias maximumScale: _pinchHandler.maximumScale
 
     signal zoomScaleChangedInteractively()
 
@@ -66,7 +65,7 @@ Flickable {
         if (!area || area.width <= 0 || area.height <= 0)
             return;
 
-        zoomScaleBehavior.allow = false;
+        _zoomScaleBehavior.allow = false;
 
         const newScale = Math.min(width / area.width, height / area.height);
         zoomTo(newScale)
@@ -80,7 +79,7 @@ Flickable {
         contentX = Math.max(0, Math.min(newContentX, contentWidth - width));
         contentY = Math.max(0, Math.min(newContentY, contentHeight - height));
 
-        zoomScaleBehavior.allow = true;
+        _zoomScaleBehavior.allow = true;
     }
 
     function ensureItemVisible(item) {
@@ -100,7 +99,7 @@ Flickable {
             const newScale = Math.min(scaleX, scaleY);
 
             if (newScale !== currentScale)
-                zoomTo(Math.max(pinchHandler.minimumScale, newScale))
+                zoomTo(Math.max(_pinchHandler.minimumScale, newScale))
         }
 
         const itemScaledRect = Qt.rect(item.x * currentScale,
@@ -164,15 +163,16 @@ Flickable {
 
     EventFilter.active: zoomOnScroll
     EventFilter.events: [EventFilter.Wheel]
-    EventFilter.onFilter: {
-        if(event.delta < 0)
-            zoomOut()
-        else
-            zoomIn()
-        zoomScaleChangedInteractively()
-        result.acceptEvent = true
-        result.filter = true
-    }
+    EventFilter.onFilter: (object, event, result) => {
+                              if(event.delta < 0) {
+                                  zoomOut()
+                              } else {
+                                  zoomIn()
+                              }
+                              zoomScaleChangedInteractively()
+                              result.acceptEvent = true
+                              result.filter = true
+                          }
 
     clip: true
     boundsBehavior: Flickable.StopAtBounds
@@ -188,14 +188,14 @@ Flickable {
     }
 
     Behavior on zoomScale {
-        id: zoomScaleBehavior
+        id: _zoomScaleBehavior
         property bool allow: true
         enabled: Runtime.applicationSettings.enableAnimations && animatePanAndZoom && allow
         NumberAnimation { id: zoomScaleAnimation; duration: 250 }
     }
 
     Timer {
-        id: returnToBoundsTimer
+        id: _returnToBoundsTimer
 
         repeat: false
         running: false
@@ -205,7 +205,7 @@ Flickable {
     }
 
     Timer {
-        id: changingTimer
+        id: _changingTimer
 
         property var dependencies: [root.contentX, root.contentY, root.moving, root.flicking]
 
@@ -222,7 +222,7 @@ Flickable {
     }
 
     PinchHandler {
-        id: pinchHandler
+        id: _pinchHandler
 
         target: null
 
@@ -233,38 +233,36 @@ Flickable {
         minimumPointCount: 2
 
         onScaleChanged: {
-            zoomScaleBehavior.allow = false;
+            _zoomScaleBehavior.allow = false;
 
-            const newScale = Math.max(minimumScale, Math.min(pinchHandler.activeScale, maximumScale));
+            const newScale = Math.max(minimumScale, Math.min(_pinchHandler.activeScale, maximumScale));
             if (zoomScale !== newScale) {
-                const pinchCenter = pinchHandler.centroid.position;
+                const pinchCenter = _pinchHandler.centroid.position;
                 resizeContent(initialContentWidth * newScale, initialContentHeight * newScale, pinchCenter);
                 zoomScale = newScale;
                 zoomScaleChangedInteractively();
             }
 
-            zoomScaleBehavior.allow = true;
+            _zoomScaleBehavior.allow = true;
         }
 
         onTargetChanged: target = null
     }
 
     onZoomScaleChanged: {
-        if (!zoomScaleBehavior.allow || pinchHandler.active)
+        if (!_zoomScaleBehavior.allow || _pinchHandler.active)
             return;
 
         // This logic zooms towards the mouse cursor. It can interfere with programmatic
         // zoom/pan like zoomFit. It's kept for interactive use, but be aware of its effects.
         const cursorPos = MouseCursor.position()
-        const fCursorPos = MouseCursor.itemPosition(root, cursorPos)
+        const fCursorPos = MouseCursor.itemPosition(root)
         const fContainsCursor = fCursorPos.x >= 0 && fCursorPos.y >= 0 && fCursorPos.x <= width && fCursorPos.y <= height
-        const mousePoint = fContainsCursor ?
-                MouseCursor.itemPosition(contentItem, MouseCursor.position()) :
-                Qt.point(contentX+width/2, contentY+height/2)
+        const mousePoint = fContainsCursor ? MouseCursor.itemPosition(contentItem) : Qt.point(contentX+width/2, contentY+height/2)
         const newWidth = initialContentWidth * zoomScale
         const newHeight = initialContentHeight * zoomScale
 
         resizeContent(newWidth, newHeight, mousePoint)
-        returnToBoundsTimer.start()
+        _returnToBoundsTimer.start()
     }
 }

@@ -40,7 +40,7 @@ Loader {
     onLodChanged: _private.loadLodComponent()
 
     Component {
-        id: defaultDetailComponent
+        id: _defaultDetailComponent
 
         Item { }
     }
@@ -53,12 +53,12 @@ Loader {
         function loadLodComponent() {
             root.active = false
 
-            if(lod === LodLoader.LOD.Low)
-                root.sourceComponent = root.lowDetailComponent ? root.lowDetailComponent : defaultDetailComponent
-            else if(lod === LodLoader.LOD.High)
-                root.sourceComponent = root.highDetailComponent ? root.highDetailComponent : defaultDetailComponent
+            if(root.lod === LodLoader.LOD.Low)
+                root.sourceComponent = root.lowDetailComponent ? root.lowDetailComponent : _defaultDetailComponent
+            else if(root.lod === LodLoader.LOD.High)
+                root.sourceComponent = root.highDetailComponent ? root.highDetailComponent : _defaultDetailComponent
             else
-                root.sourceComponent = defaultDetailComponent
+                root.sourceComponent = _defaultDetailComponent
 
             if(root.resetWidthBeforeLodChange) {
                 Object.resetProperty(root, "width")

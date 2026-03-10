@@ -45,16 +45,19 @@ MenuLoader {
         onAboutToHide: root.menuAboutToHide()
 
         Repeater {
-            id: suggestionsRepeater
+            id: _suggestionsRepeater
 
             model: root.spellingSuggestions
 
             delegate: VclMenuItem {
+                id: _suggestionDelegate
+
                 required property int index
                 required property string modelData
 
                 text: modelData
                 focusPolicy: Qt.NoFocus
+
                 onClicked: {
                     Qt.callLater(root.replaceRequest, modelData)
                     root.close()
@@ -66,7 +69,9 @@ MenuLoader {
 
         VclMenuItem {
             text: "Add to dictionary"
+
             focusPolicy: Qt.NoFocus
+
             onClicked: {
                 Qt.callLater(root.addToDictionaryRequest)
                 root.close()
@@ -75,7 +80,9 @@ MenuLoader {
 
         VclMenuItem {
             text: "Ignore"
+
             focusPolicy: Qt.NoFocus
+
             onClicked: {
                 Qt.callLater(root.addToIgnoreListRequest)
                 root.close()

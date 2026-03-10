@@ -834,7 +834,7 @@ Item {
     }
 
     function execLater(contextObject, delay, callback, args) {
-        let timer = Qt.createQmlObject("import QtQml 2.15; Timer { }", contextObject);
+        let timer = Qt.createQmlObject("import QtQml 2.15; Timer { }", contextObject ? contextObject : root);
         timer.interval = delay === undefined ? 100 : delay
         timer.repeat = false
         timer.triggered.connect(() => {

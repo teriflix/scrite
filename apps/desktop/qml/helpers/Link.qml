@@ -23,6 +23,8 @@ import "../globals"
 import "../controls"
 
 VclLabel {
+    id: root
+
     property alias containsMouse: _mouseArea.containsMouse
 
     property color hoverColor: enabled ? Runtime.colors.accent.c700.background : Runtime.colors.primary.c700.background
@@ -43,6 +45,6 @@ VclLabel {
         cursorShape: Qt.PointingHandCursor
         hoverEnabled: true
 
-        onClicked: parent.clicked()
+        onClicked: root.clicked()
     }
 }

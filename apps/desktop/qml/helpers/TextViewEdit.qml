@@ -83,7 +83,7 @@ Loader {
                 if(SearchAgent.currentSearchResultIndex < 0)
                     return
                 var result = searchResults[SearchAgent.currentSearchResultIndex]
-                markupText = SearchAgent.createMarkupText(root.text, result.from, result.to, Scrite.app.palette.highlight, Scrite.app.palette.highlightedText)
+                markupText = SearchAgent.createMarkupText(root.text, result.from, result.to, Runtime.palette.highlight, Runtime.palette.highlightedText)
                 root.highlightRequest()
             }
 
@@ -151,7 +151,7 @@ Loader {
 
             text: root.text
             font: root.font
-            palette: Scrite.app.palette
+            palette: Runtime.palette
             opacity: activeFocus ? 1 : 0.5
             wrapMode: root.wrapMode
             selectByMouse: true
@@ -222,6 +222,8 @@ Loader {
                     keyNavigationEnabled: false
 
                     delegate: VclLabel {
+                        id: _completionDelegate
+
                         required property int index
                         required property string completionString
 
@@ -229,7 +231,7 @@ Loader {
 
                         text: completionString
                         font: _textArea.font
-                        color: _root_elementIndex === _completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
+                        color: index === _completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
                         padding: 5
                     }
 

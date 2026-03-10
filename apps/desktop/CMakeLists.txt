@@ -142,6 +142,9 @@ endif()
 
 if(WIN32)
   target_link_libraries(Scrite PRIVATE User32)
+  target_compile_options(Scrite PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
+  )
 endif()
 
 if(UNIX AND NOT APPLE)

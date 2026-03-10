@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
@@ -21,7 +22,6 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 
 import io.scrite.components
-
 
 import "../globals"
 import "../controls"
@@ -36,7 +36,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         width: 640
         height: 550
@@ -71,7 +71,7 @@ DialogLauncher {
                     }
 
                     Switch {
-                        id: protectionSwitch
+                        id: _protectionSwitch
                         Layout.alignment: Qt.AlignVCenter
 
                         checked: Scrite.document.hasCollaborators
@@ -105,37 +105,38 @@ DialogLauncher {
                     }
 
                     ListView {
-                        id: collaboratorsList
+                        id: _collaboratorsList
                         anchors.fill: parent
                         anchors.margins: 5
                         anchors.leftMargin: 10
                         clip: true
                         property real viewportWidth: contentHeight > height ? width-20 : width-1
                         ScrollBar.vertical: VclScrollBar {
-                            flickable: collaboratorsList
+                            flickable: _collaboratorsList
                         }
-                        header: Scrite.document.canModifyCollaborators ? collaboratorsListHeader : null
+                        header: Scrite.document.canModifyCollaborators ? _collaboratorsListHeader : null
 
                         model: ScriteDocumentCollaborators { }
                         property var collaboratorsMetaData
 
                         delegate: Item {
+                            id: _collaboratorDelegate
                             required property int index
                             required property string collaborator
                             required property string collaboratorName
                             required property string collaboratorEmail
 
-                            width: collaboratorsList.viewportWidth
-                            height: delegateLayout.height + 4
+                            width: _collaboratorsList.viewportWidth
+                            height: _delegateLayout.height + 4
 
                             MouseArea {
-                                id: delegateMouseArea
+                                id: _delegateMouseArea
                                 anchors.fill: parent
                                 hoverEnabled: true
                             }
 
                             RowLayout {
-                                id: delegateLayout
+                                id: _delegateLayout
                                 spacing: 5
                                 width: parent.width-5
                                 anchors.centerIn: parent
@@ -146,35 +147,35 @@ DialogLauncher {
 
                                     wrapMode: Text.WordWrap
                                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                                    font.italic: collaboratorName === ""
-                                    text: collaborator
+                                    font.italic: _collaboratorDelegate.collaboratorName === ""
+                                    text: _collaboratorDelegate.collaborator
                                 }
 
                                 FlatToolButton {
-                                    id: deleteIcon
+                                    id: _deleteIcon
 
                                     Layout.alignment: Qt.AlignVCenter
 
-                                    opacity: delegateMouseArea.containsMouse || containsMouse ? (enabled ? 1 : 0.5) : 0
+                                    opacity: _delegateMouseArea.containsMouse || containsMouse ? (enabled ? 1 : 0.5) : 0
                                     iconSource: "qrc:/icons/action/close.png"
                                     enabled: Scrite.document.canModifyCollaborators
 
-                                    onClicked: Scrite.document.removeCollaborator(collaboratorEmail)
+                                    onClicked: Scrite.document.removeCollaborator(_collaboratorDelegate.collaboratorEmail)
                                 }
                             }
                         }
                     }
 
                     Component {
-                        id: collaboratorsListHeader
+                        id: _collaboratorsListHeader
 
                         RowLayout {
-                            width: collaboratorsList.width
+                            width: _collaboratorsList.width
                             enabled: Scrite.document.canModifyCollaborators
                             opacity: enabled ? 1 : 0.5
 
                             TextField {
-                                id: newCollaboratorEmail
+                                id: _newCollaboratorEmail
 
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
@@ -200,13 +201,13 @@ DialogLauncher {
                             }
 
                             FlatToolButton {
-                                id: addCollaboratorButton
+                                id: _addCollaboratorButton
 
                                 Layout.alignment: Qt.AlignVCenter
 
                                 iconSource: "qrc:/icons/content/add_box.png"
-                                onClicked: newCollaboratorEmail.addCollaborator()
-                                enabled: newCollaboratorEmail.acceptableInput
+                                onClicked: _newCollaboratorEmail.addCollaborator()
+                                enabled: _newCollaboratorEmail.acceptableInput
                             }
                         }
                     }

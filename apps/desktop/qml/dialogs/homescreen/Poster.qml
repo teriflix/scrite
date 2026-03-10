@@ -39,7 +39,7 @@ Item {
         anchors.fill: parent
 
         Image {
-            id: posterImageBg
+            id: _posterImageBg
 
             anchors.fill: parent
 
@@ -72,7 +72,7 @@ Item {
 
             Material.theme: Material.Dark
 
-            running: posterImageBg.status === Image.Loading || posterImageFg.status === Image.Loading
+            running: _posterImageBg.status === Image.Loading || _posterImageFg.status === Image.Loading
         }
     }
 
@@ -81,7 +81,7 @@ Item {
         anchors.fill: parent
 
         Image {
-            id: posterImageFg
+            id: _posterImageFg
 
             anchors.fill: parent
 

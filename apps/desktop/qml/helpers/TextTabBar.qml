@@ -81,6 +81,8 @@ Item {
             model: tabs
 
             delegate: VclLabel {
+                id: _tabDelegate
+
                 required property int index
                 required property var modelData
 
@@ -93,7 +95,7 @@ Item {
 
                     cursorShape: Qt.PointingHandCursor
 
-                    onClicked: root.currentTab = index
+                    onClicked: root.currentTab = _tabDelegate.index
                 }
             }
         }

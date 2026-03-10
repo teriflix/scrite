@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
@@ -46,7 +47,7 @@ Item {
             "title": title,
             "message": message
         }
-        let dlg = dialogComponent.createObject(root, params)
+        let dlg = _dialogComponent.createObject(root, params)
         if(dlg) {
             if(callback)
                 dlg.buttonClicked.connect(callback)
@@ -75,7 +76,7 @@ Item {
             "message": question,
             "buttons": answerButtons ? answerButtons : ["Yes", "No", "Cancel"]
         }
-        let dlg = dialogComponent.createObject(root, params)
+        let dlg = _dialogComponent.createObject(root, params)
         if(dlg) {
             if(callback)
                 dlg.buttonClicked.connect(callback)
@@ -87,10 +88,10 @@ Item {
     }
 
     Component {
-        id: dialogComponent
+        id: _dialogComponent
 
         VclDialog {
-            id: dialog
+            id: _dialog
 
             property string message
             property var buttons: ["Ok"]
@@ -98,7 +99,7 @@ Item {
             signal buttonClicked(string buttonText)
 
             width: Math.min(500, Scrite.window.width * 0.5)
-            height: layout.implicitHeight + 40 + header.height
+            height: _layout.implicitHeight + 40 + header.height
 
             titleBarButtons: null
             titleBarCloseButtonVisible: false
@@ -107,18 +108,18 @@ Item {
                 target: root
 
                 function onDiscardMessageBoxes() {
-                    Qt.callLater(dialog.close)
+                    Qt.callLater(_dialog.close)
                 }
             }
 
             ActionHandler {
-                action: dialog.acceptAction
-                enabled: dialog.buttons.length === 1 || (dialog.buttons.indexOf("Yes") >= 0)
+                action: _dialog.acceptAction
+                enabled: _dialog.buttons.length === 1 || (_dialog.buttons.indexOf("Yes") >= 0)
 
                 onTriggered: {
-                    const buttonIndex = dialog.buttons.length > 1 ? dialog.buttons.indexOf("Yes") : 0
-                    dialog.buttonClicked(buttons[buttonIndex])
-                    Qt.callLater(dialog.close)
+                    const buttonIndex = _dialog.buttons.length > 1 ? _dialog.buttons.indexOf("Yes") : 0
+                    _dialog.buttonClicked(_dialog.buttons[buttonIndex])
+                    Qt.callLater(_dialog.close)
                 }
             }
 
@@ -128,12 +129,12 @@ Item {
                     shortcut: Gui.shortcut(Qt.Key_N)
                 }
 
-                enabled: dialog.buttons.length > 1 && dialog.buttons.indexOf("No") >= 0
+                enabled: _dialog.buttons.length > 1 && _dialog.buttons.indexOf("No") >= 0
 
                 onTriggered: {
-                    const buttonIndex = dialog.buttons.indexOf("No")
-                    dialog.buttonClicked(buttons[buttonIndex])
-                    Qt.callLater(dialog.close)
+                    const buttonIndex = _dialog.buttons.indexOf("No")
+                    _dialog.buttonClicked(_dialog.buttons[buttonIndex])
+                    Qt.callLater(_dialog.close)
                 }
             }
 
@@ -143,18 +144,18 @@ Item {
                     shortcut: Gui.shortcut(Qt.Key_Escape)
                 }
 
-                enabled: dialog.buttons.length > 1 && dialog.buttons.indexOf("Cancel") >= 0
+                enabled: _dialog.buttons.length > 1 && _dialog.buttons.indexOf("Cancel") >= 0
 
                 onTriggered: {
-                    const buttonIndex = dialog.buttons.indexOf("Cancel")
-                    dialog.buttonClicked(buttons[buttonIndex])
-                    Qt.callLater(dialog.close)
+                    const buttonIndex = _dialog.buttons.indexOf("Cancel")
+                    _dialog.buttonClicked(_dialog.buttons[buttonIndex])
+                    Qt.callLater(_dialog.close)
                 }
             }
 
             contentItem: Item {
                 ColumnLayout {
-                    id: layout
+                    id: _layout
                     anchors.fill: parent
                     anchors.margins: 20
                     spacing: 20
@@ -162,7 +163,7 @@ Item {
                     VclLabel {
                         Layout.fillWidth: true
                         horizontalAlignment: lineCount > 3 ? Text.AlignLeft : Text.AlignHCenter
-                        text: dialog.message
+                        text: _dialog.message
                         wrapMode: Text.WordWrap
                     }
 
@@ -171,19 +172,19 @@ Item {
                         spacing: 20
 
                         Repeater {
-                            model: dialog.buttons
+                            model: _dialog.buttons
 
                             delegate: VclButton {
-                                id: button
+                                id: _button
 
                                 required property string index
                                 required property string modelData
 
-                                text: modelData
+                                text: _button.modelData
 
                                 onClicked: {
-                                    dialog.buttonClicked(text)
-                                    Qt.callLater(dialog.close)
+                                    _dialog.buttonClicked(_button.text)
+                                    Qt.callLater(_dialog.close)
                                 }
                             }
                         }

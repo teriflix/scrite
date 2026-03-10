@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Dialogs
 import QtQuick.Controls
@@ -23,74 +25,84 @@ import "../globals"
 import "../controls"
 
 Item {
-    id: fileSelector
+    id: root
+
+    property alias folder: _folderPathDialog.currentFolder
+    property alias absoluteFilePath: _fileInfo.absoluteFilePath
+
+    property var nameFilters // Unused, but here for backward compatibility
+    property var selectedExtension
+    property var allowedExtensions: []
 
     property string label: "Select a file to export into"
-    property alias absoluteFilePath: fileInfo.absoluteFilePath
-    property alias folder: folderPathDialog.currentFolder
-    property var allowedExtensions: []
-    property var selectedExtension
     property string filePathPrefix: "File will be saved as: "
-    property alias nameFilters: folderPathDialog.nameFilters
+
     property TabSequenceManager tabSequenceManager
 
     implicitWidth: 400
-    implicitHeight: layout.height
+    implicitHeight: _layout.height
 
     BasicFileInfo {
-        id: fileInfo
+        id: _fileInfo
     }
 
-    VclFileDialog {
-        id: folderPathDialog
+    FolderDialog {
+        id: _folderPathDialog
 
         currentFolder: {
-            if(fileInfo.absolutePath !== "") {
-                if(fileInfo.exists)
-                    return Url.fromPath(fileInfo.absolutePath)
+            if(_fileInfo.absolutePath !== "") {
+                if(_fileInfo.exists)
+                    return Url.fromPath(_fileInfo.absolutePath)
             }
             return Url.fromPath(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
         }
 
-        onAccepted: fileInfo.absolutePath = Url.toPath(selectedFile)
+        onAccepted: _fileInfo.absolutePath = Url.toPath(selectedFolder)
          // The default Ctrl+U interfers with underline
     }
 
     Column {
-        id: layout
+        id: _layout
         spacing: 10
         width: parent.width
 
         VclLabel {
-            id: labelText
+            id: _labelText
+
             width: parent.width
-            wrapMode: Text.WordWrap
+
+            enabled: visible
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
             lineHeight: 1.2
             lineHeightMode: Text.ProportionalHeight
-            text: "<b>" + label + ":</b><br/>(" + filePathPrefix + "<u>" + fileInfo.absoluteFilePath + "</u>. <a href=\"change\">Change path</a>.)</font>"
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            text: "<b>" + label + ":</b><br/>(" + filePathPrefix + "<u>" + _fileInfo.absoluteFilePath + "</u>. <a href=\"change\">Change path</a>.)</font>"
             visible: selectedExtension && selectedExtension.value !== AbstractReportGenerator.PdfFormat
-            enabled: visible
+            wrapMode: Text.WordWrap
 
             MouseArea {
                 anchors.fill: parent
+
                 hoverEnabled: true
                 cursorShape: parent.linkAt(mouseX, mouseY) === "change" ? Qt.PointingHandCursor : Qt.ArrowCursor
+
                 onClicked: (mouse) => {
                     if(parent.linkAt(mouse.x, mouse.y) === "change")
-                        folderPathDialog.open()
+                        _folderPathDialog.open()
                 }
             }
         }
 
         VclTextField {
-            placeholderText: "File Name"
-            text: fileInfo.baseName
-            width: parent.width
-            onTextEdited: fileInfo.baseName = text
             TabSequenceItem.manager: tabSequenceManager
-            visible: selectedExtension.value !== AbstractReportGenerator.PdfFormat
+
+            width: parent.width
+
             enabled: visible
+            placeholderText: "File Name"
+            text: _fileInfo.baseName
+            visible: selectedExtension.value !== AbstractReportGenerator.PdfFormat
+
+            onTextEdited: _fileInfo.baseName = text
         }
 
         Row {
@@ -100,15 +112,19 @@ Item {
                 model: allowedExtensions
 
                 delegate: VclRadioButton {
+                    id: _delegate
+
+                    required property int index
                     required property var modelData
 
                     text: modelData.label + " (." + modelData.suffix + ")"
                     checked: selectedExtension.value === modelData.value
+                    enabled: modelData.enabled ? modelData.enabled === true : true
+
                     onClicked: {
                         selectedExtension = modelData
-                        fileInfo.suffix = selectedExtension.suffix
+                        _fileInfo.suffix = selectedExtension.suffix
                     }
-                    enabled: modelData.enabled ? modelData.enabled === true : true
                 }
             }
         }

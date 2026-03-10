@@ -31,7 +31,9 @@ import "./helpers"
 import "./dialogs"
 import "./notifications"
 
-Item { }
+Item {
+    id: root
+}
 
 // Item {
 //     id: root
