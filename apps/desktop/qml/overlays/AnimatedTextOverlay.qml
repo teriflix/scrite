@@ -48,7 +48,7 @@ QtObject {
     }
 
     readonly property Component overlayComponent: Item {
-        id: overlay
+        id: _overlay
 
         required property string text
 
@@ -57,7 +57,7 @@ QtObject {
         anchors.fill: parent
 
         VclText {
-            id: textItem
+            id: _textItem
             anchors.centerIn: parent
 
             font.pixelSize: parent.height * 0.075
@@ -73,7 +73,7 @@ QtObject {
             running: true
 
             NumberAnimation {
-                target: textItem
+                target: _textItem
                 properties: "t"
                 from: 0
                 to: 1
@@ -86,7 +86,7 @@ QtObject {
             }
 
             ScriptAction {
-                script: overlay.done()
+                script: _overlay.done()
             }
         }
     }

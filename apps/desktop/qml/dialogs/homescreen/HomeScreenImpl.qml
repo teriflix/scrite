@@ -43,17 +43,17 @@ Item {
         anchors.fill: parent
         sourceComponent: {
             switch(_private.layoutType) {
-            case 1: return homeScreenLayout1
-            case 2: return homeScreenLayout2
+            case 1: return _homeScreenLayout1
+            case 2: return _homeScreenLayout2
             default:
             }
-            return homeScreenLayout2
+            return _homeScreenLayout2
         }
     }
 
     // Use this if the scaled banner height is less than 60% of the home screen height
     Component {
-        id: homeScreenLayout1
+        id: _homeScreenLayout1
 
         ColumnLayout {
             spacing: 0
@@ -72,15 +72,15 @@ Item {
                 initialItem: ContentPageLayout1 { }
 
                 function onShowScriptalay() {
-                    push(scriptalayPage)
+                    push(_scriptalayPage)
                 }
 
                 function onShowImportPanel() {
-                    push(importPage)
+                    push(_importPage)
                 }
 
                 function onShowVaultPanel() {
-                    push(vaultPage)
+                    push(_vaultPage)
                 }
 
                 Component.onCompleted: {
@@ -94,7 +94,7 @@ Item {
 
     // Use this otherwise
     Component {
-        id: homeScreenLayout2
+        id: _homeScreenLayout2
 
         StackView {
             clip: true
@@ -102,15 +102,15 @@ Item {
             initialItem: ContentPageLayout2 { }
 
             function onShowScriptalay() {
-                push(scriptalayPage)
+                push(_scriptalayPage)
             }
 
             function onShowImportPanel() {
-                push(importPage)
+                push(_importPage)
             }
 
             function onShowVaultPanel() {
-                push(vaultPage)
+                push(_vaultPage)
             }
 
             Component.onCompleted: {
@@ -122,7 +122,7 @@ Item {
     }
 
     component TopBanner : Image {
-        id: banner
+        id: _banner
 
         readonly property StackView stackView: Aggregation.firstSiblingByType("QQuickStackView")
 
@@ -135,12 +135,12 @@ Item {
 
         Image {
             anchors.centerIn: parent
-            source: (banner.stackView.currentItem && banner.stackView.currentItem.bannerImage) ? "" : "qrc:/images/banner_logo_overlay.png"
+            source: (_banner.stackView.currentItem && _banner.stackView.currentItem.bannerImage) ? "" : "qrc:/images/banner_logo_overlay.png"
             width: root.width * 0.3
             fillMode: Image.PreserveAspectFit
             smooth: true; mipmap: true
             visible: false
-            Component.onCompleted: Runtime.execLater(banner, 50, () => { visible = true } )
+            Component.onCompleted: Runtime.execLater(_banner, 50, () => { visible = true } )
         }
 
         RowLayout {
@@ -149,7 +149,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 20
             anchors.horizontalCenter: parent.horizontalCenter
-            visible: !topBannerToolTip.visible
+            visible: !_topBannerToolTip.visible
 
             LinkButton {
                 Layout.fillWidth: true
@@ -175,7 +175,7 @@ Item {
         }
 
         VclLabel {
-            id: topBannerToolTip
+            id: _topBannerToolTip
 
             width: parent.width * 0.75
 
@@ -206,21 +206,21 @@ Item {
                 target: _private
 
                 function onShowTooltipRequest(_source, _text) {
-                    topBannerToolTip.source = _source
-                    topBannerToolTip.text = _text
+                    _topBannerToolTip.source = _source
+                    _topBannerToolTip.text = _text
                 }
 
                 function onHideTooltipRequest(_source) {
-                    if(topBannerToolTip.source === _source) {
-                        topBannerToolTip.source = null
-                        topBannerToolTip.text = ""
+                    if(_topBannerToolTip.source === _source) {
+                        _topBannerToolTip.source = null
+                        _topBannerToolTip.text = ""
                     }
                 }
             }
         }
 
         Poster {
-            id: topBannerPoster
+            id: _topBannerPoster
 
             anchors.fill: parent
 
@@ -230,16 +230,16 @@ Item {
                 target: _private
 
                 function onShowPosterRequest(_source, _image, _logline) {
-                    topBannerPoster.sourceItem = _source
-                    topBannerPoster.source = _image
-                    topBannerPoster.logline = _logline
+                    _topBannerPoster.sourceItem = _source
+                    _topBannerPoster.source = _image
+                    _topBannerPoster.logline = _logline
                 }
 
                 function onHidePosterRequest(_source) {
-                    if(topBannerPoster.sourceItem === _source) {
-                        topBannerPoster.sourceItem = null
-                        topBannerPoster.source = undefined
-                        topBannerPoster.logline = ""
+                    if(_topBannerPoster.sourceItem === _source) {
+                        _topBannerPoster.sourceItem = null
+                        _topBannerPoster.source = undefined
+                        _topBannerPoster.logline = ""
                     }
                 }
             }
@@ -269,7 +269,7 @@ Item {
             }
 
             Poster {
-                id: sideBannerPoster
+                id: _sideBannerPoster
 
                 anchors.fill: parent
 
@@ -279,14 +279,14 @@ Item {
                     target: _private
 
                     function onShowPosterRequest(_source, _image, _logline) {
-                        sideBannerPoster.sourceItem = _source
-                        sideBannerPoster.source = _image
+                        _sideBannerPoster.sourceItem = _source
+                        _sideBannerPoster.source = _image
                     }
 
                     function onHidePosterRequest(_source) {
-                        if(sideBannerPoster.sourceItem === _source) {
-                            sideBannerPoster.sourceItem = null
-                            sideBannerPoster.source = undefined
+                        if(_sideBannerPoster.sourceItem === _source) {
+                            _sideBannerPoster.sourceItem = null
+                            _sideBannerPoster.source = undefined
                         }
                     }
                 }
@@ -296,16 +296,16 @@ Item {
         Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            clip: toolTipLayout.implicitHeight > height
+            clip: _toolTipLayout.implicitHeight > height
 
             ColumnLayout {
-                id: toolTipLayout
+                id: _toolTipLayout
 
                 anchors.fill: parent
                 spacing: 10
 
                 VclLabel {
-                    id: sideBannerTooltip
+                    id: _sideBannerTooltip
 
                     Layout.fillWidth: true
                     Layout.fillHeight: source ? true : false
@@ -324,16 +324,16 @@ Item {
                         target: _private
 
                         function onShowTooltipRequest(_source, _text) {
-                            sideBannerTooltip.source = _source
-                            sideBannerTooltip.text = _text
-                            sideBannerHelpButtons.visible = false
+                            _sideBannerTooltip.source = _source
+                            _sideBannerTooltip.text = _text
+                            _sideBannerHelpButtons.visible = false
                         }
 
                         function onHideTooltipRequest(_source) {
-                            if(sideBannerTooltip.source === _source) {
-                                sideBannerTooltip.source = null
-                                sideBannerTooltip.text = sideBannerTooltip.defaultText
-                                sideBannerHelpButtons.visible = true
+                            if(_sideBannerTooltip.source === _source) {
+                                _sideBannerTooltip.source = null
+                                _sideBannerTooltip.text = _sideBannerTooltip.defaultText
+                                _sideBannerHelpButtons.visible = true
                             }
                         }
                     }
@@ -342,7 +342,7 @@ Item {
                 }
 
                 ColumnLayout {
-                    id: sideBannerHelpButtons
+                    id: _sideBannerHelpButtons
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
@@ -479,7 +479,7 @@ Item {
     }
 
     Component {
-        id: iconFromSource
+        id: _iconFromSource
 
         Image {
             fillMode: Image.PreserveAspectFit
@@ -488,7 +488,7 @@ Item {
     }
 
     Component {
-        id: iconFromImage
+        id: _iconFromImage
 
         QImageItem {
             fillMode: QImageItem.PreserveAspectFit
@@ -497,7 +497,7 @@ Item {
     }
 
     component LinkButton : Rectangle {
-        id: button
+        id: _button
         property string text
         property string tooltip
         property string iconSource
@@ -505,37 +505,37 @@ Item {
         property var    iconImage: Gui.emptyQImage // has to be QImage
         property bool   singleClick: true
         property bool   showPoster: false
-        property bool   containsMouse: buttonMouseArea.containsMouse
+        property bool   containsMouse: _buttonMouseArea.containsMouse
 
         signal clicked()
         signal doubleClicked()
 
         width: 100
-        height: buttonLayout.height + 6
-        color: buttonMouseArea.containsMouse ? Runtime.colors.primary.highlight.background : Qt.rgba(0,0,0,0)
+        height: _buttonLayout.height + 6
+        color: _buttonMouseArea.containsMouse ? Runtime.colors.primary.highlight.background : Qt.rgba(0,0,0,0)
 
-        implicitWidth: buttonIcon.implicitWidth + buttonLabel.implicitWidth + buttonLayout.spacing
-        implicitHeight: buttonLayout.height + 10
+        implicitWidth: _buttonIcon.implicitWidth + _buttonLabel.implicitWidth + _buttonLayout.spacing
+        implicitHeight: _buttonLayout.height + 10
 
         RowLayout {
-            id: buttonLayout
+            id: _buttonLayout
             width: parent.width - 10
             anchors.centerIn: parent
             spacing: 5
             opacity: enabled ? 1 : 0.6
 
             Loader {
-                id: buttonIcon
+                id: _buttonIcon
 
-                property real h: buttonLabel.contentHeight * 1.5
+                property real h: _buttonLabel.contentHeight * 1.5
 
                 Layout.preferredWidth: h
                 Layout.preferredHeight: h
 
                 sourceComponent: {
                     if(iconSource !== "")
-                        return iconFromSource
-                    return iconFromImage
+                        return _iconFromSource
+                    return _iconFromImage
                 }
 
                 onLoaded: {
@@ -547,26 +547,26 @@ Item {
             }
 
             VclLabel {
-                id: buttonLabel
+                id: _buttonLabel
 
                 Layout.fillWidth: true
 
-                text: button.text
-                color: button.textColor
+                text: _button.text
+                color: _button.textColor
                 elide: Text.ElideRight
                 padding: 3
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                font.underline: singleClick ? buttonMouseArea.containsMouse : false
+                font.underline: singleClick ? _buttonMouseArea.containsMouse : false
             }
         }
 
         MouseArea {
-            id: buttonMouseArea
+            id: _buttonMouseArea
             anchors.fill: parent
-            hoverEnabled: singleClick || button.tooltip !== ""
+            hoverEnabled: singleClick || _button.tooltip !== ""
             cursorShape: singleClick ? Qt.PointingHandCursor : Qt.ArrowCursor
-            onClicked: button.clicked()
-            onDoubleClicked: button.doubleClicked()
+            onClicked: _button.clicked()
+            onDoubleClicked: _button.doubleClicked()
             onEntered: {
                 if(hoverEnabled) {
                     if(parent.tooltip !== "")
@@ -594,7 +594,7 @@ Item {
             anchors.fill: parent
 
             VclLabel {
-                id: newFileLabel
+                id: _newFileLabel
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 text: "New File"
             }
@@ -605,7 +605,7 @@ Item {
                 // Layout.leftMargin: 20
                 Layout.rightMargin: 20
                 color: Qt.rgba(0,0,0,0)
-                border.width: templatesView.interactive ? 1 : 0
+                border.width: _templatesView.interactive ? 1 : 0
                 border.color: Runtime.colors.primary.borderColor
 
                 ColumnLayout {
@@ -658,7 +658,7 @@ Item {
                 }
 
                 ListView {
-                    id: templatesView
+                    id: _templatesView
                     anchors.fill: parent
                     anchors.margins: 1
                     model: Runtime.appFeatures.templates.enabled ? Runtime.libraryService.templates : []
@@ -667,12 +667,12 @@ Item {
                     clip: true
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                     ScrollBar.vertical: VclScrollBar {
-                        flickable: templatesView
+                        flickable: _templatesView
                     }
                     highlightMoveDuration: 0
                     interactive: height < contentHeight
                     header: LinkButton {
-                        width: templatesView.width
+                        width: _templatesView.width
 
                         text: "New from Clipboard"
                         enabled: Scrite.document.canImportFromClipboard
@@ -695,7 +695,7 @@ Item {
                         required property int index
                         required property var record
 
-                        width: templatesView.width
+                        width: _templatesView.width
 
                         iconSource: index === 0 ? record.poster : Runtime.libraryService.templates.baseUrl + "/" + record.poster
                         showPoster: index > 0
@@ -729,7 +729,7 @@ Item {
             tooltip: "Launches a file dialog box so you can select a .scrite file to load from disk."
             onClicked: {
                 SaveFileTask.save( () => {
-                                        openFileDialog.open()
+                                        _openFileDialog.open()
                                     } )
             }
         }
@@ -739,13 +739,13 @@ Item {
             iconSource: Runtime.recentFiles.count === 0 ? "qrc:/icons/filetype/document.png" : "qrc:/icons/action/library.png"
             Layout.fillWidth: true
             tooltip: Runtime.recentFiles.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online library."
-            onClicked: parent.stackView.push(scriptalayPage)
+            onClicked: parent.stackView.push(_scriptalayPage)
             enabled: Runtime.recentFiles.count > 0
         }
     }
 
     Component {
-        id: quickFilesRecentFilesDelegate
+        id: _quickFilesRecentFilesDelegate
 
         LinkButton {
             id: _quickRecentFile
@@ -798,7 +798,7 @@ Item {
     }
 
     Component {
-        id: quickFilesScriptalayDelegate
+        id: _quickFilesScriptalayDelegate
 
         LinkButton {
             required property int index
@@ -832,21 +832,21 @@ Item {
                 Layout.fillWidth: true
 
                 VclToolButton {
-                    Layout.preferredHeight: quickFileOptionsLabel.height
-                    Layout.preferredWidth: quickFileOptionsLabel.height
+                    Layout.preferredHeight: _quickFileOptionsLabel.height
+                    Layout.preferredWidth: _quickFileOptionsLabel.height
 
                     visible: Runtime.recentFiles.count > 0
                     toolTipText: "Click to remove items from the recent files list."
 
-                    icon.width: quickFileOptionsLabel.height * 0.75
-                    icon.height: quickFileOptionsLabel.height * 0.75
+                    icon.width: _quickFileOptionsLabel.height * 0.75
+                    icon.height: _quickFileOptionsLabel.height * 0.75
                     icon.source: "qrc:/icons/action/edit.png"
 
                     onClicked: EditRecentFilesDialog.launch()
                 }
 
                 VclLabel {
-                    id: quickFileOptionsLabel
+                    id: _quickFileOptionsLabel
 
                     Layout.fillWidth: true
 
@@ -861,11 +861,11 @@ Item {
                 // Layout.leftMargin: 20
                 // Layout.rightMargin: 20
                 color: Qt.rgba(0,0,0,0)
-                border.width: quickFilesView.interactive ? 1 : 0
+                border.width: _quickFilesView.interactive ? 1 : 0
                 border.color: Runtime.colors.primary.borderColor
 
                 ListView {
-                    id: quickFilesView // shows either Scriptalay or Recent Files
+                    id: _quickFilesView // shows either Scriptalay or Recent Files
                     anchors.fill: parent
                     anchors.margins: 1
                     model: scriptalayMode ? Runtime.libraryService.screenplays : Runtime.recentFiles
@@ -873,11 +873,11 @@ Item {
                     clip: true
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                     ScrollBar.vertical: VclScrollBar {
-                        flickable: quickFilesView
+                        flickable: _quickFilesView
                     }
                     highlightMoveDuration: 0
                     interactive: height < contentHeight
-                    delegate: scriptalayMode ? quickFilesScriptalayDelegate : quickFilesRecentFilesDelegate
+                    delegate: scriptalayMode ? quickFilesScriptalayDelegate : _quickFilesRecentFilesDelegate
                 }
             }
         }
@@ -894,7 +894,7 @@ Item {
             tooltip: "Open cached files from your private on-disk vault."
             iconSource: "qrc:/icons/file/backup_open.png"
 
-            onClicked: parent.stackView.push(vaultPage)
+            onClicked: parent.stackView.push(_vaultPage)
         }
 
         LinkButton {
@@ -904,18 +904,18 @@ Item {
             tooltip: "Import a screenplay from Final Draft, Fountain or HTML formats."
             iconSource: "qrc:/icons/file/import_export.png"
 
-            onClicked: parent.stackView.push(importPage)
+            onClicked: parent.stackView.push(_importPage)
         }
     }
 
     component ScriptalayPage : Item {
         // Show contents of Scriptalay
-        property bool hasSelection: screenplaysView.currentIndex >= 0
+        property bool hasSelection: _screenplaysView.currentIndex >= 0
 
         function openSelected() {
             SaveFileTask.save( () => {
-                                    if(screenplaysView.currentIndex >= 0) {
-                                         var task = OpenFromLibraryTask.openScreenplayAt(Runtime.libraryService, screenplaysView.currentIndex)
+                                    if(_screenplaysView.currentIndex >= 0) {
+                                         var task = OpenFromLibraryTask.openScreenplayAt(Runtime.libraryService, _screenplaysView.currentIndex)
                                          task.finished.connect(closeRequest)
                                      }
                                 } )
@@ -934,7 +934,7 @@ Item {
                 border.color: Runtime.colors.primary.borderColor
 
                 ListView {
-                    id: screenplaysView
+                    id: _screenplaysView
                     anchors.fill: parent
                     anchors.margins: 1
                     clip: true
@@ -945,7 +945,7 @@ Item {
                         color: Runtime.colors.primary.highlight.background
                     }
                     ScrollBar.vertical: VclScrollBar {
-                        flickable: screenplaysView
+                        flickable: _screenplaysView
                     }
                     highlightMoveDuration: 0
                     highlightResizeDuration: 0
@@ -953,15 +953,15 @@ Item {
                         required property int index
                         required property var record
 
-                        width: screenplaysView.width
+                        width: _screenplaysView.width
 
                         text: record.name
                         singleClick: false
                         iconSource: Runtime.libraryService.screenplays.baseUrl + "/" + record.poster
 
-                        onClicked: screenplaysView.currentIndex = index
+                        onClicked: _screenplaysView.currentIndex = index
                         onDoubleClicked: {
-                            screenplaysView.currentIndex = index
+                            _screenplaysView.currentIndex = index
                             Qt.callLater(openSelected)
                         }
                     }
@@ -987,7 +987,7 @@ Item {
                         fillMode: Image.PreserveAspectFit
 
                         Poster {
-                            id: scriptalayPoster
+                            id: _scriptalayPoster
 
                             anchors.fill: parent
 
@@ -997,14 +997,14 @@ Item {
                                 target: _private
 
                                 function onShowPosterRequest(_source, _image, _logline) {
-                                    scriptalayPoster.sourceItem = _source
-                                    scriptalayPoster.source = _image
+                                    _scriptalayPoster.sourceItem = _source
+                                    _scriptalayPoster.source = _image
                                 }
 
                                 function onHidePosterRequest(_source) {
-                                    if(scriptalayPoster.sourceItem === _source) {
-                                        scriptalayPoster.sourceItem = null
-                                        scriptalayPoster.source = undefined
+                                    if(_scriptalayPoster.sourceItem === _source) {
+                                        _scriptalayPoster.sourceItem = null
+                                        _scriptalayPoster.source = undefined
                                     }
                                 }
                             }
@@ -1020,22 +1020,22 @@ Item {
                         border.color: Runtime.colors.primary.borderColor
 
                         Flickable {
-                            id: screenplayDetailsFlick
+                            id: _screenplayDetailsFlick
                             anchors.fill: parent
                             anchors.margins: 1
-                            contentWidth: screenplayDetailsText.width
-                            contentHeight: screenplayDetailsText.height
+                            contentWidth: _screenplayDetailsText.width
+                            contentHeight: _screenplayDetailsText.height
                             clip: true
                             flickableDirection: Flickable.VerticalFlick
 
                             ScrollBar.vertical: VclScrollBar {
-                                flickable: screenplayDetailsFlick
+                                flickable: _screenplayDetailsFlick
                             }
 
                             TextArea {
-                                id: screenplayDetailsText
-                                width: screenplayDetailsFlick.width-20
-                                property var record: screenplaysView.currentIndex >= 0 ? Runtime.libraryService.screenplays.recordAt(screenplaysView.currentIndex) : undefined
+                                id: _screenplayDetailsText
+                                width: _screenplayDetailsFlick.width-20
+                                property var record: _screenplaysView.currentIndex >= 0 ? Runtime.libraryService.screenplays.recordAt(_screenplaysView.currentIndex) : undefined
                                 textFormat: record ? TextArea.RichText : TextArea.MarkdownText
                                 wrapMode: Text.WordWrap
                                 padding: 8
@@ -1046,13 +1046,13 @@ Item {
 
                                 onRecordChanged: {
                                     if(record) {
-                                        _private.showTooltipRequest(screenplaysView.currentItem, record.logline)
-                                        _private.showPosterRequest(screenplaysView.currentItem, screenplaysView.currentItem.iconSource, record.logline)
+                                        _private.showTooltipRequest(_screenplaysView.currentItem, record.logline)
+                                        _private.showPosterRequest(_screenplaysView.currentItem, _screenplaysView.currentItem.iconSource, record.logline)
                                     }
                                 }
                                 Component.onDestruction: {
-                                    _private.hideTooltipRequest(screenplayDetailsText)
-                                    _private.hidePosterRequest(screenplaysView.currentItem)
+                                    _private.hideTooltipRequest(_screenplayDetailsText)
+                                    _private.hidePosterRequest(_screenplaysView.currentItem)
                                 }
 
                                 function composeTextFromRecord(_record) {
@@ -1082,13 +1082,13 @@ Item {
         color: Qt.rgba(0,0,0,0)
 
         function openSelected() {
-            if(vaultFilesView.currentIndex < 0)
+            if(_vaultFilesView.currentIndex < 0)
                 return
 
             SaveFileTask.save( () => {
                                     root.enabled = false
 
-                                    var task = OpenFileTask.openAnonymously(vaultFilesView.currentItem.fileInfo.filePath)
+                                    var task = OpenFileTask.openAnonymously(_vaultFilesView.currentItem.fileInfo.filePath)
                                     task.finished.connect(closeRequest)
                                 } )
         }
@@ -1107,7 +1107,7 @@ Item {
         }
 
         ListView {
-            id: vaultFilesView
+            id: _vaultFilesView
             anchors.fill: parent
             anchors.margins: 1
             clip: true
@@ -1127,7 +1127,7 @@ Item {
                 required property string timestampAsString
                 required property string relativeTime
 
-                width: vaultFilesView.width-1
+                width: _vaultFilesView.width-1
                 height: 60
 
                 singleClick: false
@@ -1145,9 +1145,9 @@ Item {
                     return Math.round(fileSize / (1024*1024), 2) + " MB"
                 }
 
-                onClicked: vaultFilesView.currentIndex = index
+                onClicked: _vaultFilesView.currentIndex = index
                 onDoubleClicked: {
-                    vaultFilesView.currentIndex = index
+                    _vaultFilesView.currentIndex = index
                     Qt.callLater( openSelected )
                 }
             }
@@ -1178,21 +1178,21 @@ Item {
     }
 
     component ImportPage : Item {
-        property bool hasActionButton: importPageStackLayout.currentIndex >= 1
-        property string actionButtonText: importPageStackLayout.currentIndex === 1 ? "Browse" : "Import"
+        property bool hasActionButton: _importPageStackLayout.currentIndex >= 1
+        property string actionButtonText: _importPageStackLayout.currentIndex === 1 ? "Browse" : "Import"
         function onActionButtonClicked() {
-            if(importPageStackLayout.currentIndex === 1)
-                dropBrowseItem.doBrowse()
-            else if(importPageStackLayout.currentIndex === 2) {
+            if(_importPageStackLayout.currentIndex === 1)
+                _dropBrowseItem.doBrowse()
+            else if(_importPageStackLayout.currentIndex === 2) {
                 SaveFileTask.save( () => {
                                         root.enabled = false
-                                        importDroppedFileItem.doImport()
+                                        _importDroppedFileItem.doImport()
                                     } )
             }
         }
 
         QtObject {
-            id: fileToImport
+            id: _fileToImport
 
             property bool valid: path !== ""
             property string path
@@ -1202,18 +1202,18 @@ Item {
         }
 
         BasicAttachmentsDropArea {
-            id: importDropArea
+            id: _importDropArea
             anchors.fill: parent
             enabled: Runtime.appFeatures.importer.enabled
             allowedType: Attachments.NoMedia
             allowedExtensions: ["scrite", "fdx", "txt", "fountain", "html"]
-            onDropped: fileToImport.path = attachment.filePath
+            onDropped: _fileToImport.path = attachment.filePath
         }
 
         StackLayout {
-            id: importPageStackLayout
+            id: _importPageStackLayout
             anchors.fill: parent
-            currentIndex: Runtime.appFeatures.importer.enabled ? (fileToImport.valid ? 2 : 1) : 0
+            currentIndex: Runtime.appFeatures.importer.enabled ? (_fileToImport.valid ? 2 : 1) : 0
 
             DisabledFeatureNotice {
                 visible: !Runtime.appFeatures.importer.enabled
@@ -1222,17 +1222,17 @@ Item {
             }
 
             Rectangle {
-                id: dropBrowseItem
+                id: _dropBrowseItem
                 border.width: 1
                 border.color: Runtime.colors.primary.borderColor
                 color: Qt.rgba(0,0,0,0)
 
                 function doBrowse() {
-                    importFileDialog.open()
+                    _importFileDialog.open()
                 }
 
                 VclFileDialog {
-                    id: importFileDialog
+                    id: _importFileDialog
 
                     title: "Import Screenplay"
                     objectName: "Import Dialog Box"
@@ -1243,7 +1243,7 @@ Item {
 
                     onAccepted: {
                         if(selectedFile !== "")
-                            fileToImport.path = Url.toPath(selectedFile)
+                            _fileToImport.path = Url.toPath(selectedFile)
                     }
                 }
 
@@ -1257,7 +1257,7 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
-                        text: importDropArea.active ? importDropArea.attachment.originalFileName : "Drop a file on to this area to import it."
+                        text: _importDropArea.active ? _importDropArea.attachment.originalFileName : "Drop a file on to this area to import it."
                     }
 
                     VclLabel {
@@ -1266,21 +1266,21 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize-1
                         color: Runtime.colors.primary.c700.background
-                        text: importDropArea.active ? "Drop to import this file." : "(Allowed file types: " + importFileDialog.nameFilters.join(", ") + ")"
+                        text: _importDropArea.active ? "Drop to import this file." : "(Allowed file types: " + _importFileDialog.nameFilters.join(", ") + ")"
                     }
                 }
             }
 
             Rectangle {
-                id: importDroppedFileItem
+                id: _importDroppedFileItem
                 border.width: 1
                 border.color: Runtime.colors.primary.borderColor
                 color: Qt.rgba(0,0,0,0)
 
                 function doImport() {
-                    Runtime.workspaceSettings.lastOpenImportFolderUrl = "file://" + fileToImport.folder
+                    Runtime.workspaceSettings.lastOpenImportFolderUrl = "file://" + _fileToImport.folder
 
-                    var task = OpenFileTask.openOrImport(fileToImport.path)
+                    var task = OpenFileTask.openOrImport(_fileToImport.path)
                     task.finished.connect(closeRequest)
                 }
 
@@ -1296,7 +1296,7 @@ Item {
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
                         font.bold: true
                         elide: Text.ElideMiddle
-                        text: fileToImport.name
+                        text: _fileToImport.name
                     }
 
                     VclLabel {
@@ -1312,16 +1312,16 @@ Item {
     }
 
     component StackPage : Item {
-        id: stackPage
+        id: _stackPage
 
         property Component content
-        property QtObject contentItem: contentLoader.item
+        property QtObject contentItem: _contentLoader.item
 
         property Component title
-        property QtObject titleItem: titleLoader.item
+        property QtObject titleItem: _titleLoader.item
 
         property Component buttons
-        property QtObject buttonsItem: buttonsLoader.item
+        property QtObject buttonsItem: _buttonsLoader.item
 
         readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
 
@@ -1333,22 +1333,22 @@ Item {
             anchors.bottomMargin: 25
 
             Loader {
-                id: contentLoader
+                id: _contentLoader
                 width: parent.width
                 anchors.top: parent.top
-                anchors.bottom: buttonsRow.top
+                anchors.bottom: _buttonsRow.top
                 anchors.bottomMargin: 20
-                sourceComponent: stackPage.content
+                sourceComponent: _stackPage.content
             }
 
             RowLayout {
-                id: buttonsRow
+                id: _buttonsRow
                 width: parent.width
                 anchors.bottom: parent.bottom
 
                 VclButton {
                     text: "< Back"
-                    onClicked: stackPage.stackView.pop()
+                    onClicked: _stackPage.stackView.pop()
 
                     EventFilter.target: Scrite.app
                     EventFilter.events: [EventFilter.KeyPress,EventFilter.KeyRelease,EventFilter.Shortcut]
@@ -1356,31 +1356,31 @@ Item {
                                               if(event.key === Qt.Key_Escape) {
                                                   result.acceptEvent = true
                                                   result.filter = true
-                                                  stackPage.stackView.pop()
+                                                  _stackPage.stackView.pop()
                                               }
                                           }
                 }
 
                 Loader {
-                    id: titleLoader
+                    id: _titleLoader
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    sourceComponent: stackPage.title
+                    sourceComponent: _stackPage.title
                 }
 
                 Loader {
-                    id: buttonsLoader
-                    sourceComponent: stackPage.buttons
+                    id: _buttonsLoader
+                    sourceComponent: _stackPage.buttons
                 }
             }
         }
     }
 
     Component {
-        id: scriptalayPage
+        id: _scriptalayPage
 
         StackPage {
-            id: scriptalayPageItem
+            id: _scriptalayPageItem
             readonly property string bannerImage: "qrc:/images/homescreen_scriptalay_banner.png"
             content: ScriptalayPage { }
             title: Item {
@@ -1393,17 +1393,17 @@ Item {
             }
             buttons: VclButton {
                 text: "Open"
-                enabled: scriptalayPageItem.contentItem.hasSelection && Runtime.libraryService.screenplays.count > 0
-                onClicked: scriptalayPageItem.contentItem.openSelected()
+                enabled: _scriptalayPageItem.contentItem.hasSelection && Runtime.libraryService.screenplays.count > 0
+                onClicked: _scriptalayPageItem.contentItem.openSelected()
             }
         }
     }
 
     Component {
-        id: vaultPage
+        id: _vaultPage
 
         StackPage {
-            id: vaultPageItem
+            id: _vaultPageItem
             content: VaultPage { }
             title: VclLabel {
                 horizontalAlignment: Text.AlignHCenter
@@ -1417,38 +1417,38 @@ Item {
 
                 VclButton {
                     text: "Open"
-                    onClicked: vaultPageItem.contentItem.openSelected()
+                    onClicked: _vaultPageItem.contentItem.openSelected()
                     enabled: Scrite.vault.documentCount > 0
                 }
 
                 VclButton {
                     text: "Clear"
                     enabled: Scrite.vault.documentCount > 0
-                    onClicked: vaultPageItem.contentItem.clearVault()
+                    onClicked: _vaultPageItem.contentItem.clearVault()
                 }
             }
         }
     }
 
     Component {
-        id: importPage
+        id: _importPage
 
         StackPage {
-            id: importPageItem
+            id: _importPageItem
             content: ImportPage { }
             title: Item { }
             buttons: RowLayout {
                 VclButton {
-                    visible: importPageItem.contentItem.hasActionButton
-                    text: importPageItem.contentItem.actionButtonText
-                    onClicked: importPageItem.contentItem.onActionButtonClicked()
+                    visible: _importPageItem.contentItem.hasActionButton
+                    text: _importPageItem.contentItem.actionButtonText
+                    onClicked: _importPageItem.contentItem.onActionButtonClicked()
                 }
             }
         }
     }
 
     VclFileDialog {
-        id: openFileDialog
+        id: _openFileDialog
 
         title: "Open Scrite Document"
         nameFilters: ["Scrite Documents (*.scrite)"]
@@ -1468,7 +1468,7 @@ Item {
     }
 
     VclDialog {
-        id: missingRecentFilesNotificationDialog
+        id: _missingRecentFilesNotificationDialog
 
         property var missingFiles: Runtime.recentFiles.missingFiles
 
@@ -1499,7 +1499,7 @@ Item {
                     border.color: Runtime.colors.primary.borderColor
 
                     ListView {
-                        id: missingFilesList
+                        id: _missingFilesList
 
                         anchors.fill: parent
                         anchors.margins: 1
@@ -1517,7 +1517,7 @@ Item {
                             required property int index
                             required property string modelData
 
-                            width: missingFilesList.width
+                            width: _missingFilesList.width
                             padding: 8
                             rightPadding: 20
                             elide: Text.ElideMiddle
@@ -1530,7 +1530,7 @@ Item {
                                 anchors.fill: parent
                                 hoverEnabled: parent.truncated
 
-                                onClicked: missingFilesList.currentIndex = index
+                                onClicked: _missingFilesList.currentIndex = index
                             }
 
                             ToolTipPopup {
@@ -1542,7 +1542,7 @@ Item {
                         }
 
                         Component.onCompleted: {
-                            model = JSON.parse( JSON.stringify(missingRecentFilesNotificationDialog.missingFiles) )
+                            model = JSON.parse( JSON.stringify(_missingRecentFilesNotificationDialog.missingFiles) )
                         }
                     }
                 }

@@ -26,12 +26,13 @@ import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
+    id: root
     property var fieldInfo
     property AbstractExporter exporter
     property TabSequenceManager tabSequence
 
     VclCheckBox {
-        id: checkBox
+        id: _root_2
 
         Layout.fillWidth: true
 
@@ -52,7 +53,7 @@ ColumnLayout {
         color: Runtime.colors.primary.c600.background
         visible: text !== ""
         wrapMode: Text.WordWrap
-        leftPadding: 2*checkBox.leftPadding + checkBox.implicitIndicatorWidth
+        leftPadding: 2*_root_2.leftPadding + _root_2.implicitIndicatorWidth
         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
         text: fieldInfo.note

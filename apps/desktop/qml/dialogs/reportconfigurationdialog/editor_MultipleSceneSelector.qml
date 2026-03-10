@@ -33,6 +33,7 @@ to let the report generator know which scenes the user has selected.
 */
 
 ColumnLayout {
+    id: root
     property var fieldInfo
     property AbstractReportGenerator report
 
@@ -81,7 +82,7 @@ ColumnLayout {
         }
 
         VclTextField {
-            id: locTypeFilter
+            id: _root_2
 
             Layout.preferredWidth: (parent.width - parent.spacing*2)*0.25
 
@@ -93,7 +94,7 @@ ColumnLayout {
         }
 
         VclTextField {
-            id: locFilter
+            id: _locFilter
 
             Layout.fillWidth: true
 
@@ -105,7 +106,7 @@ ColumnLayout {
         }
 
         VclTextField {
-            id: momentFilter
+            id: _momentFilter
 
             Layout.preferredWidth: (parent.width - parent.spacing*2)*0.25
 
@@ -128,7 +129,7 @@ ColumnLayout {
         }
 
         ListView {
-            id: sceneListView
+            id: _sceneListView
 
             property var selectedSceneNumbers: []
             property var selectedEpisodeNumbers: null
@@ -144,18 +145,18 @@ ColumnLayout {
 
                     if(scene.heading.enabled) {
                         var ret = true
-                        if(ret && locTypeFilter.items.length > 0)
-                            ret &= locTypeFilter.items.contains(scene.heading.locationType)
-                        if(ret && momentFilter.items.length > 0)
-                            ret &= momentFilter.items.contains(scene.heading.moment)
-                        if(ret && locFilter.items.length > 0)
-                            ret &= locFilter.items.contains(scene.heading.location)
+                        if(ret && _root_2.items.length > 0)
+                            ret &= _root_2.items.contains(scene.heading.locationType)
+                        if(ret && _momentFilter.items.length > 0)
+                            ret &= _momentFilter.items.contains(scene.heading.moment)
+                        if(ret && _locFilter.items.length > 0)
+                            ret &= _locFilter.items.contains(scene.heading.location)
 
                         return ret
                     }
                 }
 
-                return locTypeFilter.items.length === 0 && momentFilter.items.length === 0 && locFilter.items.length === 0
+                return _root_2.items.length === 0 && _momentFilter.items.length === 0 && _locFilter.items.length === 0
             }
 
             function select(sceneNumber, flag) {
@@ -186,28 +187,28 @@ ColumnLayout {
                 required property string sceneID
                 required property ScreenplayElement screenplayElement
 
-                width: sceneListView.width-1
-                height: sceneCheckBox.visible ? sceneCheckBox.height : 0
+                width: _sceneListView.width-1
+                height: _sceneCheckBox.visible ? _sceneCheckBox.height : 0
 
                 VclCheckBox {
-                    id: sceneCheckBox
+                    id: _sceneCheckBox
 
                     width: parent.width-1
 
                     font.family: Scrite.document.formatting.defaultFont.family
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-                    visible: screenplayElement.scene && sceneListView.filter(screenplayElement.scene)
+                    visible: screenplayElement.scene && _sceneListView.filter(screenplayElement.scene)
                     text: {
                         var scene = screenplayElement.scene
                         if(scene && scene.heading.enabled)
                             return "[" + screenplayElement.resolvedSceneNumber + "] " + (scene && scene.heading.enabled ? scene.heading.text : "")
                         return "NO SCENE HEADING"
                     }
-                    checked: sceneListView.selectedSceneNumbers.indexOf(screenplayElement.elementIndex) >= 0
+                    checked: _sceneListView.selectedSceneNumbers.indexOf(screenplayElement.elementIndex) >= 0
                     enabled: screenplayElement.scene
 
-                    onToggled: sceneListView.select(screenplayElement.elementIndex, checked)
+                    onToggled: _sceneListView.select(screenplayElement.elementIndex, checked)
                 }
             }
         }
@@ -225,12 +226,12 @@ ColumnLayout {
                 var numbers = report.getConfigurationValue(fieldInfo.name)
                 for(var i=0; i<count; i++) {
                     var element = Scrite.document.screenplay.elementAt(i)
-                    if( sceneListView.filter(element.scene) ) {
+                    if( _sceneListView.filter(element.scene) ) {
                         if(numbers.indexOf(element.elementIndex) < 0)
                             numbers.push(element.elementIndex)
                     }
                 }
-                sceneListView.selectedSceneNumbers = numbers
+                _sceneListView.selectedSceneNumbers = numbers
                 report.setConfigurationValue(fieldInfo.name, numbers)
             }
         }
@@ -242,13 +243,13 @@ ColumnLayout {
                 var numbers = report.getConfigurationValue(fieldInfo.name)
                 for(var i=0; i<count; i++) {
                     var element = Scrite.document.screenplay.elementAt(i)
-                    if( sceneListView.filter(element.scene) ) {
+                    if( _sceneListView.filter(element.scene) ) {
                         var idx = numbers.indexOf(element.elementIndex)
                         if(idx >= 0)
                             numbers.splice(idx, 1)
                     }
                 }
-                sceneListView.selectedSceneNumbers = numbers
+                _sceneListView.selectedSceneNumbers = numbers
                 report.setConfigurationValue(fieldInfo.name, numbers)
             }
         }
@@ -256,16 +257,16 @@ ColumnLayout {
         VclLabel {
             Layout.fillWidth: true
 
-            text: sceneListView.selectedSceneNumbers.length === 0 ? "All Scenes Are Selected" : ("" + sceneListView.selectedSceneNumbers.length + " Scene(s) Are Selected")
+            text: _sceneListView.selectedSceneNumbers.length === 0 ? "All Scenes Are Selected" : ("" + _sceneListView.selectedSceneNumbers.length + " Scene(s) Are Selected")
             padding: 5
         }
     }
 
     function getReady() {
         const ssn = report ? report.getConfigurationValue(fieldInfo.name) : []
-        sceneListView.selectedSceneNumbers = ssn
-        sceneListView.selectedEpisodeNumbers = report.episodeNumbers
+        _sceneListView.selectedSceneNumbers = ssn
+        _sceneListView.selectedEpisodeNumbers = report.episodeNumbers
         const idx = ssn && ssn.length > 0 ? ssn[0] : 0
-        sceneListView.positionViewAtIndex(idx, ListView.Beginning)
+        _sceneListView.positionViewAtIndex(idx, ListView.Beginning)
     }
 }

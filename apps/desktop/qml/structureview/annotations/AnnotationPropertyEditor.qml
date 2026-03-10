@@ -34,21 +34,21 @@ Item {
     required property BoundingBoxEvaluator canvasItemsBoundingBox
 
     Flickable {
-        id: propertyEditorView
+        id: _propertyEditorView
         clip: true
         anchors.fill: parent
         anchors.leftMargin: 10
         anchors.rightMargin: scrollBarVisible ? 0 : 10
-        contentWidth: propertyEditorItems.width
-        contentHeight: propertyEditorItems.height
+        contentWidth: _propertyEditorItems.width
+        contentHeight: _propertyEditorItems.height
         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
         property bool scrollBarVisible: contentHeight > height
-        ScrollBar.vertical: VclScrollBar { flickable: propertyEditorView }
+        ScrollBar.vertical: VclScrollBar { flickable: _propertyEditorView }
 
         Column {
-            id: propertyEditorItems
-            width: propertyEditorView.width - (propertyEditorView.scrollBarVisible ? 20 : 0)
+            id: _propertyEditorItems
+            width: _propertyEditorView.width - (_propertyEditorView.scrollBarVisible ? 20 : 0)
             spacing: 20
 
             Column {
@@ -89,7 +89,7 @@ Item {
                 model: annotation ? annotation.metaData : 0
 
                 delegate: Column {
-                    id: editorDelegate
+                    id: _editorDelegate
 
                     required property int index
                     required property var modelData
@@ -98,7 +98,7 @@ Item {
                     property var propertyValue: annotation.attributes[ propertyInfo.name ]
 
                     spacing: 3
-                    width: propertyEditorView.width - (propertyEditorView.scrollBarVisible ? 20 : 0)
+                    width: _propertyEditorView.width - (_propertyEditorView.scrollBarVisible ? 20 : 0)
                     visible: propertyInfo.visible === true
 
                     VclLabel {
@@ -109,10 +109,10 @@ Item {
                     }
 
                     Loader {
-                        id: editorLoader
+                        id: _editorLoader
 
-                        property alias propertyInfo: editorDelegate.propertyInfo
-                        property alias propertyValue: editorDelegate.propertyValue
+                        property alias propertyInfo: _editorDelegate.propertyInfo
+                        property alias propertyValue: _editorDelegate.propertyValue
 
                         function changePropertyValue(newValue) {
                             var attrs = annotation.attributes
@@ -128,18 +128,18 @@ Item {
                         active: propertyInfo.visible === true
                         sourceComponent: {
                             switch(propertyInfo.type) {
-                            case "color": return colorEditor
-                            case "number": return numberEditor
-                            case "boolean": return booleanEditor
-                            case "text": return textEditor
-                            case "url": return urlEditor
-                            case "fontFamily": return fontFamilyEditor
-                            case "fontStyle": return fontStyleEditor
-                            case "hAlign": return hAlignEditor
-                            case "vAlign": return vAlignEditor
-                            case "image": return imageEditor
+                            case "color": return _colorEditor
+                            case "number": return _numberEditor
+                            case "boolean": return _booleanEditor
+                            case "text": return _textEditor
+                            case "url": return _urlEditor
+                            case "fontFamily": return _fontFamilyEditor
+                            case "fontStyle": return _fontStyleEditor
+                            case "hAlign": return _hAlignEditor
+                            case "vAlign": return _vAlignEditor
+                            case "image": return _imageEditor
                             }
-                            return unknownEditor
+                            return _unknownEditor
                         }
                     }
                 }
@@ -193,7 +193,7 @@ Item {
     }
 
     Component {
-        id: colorEditor
+        id: _colorEditor
 
         Row {
             property var propertyInfo: parent.propertyInfo
@@ -210,11 +210,11 @@ Item {
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: colorMenu.show()
+                    onClicked: _colorMenu.show()
                 }
 
                 MenuLoader {
-                    id: colorMenu
+                    id: _colorMenu
                     anchors.top: parent.bottom
                     anchors.left: parent.left
 
@@ -222,7 +222,7 @@ Item {
                         ColorMenu {
                             title: "Standard Colors"
                             onMenuItemClicked: {
-                                colorMenu.close()
+                                _colorMenu.close()
                                 changePropertyValue(color)
                             }
                         }
@@ -234,7 +234,7 @@ Item {
                             onClicked: {
                                 var newColor = Color.pick(propertyValue)
                                 changePropertyValue( "" + newColor )
-                                colorMenu.close()
+                                _colorMenu.close()
                             }
                         }
                     }
@@ -251,7 +251,7 @@ Item {
     }
 
     Component {
-        id: numberEditor
+        id: _numberEditor
 
         Row {
             property var propertyInfo: parent.propertyInfo
@@ -269,7 +269,7 @@ Item {
     }
 
     Component {
-        id: booleanEditor
+        id: _booleanEditor
 
         VclCheckBox {
             property var propertyInfo: parent.propertyInfo
@@ -283,7 +283,7 @@ Item {
     }
 
     Component {
-        id: textEditor
+        id: _textEditor
 
         TextArea {
             id: _textArea
@@ -331,25 +331,25 @@ Item {
 
             onCursorRectangleChanged: {
                 if(activeFocus) {
-                    var pt = mapToItem(propertyEditorItems, cursorRectangle.x, cursorRectangle.y)
-                    if(pt.y < propertyEditorView.contentY)
-                        propertyEditorView.contentY = Math.max(pt.y-10, 0)
-                    else if(pt.y + cursorRectangle.height > propertyEditorView.contentY + propertyEditorView.height)
-                        propertyEditorView.contentY = (pt.y + cursorRectangle.height + 10 - propertyEditorView.height)
+                    var pt = mapToItem(_propertyEditorItems, cursorRectangle.x, cursorRectangle.y)
+                    if(pt.y < _propertyEditorView.contentY)
+                        _propertyEditorView.contentY = Math.max(pt.y-10, 0)
+                    else if(pt.y + cursorRectangle.height > _propertyEditorView.contentY + _propertyEditorView.height)
+                        _propertyEditorView.contentY = (pt.y + cursorRectangle.height + 10 - _propertyEditorView.height)
                 }
             }
         }
     }
 
     Component {
-        id: urlEditor
+        id: _urlEditor
 
         Column {
             property var propertyInfo: parent.propertyInfo
             property var propertyValue: parent.propertyValue
 
             TextField {
-                id: urlField
+                id: _urlField
                 text: propertyValue
                 onAccepted: changePropertyValue(text)
                 placeholderText: "Enter URL and press " + (Platform.isMacOSDesktop ? "Return" : "Enter") + " key to set."
@@ -359,17 +359,17 @@ Item {
             VclLabel {
                 width: parent.width
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize-1
-                visible: propertyValue != urlField.text
+                visible: propertyValue != _urlField.text
                 text: "Press " + (Platform.isMacOSDesktop ? "Return" : "Enter") + " key to set."
             }
         }
     }
 
     Component {
-        id: fontFamilyEditor
+        id: _fontFamilyEditor
 
         VclButton {
-            id: fontFamilyButton
+            id: _fontFamilyButton
 
             property var propertyInfo: parent.propertyInfo
             property var propertyValue: parent.propertyValue
@@ -381,8 +381,8 @@ Item {
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
             contentItem: VclLabel {
-                text: fontFamilyButton.text
-                font: fontFamilyButton.font
+                text: _fontFamilyButton.text
+                font: _fontFamilyButton.font
                 elide: Text.ElideRight
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
@@ -396,7 +396,7 @@ Item {
     }
 
     Component {
-        id: fontStyleEditor
+        id: _fontStyleEditor
 
         Row {
             property var propertyInfo: parent.propertyInfo
@@ -431,7 +431,7 @@ Item {
     }
 
     Component {
-        id: hAlignEditor
+        id: _hAlignEditor
 
         Row {
             property var propertyInfo: parent.propertyInfo
@@ -456,7 +456,7 @@ Item {
     }
 
     Component {
-        id: vAlignEditor
+        id: _vAlignEditor
 
         Row {
             property var propertyInfo: parent.propertyInfo
@@ -481,7 +481,7 @@ Item {
     }
 
     Component {
-        id: imageEditor
+        id: _imageEditor
 
         Rectangle {
             property var propertyInfo: parent.propertyInfo
@@ -493,7 +493,7 @@ Item {
             border.color: Runtime.colors.primary.borderColor
 
             VclFileDialog {
-                id: fileDialog
+                id: _fileDialog
 
                 nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
 
@@ -508,7 +508,7 @@ Item {
             }
 
             Image {
-                id: image
+                id: _image
                 anchors.fill: parent
                 anchors.margins: 1
                 fillMode: Image.PreserveAspectFit
@@ -524,7 +524,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
-                onContainsMouseChanged: image.opacity = containsMouse ? 0.25 : 1
+                onContainsMouseChanged: _image.opacity = containsMouse ? 0.25 : 1
             }
 
             Row {
@@ -539,7 +539,7 @@ Item {
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: fileDialog.open()
+                        onClicked: _fileDialog.open()
                         cursorShape: Qt.PointingHandCursor
                     }
                 }
@@ -566,7 +566,7 @@ Item {
     }
 
     Component {
-        id: unknownEditor
+        id: _unknownEditor
 
         Item {
             property var propertyInfo: parent.propertyInfo

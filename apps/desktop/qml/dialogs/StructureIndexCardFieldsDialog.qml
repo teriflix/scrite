@@ -37,26 +37,26 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         title: "Customise Index Card Fields"
         width: Math.min(Scrite.window.width-80, 1050)
         height: Math.min(Scrite.window.height-80, 750)
 
         content: PageView {
-            id: pageView
+            id: _pageView
             pagesArray: ["This Document", "Default Global"]
             currentIndex: 0
             pageContent: Loader {
-                width: pageView.availablePageContentWidth
-                height: pageView.availablePageContentHeight
-                sourceComponent: pageView.currentIndex === 0 ? thisDocumentPage : defaultGlobalPage
+                width: _pageView.availablePageContentWidth
+                height: _pageView.availablePageContentHeight
+                sourceComponent: _pageView.currentIndex === 0 ? thisDocumentPage : _defaultGlobalPage
             }
         }
     }
 
     Component {
-        id: thisDocumentPage
+        id: _thisDocumentPage
 
         StructureIndexCardFieldsPage {
             target: e_CurrentDocumentTarget
@@ -64,7 +64,7 @@ DialogLauncher {
     }
 
     Component {
-        id: defaultGlobalPage
+        id: _defaultGlobalPage
 
         StructureIndexCardFieldsPage {
             target: e_DefaultGlobalTarget
@@ -74,6 +74,6 @@ DialogLauncher {
     QtObject {
         id: _private
 
-        property VclDialog dialog
+        property VclDialog _dialog
     }
 }

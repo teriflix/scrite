@@ -13,4 +13,5 @@
 **
 ****************************************************************************/
 
-AbstractScreenplayElementBreakDelegate { }
+AbstractScreenplayElementBreakDelegate {
+    id: root }

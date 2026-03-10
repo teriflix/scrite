@@ -30,7 +30,7 @@ Item {
     clip: true
 
     ColumnLayout {
-        id: layout
+        id: _layout
 
         anchors.fill: parent
         anchors.margins: 10
@@ -44,11 +44,11 @@ Item {
             spacing: 5
 
             VclComboBox {
-                id: paragraphTypeComboBox
+                id: _paragraphTypeComboBox
 
                 Layout.fillWidth: true
 
-                visible: layout.width >= 800
+                visible: _layout.width >= 800
 
                 model: GenericArrayModel {
                     array: [
@@ -76,7 +76,7 @@ Item {
             }
 
             VclComboBox {
-                id: languageComboBox
+                id: _languageComboBox
 
                 Layout.preferredWidth: _private.lanugageModel.longestKeyWidth
 
@@ -92,7 +92,7 @@ Item {
             }
 
             VclComboBox {
-                id: fontSizesComboBox
+                id: _fontSizesComboBox
 
                 readonly property var systemFonts: Scrite.app.systemFontInfo()
 
@@ -109,7 +109,7 @@ Item {
                 spacing: 0
 
                 SimpleToolButton {
-                    id: boldButton
+                    id: _boldButton
                     down: checked
                     iconSource: "qrc:/icons/editor/format_bold.png"
                     onClicked: {
@@ -120,7 +120,7 @@ Item {
                 }
 
                 SimpleToolButton {
-                    id: italicsButton
+                    id: _italicsButton
                     down: checked
                     iconSource: "qrc:/icons/editor/format_italics.png"
                     onClicked: {
@@ -131,7 +131,7 @@ Item {
                 }
 
                 SimpleToolButton {
-                    id: underlineButton
+                    id: _underlineButton
                     down: checked
                     iconSource: "qrc:/icons/editor/format_underline.png"
                     onClicked: {
@@ -143,7 +143,7 @@ Item {
             }
 
             SimpleToolButton {
-                id: textAlignment
+                id: _textAlignment
                 property int value: Qt.AlignLeft
                 iconSource: {
                     switch(value) {
@@ -163,64 +163,64 @@ Item {
                 ToolTip.text: "Paragraph Indentation"
                 ToolTip.visible: containsMouse
 
-                onClicked: textAlignmentMenu.open()
+                onClicked: _textAlignmentMenu.open()
 
                 Item {
                     width: parent.width
                     anchors.bottom: parent.bottom
 
                     VclMenu {
-                        id: textAlignmentMenu
+                        id: _textAlignmentMenu
 
                         VclMenuItem {
                             text: "Left"
                             checkable: true
-                            checked: textAlignment.value === Qt.AlignLeft
+                            checked: _textAlignment.value === Qt.AlignLeft
                             icon.source: "qrc:/icons/editor/format_align_left.png"
-                            font.bold: textAlignment.value === Qt.AlignLeft
+                            font.bold: _textAlignment.value === Qt.AlignLeft
                             onClicked: {
-                                textAlignment.value = Qt.AlignLeft
-                                _private.printElementFormat.textAlignment = textAlignment.value
-                                _private.displayElementFormat.textAlignment = textAlignment.value
+                                _textAlignment.value = Qt.AlignLeft
+                                _private.printElementFormat._textAlignment = _textAlignment.value
+                                _private.displayElementFormat._textAlignment = _textAlignment.value
                             }
                         }
 
                         VclMenuItem {
                             text: "Center"
                             checkable: true
-                            checked: textAlignment.value === Qt.AlignHCenter
+                            checked: _textAlignment.value === Qt.AlignHCenter
                             icon.source: "qrc:/icons/editor/format_align_center.png"
-                            font.bold: textAlignment.value === Qt.AlignHCenter
+                            font.bold: _textAlignment.value === Qt.AlignHCenter
                             onClicked: {
-                                textAlignment.value = Qt.AlignHCenter
-                                _private.printElementFormat.textAlignment = textAlignment.value
-                                _private.displayElementFormat.textAlignment = textAlignment.value
+                                _textAlignment.value = Qt.AlignHCenter
+                                _private.printElementFormat._textAlignment = _textAlignment.value
+                                _private.displayElementFormat._textAlignment = _textAlignment.value
                             }
                         }
 
                         VclMenuItem {
                             text: "Right"
                             checkable: true
-                            checked: textAlignment.value === Qt.AlignRight
+                            checked: _textAlignment.value === Qt.AlignRight
                             icon.source: "qrc:/icons/editor/format_align_right.png"
-                            font.bold: textAlignment.value === Qt.AlignRight
+                            font.bold: _textAlignment.value === Qt.AlignRight
                             onClicked: {
-                                textAlignment.value = Qt.AlignRight
-                                _private.printElementFormat.textAlignment = textAlignment.value
-                                _private.displayElementFormat.textAlignment = textAlignment.value
+                                _textAlignment.value = Qt.AlignRight
+                                _private.printElementFormat._textAlignment = _textAlignment.value
+                                _private.displayElementFormat._textAlignment = _textAlignment.value
                             }
                         }
 
                         VclMenuItem {
                             text: "Justify"
                             checkable: true
-                            checked: textAlignment.value === Qt.AlignJustify
+                            checked: _textAlignment.value === Qt.AlignJustify
                             icon.source: "qrc:/icons/editor/format_align_justify.png"
-                            font.bold: textAlignment.value === Qt.AlignJustify
+                            font.bold: _textAlignment.value === Qt.AlignJustify
                             onClicked: {
-                                textAlignment.value = Qt.AlignJustify
-                                _private.printElementFormat.textAlignment = textAlignment.value
-                                _private.displayElementFormat.textAlignment = textAlignment.value
+                                _textAlignment.value = Qt.AlignJustify
+                                _private.printElementFormat._textAlignment = _textAlignment.value
+                                _private.displayElementFormat._textAlignment = _textAlignment.value
                             }
                         }
                     }
@@ -228,14 +228,14 @@ Item {
             }
 
             ColorToolButton {
-                id: textForeground
+                id: _textForeground
 
                 ToolTip.text: "Text Color"
                 ToolTip.visible: containsMouse
 
                 hoverEnabled: true
                 onColorPicked: (newColor) => {
-                                   textForeground.selectedColor = newColor
+                                   _textForeground.selectedColor = newColor
                                    _private.printElementFormat.textColor = newColor
                                    _private.displayElementFormat.textColor = newColor
                                }
@@ -251,7 +251,7 @@ Item {
                     VclText {
                         anchors.centerIn: parent
 
-                        color: textForeground.selectedColor === Runtime.colors.transparent ? "black" : textForeground.selectedColor
+                        color: _textForeground.selectedColor === Runtime.colors.transparent ? "black" : _textForeground.selectedColor
 
                         font.bold: true
                         font.pixelSize: parent.height * 0.70
@@ -264,7 +264,7 @@ Item {
 
             // FIXME: Make this visible once we figure out a way to show background colors
             ColorToolButton {
-                id: textBackground
+                id: _textBackground
 
                 ToolTip.text: "Background Color"
                 ToolTip.visible: containsMouse
@@ -272,7 +272,7 @@ Item {
                 visible: false
                 hoverEnabled: true
                 onColorPicked: (newColor) => {
-                                   textBackground.selectedColor = newColor
+                                   _textBackground.selectedColor = newColor
                                    _private.printElementFormat.backgroundColor = newColor
                                    _private.displayElementFormat.backgroundColor = newColor
                                }
@@ -285,12 +285,12 @@ Item {
 
                     border.width: parent.colorsMenuVisible ? 2 : 1
                     border.color: "black"
-                    color: textBackground.selectedColor === Runtime.colors.transparent ? "white" : textBackground.selectedColor
+                    color: _textBackground.selectedColor === Runtime.colors.transparent ? "white" : _textBackground.selectedColor
 
                     VclText {
                         anchors.centerIn: parent
 
-                        color: textForeground.selectedColor === Runtime.colors.transparent ? "black" : textForeground.selectedColor
+                        color: _textForeground.selectedColor === Runtime.colors.transparent ? "black" : _textForeground.selectedColor
 
                         font.bold: true
                         font.pixelSize: parent.height * 0.70
@@ -301,13 +301,13 @@ Item {
             }
 
             SimpleToolButton {
-                id: textLineHeight
+                id: _textLineHeight
                 property real value: 0.85
-                down: textLineHeightEditor.visible
+                down: _textLineHeightEditor.visible
                 iconSource: "qrc:/icons/editor/format_line_spacing.png"
                 hoverEnabled: true
 
-                onClicked: textLineHeightEditor.open()
+                onClicked: _textLineHeightEditor.open()
 
                 ToolTip.text: "Line Spacing"
                 ToolTip.visible: containsMouse
@@ -317,17 +317,17 @@ Item {
                     anchors.bottom: parent.bottom
 
                     Popup {
-                        id: textLineHeightEditor
+                        id: _textLineHeightEditor
                         closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
                         contentItem: SpinBox {
                             from: 25
                             to: 300
                             stepSize: 5
                             editable: true
-                            value: textLineHeight.value * 100
+                            value: _textLineHeight.value * 100
                             onValueModified: {
                                 const v = value/100
-                                textLineHeight.value = v
+                                _textLineHeight.value = v
                                 _private.printElementFormat.lineHeight = v
                                 _private.displayElementFormat.lineHeight = v
                             }
@@ -337,14 +337,14 @@ Item {
             }
 
             SimpleToolButton {
-                id: firstLineIndent
+                id: _firstLineIndent
                 property real value: 0
 
-                down: firstLineIndentEditor.visible
+                down: _firstLineIndentEditor.visible
                 iconSource: "qrc:/icons/editor/format_first_line_indent.png"
                 hoverEnabled: true
 
-                onClicked: firstLineIndentEditor.open()
+                onClicked: _firstLineIndentEditor.open()
 
                 ToolTip.text: "First Line Indent"
                 ToolTip.visible: containsMouse
@@ -354,17 +354,17 @@ Item {
                     anchors.bottom: parent.bottom
 
                     Popup {
-                        id: firstLineIndentEditor
+                        id: _firstLineIndentEditor
                         closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
                         contentItem: SpinBox {
                             from: 0
                             to: 100
                             stepSize: 5
                             editable: true
-                            value: firstLineIndent.value
+                            value: _firstLineIndent.value
                             onValueModified: {
                                 const v = value
-                                firstLineIndent.value = v
+                                _firstLineIndent.value = v
                                 _private.printElementFormat.textIndent = v
                                 _private.displayElementFormat.textIndent = v
                             }
@@ -377,12 +377,12 @@ Item {
                 ToolTipPopup {
                     container: parent
                     visible: parent.containsMouse
-                    text: "Copy one or more attributes of " + paragraphTypeComboBox.currentText + " to other paragraph types."
+                    text: "Copy one or more attributes of " + _paragraphTypeComboBox.currentText + " to other paragraph types."
                 }
 
                 hoverEnabled: true
                 iconSource: "qrc:/icons/action/done_all.png"
-                onClicked: copyAttribsDialog.open()
+                onClicked: _copyAttribsDialog.open()
             }
         }
 
@@ -391,7 +391,7 @@ Item {
             Layout.fillHeight: true
 
             TextArea {
-                id: previewText
+                id: _previewText
 
                 scale: (parent.width-100)/width
                 width: Scrite.document.printFormat.pageLayout.contentWidth
@@ -403,7 +403,7 @@ Item {
                 background: Item { }
 
                 SceneDocumentBinder {
-                    id: previewTextBinder
+                    id: _previewTextBinder
                     screenplayFormat: Scrite.document.printFormat
                     applyLanguageFonts: true
                     applyFormattingEvenInTransaction: true
@@ -441,8 +441,8 @@ Item {
                             }
                         ]
                     }
-                    textWidth: previewText.width
-                    textDocument: previewText.textDocument
+                    textWidth: _previewText.width
+                    textDocument: _previewText.textDocument
                     cursorPosition: -1
                     forceSyncDocument: true
                 }
@@ -451,23 +451,23 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: (mouse) => {
-                                   var cpos = previewText.positionAt(mouse.x, mouse.y)
-                                   var sceneElement = previewTextBinder.sceneElementAt(cpos)
+                                   var cpos = _previewText.positionAt(mouse.x, mouse.y)
+                                   var sceneElement = _previewTextBinder.sceneElementAt(cpos)
                                    if(sceneElement)
-                                   paragraphTypeComboBox.currentIndex = paragraphTypeComboBox.model.firstIndexOf("value", sceneElement.type)
+                                   _paragraphTypeComboBox.currentIndex = _paragraphTypeComboBox.model.firstIndexOf("value", sceneElement.type)
                                }
 
                     // This rectangle follows actively selected paragraph type in the dialog box
                     SceneElementIndicator {
-                        id: activeElementIndicator
+                        id: _activeElementIndicator
 
                         opacity: 0.2
                         backgroundColor: Color.translucent(Runtime.colors.accent.c600.background, 0.5)
 
                         function updateSceneElement() {
-                            for(var i=0; i<previewTextBinder.scene.elementCount; i++) {
-                                var _sceneElement = previewTextBinder.scene.elementAt(i)
-                                if(_sceneElement.type === paragraphTypeComboBox.currentValue) {
+                            for(var i=0; i<_previewTextBinder.scene.elementCount; i++) {
+                                var _sceneElement = _previewTextBinder.scene.elementAt(i)
+                                if(_sceneElement.type === _paragraphTypeComboBox.currentValue) {
                                     sceneElement = _sceneElement
                                     return
                                 }
@@ -476,18 +476,18 @@ Item {
 
                         Component.onCompleted: {
                             updateSceneElement()
-                            paragraphTypeComboBox.currentValueChanged.connect(updateSceneElement)
+                            _paragraphTypeComboBox.currentValueChanged.connect(updateSceneElement)
                         }
                     }
 
                     // This rectangle follows paragraph under the mouse cursor
                     SceneElementIndicator {
-                        id: hoveredElementIndicator
+                        id: _hoveredElementIndicator
 
-                        property int cursorPosition: parent.containsMouse ? previewText.positionAt(parent.mouseX, parent.mouseY) : -1
-                        sceneElement: previewTextBinder.sceneElementAt(cursorPosition)
+                        property int cursorPosition: parent.containsMouse ? _previewText.positionAt(parent.mouseX, parent.mouseY) : -1
+                        sceneElement: _previewTextBinder.sceneElementAt(cursorPosition)
 
-                        opacity: activeElementIndicator.sceneElement === sceneElement ? 0 : 0.5
+                        opacity: _activeElementIndicator.sceneElement === sceneElement ? 0 : 0.5
                         backgroundColor: Color.translucent(Runtime.colors.primary.c600.background, 0.5)
 
                         ToolTip.text: sceneElement ? sceneElement.typeAsString : ""
@@ -495,7 +495,7 @@ Item {
                     }
 
                     component SceneElementIndicator : Item {
-                        id: sceneElementIndicator
+                        id: _sceneElementIndicator
                         property SceneElement sceneElement
                         property rect sceneElementRect
 
@@ -503,8 +503,8 @@ Item {
 
                         property bool valid: sceneElementRect.width > 0 && sceneElementRect.height > 0
                         visible: valid
-                        x: valid ? previewText.leftInset + previewText.leftPadding + sceneElementRect.x : 0
-                        y: valid ? previewText.topInset + previewText.topPadding + sceneElementRect.y : 0
+                        x: valid ? _previewText.leftInset + _previewText.leftPadding + sceneElementRect.x : 0
+                        y: valid ? _previewText.topInset + _previewText.topPadding + sceneElementRect.y : 0
                         width: valid ? sceneElementRect.width : 0
                         height: valid ? sceneElementRect.height : 0
 
@@ -518,7 +518,7 @@ Item {
                         Connections {
                             target: _private.printElementFormat
                             function onElementFormatChanged() {
-                                Qt.callLater(sceneElementIndicator.determineSceneElementRect, true)
+                                Qt.callLater(_sceneElementIndicator.determineSceneElementRect, true)
                             }
                         }
 
@@ -526,8 +526,8 @@ Item {
 
                         function determineSceneElementRect(reload) {
                             if(reload === true)
-                                previewTextBinder.reload()
-                            sceneElementRect = previewTextBinder.sceneElementBoundingRect(sceneElement)
+                                _previewTextBinder.reload()
+                            sceneElementRect = _previewTextBinder.sceneElementBoundingRect(sceneElement)
                         }
                     }
                 }
@@ -571,17 +571,17 @@ Item {
 
     // Private implementation
     VclDialog {
-        id: copyAttribsDialog
+        id: _copyAttribsDialog
 
         title: "Copy Attributes"
         width: 640
         height: Math.min(480, root.height*0.8)
 
         content: Item {
-            implicitHeight: copyAttribsDialogLayout.height + 40
+            implicitHeight: _copyAttribsDialogLayout.height + 40
 
             ColumnLayout {
-                id: copyAttribsDialogLayout
+                id: _copyAttribsDialogLayout
                 width: parent.width-40
                 anchors.centerIn: parent
                 spacing: 20
@@ -589,7 +589,7 @@ Item {
                 VclLabel {
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
-                    text: "Select attributes of <b>" + paragraphTypeComboBox.currentText + "</b> you want to copy to all other paragraph types."
+                    text: "Select attributes of <b>" + _paragraphTypeComboBox.currentText + "</b> you want to copy to all other paragraph types."
                 }
 
                 ColumnLayout {
@@ -598,21 +598,21 @@ Item {
                     spacing: 5
 
                     VclCheckBox {
-                        id: copyFontFamilyAttrib
+                        id: _copyFontFamilyAttrib
                         text: "Font Family: " + _private.displayElementFormat.font.family
                         padding: 0
                         checked: false
                     }
 
                     VclCheckBox {
-                        id: copyFontSizeAttrib
+                        id: _copyFontSizeAttrib
                         text: "Font Size: " + _private.displayElementFormat.font.pointSize + " pt"
                         padding: 0
                         checked: false
                     }
 
                     VclCheckBox {
-                        id: copyFontStyleAttrib
+                        id: _copyFontStyleAttrib
                         text: "Font Style: (" + fontStyle + ")"
                         padding: 0
                         checked: false
@@ -631,33 +631,33 @@ Item {
                     }
 
                     VclCheckBox {
-                        id: copyTextAlignmentAttrib
+                        id: _copyTextAlignmentAttrib
                         text: "Alignment: " + alignment
                         padding: 0
                         checked: false
 
                         property string alignment: {
-                            if(_private.displayElementFormat.textAlignment === Qt.AlignLeft)
+                            if(_private.displayElementFormat._textAlignment === Qt.AlignLeft)
                                 return "Left Align"
-                            if(_private.displayElementFormat.textAlignment === Qt.AlignRight)
+                            if(_private.displayElementFormat._textAlignment === Qt.AlignRight)
                                 return "Right Align"
-                            if(_private.displayElementFormat.textAlignment === Qt.AlignHCenter)
+                            if(_private.displayElementFormat._textAlignment === Qt.AlignHCenter)
                                 return "Center Align"
-                            if(_private.displayElementFormat.textAlignment === Qt.AlignJustify)
+                            if(_private.displayElementFormat._textAlignment === Qt.AlignJustify)
                                 return "Justify"
                             return "Left Align"
                         }
                     }
 
                     VclCheckBox {
-                        id: copyLineHeightAttrib
+                        id: _copyLineHeightAttrib
                         text: "Line Height: " + Math.round(_private.displayElementFormat.lineHeight*100) + "%"
                         padding: 0
                         checked: false
                     }
 
                     VclCheckBox {
-                        id: copyTextIndentAttrib
+                        id: _copyTextIndentAttrib
                         text: "First Line Indent: " + Math.round(_private.displayElementFormat.textIndent) + "pt"
                         padding: 0
                         checked: false
@@ -667,7 +667,7 @@ Item {
                         spacing: 10
 
                         VclCheckBox {
-                            id: copyColorAttribs
+                            id: _copyColorAttribs
                             text: "Colors"
                             padding: 0
                             checked: false
@@ -675,7 +675,7 @@ Item {
 
                         Rectangle {
                             implicitWidth: 30
-                            implicitHeight: copyColorAttribs.height
+                            implicitHeight: _copyColorAttribs.height
                             color: _private.displayElementFormat.backgroundColor
                             border.width: 1
                             border.color: Runtime.colors.primary.borderColor
@@ -697,26 +697,26 @@ Item {
                     VclButton {
                         text: "Select All"
                         onClicked: {
-                            copyFontFamilyAttrib.checked = true
-                            copyFontSizeAttrib.checked = true
-                            copyFontStyleAttrib.checked = true
-                            copyLineHeightAttrib.checked = true
-                            copyTextAlignmentAttrib.checked = true
-                            copyColorAttribs.checked = true
-                            copyTextIndentAttrib.checked = true
+                            _copyFontFamilyAttrib.checked = true
+                            _copyFontSizeAttrib.checked = true
+                            _copyFontStyleAttrib.checked = true
+                            _copyLineHeightAttrib.checked = true
+                            _copyTextAlignmentAttrib.checked = true
+                            _copyColorAttribs.checked = true
+                            _copyTextIndentAttrib.checked = true
                         }
                     }
 
                     VclButton {
                         text: "Unselect All"
                         onClicked: {
-                            copyFontFamilyAttrib.checked = false
-                            copyFontSizeAttrib.checked = false
-                            copyFontStyleAttrib.checked = false
-                            copyLineHeightAttrib.checked = false
-                            copyTextAlignmentAttrib.checked = false
-                            copyColorAttribs.checked = false
-                            copyTextIndentAttrib.checked = false
+                            _copyFontFamilyAttrib.checked = false
+                            _copyFontSizeAttrib.checked = false
+                            _copyFontStyleAttrib.checked = false
+                            _copyLineHeightAttrib.checked = false
+                            _copyTextAlignmentAttrib.checked = false
+                            _copyColorAttribs.checked = false
+                            _copyTextIndentAttrib.checked = false
                         }
                     }
 
@@ -728,22 +728,22 @@ Item {
                                 _private.printElementFormat.applyToAll(props)
                             }
 
-                            if(copyFontFamilyAttrib.checked)
+                            if(_copyFontFamilyAttrib.checked)
                                 applyToAll(SceneElementFormat.FontFamily)
-                            if(copyFontSizeAttrib.checked)
+                            if(_copyFontSizeAttrib.checked)
                                 applyToAll(SceneElementFormat.FontSize)
-                            if(copyFontStyleAttrib.checked)
+                            if(_copyFontStyleAttrib.checked)
                                 applyToAll(SceneElementFormat.FontStyle)
-                            if(copyLineHeightAttrib.checked)
+                            if(_copyLineHeightAttrib.checked)
                                 applyToAll(SceneElementFormat.LineHeight)
-                            if(copyTextAlignmentAttrib.checked)
+                            if(_copyTextAlignmentAttrib.checked)
                                 applyToAll(SceneElementFormat.TextAlignment)
-                            if(copyColorAttribs.checked)
+                            if(_copyColorAttribs.checked)
                                 applyToAll(SceneElementFormat.TextAndBackgroundColors)
-                            if(copyTextIndentAttrib.checked)
+                            if(_copyTextIndentAttrib.checked)
                                 applyToAll(SceneElementFormat.TextIndent)
 
-                            copyAttribsDialog.close()
+                            _copyAttribsDialog.close()
                         }
                     }
                 }
@@ -774,23 +774,23 @@ Item {
             }
         }
 
-        property SceneElementFormat printElementFormat: Scrite.document.printFormat.elementFormat(paragraphTypeComboBox.currentValue)
-        property SceneElementFormat displayElementFormat: Scrite.document.formatting.elementFormat(paragraphTypeComboBox.currentValue)
+        property SceneElementFormat printElementFormat: Scrite.document.printFormat.elementFormat(_paragraphTypeComboBox.currentValue)
+        property SceneElementFormat displayElementFormat: Scrite.document.formatting.elementFormat(_paragraphTypeComboBox.currentValue)
 
         onPrintElementFormatChanged: {
-            languageComboBox.currentIndex = Runtime.language.supported.indexOfLanguage(printElementFormat.defaultLanguageCode) + 1
+            _languageComboBox.currentIndex = Runtime.language.supported.indexOfLanguage(printElementFormat.defaultLanguageCode) + 1
 
             const font = printElementFormat.font
-            fontSizesComboBox.currentIndex = fontSizesComboBox.model.indexOf(font.pointSize)
-            boldButton.checked = font.bold
-            italicsButton.checked = font.italic
-            underlineButton.checked = font.underline
+            _fontSizesComboBox.currentIndex = _fontSizesComboBox.model.indexOf(font.pointSize)
+            _boldButton.checked = font.bold
+            _italicsButton.checked = font.italic
+            _underlineButton.checked = font.underline
 
-            textForeground.selectedColor = printElementFormat.textColor
-            textBackground.selectedColor = Color.translucent(printElementFormat.backgroundColor, 4)
-            textAlignment.value = printElementFormat.textAlignment
-            textLineHeight.value = printElementFormat.lineHeight
-            firstLineIndent.value = printElementFormat.textIndent
+            _textForeground.selectedColor = printElementFormat.textColor
+            _textBackground.selectedColor = Color.translucent(printElementFormat.backgroundColor, 4)
+            _textAlignment.value = printElementFormat._textAlignment
+            _textLineHeight.value = printElementFormat.lineHeight
+            _firstLineIndent.value = printElementFormat.textIndent
         }
     }
 

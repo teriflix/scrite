@@ -40,7 +40,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         title: {
             if(SubscriptionPlanOperations.taxonomy)
@@ -60,13 +60,13 @@ DialogLauncher {
             set: Scrite.user.info.hasTrialSubscription || Scrite.user.info.hasActiveSubscription
             onGetChanged: {
                 if(get)
-                    dialog.close()
+                    _dialog.close()
             }
         }
 
         content: Item {
             ButtonGroup {
-                id: buttonGroup
+                id: _buttonGroup
             }
 
             ColumnLayout {
@@ -75,7 +75,7 @@ DialogLauncher {
                 width: parent.width-40
                 spacing: 20
 
-                enabled: !apiCalls.busy
+                enabled: !_apiCalls.busy
                 opacity: enabled ? 1 : 0.5
 
                 VclLabel {
@@ -88,53 +88,53 @@ DialogLauncher {
 
                 ColumnLayout {
                     VclRadioButton {
-                        id: activateTrialNowButton
+                        id: _activateTrialNowButton
 
                         Layout.fillWidth: true
-                        ButtonGroup.group: buttonGroup
+                        ButtonGroup.group: _buttonGroup
 
                         text: "I want to activate my free trial now."
                     }
 
                     VclRadioButton {
-                        id: activateTrialLaterButton
+                        id: _activateTrialLaterButton
 
                         Layout.fillWidth: true
-                        ButtonGroup.group: buttonGroup
+                        ButtonGroup.group: _buttonGroup
 
                         text: "I'll activate the trial later."
                     }
 
                     VclRadioButton {
-                        id: subscriptionRequirementButton
+                        id: _subscriptionRequirementButton
 
                         Layout.fillWidth: true
-                        ButtonGroup.group: buttonGroup
+                        ButtonGroup.group: _buttonGroup
 
                         text: "I didn’t realize a subscription is required after the trial."
                     }
 
                     VclRadioButton {
-                        id: othersButton
+                        id: _othersButton
 
                         Layout.fillWidth: true
-                        ButtonGroup.group: buttonGroup
+                        ButtonGroup.group: _buttonGroup
 
                         text: "Other (please specify)"
                     }
 
                     ScrollView {
-                        id: othersReasonView
+                        id: _othersReasonView
 
                         Layout.fillWidth: true
-                        Layout.leftMargin: othersButton.indicator.width + othersButton.spacing + parent.spacing
+                        Layout.leftMargin: _othersButton.indicator.width + _othersButton.spacing + parent.spacing
                         Layout.preferredHeight: 80
 
-                        enabled: othersButton.checked
+                        enabled: _othersButton.checked
                         opacity: enabled ? 1 : 0.5
 
                         TextArea {
-                            id: otherReason
+                            id: _otherReason
 
                             width: othersReason.width-17
 
@@ -151,49 +151,49 @@ DialogLauncher {
                 VclButton {
                     Layout.alignment: Qt.AlignRight
 
-                    enabled: buttonGroup.checkState !== Qt.Unchecked &&
-                             (otherReason.enabled ? otherReason.text !== "" : true)
+                    enabled: _buttonGroup.checkState !== Qt.Unchecked &&
+                             (_otherReason.enabled ? _otherReason.text !== "" : true)
 
                     text: {
-                        if(activateTrialNowButton.checked)
+                        if(_activateTrialNowButton.checked)
                             return "Activate Trial Now »"
 
-                        if(othersButton.checked)
+                        if(_othersButton.checked)
                             return "Share Feedback »"
 
                         return "Submit »"
                     }
 
                     onClicked: {
-                        if(activateTrialNowButton.checked) {
-                            activateTrialApi.call()
+                        if(_activateTrialNowButton.checked) {
+                            _activateTrialApi.call()
                             return
                         }
 
-                        if(activateTrialLaterButton.checked)
-                            reasonApi.reason = activateTrialLaterButton.text
-                        else if(subscriptionRequirementButton.checked)
-                            reasonApi.reason = subscriptionRequirementButton.text
-                        else if(othersButton.checkable)
-                            reasonApi.reason = otherReason.text
+                        if(_activateTrialLaterButton.checked)
+                            _reasonApi.reason = _activateTrialLaterButton.text
+                        else if(_subscriptionRequirementButton.checked)
+                            _reasonApi.reason = _subscriptionRequirementButton.text
+                        else if(_othersButton.checkable)
+                            _reasonApi.reason = _otherReason.text
 
-                        reasonApi.call()
+                        _reasonApi.call()
                     }
                 }
             }
 
             RestApiCallList {
-                id: apiCalls
-                calls: [activateTrialApi,reasonApi]
+                id: _apiCalls
+                calls: [_activateTrialApi,_reasonApi]
             }
 
             BusyIndicator {
-                running: apiCalls.busy
+                running: _apiCalls.busy
                 anchors.centerIn: parent
             }
 
             SubscriptionPlanActivationRestApiCall {
-                id: activateTrialApi
+                id: _activateTrialApi
 
                 api: SubscriptionPlanOperations.taxonomy.trialActivationApi
 
@@ -202,20 +202,20 @@ DialogLauncher {
                         MessageBox.information("Error", errorMessage)
                     } else {
                         UserAccountDialog.launch("Subscriptions")
-                        dialog.close()
+                        _dialog.close()
                     }
                 }
             }
 
             SubscriptionTrialDeclineReasonApiCall {
-                id: reasonApi
+                id: _reasonApi
 
                 onFinished: {
                     if(hasError) {
                         MessageBox.information("Error", errorMessage)
                     } else {
                         _private.closeMainWindow()
-                        dialog.close()
+                        _dialog.close()
                     }
                 }
             }

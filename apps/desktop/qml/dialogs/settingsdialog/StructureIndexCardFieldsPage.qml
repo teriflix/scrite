@@ -34,7 +34,7 @@ Item {
     property int target: e_DefaultGlobalTarget
 
     ColumnLayout {
-        id: layout
+        id: _layout
 
         anchors.fill: parent
         anchors.margins: 15
@@ -70,68 +70,68 @@ Item {
                 width: parent.width
 
                 flow: GridLayout.TopToBottom
-                rows: indexCardFieldsModel.maxCount
+                rows: _indexCardFieldsModel.maxCount
                 columns: 3
                 columnSpacing: 20
 
                 // Column 1: labels
                 Repeater {
-                    model: indexCardFieldsModel.maxCount
+                    model: _indexCardFieldsModel.maxCount
 
                     delegate: VclTextField {
                         required property int index
 
                         Layout.preferredWidth: Runtime.idealFontMetrics.averageCharacterWidth * (maximumLength+2)
 
-                        text: index < indexCardFieldsModel.count ? indexCardFieldsModel.get(index).name : ""
-                        enabled: index <= indexCardFieldsModel.count
+                        text: index < _indexCardFieldsModel.count ? _indexCardFieldsModel.get(index).name : ""
+                        enabled: index <= _indexCardFieldsModel.count
                         opacity: enabled ? 1 : 0.5
                         placeholderText: text === "" && enabled ? "Label" : ""
 
-                        onTextChanged: indexCardFieldsModel.capture(index, "name", text.trim())
+                        onTextChanged: _indexCardFieldsModel.capture(index, "name", text.trim())
 
                         maximumLength: 5
 
                         TabSequenceItem.enabled: enabled
-                        TabSequenceItem.manager: tabSequenceManager
+                        TabSequenceItem.manager: _tabSequenceManager
                         TabSequenceItem.sequence: index * 2
                     }
                 }
 
                 // Column 2: description
                 Repeater {
-                    model: indexCardFieldsModel.maxCount
+                    model: _indexCardFieldsModel.maxCount
 
                     delegate: VclTextField {
                         required property int index
 
                         Layout.fillWidth: true
 
-                        text: index < indexCardFieldsModel.count ? indexCardFieldsModel.get(index).description : ""
-                        enabled: index <= indexCardFieldsModel.count
+                        text: index < _indexCardFieldsModel.count ? _indexCardFieldsModel.get(index).description : ""
+                        enabled: index <= _indexCardFieldsModel.count
                         opacity: enabled ? 1 : 0.5
                         placeholderText: text === "" && enabled ? "Description" : ""
 
-                        onTextChanged: indexCardFieldsModel.capture(index, "description", text.trim())
+                        onTextChanged: _indexCardFieldsModel.capture(index, "description", text.trim())
 
                         TabSequenceItem.enabled: enabled
-                        TabSequenceItem.manager: tabSequenceManager
+                        TabSequenceItem.manager: _tabSequenceManager
                         TabSequenceItem.sequence: index * 2 + 1
                     }
                 }
 
                 // Column 3: delete icon
                 Repeater {
-                    model: indexCardFieldsModel.maxCount
+                    model: _indexCardFieldsModel.maxCount
 
                     delegate: VclToolButton {
                         required property int index
 
-                        enabled: index < indexCardFieldsModel.count
+                        enabled: index < _indexCardFieldsModel.count
                         opacity: enabled ? 1 : 0.05
                         icon.source: "qrc:/icons/action/delete.png"
 
-                        onClicked: indexCardFieldsModel.remove(index, 1)
+                        onClicked: _indexCardFieldsModel.remove(index, 1)
                     }
                 }
             }
@@ -153,7 +153,7 @@ Item {
 
             VclButton {
                 visible: target === e_CurrentDocumentTarget
-                enabled: JSON.stringify(Scrite.document.structure.defaultIndexCardFields) !== JSON.stringify(indexCardFieldsModel.array)
+                enabled: JSON.stringify(Scrite.document.structure.defaultIndexCardFields) !== JSON.stringify(_indexCardFieldsModel.array)
 
                 text: "Use Defaults"
                 toolTipText: "Click this button to use your global default index card fields in this document."
@@ -174,21 +174,21 @@ Item {
 
                 function useDefaults() {
                     Scrite.document.structure.indexCardFields = Scrite.document.structure.defaultIndexCardFields
-                    indexCardFieldsModel.reset()
+                    _indexCardFieldsModel.reset()
                 }
             }
 
             VclButton {
                 text: "Revert"
-                enabled: indexCardFieldsModel.canReset
-                onClicked: indexCardFieldsModel.reset()
+                enabled: _indexCardFieldsModel.canReset
+                onClicked: _indexCardFieldsModel.reset()
             }
 
             VclButton {
                 text: "Apply"
-                enabled: indexCardFieldsModel.modified
+                enabled: _indexCardFieldsModel.modified
                 onClicked: {
-                    indexCardFieldsModel.commit()
+                    _indexCardFieldsModel.commit()
 
                     if(root.target === root.e_DefaultGlobalTarget) {
                         MessageBox.question("Index Card Fields",
@@ -207,12 +207,12 @@ Item {
 
     // Private stuff
     TabSequenceManager {
-        id: tabSequenceManager
+        id: _tabSequenceManager
         wrapAround: true
     }
 
     GenericArrayModel {
-        id: indexCardFieldsModel
+        id: _indexCardFieldsModel
 
         property int maxCount: 5
 

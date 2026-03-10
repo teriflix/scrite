@@ -39,12 +39,12 @@ VclDialog {
     handleLanguageShortcuts: true
     title: report ? report.title : "Report Configuration Dialog"
 
-    content: report && visible ? (_private.reportEnabled ? reportConfigContent : reportFeatureDisabledContent) : null
+    content: report && visible ? (_private.reportEnabled ? reportConfigContent : _reportFeatureDisabledContent) : null
     bottomBar: report && visible && _private.reportEnabled ? generateButtonBar : null
 
     // Show this component if the report feature is disabled for the current user
     Component {
-        id: reportFeatureDisabledContent
+        id: _reportFeatureDisabledContent
 
         DisabledFeatureNotice {
             color: Qt.rgba(1,1,1,0.9)
@@ -54,7 +54,7 @@ VclDialog {
 
     // Show this component if the report is enabled for the current user
     Component {
-        id: reportConfigContent
+        id: _reportConfigContent
 
         ColumnLayout {
             spacing: 0
@@ -76,7 +76,7 @@ VclDialog {
             }
 
             PageView {
-                id: reportConfigPageView
+                id: _reportConfigPageView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 pagesArray: _private.configuration.groups
@@ -94,25 +94,25 @@ VclDialog {
                 }
                 pageListVisible: pagesArray && pagesArray.length > 1
                 pageContent: ColumnLayout {
-                    width: reportConfigPageView.availablePageContentWidth
+                    width: _reportConfigPageView.availablePageContentWidth
 
                     Loader {
-                        id: pageContentLoader
+                        id: _pageContentLoader
 
                         Layout.fillWidth: true
                         Layout.margins: 10
                         Layout.leftMargin: 0
 
-                        sourceComponent: reportConfigPageView.currentIndex === 0 ? reportConfigPage0 : reportConfigPageN
-                        onLoaded: item.fieldGroupIndex = reportConfigPageView.currentIndex
+                        sourceComponent: _reportConfigPageView.currentIndex === 0 ? reportConfigPage0 : _reportConfigPageN
+                        onLoaded: item.fieldGroupIndex = _reportConfigPageView.currentIndex
                     }
 
                     Connections {
-                        target: reportConfigPageView
+                        target: _reportConfigPageView
 
                         function onCurrentIndexChanged() {
-                            pageContentLoader.active = false
-                            Qt.callLater( () => { pageContentLoader.active = true } )
+                            _pageContentLoader.active = false
+                            Qt.callLater( () => { _pageContentLoader.active = true } )
                         }
                     }
                 }
@@ -135,7 +135,7 @@ VclDialog {
     // The first page in the PageView of reportConfigContent should show
     // FileSelector and other options from the report generator
     Component {
-        id: reportConfigPage0
+        id: _reportConfigPage0
 
         ColumnLayout {
             property int fieldGroupIndex: -1
@@ -143,7 +143,7 @@ VclDialog {
             spacing: 5
 
             FileSelector {
-                id: fileSelector
+                id: _fileSelector
                 Layout.fillWidth: true
 
                 label: "Select a file to export into"
@@ -198,7 +198,7 @@ VclDialog {
 
             Repeater {
                 model: _private.configuration.groups[0].fields
-                delegate: fieldEditorLoader
+                delegate: _fieldEditorLoader
             }
         }
     }
@@ -206,7 +206,7 @@ VclDialog {
     // Every page there after in PageView of reportConfigContent should
     // show only options from the report generator
     Component {
-        id: reportConfigPageN
+        id: _reportConfigPageN
 
         ColumnLayout {
             property int fieldGroupIndex: -1
@@ -215,24 +215,24 @@ VclDialog {
 
             Repeater {
                 model: fieldGroupIndex > 0 && _private.configuration.groups[fieldGroupIndex] ? _private.configuration.groups[fieldGroupIndex].fields : []
-                delegate: fieldEditorLoader
+                delegate: _fieldEditorLoader
             }
         }
     }
 
     // Editor fields are instances of this component.
     Component {
-        id: fieldEditorLoader
+        id: _fieldEditorLoader
 
         Loader {
-            id: fieldLoader
+            id: _fieldLoader
 
             required property int index
             required property var modelData
 
             Layout.fillWidth: true
 
-            source: delegateChooser.delegateSource(modelData.editor)
+            source: _delegateChooser.delegateSource(modelData.editor)
             onLoaded: {
                 item.report = report
                 item.fieldInfo = modelData
@@ -243,7 +243,7 @@ VclDialog {
             opacity: enabled ? 1 : 0.5
             enabled: {
                 if(modelData.feature !== "") {
-                    const afc = Qt.createQmlObject("import io.scrite.components 1.0; AppFeature { }", fieldLoader)
+                    const afc = Qt.createQmlObject("import io.scrite.components 1.0; AppFeature { }", _fieldLoader)
                     afc.featureName = modelData.feature
                     const ret = afc.enabled
                     afc.destroy()
@@ -255,14 +255,14 @@ VclDialog {
     }
 
     Component {
-        id: generateButtonBar
+        id: _generateButtonBar
 
         Item {
-            id: footerItem
-            height: footerLayout.height+20
+            id: _footerItem
+            height: _footerLayout.height+20
 
             RowLayout {
-                id: footerLayout
+                id: _footerLayout
                 width: parent.width-32
                 anchors.centerIn: parent
 
@@ -270,18 +270,18 @@ VclDialog {
                     Layout.alignment: Qt.AlignRight
                     enabled: report.fileName !== "" && _private.reportEnabled
                     text: "Generate"
-                    onClicked: generateReportJob.start()
+                    onClicked: _generateReportJob.start()
 
                     ActionHandler {
                         action: root.acceptAction
 
-                        onTriggered: generateReportJob.start()
+                        onTriggered: _generateReportJob.start()
                     }
                 }
             }
 
             SequentialAnimation {
-                id: generateReportJob
+                id: _generateReportJob
 
                 running: false
 
@@ -332,7 +332,7 @@ VclDialog {
 
     // Factory function for loading delegates
     QtObject {
-        id: delegateChooser
+        id: _delegateChooser
 
         readonly property var knownEditors: [
             "CheckBox",

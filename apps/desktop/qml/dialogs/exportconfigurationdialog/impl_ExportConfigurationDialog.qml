@@ -37,12 +37,12 @@ VclDialog {
     handleLanguageShortcuts: true
     title: exporter ? ("Export to " + exporter.formatName) : "Export Configuration Dialog"
 
-    content: visible ? (_private.exportEnabled ? exportConfigContent : exportFeatureDisabledContent) : null
+    content: visible ? (_private.exportEnabled ? exportConfigContent : _exportFeatureDisabledContent) : null
     bottomBar: visible && _private.exportEnabled ? exportButtonFooter : null
 
     // Show this component if the exporter feature is disabled for the user
     Component {
-        id: exportFeatureDisabledContent
+        id: _exportFeatureDisabledContent
 
         DisabledFeatureNotice {
             color: Qt.rgba(1,1,1,0.9)
@@ -52,13 +52,13 @@ VclDialog {
 
     // Show this component if the exporter is enabled for the current user
     Component {
-        id: exportConfigContent
+        id: _exportConfigContent
 
         Item {
-            implicitHeight: exportConfigItemLayout.implicitHeight + 2*exportConfigItemLayout.spacing
+            implicitHeight: _exportConfigItemLayout.implicitHeight + 2*_exportConfigItemLayout.spacing
 
             ColumnLayout {
-                id: exportConfigItemLayout
+                id: _exportConfigItemLayout
 
                 width: parent.width - 4*spacing
                 anchors.top: parent.top
@@ -69,14 +69,14 @@ VclDialog {
 
                 // Show file selector for non-PDF exporters
                 FileSelector {
-                    id: fileSelector
+                    id: _fileSelector
                     Layout.fillWidth: true
 
                     label: "Select a file to export into"
                     absoluteFilePath: exporter.fileName
                     onAbsoluteFilePathChanged: exporter.fileName = absoluteFilePath
                     nameFilters: exporter.nameFilters
-                    tabSequenceManager: tabSequence
+                    tabSequenceManager: _tabSequence
                     visible: !_private.isPdfExport
                     enabled: visible && _private.exportSaveFeature.enabled
                     opacity: enabled ? 1 : 0.5
@@ -104,17 +104,17 @@ VclDialog {
                     model: _private.configuration.fields
 
                     delegate: Loader {
-                        id: fieldLoader
+                        id: _fieldLoader
 
                         required property int index
                         required property var modelData
 
                         Layout.fillWidth: true
-                        source: delegateChooser.delegateSource(modelData.editor)
+                        source: _delegateChooser.delegateSource(modelData.editor)
                         opacity: enabled ? 1 : 0.5
                         enabled: {
                             if(modelData.feature !== "") {
-                                const afc = Qt.createQmlObject("import io.scrite.components 1.0; AppFeature { }", fieldLoader)
+                                const afc = Qt.createQmlObject("import io.scrite.components 1.0; AppFeature { }", _fieldLoader)
                                 afc.featureName = modelData.feature
                                 const ret = afc.enabled
                                 afc.destroy()
@@ -125,7 +125,7 @@ VclDialog {
 
                         onLoaded: {
                             item.exporter = exporter
-                            item.tabSequence = tabSequence
+                            item._tabSequence = _tabSequence
                             item.fieldInfo = modelData
                         }
                     }
@@ -134,7 +134,7 @@ VclDialog {
                 // Dummy item
                 Item {
                     TabSequenceManager {
-                        id: tabSequence
+                        id: _tabSequence
                         wrapAround: true
                     }
                 }
@@ -159,14 +159,14 @@ VclDialog {
     }
 
     Component {
-        id: exportButtonFooter
+        id: _exportButtonFooter
 
         Item {
-            id: footerItem
-            height: footerLayout.height+20
+            id: _footerItem
+            height: _footerLayout.height+20
 
             RowLayout {
-                id: footerLayout
+                id: _footerLayout
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: 16
@@ -178,8 +178,8 @@ VclDialog {
                     visible: exporter.canCopyToClipboard
                     text: "Copy to Clipboard"
                     onClicked: {
-                        exportJob.copyToClipboard = true
-                        exportJob.start()
+                        _exportJob.copyToClipboard = true
+                        _exportJob.start()
                     }
                 }
 
@@ -191,8 +191,8 @@ VclDialog {
                     enabled: exporter.fileName !== "" && _private.exportEnabled
                     text: _private.isPdfExport ? "Generate PDF" : "Export"
                     onClicked: {
-                        exportJob.copyToClipboard = false
-                        exportJob.start()
+                        _exportJob.copyToClipboard = false
+                        _exportJob.start()
                     }
 
                     ActionHandler {
@@ -204,7 +204,7 @@ VclDialog {
             }
 
             SequentialAnimation {
-                id: exportJob
+                id: _exportJob
 
                 property bool copyToClipboard: false
 
@@ -234,13 +234,13 @@ VclDialog {
                             Runtime.fileNamager.addToAutoDeleteList(exporter.fileName)
                         }
 
-                        const success = exporter.write(exportJob.copyToClipboard ? AbstractExporter.ClipboardTarget : AbstractExporter.FileTarget)
+                        const success = exporter.write(_exportJob.copyToClipboard ? AbstractExporter.ClipboardTarget : AbstractExporter.FileTarget)
 
                         Qt.callLater(_private.waitDialog.close)
                         _private.waitDialog = null
 
                         if(success) {
-                            if(exportJob.copyToClipboard) {
+                            if(_exportJob.copyToClipboard) {
                                 MessageBox.information(exporter.formatName + " - Export", "Successfully copied text to clipboard.", root.close)
                                 return
                             }
@@ -262,7 +262,7 @@ VclDialog {
 
     // Factory function for loading delegates
     QtObject {
-        id: delegateChooser
+        id: _delegateChooser
 
         readonly property var knownEditors: [
             "IntegerSpinBox",

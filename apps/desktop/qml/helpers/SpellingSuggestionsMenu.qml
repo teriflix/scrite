@@ -43,7 +43,7 @@ MenuLoader {
         onAboutToHide: root.menuAboutToHide()
 
         Repeater {
-            id: suggestionsRepeater
+            id: _suggestionsRepeater
 
             model: root.spellingSuggestions
 

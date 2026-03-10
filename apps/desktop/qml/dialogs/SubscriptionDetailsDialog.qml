@@ -48,7 +48,7 @@ DialogLauncher {
     }
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         property var subscription
 
@@ -57,32 +57,32 @@ DialogLauncher {
         title: "Subscription Details"
 
         content: Item {
-            Component.onCompleted: SubscriptionPlanOperations.populateFeatureListTableModel(dialog.subscription, featureModel)
+            Component.onCompleted: SubscriptionPlanOperations.populateFeatureListTableModel(_dialog.subscription, _featureModel)
 
             ListModel {
-                id: featureModel
+                id: _featureModel
             }
 
             Flickable {
-                id: detailsView
+                id: _detailsView
 
                 anchors.fill: parent
 
                 clip: true
 
                 contentWidth: width
-                contentHeight: detailsViewLayout.height
+                contentHeight: _detailsViewLayout.height
                 boundsBehavior: Flickable.StopAtBounds
                 boundsMovement: Flickable.StopAtBounds
 
                 ScrollBar.vertical: VclScrollBar {
-                    flickable: detailsView
+                    flickable: _detailsView
                 }
 
                 ColumnLayout {
-                    id: detailsViewLayout
+                    id: _detailsViewLayout
 
-                    width: detailsView.width - 20
+                    width: _detailsView.width - 20
                     spacing: 10
 
                     Item {
@@ -93,7 +93,7 @@ DialogLauncher {
                     VclLabel {
                         Layout.fillWidth: true
 
-                        text: dialog.subscription.plan.title
+                        text: _dialog.subscription.plan.title
                         wrapMode: Text.WordWrap
                         color: Runtime.colors.accent.c600.background
                         font.bold: true
@@ -104,7 +104,7 @@ DialogLauncher {
                     VclLabel {
                         Layout.fillWidth: true
 
-                        text: dialog.subscription.plan.subtitle
+                        text: _dialog.subscription.plan.subtitle
                         font.italic: true
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignHCenter
@@ -115,10 +115,10 @@ DialogLauncher {
                         Layout.preferredWidth: parent.width * 0.65
 
                         text: {
-                            let ret = dialog.subscription.hasExpired ? "Was used for " : (dialog.subscription.isUpcoming ? "Will be valid for " : "Valid for ")
-                            ret += "<b>" + Runtime.daysSpanAsString(dialog.subscription.plan.duration) + "</b>"
-                            ret += " from <b>" + Runtime.formatDateIncludingYear(new Date(dialog.subscription.from)) + "</b> until <b>" + Runtime.formatDateIncludingYear(new Date(dialog.subscription.until)) + "</b>"
-                            ret += ", with activation limit of <b>" + dialog.subscription.plan.devices + "</b> device(s)."
+                            let ret = _dialog.subscription.hasExpired ? "Was used for " : (_dialog.subscription.isUpcoming ? "Will be valid for " : "Valid for ")
+                            ret += "<b>" + Runtime.daysSpanAsString(_dialog.subscription.plan.duration) + "</b>"
+                            ret += " from <b>" + Runtime.formatDateIncludingYear(new Date(_dialog.subscription.from)) + "</b> until <b>" + Runtime.formatDateIncludingYear(new Date(_dialog.subscription.until)) + "</b>"
+                            ret += ", with activation limit of <b>" + _dialog.subscription.plan.devices + "</b> device(s)."
                             return ret
                         }
                         wrapMode: Text.WordWrap
@@ -130,11 +130,11 @@ DialogLauncher {
 
                         text: {
                             let ret = "Status: "
-                            if(dialog.subscription.isActive)
+                            if(_dialog.subscription.isActive)
                                 ret += "<b>Active</b>"
-                            else if(dialog.subscription.isUpcoming)
+                            else if(_dialog.subscription.isUpcoming)
                                 ret += "Upcoming"
-                            else if(dialog.subscription.hasExpired)
+                            else if(_dialog.subscription.hasExpired)
                                 ret += "Expired"
                             else
                                 ret += "Unknown"
@@ -148,10 +148,10 @@ DialogLauncher {
                     Link {
                         Layout.alignment: Qt.AlignHCenter
 
-                        text: "Order #" + dialog.subscription.wc_order_id + " »"
-                        visible: dialog.subscription.wc_order_id !== undefined && dialog.subscription.wc_order_id !== ""
+                        text: "Order #" + _dialog.subscription.wc_order_id + " »"
+                        visible: _dialog.subscription.wc_order_id !== undefined && _dialog.subscription.wc_order_id !== ""
 
-                        onClicked: Qt.openUrlExternally(dialog.subscription.detailsUrl)
+                        onClicked: Qt.openUrlExternally(_dialog.subscription.detailsUrl)
                     }
 
                     Item {
@@ -160,7 +160,7 @@ DialogLauncher {
                     }
 
                     GridLayout {
-                        id: featureTable
+                        id: _featureTable
 
                         Layout.alignment: Qt.AlignHCenter
 
@@ -169,7 +169,7 @@ DialogLauncher {
                         columnSpacing: 0
 
                         Repeater {
-                            model: featureModel
+                            model: _featureModel
 
                             DelegateChooser {
                                 role: "kind"

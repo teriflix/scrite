@@ -85,7 +85,7 @@ VclMenu {
     MarkSceneAsMenu {
         title: "Mark Scene As"
         scene: root.element ? root.element.scene : null
-        enabled: !Scrite.document.readOnly && !omitIncludeMenuItem.omitted
+        enabled: !Scrite.document.readOnly && !_omitIncludeMenuItem.omitted
 
         onTriggered: {
             for(var i=0; i<root.sceneGroup.sceneCount; i++) {
@@ -178,7 +178,7 @@ VclMenu {
     MenuSeparator { }
 
     VclMenuItem {
-        id: omitIncludeMenuItem
+        id: _omitIncludeMenuItem
 
         property bool omitted: Scrite.document.screenplay.selectedElementsOmitStatus !== Screenplay.NotOmitted
 

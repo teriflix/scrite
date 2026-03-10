@@ -43,7 +43,7 @@ VclMenu {
     closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
 
     HelpTipNotification {
-        id: htn
+        id: _htn
 
         tipName: "story_beat_tagging"
         enabled: false
@@ -73,13 +73,13 @@ VclMenu {
                     opacity: enabled ? 1 : 0.5
 
                     Rectangle {
-                        anchors.fill: innerTitleText
+                        anchors.fill: _innerTitleText
                         color: Runtime.colors.primary.c700.background
-                        visible: innerTitleText.visible
+                        visible: _innerTitleText.visible
                     }
 
                     VclLabel {
-                        id: innerTitleText
+                        id: _innerTitleText
 
                         anchors.top: parent.top
                         anchors.margins: 3
@@ -108,9 +108,9 @@ VclMenu {
                     }
 
                     ListView {
-                        id: groupsView
+                        id: _groupsView
 
-                        property bool scrollBarVisible: groupsView.height < groupsView.contentHeight
+                        property bool scrollBarVisible: _groupsView.height < _groupsView.contentHeight
                         property bool showingFilteredItems: sceneGroup.hasSceneActs && sceneGroup.hasGroupActs
 
                         function adjustScrolling() {
@@ -137,14 +137,14 @@ VclMenu {
                         }
 
                         function adjustScrollingLater() {
-                            Runtime.execLater(groupsView, 50, adjustScrolling)
+                            Runtime.execLater(_groupsView, 50, adjustScrolling)
                         }
 
-                        ScrollBar.vertical: VclScrollBar { flickable: groupsView }
+                        ScrollBar.vertical: VclScrollBar { flickable: _groupsView }
                         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
                         anchors.left: parent.left
-                        anchors.top: innerTitleText.visible ? innerTitleText.bottom : parent.top
+                        anchors.top: _innerTitleText.visible ? _innerTitleText.bottom : parent.top
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         anchors.margins: 5
@@ -158,12 +158,12 @@ VclMenu {
                         section.delegate: Rectangle {
                             required property string section
 
-                            width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
+                            width: _groupsView.width - (_groupsView.scrollBarVisible ? 20 : 1)
                             height: 30
                             color: Runtime.colors.primary.windowColor
 
                             VclLabel {
-                                id: categoryLabel
+                                id: _categoryLabel
                                 text: section
                                 topPadding: 5
                                 bottomPadding: 5
@@ -180,11 +180,11 @@ VclMenu {
                             property bool doesNotBelongToAnyAct: arrayItem.act === ""
                             property bool filtered: doesNotBelongToAnyAct || sceneGroup.sceneActs.indexOf(arrayItem.act) >= 0
 
-                            width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
+                            width: _groupsView.width - (_groupsView.scrollBarVisible ? 20 : 1)
                             height: 30
 
-                            color: groupItemMouseArea.containsMouse ? Runtime.colors.primary.button.background : Qt.rgba(0,0,0,0)
-                            opacity: groupsView.showingFilteredItems ? (filtered ? 1 : 0.5) : 1
+                            color: _groupItemMouseArea.containsMouse ? Runtime.colors.primary.button.background : Qt.rgba(0,0,0,0)
+                            opacity: _groupsView.showingFilteredItems ? (filtered ? 1 : 0.5) : 1
 
                             Row {
                                 anchors.fill: parent
@@ -218,13 +218,13 @@ VclMenu {
                                     elide: Text.ElideRight
                                     leftPadding: arrayItem.type > 0 ? 20 : 0
 
-                                    font.bold: groupsView.showingFilteredItems ? filtered : doesNotBelongToAnyAct
+                                    font.bold: _groupsView.showingFilteredItems ? filtered : doesNotBelongToAnyAct
                                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 }
                             }
 
                             MouseArea {
-                                id: groupItemMouseArea
+                                id: _groupItemMouseArea
 
                                 anchors.fill: parent
 
@@ -262,5 +262,5 @@ VclMenu {
         }
     }
 
-    onOpened: htn.enabled = true
+    onOpened: _htn.enabled = true
 }

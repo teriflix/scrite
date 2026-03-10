@@ -40,7 +40,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         property string mode
 
@@ -49,15 +49,15 @@ DialogLauncher {
         title: "scrite.io"
 
         contentItem: HomeScreenImpl {
-            mode: dialog.mode
-            onCloseRequest: Qt.callLater(dialog.close)
+            mode: _dialog.mode
+            onCloseRequest: Qt.callLater(_dialog.close)
         }
 
         onOpened: _private.launchCounter = _private.launchCounter+1
 
         Announcement.onIncoming: (type, data) => {
             if(type === Runtime.announcementIds.closeHomeScreenRequest || type === Runtime.announcementIds.loginRequest)
-                Qt.callLater(dialog.close)
+                Qt.callLater(_dialog.close)
         }
     }
 

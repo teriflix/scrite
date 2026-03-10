@@ -44,7 +44,7 @@ QtObject {
     }
 
     readonly property Component theTask: SequentialAnimation {
-        id: theTaskInstance
+        id: _theTaskInstance
 
         property VclDialog waitDialog
         property string filePath
@@ -59,7 +59,7 @@ QtObject {
         ScriptAction {
             script: {
                 Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
-                theTaskInstance.waitDialog = WaitDialog.launch()
+                _theTaskInstance.waitDialog = WaitDialog.launch()
             }
         }
 
@@ -80,17 +80,17 @@ QtObject {
         ScriptAction {
             script: {
                 const modes = ["open", "openAnonymously", "openOrImport"]
-                const modeIndex = modes.indexOf(theTaskInstance.mode)
+                const modeIndex = modes.indexOf(_theTaskInstance.mode)
 
                 switch(modeIndex) {
                 case 0:
-                    Scrite.document.open(theTaskInstance.filePath)
+                    Scrite.document.open(_theTaskInstance.filePath)
                     break
                 case 1:
-                    Scrite.document.openAnonymously(theTaskInstance.filePath)
+                    Scrite.document.openAnonymously(_theTaskInstance.filePath)
                     break
                 case 2:
-                    Scrite.document.openOrImport(theTaskInstance.filePath)
+                    Scrite.document.openOrImport(_theTaskInstance.filePath)
                     break
                 }
                 Runtime.loadMainUiContent = true
@@ -104,9 +104,9 @@ QtObject {
         ScriptAction {
             script: {
                 Scrite.document.justLoaded()
-                if(theTaskInstance.waitDialog)
-                    theTaskInstance.waitDialog.close()
-                Qt.callLater(theTaskInstance.destroy)
+                if(_theTaskInstance.waitDialog)
+                    _theTaskInstance.waitDialog.close()
+                Qt.callLater(_theTaskInstance.destroy)
             }
         }
     }

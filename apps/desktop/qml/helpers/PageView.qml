@@ -25,19 +25,19 @@ import "../controls"
 Rectangle {
     id: root
 
-    property alias pageListVisible: pageList.visible
-    property alias pagesArray: pageRepeater.model
-    property alias currentIndex: pageList.currentIndex
+    property alias pageListVisible: _pageList.visible
+    property alias pagesArray: _pageRepeater.model
+    property alias currentIndex: _pageList.currentIndex
     property string pageTitleRole
-    property alias cornerContent: cornerContentLoader.sourceComponent
-    property alias cornerContentItem: cornerContentLoader.item
-    property alias pageContent: pageContentLoader.sourceComponent
-    property alias pageContentItem: pageContentLoader.item
+    property alias cornerContent: _cornerContentLoader.sourceComponent
+    property alias cornerContentItem: _cornerContentLoader.item
+    property alias pageContent: _pageContentLoader.sourceComponent
+    property alias pageContentItem: _pageContentLoader.item
     property int pageContentSpacing: 20
     property real maxPageListWidth: 220
     property real pageListWidth: Math.max(width * 0.2, maxPageListWidth)
-    property real availablePageContentWidth: pageContentLoader.width
-    property real availablePageContentHeight: pageContentArea.height
+    property real availablePageContentWidth: _pageContentLoader.width
+    property real availablePageContentHeight: _pageContentArea.height
 
     color: Runtime.colors.primary.c50.background
 
@@ -47,7 +47,7 @@ Rectangle {
         spacing: root.pageContentSpacing
 
         Rectangle {
-            id: pageList
+            id: _pageList
 
             Layout.fillHeight: true
             Layout.minimumWidth: pageListWidth
@@ -62,7 +62,7 @@ Rectangle {
                 shortcut: ActionHub.applicationOptions.find("tabDown").shortcut
 
                 onTriggered: (source) => {
-                                 pageList.currentIndex = (pageList.currentIndex+1)%pageRepeater.count
+                                 _pageList.currentIndex = (_pageList.currentIndex+1)%_pageRepeater.count
                              }
             }
 
@@ -70,40 +70,40 @@ Rectangle {
                 shortcut: ActionHub.applicationOptions.find("tabUp").shortcut
 
                 onTriggered: (source) => {
-                                 const prevIndex = pageList.currentIndex-1
-                                 pageList.currentIndex = prevIndex < 0 ? (pageRepeater.count-1) : prevIndex
+                                 const prevIndex = _pageList.currentIndex-1
+                                 _pageList.currentIndex = prevIndex < 0 ? (_pageRepeater.count-1) : prevIndex
                              }
             }
 
             ColumnLayout {
-                id: pageRepeaterLayout
+                id: _pageRepeaterLayout
 
                 anchors.fill: parent
                 anchors.topMargin: 20
 
                 Repeater {
-                    id: pageRepeater
+                    id: _pageRepeater
 
                     delegate: Item {
                         required property int index
                         required property var modelData
 
                         Layout.fillWidth: true
-                        Layout.preferredHeight: pageLabel.height*1.25
+                        Layout.preferredHeight: _pageLabel.height*1.25
 
                         Rectangle {
                             anchors.fill: parent
 
                             color: Runtime.colors.primary.c100.background
                             opacity: 0.8
-                            visible: pageList.currentIndex === index
+                            visible: _pageList.currentIndex === index
 
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.right: parent.right
                         }
 
                         VclLabel {
-                            id: pageLabel
+                            id: _pageLabel
 
                             anchors.left: parent.left
                             anchors.right: parent.right
@@ -112,13 +112,13 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
 
                             text: pageTitleRole === "" ? modelData : modelData[pageTitleRole]
-                            color: pageList.currentIndex === index ? Runtime.colors.primary.c50.text : Runtime.colors.accent.c600.text
+                            color: _pageList.currentIndex === index ? Runtime.colors.primary.c50.text : Runtime.colors.accent.c600.text
                             elide: Text.ElideMiddle
                             horizontalAlignment: Text.AlignRight
                             topPadding: 6
                             bottomPadding: 6
 
-                            font.bold: pageList.currentIndex === index
+                            font.bold: _pageList.currentIndex === index
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         }
 
@@ -130,13 +130,13 @@ Rectangle {
                             height: 24
 
                             source: "qrc:/icons/navigation/arrow_right.png"
-                            visible: pageList.currentIndex === index
+                            visible: _pageList.currentIndex === index
                         }
 
                         MouseArea {
                             anchors.fill: parent
 
-                            onClicked: pageList.currentIndex = index
+                            onClicked: _pageList.currentIndex = index
                         }
                     }
                 }
@@ -146,7 +146,7 @@ Rectangle {
                 }
 
                 Loader {
-                    id: cornerContentLoader
+                    id: _cornerContentLoader
 
                     Layout.fillWidth: true
                 }
@@ -154,7 +154,7 @@ Rectangle {
         }
 
         Flickable {
-            id: pageContentArea
+            id: _pageContentArea
 
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -163,17 +163,17 @@ Rectangle {
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
             clip: ScrollBar.vertical.needed
-            contentWidth: pageContentLoader.active && ScrollBar.vertical.needed ? (width-20) : width
-            contentHeight: pageContentLoader.height
+            contentWidth: _pageContentLoader.active && ScrollBar.vertical.needed ? (width-20) : width
+            contentHeight: _pageContentLoader.height
 
-            ScrollBar.vertical: VclScrollBar { flickable: pageContentArea }
+            ScrollBar.vertical: VclScrollBar { flickable: _pageContentArea }
 
             Loader {
-                id: pageContentLoader
+                id: _pageContentLoader
 
-                width: pageContentArea.contentWidth
+                width: _pageContentArea.contentWidth
 
-                onItemChanged: Object.resetProperty(pageContentLoader, "height")
+                onItemChanged: Object.resetProperty(_pageContentLoader, "height")
             }
         }
     }

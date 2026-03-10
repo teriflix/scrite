@@ -27,10 +27,10 @@ import "../../controls"
 Item {
     id: root
 
-    height: layout.height + 2*layout.margin
+    height: _layout.height + 2*_layout.margin
 
     ColumnLayout {
-        id: layout
+        id: _layout
 
         readonly property real margin: 10
 
@@ -117,7 +117,7 @@ Item {
                         }
 
                         TextField {
-                            id: txtMaxTime
+                            id: _txtMaxTime
                             Layout.fillWidth: true
 
                             text: Runtime.notebookSettings.graphLayoutMaxTime
@@ -132,7 +132,7 @@ Item {
                                 else
                                     Runtime.notebookSettings.graphLayoutMaxTime = parseInt(text)
                             }
-                            KeyNavigation.tab: txtMaxIterations
+                            KeyNavigation.tab: _txtMaxIterations
                         }
                     }
 
@@ -156,7 +156,7 @@ Item {
                         }
 
                         TextField {
-                            id: txtMaxIterations
+                            id: _txtMaxIterations
                             Layout.fillWidth: true
 
                             text: Runtime.notebookSettings.graphLayoutMaxIterations
@@ -171,7 +171,7 @@ Item {
                                 else
                                     Runtime.notebookSettings.graphLayoutMaxIterations = parseInt(text)
                             }
-                            KeyNavigation.tab: txtMaxTime
+                            KeyNavigation.tab: _txtMaxTime
                         }
                     }
                 }

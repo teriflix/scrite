@@ -25,7 +25,7 @@ import "../globals"
 import "../controls"
 
 Item {
-    id: sceneFeaturedPhotoItem
+    id: root
 
     required property Scene scene
 
@@ -49,7 +49,7 @@ Item {
         }
         source: featuredImage ? featuredImage.fileSource : ""
         visible: featuredImage
-        mipmap: sceneFeaturedPhotoItem.mipmap
+        mipmap: root.mipmap
 
         RoundButton {
             icon.source: parent.fillMode === Image.PreserveAspectCrop ? "qrc:/icons/navigation/zoom_fit.png" : "qrc:/icons/navigation/zoom_one.png"
@@ -58,7 +58,7 @@ Item {
             anchors.margins: 5
             hoverEnabled: true
             opacity: hovered ? 1 : 0.5
-            enabled: !removeFeaturedImageDialog.active
+            enabled: !_removeFeaturedImageDialog.active
             onClicked: {
                 if(parent.fillMode === Image.PreserveAspectFit)
                     parent.fillMode = Image.PreserveAspectCrop
@@ -79,12 +79,12 @@ Item {
             anchors.rightMargin: 10
             hoverEnabled: true
             opacity: hovered ? 1 : 0.5
-            onClicked: removeFeaturedImageDialog.active = true
-            enabled: !removeFeaturedImageDialog.active
+            onClicked: _removeFeaturedImageDialog.active = true
+            enabled: !_removeFeaturedImageDialog.active
         }
 
         Loader {
-            id: removeFeaturedImageDialog
+            id: _removeFeaturedImageDialog
             anchors.fill: parent
             active: false
             sourceComponent: Rectangle {
@@ -119,7 +119,7 @@ Item {
                             onClicked: {
                                 Qt.callLater( () => {
                                                  sceneAttachments.removeAttachment(featuredImage)
-                                                 removeFeaturedImageDialog.active = false
+                                                 _removeFeaturedImageDialog.active = false
                                              } )
                             }
                         }
@@ -127,7 +127,7 @@ Item {
                         VclButton {
                             text: "No"
                             focusPolicy: Qt.NoFocus
-                            onClicked: removeFeaturedImageDialog.active = false
+                            onClicked: _removeFeaturedImageDialog.active = false
                         }
                     }
                 }
@@ -157,19 +157,19 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                text: sceneFeaturedPhotoItem.height > 150 ? "Drag & Drop a Photo\n\n-- OR --" : "Drag & Drop a Photo"
+                text: root.height > 150 ? "Drag & Drop a Photo\n\n-- OR --" : "Drag & Drop a Photo"
             }
 
             VclButton {
                 text: "Select Photo"
                 anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: featuredAttachmentFileDialog.open()
-                visible: sceneFeaturedPhotoItem.height > 150
+                onClicked: _featuredAttachmentFileDialog.open()
+                visible: root.height > 150
             }
         }
 
         VclFileDialog {
-            id: featuredAttachmentFileDialog
+            id: _featuredAttachmentFileDialog
             nameFilters: sceneAttachments ? sceneAttachments.nameFilters : []
             onAccepted: {
                 const attachment = sceneAttachments.includeAttachment( Url.toPath(selectedFile) )

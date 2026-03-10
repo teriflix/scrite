@@ -28,10 +28,11 @@ import "../../helpers"
 import ".."
 
 Item {
+    id: root
     readonly property bool modal: true
     readonly property string title: "Setup your Scrite account"
 
-    Component.onCompleted: Qt.callLater(emailField.forceActiveFocus)
+    Component.onCompleted: Qt.callLater(_emailField.forceActiveFocus)
 
     Image {
         anchors.fill: parent
@@ -47,7 +48,7 @@ Item {
         anchors.bottomMargin: 50
 
         TabSequenceManager {
-            id: userInfoFields
+            id: _userInfoFields
         }
 
         ColumnLayout {
@@ -55,7 +56,7 @@ Item {
 
             width: parent.width
             spacing: 20
-            enabled: !checkUserCall.isBusy
+            enabled: !_root_2.isBusy
             opacity: enabled ? 1 : 0.5
 
             VclLabel {
@@ -80,21 +81,21 @@ Item {
             }
 
             VclTextField {
-                id: emailField
+                id: _emailField
 
                 Layout.fillWidth: true
 
-                TabSequenceItem.manager: userInfoFields
+                TabSequenceItem.manager: _userInfoFields
                 TabSequenceItem.sequence: 0
 
-                text: checkUserCall.email
+                text: _root_2.email
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
 
                 maximumLength: 128
                 selectByMouse: true
                 undoRedoEnabled: true
 
-                onReturnPressed: if(submit.enabled) submit.clicked()
+                onReturnPressed: if(_submit.enabled) _submit.clicked()
             }
 
             Item {
@@ -103,41 +104,41 @@ Item {
             }
 
             VclButton {
-                id: submit
+                id: _submit
 
                 Component.onCompleted: determineEnabled()
                 Layout.alignment: Qt.AlignRight
 
                 function determineEnabled() {
-                    enabled = Runtime.validateEmail(emailField.text.trim())
+                    enabled = Runtime.validateEmail(_emailField.text.trim())
                 }
 
                 text: "Continue »"
 
                 Connections {
-                    target: emailField
+                    target: _emailField
 
                     function onTextChanged() {
-                        Qt.callLater(submit.determineEnabled)
+                        Qt.callLater(_submit.determineEnabled)
                     }
                 }
 
-                onClicked: checkUserCall.check()
+                onClicked: _root_2.check()
             }
         }
 
         BusyIndicator {
             anchors.centerIn: parent
 
-            running: checkUserCall.busy
+            running: _root_2.busy
         }
     }
 
     AppCheckUserRestApiCall {
-        id: checkUserCall
+        id: _root_2
 
         function check() {
-            const _email = emailField.text.trim()
+            const _email = _emailField.text.trim()
             if(Runtime.validateEmail(_email)) {
                 email = _email
 

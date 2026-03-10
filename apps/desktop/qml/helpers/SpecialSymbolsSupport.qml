@@ -24,33 +24,33 @@ import "../globals"
 import "../controls"
 
 Item {
-    id: specialSymbolsSupport
+    id: root
     property Item textEditor
     property bool textEditorHasCursorInterface: false
     property bool includeEmojis: true
-    property bool showingSymbols: symbolMenu.visible
+    property bool showingSymbols: _symbolMenu.visible
 
     signal symbolSelected(string text)
 
     EventFilter.target: textEditor
-    EventFilter.active: textEditor !== null && specialSymbolsSupport.enabled && textEditor.activeFocus
+    EventFilter.active: textEditor !== null && root.enabled && textEditor.activeFocus
     EventFilter.events: [6]
     EventFilter.onFilter: {
-        if(!specialSymbolsSupport.enabled)
+        if(!root.enabled)
             return
 
         if(textEditorHasCursorInterface && textEditor.readOnly)
             return
 
         if(event.key === Qt.Key_F3) {
-            symbolMenu.visible = true
+            _symbolMenu.visible = true
             result.filer = true
             result.accepted = true
         }
     }
 
     VclMenu {
-        id: symbolMenu
+        id: _symbolMenu
 
         width: 514
 
@@ -58,14 +58,14 @@ Item {
         autoWidth: false
 
         VclMenuItem {
-            width: symbolMenu.width
+            width: _symbolMenu.width
             height: 400
             focusPolicy: Qt.NoFocus
             background: Item { }
             contentItem: SpecialSymbolsPanel {
-                includeEmojis: specialSymbolsSupport.includeEmojis
+                includeEmojis: root.includeEmojis
                 onSymbolClicked: {
-                    if(!specialSymbolsSupport.enabled)
+                    if(!root.enabled)
                         return
 
                     if(textEditorHasCursorInterface) {
@@ -75,10 +75,10 @@ Item {
                         var cp = textEditor.cursorPosition
                         textEditor.insert(textEditor.cursorPosition, text)
                         Utils.execLater(textEditor, 250, function() { textEditor.cursorPosition = cp + text.length })
-                        symbolMenu.close()
+                        _symbolMenu.close()
                         textEditor.forceActiveFocus()
                     } else {
-                        symbolMenu.close()
+                        _symbolMenu.close()
                         symbolSelected(text)
                     }
                 }
@@ -105,15 +105,15 @@ Item {
 
         signal symbolClicked(string text)
 
-        id: symbolsView
+        id: _symbolsView
         width: 500; height: 400
         color: Runtime.colors.primary.c100.background
 
         Rectangle {
-            id: symbolsPanel
+            id: _symbolsPanel
 
             property int currentIndex: 0
-            property bool currentIndexIsEmoji: symbols[symbolsPanel.currentIndex].title === "Emoji"
+            property bool currentIndexIsEmoji: symbols[_symbolsPanel.currentIndex].title === "Emoji"
 
             anchors.top: parent.top
             anchors.left: parent.left
@@ -132,9 +132,9 @@ Item {
                         required property int index
                         required property var modelData
 
-                        width: symbolsPanel.width
+                        width: _symbolsPanel.width
                         height: 40
-                        color: symbolsPanel.currentIndex === index ? Runtime.colors.primary.windowColor : Qt.rgba(0,0,0,0)
+                        color: _symbolsPanel.currentIndex === index ? Runtime.colors.primary.windowColor : Qt.rgba(0,0,0,0)
 
                         VclLabel {
                             anchors.verticalCenter: parent.verticalCenter
@@ -142,12 +142,12 @@ Item {
                             anchors.rightMargin: 10
                             text: modelData.title
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                            color: symbolsPanel.currentIndex === index ? "black" : "white"
+                            color: _symbolsPanel.currentIndex === index ? "black" : "white"
                         }
 
                         MouseArea {
                             anchors.fill: parent
-                            onClicked: symbolsPanel.currentIndex = index
+                            onClicked: _symbolsPanel.currentIndex = index
                         }
                     }
                 }
@@ -155,12 +155,12 @@ Item {
         }
 
         GridView {
-            id: symbolsGridView
+            id: _symbolsGridView
 
-            ScrollBar.vertical: VclScrollBar { flickable: symbolsGridView }
+            ScrollBar.vertical: VclScrollBar { flickable: _symbolsGridView }
 
             anchors.top: parent.top
-            anchors.left: symbolsPanel.right
+            anchors.left: _symbolsPanel.right
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.leftMargin: 5
@@ -168,15 +168,15 @@ Item {
             clip: true
             rightMargin: 14
 
-            cellWidth: symbolsPanel.currentIndexIsEmoji ? 50 : 40
+            cellWidth: _symbolsPanel.currentIndexIsEmoji ? 50 : 40
             cellHeight: cellWidth
-            model: symbols[symbolsPanel.currentIndex].symbols
+            model: symbols[_symbolsPanel.currentIndex].symbols
             header: Item {
-                width: symbolsGridView.width-14
-                height: symbolsPanel.currentIndexIsEmoji ? 35 : 0
+                width: _symbolsGridView.width-14
+                height: _symbolsPanel.currentIndexIsEmoji ? 35 : 0
 
                 VclLabel {
-                    visible: symbolsPanel.currentIndexIsEmoji
+                    visible: _symbolsPanel.currentIndexIsEmoji
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
                     anchors.centerIn: parent
@@ -189,9 +189,9 @@ Item {
                 required property int index
                 required property string modelData
 
-                width: symbolsGridView.cellWidth
-                height: symbolsGridView.cellHeight
-                enabled: !symbolsPanel.currentIndexIsEmoji || includeEmojis
+                width: _symbolsGridView.cellWidth
+                height: _symbolsGridView.cellHeight
+                enabled: !_symbolsPanel.currentIndexIsEmoji || includeEmojis
                 opacity: enabled ? 1 : 0.5
 
                 Rectangle {

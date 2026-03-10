@@ -38,7 +38,7 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         width: Math.min(Scrite.window.width-80, 1050)
         height: Math.min(Scrite.window.height-80, 750)
@@ -47,57 +47,57 @@ DialogLauncher {
         title: "Title Page"
 
         content: Item {
-            implicitHeight: titlePageSettingsLayout.implicitHeight+60
+            implicitHeight: _titlePageSettingsLayout.implicitHeight+60
 
             TabSequenceManager {
-                id: titlePageFieldsTabSequence
+                id: _titlePageFieldsTabSequence
                 wrapAround: true
             }
 
             ColumnLayout {
-                id: titlePageSettingsLayout
+                id: _titlePageSettingsLayout
                 width: parent.width-160
                 spacing: 30
                 anchors.centerIn: parent
 
                 // Cover page photo field
                 Rectangle {
-                    id: coverPageEdit
+                    id: _coverPageEdit
                     /*
                           At best we can paint a 464x261 point photo on the cover page. Nothing more.
                           So, we need to provide a image preview in this aspect ratio.
                           */
-                    color: dialog.background && dialog.background.item ? dialog.background.item.color : Runtime.colors.primary.c10.background
-                    border.width: Scrite.document.screenplay.coverPagePhoto === "" ? 1 : 0
+                    color: _dialog.background && _dialog.background.item ? _dialog.background.item.color : Runtime.colors.primary.c10.background
+                    border.width: Scrite.document.screenplay._coverPagePhoto === "" ? 1 : 0
                     border.color: "black"
                     Layout.preferredWidth: 400
                     Layout.preferredHeight: 255
                     Layout.alignment: Qt.AlignHCenter
 
                     Loader {
-                        id: coverPagePhotoLoader
+                        id: _coverPagePhotoLoader
                         anchors.fill: parent
                         anchors.margins: 1
-                        active: Scrite.document.screenplay.coverPagePhoto !== ""
+                        active: Scrite.document.screenplay._coverPagePhoto !== ""
                         sourceComponent: Item {
                             Image {
                                 anchors.fill: parent
                                 fillMode: Image.PreserveAspectCrop
                                 asynchronous: true
-                                source: coverPagePhoto.source
-                                visible: (coverPagePhoto.go && coverPagePhoto.status === Image.Ready) && (coverPagePhoto.paintedWidth < width || coverPagePhoto.paintedHeight < height)
-                                opacity: 0.1 * coverPagePhoto.opacity
+                                source: _coverPagePhoto.source
+                                visible: (_coverPagePhoto.go && _coverPagePhoto.status === Image.Ready) && (_coverPagePhoto.paintedWidth < width || _coverPagePhoto.paintedHeight < height)
+                                opacity: 0.1 * _coverPagePhoto.opacity
                                 cache: false
                             }
 
                             Image {
-                                id: coverPagePhoto
+                                id: _coverPagePhoto
                                 anchors.fill: parent
                                 smooth: true; mipmap: true
                                 asynchronous: true
                                 fillMode: Image.PreserveAspectFit
                                 source: go ? "file:///" + Scrite.document.screenplay.coverPagePhoto : ""
-                                opacity: coverPagePhotoMouseArea.containsMouse ? 0.25 : 1
+                                opacity: _coverPagePhotoMouseArea.containsMouse ? 0.25 : 1
                                 cache: false
                                 property bool go: false
 
@@ -106,8 +106,8 @@ DialogLauncher {
                                     running: parent.status === Image.Loading || !parent.go
                                 }
 
-                                Component.onCompleted: Runtime.execLater(coverPagePhoto, 400, () => {
-                                                                           coverPagePhoto.go = true
+                                Component.onCompleted: Runtime.execLater(_coverPagePhoto, 400, () => {
+                                                                           _coverPagePhoto.go = true
                                                                        } )
                             }
                         }
@@ -118,18 +118,18 @@ DialogLauncher {
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        opacity: coverPagePhotoMouseArea.containsMouse ? 1 : (Scrite.document.screenplay.coverPagePhoto === "" ? 0.5 : 0)
-                        text: Scrite.document.screenplay.coverPagePhoto === "" ? "Click here to set the cover page photo" : "Click here to change the cover page photo"
+                        opacity: _coverPagePhotoMouseArea.containsMouse ? 1 : (Scrite.document.screenplay._coverPagePhoto === "" ? 0.5 : 0)
+                        text: Scrite.document.screenplay._coverPagePhoto === "" ? "Click here to set the cover page photo" : "Click here to change the cover page photo"
                         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                     }
 
                     MouseArea {
-                        id: coverPagePhotoMouseArea
+                        id: _coverPagePhotoMouseArea
                         anchors.fill: parent
                         cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                         hoverEnabled: true
                         enabled: !Scrite.document.readOnly
-                        onClicked: fileDialog.open()
+                        onClicked: _fileDialog.open()
                     }
 
                     AttachmentsDropArea {
@@ -150,7 +150,7 @@ DialogLauncher {
                         spacing: 0
                         anchors.left: parent.right
                         anchors.leftMargin: 20
-                        visible: Scrite.document.screenplay.coverPagePhoto !== ""
+                        visible: Scrite.document.screenplay._coverPagePhoto !== ""
                         enabled: visible && !Scrite.document.readOnly
 
                         VclLabel {
@@ -188,7 +188,7 @@ DialogLauncher {
                     }
 
                     VclFileDialog {
-                        id: fileDialog
+                        id: _fileDialog
 
                         currentFolder: Runtime.workspaceSettings.lastOpenPhotosFolderUrl
                         nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
@@ -203,7 +203,7 @@ DialogLauncher {
                 }
 
                 Grid {
-                    id: titlePageFields
+                    id: _titlePageFields
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     rowSpacing: 5
@@ -232,7 +232,7 @@ DialogLauncher {
                             required property string name
                             required property string key
 
-                            width: (titlePageFields.width-titlePageFields.columnSpacing)/2
+                            width: (_titlePageFields.width-_titlePageFields.columnSpacing)/2
                             height: _tpfRow.height
 
                             TextLimiter {
@@ -279,7 +279,7 @@ DialogLauncher {
                                     }
                                     font.pointSize: Runtime.idealFontMetrics.font.pointSize+1
                                     enableTransliteration: true
-                                    TabSequenceItem.manager: titlePageFieldsTabSequence
+                                    TabSequenceItem.manager: _titlePageFieldsTabSequence
                                     TabSequenceItem.sequence: index
                                 }
                             }
@@ -288,11 +288,11 @@ DialogLauncher {
                 }
 
                 Item {
-                    id: titlePageOptions
+                    id: _titlePageOptions
 
                     Layout.alignment: Qt.AlignHCenter
                     Layout.fillWidth: true
-                    Layout.preferredHeight: useAsDefaultsButton.height
+                    Layout.preferredHeight: _useAsDefaultsButton.height
 
                     VclCheckBox {
                         anchors.left: parent.left
@@ -304,13 +304,13 @@ DialogLauncher {
                     }
 
                     VclButton {
-                        id: useAsDefaultsButton
+                        id: _useAsDefaultsButton
                         anchors.centerIn: parent
 
                         text: "Use As Defaults"
                         hoverEnabled: true
                         toolTipText: "Click this button to use Address, Author, Contact, Email, Phone and Website field values from this dialogue as default from now on."
-                        toolTipVisible: hovered && defaultsSavedNotice.opacity === 0
+                        toolTipVisible: hovered && _defaultsSavedNotice.opacity === 0
 
                         onClicked: {
                             Runtime.titlePageSettings.author = Scrite.document.screenplay.author
@@ -319,7 +319,7 @@ DialogLauncher {
                             Runtime.titlePageSettings.email = Scrite.document.screenplay.email
                             Runtime.titlePageSettings.phone = Scrite.document.screenplay.phoneNumber
                             Runtime.titlePageSettings.website = Scrite.document.screenplay.website
-                            defaultsSavedNotice.opacity = 1
+                            _defaultsSavedNotice.opacity = 1
                         }
                     }
 
@@ -336,15 +336,15 @@ DialogLauncher {
             }
 
             VclLabel {
-                id: defaultsSavedNotice
-                anchors.top: titlePageSettingsLayout.bottom
+                id: _defaultsSavedNotice
+                anchors.top: _titlePageSettingsLayout.bottom
                 anchors.topMargin: 10
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Address, Author, Contact, Email, Phone and Website field values saved as default."
                 opacity: 0
                 onOpacityChanged: {
                     if(opacity > 0)
-                    Runtime.execLater(defaultsSavedNotice, 2500, function() { defaultsSavedNotice.opacity = 0 })
+                    Runtime.execLater(_defaultsSavedNotice, 2500, function() { _defaultsSavedNotice.opacity = 0 })
                 }
             }
         }

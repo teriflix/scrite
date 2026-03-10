@@ -37,26 +37,26 @@ DialogLauncher {
     singleInstanceOnly: true
 
     dialogComponent: VclDialog {
-        id: dialog
+        id: _dialog
 
         title: "Customise Story Beats"
         width: Math.min(Scrite.window.width-80, 1050)
         height: Math.min(Scrite.window.height-80, 750)
 
         content: PageView {
-            id: pageView
+            id: _pageView
             pagesArray: ["This Document", "Default Global"]
             currentIndex: 0
             pageContent: Loader {
-                width: pageView.availablePageContentWidth
-                height: pageView.availablePageContentHeight
-                sourceComponent: pageView.currentIndex === 0 ? thisDocumentPage : defaultGlobalPage
+                width: _pageView.availablePageContentWidth
+                height: _pageView.availablePageContentHeight
+                sourceComponent: _pageView.currentIndex === 0 ? thisDocumentPage : _defaultGlobalPage
             }
         }
     }
 
     Component {
-        id: thisDocumentPage
+        id: _thisDocumentPage
 
         StructureStoryBeatsPage {
             target: e_CurrentDocumentTarget
@@ -64,7 +64,7 @@ DialogLauncher {
     }
 
     Component {
-        id: defaultGlobalPage
+        id: _defaultGlobalPage
 
         StructureStoryBeatsPage {
             target: e_DefaultGlobalTarget

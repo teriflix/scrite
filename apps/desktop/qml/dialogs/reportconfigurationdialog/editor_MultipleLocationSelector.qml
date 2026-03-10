@@ -26,6 +26,7 @@ import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
+    id: root
     property var fieldInfo
     property AbstractReportGenerator report
 
@@ -65,7 +66,7 @@ ColumnLayout {
         border.color: Runtime.colors.primary.c50.text
 
         ListView {
-            id: locationListView
+            id: _root_2
 
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
             ScrollBar.vertical: VclScrollBar { }
@@ -81,7 +82,7 @@ ColumnLayout {
                 required property var modelData
 
                 text: modelData
-                width: locationListView.width-1
+                width: _root_2.width-1
                 checked: selectedLocations.indexOf(modelData) >= 0
 
                 font.family: Scrite.document.formatting.defaultFont.family

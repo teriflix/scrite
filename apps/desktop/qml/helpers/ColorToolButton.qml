@@ -24,9 +24,9 @@ Item {
     id: root
 
     property color selectedColor: Runtime.colors.transparent
-    property alias hoverEnabled: cbMouseArea.hoverEnabled
-    property alias containsMouse: cbMouseArea.containsMouse
-    property bool colorsMenuVisible: colorsMenuLoader.active
+    property alias hoverEnabled: _cbMouseArea.hoverEnabled
+    property alias containsMouse: _cbMouseArea.containsMouse
+    property bool colorsMenuVisible: _colorsMenuLoader.active
 
     signal colorPicked(color newColor)
 
@@ -38,38 +38,38 @@ Item {
     opacity: enabled ? 1 : 0.5
 
     MouseArea {
-        id: cbMouseArea
+        id: _cbMouseArea
         anchors.fill: parent
-        onClicked: colorsMenuLoader.active = true
+        onClicked: _colorsMenuLoader.active = true
     }
 
     Loader {
-        id: colorsMenuLoader
+        id: _colorsMenuLoader
         x: 0; y: parent.height
         active: false
         sourceComponent: Popup {
-            id: colorsMenu
+            id: _colorsMenu
             x: 0; y: 0
-            width: availableColorsPalette.suggestedWidth
-            height: availableColorsPalette.suggestedHeight
+            width: _availableColorsPalette.suggestedWidth
+            height: _availableColorsPalette.suggestedHeight
             closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
             Component.onCompleted: open()
-            onClosed: Qt.callLater(() => { colorsMenuLoader.active = false})
+            onClosed: Qt.callLater(() => { _colorsMenuLoader.active = false})
 
             contentItem: AvailableColorsPalette {
-                id: availableColorsPalette
+                id: _availableColorsPalette
                 selectedColor: root.selectedColor
                 onColorPicked: (newColor) => {
                                    root.colorPicked(newColor)
-                                   colorsMenu.close()
+                                   _colorsMenu.close()
                                }
             }
         }
     }
 
     component AvailableColorsPalette : Grid {
-        id: colorsGrid
+        id: _colorsGrid
         property int cellSize: width/columns
         readonly property int suggestedWidth: 280
         readonly property int suggestedHeight: 200
@@ -80,8 +80,8 @@ Item {
         signal colorPicked(color newColor)
 
         Item {
-            width: colorsGrid.cellSize
-            height: colorsGrid.cellSize
+            width: _colorsGrid.cellSize
+            height: _colorsGrid.cellSize
 
             Image {
                 source: "qrc:/icons/navigation/close.png"
@@ -103,13 +103,13 @@ Item {
                 required property int index
                 required property color modelData
 
-                width: colorsGrid.cellSize
-                height: colorsGrid.cellSize
+                width: _colorsGrid.cellSize
+                height: _colorsGrid.cellSize
 
                 Rectangle {
                     anchors.fill: parent
                     anchors.margins: 3
-                    border.width: colorsGrid.selectedColor === modelData ? 3 : 0.5
+                    border.width: _colorsGrid.selectedColor === modelData ? 3 : 0.5
                     border.color: "black"
                     color: modelData
                 }

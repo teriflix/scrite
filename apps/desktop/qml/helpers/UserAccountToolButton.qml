@@ -48,7 +48,7 @@ Item {
         }
 
         Image {
-            id: profilePic
+            id: _profilePic
 
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
@@ -68,13 +68,13 @@ Item {
             anchors.right: parent.right
 
             sourceComponent: Rectangle {
-                width: Math.max(unreadMessageCountLabel.contentWidth*1.15, unreadMessageCountLabel.contentHeight*1.15)
+                width: Math.max(_unreadMessageCountLabel.contentWidth*1.15, _unreadMessageCountLabel.contentHeight*1.15)
                 height: width; radius: width/2
 
                 color: Runtime.colors.primary.a100.background
 
                 Text {
-                    id: unreadMessageCountLabel
+                    id: _unreadMessageCountLabel
 
                     font.bold: true
                     font.pixelSize: root.height * 0.25
@@ -97,18 +97,18 @@ Item {
             anchors.centerIn: parent
 
             Text {
-                anchors.top: initials.top
-                anchors.left: initials.left
+                anchors.top: _initials.top
+                anchors.left: _initials.left
                 anchors.margins: 1
 
-                font: initials.font
-                text: initials.text
+                font: _initials.font
+                text: _initials.text
                 color: Runtime.colors.primary.c600.background
                 opacity: 0.5
             }
 
             Text {
-                id: initials
+                id: _initials
                 anchors.centerIn: parent
 
                 font.bold: true
@@ -117,7 +117,7 @@ Item {
                 color: Scrite.user.info.badgeTextColor
                 text: {
                     if(Scrite.user.loggedIn)
-                        return Scrite.user.info.initials()
+                        return Scrite.user.info._initials()
                     return "S"
                 }
             }

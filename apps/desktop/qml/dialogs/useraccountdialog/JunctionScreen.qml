@@ -25,6 +25,7 @@ import ".."
 import "../../controls"
 
 Item {
+    id: root
     readonly property bool modal: true
     readonly property string title: "Welcome to Scrite!"
 
@@ -52,28 +53,28 @@ Item {
             VclLabel {
                 Layout.fillWidth: true
 
-                text: sendActivationCodeCall.busy ? "Requesting activation code ..." : "Click the button below to request activation code."
+                text: _root_2.busy ? "Requesting activation code ..." : "Click the button below to request activation code."
             }
 
             VclButton {
-                visible: !sendActivationCodeCall.hasError && !sendActivationCodeCall.busy
+                visible: !_root_2.hasError && !_root_2.busy
 
                 text: "Request Activation Code"
 
-                onClicked: sendActivationCodeCall.call()
+                onClicked: _root_2.call()
             }
         }
 
-        Component.onCompleted: sendActivationCodeCall.call()
+        Component.onCompleted: _root_2.call()
     }
 
     BusyIndicator {
         anchors.centerIn: parent
-        running: sendActivationCodeCall.busy
+        running: _root_2.busy
     }
 
     AppRequestActivationCodeRestApiCall {
-        id: sendActivationCodeCall
+        id: _root_2
 
         onFinished: {
             if(hasError || !hasResponse) {
