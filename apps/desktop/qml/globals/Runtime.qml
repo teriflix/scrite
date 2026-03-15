@@ -21,6 +21,8 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
+import "./runtime"
+
 Item {
     id: root
 
@@ -72,326 +74,27 @@ Item {
 
     property ObjectListModel dialogs: ObjectListModel { }
 
-    readonly property QtObject language: QtObject {
-        readonly property AvailableLanguages available: LanguageEngine.availableLanguages
-        readonly property LanguageEngine engine: LanguageEngine
-        readonly property SupportedLanguages supported: LanguageEngine.supportedLanguages
-
-        property int activeCode: supported.activeLanguageCode
-
-        property var active: supported.activeLanguage
-        property var activeTransliterationOption: active.valid ? active.preferredTransliterationOption() : undefined
-
-        property bool activeTransliterationIsInApp: activeTransliterationOption && activeTransliterationOption.valid ? activeTransliterationOption.inApp : false
-
-        property AbstractTransliterationEngine activeTransliterator: activeTransliterationOption && activeTransliterationOption.valid ? activeTransliterationOption.transliterator : null
-
-        function setActiveCode(code) {
-            if(activeCode === code)
-                return
-
-            supported.activeLanguageCode = code
-            Scrite.document.displayFormat.activeLanguageCode = activeCode
-            logActivity("language-activate", supported.activeLanguage)
-        }
-
-        function logActivity(activity, lang) {
-            if(lang && Scrite.user.info.consentToActivityLog) {
-                const txOption = lang.preferredTransliterationOption()
-                const portableShortcut = Gui.portableShortcut(lang.keySequence)
-                const shortcut = portableShortcut === "" ? "<no-shortcut>" : portableShortcut
-                const details = [lang.name, shortcut, txOption.id, txOption.name, lang.font().family, Platform.typeString].join(";")
-                Scrite.user.logActivity2(activity, details)
-            }
-        }
-    }
+    readonly property Language_RT language: Language_RT { }
 
     // Persistent Settings
-    readonly property Settings userAccountDialogSettings: Settings {
-        property bool welcomeScreenShown: false
-        property string userOnboardingStatus: "unknown"
+    readonly property UserAccountDialogSettings_RT userAccountDialogSettings: UserAccountDialogSettings_RT { }
+    readonly property ScrollAreaSettings_RT scrollAreaSettings: ScrollAreaSettings_RT { }
+    readonly property StructureCanvasSettings_RT structureCanvasSettings: StructureCanvasSettings_RT { }
+    readonly property TimelineViewSettings_RT timelineViewSettings: TimelineViewSettings_RT { }
+    readonly property ScreenplayEditorSettings_RT screenplayEditorSettings: ScreenplayEditorSettings_RT { }
+    readonly property ScreenplayTracksSettings_RT screenplayTracksSettings: ScreenplayTracksSettings_RT { }
+    readonly property PdfExportSettings_RT pdfExportSettings: PdfExportSettings_RT { }
+    readonly property TitlePageSettings_RT titlePageSettings: TitlePageSettings_RT { }
+    readonly property RichTextEditorSettings_RT richTextEditorSettings: RichTextEditorSettings_RT { }
+    readonly property SceneListPanelSettings_RT sceneListPanelSettings: SceneListPanelSettings_RT { }
+    readonly property MarkupToolsSettings_RT markupToolsSettings: MarkupToolsSettings_RT { }
+    readonly property ScritedSettings_RT scritedSettings: ScritedSettings_RT { }
+    readonly property HelpNotificationSettings_RT helpNotificationSettings: HelpNotificationSettings_RT { }
+    readonly property NotebookSettings_RT notebookSettings: NotebookSettings_RT { }
+    readonly property WorkspaceSettings_RT workspaceSettings: WorkspaceSettings_RT { }
 
-        category: "UserAccountDialog"
-        location: Platform.settingsLocation
-    }
-
-    readonly property Settings scrollAreaSettings: Settings {
-        property real zoomFactor: 0.05
-
-        category: "ScrollArea"
-        location: Platform.settingsLocation
-    }
-
-    readonly property Settings structureCanvasSettings: Settings {
-        property bool displayAnnotationProperties: true
-        property bool showGrid: true
-        property bool showPreview: true
-        property bool showPullHandleAnimation: true
-
-        property real connectorLineWidth: 2
-        property real overflowFactor: 0.05
-        property real previewSize: 300
-        property real annotationDockX: 80
-        property real annotationDockY: 100
-
-        property color canvasColor: Runtime.colors.accent.c50.background
-        property color gridColor: Runtime.colors.accent.c400.background
-
-        function restoreDefaultGridColor() {
-            gridColor = Runtime.colors.accent.c400.background
-        }
-
-        function restoreDefaultCanvasColor() {
-            canvasColor = Runtime.colors.accent.c50.background
-        }
-
-        category: "Structure Tab"
-        location: Platform.settingsLocation
-
-    }
-
-    readonly property Settings timelineViewSettings: Settings {
-        readonly property string dropAreaKey: "scrite/sceneID"
-
-        property bool showCursor: true
-        property string textMode: "HeadingOrTitle"
-
-        category: "Timeline View"
-        location: Platform.settingsLocation
-    }
-
-    readonly property Settings screenplayEditorSettings: Settings {
-        category: "Screenplay Editor"
-        location: Platform.settingsLocation
-
-        ObjectRegister.name: "screenplayEditorSettings"
-
-        property var zoomLevelModifiers: { "tab0": 0, "tab1": 0, "tab2": 0, "tab3": 0 }
-
-        property int commentsPanelTabIndex: 1
-        property int embeddedEditorZoomValue: -1
-        property int lastLanguageRefreshNoticeBoxTimestamp: 0
-        property int lastSpellCheckRefreshNoticeBoxTimestamp: 0
-        property int longSceneWordTreshold: 150
-        property int mainEditorZoomValue: -1
-        property int placeholderInterval: 250 // ms after which placeholder is swapped to content in delegates
-        property int sceneSidePanelActiveTab: 0
-        property int slpSynopsisLineCount: 2
-        property int jumpToSceneFilterMode: 0
-
-        property bool allowDiacriticEditing: true
-        property bool allowSelectedTextTranslation: false
-        property bool allowTaggingOfScenes: false
-        property bool applyUserDefinedLanguageFonts: true
-        property bool autoAdjustEditorWidthInScreenplayEditor: true
-        property bool autoSelectSceneUnderMouse: true
-        property bool captureInvisibleCharacters: false
-        property bool copyAsFountain: true
-        property bool copyFountainUsingStrictSyntax: true
-        property bool copyFountainWithEmphasis: true
-        property bool displayAddSceneBreakButtons: true
-        property bool displayEmptyTitleCard: true
-        property bool displayIndexCardFields: true
-        property bool displayRuler: false
-        property bool displaySceneCharacters: false
-        property bool displaySceneComments: false
-        property bool displaySceneSynopsis: false
-        property bool enableAutoCapitalizeSentences: true
-        property bool enableAutoPolishParagraphs: true // for automatically adding/removing CONT'D where appropriate
-        property bool enableSpellCheck: true // Since this is now fixed: https://github.com/teriflix/scrite/issues/138
-        property bool focusCursorOnSceneHeadingInNewScenes: false
-        property bool highlightCurrentLine: true
-        property bool includeTitlePageInPreview: true
-        property bool languageInputPreferenceChecked: false
-        property bool longSceneWarningEnabled: true
-        property bool markupToolsDockVisible: false
-        property bool optimiseScrolling: false
-        property bool pasteAfterResolvingEmphasis: true
-        property bool pasteAsFountain: true
-        property bool pasteByLinkingScenesWhenPossible: true
-        property bool pasteByMergingAdjacentElements: true
-        property bool refreshButtonInStatsReportAnimationDone: false
-        property bool restartEpisodeScenesAtOne: false // If set, each episode starts with scene number 1
-        property bool sceneSidePanelOpen: false
-        property bool screenplayEditorAddButtonsAnimationShown: false
-        property bool showLanguageRefreshNoticeBox: true
-        property bool showLoglineEditor: false
-        property bool showSpellCheckRefreshNoticeBox: true
-        property bool singleClickAutoComplete: true
-
-        property real sidePanelWidth: 400
-        property real spaceBetweenScenes: 0
-    }
-
-    readonly property Settings screenplayTracksSettings: Settings {
-        category: "ScreenplayTracks"
-        location: Platform.settingsLocation
-
-        property bool displayTracks: true
-        property bool displayStacks: true
-        property bool displayKeywordsTracks: true
-        property bool displayStructureTracks: true
-    }
-
-    readonly property Settings pdfExportSettings: Settings {
-        property bool usePdfDriver: true
-
-        category: "PdfExport"
-        location: Platform.settingsLocation
-    }
-
-    readonly property Settings titlePageSettings: Settings {
-        location: Platform.settingsLocation
-        category: "TitlePage"
-
-        property bool includeTimestamp: false
-
-        property string address
-        property string author
-        property string contact
-        property string email
-        property string phone
-        property string website
-    }
-
-    readonly property Settings richTextEditorSettings: Settings {
-        property bool languageNoteShown: false
-
-        category: "Rich Text Editor"
-        location: Platform.settingsLocation
-    }
-
-    readonly property Settings sceneListPanelSettings: Settings {
-        property bool showTooltip: true
-
-        property bool displayTracks: true
-        property string displaySceneLength: "TIME" // can be NO, PAGE, TIME
-        property string sceneTextMode: "HEADING" // can be SUMMARY also
-
-        category: "Scene List Panel"
-        location: Platform.settingsLocation
-    }
-
-    readonly property Settings markupToolsSettings: Settings {
-        property real contentX: 20
-        property real contentY: 20
-
-        category: "Markup Tools"
-        location: Platform.settingsLocation
-    }
-
-    readonly property Settings scritedSettings: Settings {
-        property bool codecsNoticeDisplayed: false
-        property bool experimentalFeatureNoticeDisplayed: false
-        property bool videoPlayerVisible: true
-
-        property real playerAreaRatio: 0.5
-
-        property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
-
-        category: "Scrited"
-        location: Platform.settingsLocation
-    }
-
-    readonly property Settings helpNotificationSettings: Settings {
-        property string dayZero
-        property string tipsShown: ""
-
-        function daysSinceZero() {
-            const today = new Date()
-            const dzero = dayZero === "" ? today : new Date(dayZero + "Z")
-            const days = Math.floor((today.getTime() - dzero.getTime()) / (24*60*60*1000))
-            return days
-        }
-
-        function isTipShown(val) {
-            const ts = tipsShown.split(",")
-            return ts.indexOf(val) >= 0
-        }
-
-        function markTipAsShown(val) {
-            let ts = tipsShown.length > 0 ? tipsShown.split(",") : []
-            if(ts.indexOf(val) < 0)
-                ts.push(val)
-            tipsShown = ts.join(",")
-        }
-
-        location: Platform.settingsLocation
-        category: "Help"
-    }
-
-    readonly property Settings notebookSettings: Settings {
-        property int characterPageTab: 0
-        property int charactersPageTab: 0
-        property int screenplayPageTab: 0
-        property int sceneNotesPageTab: 0
-        property int sceneSynopsisTabIndex: 0
-        property int graphLayoutMaxIterations: 50000
-        property int graphLayoutMaxTime: 1000
-
-        property bool richTextNotesEnabled: true
-        property bool showAllFormQuestions: true
-
-        location: Platform.settingsLocation
-        category: "Notebook"
-    }
-
-    readonly property Settings workspaceSettings: Settings {
-        location: Platform.settingsLocation
-        category: "Workspace"
-
-        property var customColors: []
-        property var defaultSceneColor: SceneColors.palette[0]
-
-        property bool animateNotebookIcon: true
-        property bool animateStructureIcon: true
-        property bool autoOpenLastFile: false
-        property bool mouseWheelZoomsInCharacterGraph: Platform.isWindowsDesktop || Platform.isLinuxDesktop
-        property bool mouseWheelZoomsInStructureCanvas: Platform.isWindowsDesktop || Platform.isLinuxDesktop
-        property bool scriptalayIntroduced: false
-        property bool showNotebookInStructure: true
-        property bool showScritedTab: false
-        property bool syncCurrentSceneOnNotebook: true
-
-        property real flickScrollSpeedFactor: 1.0
-        property real screenplayEditorWidth: -1
-        property real workspaceHeight
-
-        property string lastOpenExportFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
-        property string lastOpenFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
-        property string lastOpenImportFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
-        property string lastOpenPhotosFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.PicturesLocation)
-        property string lastOpenReportsFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
-        property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
-    }
-
-    readonly property Settings applicationSettings: Settings {
+    readonly property ApplicationSettings_RT applicationSettings: ApplicationSettings_RT {
         id: _applicationSettings
-
-        property int accentColor: colors.defaultAccentColor
-        property int primaryColor: colors.defaultPrimaryColor
-        property int joinDiscordPromptCounter: 0
-
-        property real colorIntensity: 0.5
-
-        property bool enableAnimations: true
-        property bool notifyMissingRecentFiles: true
-        property bool reloadPrompt: true
-        property bool useNativeTextRendering: false
-        property bool useSoftwareRenderer: false
-
-        property string theme: "Material"
-
-        Component.onCompleted: {
-            colorIntensity = bounded(0, colorIntensity, 1)
-            Qt.callLater( () => {
-                             Runtime.currentTheme = theme
-                             Runtime.currentUseSoftwareRenderer = useSoftwareRenderer
-                         })
-        }
-
-        category: "Application"
-        location: Platform.settingsLocation
     }
 
     // Global undo-redo stack
@@ -441,240 +144,13 @@ Item {
         font: Scrite.document.formatting.defaultFont2
     }
 
-    // Color Palettes
-    component Colors : QtObject {
-        property int key: Material.Indigo
-
-        property var button: c200
-        property var highlight: c400
-
-        property color borderColor: c400.background
-        property color separatorColor: c400.background
-        property color windowColor: c300.background
-
-        property QtObject regular: QtObject {
-            property color background: Material.color(key)
-            property color text: Color.textColorFor(background)
-        }
-
-        property QtObject c10: QtObject {
-            property color background: Qt.rgba(1,1,1,0)
-            property color text: "black"
-        }
-
-        property QtObject c50: QtObject {
-            property color background: Material.color(key, Material.Shade50)
-            property color text: Color.textColorFor(background)
-        }
-
-        property QtObject c100: QtObject {
-            property color background: Material.color(key, Material.Shade100)
-            property color text: Color.textColorFor(background)
-        }
-
-        property QtObject c200: QtObject {
-            property color background: Material.color(key, Material.Shade200)
-            property color text: Color.textColorFor(background)
-        }
-
-        property QtObject c300: QtObject {
-            property color background: Material.color(key, Material.Shade300)
-            property color text: Color.textColorFor(background)
-        }
-
-        property QtObject c400: QtObject {
-            property color background: Material.color(key, Material.Shade400)
-            property color text: Color.textColorFor(background)
-        }
-
-        property QtObject c500: QtObject {
-            property color background: Material.color(key, Material.Shade500)
-            property color text: Color.textColorFor(background)
-        }
-
-        property QtObject c600: QtObject {
-            property color background: Material.color(key, Material.Shade600)
-            property color text: Color.textColorFor(background)
-        }
-
-        property QtObject c700: QtObject {
-            property color background: Material.color(key, Material.Shade700)
-            property color text: Color.textColorFor(background)
-        }
-
-        property QtObject c800: QtObject {
-            property color background: Material.color(key, Material.Shade800)
-            property color text: Color.textColorFor(background)
-        }
-
-        property QtObject c900: QtObject {
-            property color background: Material.color(key, Material.Shade900)
-            property color text: Color.textColorFor(background)
-        }
-
-        property QtObject a100: QtObject {
-            property color background: Material.color(key, Material.ShadeA100)
-            property color text: Color.textColorFor(background)
-        }
-
-        property QtObject a200: QtObject {
-            property color background: Material.color(key, Material.ShadeA200)
-            property color text: Color.textColorFor(background)
-        }
-
-        property QtObject a400: QtObject {
-            property color background: Material.color(key, Material.ShadeA400)
-            property color text: Color.textColorFor(background)
-        }
-
-        property QtObject a700: QtObject {
-            property color background: Material.color(key, Material.ShadeA700)
-            property color text: Color.textColorFor(background)
-        }
+    readonly property Colors_RT colors: Colors_RT { 
+        applicationSettings: _applicationSettings 
     }
 
-    readonly property QtObject colors: Item {
-        ObjectRegister.name: "runtimeColors"
-
-        readonly property int   defaultAccentColor: Material.DeepPurple
-        readonly property int   defaultPrimaryColor: Material.Grey
-        readonly property int   theme: Material.Light
-
-        readonly property var   forDocument: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
-        readonly property var   forScene: SceneColors.palette
-
-        property real sceneControlTint: _applicationSettings.colorIntensity*0.4
-        property real sceneHeadingTint: _applicationSettings.colorIntensity*0.4
-        property real currentNoteTint: _applicationSettings.colorIntensity*0.4
-        property real currentLineHightlightTint: _applicationSettings.colorIntensity*0.2
-        property real screenplayTracksTint: root.bounded(0.4, _applicationSettings.colorIntensity, 1)
-        property color selectedSceneControlTint: Color.translucent(primary.c100.background, root.bounded(0.2,1-_applicationSettings.colorIntensity,0.8))
-        property color selectedSceneHeadingTint:  Color.translucent(primary.c100.background, root.bounded(0.2,1-_applicationSettings.colorIntensity,0.8))
-
-        readonly property color transparent: "transparent"
-
-        readonly property Colors primary: Colors {
-            ObjectRegister.name: "primaryColors"
-
-            key: Material.Grey // applicationSettings.primaryColor
-
-            property QtObject editor: QtObject {
-                readonly property color background: colors.theme === Material.Light ? "white" : "black"
-                readonly property color text: colors.theme === Material.Light ? "black" : "white"
-            }
-        }
-
-        readonly property Colors accent: Colors {
-            ObjectRegister.name: "accentColors"
-
-            key: _applicationSettings.accentColor
-        }
-
-        function tint(a, b) {
-            return Color.stacked( Color.tint(a, b), theme === Material.Light ? "white" : "black" )
-        }
-    }
-
-    // All the app-features
-    readonly property QtObject appFeatures: QtObject {
-        readonly property AppFeature screenplay: AppFeature {
-            feature: Scrite.ScreenplayFeature
-        }
-
-        readonly property AppFeature structure: AppFeature {
-            feature: Scrite.StructureFeature
-        }
-
-        readonly property AppFeature notebook: AppFeature {
-            feature: Scrite.NotebookFeature
-        }
-
-        readonly property AppFeature scrited: AppFeature {
-            feature: Scrite.ScritedFeature
-        }
-
-        readonly property AppFeature characterRelationshipGraph: AppFeature {
-            feature: Scrite.RelationshipGraphFeature
-        }
-
-        readonly property AppFeature watermark: AppFeature {
-            feature: Scrite.WatermarkFeature
-        }
-
-        readonly property AppFeature importer: AppFeature {
-            feature: Scrite.ImportFeature
-        }
-
-        readonly property AppFeature exporter: AppFeature {
-            feature: Scrite.ExportFeature
-        }
-
-        readonly property AppFeature scriptalay: AppFeature {
-            feature: Scrite.ScriptalayFeature
-        }
-
-        readonly property AppFeature templates: AppFeature {
-            feature: Scrite.TemplateFeature
-        }
-
-        readonly property AppFeature emailSupport: AppFeature {
-            featureName: "support/email"
-        }
-    }
-
-    // This model provides access to recently accessed files. It is updated from
-    // different parts of the UI where opening / saving of files is triggered.
-    // Contents of this model is listed in the HomeScreen.
-    readonly property ScriteFileListModel recentFiles: ScriteFileListModel {
-        id: _recentFiles
-
-        property var missingFiles: []
-
-        property bool preferTitleVersionText: true
-
-        Component.onCompleted: {
-            Scrite.document.justLoaded.connect(onDocumentJustLoaded)
-            Scrite.document.justSaved.connect(onDocumentJustSaved)
-            filesChanged.connect(captureChangeInFiles)
-        }
-
-        function onDocumentJustSaved() {
-            Qt.callLater(addDocumentFile)
-        }
-
-        function onDocumentJustLoaded() {
-            Qt.callLater(addDocumentFile)
-        }
-
-        function addDocumentFile() {
-            const docFilePath = Scrite.document.fileName
-            if(docFilePath !== "")
-                add(docFilePath)
-
-            // Remove this file from missing files list.
-            if(Array.isArray(missingFiles) || missingFiles.length) {
-                let f = missingFiles
-                missingFiles = f.filter(item => item === docFilePath);
-            }
-        }
-
-        function captureChangeInFiles() {
-            _recentFilesSettings.files = files
-        }
-
-        notifyMissingFiles: _applicationSettings.notifyMissingRecentFiles
-        source: ScriteFileListModel.RecentFiles
-
-        onFilesMissing: (files) => {
-            let f = Array.isArray(missingFiles) || missingFiles.length ? missingFiles : []
-            f.push(...files)
-            missingFiles = f
-        }
-
-        onNotifyMissingFilesChanged: {
-            if(!notifyMissingFiles)
-                missingFiles = []
-        }
+    readonly property AppFeatures_RT appFeatures: AppFeatures_RT { }
+    readonly property RecentFiles_RT recentFiles: RecentFiles_RT {
+        applicationSettings: _applicationSettings
     }
 
     readonly property LibraryService libraryService : LibraryService { }
@@ -703,59 +179,19 @@ Item {
         }
     }
 
-    readonly property ScreenplayPaginator paginator : ScreenplayPaginator {
-        property bool paused: false
-        property ScreenplayElement currentElement: screenplay !== null ? Runtime.screenplayAdapter.currentElement : null
-
-        enabled: !paused && !Scrite.document.loading
-        format: Scrite.document.printFormat
-        screenplay: Runtime.screenplayAdapter.screenplay
-        cursorPosition: currentElement ? (currentElement.scene ? Math.max(currentElement.scene.cursorPosition,0) : 0) : -1
-
-        function toggle() { paused = !paused }
-        function pause() { paused = true }
-        function resume() { paused = false }
+    readonly property ScreenplayPaginator_RT paginator : ScreenplayPaginator_RT {
+        currentElement: screenplay !== null ? root.screenplayAdapter.currentElement : null
+        screenplay: root.screenplayAdapter.screenplay
     }
 
     // Announcement IDs
-    readonly property QtObject announcementIds: QtObject {
-        readonly property string characterNotesRequest: "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8"
-        readonly property string closeDialogBoxRequest: "A6456A87-FC8C-405B-BDD7-7625F86272BA"
-        readonly property string closeHomeScreenRequest: "4F8F6B5B-5BEB-4D01-97BA-B0018241BD38"
-        readonly property string embeddedTabRequest: "190B821B-50FE-4E47-A4B2-BDBB2A13B72C"
-        readonly property string englishFontFamilyChanged: "763E8FAD-8681-4F64-B574-F9BB7CF8A7F1"
-        readonly property string focusRequest: "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8"
-        readonly property string loginRequest: "97369507-721E-4A7F-886C-4CE09A5BCCFB"
-        readonly property string notebookNodeRequest: "1DC67418-2584-4598-A68A-DE5205BBC028"
-        readonly property string reloadMainUiRequest: "9A7F0F35-346F-461D-BB85-F5C6DC08A01D"
-        readonly property string sceneNotesRequest: "41EE5E06-FF97-4DB6-B32D-F938418C9529"
-        readonly property string sceneTextEditorReceivedFocus: "598E1699-465B-40D5-8CF4-E9753E2C16E7"
-        readonly property string showHelpTip: "B168E17C-14CA-454F-9DF8-CAA381D9A8A2"
-        readonly property string notebookRequest: "ABCD190B821B-50FE-4E47-A4B2-BDBB2A13B72C"
-        readonly property string userAccountDialogScreen: "24A8C9F3-1F62-4B14-A65E-250E53350152"
-        readonly property string userProfileScreenPage: "D97FD221-5257-4A20-B9A2-744594E99D76"
-    }
-
-    readonly property QtObject announcementData: QtObject {
-        readonly property QtObject focusOptions: QtObject {
-            readonly property string addMuteCharacter: "Add Mute Character"
-            readonly property string addSceneTag: "Add Scene Tag"
-            readonly property string scene: "Scene"
-            readonly property string sceneHeading: "Scene Heading"
-            readonly property string sceneNumber: "Scene Number"
-            readonly property string sceneSynopsis: "Scene Synopsis"
-        }
-    }
+    readonly property AnnouncementIds_RT announcementIds: AnnouncementIds_RT { }
 
     // Global file-manager
-    readonly property FileManager fileNamager: FileManager {
-
-    }
+    readonly property FileManager fileNamager: FileManager { }
 
     // Global user guide search index
-    readonly property UserGuideSearchIndex userGuideSearchIndex: UserGuideSearchIndex {
-
-    }
+    readonly property UserGuideSearchIndex userGuideSearchIndex: UserGuideSearchIndex { }
 
     function init(_parent) {
         if( !(_parent && Object.isOfType(_parent, "QQuickItem")) )
@@ -798,9 +234,10 @@ Item {
             code += itemNameOrCode + " { visible: false }\n"
 
         let instance = Qt.createQmlObject(code, root)
+        let itemInstance = instance as Item
         let instanceSize = Qt.size(0, 0)
-        if(instance) {
-            instanceSize = Qt.size(instance.width, instance.height)
+        if(itemInstance) {
+            instanceSize = Qt.size(itemInstance.width, itemInstance.height)
             instance.destroy()
         }
 
@@ -856,7 +293,8 @@ Item {
         if(!parent || !type || !geometry)
             return null
 
-        let annot = Qt.createQmlObject("import io.scrite.components 1.0; Annotation { objectName: \"ica\" }", parent)
+        let annotObject = Qt.createQmlObject("import io.scrite.components 1.0; Annotation { objectName: \"ica\" }", parent)
+        let annot = annotObject as Annotation
         annot.type = type
         annot.geometry = geometry
         if(config) {
@@ -970,18 +408,6 @@ Item {
     onShowNotebookInStructureChanged: activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
 
     // Private objects
-    Settings {
-        id: _recentFilesSettings
-
-        property var files: []
-
-        property alias missingFiles: _recentFiles.missingFiles
-        property alias preferTitleVersionText: _recentFiles.preferTitleVersionText
-
-        category: "RecentFiles"
-        location: Platform.settingsLocation
-    }
-
     SequentialAnimation {
         id: _mainWindowTabSwitchTask
 

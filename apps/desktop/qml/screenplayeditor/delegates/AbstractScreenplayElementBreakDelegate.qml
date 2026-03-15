@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Controls
@@ -20,7 +22,6 @@ import QtQuick.Layouts
 import QtQuick.Controls.Material
 
 import io.scrite.components
-
 
 import "../../globals"
 import "../../dialogs"
@@ -38,12 +39,12 @@ AbstractScreenplayElementDelegate {
         Connections {
             target: root
 
-            function on__focusIn(cursorPosition) {
+            function on__FocusIn(cursorPosition) {
                 _titleField.cursorPosition = cursorPosition < 0 ? _titleField.length : 0
                 _titleField.forceActiveFocus()
             }
 
-            function on__focusOut() {
+            function on__FocusOut() {
                 _titleField.focus = false
             }
         }
