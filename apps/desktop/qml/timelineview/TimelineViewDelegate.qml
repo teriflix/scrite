@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Shapes
@@ -27,6 +29,7 @@ import "../helpers"
 Item {
     id: root
 
+    required property real zoomLevel
     required property ListView screenplayElementList
 
     // Since this will be used as a delegate with Screenplay model, the following properties will come from that model
@@ -65,7 +68,7 @@ Item {
         anchors.topMargin: minimumMargin
         anchors.leftMargin: minimumMargin
         anchors.rightMargin: minimumMargin
-        anchors.bottomMargin: minimumMargin + (screenplayElementList.scrollBarRequired ? screenplayElementList.ScrollBar.horizontal.height : 0)
+        anchors.bottomMargin: minimumMargin + (root.screenplayElementList.scrollBarRequired ? root.screenplayElementList.ScrollBar.horizontal.height : 0)
 
         enabled: !_delegateDropArea.containsDrag
 
@@ -116,7 +119,7 @@ Item {
                 anchors.leftMargin: 5
                 anchors.rightMargin: 5
 
-                active: _private.isBreakElement || parent.width > screenplayElementList.minimumDelegateWidthForTextVisibility
+                active: _private.isBreakElement || parent.width > root.screenplayElementList.minimumDelegateWidthForTextVisibility
                 visible: active
 
                 sourceComponent: Item {

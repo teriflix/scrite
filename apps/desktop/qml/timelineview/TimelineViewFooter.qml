@@ -27,6 +27,7 @@ import "../helpers"
 Item {
     id: root
 
+    required property bool dragDropEnabled
     required property DropArea mainDropArea
     required property ListView screenplayElementList
     required property color dropAreaHighlightColor
@@ -52,7 +53,7 @@ Item {
         border.width: 1
 
         opacity: _private.highlightAsDropArea ? 0.75 : 0.5
-        visible: Scrite.document.structure.elementCount > 0 && enableDragDrop
+        visible: Scrite.document.structure.elementCount > 0 && root.dragDropEnabled
 
         VclLabel {
             anchors.fill: parent
@@ -73,7 +74,7 @@ Item {
         anchors.fill: parent
 
         keys: [Runtime.timelineViewSettings.dropAreaKey]
-        enabled: enableDragDrop
+        enabled: root.dragDropEnabled
 
         onEntered: (drag) => {
                        root.screenplayElementList.forceActiveFocus()
@@ -82,7 +83,7 @@ Item {
 
         onDropped: (drop) => {
                        _private.highlightAsDropArea = false
-                       dropSceneAtRequest(drop.source, Scrite.document.screenplay.elementCount)
+                       root.dropSceneAtRequest(drop.source, Scrite.document.screenplay.elementCount)
                        drop.acceptProposedAction()
                    }
     }

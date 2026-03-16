@@ -97,7 +97,7 @@ DialogLauncher {
 
                                 VclLabel {
                                     width: parent.width * 0.75
-                                    text: relativeTime + "<br/><font size=\"-2\">" + _backupFilesViewDelegate.timestampAsString + "</font>"
+                                    text: _backupFilesViewDelegate.relativeTime + "<br/><font size=\"-2\">" + _backupFilesViewDelegate.timestampAsString + "</font>"
                                     padding: 5
                                     leftPadding: 12
                                     elide: Text.ElideRight

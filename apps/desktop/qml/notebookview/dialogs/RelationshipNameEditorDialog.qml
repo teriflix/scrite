@@ -128,7 +128,7 @@ DialogLauncher {
                             Layout.preferredHeight: 150
                             Layout.alignment: Qt.AlignHCenter
 
-                            color: withCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
+                            color: _dialog.withCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
                             border.width: 1
                             border.color: "black"
 

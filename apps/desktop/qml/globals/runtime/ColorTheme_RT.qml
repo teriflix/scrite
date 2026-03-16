@@ -22,6 +22,7 @@ QtObject {
     id: root
 
     required property int key
+    required property int theme
 
     property var button: c200
     property var highlight: c400
@@ -92,5 +93,10 @@ QtObject {
 
     property ColorPair_RT a700: ColorPair_RT {
         background: Material.color(root.key, Material.ShadeA700)
+    }
+
+    property ColorPair_RT editor: ColorPair_RT {
+        background: root.theme === Material.Light ? "white" : "black"
+        text: root.theme === Material.Light ? "black" : "white"
     }
 }

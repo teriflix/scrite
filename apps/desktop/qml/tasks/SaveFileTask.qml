@@ -156,7 +156,7 @@ Item {
             property BasicFileInfo fileInfo
 
             Component.onCompleted: {
-                fileInfo = Qt.createQmlObject("import io.scrite.components 1.0; BasicFileInfo { }", _documentSavedButHasChangesItem)
+                fileInfo = Qt.createQmlObject("import io.scrite.components; BasicFileInfo { }", _documentSavedButHasChangesItem)
                 fileInfo.absoluteFilePath = Scrite.document.fileName
 
                 if(silent)
@@ -183,7 +183,7 @@ Item {
     Component {
         id: _saveFileDialog
 
-        VclFileDialog {
+        FileDialog {
             title: "Save Scrite Document As"
             fileMode: FileDialog.SaveFile
             nameFilters: ["Scrite Documents (*.scrite)"]

@@ -74,7 +74,7 @@ Item {
             required property int index
             required property var objectItem
 
-            property Character character: objectItem
+            property Character character: objectItem as Character
 
             width: _charactersView.cellWidth
             height: _charactersView.cellHeight
@@ -83,9 +83,9 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 5
 
-                color: Runtime.colors.tint(_delegate.character.color, _charactersView.currentIndex === index ? Runtime.colors.currentNoteTint : Runtime.colors.sceneHeadingTint)
+                color: Runtime.colors.tint(_delegate.character.color, _charactersView.currentIndex === _delegate.index ? Runtime.colors.currentNoteTint : Runtime.colors.sceneHeadingTint)
                 border.width: 1
-                border.color: Color.isLight(_delegate.character.color) ? (_charactersView.currentIndex === index ? "darkgray" : Runtime.colors.primary.borderColor) : _delegate.character.color
+                border.color: Color.isLight(_delegate.character.color) ? (_charactersView.currentIndex === _delegate.index ? "darkgray" : Runtime.colors.primary.borderColor) : _delegate.character.color
 
                 Row {
                     anchors.fill: parent
@@ -154,7 +154,7 @@ Item {
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                 onClicked: (mouse) => {
-                               _charactersView.currentIndex = index
+                               _charactersView.currentIndex = _delegate.index
                                if(mouse.button === Qt.RightButton) {
                                    _private.popupCharacterMenu(_delegate.character, _delegate)
                                }
@@ -287,7 +287,7 @@ Item {
         }
 
         function popupCharacterMenu(character, source) {
-            let menu = characterMenu.createObject(source, {"character": character})
+            let menu = characterMenu.createObject(source, {"character": character}) as CharacterMenu
             menu.aboutToHide.connect(menu.destroy)
             menu.popup()
         }

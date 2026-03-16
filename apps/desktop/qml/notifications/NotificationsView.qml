@@ -104,7 +104,7 @@ Rectangle {
                                 return Layout.preferredWidth*9/16
                             }
 
-                            visible: notification.hasImage
+                            visible: _delegate.notification.hasImage
                             border.width: 1
                             border.color: Runtime.colors.primary.borderColor
 
@@ -116,7 +116,7 @@ Rectangle {
 
                                 fillMode: Image.PreserveAspectFit
                                 mipmap: true
-                                source: notification.image
+                                source: _delegate.notification.image
 
                                 MouseArea {
                                     anchors.fill: parent
@@ -185,7 +185,7 @@ Rectangle {
                             visible: !_delegate.notification.autoClose && !_delegate.notification.hasButtons
                             text: "Dismiss"
 
-                            onClicked: Scrite.notifications.dismissNotification(index)
+                            onClicked: Scrite.notifications.dismissNotification(_delegate.index)
                         }
                     }
                 }

@@ -56,8 +56,8 @@ Flickable {
     Item {
         id: _content
 
-        width: _private.isHorizontalTrack ? listView.contentItem.width : _private.totalTracksSize
-        height: _private.isHorizontalTrack ? _private.totalTracksSize : listView.contentItem.height
+        width: _private.isHorizontalTrack ? root.listView.contentItem.width : _private.totalTracksSize
+        height: _private.isHorizontalTrack ? _private.totalTracksSize : root.listView.contentItem.height
 
         Repeater {
             id: _trackRepeater
@@ -117,28 +117,28 @@ Flickable {
                         required property var modelData // of type ScreenplayTrackItem, a Q_GADGET declared in screenplay.h
                                                         // struct ScreenplayTrackItem { int startIndex, endIndex; QString name; QColor color; }
 
-                        property QtObject extents: QtObject {
-                            property real from: {
+                        property Extents extents: Extents {
+                            from: {
                                 if(_trackItem.startItem === null || _trackItem.endItem === null)
                                     return 0
 
-                                return (_private.isHorizontalTrack ? _trackItem.startItem.x - listView.originX :
-                                                                     _trackItem.startItem.y - listView.originY)
+                                return (_private.isHorizontalTrack ? _trackItem.startItem.x - root.listView.originX :
+                                                                     _trackItem.startItem.y - root.listView.originY)
                             }
-                            property real to: {
+                            to: {
                                 if(_trackItem.startItem === null || _trackItem.endItem === null)
                                     return 0
 
-                                return (_private.isHorizontalTrack ? _trackItem.endItem.x + _trackItem.endItem.width - listView.originX :
-                                                                     _trackItem.endItem.y + _trackItem.endItem.height - listView.originY)
+                                return (_private.isHorizontalTrack ? _trackItem.endItem.x + _trackItem.endItem.width - root.listView.originX :
+                                                                     _trackItem.endItem.y + _trackItem.endItem.height - root.listView.originY)
                             }
                         }
 
                         property int startIndex: root.screenplay.indexOfElement(root.screenplay.elementWithIndex(modelData.startIndex))
                         property int endIndex: modelData.startIndex === modelData.endIndex ? startIndex : root.screenplay.indexOfElement(root.screenplay.elementWithIndex(modelData.endIndex))
 
-                        property Item startItem: listView.itemAtIndex(startIndex)
-                        property Item endItem: listView.itemAtIndex(endIndex)
+                        property Item startItem: root.listView.itemAtIndex(startIndex)
+                        property Item endItem: root.listView.itemAtIndex(endIndex)
 
                         property string name: modelData.name
 
@@ -146,9 +146,9 @@ Flickable {
 
                         function lookupItems() {
                             if(!startItem)
-                                startItem = listView.itemAtIndex(startIndex)
+                                startItem = root.listView.itemAtIndex(startIndex)
                             if(!endItem)
-                                endItem = listView.itemAtIndex(endIndex)
+                                endItem = root.listView.itemAtIndex(endIndex)
                             if(!startItem || !endItem)
                                 Qt.callLater(lookupItems)
                         }
@@ -266,7 +266,7 @@ Flickable {
     }
 
     Connections {
-        target: listView
+        target: root.listView
 
         ignoreUnknownSignals: true
 
@@ -297,17 +297,22 @@ Flickable {
         }
     }
 
+    component Extents : QtObject {
+        property real from
+        property real to
+    }
+
     QtObject {
         id: _private
 
         property int trackSize: Math.ceil(Runtime.minimumFontMetrics.lineSpacing) + 8
-        property int totalTracksSize: model.trackCount * trackSize
-        property bool isHorizontalTrack: listView.orientation === Qt.Horizontal
+        property int totalTracksSize: _private.model.trackCount * _private.trackSize
+        property bool isHorizontalTrack: root.listView.orientation === Qt.Horizontal
 
-        property rect viewportRect: Qt.rect( visibleArea.xPosition * contentWidth,
-                                            visibleArea.yPosition * contentHeight,
-                                            visibleArea.widthRatio * contentWidth,
-                                            visibleArea.heightRatio * contentHeight )
+        property rect viewportRect: Qt.rect( root.visibleArea.xPosition * root.contentWidth,
+                                            root.visibleArea.yPosition * root.contentHeight,
+                                            root.visibleArea.widthRatio * root.contentWidth,
+                                            root.visibleArea.heightRatio * root.contentHeight )
 
         property ScreenplayTracks model: ScreenplayTracks {
             property bool enabled: root.enabled && Runtime.screenplayTracksSettings.displayTracks && Runtime.appFeatures.structure.enabled
@@ -320,7 +325,7 @@ Flickable {
 
             allowedOpenTags: {
                 if(enabled) {
-                    const userData = Scrite.document.userData
+                    const userData = Scrite.document.userData || {}
                     if(userData && userData.allowedOpenTagsInTracks !== undefined && userData.allowedOpenTagsInTracks.length > 0)
                         return userData.allowedOpenTagsInTracks
                 }
@@ -328,8 +333,8 @@ Flickable {
             }
 
             onModelReset: {
-                root.implicitWidth = _private.isHorizontalTrack ? 0 : trackCount * _private.trackSize
-                root.implicitHeight = _private.isHorizontalTrack ? trackCount * _private.trackSize : 0
+                root.implicitWidth = _private.isHorizontalTrack ? 0 : _private.model.trackCount * _private.trackSize
+                root.implicitHeight = _private.isHorizontalTrack ? _private.model.trackCount * _private.trackSize : 0
             }
         }
 

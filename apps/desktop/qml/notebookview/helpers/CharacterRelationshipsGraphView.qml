@@ -234,12 +234,12 @@ Rectangle {
                             property bool visible: enabled
 
                             text: "Add A New Relationship"
-                            enabled: _graph.character && (_graph.character && _graph.character === _canvas.activeCharacter) && editRelationshipsEnabled && !Scrite.document.readOnly
+                            enabled: _graph.character && (_graph.character && _graph.character === _canvas.activeCharacter) && root.editRelationshipsEnabled && !Scrite.document.readOnly
                             icon.source: "qrc:/icons/content/add_circle_outline.png"
 
                             onTriggered: (source) => {
                                              _canvas.reloadIfDirty()
-                                             root.addNewRelationshipRequest(source)
+                                             root.root.addNewRelationshipRequest(source)
                                          }
                         }
 
@@ -247,7 +247,7 @@ Rectangle {
                             property bool visible: enabled
 
                             text: _canvas.activeCharacter ? ("Remove relationship with " + _canvas.activeCharacter.name) : "Remove Relationship"
-                            enabled: _graph.character && _canvas.activeCharacter !== _graph.character && _canvas.activeCharacter && editRelationshipsEnabled && !Scrite.document.readOnly
+                            enabled: _graph.character && _canvas.activeCharacter !== _graph.character && _canvas.activeCharacter && root.editRelationshipsEnabled && !Scrite.document.readOnly
                             icon.source: "qrc:/icons/action/delete.png"
 
                             onTriggered: _removeRelationshipConfirmation.active = true
@@ -365,7 +365,7 @@ Rectangle {
                                         focusPolicy: Qt.NoFocus
 
                                         onClicked: {
-                                            removeRelationshipWithRequest(_canvas.activeCharacter, this);
+                                            root.removeRelationshipWithRequest(_canvas.activeCharacter, this);
                                             _canvas.reloadIfDirty();
                                             _removeRelationshipConfirmation.active = false
                                         }
@@ -508,7 +508,7 @@ Rectangle {
     }
 
     BusyIcon {
-        running: _graph.busy || showBusyIndicator
+        running: _graph.busy || root.showBusyIndicator
 
         anchors.centerIn: parent
     }
@@ -545,26 +545,26 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: -Math.min(width,height)*0.075
 
-                color: Color.translucent(character.color, 0.15)
+                color: Color.translucent(root.character.color, 0.15)
                 radius: Math.min(width,height)*0.0375
-                visible: character.photos.length > 0
+                visible: root.character.photos.length > 0
 
                 border.width: 1
-                border.color: Color.translucent(character.color, 0.5)
+                border.color: Color.translucent(root.character.color, 0.5)
             }
 
             Image {
                 anchors.fill: parent
 
-                z: character === _canvas.activeCharacter ? 1 : 0
+                z: root.character === _canvas.activeCharacter ? 1 : 0
 
                 fillMode: Image.PreserveAspectCrop
                 mipmap: true
                 smooth: true
 
                 source: {
-                    if(character.hasKeyPhoto > 0)
-                        return "file:///" + character.keyPhoto
+                    if(root.character.hasKeyPhoto > 0)
+                        return "file:///" + root.character.keyPhoto
                     return "qrc:/icons/content/character_icon.png"
                 }
 
@@ -572,12 +572,12 @@ Rectangle {
                     anchors.fill: _infoLabel
                     anchors.margins: -4
 
-                    color: node.marked ? Runtime.colors.accent.a700.background : Runtime.colors.tint(character.color, Runtime.colors.sceneControlTint)
-                    opacity: character.photos.length === 0 ? 1 : 0.8
+                    color: _nodeItem.node.marked ? Runtime.colors.accent.a700.background : Runtime.colors.tint(root.character.color, Runtime.colors.sceneControlTint)
+                    opacity: root.character.photos.length === 0 ? 1 : 0.8
                     radius: 4
 
                     border.width: 1
-                    border.color: node.marked ? Runtime.colors.accent.a700.text : "black"
+                    border.color: _nodeItem.node.marked ? Runtime.colors.accent.a700.text : "black"
                 }
 
                 VclText {
@@ -589,7 +589,7 @@ Rectangle {
 
                     width: parent.width - 30
 
-                    color: node.marked ? Runtime.colors.accent.a700.text : "black"
+                    color: _nodeItem.node.marked ? Runtime.colors.accent.a700.text : "black"
                     horizontalAlignment: Text.AlignHCenter
                     maximumLineCount: 3
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -598,18 +598,18 @@ Rectangle {
 
                     text: {
                         let fields = []
-                        fields.push("<b>" + character.name + "</b>");
-                        if(character.designation !== "")
-                            fields.push("<i>" + character.designation + "</i>")
+                        fields.push("<b>" + root.character.name + "</b>");
+                        if(root.character.designation !== "")
+                            fields.push("<i>" + root.character.designation + "</i>")
                         return fields.join("<br/>")
                     }
                 }
 
                 Rectangle {
                     property real alpha: {
-                        if(!_canvas.activeCharacter || character === _canvas.activeCharacter)
+                        if(!_canvas.activeCharacter || root.character === _canvas.activeCharacter)
                             return 0
-                        return character.isDirectlyRelatedTo(_canvas.activeCharacter) ? 0 : 0.75
+                        return root.character.isDirectlyRelatedTo(_canvas.activeCharacter) ? 0 : 0.75
                     }
 
                     Behavior on alpha {
@@ -621,12 +621,14 @@ Rectangle {
 
                     color: Qt.rgba(1,1,1,alpha)
 
-                    border.width: character === _canvas.activeCharacter ? 3 : 1
-                    border.color: character === _canvas.activeCharacter ? "black" : Runtime.colors.primary.borderColor
+                    border.width: root.character === _canvas.activeCharacter ? 3 : 1
+                    border.color: root.character === _canvas.activeCharacter ? "black" : Runtime.colors.primary.borderColor
                 }
             }
 
             MouseArea {
+                id: _nodeItemMouseArea
+
                 anchors.fill: parent
 
                 hoverEnabled: true
@@ -635,10 +637,10 @@ Rectangle {
                 drag.target: !Scrite.document.readOnly ? parent : null
 
                 ToolTipPopup {
-                    text: (_graph.character && character.name === _graph.character.name) ?
+                    text: (_graph.character && root.character.name === _graph.character.name) ?
                               "Double click to add a relationship to this character." :
-                              "Double click to switch to " + character.name + "'s notes."
-                    visible: container.containsMouse && !_removeRelationshipConfirmation.active && !container.pressed
+                              "Double click to switch to " + root.character.name + "'s notes."
+                    visible: _nodeItemMouseArea.containsMouse && !_removeRelationshipConfirmation.active && !_nodeItemMouseArea.pressed
                 }
 
                 onPressed: {
@@ -647,7 +649,7 @@ Rectangle {
                     _canvas.reloadIfDirty()
                 }
                 onReleased: _canvasScroll.interactive = true
-                onDoubleClicked: characterDoubleClicked(character.name, parent)
+                onDoubleClicked: root.characterDoubleClicked(root.character.name, parent)
             }
         }
     }
@@ -656,6 +658,8 @@ Rectangle {
         id: _crGraphEdgeDelegate
 
         PainterPathItem {
+            id: _crGraphEdge
+
             required property int index
             required property var modelData
 
@@ -669,7 +673,7 @@ Rectangle {
             z: opacity
 
             outlineColor: Runtime.colors.primary.c700.background
-            outlineWidth: Scrite.app.devicePixelRatio * _canvas.scale * Runtime.structureCanvasSettings.lineWidthOfConnectors
+            outlineWidth: Scrite.app.devicePixelRatio * _canvas.scale * Runtime.structureCanvasSettings.connectorLineWidth
             renderType: PainterPathItem.OutlineOnly
             renderingMechanism: PainterPathItem.UseOpenGL
 
@@ -680,13 +684,13 @@ Rectangle {
             }
 
             Rectangle {
-                x: modelData.labelPosition.x - width/2
-                y: modelData.labelPosition.y - height/2
+                x: _crGraphEdge.modelData.labelPosition.x - width/2
+                y: _crGraphEdge.modelData.labelPosition.y - height/2
                 width: _nameLabel.width + 10
                 height: _nameLabel.height + 4
 
                 color: _nameLabelMouseArea.containsMouse ? Runtime.colors.accent.c700.background : Runtime.colors.primary.c700.background
-                rotation: modelData.labelAngle
+                rotation: _crGraphEdge.modelData.labelAngle
 
                 VclLabel {
                     id: _nameLabel
@@ -695,7 +699,7 @@ Rectangle {
 
                     color: _nameLabelMouseArea.containsMouse ? Runtime.colors.accent.c700.text : Runtime.colors.primary.c700.text
                     horizontalAlignment: Text.AlignHCenter
-                    text: modelData.relationship.name
+                    text: _crGraphEdge.modelData.relationship.name
 
                     font.pointSize: Math.floor(Runtime.idealFontMetrics.font.pointSize*0.75)
                 }
@@ -709,7 +713,7 @@ Rectangle {
                     enabled: !Scrite.document.readOnly
                     hoverEnabled: enabled
 
-                    onClicked: RelationshipNameEditorDialog.launch(modelData.relationship)
+                    onClicked: RelationshipNameEditorDialog.launch(_crGraphEdge.modelData.relationship)
                 }
             }
 

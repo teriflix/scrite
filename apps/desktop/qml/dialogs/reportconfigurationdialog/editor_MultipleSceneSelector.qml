@@ -29,7 +29,7 @@ import "../../helpers"
 
 /**
 Once upon a time sceneNumber was the same as element index.
-It is no longer the case. Scene number can event be user specified.
+It is no longer the case. Scene number can even be user specified.
 So rather than using ScreenplayElement.sceneNumber we now use ScreenplayElement.elementIndex
 to let the report generator know which scenes the user has selected.
 */
@@ -47,7 +47,7 @@ ColumnLayout {
 
         wrapMode: Text.WordWrap
 
-        text: fieldInfo.label
+        text: root.fieldInfo.label
     }
 
     VclLabel {
@@ -57,7 +57,7 @@ ColumnLayout {
         font.italic: true
         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
-        text: fieldInfo.note ? (fieldInfo.note + ". Filter by: ") : "Filter by: "
+        text: root.fieldInfo.note ? (root.fieldInfo.note + ". Filter by: ") : "Filter by: "
     }
 
     RowLayout {
@@ -163,7 +163,7 @@ ColumnLayout {
             }
 
             function select(sceneNumber, flag) {
-                var numbers = report.getConfigurationValue(fieldInfo.name)
+                var numbers = root.report.getConfigurationValue(root.fieldInfo.name)
                 var idx = numbers.indexOf(sceneNumber)
                 if(flag) {
                     if(idx < 0)
@@ -177,7 +177,7 @@ ColumnLayout {
                         return
                 }
                 selectedSceneNumbers = numbers
-                report.setConfigurationValue(fieldInfo.name, numbers)
+                root.report.setConfigurationValue(root.fieldInfo.name, numbers)
             }
 
             model: Scrite.document.screenplay
@@ -185,6 +185,7 @@ ColumnLayout {
 
             delegate: Item {
                 id: _sceneDelegate
+
                 required property int index
                 required property int screenplayElementType
                 required property int breakType
@@ -225,9 +226,10 @@ ColumnLayout {
 
         VclButton {
             text: "Select All"
+
             onClicked: {
                 var count = Scrite.document.screenplay.elementCount
-                var numbers = report.getConfigurationValue(fieldInfo.name)
+                var numbers = root.report.getConfigurationValue(root.fieldInfo.name)
                 for(var i=0; i<count; i++) {
                     var element = Scrite.document.screenplay.elementAt(i)
                     if( _sceneListView.filter(element.scene) ) {
@@ -236,15 +238,16 @@ ColumnLayout {
                     }
                 }
                 _sceneListView.selectedSceneNumbers = numbers
-                report.setConfigurationValue(fieldInfo.name, numbers)
+                root.report.setConfigurationValue(root.fieldInfo.name, numbers)
             }
         }
 
         VclButton {
             text: "Unselect All"
+            
             onClicked: {
                 var count = Scrite.document.screenplay.elementCount
-                var numbers = report.getConfigurationValue(fieldInfo.name)
+                var numbers = root.report.getConfigurationValue(root.fieldInfo.name)
                 for(var i=0; i<count; i++) {
                     var element = Scrite.document.screenplay.elementAt(i)
                     if( _sceneListView.filter(element.scene) ) {
@@ -254,7 +257,7 @@ ColumnLayout {
                     }
                 }
                 _sceneListView.selectedSceneNumbers = numbers
-                report.setConfigurationValue(fieldInfo.name, numbers)
+                root.report.setConfigurationValue(root.fieldInfo.name, numbers)
             }
         }
 
@@ -267,9 +270,9 @@ ColumnLayout {
     }
 
     function getReady() {
-        const ssn = report ? report.getConfigurationValue(fieldInfo.name) : []
+        const ssn = root.report ? root.report.getConfigurationValue(root.fieldInfo.name) : []
         _sceneListView.selectedSceneNumbers = ssn
-        _sceneListView.selectedEpisodeNumbers = report.episodeNumbers
+        _sceneListView.selectedEpisodeNumbers = root.report.episodeNumbers
         const idx = ssn && ssn.length > 0 ? ssn[0] : 0
         _sceneListView.positionViewAtIndex(idx, ListView.Beginning)
     }

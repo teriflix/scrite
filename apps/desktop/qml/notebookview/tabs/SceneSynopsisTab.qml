@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
@@ -39,13 +41,13 @@ Item {
     TabSequenceManager {
         id: _sceneTabSequence
 
-        enabled: parent.visible
+        enabled: root.visible
     }
 
     ColumnLayout {
         EventFilter.active: _private.sceneSynopsisField !== null
         EventFilter.events: [EventFilter.Wheel]
-        EventFilter.onFilter: {
+        EventFilter.onFilter: (object,event,result) => {
             EventFilter.forwardEventTo(_private.sceneSynopsisField)
             result.filter = true
             result.accepted = true
@@ -340,7 +342,7 @@ Item {
         }
 
         function popupFormalTagsMenu(parent) {
-            let menu = formalTagsMenu.createObject(root)
+            let menu = formalTagsMenu.createObject(root) as StructureGroupsMenu
             menu.closed.connect(menu.destroy)
             menu.popup()
             return menu
@@ -349,7 +351,7 @@ Item {
         property Component characterMenu: ScreenplayEditorCharacterMenu { }
 
         function popupCharacterMenu(characterName, parent) {
-            let menu = characterMenu.createObject(parent, {"characterName": characterName})
+            let menu = characterMenu.createObject(parent, {"characterName": characterName}) as ScreenplayEditorCharacterMenu
             menu.closed.connect(menu.destroy)
             menu.popup()
             return menu

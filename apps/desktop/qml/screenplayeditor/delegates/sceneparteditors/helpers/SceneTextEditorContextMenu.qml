@@ -52,36 +52,36 @@ MenuLoader {
         property bool mergeWithPreviousSceneEnabled: false
         property int sceneTextEditorCursorPosition: -1
 
-        property TextFormat sceneTextFormat: sceneDocumentBinder.textFormat
+        property TextFormat sceneTextFormat: root.sceneDocumentBinder.textFormat
         property SceneElement sceneCurrentElement
 
         onAboutToShow: {
             splitSceneEnabled = root.splitSceneEnabled
             mergeWithPreviousSceneEnabled = root.mergeWithPreviousSceneEnabled
-            sceneCurrentElement = sceneDocumentBinder.currentElement
-            sceneTextEditorCursorPosition = sceneTextEditor.cursorPosition
-            sceneTextEditor.persistentSelection = true
+            sceneCurrentElement = root.sceneDocumentBinder.currentElement
+            sceneTextEditorCursorPosition = root.sceneTextEditor.cursorPosition
+            root.sceneTextEditor.persistentSelection = true
         }
-        onAboutToHide: sceneTextEditor.persistentSelection = false
+        onAboutToHide: root.sceneTextEditor.persistentSelection = false
 
         VclMenuItem {
             focusPolicy: Qt.NoFocus
             text: "Cut\t" + ActionHub.editOptions.find("cut").shortcut
-            enabled: sceneTextEditor.selectionEnd > sceneTextEditor.selectionStart
+            enabled: root.sceneTextEditor.selectionEnd > root.sceneTextEditor.selectionStart
             onClicked: { root.cutRequest(); root.close() }
         }
 
         VclMenuItem {
             focusPolicy: Qt.NoFocus
             text: "Copy\t" + ActionHub.editOptions.find("copy").shortcut
-            enabled: sceneTextEditor.selectionEnd > sceneTextEditor.selectionStart
+            enabled: root.sceneTextEditor.selectionEnd > root.sceneTextEditor.selectionStart
             onClicked: { root.copyRequest(); root.close() }
         }
 
         VclMenuItem {
             focusPolicy: Qt.NoFocus
             text: "Paste\t" + ActionHub.editOptions.find("paste").shortcut
-            enabled: sceneTextEditor.canPaste
+            enabled: root.sceneTextEditor.canPaste
             onClicked: { root.pasteRequest(); root.close() }
         }
 
@@ -108,14 +108,14 @@ MenuLoader {
         }
 
         VclMenuItem {
-            readonly property Action txAction: ActionHub.editOptions.find("translateToActiveLanguage")
+            readonly property Action txAction: ActionHub.editOptions.find("translateToActiveLanguage") as Action
 
             text: "Translate to " + Runtime.language.active.name + "\t" + txAction.shortcut
             enabled: Runtime.screenplayEditorSettings.allowSelectedTextTranslation &&
                      root.sceneTextEditor.selectedText !== "" && Runtime.language.active.preferredTransliterationOption().inApp
             focusPolicy: Qt.NoFocus
 
-            onTriggered: (source) => {
+            onTriggered: () => {
                              root.translateSelection()
                          }
         }

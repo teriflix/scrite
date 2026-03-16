@@ -46,7 +46,7 @@ Item {
     }
 
     EventFilter.events: [EventFilter.Wheel]
-    EventFilter.onFilter: {
+    EventFilter.onFilter: (object,event,result) => {
         EventFilter.forwardEventTo(_flickable)
         result.filter = true
         result.accepted = true
@@ -61,11 +61,11 @@ Item {
 
         function formFilterFunction(form) {
             if(filterForms)
-                return note.getFormData(form.id) !== ""
+                return root.note.getFormData(form.id) !== ""
             return true;
         }
 
-        sourceModel: form.questionsModel
+        sourceModel: root.form.questionsModel
         filterFunction: formFilterFunction
 
         onFilterFormsChanged: invalidate()
@@ -129,15 +129,15 @@ Item {
                     width: parent.width
 
                     placeholderText: "Title"
-                    text: note ? note.title : ""
+                    text: root.note ? root.note.title : ""
                     wrapMode: Text.WordWrap
 
                     font.bold: true
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
 
                     onTextChanged: {
-                        if(note)
-                            note.title = text
+                        if(root.note)
+                            root.note.title = text
                     }
 
                     onActiveFocusChanged: {
@@ -155,14 +155,14 @@ Item {
                     width: parent.width
 
                     placeholderText: "Description"
-                    text: note ? note.summary : ""
+                    text: root.note ? root.note.summary : ""
                     wrapMode: Text.WordWrap
 
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
                     onTextChanged: {
-                        if(note)
-                            note.summary = text
+                        if(root.note)
+                            root.note.summary = text
                     }
 
                     onActiveFocusChanged: {
@@ -176,11 +176,11 @@ Item {
 
                     elide: Text.ElideRight
                     maximumLineCount: 2
-                    text: form.moreInfoUrl == "" ? "" : "To learn more about this form, visit <a href=\"" + form.moreInfoUrl + "\">" + form.moreInfoUrl + "</a>"
+                    text: root.form.moreInfoUrl == "" ? "" : "To learn more about this form, visit <a href=\"" + root.form.moreInfoUrl + "\">" + root.form.moreInfoUrl + "</a>"
                     visible: text !== ""
                     wrapMode: Text.WordWrap
 
-                    onLinkActivated: Qt.openUrlExternally(form.moreInfoUrl)
+                    onLinkActivated: Qt.openUrlExternally(root.form.moreInfoUrl)
                 }
             }
 
@@ -233,27 +233,29 @@ Item {
                     required property int index
                     required property QtObject objectItem
 
+                    property FormQuestion formQuestion: objectItem as FormQuestion
+
                     property bool visibleToUser: GMath.doRectanglesIntersect( Qt.rect(x,y,width,height),
                                                         Qt.rect(0,_flickable.contentY,width,_flickable.height) )
 
                     Component.onCompleted: {
-                        if(note)
-                            answer = note.getFormData(objectItem.id)
+                        if(root.note)
+                            answer = root.note.getFormData(formQuestion.id)
                     }
 
                     anchors.right: parent.right
 
-                    width: parent.width
+                    width: _formLayout.width
 
-                    answerLength: objectItem.type
-                    indentation: objectItem.indentation*50
+                    answerLength: formQuestion.type
+                    indentation: formQuestion.indentation*50
                     nrQuestionDigits: root.nrQuestionDigits
                     opacity: visibleToUser ? 1 : 0
-                    placeholderText: objectItem.answerHint === "" ? "Your answer ..." : objectItem.answerHint
-                    question: objectItem.questionText
-                    questionKey: objectItem.id
-                    questionNumber: objectItem.number
-                    spacing: parent.spacing/2
+                    placeholderText: formQuestion.answerHint === "" ? "Your answer ..." : formQuestion.answerHint
+                    question: formQuestion.questionText
+                    questionKey: formQuestion.id
+                    questionNumber: formQuestion.number
+                    spacing: _formLayout.spacing/2
                     tabSequenceIndex: 2+index
                     tabSequenceManager: _tabManager
 
@@ -274,8 +276,8 @@ Item {
                     }
 
                     onAnswerChanged: {
-                        if(note)
-                            note.setFormData(objectItem.id, answer)
+                        if(root.note)
+                            root.note.setFormData(formQuestion.id, answer)
                     }
 
                     onFocusNextRequest: {

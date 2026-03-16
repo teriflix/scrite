@@ -13,13 +13,14 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
 import io.scrite.components
-
 
 import "../../../helpers"
 import "../../../globals"
@@ -142,7 +143,7 @@ AbstractScenePartEditor {
         action: ActionHub.editOptions.find("addOpenTag")
         enabled: root.isCurrent && !_tagsInput.readOnly && !_tagsInput.acceptingNewText
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          _tagsInput.acceptNewText()
                      }
     }
@@ -150,7 +151,7 @@ AbstractScenePartEditor {
     QtObject {
         id: _private
 
-        readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent")
+        readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent") as Action
 
         property string presentableGroupNames: Scrite.document.structure.presentableGroupNames(root.scene.groups)
 
@@ -162,7 +163,7 @@ AbstractScenePartEditor {
         }
 
         function popupFormalTagsMenu(parent) {
-            let menu = formalTagsMenu.createObject(root)
+            let menu = formalTagsMenu.createObject(root) as StructureGroupsMenu
             menu.closed.connect(menu.destroy)
             menu.popup()
             return menu

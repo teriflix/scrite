@@ -13,11 +13,11 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
-import QtQuick.Shapes
 import QtQuick.Layouts
-import QtQuick.Controls
 
 import io.scrite.components
 
@@ -53,8 +53,8 @@ Item {
 
             Layout.fillHeight: true
 
-            canZoomIn: zoomLevel < _private.maximumZoomLevel
-            canZoomOut: zoomLevel > _private.minimumZoomLevel
+            canZoomIn: root.zoomLevel < _private.maximumZoomLevel
+            canZoomOut: root.zoomLevel > _private.minimumZoomLevel
 
             ToolTipPopup {
                 background: Rectangle {
@@ -64,7 +64,7 @@ Item {
 
                 delay: 0
                 text: {
-                    const sceneGroup = _private.sceneGroup
+                    const sceneGroup = _sceneGroup
                     const fields = [
                                      sceneGroup.sceneCount + " scene(s)",
                                      "<b>Duration</b> " + (sceneGroup.evaluatingLengths ? "...." : TMath.timeLengthString(sceneGroup.timeLength)),
@@ -72,7 +72,7 @@ Item {
                                  ]
                     return "<p>Scene Selection:</p>" + SMath.formatAsBulletPoints(fields)
                 }
-                visible: _private.sceneGroup.evaluateLengths && _private.sceneGroup.sceneCount >= 2
+                visible: _sceneGroup.evaluateLengths && _sceneGroup.sceneCount >= 2
                 parseShortcutInText: false
             }
 
@@ -90,7 +90,7 @@ Item {
             }
 
             onZoomInRequest: {
-                root.zoomLevel = Math.min(zoomLevel * 1.1, _private.maximumZoomLevel)
+                root.zoomLevel = Math.min(root.zoomLevel * 1.1, _private.maximumZoomLevel)
                 _screenplayElementList.updateCacheBuffer()
 
                 const ci = Scrite.document.screenplay.currentElementIndex
@@ -99,7 +99,7 @@ Item {
             }
 
             onZoomOutRequest: {
-                root.zoomLevel = Math.max(zoomLevel * 0.9, _private.minimumZoomLevel)
+                root.zoomLevel = Math.max(root.zoomLevel * 0.9, _private.minimumZoomLevel)
                 _screenplayElementList.updateCacheBuffer()
 
                 const ci = Scrite.document.screenplay.currentElementIndex
@@ -116,7 +116,7 @@ Item {
                 id: _mainDropArea
                 anchors.fill: parent
                 keys: [Runtime.timelineViewSettings.dropAreaKey]
-                enabled: _screenplayElementList.count === 0 && enableDragDrop
+                enabled: _screenplayElementList.count === 0 && root.enableDragDrop
 
                 onEntered: (drag) => {
                                _screenplayElementList.forceActiveFocus()
@@ -152,6 +152,9 @@ Item {
 
                     showCursor: root.showCursor
                     mainDropArea: _mainDropArea
+                    zoomLevel: root.zoomLevel
+                    dragDropEnabled: root.enableDragDrop
+                    visibleTrackCount: _screenplayTracksView.trackCount
 
                     onEditorRequest: _private.requestEditorLater()
                     onDropSceneAtRequest: (source, index) => { _private.dropSceneAt(source, index) }
@@ -177,94 +180,54 @@ Item {
     ScreenplaySceneElementsContextMenu {
         id: _sceneElementsContextMenu
 
-        sceneGroup: _private.sceneGroup
+        sceneGroup: _sceneGroup
     }
 
-    ActionHandler {
-        action: ActionHub.sceneListPanelOptions.find("copy")
-        enabled: true
+    // Private Section
+    QtObject {
+        id: _private
 
-        onTriggered: (source) => {
-                         Scrite.document.screenplay.copySelection()
-                     }
-    }
+        readonly property real maximumZoomLevel: 4
+        property real minimumZoomLevel: _screenplayElementList.perElementWidth/_screenplayElementList.minimumDelegateWidth
 
-    ActionHandler {
-        action: ActionHub.sceneListPanelOptions.find("paste")
-        enabled: !Scrite.document.readOnly && Scrite.document.screenplay.canPaste
+        function dropSceneAt(source, index) {
+            if(source === null)
+                return
 
-        onTriggered: (source) => {
-                         Scrite.document.screenplay.pasteAfter(Scrite.document.sreenplay.currentElementIndex)
-                     }
-    }
+            _dropSceneTask.dropSource = source
+            _dropSceneTask.dropIndex = index
+            _dropSceneTask.start()
+        }
 
-    ActionHandler {
-        action: ActionHub.sceneListPanelOptions.find("remove")
-        enabled: !Scrite.document.readOnly && Scrite.document.screenplay.canPaste
+        function requestEditorLater() {
+            Runtime.execLater(root, 100, root.requestEditor)
+        }
 
-        onTriggered: (source) => {
-                         if(_private.sceneGroup.sceneCount <= 1)
-                             Scrite.document.screenplay.removeElement(Scrite.document.screenplay.elementAt(Scrite.document.screenplay.currentElementIndex))
-                         else
-                             Scrite.document.screenplay.removeSelectedElements();
-                     }
-    }
+        function saveZoomLevel() {
+            let userData = Scrite.document.userData
+            userData["timelineView"] = {
+                "version": 0,
+                "zoomLevel": root.zoomLevel
+            }
+            Scrite.document.userData = userData
+        }
 
-    ActionHandler {
-        action: ActionHub.sceneListPanelOptions.find("keywords")
-        enabled: !Scrite.document.readOnly
+        function restoreZoomLevel() {
+            const userData = Scrite.document.userData || {}
+            const timelineView = userData.timelineView
+            if(!timelineView || timelineView.version !== 0)
+                return
 
-        onTriggered: (source) => {
-                         SceneGroupKeywordsDialog.launch(_private.sceneGroup)
-                     }
-    }
+            const zl = timelineView.zoomLevel
+            if(typeof zl === "number")
+                root.zoomLevel = Runtime.bounded(_private.minimumZoomLevel, zl, _private.maximumZoomLevel)
+        }
 
-    ActionHandler {
-        action: ActionHub.sceneListPanelOptions.find("clearSelection")
-        enabled: Scrite.document.screenplay.hasSelectedElements
-
-        onTriggered: (source) => {
-                         Scrite.document.screenplay.clearSelection()
-                     }
-    }
-
-    ActionHandler {
-        action: ActionHub.sceneListPanelOptions.find("makeSequence")
-        enabled: !Scrite.document.readOnly && _private.sceneGroup.canBeStacked
-
-        onTriggered: (source) => {
-                         if(!_private.sceneGroup.stack()) {
-                             MessageBox.information("Make Sequence Error",
-                                                    "Couldn't stack these scenes to make a sequence. Please try doing this on the Structure Tab.")
-                         }
-                     }
-    }
-
-    ActionHandler {
-        action: ActionHub.sceneListPanelOptions.find("breakSequence")
-        enabled: !Scrite.document.readOnly && _private.sceneGroup.canBeUnstacked
-
-        onTriggered: (source) => {
-                         if(!_private.sceneGroup.unstack()) {
-                             MessageBox.information("Break Sequence Error",
-                                                    "Couldn't unstack these scenes to make a sequence. Please try doing this on the Structure Tab.")
-                         }
-                     }
-    }
-
-    ActionHandler {
-        property bool omitted: Scrite.document.screenplay.selectedElementsOmitStatus !== Screenplay.NotOmitted
-        property string text: omitted ? "Include" : "Omit"
-
-        action: ActionHub.sceneListPanelOptions.find("includeOmit")
-        enabled: !Scrite.document.readOnly
-
-        onTriggered: (source) => {
-                         if(omitted)
-                             Scrite.document.screenplay.includeSelectedElements()
-                         else
-                             Scrite.document.screenplay.omitSelectedElements()
-                     }
+        Component.onCompleted: {
+            restoreZoomLevel()
+            _sceneGroup.refresh()
+        }
+        Component.onDestruction: saveZoomLevel()
     }
 
     Component {
@@ -274,6 +237,36 @@ Item {
             screenplay: Scrite.document.screenplay
         }
     }
+
+    SceneGroup {
+        id: _sceneGroup
+
+        structure: Scrite.document.structure
+        evaluateLengths: true
+
+        function refresh() {
+            clearScenes()
+            if(Scrite.document.screenplay.hasSelectedElements)
+                Scrite.document.screenplay.gatherSelectedScenes(_sceneGroup)
+            else
+                addScene(Scrite.document.screenplay.activeScene)
+        }
+    }
+
+    Connections {
+        id: _screenplayConnections
+
+        target: Scrite.document.screenplay
+
+        function onSelectionChanged() {
+            Qt.callLater(_sceneGroup.refresh)
+        }
+
+        function onCurrentElementIndexChanged() {
+            Qt.callLater(_sceneGroup.refresh)
+        }
+    }
+
 
     Connections {
         target: Scrite.document.screenplay
@@ -304,145 +297,165 @@ Item {
         }
     }
 
-    QtObject {
-        id: _private
+    SequentialAnimation {
+        id: _dropSceneTask
 
-        readonly property real maximumZoomLevel: 4
-        property real minimumZoomLevel: _screenplayElementList.perElementWidth/_screenplayElementList.minimumDelegateWidth
+        property var dropSource // must be a QObject subclass
+        property int dropIndex
 
-        readonly property Connections screenplayConnections: Connections {
-            target: Scrite.document.screenplay
+        PauseAnimation { duration: 50 }
 
-            function onSelectionChanged() {
-                Qt.callLater(_private.sceneGroup.refresh)
-            }
+        ScriptAction {
+            script: {
+                const source = _dropSceneTask.dropSource
+                const index = _dropSceneTask.dropIndex
 
-            function onCurrentElementIndexChanged() {
-                Qt.callLater(_private.sceneGroup.refresh)
-            }
-        }
+                _dropSceneTask.dropSource = null
+                _dropSceneTask.dropIndex = -2
 
-        readonly property SceneGroup sceneGroup: SceneGroup {
-            id: _sceneGroup
+                let sourceType = Object.typeOf(source)
 
-            structure: Scrite.document.structure
-            evaluateLengths: true
-
-            function refresh() {
-                clearScenes()
-                if(Scrite.document.screenplay.hasSelectedElements)
-                    Scrite.document.screenplay.gatherSelectedScenes(_sceneGroup)
-                else
-                    addScene(Scrite.document.screenplay.activeScene)
-            }
-        }
-
-        property SequentialAnimation dropSceneTask : SequentialAnimation {
-            property var dropSource // must be a QObject subclass
-            property int dropIndex
-
-            PauseAnimation { duration: 50 }
-
-            ScriptAction {
-                script: {
-                    const source = _private.dropSceneTask.dropSource
-                    const index = _private.dropSceneTask.dropIndex
-
-                    _private.dropSceneTask.dropSource = null
-                    _private.dropSceneTask.dropIndex = -2
-
-                    var sourceType = Object.typeOf(source)
-
-                    if(sourceType === "ScreenplayElement") {
-                        Scrite.document.screenplay.moveSelectedElements(index)
-                        return
-                    }
-
-                    var sceneID = source.id
-                    if(sceneID.length === 0)
-                        return
-
-                    var scene = Scrite.document.structure.findElementBySceneID(sceneID)
-                    if(scene === null)
-                        return
-
-                    var element = _screenplayElementComponent.createObject()
-                    element.sceneID = sceneID
-                    Scrite.document.screenplay.insertElementAt(element, index)
-                    _private.requestEditorLater()
+                if(sourceType === "ScreenplayElement") {
+                    Scrite.document.screenplay.moveSelectedElements(index)
+                    return
                 }
+
+                let sceneID = source.id
+                if(sceneID.length === 0)
+                    return
+
+                let scene = Scrite.document.structure.findElementBySceneID(sceneID)
+                if(scene === null)
+                    return
+
+                let element = _screenplayElementComponent.createObject()
+                element.sceneID = sceneID
+                Scrite.document.screenplay.insertElementAt(element, index)
+                _private.requestEditorLater()
             }
         }
+    }
 
-        readonly property TrackerPack trackerForUpdateCacheBuffer: TrackerPack {
-            TrackSignal {
-                target: _screenplayTracksView
-                signal: "trackCountChanged()"
-            }
+    TrackerPack {
+        id: _trackerForUpdateCacheBuffer
 
-            TrackProperty {
-                target: Scrite.document.screenplay
-                property: "currentElementIndex"
-            }
-
-            TrackSignal {
-                target: Scrite.document.screenplay
-                signal: "elementsChanged()"
-            }
-
-            TrackSignal {
-                target: Scrite.document.screenplay
-                signal: "elementInserted(ScreenplayElement*,int)"
-            }
-
-            TrackSignal {
-                target: Scrite.document.screenplay
-                signal: "elementRemoved(ScreenplayElement*,int)"
-            }
-
-            TrackSignal {
-                target: Scrite.document.screenplay
-                signal: "elementMoved(ScreenplayElement*,int,int)"
-            }
-
-            onTracked: _screenplayElementList.updateCacheBuffer()
+        TrackSignal {
+            target: _screenplayTracksView
+            signal: "trackCountChanged()"
         }
 
-        function dropSceneAt(source, index) {
-            if(source === null)
-                return
-
-            dropSceneTask.dropSource = source
-            dropSceneTask.dropIndex = index
-            dropSceneTask.start()
+        TrackProperty {
+            target: Scrite.document.screenplay
+            property: "currentElementIndex"
         }
 
-        function requestEditorLater() {
-            Runtime.execLater(root, 100, root.requestEditor)
+        TrackSignal {
+            target: Scrite.document.screenplay
+            signal: "elementsChanged()"
         }
 
-        function saveZoomLevel() {
-            let userData = Scrite.document.userData
-            userData["timelineView"] = {
-                "version": 0,
-                "zoomLevel": root.zoomLevel
-            }
-            Scrite.document.userData = userData
+        TrackSignal {
+            target: Scrite.document.screenplay
+            signal: "elementInserted(ScreenplayElement*,int)"
         }
 
-        function restoreZoomLevel() {
-            const userData = Scrite.document.userData
-            if(userData.timelineView && userData.timelineView.version === 0) {
-                const zl = userData.timelineView.zoomLevel
-                if(typeof zl === "number")
-                    root.zoomLevel = Runtime.bounded(_private.minimumZoomLevel, zl, _private.maximumZoomLevel);
-            }
+        TrackSignal {
+            target: Scrite.document.screenplay
+            signal: "elementRemoved(ScreenplayElement*,int)"
         }
 
-        Component.onCompleted: {
-            restoreZoomLevel()
-            sceneGroup.refresh()
+        TrackSignal {
+            target: Scrite.document.screenplay
+            signal: "elementMoved(ScreenplayElement*,int,int)"
         }
-        Component.onDestruction: saveZoomLevel()
+
+        onTracked: _screenplayElementList.updateCacheBuffer()
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("copy")
+        enabled: true
+
+        onTriggered: () => {
+                         Scrite.document.screenplay.copySelection()
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("paste")
+        enabled: !Scrite.document.readOnly && Scrite.document.screenplay.canPaste
+
+        onTriggered: () => {
+                         Scrite.document.screenplay.pasteAfter(Scrite.document.screenplay.currentElementIndex)
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("remove")
+        enabled: !Scrite.document.readOnly && Scrite.document.screenplay.canPaste
+
+        onTriggered: () => {
+                         if(_sceneGroup.sceneCount <= 1)
+                             Scrite.document.screenplay.removeElement(Scrite.document.screenplay.elementAt(Scrite.document.screenplay.currentElementIndex))
+                         else
+                             Scrite.document.screenplay.removeSelectedElements();
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("keywords")
+        enabled: !Scrite.document.readOnly
+
+        onTriggered: () => {
+                         SceneGroupKeywordsDialog.launch(_sceneGroup)
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("clearSelection")
+        enabled: Scrite.document.screenplay.hasSelectedElements
+
+        onTriggered: () => {
+                         Scrite.document.screenplay.clearSelection()
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("makeSequence")
+        enabled: !Scrite.document.readOnly && _sceneGroup.canBeStacked
+
+        onTriggered: () => {
+                         if(!_sceneGroup.stack()) {
+                             MessageBox.information("Make Sequence Error",
+                                                    "Couldn't stack these scenes to make a sequence. Please try doing this on the Structure Tab.")
+                         }
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("breakSequence")
+        enabled: !Scrite.document.readOnly && _sceneGroup.canBeUnstacked
+
+        onTriggered: () => {
+                         if(!_sceneGroup.unstack()) {
+                             MessageBox.information("Break Sequence Error",
+                                                    "Couldn't unstack these scenes to make a sequence. Please try doing this on the Structure Tab.")
+                         }
+                     }
+    }
+
+    ActionHandler {
+        property bool omitted: Scrite.document.screenplay.selectedElementsOmitStatus !== Screenplay.NotOmitted
+        property string text: omitted ? "Include" : "Omit"
+
+        action: ActionHub.sceneListPanelOptions.find("includeOmit")
+        enabled: !Scrite.document.readOnly
+
+        onTriggered: () => {
+                         if(omitted)
+                             Scrite.document.screenplay.includeSelectedElements()
+                         else
+                             Scrite.document.screenplay.omitSelectedElements()
+                     }
     }
 }

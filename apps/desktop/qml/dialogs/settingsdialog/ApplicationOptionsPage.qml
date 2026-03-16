@@ -58,27 +58,32 @@ Item {
                 }
 
                 VclCheckBox {
+                    id: _useNativeTextRendering
+
                     text: "Use Native Text Rendering"
                     checked: Runtime.applicationSettings.useNativeTextRendering
                     onToggled: {
                         Runtime.applicationSettings.useNativeTextRendering = checked
 
-                        if(Runtime.useNativeTextRendering !== checked) {
+                        if(Runtime.applicationSettings.useNativeTextRendering !== checked) {
                             const msg = checked ? "Native OS text rendering engine will be used when you restart Scrite." : "Qt's text renderning engine will be used when you restart Scrite."
                             MessageBox.information("Requires Restart", msg)
                         }
                     }
 
                     ToolTipPopup {
-                        container: parent
+                        container: _useNativeTextRendering
                         text: "If texts are not being rendered properly on your display, then switch to native text rendering. Otherwise, keep this setting unchecked."
-                        visible: parent.hovered
+                        visible: _useNativeTextRendering.hovered
                     }
                 }
 
                 VclCheckBox {
+                    id: _useSoftwareRenderer
+
                     text: "Use Software Renderer"
                     checked: Runtime.applicationSettings.useSoftwareRenderer
+
                     onToggled: {
                         Runtime.applicationSettings.useSoftwareRenderer = checked
 
@@ -89,9 +94,9 @@ Item {
                     }
 
                     ToolTipPopup {
-                        container: parent
+                        container: _useSoftwareRenderer
                         text: "If you feel that Scrite is not responding fast enough, then you may want to switch to using a Software Renderer to speed things up. Otherwise, keep this option unchecked for best experience."
-                        visible: parent.hovered
+                        visible: _useSoftwareRenderer.hovered
                     }
                 }
             }
@@ -323,6 +328,7 @@ Item {
 
                 Slider {
                     id: _flickSpeedSlider
+
                     Layout.fillWidth: true
 
                     from: 0.1
@@ -333,9 +339,9 @@ Item {
                     onMoved: Runtime.workspaceSettings.flickScrollSpeedFactor = value
 
                     ToolTipPopup {
-                        container: parent
+                        container: _flickSpeedSlider
                         text: "Configure the scroll sensitivity of your mouse and trackpad."
-                        visible: parent.hovered
+                        visible: _flickSpeedSlider.hovered
                     }
                 }
 

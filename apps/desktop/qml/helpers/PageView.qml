@@ -55,9 +55,9 @@ Rectangle {
             id: _pageList
 
             Layout.fillHeight: true
-            Layout.minimumWidth: pageListWidth
-            Layout.maximumWidth: pageListWidth
-            Layout.preferredWidth: pageListWidth
+            Layout.minimumWidth: root.pageListWidth
+            Layout.maximumWidth: root.pageListWidth
+            Layout.preferredWidth: root.pageListWidth
 
             property int currentIndex: -1
 
@@ -66,7 +66,7 @@ Rectangle {
             Action {
                 shortcut: ActionHub.applicationOptions.find("tabDown").shortcut
 
-                onTriggered: (source) => {
+                onTriggered: () => {
                                  _pageList.currentIndex = (_pageList.currentIndex+1)%_pageRepeater.count
                              }
             }
@@ -74,7 +74,7 @@ Rectangle {
             Action {
                 shortcut: ActionHub.applicationOptions.find("tabUp").shortcut
 
-                onTriggered: (source) => {
+                onTriggered: () => {
                                  const prevIndex = _pageList.currentIndex-1
                                  _pageList.currentIndex = prevIndex < 0 ? (_pageRepeater.count-1) : prevIndex
                              }
@@ -118,7 +118,7 @@ Rectangle {
                             anchors.rightMargin: 24
                             anchors.verticalCenter: parent.verticalCenter
 
-                            text: pageTitleRole === "" ? _pageRepeaterDelegate.modelData : _pageRepeaterDelegate.modelData[pageTitleRole]
+                            text: root.pageTitleRole === "" ? _pageRepeaterDelegate.modelData : _pageRepeaterDelegate.modelData[root.pageTitleRole]
                             color: _pageList.currentIndex === _pageRepeaterDelegate.index ? Runtime.colors.primary.c50.text : Runtime.colors.accent.c600.text
                             elide: Text.ElideMiddle
                             horizontalAlignment: Text.AlignRight
@@ -165,7 +165,7 @@ Rectangle {
 
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.leftMargin: pageListVisible ? 0 : 20
+            Layout.leftMargin: root.pageListVisible ? 0 : 20
 
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 

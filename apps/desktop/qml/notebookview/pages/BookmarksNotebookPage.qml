@@ -44,7 +44,7 @@ AbstractNotebookPage {
         anchors.fill: parent
         anchors.rightMargin: contentHeight > height ? 17 : 12
 
-        model: notebookModel.bookmarkedNotes
+        model: root.notebookModel.bookmarkedNotes
 
         cellWidth: width/__columnCount
         cellHeight: 150

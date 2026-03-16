@@ -153,7 +153,7 @@ Rectangle {
                     Material.foreground: highlight ? Runtime.colors.accent.c300.text : Runtime.colors.primary.c10.text
 
                     SearchAgent.engine: _searchBar.searchEngine
-                    SearchAgent.onSearchRequest: {
+                    SearchAgent.onSearchRequest: (string) => {
                         SearchAgent.searchResultCount = SearchAgent.indexesOf(string, _characterCheckBox.text).length > 0 ? 1 : 0
                     }
                     SearchAgent.onCurrentSearchResultIndexChanged: {

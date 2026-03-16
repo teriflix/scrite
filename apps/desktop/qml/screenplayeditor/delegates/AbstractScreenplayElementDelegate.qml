@@ -13,15 +13,15 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
-import QtQuick.Layouts
 
 import io.scrite.components
 
-
+import "../"
 import "../../globals"
-import ".."
 
 FocusScope {
     id: root
@@ -137,7 +137,6 @@ FocusScope {
                 FocusTracker.indicator.property: "hasFocus"
 
                 width: parent.width
-                height: item ? item.height : 0
 
                 onItemChanged: {
                     if(item && item.__searchBarSaysReplaceCurrent) {

@@ -67,11 +67,12 @@ Rectangle {
         font.pixelSize: root.height * 0.5
 
         text: {
-            if(!canvasScrollInteractive)
+            if(!root.canvasScrollInteractive)
                 return "Canvas Locked While Index Card Has Focus. Hit ESC To Release Focus."
-            var ret = Scrite.document.structure.elementCount + " Scenes";
-            if(canvasEpisodeBoxCount > 0)
-                ret += ", " + canvasEpisodeBoxCount + " Episodes";
+
+            let ret = Scrite.document.structure.elementCount + " Scenes";
+            if(root.canvasEpisodeBoxCount > 0)
+                ret += ", " + root.canvasEpisodeBoxCount + " Episodes";
             if(Scrite.document.structure.forceBeatBoardLayout)
                 ret += ", Scenes Not Movable"
             ret += "."
@@ -79,6 +80,8 @@ Rectangle {
         }
 
         MouseArea {
+            id: _statusTextMouseArea
+
             anchors.fill: parent
 
             enabled: parent.truncated
@@ -86,7 +89,7 @@ Rectangle {
 
             ToolTipPopup {
                 text: _statusText.text
-                visible: container.containsMouse
+                visible: _statusTextMouseArea.containsMouse
             }
         }
     }
@@ -198,8 +201,8 @@ Rectangle {
             suggestedWidth: parent.height
             suggestedHeight: parent.height
 
-            down: canvasPreviewVisible
-            checked: canvasPreviewVisible
+            down: root.canvasPreviewVisible
+            checked: root.canvasPreviewVisible
             checkable: true
             iconSource: "qrc:/icons/action/thumbnail.png"
             toolTipText: "Preview"

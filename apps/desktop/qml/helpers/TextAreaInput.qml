@@ -96,14 +96,14 @@ TextArea {
         action: ActionHub.editOptions.find("undo")
         enabled: !root.readOnly && root.activeFocus && root.undoRedoEnabled && root.canUndo
 
-        onTriggered: (source) => { root.undo() }
+        onTriggered: () => { root.undo() }
     }
 
     ActionHandler {
         action: ActionHub.editOptions.find("redo")
         enabled: !root.readOnly && root.activeFocus && root.undoRedoEnabled && root.canRedo
 
-        onTriggered: (source) => { root.redo() }
+        onTriggered: () => { root.redo() }
     }
 
     TextAreaSpellingSuggestionsMenu {

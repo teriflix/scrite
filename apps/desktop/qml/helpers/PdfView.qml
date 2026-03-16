@@ -243,24 +243,24 @@ Item {
             // Download & Refresh buttons
             VclToolButton {
                 text: "Refresh"
-                visible: displayRefreshButton
+                visible: root.displayRefreshButton
                 toolTipText: "Regenerates this PDF and refreshes its content."
 
                 icon.source: "qrc:/icons/navigation/refresh.png"
 
-                onClicked: refreshRequest()
+                onClicked: root.refreshRequest()
             }
 
             VclToolButton {
                 text: "Save PDF"
                 down: _saveMenu.visible
-                visible: (allowFileSave || saveFeatureDisabled)
+                visible: (root.allowFileSave || root.saveFeatureDisabled)
                 toolTipText: "Save this PDF to your computer."
 
                 icon.source: "qrc:/icons/file/file_download.png"
 
                 onClicked: {
-                    if(saveFeatureDisabled)
+                    if(root.saveFeatureDisabled)
                         _saveDisabledNotice.open()
                     else
                         _saveMenu.open()
@@ -308,7 +308,7 @@ Item {
                 id: _revealFileButton
 
                 text: "Reveal"
-                visible: allowFileReveal
+                visible: root.allowFileReveal
                 toolTipText: "Reveal the location of this PDF on your computer."
 
                 icon.source: "qrc:/icons/file/folder_open.png"
@@ -361,7 +361,7 @@ Item {
         })
     }
 
-    VclFileDialog {
+    FileDialog {
         id: _saveFileDialog
 
         fileMode: FileDialog.SaveFile
@@ -394,10 +394,10 @@ Item {
 
         function savePdf(folderPath) {
             let targetFilePath = ""
-            if(saveFilePath !== "")
-                targetFilePath = File.completeBaseName(saveFilePath) + ".pdf"
+            if(root.saveFilePath !== "")
+                targetFilePath = File.completeBaseName(root.saveFilePath) + ".pdf"
             else
-                targetFilePath = saveFileName
+                targetFilePath = root.saveFileName
             targetFilePath = folderPath + "/" + targetFilePath
 
             const downloadedFilePath = File.copyToFolder( Url.toPath(_pdfDoc.source), targetFilePath)

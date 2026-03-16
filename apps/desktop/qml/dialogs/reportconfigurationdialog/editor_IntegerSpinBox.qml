@@ -20,7 +20,6 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../controls"
 import "../../helpers"
@@ -39,7 +38,7 @@ ColumnLayout {
         wrapMode: Text.WordWrap
         maximumLineCount: 2
 
-        text: fieldInfo.label
+        text: root.fieldInfo.label
     }
 
     VclLabel {
@@ -51,18 +50,18 @@ ColumnLayout {
         font.italic: true
         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
-        text: fieldInfo.note
+        text: root.fieldInfo.note
     }
 
     SpinBox {
-        to: fieldInfo.max
-        from: fieldInfo.min
+        to: root.fieldInfo.max
+        from: root.fieldInfo.min
 
-        value: report ? report.getConfigurationValue(fieldInfo.name) : 0
+        value: root.report ? root.report.getConfigurationValue(root.fieldInfo.name) : 0
 
         onValueModified: {
-            if(report)
-                report.setConfigurationValue(fieldInfo.name, value)
+            if(root.report)
+                root.report.setConfigurationValue(root.fieldInfo.name, value)
         }
     }
 }

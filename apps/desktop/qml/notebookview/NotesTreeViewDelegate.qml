@@ -55,22 +55,22 @@ Item {
         height: _layout.height
 
         color: {
-            if(itemData.selected)
+            if(root.itemData.selected)
                 return Runtime.colors.primary.highlight.background
 
             let baseColor = undefined
 
-            if(itemData.value.notebookItemType === NotebookModel.NotesType) {
-                switch(itemData.value.notebookItemObject.ownerType) {
+            if(root.itemData.value.notebookItemType === NotebookModel.NotesType) {
+                switch(root.itemData.value.notebookItemObject.ownerType) {
                 case Notes.SceneOwner:
                 case Notes.CharacterOwner:
-                    baseColor = itemData.value.notebookItemObject.color
+                    baseColor = root.itemData.value.notebookItemObject.color
                     break
                 default:
                     break
                 }
-            } else if(itemData.value.notebookItemType === NotebookModel.NoteType)
-                baseColor = itemData.value.notebookItemObject.color
+            } else if(root.itemData.value.notebookItemType === NotebookModel.NoteType)
+                baseColor = root.itemData.value.notebookItemObject.color
 
             if(baseColor)
                 return Runtime.colors.tint(baseColor, Runtime.colors.sceneHeadingTint)
@@ -86,8 +86,8 @@ Item {
         width: Runtime.idealFontMetrics.height
         height: Runtime.idealFontMetrics.height
 
-        source: itemData.isExpanded ? "qrc:/icons/navigation/arrow_down.png" : "qrc:/icons/navigation/arrow_right.png"
-        visible: itemData.hasChildren
+        source: root.itemData.isExpanded ? "qrc:/icons/navigation/arrow_down.png" : "qrc:/icons/navigation/arrow_right.png"
+        visible: root.itemData.hasChildren
     }
 
     Row {
@@ -109,22 +109,22 @@ Item {
             mipmap: true
             visible: source != ""
             opacity: {
-                switch(itemData.value.notebookItemType) {
+                switch(root.itemData.value.notebookItemType) {
                 case NotebookModel.EpisodeBreakType:
                 case NotebookModel.ActBreakType:
-                    return itemData.value.notebookItemObject ? 1 : 0.5
+                    return root.itemData.value.notebookItemObject ? 1 : 0.5
                 }
                 return 1
             }
 
             source: {
-                switch(itemData.value.notebookItemType) {
+                switch(root.itemData.value.notebookItemType) {
                 case NotebookModel.EpisodeBreakType:
                     return "qrc:/icons/content/episode.png"
                 case NotebookModel.ActBreakType:
                     return "qrc:/icons/content/act.png"
                 case NotebookModel.NotesType:
-                    switch(itemData.value.notebookItemObject.ownerType) {
+                    switch(root.itemData.value.notebookItemObject.ownerType) {
                     case Notes.SceneOwner:
                         return "qrc:/icons/content/scene.png"
                     case Notes.CharacterOwner:
@@ -136,7 +136,7 @@ Item {
                     }
                     break;
                 case NotebookModel.NoteType:
-                    switch(itemData.value.notebookItemObject.type) {
+                    switch(root.itemData.value.notebookItemObject.type) {
                     case Note.TextNoteType:
                         return "qrc:/icons/content/note.png"
                     case Note.FormNoteType:
@@ -163,14 +163,14 @@ Item {
             color: Color.textColorFor(_container.color)
             elide: Text.ElideRight
             padding: 5
-            text: itemData.value.notebookItemTitle ? itemData.value.notebookItemTitle : ""
+            text: root.itemData.value.notebookItemTitle ? root.itemData.value.notebookItemTitle : ""
 
             font.family: Runtime.idealFontMetrics.font.family
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
             font.capitalization: Runtime.idealFontMetrics.font.capitalization
-            font.bold: itemData.value.notebookItemType === NotebookModel.CategoryType ||
-                       (itemData.value.notebookItemType === NotebookModel.NotesType &&
-                        itemData.value.notebookItemObject.ownerType === Notes.StructureOwner)
+            font.bold: root.itemData.value.notebookItemType === NotebookModel.CategoryType ||
+                       (root.itemData.value.notebookItemType === NotebookModel.NotesType &&
+                        root.itemData.value.notebookItemObject.ownerType === Notes.StructureOwner)
         }
     }
 
@@ -188,11 +188,11 @@ Item {
         onClicked: {
             root.makeCurrentRequest()
 
-            if(itemData.value.notebookItemType === NotebookModel.NoteType) {
-                root.noteMenuRequest(itemData.value.notebookItemObject)
-            } else if(itemData.value.notebookItemType === NotebookModel.NotesType &&
-                      itemData.value.notebookItemObject.ownerType === Notes.CharacterOwner) {
-                root.characterMenuRequest(itemData.value.notebookItemObject.character)
+            if(root.itemData.value.notebookItemType === NotebookModel.NoteType) {
+                root.noteMenuRequest(root.itemData.value.notebookItemObject)
+            } else if(root.itemData.value.notebookItemType === NotebookModel.NotesType &&
+                      root.itemData.value.notebookItemObject.ownerType === Notes.CharacterOwner) {
+                root.characterMenuRequest(root.itemData.value.notebookItemObject.character)
             }
         }
     }

@@ -77,20 +77,20 @@ Item {
     }
 
     Image {
-        anchors.right: menuArrow === Qt.RightArrow ? parent.right : undefined
-        anchors.rightMargin: menuArrow === Qt.RightArrow ? -parent.width/10 : 0
-        anchors.verticalCenter: menuArrow === Qt.RightArrow ? parent.verticalCenter : undefined
+        anchors.right: root.menuArrow === Qt.RightArrow ? parent.right : undefined
+        anchors.rightMargin: root.menuArrow === Qt.RightArrow ? -parent.width/10 : 0
+        anchors.verticalCenter: root.menuArrow === Qt.RightArrow ? parent.verticalCenter : undefined
 
-        anchors.bottom: menuArrow === Qt.DownArrow ? parent.bottom : undefined
-        anchors.bottomMargin:  menuArrow === Qt.DownArrow ? -parent.height/10 : 0
-        anchors.horizontalCenter: menuArrow === Qt.DownArrow ? parent.horizontalCenter : undefined
+        anchors.bottom: root.menuArrow === Qt.DownArrow ? parent.bottom : undefined
+        anchors.bottomMargin:  root.menuArrow === Qt.DownArrow ? -parent.height/10 : 0
+        anchors.horizontalCenter: root.menuArrow === Qt.DownArrow ? parent.horizontalCenter : undefined
 
         width: parent.width/2.5
         height: parent.height/2.5
 
-        visible: hasMenu
+        visible: root.hasMenu
 
-        source: menuArrow === Qt.RightArrow ? "qrc:/icons/navigation/arrow_right.png" : "qrc:/icons/navigation/arrow_down.png"
+        source: root.menuArrow === Qt.RightArrow ? "qrc:/icons/navigation/arrow_right.png" : "qrc:/icons/navigation/arrow_down.png"
         opacity: _icon.opacity
         fillMode: Image.PreserveAspectFit
     }

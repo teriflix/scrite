@@ -13,18 +13,19 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
 
 import io.scrite.components
 
-
+import "../"
 import "../../globals"
 import "../../helpers"
 import "../../dialogs"
 import "../../controls"
-import ".."
 
 Loader {
     id: root
@@ -39,9 +40,9 @@ Loader {
     QtObject {
         id: _private
 
-        property Screenplay screenplay: screenplayAdapter.screenplay
+        property Screenplay screenplay: root.screenplayAdapter.screenplay
 
-        property bool showTitleCard: screenplayAdapter.isSourceScreenplay &&
+        property bool showTitleCard: root.screenplayAdapter.isSourceScreenplay &&
                                           (screenplay.hasTitlePageAttributes ||
                                            Runtime.screenplayEditorSettings.showLoglineEditor ||
                                            screenplay.coverPagePhoto !== "")
@@ -84,7 +85,7 @@ Loader {
             ColumnLayout {
                 id: _titleCardLayout
 
-                spacing: 10 * zoomLevel
+                spacing: 10 * root.zoomLevel
 
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -93,7 +94,7 @@ Loader {
 
                 Item {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 35 * zoomLevel
+                    Layout.preferredHeight: 35 * root.zoomLevel
                 }
 
                 Item {
@@ -146,7 +147,7 @@ Loader {
 
                 Item {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: _private.screenplay.coverPagePhoto !== "" ? 20 * zoomLevel : 0
+                    Layout.preferredHeight: _private.screenplay.coverPagePhoto !== "" ? 20 * root.zoomLevel : 0
                 }
 
                 Link {
@@ -193,7 +194,6 @@ Loader {
 
                         text: "Written By"
                         font: _private.fontMetrics.font
-                        width: parent.width
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         horizontalAlignment: Text.AlignHCenter
                     }
@@ -253,7 +253,7 @@ Loader {
 
                     Item {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 20 * zoomLevel
+                        Layout.preferredHeight: 20 * root.zoomLevel
                     }
 
                     Link {
@@ -348,7 +348,7 @@ Loader {
 
                 Item {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: (_loglineFieldLayout.visible ? 20 : 35) * zoomLevel
+                    Layout.preferredHeight: (_loglineFieldLayout.visible ? 20 : 35) * root.zoomLevel
                 }
 
                 ColumnLayout {
@@ -389,7 +389,7 @@ Loader {
 
                     Item {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 35 * zoomLevel
+                        Layout.preferredHeight: 35 * root.zoomLevel
                     }
                 }
             }

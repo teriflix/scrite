@@ -75,8 +75,8 @@ Item {
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
             lineHeight: 1.2
             lineHeightMode: Text.ProportionalHeight
-            text: "<b>" + label + ":</b><br/>(" + filePathPrefix + "<u>" + _fileInfo.absoluteFilePath + "</u>. <a href=\"change\">Change path</a>.)</font>"
-            visible: selectedExtension && selectedExtension.value !== AbstractReportGenerator.PdfFormat
+            text: "<b>" + root.label + ":</b><br/>(" + root.filePathPrefix + "<u>" + _fileInfo.absoluteFilePath + "</u>. <a href=\"change\">Change path</a>.)</font>"
+            visible: root.selectedExtension && root.selectedExtension.value !== AbstractReportGenerator.PdfFormat
             wrapMode: Text.WordWrap
 
             MouseArea {
@@ -93,14 +93,14 @@ Item {
         }
 
         VclTextField {
-            TabSequenceItem.manager: tabSequenceManager
+            TabSequenceItem.manager: root.tabSequenceManager
 
             width: parent.width
 
             enabled: visible
             placeholderText: "File Name"
             text: _fileInfo.baseName
-            visible: selectedExtension.value !== AbstractReportGenerator.PdfFormat
+            visible: root.selectedExtension.value !== AbstractReportGenerator.PdfFormat
 
             onTextEdited: _fileInfo.baseName = text
         }
@@ -109,7 +109,7 @@ Item {
             spacing: 20
 
             Repeater {
-                model: allowedExtensions
+                model: root.allowedExtensions
 
                 delegate: VclRadioButton {
                     id: _delegate
@@ -118,12 +118,12 @@ Item {
                     required property var modelData
 
                     text: modelData.label + " (." + modelData.suffix + ")"
-                    checked: selectedExtension.value === modelData.value
+                    checked: root.selectedExtension.value === modelData.value
                     enabled: modelData.enabled ? modelData.enabled === true : true
 
                     onClicked: {
-                        selectedExtension = modelData
-                        _fileInfo.suffix = selectedExtension.suffix
+                        root.selectedExtension = modelData
+                        _fileInfo.suffix = root.selectedExtension.suffix
                     }
                 }
             }

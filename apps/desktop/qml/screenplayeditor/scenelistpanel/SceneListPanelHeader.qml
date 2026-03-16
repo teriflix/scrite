@@ -64,12 +64,14 @@ Rectangle {
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
             MouseArea {
+                id: _headingTextMouseArea
+
                 anchors.fill: parent
                 hoverEnabled: _headingText.truncated
 
                 ToolTipPopup {
                     text: _headingText.text
-                    visible: _headingText.truncated && container.containsMouse
+                    visible: _headingText.truncated && _headingTextMouseArea.containsMouse
                 }
 
                 onClicked: root.clicked()
@@ -86,13 +88,15 @@ Rectangle {
             fillMode: Image.PreserveAspectFit
 
             MouseArea {
+                id: _menuButtonMouseArea
+
                 anchors.fill: parent
 
                 hoverEnabled: true
 
                 ToolTipPopup {
                     text: "Scene List Options"
-                    visible: parent.containsMouse
+                    visible: _menuButtonMouseArea.containsMouse
                 }
 
                 onClicked: _menu.open()

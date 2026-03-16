@@ -58,9 +58,9 @@ MouseArea {
         source: "qrc:/icons/action/add_scene.png"
     }
 
-    onClicked: {
+    onClicked: (mouse) => {
         if(!Scrite.document.readOnly) {
-            root.createElementRequest(mouse.x-130, mouse.y-22, sceneColor)
+            root.createElementRequest(mouse.x-130, mouse.y-22, root.sceneColor)
             Qt.callLater(root.done)
         }
     }

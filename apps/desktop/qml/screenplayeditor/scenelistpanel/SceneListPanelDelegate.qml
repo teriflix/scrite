@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
@@ -313,7 +315,7 @@ Rectangle {
 
                              root.screenplayAdapter.screenplay.clearSelection()
                              root.screenplayElement.toggleSelection()
-                             root.screenplayAdapter.currentIndex = index
+                             root.screenplayAdapter.currentIndex = root.index
                              root.collapseSideListPanelRequest()
                          }
 
@@ -321,7 +323,7 @@ Rectangle {
                        root.clicked()
 
                        if(mouse.button === Qt.RightButton) {
-                           root.screenplayAdapter.currentIndex = index
+                           root.screenplayAdapter.currentIndex = root.index
                            root.contextMenuRequest()
                            return
                        }
@@ -332,8 +334,8 @@ Rectangle {
                            if(isControlPressed) {
                                root.screenplayElement.toggleSelection()
                            } else if(isShiftPressed) {
-                               const fromIndex = Math.min(root.screenplayAdapter.currentIndex, index)
-                               const toIndex = Math.max(root.screenplayAdapter.currentIndex, index)
+                               const fromIndex = Math.min(root.screenplayAdapter.currentIndex, root.index)
+                               const toIndex = Math.max(root.screenplayAdapter.currentIndex, root.index)
                                if(fromIndex === toIndex) {
                                    root.screenplayElement.toggleSelection()
                                } else {
@@ -350,7 +352,7 @@ Rectangle {
                            }
                        }
 
-                       root.screenplayAdapter.currentIndex = index
+                       root.screenplayAdapter.currentIndex = root.index
                    }
     }
 
@@ -360,7 +362,7 @@ Rectangle {
         anchors.fill: parent
 
         keys: [root.dragDropMimeType]
-        enabled: !screenplayElement.selected && !root.readOnly
+        enabled: !root.screenplayElement.selected && !root.readOnly
 
         onEntered: (drag) => {
                        drag.acceptProposedAction()
@@ -405,7 +407,7 @@ Rectangle {
 
         property bool isBreak: root.screenplayElementType === ScreenplayElement.BreakElementType
         property bool isCurrent: root.screenplayAdapter.currentIndex === root.index
-        property bool isSelection: (isCurrent || screenplayElement.selected)
+        property bool isSelection: (isCurrent || root.screenplayElement.selected)
         property bool isEpisodeBreak: root.screenplayElementType === ScreenplayElement.BreakElementType && root.breakType === Screenplay.Episode
         property bool isSceneTextModeHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
 
@@ -469,7 +471,7 @@ Rectangle {
                             ret += "[OMITTED] <font color=\"gray\">" + root.scene.heading.text + "</font>"
                         else
                             ret += sceneHeading.displayText
-                    } else if(screenplayElement.omitted)
+                    } else if(root.screenplayElement.omitted)
                         ret = "[OMITTED]"
                     else
                         ret = "NO SCENE HEADING"

@@ -102,7 +102,7 @@ AbstractNotebookPage {
             anchors.right: parent.right
             anchors.bottom: _attachmentsView.top
 
-            flickable: _summaryField.lod
+            flickable: _summaryField
             orientation: Qt.Vertical
         }
 

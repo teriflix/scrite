@@ -171,7 +171,7 @@ Item {
         action: ActionHub.notebookOperations.find("sync")
         checked: Runtime.workspaceSettings.syncCurrentSceneOnNotebook
 
-        onToggled: (source) => {
+        onToggled: () => {
                        Runtime.workspaceSettings.syncCurrentSceneOnNotebook = !checked
                        if(Runtime.workspaceSettings.syncCurrentSceneOnNotebook) {
                            _notebookTree.activateFromCurrentScreenplayElement()
@@ -182,7 +182,7 @@ Item {
     ActionHandler {
         action: ActionHub.notebookOperations.find("reload")
 
-        onTriggered: (source) => {
+        onTriggered: () => {
             _notebookModel.refresh()
         }
     }
@@ -192,7 +192,7 @@ Item {
         priority: -1 // Meaning we get to run this only if the active page doesnt handle it
         tooltip: "Export entire notebook as PDF or ODT."
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          ReportConfigurationDialog.launch("Notebook Report")
                      }
     }
@@ -210,7 +210,7 @@ Item {
         iconSource: currentNoteIsBookmarked ? "qrc:/icons/content/bookmark.png" : "qrc:/icons/content/bookmark_outline.png"
         tooltip: currentNoteIsBookmarked ? "Remove bookmark on this note" : "Bookmark this note"
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          if(_notebookModel.bookmarkedNotes.toggleBookmark(currentNote))
                             determineIfCurrentNoteIsBookmarked()
                      }

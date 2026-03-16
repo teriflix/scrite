@@ -30,6 +30,7 @@ class AbstractSyntaxHighlighterDelegate : public QObject, public QQmlParserStatu
 {
     Q_OBJECT
     QML_ELEMENT
+    QML_UNCREATABLE("Abstract class, cannot be instantiated.")
     Q_INTERFACES(QQmlParserStatus)
 
 public:

@@ -183,7 +183,7 @@ Item {
         id: _private
 
         Component.onCompleted: {
-            const userData = Scrite.document.userData
+            const userData = Scrite.document.userData || {}
             if(userData && userData.allowedOpenTagsInTracks !== undefined && userData.allowedOpenTagsInTracks.length > 0)
                 keywords = userData.allowedOpenTagsInTracks
         }

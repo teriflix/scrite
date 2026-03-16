@@ -36,7 +36,7 @@ AbstractScenePartEditor {
 
         Keys.onPressed: (event) => {
                             if(event.key === Qt.Key_Escape && root.isCurrent) {
-                                const editSceneContent = ActionHub.editOptions.find("editSceneContent")
+                                const editSceneContent = ActionHub.editOptions.find("editSceneContent") as Action
                                 editSceneContent.trigger()
                             }
                         }
@@ -73,7 +73,7 @@ AbstractScenePartEditor {
         action: ActionHub.editOptions.find("editSceneSynopsis")
         enabled: root.isCurrent && !root.readOnly && !_synopsisInput.activeFocus
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          _synopsisInput.selectAll()
                          _synopsisInput.forceActiveFocus()
                      }

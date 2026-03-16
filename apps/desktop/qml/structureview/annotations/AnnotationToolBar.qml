@@ -21,7 +21,6 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../helpers"
 
@@ -58,7 +57,7 @@ Rectangle {
             toolTipText: "Bring this annotation to front"
 
             onClicked: {
-                Scrite.document.structure.bringToFront(annotation)
+                Scrite.document.structure.bringToFront(root.annotation)
             }
         }
 
@@ -69,7 +68,7 @@ Rectangle {
 
             onClicked: {
                 root.resetRequest()
-                Scrite.document.structure.sendToBack(annotation)
+                Scrite.document.structure.sendToBack(root.annotation)
             }
         }
 

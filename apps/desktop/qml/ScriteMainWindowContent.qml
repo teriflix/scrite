@@ -16,10 +16,7 @@
 import QtQml
 import QtQuick
 import QtQuick.Window
-import QtQuick.Dialogs
 import QtQuick.Layouts
-import QtQuick.Controls
-import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -60,7 +57,7 @@ Item {
                 action: ActionHub.applicationOptions.find("toggleToolbarVisibility")
 
                 checked: _header.visible
-                onToggled: (source) => {
+                onToggled: () => {
                                Qt.callLater(_header.toggleVisibility)
                            }
             }
@@ -112,7 +109,8 @@ Item {
                     Runtime.shoutout(Runtime.announcementIds.closeHomeScreenRequest, undefined)
                     OpenFileTask.open(fileName)
                 } else {
-                    let fileInfo = Qt.createQmlObject("import io.scrite.components 1.0; BasicFileInfo { }", _private)
+                    let fileInfoObj = Qt.createQmlObject("import io.scrite.components; BasicFileInfo { }", _private)
+                    let fileInfo = fileInfoObj as BasicFileInfo
                     fileInfo.absoluteFilePath = fileName
 
                     const justFileName = fileInfo.baseName
@@ -203,16 +201,16 @@ Item {
             if(hasDocumentErrors) {
                 var msg = documentErrors.errorMessage;
 
-                if(documentErrors.details && documentErrors.details.revealOnDesktopRequest)
-                    msg += "<br/><br/>Click Ok to reveal <u>" + documentErrors.details.revealOnDesktopRequest + "</u> on your computer."
+                const details = documentErrors.details || {}
+                if(details && details.revealOnDesktopRequest)
+                    msg += "<br/><br/>Click Ok to reveal <u>" + details.revealOnDesktopRequest + "</u> on your computer."
 
                 MessageBox.information("Scrite Document Error", msg, () => {
-                                           if(documentErrors.details && documentErrors.details.revealOnDesktopRequest)
-                                               File.revealOnDesktop(documentErrors.details.revealOnDesktopRequest)
+                                           if(details && details.revealOnDesktopRequest)
+                                               File.revealOnDesktop(details.revealOnDesktopRequest)
                                            documentErrors.clear()
                                        })
             }
         }
-
     }
 }

@@ -71,7 +71,7 @@ Item {
                     id: _tabText
                     anchors.centerIn: parent
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                    text: tabTitleRole === "" ? _tabRepeaterDelegate.modelData : _tabRepeaterDelegate.modelData[tabTitleRole]
+                    text: root.tabTitleRole === "" ? _tabRepeaterDelegate.modelData : _tabRepeaterDelegate.modelData[root.tabTitleRole]
                 }
 
                 MouseArea {
@@ -84,7 +84,7 @@ Item {
                     onClicked: _tabBar.currentIndex = _tabRepeaterDelegate.index
 
                     ToolTipPopup {
-                        text: tabTooltipRole === "" ? _tabRepeaterDelegate.modelData : _tabRepeaterDelegate.modelData[tabTooltipRole]
+                        text: root.tabTooltipRole === "" ? _tabRepeaterDelegate.modelData : _tabRepeaterDelegate.modelData[root.tabTooltipRole]
                         visible: _tabMouseArea.containsMouse
                     }
                 }

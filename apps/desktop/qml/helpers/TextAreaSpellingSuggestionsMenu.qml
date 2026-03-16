@@ -63,20 +63,20 @@ SpellingSuggestionsMenu {
                               }
 
     MouseArea {
-        parent: textArea ? textArea : root
+        parent: root.textArea ? root.textArea : root
 
         anchors.fill: parent
 
-        enabled: textArea && textArea.activeFocus && _private.spellCheck && _private.spellCheck.enabled
+        enabled: root.textArea && root.textArea.activeFocus && _private.spellCheck && _private.spellCheck.enabled
         cursorShape: Qt.IBeamCursor
         acceptedButtons: Qt.RightButton
 
         onClicked: (mouse) => {
                        mouse.accepted = false
 
-                       textArea.persistentSelection = true
-                       if(!textArea.hasSelection) {
-                           textArea.cursorPosition = textArea.positionAt(mouse.x, mouse.y)
+                       root.textArea.persistentSelection = true
+                       if(!root.textArea.hasSelection) {
+                           root.textArea.cursorPosition = root.textArea.positionAt(mouse.x, mouse.y)
                            if(_private.spellCheck.wordUnderCursorIsMisspelled) {
                                root.spellingSuggestions = _private.spellCheck.spellingSuggestionsForWordUnderCursor
                                root.popup()
@@ -85,7 +85,7 @@ SpellingSuggestionsMenu {
                            }
                        }
 
-                       textArea.persistentSelection = false
+                       root.textArea.persistentSelection = false
                    }
     }
 

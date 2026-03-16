@@ -38,12 +38,12 @@ Item {
     }
 
     ResetOnChange {
-        trackChangesOn: screenplayElementList.currentIndex
+        trackChangesOn: root.screenplayElementList.currentIndex
         from: false
         to: true
         onValueChanged: {
             if(value) {
-                const ci = screenplayElementList.currentItem
+                const ci = root.screenplayElementList.currentItem
                 if(ci) {
                     ci.grabToImage( function(result) {
                         _highlightBackdrop.source = result.url

@@ -20,7 +20,6 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../controls"
 import "../../helpers"
@@ -32,14 +31,14 @@ ColumnLayout {
     property AbstractReportGenerator report
 
     spacing: 5
-    enabled: report !== null
+    enabled: root.report !== null
 
     VclLabel {
         Layout.fillWidth: true
         Layout.leftMargin: 10
         Layout.rightMargin: 20
 
-        text: fieldInfo.label
+        text: root.fieldInfo.label
         elide: Text.ElideRight
         wrapMode: Text.WordWrap
         font.bold: true
@@ -55,7 +54,7 @@ ColumnLayout {
         Layout.preferredHeight: 100
 
         readonly property real minLeftColumnWidth: 0.2
-        property real leftColumnWidth: report ? report.getConfigurationValue(fieldInfo.name) : minLeftColumnWidth
+        property real leftColumnWidth: root.report ? root.report.getConfigurationValue(root.fieldInfo.name) : minLeftColumnWidth
 
         orientation: Qt.Horizontal
 
@@ -106,8 +105,8 @@ ColumnLayout {
         }
 
         onLeftColumnWidthChanged: {
-            if( (resizing || _leftColumnWidthEditor.activeFocus) && report)
-                report.setConfigurationValue(fieldInfo.name, leftColumnWidth)
+            if( (resizing || _leftColumnWidthEditor.activeFocus) && root.report)
+                root.report.setConfigurationValue(root.fieldInfo.name, _splitView.leftColumnWidth)
         }
     }
 }

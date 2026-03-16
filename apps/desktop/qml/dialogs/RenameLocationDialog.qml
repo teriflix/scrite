@@ -14,11 +14,10 @@
 ****************************************************************************/
 
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
-import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -142,7 +141,7 @@ DialogLauncher {
                          _newName.text !== "" && _newName.text.trim() !== _originalName.text &&
                          !_originalName.completionHasSuggestions && !_newName.completionHasSuggestions
 
-                onTriggered: (source) => {
+                onTriggered: () => {
                     const originalName = _originalName.text.toUpperCase()
                     const newName = _newName.text.toUpperCase()
                     const nrHeadings = Scrite.document.structure.renameLocation(originalName, newName)

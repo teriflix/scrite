@@ -46,17 +46,14 @@ Item {
         ObjectRegister.name: "primaryColors"
 
         key: Material.Grey // applicationSettings.primaryColor
-
-        property ColorPair_RT editor: ColorPair_RT {
-            background: root.theme === Material.Light ? "white" : "black"
-            text: root.theme === Material.Light ? "black" : "white"
-        }
+        theme: root.theme
     }
 
     readonly property ColorTheme_RT accent: ColorTheme_RT {
         ObjectRegister.name: "accentColors"
 
         key: root.applicationSettings.accentColor
+        theme: root.theme
     }
 
     function tint(a, b) {

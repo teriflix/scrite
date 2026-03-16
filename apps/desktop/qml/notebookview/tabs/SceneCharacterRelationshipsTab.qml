@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
@@ -73,7 +75,7 @@ Item {
             showBusyIndicator: true
 
             onCharacterDoubleClicked: (characterName, nodeItem) => {
-                var ch = Scrite.document.structure.findCharacter(characterName)
+                var ch = Scrite.document.structure.findCharacter(characterName) as Character
                 if(ch)
                     root.switchRequest(ch.notes)
             }

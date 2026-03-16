@@ -65,7 +65,7 @@ Item {
 
             enabled: root.canvasScroll.itemsBoundingBox.itemCount > 0
 
-            onClicked: {
+            onClicked: (mouse) => {
                 let scale = root.canvasScroll.itemsBoundingBox.width / _preview.width
                 let x = root.canvasScroll.itemsBoundingBox.x + mouse.x * scale - root.canvasScroll.width/2
                 let y = root.canvasScroll.itemsBoundingBox.y + mouse.y * scale - root.canvasScroll.height/2

@@ -44,7 +44,7 @@ AbstractScenePartEditor {
         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 1
 
         background: Rectangle {
-            color: Runtime.colors.tint(scene.color, Runtime.colors.sceneHeadingTint)
+            color: Runtime.colors.tint(root.scene.color, Runtime.colors.sceneHeadingTint)
         }
         readOnly: Scrite.document.readOnly
 

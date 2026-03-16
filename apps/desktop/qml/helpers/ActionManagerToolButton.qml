@@ -59,7 +59,7 @@ ToolButton {
     ToolTipPopup {
         container: root
 
-        text: display === ToolButton.IconOnly ? actionManager.title : ""
-        visible: display === ToolButton.IconOnly ? text !== "" && hovered : false
+        text: root.display === ToolButton.IconOnly ? root.actionManager.title : ""
+        visible: root.display === ToolButton.IconOnly ? text !== "" && root.hovered : false
     }
 }

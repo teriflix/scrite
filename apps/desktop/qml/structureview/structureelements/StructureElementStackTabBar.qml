@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
@@ -88,7 +90,7 @@ Item {
 
                 minimumTabWidth: root.width*0.1
 
-                onTabClicked: root.elementStack.bringElementToTop(index)
+                onTabClicked: (index) => { root.elementStack.bringElementToTop(index) }
 
                 onActiveTabIndexChanged: Qt.callLater(ensureActiveTabIsVisible)
 

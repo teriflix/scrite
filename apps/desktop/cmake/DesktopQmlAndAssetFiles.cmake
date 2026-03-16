@@ -10,7 +10,6 @@ set(SCRITE_DESKTOP_QML_FILES
   "qml/controls/VclCheckBox.qml"
   "qml/controls/VclComboBox.qml"
   "qml/controls/VclDialog.qml"
-  "qml/controls/VclFileDialog.qml"
   "qml/controls/VclGroupBox.qml"
   "qml/controls/VclLabel.qml"
   "qml/controls/VclMenu.qml"

@@ -34,15 +34,13 @@
 
 #include "errorreport.h"
 
-#define QtApplicationClass QApplication
-
 class Forms;
 class QSettings;
 class AutoUpdate;
 class QQmlEngine;
 class QNetworkConfigurationManager;
 
-class Application : public QtApplicationClass
+class Application : public QApplication
 {
     Q_OBJECT
     QML_ELEMENT
@@ -58,6 +56,13 @@ public:
     QString deviceId() const;
     QString installationId() const;
     QDateTime installationTimestamp() const;
+
+    // clang-format off
+    Q_MOC_INCLUDE("QStyleHints")
+    Q_PROPERTY(QStyleHints* styleHints
+               READ styleHints // comes from QGuiApplication::styleHints()
+               CONSTANT)
+    // clang-format on
 
     // clang-format off
     Q_PROPERTY(int appState

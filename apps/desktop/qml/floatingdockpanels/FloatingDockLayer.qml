@@ -33,7 +33,7 @@ QtObject {
         if( !(_parent && Object.isOfType(_parent, "QQuickItem")) )
             _parent = Scrite.window.contentItem
 
-        item = Qt.createQmlObject("import QtQuick 2.15; Item { }", _parent)
+        item = Qt.createQmlObject("import QtQuick; Item { }", _parent)
         item.objectName = "FloatingDockLayer"
         item.anchors.fill = _parent
         item.visible = _parent

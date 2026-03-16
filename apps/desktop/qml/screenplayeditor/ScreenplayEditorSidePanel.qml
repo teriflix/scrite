@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Controls
@@ -145,6 +147,8 @@ Item {
                 readOnly: root.readOnly
                 screenplayAdapter: root.screenplayAdapter
                 tracksVisible: _screenplayTracksView.visible
+
+                onCollapseSidePanelRequest: () => { _sidePanel.expanded = false }
 
                 ToolTipPopup {
                     background: Rectangle {

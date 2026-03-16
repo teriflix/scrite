@@ -17,17 +17,16 @@ pragma ComponentBehavior: Bound
 
 import QtQml
 import QtQuick
-import QtQuick.Layouts
 import QtQuick.Controls
 
 import io.scrite.components
 
+import "../../"
 import "../../../dialogs"
 import "../../../helpers"
 import "../../../globals"
 import "../../../controls"
 import "../../../structureview"
-import "../.."
 import "../../../floatingdockpanels"
 import "./helpers"
 
@@ -141,14 +140,14 @@ AbstractScenePartEditor {
                 action: ActionHub.editOptions.find("showCursor")
                 enabled: _sceneTextEditor.activeFocus
 
-                onTriggered: (source) => { _cursor.highlight() }
+                onTriggered: () => { _cursor.highlight() }
             }
 
             ActionHandler {
                 action: root.ensureCursorCenteredAction
                 enabled: _sceneTextEditor.activeFocus
 
-                onTriggered: (source) => { root.ensureCentered(_sceneTextEditor, _sceneTextEditor.cursorRectangle) }
+                onTriggered: () => { root.ensureCentered(_sceneTextEditor, _sceneTextEditor.cursorRectangle) }
             }
 
             SpecialSymbolsSupport {
@@ -189,7 +188,7 @@ AbstractScenePartEditor {
 
                 action: ActionHub.paragraphFormats.find("nextFormat")
                 enabled: _sceneTextEditor.activeFocus && !root.readOnly && !_completion.model.hasSuggestion
-                onTriggered: (source) => {  } // Do nothing, since we already handle this in Keys.onTabPressed()
+                onTriggered: () => {  } // Do nothing, since we already handle this in Keys.onTabPressed()
             }
         }
 
@@ -297,9 +296,9 @@ AbstractScenePartEditor {
         readonly property TextArea textArea: _sceneTextEditor
 
         function preserveScrollAndReload() {
-            var cy = contentView.contentY
+            var cy = root.listView.contentY
             reload()
-            contentView.contentY = cy
+            root.listView.contentY = cy
         }
 
         function changeCase(textCase) {
@@ -313,7 +312,7 @@ AbstractScenePartEditor {
                                     _sceneTextEditor.select(sstart, send)
                                 })
             else if(cp >= 0)
-                contentItem.assumeFocusLater(cp, 100)
+                root.assumeFocusAt(cp)
         }
 
         scene: root.scene
@@ -423,7 +422,7 @@ AbstractScenePartEditor {
         action: ActionHub.editOptions.find("cut")
         enabled: !root.readOnly && root.isCurrent && _sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          _private.cut()
                      }
     }
@@ -432,7 +431,7 @@ AbstractScenePartEditor {
         action: ActionHub.editOptions.find("copy")
         enabled: !root.readOnly && root.isCurrent && _sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          _private.copy()
                      }
     }
@@ -441,7 +440,7 @@ AbstractScenePartEditor {
         action: ActionHub.editOptions.find("paste")
         enabled: !root.readOnly && root.isCurrent && _sceneTextEditor.activeFocus
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          _private.paste()
                      }
     }
@@ -450,7 +449,7 @@ AbstractScenePartEditor {
         action: ActionHub.editOptions.find("editSceneContent")
         enabled: !root.readOnly && root.isCurrent && !_sceneTextEditor.activeFocus
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          _sceneTextEditor.forceActiveFocus()
                      }
     }
@@ -459,7 +458,7 @@ AbstractScenePartEditor {
         action: ActionHub.editOptions.find("splitScene")
         enabled: !root.readOnly && _private.canSplitScene
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          Qt.callLater(_private.splitSceneAt, _sceneTextEditor.cursorPosition)
                      }
     }
@@ -468,7 +467,7 @@ AbstractScenePartEditor {
         action: ActionHub.editOptions.find("mergeScene")
         enabled: !root.readOnly && _private.canJoinToPreviousScene
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          Qt.callLater(_private.mergeWithPreviousScene, _sceneTextEditor.cursorPosition)
                      }
     }
@@ -477,7 +476,7 @@ AbstractScenePartEditor {
         action: ActionHub.editOptions.find("pageUp")
         enabled: _sceneTextEditor.activeFocus
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          if(_sceneTextEditor.cursorPosition > 0) {
                              const pageHeight = root.listView.height * 0.85
                              const cursorRect = _sceneTextEditor.cursorRectangle
@@ -500,7 +499,7 @@ AbstractScenePartEditor {
         action: ActionHub.editOptions.find("pageDown")
         enabled: _sceneTextEditor.activeFocus
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          if(_sceneTextEditor.cursorPosition < _sceneTextEditor.length) {
                              const pageHeight = root.listView.height * 0.85
                              const cursorRect = _sceneTextEditor.cursorRectangle
@@ -526,7 +525,7 @@ AbstractScenePartEditor {
         enabled: Runtime.screenplayEditorSettings.allowSelectedTextTranslation && _sceneTextEditor.activeFocus &&
                  _sceneTextEditor.selectionEnd > _sceneTextEditor.selectionStart && _sceneTextEditor.selectionStart >= 0
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          if(!enabled) return
 
                          const option = Runtime.language.active.preferredTransliterationOption()
@@ -552,7 +551,7 @@ AbstractScenePartEditor {
 
         enabled: _sceneTextEditor.activeFocus && Runtime.allowAppUsage
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          let cursorPosition = -1
                          let selectedText = _sceneDocumentBinder.selectedText
                          let selectionStart = _sceneTextEditor.selectionStart
@@ -639,10 +638,10 @@ AbstractScenePartEditor {
     QtObject {
         id: _private
 
-        readonly property Action scrollNextScene: ActionHub.editOptions.find("scrollNextScene")
-        readonly property Action scrollPreviousScene: ActionHub.editOptions.find("scrollPreviousScene")
-        readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition")
-        readonly property Action translateToActiveLanguage: ActionHub.editOptions.find("translateToActiveLanguage")
+        readonly property Action scrollNextScene: ActionHub.editOptions.find("scrollNextScene") as Action
+        readonly property Action scrollPreviousScene: ActionHub.editOptions.find("scrollPreviousScene") as Action
+        readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition") as Action
+        readonly property Action translateToActiveLanguage: ActionHub.editOptions.find("translateToActiveLanguage") as Action
 
         property bool canSplitScene: _sceneTextEditor.activeFocus &&
                                      !root.readOnly &&
@@ -691,7 +690,7 @@ AbstractScenePartEditor {
             event.accepted = false
 
             const shortcut = Gui.shortcut(event.modifiers + event.key)
-            const action = ActionHub.editOptions.findByShortcut(shortcut)
+            const action = ActionHub.editOptions.findByShortcut(shortcut) as Action
             if(action) {
                 if(action.enabled) {
                     action.trigger()
@@ -822,7 +821,7 @@ AbstractScenePartEditor {
         property rect localCursorRect: Qt.rect(0,0,0,0)
 
         function captureCursorOffset() {
-            globalCursorY = listView.mapFromItem(_sceneTextEditor, _sceneTextEditor.cursorRectangle).y
+            globalCursorY = root.listView.mapFromItem(_sceneTextEditor, _sceneTextEditor.cursorRectangle).y
             localCursorRect = _sceneTextEditor.cursorRectangle
         }
 
@@ -830,10 +829,10 @@ AbstractScenePartEditor {
             let localCursorYDelta = _sceneTextEditor.cursorRectangle.y - localCursorRect.y
             let expectedGlobalCursorY = globalCursorY + localCursorYDelta
 
-            let expectedGlobalCursorYDiff = Math.abs(listView.mapFromItem(_sceneTextEditor, _sceneTextEditor.cursorRectangle).y - expectedGlobalCursorY)
+            let expectedGlobalCursorYDiff = Math.abs(root.listView.mapFromItem(_sceneTextEditor, _sceneTextEditor.cursorRectangle).y - expectedGlobalCursorY)
             if( expectedGlobalCursorYDiff < Runtime.idealFontMetrics.lineSpacing/2 ) {
                 discardCursorOffset()
-                if(expectedGlobalCursorY < Runtime.idealFontMetrics.lineSpacing || expectedGlobalCursorY > listView.height-Runtime.idealFontMetrics.lineSpacing)
+                if(expectedGlobalCursorY < Runtime.idealFontMetrics.lineSpacing || expectedGlobalCursorY > root.listView.height-Runtime.idealFontMetrics.lineSpacing)
                     ensureSceneTextEditorCursorIsCentered()
                 return
             }

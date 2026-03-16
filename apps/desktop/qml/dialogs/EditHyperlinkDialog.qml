@@ -115,7 +115,7 @@ DialogLauncher {
                         ActionHandler {
                             action: _dialog.acceptAction
 
-                            onTriggered: (source) => { _acceptButton.clicked() }
+                            onTriggered: () => { _acceptButton.clicked() }
                         }
                     }
                 }

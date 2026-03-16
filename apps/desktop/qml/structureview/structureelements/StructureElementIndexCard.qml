@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
@@ -332,6 +334,8 @@ AbstractStructureElementUI {
                         TextEdit {
                             id: _synopsisTextDisplay
 
+                            property bool truncated: contentHeight > height
+
                             anchors.fill: parent
 
                             SyntaxHighlighter.delegates: [
@@ -353,7 +357,7 @@ AbstractStructureElementUI {
                             bottomPadding: 4
 
                             text: root.element.scene.hasSynopsis ? root.element.scene.synopsis : "Describe what happens in this scene."
-                            color: root.element.scene.hasTitle ? "black" : "gray"
+                            color: root.element.hasTitle ? "black" : "gray"
                             enabled: false
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             readOnly: true
@@ -632,7 +636,7 @@ AbstractStructureElementUI {
                         color: _footerRow.lightBackground ? "black" : "white"
                         visible: root.element.scene.groups.length > 0 || !root.element.scene.hasCharacters
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                        font.pointSize: Scrite.app.idealAppFontSize - 2
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
                     }
 
                     VclLabel {
@@ -648,7 +652,7 @@ AbstractStructureElementUI {
                         color: _footerRow.lightBackground ? "black" : "white"
                         visible: root.element.scene.hasCharacters
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                        font.pointSize: Scrite.app.idealAppFontSize - 2
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
                     }
                 }
 
@@ -739,19 +743,19 @@ AbstractStructureElementUI {
                     MessageBox.information("",
                         "Scenes must be added to the timeline before they can be stacked."
                     )
-                    drop.ignore()
+                    drop.accept(Qt.IgnoreAction)
                     return
                 }
 
                 const otherSceneId = otherScene.id
                 if(otherSceneId === root.element.scene.id) {
-                    drop.ignore()
+                    drop.accept(Qt.IgnoreAction)
                     return
                 }
 
                 const otherElement = Scrite.document.structure.findElementBySceneID(otherSceneId)
                 if(otherElement === null) {
-                    drop.ignore()
+                    drop.accept(Qt.IgnoreAction)
                     return
                 }
 
@@ -759,7 +763,7 @@ AbstractStructureElementUI {
                     MessageBox.information("",
                         "Scenes must be added to the timeline before they can be stacked."
                     )
-                    drop.ignore()
+                    drop.accept(Qt.IgnoreAction)
                     return
                 }
 
@@ -767,7 +771,7 @@ AbstractStructureElementUI {
                     MessageBox.information("",
                         "Scenes must belong to the same act for them to be stacked."
                     )
-                    drop.ignore()
+                    drop.accept(Qt.IgnoreAction)
                     return
                 }
 

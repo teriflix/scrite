@@ -37,7 +37,7 @@ FocusScope {
     clip: true
 
     function askDeleteConfirmation(message, callback) {
-        let popup = _private.deleteConfirmationPopup.createObject(root, {"message": message})
+        let popup = _private.deleteConfirmationPopup.createObject(root, {"message": message}) as DeleteConfirmationPopup
         popup.closed.connect(popup.destroy)
         popup.deletionConfirmed.connect(callback)
         popup.open()

@@ -20,11 +20,10 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-
+import "../"
 import "../../globals"
 import "../../helpers"
 import "../../controls"
-import ".."
 
 Rectangle {
     id: root
@@ -153,7 +152,7 @@ Rectangle {
         anchors.bottom: parent.top
         anchors.bottomMargin: parent.radius-parent.border.width
 
-        text: "<b>" + groupBox.name + "</b><font size=\"-2\">: " + groupBox.sceneCount + (groupBox.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
+        text: "<b>" + root.groupBox.name + "</b><font size=\"-2\">: " + root.groupBox.sceneCount + (root.groupBox.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
         color: Runtime.colors.accent.c200.text
         elide: Text.ElideRight
         padding: 10
@@ -186,14 +185,14 @@ Rectangle {
             for(let i=0; i<nrElements; i++) {
                 let idx = idxList[i]
                 if(movedIdxList.indexOf(idx) < 0) {
-                    let item = elementItems.itemAt(idxList[i])
+                    let item = root.elementItems.itemAt(idxList[i])
                     item.x = item.x + dx
                     item.y = item.y + dy
                     movedIdxList.push(idx)
                 }
             }
-            _private.refX = x
-            _private.refY = y
+            _private.refX = root.x
+            _private.refY = root.y
         }
 
         function selectBeatItems() {
@@ -204,7 +203,7 @@ Rectangle {
             for(let i=0; i<nrElements; i++) {
                 let idx = idxList[i]
                 if(selIdxList.indexOf(idx) < 0) {
-                    let item = elementItems.itemAt(idxList[i])
+                    let item = root.elementItems.itemAt(idxList[i])
                     items.push(item)
                     selIdxList.push(idx)
                 }

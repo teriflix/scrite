@@ -51,7 +51,7 @@ Item {
         anchors.fill: parent
         opacity: 0.2
         source: "qrc:/images/useraccountdialogbg.png"
-        fillMode: standalone ? Image.PreserveAspectFit : Image.PreserveAspectCrop
+        fillMode: root.standalone ? Image.PreserveAspectFit : Image.PreserveAspectCrop
     }
 
     ColumnLayout {
@@ -230,7 +230,7 @@ Item {
         onFinished: {
             if(hasResponse && !hasError) {
                 Runtime.userAccountDialogSettings.userOnboardingStatus = "completed"
-                if(standalone)
+                if(root.standalone)
                     root.formSubmitted()
                 else
                     Runtime.shoutout(Runtime.announcementIds.userAccountDialogScreen, "UserProfileScreen")

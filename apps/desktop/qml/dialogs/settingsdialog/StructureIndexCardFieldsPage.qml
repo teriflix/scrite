@@ -49,7 +49,7 @@ Item {
             font.bold: true
             wrapMode: Text.WordWrap
 
-            text: target === e_CurrentDocumentTarget ? "Fields on index cards in the currently open document" : "Default fields on index cards in all new documents created in the future"
+            text: root.target === root.e_CurrentDocumentTarget ? "Fields on index cards in the currently open document" : "Default fields on index cards in all new documents created in the future"
         }
 
         VclLabel {
@@ -153,7 +153,7 @@ Item {
             }
 
             VclButton {
-                visible: target === e_CurrentDocumentTarget
+                visible: root.target === root.e_CurrentDocumentTarget
                 enabled: JSON.stringify(Scrite.document.structure.defaultIndexCardFields) !== JSON.stringify(_indexCardFieldsModel.array)
 
                 text: "Use Defaults"

@@ -47,7 +47,7 @@ Item {
     signal canvasActiveFocusRequest()
     signal ensureAreaVisibleRequest(rect area)
 
-    property AnnotationGrip grip: _gripLoader.item
+    property AnnotationGrip grip: _gripLoader.item as AnnotationGrip
 
     function createAnnotation(type, x, y) {
         return _private.createAnnotation(type, x, y)

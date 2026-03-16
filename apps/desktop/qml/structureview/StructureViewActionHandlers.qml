@@ -166,7 +166,7 @@ Item {
                     text: modelData.text
                     icon.source: "qrc:/icons/action/" + modelData.icon
 
-                    onClicked: selectionLayoutRequest(modelData.type)
+                    onClicked: root.selectionLayoutRequest(modelData.type)
                 }
             }
         }
@@ -179,7 +179,7 @@ Item {
         enabled: !Scrite.document.readOnly
         checked: Scrite.document.structure.forceBeatBoardLayout
 
-        onToggled: (source) => {
+        onToggled: () => {
                        const canvasPreviewAllowed = root.canvasPreview.allowed
                        root.canvasPreview.allowed = false
 
@@ -190,7 +190,7 @@ Item {
                        }
 
                        Runtime.execLater(root.canvasPreview, 1000, function() {
-                           zoomOneRequest()
+                           root.zoomOneRequest()
                            root.canvasPreview.allowed = canvasPreviewAllowed
                        })
                    }
@@ -236,7 +236,7 @@ Item {
                 checkable: true
                 checked: root.canvasScroll.groupCategory === "{NONE}"
 
-                onTriggered: groupCategoryRequest("{NONE}")
+                onTriggered: root.groupCategoryRequest("{NONE}")
             }
 
             VclMenuItem {
@@ -244,7 +244,7 @@ Item {
                 checkable: true
                 checked: root.canvasScroll.groupCategory === ""
 
-                onTriggered: groupCategoryRequest("")
+                onTriggered: root.groupCategoryRequest("")
             }
 
             Repeater {
@@ -258,7 +258,7 @@ Item {
                     checkable: true
                     checked: root.canvasScroll.groupCategory === modelData
 
-                    onTriggered: groupCategoryRequest(modelData)
+                    onTriggered: root.groupCategoryRequest(modelData)
                 }
             }
 
@@ -336,7 +336,7 @@ Item {
 
             title: "Scenes Color"
 
-            onMenuItemClicked: {
+            onMenuItemClicked: (color) => {
                 if(root.canvasScroll.selection.hasItems) {
                     let items = root.canvasScroll.selection.items
                     items.forEach( function(item) {
@@ -346,7 +346,7 @@ Item {
                     root.canvasScroll.currentElementItem.element.scene.color = color
                 }
 
-                _colorMenuLoader.active = false
+                close()
             }
         }
     }
@@ -377,7 +377,7 @@ Item {
 
             enableValidation: false
 
-            onTriggered: {
+            onTriggered: (type) => {
                 if(root.canvasScroll.selection.hasItems) {
                     let items = root.canvasScroll.selection.items
                     items.forEach( function(item) {
@@ -386,7 +386,8 @@ Item {
                 } else {
                     root.canvasScroll.currentElementItem.element.scene.type = type
                 }
-                _sceneTypeMenuLoader.active = false
+
+                close()
             }
         }
     }

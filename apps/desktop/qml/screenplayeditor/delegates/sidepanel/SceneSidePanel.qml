@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 
@@ -66,7 +68,7 @@ AbstractScenePartEditor {
 
         enabled: root.isCurrent
         checked: Runtime.screenplayEditorSettings.sceneSidePanelOpen
-        onTriggered: (source) => {
+        onTriggered: () => {
                         Runtime.screenplayEditorSettings.sceneSidePanelOpen = !Runtime.screenplayEditorSettings.sceneSidePanelOpen
                      }
     }
@@ -79,8 +81,8 @@ AbstractScenePartEditor {
         property var tabComponentsArray: [_private.commentsTab,_private.featuredImageTab,_private.indexCardFieldsTab,_private.sceneMetaDataTab]
 
         property color indicatorColor: {
-            const ideally = Runtime.colors.tint(scene.color, root.isCurrent ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneControlTint)
-            return Color.isLight(scene.color) ? (root.isCurrent ? Runtime.colors.primary.c200.background : Runtime.colors.primary.c50.background) : ideally
+            const ideally = Runtime.colors.tint(root.scene.color, root.isCurrent ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneControlTint)
+            return Color.isLight(root.scene.color) ? (root.isCurrent ? Runtime.colors.primary.c200.background : Runtime.colors.primary.c50.background) : ideally
         }
 
         readonly property Component collapsedCorner: CollapsedCorner {
@@ -90,7 +92,7 @@ AbstractScenePartEditor {
                 action: ActionHub.editOptions.find("cycleCommentsPanelTab")
 
                 enabled: root.isCurrent
-                onTriggered: (source) => { Runtime.screenplayEditorSettings.sceneSidePanelOpen = true }
+                onTriggered: () => { Runtime.screenplayEditorSettings.sceneSidePanelOpen = true }
             }
         }
 
@@ -105,7 +107,7 @@ AbstractScenePartEditor {
                 action: ActionHub.editOptions.find("cycleCommentsPanelTab")
 
                 enabled: root.isCurrent
-                onTriggered: (source) => { parent.cycleTab() }
+                onTriggered: () => { parent.cycleTab() }
             }
         }
 

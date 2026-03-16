@@ -90,7 +90,7 @@ Loader {
             text: markupText !== "" ? markupText : root.text
             font: root.font
             elide: root.elide
-            color: textColor
+            color: root.textColor
             wrapMode: root.wrapMode
             textFormat: markupText === "" ? Text.PlainText : Text.RichText
             verticalAlignment: root.verticalAlignment
@@ -122,7 +122,7 @@ Loader {
                 editingFinished()
             }
 
-            Keys.onReturnPressed: {
+            Keys.onReturnPressed: (event) => {
                 if(_completionModel.hasSuggestion) {
                     _textArea.text = _completionModel.suggestion
                     _textArea.cursorPosition = _textArea.length
@@ -165,7 +165,7 @@ Loader {
             bottomPadding: root.bottomPadding
 
             background: Rectangle {
-                visible: frameVisible
+                visible: root.frameVisible
                 border.width: 1
                 border.color: Runtime.colors.primary.borderColor
             }
@@ -180,7 +180,7 @@ Loader {
                 property string suggestion: currentCompletion
 
                 enabled: allowEnable && _textArea.activeFocus
-                strings: completionStrings
+                strings: root.completionStrings
                 sortStrings: false
                 completionPrefix: _textArea.text
                 filterKeyStrokes: _textArea.activeFocus
@@ -202,8 +202,8 @@ Loader {
             Popup {
                 id: _completionViewPopup
 
-                x: parent.cursorRectangle.x - GMath.boundingRect(_completionModel.completionPrefix, parent.font).width
-                y: parent.cursorRectangle.y + parent.cursorRectangle.height
+                x: _textArea.cursorRectangle.x - GMath.boundingRect(_completionModel.completionPrefix, parent.font).width
+                y: _textArea.cursorRectangle.y + _textArea.cursorRectangle.height
                 width: GMath.largestBoundingRect(_completionModel.strings, _textArea.font).width + leftInset + rightInset + leftPadding + rightPadding + 20
                 height: _completionView.contentHeight + topInset + bottomInset + topPadding + bottomPadding
 

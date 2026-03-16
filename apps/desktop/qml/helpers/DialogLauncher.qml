@@ -51,11 +51,8 @@ Item {
             return null
         }
 
-        if(!dialogComponent.parent) {
-            Object.reparent(dialogComponent, root)
-        }
-
-        var dlg = initialProperties ? dialogComponent.createObject(root,initialProperties) : dialogComponent.createObject(root)
+        let dlgObject = initialProperties ? dialogComponent.createObject(root,initialProperties) : dialogComponent.createObject(root)
+        let dlg = dlgObject as Dialog
         if(dlg) {
             if(singleInstanceOnly)
                 _private.dialog = dlg

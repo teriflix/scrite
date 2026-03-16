@@ -150,7 +150,7 @@ TextField {
         filterKeyStrokes: root.activeFocus
 
         onRequestCompletion: {
-            autoCompleteOrFocusNext(tabItemUponReturn)
+            root.autoCompleteOrFocusNext(root.tabItemUponReturn)
         }
 
         onHasSuggestionChanged: {
@@ -165,14 +165,14 @@ TextField {
         action: ActionHub.editOptions.find("undo")
         enabled: root.undoRedoEnabled && !root.readOnly && root.activeFocus && root.canUndo
 
-        onTriggered: (source) => { root.undo() }
+        onTriggered: () => { root.undo() }
     }
 
     ActionHandler {
         action: ActionHub.editOptions.find("redo")
         enabled: root.undoRedoEnabled && !root.readOnly && root.activeFocus && root.canRedo
 
-        onTriggered: (source) => { root.redo() }
+        onTriggered: () => { root.redo() }
     }
 
     SpecialSymbolsSupport {
@@ -226,7 +226,7 @@ TextField {
 
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-            height: Math.min( Scrite.window.height*0.3, Math.min(contentHeight, maxVisibleItems > 0 ? delegateHeight*maxVisibleItems : contentHeight) )
+            height: Math.min( Scrite.window.height*0.3, Math.min(contentHeight, root.maxVisibleItems > 0 ? delegateHeight*root.maxVisibleItems : contentHeight) )
 
             clip: true
             model: _completionModel
@@ -236,6 +236,8 @@ TextField {
             highlightResizeDuration: 0
 
             delegate: VclLabel {
+                id: _completionDelegate
+
                 required property int index
                 required property var completionString
 
@@ -253,14 +255,14 @@ TextField {
 
                     anchors.fill: parent
 
-                    hoverEnabled: singleClickAutoComplete
-                    cursorShape: singleClickAutoComplete ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    hoverEnabled: root.singleClickAutoComplete
+                    cursorShape: root.singleClickAutoComplete ? Qt.PointingHandCursor : Qt.ArrowCursor
 
                     onClicked: {
-                        if(singleClickAutoComplete || _completionModel.currentRow === index)
+                        if(root.singleClickAutoComplete || _completionModel.currentRow === _completionDelegate.index)
                             _completionModel.requestCompletion(parent.text)
                         else
-                            _completionModel.currentRow = index
+                            _completionModel.currentRow = _completionDelegate.index
                     }
 
                     onDoubleClicked: {
@@ -268,8 +270,8 @@ TextField {
                     }
 
                     onContainsMouseChanged: {
-                        if(singleClickAutoComplete)
-                            _completionModel.currentRow = index
+                        if(root.singleClickAutoComplete)
+                            _completionModel.currentRow = _completionDelegate.index
                     }
                 }
             }

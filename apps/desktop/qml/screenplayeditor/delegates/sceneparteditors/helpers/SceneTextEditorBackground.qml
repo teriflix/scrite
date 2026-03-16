@@ -38,12 +38,12 @@ Item {
     // Current line highlight
     Rectangle {
         x: 0
-        y: sceneTextEditor.cursorRectangle.y-2*zoomLevel
+        y: root.sceneTextEditor.cursorRectangle.y-2*root.zoomLevel
         width: parent.width
-        height: sceneTextEditor.cursorRectangle.height+4*zoomLevel
+        height: root.sceneTextEditor.cursorRectangle.height+4*root.zoomLevel
 
-        color: Runtime.colors.tint(sceneDocumentBinder.scene.highlightColor, Runtime.colors.currentLineHightlightTint)
-        visible: sceneTextEditor.cursorVisible && sceneTextEditor.activeFocus && Runtime.screenplayEditorSettings.highlightCurrentLine && Scrite.app.usingMaterialTheme
+        color: Runtime.colors.tint(root.sceneDocumentBinder.scene.highlightColor, Runtime.colors.currentLineHightlightTint)
+        visible: root.sceneTextEditor.cursorVisible && root.sceneTextEditor.activeFocus && Runtime.screenplayEditorSettings.highlightCurrentLine && Scrite.app.usingMaterialTheme
 
         Rectangle {
             width: 20 * root.zoomLevel

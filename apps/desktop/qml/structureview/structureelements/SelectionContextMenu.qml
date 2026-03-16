@@ -13,16 +13,18 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 
 import io.scrite.components
 
+import "../"
 import "../../globals"
 import "../../dialogs"
 import "../../helpers"
 import "../../controls"
-import ".."
 
 VclMenu {
     id: root
@@ -38,8 +40,8 @@ VclMenu {
     ColorMenu {
         title: "Scenes Color"
 
-        onMenuItemClicked: {
-            let items = selection.items
+        onMenuItemClicked: (color) => {
+            let items = root.selection.items
             items.forEach( function(item) {
                 item.element.scene.color = color
             })
@@ -51,8 +53,8 @@ VclMenu {
         title: "Mark Scenes As"
         enableValidation: false
 
-        onTriggered: {
-            let items = selection.items
+        onTriggered: (type) => {
+            let items = root.selection.items
             items.forEach( function(item) {
                 item.element.scene.type = type
             })
@@ -65,34 +67,46 @@ VclMenu {
 
         VclMenuItem {
             text: "Layout Horizontally"
-            enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
+            enabled: !Scrite.document.readOnly && (root.selection.hasItems ? root.selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
             icon.source: "qrc:/icons/action/layout_horizontally.png"
 
-            onClicked: selection.layout(Structure.HorizontalLayout)
+            onClicked: {
+                const s = root.selection as StructureElementsSelection
+                s.layout(Structure.HorizontalLayout)
+            }
         }
 
         VclMenuItem {
             icon.source: "qrc:/icons/action/layout_vertically.png"
             text: "Layout Vertically"
-            enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
+            enabled: !Scrite.document.readOnly && (root.selection.hasItems ? root.selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
 
-            onClicked: selection.layout(Structure.VerticalLayout)
+            onClicked: {
+                const s = root.selection as StructureElementsSelection
+                s.layout(Structure.VerticalLayout)
+            }
         }
 
         VclMenuItem {
             icon.source: "qrc:/icons/action/layout_flow_horizontally.png"
             text: "Flow Horizontally"
-            enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
+            enabled: !Scrite.document.readOnly && (root.selection.hasItems ? root.selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
 
-            onClicked: selection.layout(Structure.FlowHorizontalLayout)
+            onClicked: {
+                const s = root.selection as StructureElementsSelection
+                s.layout(Structure.FlowHorizontalLayout)
+            }
         }
 
         VclMenuItem {
             text: "Flow Vertically"
-            enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
+            enabled: !Scrite.document.readOnly && (root.selection.hasItems ? root.selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
             icon.source: "qrc:/icons/action/layout_flow_vertically.png"
 
-            onClicked: selection.layout(Structure.FlowVerticalLayout)
+            onClicked: {
+                const s = root.selection as StructureElementsSelection
+                s.layout(Structure.FlowVerticalLayout)
+            }
         }
     }
 
@@ -100,8 +114,8 @@ VclMenu {
         text: "Annotate With Rectangle"
 
         onClicked: {
-            root.rectangleAnnotationRequest(selection.rect.x-10, selection.rect.y-10, selection.rect.width+20, selection.rect.height+20)
-            selection.clear()
+            root.rectangleAnnotationRequest(root.selection.rect.x-10, root.selection.rect.y-10, root.selection.rect.width+20, root.selection.rect.height+20)
+            root.selection.clear()
         }
     }
 
@@ -117,7 +131,7 @@ VclMenu {
         text: "Add To Timeline"
 
         onClicked: {
-            let items = selection.items
+            let items = root.selection.items
             items.forEach( function(item) {
                 Scrite.document.screenplay.addScene(item.element.scene)
             })
@@ -128,9 +142,9 @@ VclMenu {
         text: "Remove From Timeline"
 
         enabled: {
-            if(!selection.hasItems)
+            if(!root.selection.hasItems)
                 return false
-            let items = selection.items
+            let items = root.selection.items
             for(var i=0; i<items.length; i++) {
                 if(items[i].element.scene.addedToScreenplay)
                     continue
@@ -140,12 +154,12 @@ VclMenu {
         }
 
         onClicked: {
-            let items = selection.items
+            let items = root.selection.items
             let firstItem = items[0]
             items.forEach( function(item) {
                 Scrite.document.screenplay.removeSceneElements(item.element.scene)
             })
-            selection.clear()
+            root.selection.clear()
             root.ensureItemVisibleRequest(firstItem)
         }
     }
@@ -155,7 +169,7 @@ VclMenu {
 
         sceneGroup: _sceneGroup
 
-        onToggled: Runtime.execLater(selection, 250, function() { selection.refit() })
+        onToggled: Runtime.execLater(root.selection, 250, function() { root.selection.refit() })
     }
 
     VclMenuItem {
@@ -183,7 +197,7 @@ VclMenu {
     onAboutToShow: {
         _sceneGroup.clearScenes()
 
-        let items = selection.items
+        let items = root.selection.items
         items.forEach( function(item) {
             _sceneGroup.addScene(item.element.scene)
         })

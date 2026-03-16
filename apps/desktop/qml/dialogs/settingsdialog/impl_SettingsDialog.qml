@@ -41,7 +41,7 @@ VclDialog {
         Component.onCompleted: {
             if(root.activeTab !== "") {
                 for(let i=0; i<_tabBar.count; i++) {
-                    const tab = _tabBar.itemAt(i)
+                    const tab = _tabBar.itemAt(i) as TabButton
                     if(tab.text === root.activeTab) {
                         _tabBar.currentIndex = i
                         break
@@ -95,7 +95,7 @@ VclDialog {
                 property int nextIndex: (_tabBar.currentIndex+1)%_tabBar.count
                 shortcut: ActionHub.applicationOptions.find("tabRight").shortcut
 
-                onTriggered: (source) => {
+                onTriggered: () => {
                     _tabBar.setCurrentIndex(nextIndex)
                 }
             }
@@ -104,7 +104,7 @@ VclDialog {
                 property int prevIndex: (_tabBar.currentIndex-1) < 0 ? _tabBar.count-1 : (_tabBar.currentIndex-1)
                 shortcut: ActionHub.applicationOptions.find("tabLeft").shortcut
 
-                onTriggered: (source) => {
+                onTriggered: () => {
                     _tabBar.setCurrentIndex(prevIndex)
                 }
             }

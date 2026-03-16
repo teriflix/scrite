@@ -106,7 +106,7 @@ Item {
 
                     VclLabel {
                         width: parent.width
-                        text: propertyInfo.title
+                        text: _editorDelegate.propertyInfo.title
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         font.bold: true
                     }
@@ -211,25 +211,27 @@ Item {
             Rectangle {
                 width: 30; height: 30
                 anchors.verticalCenter: parent.verticalCenter
-                color: propertyValue
+                color: _colorEditor.propertyValue
                 border { width: 1; color: "black" }
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: colorMenu.show()
+
+                    onClicked: _colorMenu.show()
                 }
 
                 MenuLoader {
-                    id: colorMenu
+                    id: _colorMenu
+
                     anchors.top: parent.bottom
                     anchors.left: parent.left
 
                     menu: VclMenu {
                         ColorMenu {
                             title: "Standard Colors"
-                            onMenuItemClicked: {
-                                colorMenu.close()
-                                changePropertyValue(color)
+                            onMenuItemClicked: (color) => {
+                                _colorMenu.close()
+                                _colorEditor.changePropertyValue(color)
                             }
                         }
 
@@ -238,9 +240,9 @@ Item {
                         VclMenuItem {
                             text: "Custom Color"
                             onClicked: {
-                                var newColor = Color.pick(propertyValue)
-                                changePropertyValue( "" + newColor )
-                                colorMenu.close()
+                                var newColor = Color.pick(_colorEditor.propertyValue)
+                                _colorEditor.changePropertyValue( "" + newColor )
+                                _colorMenu.close()
                             }
                         }
                     }
@@ -249,7 +251,7 @@ Item {
 
             VclLabel {
                 anchors.verticalCenter: parent.verticalCenter
-                text: propertyValue
+                text: _colorEditor.propertyValue
                 font.capitalization: Font.AllUppercase
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
@@ -267,12 +269,12 @@ Item {
             function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
 
             SpinBox {
-                value: propertyValue
-                from: propertyInfo.min
-                to: propertyInfo.max
-                stepSize: propertyInfo.step
+                value: _numberEditor.propertyValue
+                from: _numberEditor.propertyInfo.min
+                to: _numberEditor.propertyInfo.max
+                stepSize: _numberEditor.propertyInfo.step
                 editable: true
-                onValueModified: changePropertyValue(value)
+                onValueModified: _numberEditor.changePropertyValue(value)
             }
         }
     }
@@ -365,17 +367,19 @@ Item {
             function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
 
             TextField {
-                id: urlField
-                text: propertyValue
-                onAccepted: changePropertyValue(text)
-                placeholderText: "Enter URL and press " + (Platform.isMacOSDesktop ? "Return" : "Enter") + " key to set."
+                id: _urlField
+
                 width: parent.width
+                text: _urlEditor.propertyValue
+                placeholderText: "Enter URL and press " + (Platform.isMacOSDesktop ? "Return" : "Enter") + " key to set."
+
+                onAccepted: _urlEditor.changePropertyValue(text)
             }
 
             VclLabel {
                 width: parent.width
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize-1
-                visible: propertyValue != urlField.text
+                visible: _urlEditor.propertyValue != _urlField.text
                 text: "Press " + (Platform.isMacOSDesktop ? "Return" : "Enter") + " key to set."
             }
         }
@@ -407,7 +411,7 @@ Item {
 
             onClicked: FontSelectionDialog.launchWithTitle("Select a font for root.annotation", (family) => {
                                                                if(family !== "")
-                                                                   changePropertyValue(family)
+                                                                   _fontFamilyEditor.changePropertyValue(family)
                                                            }, propertyValue)
         }
     }
@@ -436,14 +440,14 @@ Item {
                     font.bold: index === 0
                     font.italic: index === 1
                     font.underline: index === 2
-                    checked: propertyValue.indexOf(modelData) >= 0
+                    checked: _fontStyleEditor.propertyValue.indexOf(modelData) >= 0
                     onToggled: {
-                        var pv = Array.isArray(propertyValue) ? propertyValue : []
+                        var pv = Array.isArray(_fontStyleEditor.propertyValue) ? _fontStyleEditor.propertyValue : []
                         if(checked)
                             pv.push(modelData)
                         else
-                            pv.splice(propertyValue.indexOf(modelData), 1)
-                        changePropertyValue(pv)
+                            pv.splice(_fontStyleEditor.propertyValue.indexOf(modelData), 1)
+                        _fontStyleEditor.changePropertyValue(pv)
                     }
                 }
             }
@@ -471,8 +475,8 @@ Item {
 
                     text: modelData
                     font.capitalization: Font.Capitalize
-                    checked: modelData === propertyValue
-                    onToggled: changePropertyValue(modelData)
+                    checked: modelData === _hAlignEditor.propertyValue
+                    onToggled: _hAlignEditor.changePropertyValue(modelData)
                 }
             }
         }
@@ -482,6 +486,8 @@ Item {
         id: _vAlignEditorComponent
 
         Row {
+            id: _vAlignEditor
+
             property var propertyInfo: parent.propertyInfo
             property var propertyValue: parent.propertyValue
             function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
@@ -497,8 +503,8 @@ Item {
 
                     text: modelData
                     font.capitalization: Font.Capitalize
-                    checked: modelData === propertyValue
-                    onToggled: changePropertyValue(modelData)
+                    checked: modelData === _vAlignEditor.propertyValue
+                    onToggled: _vAlignEditor.changePropertyValue(modelData)
                 }
             }
         }
@@ -519,17 +525,17 @@ Item {
             border.width: 1
             border.color: Runtime.colors.primary.borderColor
 
-            VclFileDialog {
+            FileDialog {
                 id: _imageEditorFileDialog
 
                 nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
 
                 onAccepted: {
                     if(selectedFile !== "") {
-                        if(propertyValue != "")
-                            root.annotation.removeImage(propertyValue)
+                        if(_imageEditor.propertyValue != "")
+                            root.annotation.removeImage(_imageEditor.propertyValue)
                         var newImageName = root.annotation.addImage(Url.toPath(selectedFile))
-                        changePropertyValue(newImageName)
+                        _imageEditor.changePropertyValue(newImageName)
                     }
                 }
             }
@@ -539,13 +545,13 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 1
                 fillMode: Image.PreserveAspectFit
-                source: root.annotation.imageUrl(propertyValue)
+                source: root.annotation.imageUrl(_imageEditor.propertyValue)
                 asynchronous: true
-            }
 
-            BusyIcon {
-                anchors.centerIn: parent
-                running: parent.status === Image.Loading
+                BusyIcon {
+                    anchors.centerIn: parent
+                    running: parent.status === Image.Loading
+                }
             }
 
             MouseArea {
@@ -559,7 +565,7 @@ Item {
                 spacing: 20
 
                 VclLabel {
-                    text: propertyValue == "" ? "Set" : "Change"
+                    text: _imageEditor.propertyValue == "" ? "Set" : "Change"
                     color: "blue"
                     font.underline: true
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -575,16 +581,16 @@ Item {
                     text: "Remove"
                     color: "blue"
                     font.underline: true
-                    visible: propertyValue != ""
+                    visible: _imageEditor.propertyValue != ""
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            if(propertyValue != "")
-                                root.annotation.removeImage(propertyValue)
-                            changePropertyValue("")
+                            if(_imageEditor.propertyValue != "")
+                                root.annotation.removeImage(_imageEditor.propertyValue)
+                            _imageEditor.changePropertyValue("")
                         }
                     }
                 }

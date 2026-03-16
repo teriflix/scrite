@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
@@ -21,12 +23,12 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
+import "../"
+import "../helpers"
+import "../dialogs"
 import "../../globals"
 import "../../helpers"
 import "../../controls"
-import ".."
-import "../helpers"
-import "../dialogs"
 
 Item {
     id: root

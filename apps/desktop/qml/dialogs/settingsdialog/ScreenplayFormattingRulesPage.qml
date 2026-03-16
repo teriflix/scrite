@@ -80,9 +80,9 @@ Item {
             VclComboBox {
                 id: _languageComboBox
 
-                Layout.preferredWidth: _private.lanugageModel.longestKeyWidth
+                Layout.preferredWidth: _private.languageModel.longestKeyWidth
 
-                model: _private.lanugageModel
+                model: _private.languageModel
                 enabled: LanguageEngine.handleLanguageSwitch
 
                 textRole: "languageName"
@@ -566,7 +566,7 @@ Item {
             Layout.fillWidth: true
             Layout.topMargin: 20
 
-            readonly property Action action: ActionHub.languageOptions.find("handleLanguageSwitch")
+            readonly property Action action: ActionHub.languageOptions.find("handleLanguageSwitch") as Action
 
             visible: !LanguageEngine.handleLanguageSwitch
             wrapMode: Text.WordWrap
@@ -601,13 +601,6 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
 
                     spacing: 5
-
-                    VclCheckBox {
-                        id: _copyFontFamilyAttrib
-                        text: "Font Family: " + _private.displayElementFormat.font.family
-                        padding: 0
-                        checked: false
-                    }
 
                     VclCheckBox {
                         id: _copyFontSizeAttrib
@@ -702,7 +695,6 @@ Item {
                     VclButton {
                         text: "Select All"
                         onClicked: {
-                            _copyFontFamilyAttrib.checked = true
                             _copyFontSizeAttrib.checked = true
                             _copyFontStyleAttrib.checked = true
                             _copyLineHeightAttrib.checked = true
@@ -715,7 +707,6 @@ Item {
                     VclButton {
                         text: "Unselect All"
                         onClicked: {
-                            _copyFontFamilyAttrib.checked = false
                             _copyFontSizeAttrib.checked = false
                             _copyFontStyleAttrib.checked = false
                             _copyLineHeightAttrib.checked = false
@@ -733,8 +724,6 @@ Item {
                                 _private.printElementFormat.applyToAll(props)
                             }
 
-                            if(_copyFontFamilyAttrib.checked)
-                                applyToAll(SceneElementFormat.FontFamily)
                             if(_copyFontSizeAttrib.checked)
                                 applyToAll(SceneElementFormat.FontSize)
                             if(_copyFontStyleAttrib.checked)
@@ -759,7 +748,7 @@ Item {
     QtObject {
         id: _private
 
-        readonly property ListModel lanugageModel: ListModel {
+        readonly property ListModel languageModel: ListModel {
             property int longestKeyWidth: -1
 
             Component.onCompleted: {

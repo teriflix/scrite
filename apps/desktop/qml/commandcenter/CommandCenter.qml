@@ -164,7 +164,7 @@ Popup {
                         anchors.fill: parent
 
                         onClicked: {
-                            _private.trigger(qmlAction)
+                            _private.trigger(_delegate.qmlAction)
                             root.close()
                         }
                     }
@@ -182,7 +182,7 @@ Popup {
                             Layout.preferredWidth: _nameLabel.height * 0.5
 
                             fillMode: Image.PreserveAspectFit
-                            source: qmlAction.icon.source !== "" ? qmlAction.icon.source : "qrc:/icons/content/blank.png"
+                            source: _delegate.qmlAction.icon.source !== "" ? _delegate.qmlAction.icon.source : "qrc:/icons/content/blank.png"
                         }
 
                         ColumnLayout {
@@ -202,7 +202,7 @@ Popup {
                                 color: Runtime.colors.primary.regular.text
                                 elide: Text.ElideRight
                                 font: Runtime.idealFontMetrics.font
-                                text: "<b>" + actionManager.title + "</b>: " + qmlAction.text + (qmlAction.checkable & qmlAction.checked ? " ✔" : "")
+                                text: "<b>" + _delegate.actionManager.title + "</b>: " + _delegate.qmlAction.text + (_delegate.qmlAction.checkable & _delegate.qmlAction.checked ? " ✔" : "")
                             }
 
                             VclText {
@@ -219,7 +219,7 @@ Popup {
                                 elide: Text.ElideRight
                                 font: Runtime.minimumFontMetrics.font
                                 maximumLineCount: 3
-                                text: qmlAction.tooltip !== undefined ? qmlAction.tooltip : ""
+                                text: _delegate.qmlAction.tooltip !== undefined ? _delegate.qmlAction.tooltip : ""
                                 visible: text !== ""
                                 wrapMode: Text.WordWrap
                             }
@@ -231,13 +231,13 @@ Popup {
                             Layout.preferredWidth: _delegateLayout.width * 0.25
 
                             fontMetrics: Runtime.minimumShortcutFontMetrics
-                            description: actionManager.title + ": " + qmlAction.text
-                            enabled: shortcutIsEditable
-                            placeholderText: shortcutIsEditable ? "Assign" : ""
-                            portableShortcut: qmlAction.shortcut !== undefined ? qmlAction.shortcut : ""
+                            description: _delegate.actionManager.title + ": " + _delegate.qmlAction.text
+                            enabled: _delegate.shortcutIsEditable
+                            placeholderText: _delegate.shortcutIsEditable ? "Assign" : ""
+                            portableShortcut: _delegate.qmlAction.shortcut !== undefined ? _delegate.qmlAction.shortcut : ""
 
                             onShortcutEdited: (newShortcut) => {
-                                ActionHub.assignShortcut(qmlAction, newShortcut)
+                                ActionHub.assignShortcut(_delegate.qmlAction, newShortcut)
                             }
                         }
                     }
@@ -255,7 +255,7 @@ Popup {
     ActionHandler {
         action: ActionHub.appOptions.find("commandCenter")
 
-        onTriggered: (source) => {
+        onTriggered: () => {
             root.open()
         }
     }

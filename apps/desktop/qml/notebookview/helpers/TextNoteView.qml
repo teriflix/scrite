@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Controls
@@ -62,7 +64,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
 
             placeholderText: "Heading"
-            text: note ? note.title : ""
+            text: root.note ? root.note.title : ""
             width: parent.width >= root.maxTextAreaSize+20 ? root.maxTextAreaSize : parent.width-20
             wrapMode: Text.WordWrap
 
@@ -70,8 +72,8 @@ Item {
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
 
             onTextChanged: {
-                if(note)
-                    note.title = text
+                if(root.note)
+                    root.note.title = text
             }
 
             onActiveFocusChanged: {
@@ -93,12 +95,12 @@ Item {
             lod: Runtime.notebookSettings.richTextNotesEnabled ? LodLoader.LOD.High : LodLoader.LOD.Low
             resetHeightBeforeLodChange: false
             resetWidthBeforeLodChange: false
-            sanctioned: note
+            sanctioned: root.note
 
             lowDetailComponent: FlickableTextArea {
                 DeltaDocument {
                     id: _noteContent
-                    content: note.content
+                    content: root.note.content
                 }
 
                 text: _noteContent.plainText
@@ -111,7 +113,7 @@ Item {
                     opacity: 0.15
                 }
 
-                onTextChanged: if(textArea.activeFocus) note.content = text
+                onTextChanged: if(textArea.activeFocus) root.note.content = text
 
                 function assumeFocus() {
                     textArea.forceActiveFocus()
@@ -127,10 +129,10 @@ Item {
                 placeholderText: "Content"
                 tabSequenceIndex: 1
                 tabSequenceManager: _tabManager
-                text: note.content
+                text: root.note.content
 
                 onTextChanged: {
-                    note.content = text
+                    root.note.content = text
                 }
             }
         }
@@ -149,7 +151,7 @@ Item {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
 
-        attachments: note ? note.attachments : null
+        attachments: root.note ? root.note.attachments : null
         orientation: ListView.Horizontal
     }
 
@@ -159,7 +161,7 @@ Item {
         anchors.fill: parent
 
         allowMultiple: true
-        target: note ? note.attachments : null
+        target: root.note ? root.note.attachments : null
     }
 
     onNoteChanged: {

@@ -84,7 +84,7 @@ AbstractScenePartEditor {
         action: ActionHub.editOptions.find("addMuteCharacter")
         enabled: root.isCurrent && !_charactersInput.readOnly && !_charactersInput.acceptingNewText
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          _charactersInput.acceptNewText()
                      }
     }
@@ -92,7 +92,7 @@ AbstractScenePartEditor {
     QtObject {
         id: _private
 
-        readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent")
+        readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent") as Action
 
         property bool captureInvisibleCharacters: Runtime.screenplayEditorSettings.captureInvisibleCharacters
 
@@ -107,7 +107,7 @@ AbstractScenePartEditor {
         }
 
         function popupCharacterMenu(characterName, parent) {
-            let menu = characterMenu.createObject(parent, {"characterName": characterName})
+            let menu = characterMenu.createObject(parent, {"characterName": characterName}) as ScreenplayEditorCharacterMenu
             menu.closed.connect(menu.destroy)
             menu.popup()
             return menu

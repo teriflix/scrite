@@ -16,8 +16,6 @@
 pragma Singleton
 
 import QtQuick
-import QtCore
-import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -107,7 +105,7 @@ Item {
 
     // App-wide font-metrics
     readonly property FontMetrics minimumFontMetrics: FontMetrics {
-        font.pointSize: idealFontMetrics.font.pointSize-2
+        font.pointSize: root.idealFontMetrics.font.pointSize-2
     }
 
     readonly property FontMetrics idealFontMetrics: FontMetrics {
@@ -115,7 +113,7 @@ Item {
     }
 
     readonly property FontMetrics shortcutFontMetrics: FontMetrics {
-        font.pointSize: idealFontMetrics.font.pointSize
+        font.pointSize: root.idealFontMetrics.font.pointSize
         font.family: {
             // We need ZERO and the letter O to be rendered distinctly
             // We also need small-L and capital-I and digit-1 to look disctinct.
@@ -129,8 +127,8 @@ Item {
     }
 
     readonly property FontMetrics minimumShortcutFontMetrics: FontMetrics {
-        font.pointSize: minimumFontMetrics.font.pointSize
-        font.family: shortcutFontMetrics.font.family
+        font.pointSize: root.minimumFontMetrics.font.pointSize
+        font.family: root.shortcutFontMetrics.font.family
     }
 
     readonly property FontMetrics sceneEditorFontMetrics: FontMetrics {
@@ -163,7 +161,7 @@ Item {
             // if(Scrite.document.sessionId !== sessionId)
             //     return null
 
-            if(mainWindowTab !== Runtime.MainWindowTab.ScreenplayTab && Scrite.document.screenplay.currentElementIndex < 0) {
+            if(root.mainWindowTab !== Runtime.MainWindowTab.ScreenplayTab && Scrite.document.screenplay.currentElementIndex < 0) {
                 let index = Scrite.document.structure.currentElementIndex
                 let element = Scrite.document.structure.elementAt(index)
                 if(element) {
@@ -271,7 +269,7 @@ Item {
     }
 
     function execLater(contextObject, delay, callback, args) {
-        let timer = Qt.createQmlObject("import QtQml 2.15; Timer { }", contextObject ? contextObject : root);
+        let timer = Qt.createQmlObject("import QtQml; Timer { }", contextObject ? contextObject : root);
         timer.interval = delay === undefined ? 100 : delay
         timer.repeat = false
         timer.triggered.connect(() => {
@@ -293,7 +291,7 @@ Item {
         if(!parent || !type || !geometry)
             return null
 
-        let annotObject = Qt.createQmlObject("import io.scrite.components 1.0; Annotation { objectName: \"ica\" }", parent)
+        let annotObject = Qt.createQmlObject("import io.scrite.components; Annotation { objectName: \"ica\" }", parent)
         let annot = annotObject as Annotation
         annot.type = type
         annot.geometry = geometry
@@ -446,7 +444,7 @@ Item {
 
         function onLoggedInChanged() {
             if(Scrite.user.loggedIn) {
-                let api = Qt.createQmlObject("import io.scrite.components 1.0; UserHelpTipsRestApiCall {}", root)
+                let api = Qt.createQmlObject("import io.scrite.components; UserHelpTipsRestApiCall {}", root)
                 api.finished.connect( () => {
                                           root.helpTips = api.helpTips
                                           api.destroy()

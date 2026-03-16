@@ -30,6 +30,9 @@ import "../controls"
 ListView {
     id: root
 
+    required property int visibleTrackCount
+    required property bool dragDropEnabled
+    required property real zoomLevel
     required property DropArea mainDropArea
 
     readonly property real omittedDelegateWidth: 34
@@ -121,6 +124,7 @@ ListView {
         mainDropArea: root.mainDropArea
         screenplayElementList: root
         dropAreaHighlightColor: root.dropAreaHighlightColor
+        dragDropEnabled: root.dragDropEnabled
 
         onDropSceneAtRequest: (source, index) => { root.dropSceneAtRequest(source,index) }
     }
@@ -128,6 +132,7 @@ ListView {
     delegate: TimelineViewDelegate {
         showCursor: root.showCursor
         screenplayElementList: root
+        zoomLevel: root.zoomLevel
 
         onEditorRequest: root.editorRequest()
         onDropSceneAtRequest: (source, index) => { root.dropSceneAtRequest(source,index) }
@@ -146,7 +151,7 @@ ListView {
         function removeCurrentElement() {
             if(Scrite.document.loading)
                 return
-            let cidx = currentIndex
+            let cidx = root.currentIndex
             if(cidx < 0)
                 return
             let celement = Scrite.document.screenplay.elementAt(cidx)
@@ -155,10 +160,10 @@ ListView {
         }
 
         function updateCacheBuffer() {
-            if(_screenplayTracksView.trackCount > 0)
-                cacheBuffer = contentWidth
+            if(root.visibleTrackCount > 0)
+                root.cacheBuffer = root.contentWidth
             else
-                cacheBuffer = 0
+                root.cacheBuffer = 0
         }
 
         property real contentOffset: 0

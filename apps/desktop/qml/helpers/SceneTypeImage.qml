@@ -29,7 +29,7 @@ Image {
 
     ToolTipPopup {
         text: {
-            switch(sceneType) {
+            switch(root.sceneType) {
             case Scene.Song: return "This is a Song scene."
             case Scene.Action: return "This is a Action scene."
             case Scene.Montage: return "This is a Montage scene."
@@ -37,7 +37,7 @@ Image {
             }
             return ""
         }
-        visible: _mouseArea.containsMouse && showTooltip
+        visible: _mouseArea.containsMouse && root.showTooltip
     }
 
     width: 32

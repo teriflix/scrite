@@ -41,7 +41,7 @@ Item {
         if(!root.enabled)
         return
 
-        if(textEditorHasCursorInterface && textEditor.readOnly)
+        if(root.textEditorHasCursorInterface && root.textEditor.readOnly)
         return
 
         if(event.key === Qt.Key_F3) {
@@ -70,18 +70,18 @@ Item {
                     if(!root.enabled)
                     return
 
-                    if(textEditorHasCursorInterface) {
-                        if(textEditor.readOnly)
+                    if(root.textEditorHasCursorInterface) {
+                        if(root.textEditor.readOnly)
                         return
 
-                        var cp = textEditor.cursorPosition
-                        textEditor.insert(textEditor.cursorPosition, text)
-                        Utils.execLater(textEditor, 250, function() { textEditor.cursorPosition = cp + text.length })
+                        const cp = root.textEditor.cursorPosition
+                        root.textEditor.insert(root.textEditor.cursorPosition, text)
+                        Utils.execLater(root.textEditor, 250, function() { root.textEditor.cursorPosition = cp + text.length })
                         _symbolMenu.close()
-                        textEditor.forceActiveFocus()
+                        root.textEditor.forceActiveFocus()
                     } else {
                         _symbolMenu.close()
-                        symbolSelected(text)
+                        root.symbolSelected(text)
                     }
                 }
             }

@@ -73,11 +73,15 @@ QtObject {
         Runtime.helpNotificationSettings.markTipAsShown(_private.resolvedTipName)
     }
 
-    readonly property QtObject _private: QtObject {
-        property var helpTip: Runtime.helpTips === undefined || resolvedTipName === "" ? undefined : Runtime.helpTips[resolvedTipName]
+    component Private: QtObject {
+        property var helpTip: undefined
+        property bool tipShown: false
+        property string resolvedTipName
+    }
 
-        property bool tipShown: Runtime.helpNotificationSettings.isTipShown(resolvedTipName)
-
-        property string resolvedTipName: root.tipName + root.version
+    readonly property Private _private: Private {
+        helpTip: Runtime.helpTips === undefined || resolvedTipName === "" ? undefined : Runtime.helpTips[resolvedTipName]
+        tipShown: Runtime.helpNotificationSettings.isTipShown(resolvedTipName)
+        resolvedTipName: root.tipName + root.version
     }
 }

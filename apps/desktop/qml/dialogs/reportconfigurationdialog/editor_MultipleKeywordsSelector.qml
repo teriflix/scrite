@@ -39,7 +39,7 @@ ColumnLayout {
 
         wrapMode: Text.WordWrap
 
-        text: fieldInfo.label
+        text: root.fieldInfo.label
     }
 
     VclLabel {
@@ -49,7 +49,7 @@ ColumnLayout {
         font.italic: true
         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
-        text: fieldInfo.note
+        text: root.fieldInfo.note
     }
 
     VclLabel {
@@ -91,12 +91,13 @@ ColumnLayout {
                 Repeater {
                     id: _keywordsView
 
-                    property var keywords: report.getConfigurationValue(fieldInfo.name)
+                    property var keywords: root.report.getConfigurationValue(root.fieldInfo.name)
 
                     model: Scrite.document.structure.sceneTags
 
                     delegate: VclCheckBox {
                         id: _keywordDelegate
+
                         required property int index
                         required property string modelData
 
@@ -112,7 +113,7 @@ ColumnLayout {
                             else
                                 keywords.splice(keywords.indexOf(_keywordDelegate.modelData), 1)
 
-                            if(report.setConfigurationValue(fieldInfo.name, keywords))
+                            if(root.report.setConfigurationValue(root.fieldInfo.name, keywords))
                                 _keywordsView.keywords = keywords
                         }
                     }

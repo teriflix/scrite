@@ -75,6 +75,8 @@ Item {
             }
 
             delegate: VclLabel {
+                id: _completionDelegate
+
                 required property int index
                 required property string completionString
 
@@ -95,15 +97,15 @@ Item {
                     hoverEnabled: singleClickAutoComplete
 
                     onClicked: {
-                        if(singleClickAutoComplete || _private.completionModel.currentRow === index)
+                        if(singleClickAutoComplete || _private.completionModel.currentRow === _completionDelegate.index)
                             _private.completionModel.requestCompletion( _private.completionModel.currentCompletion )
                         else
-                            _private.completionModel.currentRow = index
+                            _private.completionModel.currentRow = _completionDelegate.index
                     }
 
                     onDoubleClicked: _private.completionModel.requestCompletion( _private.completionModel.currentCompletion )
 
-                    onContainsMouseChanged: if(singleClickAutoComplete) _private.completionModel.currentRow = index
+                    onContainsMouseChanged: if(singleClickAutoComplete) _private.completionModel.currentRow = _completionDelegate.index
                 }
             }
         }
@@ -116,7 +118,7 @@ Item {
             to: true
             from: false
             delay: 250
-            trackChangesOn: sceneTextEditor.cursorRectangle.y
+            trackChangesOn: root.sceneTextEditor.cursorRectangle.y
         }
 
         readonly property CompletionModel completionModel: CompletionModel {

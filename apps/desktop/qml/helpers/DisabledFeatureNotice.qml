@@ -92,7 +92,7 @@ Rectangle {
                 VclLabel {
                     Layout.fillWidth: true
 
-                    text: featureName
+                    text: root.featureName
                     visible: text !== ""
                     wrapMode: Text.WordWrap
 

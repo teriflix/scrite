@@ -14,12 +14,12 @@
 ****************************************************************************/
 
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQml
 import QtQuick
 
 import io.scrite.components
-
 
 import "../../globals"
 import "../../helpers"
@@ -87,7 +87,7 @@ QtObject {
             width: _image.width
             height: Math.max(_d.height - _image.height - 10, 0)
 
-            text: _image.isSet ? _d.annotation.attributes.caption : (currentAnnotationItem === _d ? "Set an image" : "Click to set an image")
+            text: _image.isSet ? _d.annotation.attributes.caption : (_d.currentAnnotationItem === _d ? "Set an image" : "Click to set an image")
             color: _d.annotation.attributes.captionColor
             elide: Text.ElideRight
             visible: height > 0

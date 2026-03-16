@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
@@ -126,7 +128,7 @@ AbstractNotebookPage {
         enabled: true
         tooltip: "Export current scene report as a PDF or ODT."
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          let generator = Scrite.document.createReportGenerator("Notebook Report")
                          generator.section = _private.scene
                          ReportConfigurationDialog.launch(generator)
@@ -177,7 +179,7 @@ AbstractNotebookPage {
         }
 
         function popupNewNoteMenu(source) {
-            let menu = newNoteMenu.createObject(source)
+            let menu = newNoteMenu.createObject(source) as NewNoteMenu
             menu.aboutToHide.connect(menu.destroy)
             menu.popup()
             return menu
@@ -192,7 +194,7 @@ AbstractNotebookPage {
         }
 
         function popupColorMenu(source) {
-            let menu = colorMenu.createObject(source)
+            let menu = colorMenu.createObject(source) as ColorMenu
             menu.aboutToHide.connect(menu.destroy)
             menu.popup()
             return menu

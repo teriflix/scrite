@@ -32,6 +32,8 @@
   5. Handles language change shortcuts, provided handleLanguageShortcuts is set to true.
   */
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
@@ -87,7 +89,7 @@ Dialog {
         source: "qrc:/icons/action/dialog_close_button.png"
         smooth: true; mipmap: true
         enabled: visible
-        visible: titleBarCloseButtonVisible
+        visible: root.titleBarCloseButtonVisible
 
         MouseArea {
             anchors.fill: parent
@@ -148,16 +150,18 @@ Dialog {
             Loader {
                 id: _contentItemLoader
 
-                property real itemImplicitWidth: item ? item.implicitWidth : 0
-                property real itemImplicitHeight: item ? item.implicitHeight : 0
+                property Item visualItem: item as Item
+
+                property real itemImplicitWidth: visualItem ? visualItem.implicitWidth : 0
+                property real itemImplicitHeight: visualItem ? visualItem.implicitHeight : 0
 
                 width: (itemImplicitWidth === 0) ? _contentItemScroll.width : Math.max(_contentItemScroll.width,itemImplicitWidth)
                 height: (itemImplicitHeight === 0) ? _contentItemScroll.height : Math.max(_contentItemScroll.height,itemImplicitHeight)
 
                 active: false
-                sourceComponent: content
+                sourceComponent: root.content
 
-                onLoaded: item.focus = true
+                onLoaded: visualItem.focus = true
 
                 Connections {
                     target: root
@@ -202,7 +206,7 @@ Dialog {
 
             Loader {
                 active: root.visible
-                sourceComponent: titleBarButtons
+                sourceComponent: root.titleBarButtons
 
                 Layout.alignment: Qt.AlignVCenter
                 Layout.rightMargin: 8
@@ -221,7 +225,7 @@ Dialog {
 
             width: parent.width
 
-            sourceComponent: bottomBar
+            sourceComponent: root.bottomBar
         }
     }
 
@@ -260,15 +264,17 @@ Dialog {
             model: root.visible && root.modal && root.handleLanguageShortcuts ? LanguageEngine.supportedLanguages : 0
 
             delegate: Item {
+                id: _languageDelegate
+
                 required property int index
                 required property var language // This is of type Language, but we have to use var here.
                 // You cannot use Q_GADGET struct names as type names in QML
                 // that privilege is only reserved for QObject types.
 
                 Shortcut {
-                    sequence: language.shortcut()
+                    sequence: _languageDelegate.language.shortcut()
 
-                    onActivated: Runtime.language.setActiveCode(language.code)
+                    onActivated: Runtime.language.setActiveCode(_languageDelegate.language.code)
                 }
             }
         }

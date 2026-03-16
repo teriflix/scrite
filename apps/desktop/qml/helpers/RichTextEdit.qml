@@ -61,8 +61,8 @@ Item {
         property bool contentUpdatedFromQuill: false
 
         // Focus handling
-        TabSequenceItem.manager: tabSequenceManager
-        TabSequenceItem.sequence: tabSequenceIndex
+        TabSequenceItem.manager: root.tabSequenceManager
+        TabSequenceItem.sequence: root.tabSequenceIndex
         TabSequenceItem.onAboutToReceiveFocus: {
             Qt.callLater( () => {
                             _scriteWebChannelObject.requestFocus(true)
@@ -70,8 +70,8 @@ Item {
         }
 
         Component.onCompleted: {
-            font.family = "Verdana"
-            font.pointSize = Qt.binding( () => { return Runtime.idealFontMetrics.font.pointSize } )
+            root.font.family = "Verdana"
+            root.font.pointSize = Qt.binding( () => { return Runtime.idealFontMetrics.font.pointSize } )
 
             if(!Runtime.richTextEditorSettings.languageNoteShown) {
                 Runtime.richTextEditorSettings.languageNoteShown = true
@@ -90,14 +90,14 @@ Item {
             action: ActionHub.editOptions.find("undo")
             enabled: !_webEngineView.readOnly && _scriteWebChannelObject.focus && _webEngineView.activeFocus
 
-            onTriggered: (source) => { _scriteWebChannelObject.requestUndo() }
+            onTriggered: () => { _scriteWebChannelObject.requestUndo() }
         }
 
         ActionHandler {
             action: ActionHub.editOptions.find("redo")
             enabled: !_webEngineView.readOnly && _scriteWebChannelObject.focus && _webEngineView.activeFocus
 
-            onTriggered: (source) => { _scriteWebChannelObject.requestRedo() }
+            onTriggered: () => { _scriteWebChannelObject.requestRedo() }
         }
 
         // Send messages to the HTML side.

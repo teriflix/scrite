@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Controls
@@ -42,7 +44,7 @@ AbstractNotebookPage {
         enabled: true
         tooltip: "Export current text note as a PDF or ODT."
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          let generator = Scrite.document.createReportGenerator("Notebook Report")
                          generator.section = _private.note
                          ReportConfigurationDialog.launch(generator)
@@ -55,7 +57,7 @@ AbstractNotebookPage {
         enabled: true
         tooltip: "Delete current text note."
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          root.askDeleteConfirmation("Are you sure you want to delete this text note?", confirmDeleteLater)
                      }
 
@@ -112,7 +114,7 @@ AbstractNotebookPage {
         }
 
         function popupNewNoteMenu(source) {
-            let menu = newNoteMenu.createObject(source)
+            let menu = newNoteMenu.createObject(source) as NewNoteMenu
             menu.aboutToHide.connect(menu.destroy)
             menu.popup()
             return menu
@@ -127,7 +129,7 @@ AbstractNotebookPage {
         }
 
         function popupColorMenu(source) {
-            let menu = colorMenu.createObject(source)
+            let menu = colorMenu.createObject(source) as ColorMenu
             menu.aboutToHide.connect(menu.destroy)
             menu.popup()
             return menu

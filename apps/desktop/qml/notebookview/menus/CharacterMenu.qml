@@ -41,7 +41,7 @@ VclMenu {
     ColorMenu {
         title: "Character Color"
 
-        onMenuItemClicked: {
+        onMenuItemClicked: (color) => {
             root.character.color = color
             root.close()
         }

@@ -28,7 +28,7 @@ Item {
     property color selectedColor: Runtime.colors.transparent
     property alias hoverEnabled: _cbMouseArea.hoverEnabled
     property alias containsMouse: _cbMouseArea.containsMouse
-    property bool _colorsMenuVisible: _colorsMenuLoader.active
+    property bool  colorsMenuVisible: _colorsMenuLoader.active
 
     signal colorPicked(color newColor)
 
@@ -107,7 +107,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: colorPicked(Runtime.colors.transparent)
+                onClicked: root.colorPicked(Runtime.colors.transparent)
             }
         }
 
@@ -133,7 +133,7 @@ Item {
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: colorPicked(_delegate.modelData)
+                    onClicked: root.colorPicked(_delegate.modelData)
                 }
             }
         }

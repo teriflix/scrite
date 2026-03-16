@@ -55,15 +55,15 @@ Item {
 
             placeholderText: "Title"
             tabItem: _description
-            text: note ? note.title : ""
+            text: root.note ? root.note.title : ""
             wrapMode: Text.WordWrap
 
             font.bold: true
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
 
             onTextChanged: {
-                if(note)
-                    note.title = text
+                if(root.note)
+                    root.note.title = text
             }
         }
 
@@ -75,14 +75,14 @@ Item {
             backTabItem: _title
             placeholderText: "Description"
             tabItem: _checkListView
-            text: note ? note.summary : ""
+            text: root.note ? root.note.summary : ""
             wrapMode: Text.WordWrap
 
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
             onTextChanged: {
-                if(note)
-                    note.summary = text
+                if(root.note)
+                    root.note.summary = text
             }
         }
 
@@ -135,7 +135,7 @@ Item {
                         target: _checkListView
 
                         function onAssumeFocusRequest(focusItemIndex, tabReason) {
-                            if(focusItemIndex === index)
+                            if(focusItemIndex === _delegate.index)
                                 _delegate.assumeFocus(tabReason)
                         }
                     }

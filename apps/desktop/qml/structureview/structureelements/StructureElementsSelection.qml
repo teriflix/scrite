@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 
@@ -40,7 +42,7 @@ AbstractSelection {
         if(!hasItems) {
             root.denyCanvasPreviewRequest()
             const rect = Scrite.document.structure.layoutElements(type)
-            Runtime.execLater(_selection, 1000, function() {
+            Runtime.execLater(root, 1000, function() {
                 root.zoomOneRequest()
                 root.allowCanvasPreviewRequest()
             })
@@ -82,12 +84,12 @@ AbstractSelection {
                                       }
     }
 
-    onMoveItem: {
+    onMoveItem: (item, dx, dy) => {
         item.x = item.x + dx
         item.y = item.y + dy
     }
 
-    onPlaceItem: {
+    onPlaceItem: (item) => {
         item.x = Scrite.document.structure.snapToGrid(item.x)
         item.y = Scrite.document.structure.snapToGrid(item.y)
     }

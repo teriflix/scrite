@@ -20,13 +20,13 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
     id: root
+    
     property var fieldInfo
     property AbstractExporter exporter
     property TabSequenceManager tabSequence
@@ -40,18 +40,18 @@ ColumnLayout {
         font.pointSize: Runtime.idealFontMetrics.font.pointSize
         font.capitalization: Font.Capitalize
 
-        text: fieldInfo.name
+        text: root.fieldInfo.name
     }
 
     VclTextField {
         Layout.fillWidth: true
         Layout.rightMargin: 30
 
-        TabSequenceItem.manager: tabSequence
+        TabSequenceItem.manager: root.tabSequence
 
         label: ""
 
-        placeholderText: fieldInfo.label
-        onTextChanged: exporter.setConfigurationValue(fieldInfo.name, text)
+        placeholderText: root.fieldInfo.label
+        onTextChanged: root.exporter.setConfigurationValue(root.fieldInfo.name, text)
     }
 }

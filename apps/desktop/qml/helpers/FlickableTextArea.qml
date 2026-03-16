@@ -104,7 +104,7 @@ Flickable {
             }
         ]
         SyntaxHighlighter.textDocument: textDocument
-        SyntaxHighlighter.textDocumentUndoRedoEnabled: undoRedoEnabled
+        SyntaxHighlighter.textDocumentUndoRedoEnabled: root.undoRedoEnabled
 
         LanguageTransliterator.popup: LanguageTransliteratorPopup {
             editorFont: _textArea.font
@@ -122,9 +122,9 @@ Flickable {
             _contextMenu.popup()
         }
 
-        TabSequenceItem.manager: tabSequenceManager
-        TabSequenceItem.enabled: tabSequenceEnabled
-        TabSequenceItem.sequence: tabSequenceIndex
+        TabSequenceItem.manager: root.tabSequenceManager
+        TabSequenceItem.enabled: root.tabSequenceEnabled
+        TabSequenceItem.sequence: root.tabSequenceIndex
 
         readOnly: Scrite.document.readOnly
         background: Item { }
@@ -141,14 +141,14 @@ Flickable {
             action: ActionHub.editOptions.find("undo")
             enabled: !_textArea.readOnly && _textArea.activeFocus && root.undoRedoEnabled && _textArea.canRedo
 
-            onTriggered: (source) => { _textArea.undo() }
+            onTriggered: () => { _textArea.undo() }
         }
 
         ActionHandler {
             action: ActionHub.editOptions.find("redo")
             enabled: !_textArea.readOnly && _textArea.activeFocus && root.undoRedoEnabled && _textArea.canRedo
 
-            onTriggered: (source) => { _textArea.redo() }
+            onTriggered: () => { _textArea.redo() }
         }
 
         TextAreaSpellingSuggestionsMenu {

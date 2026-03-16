@@ -13,13 +13,14 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
 import io.scrite.components
-
 
 import "../../globals"
 import "../../helpers"
@@ -53,7 +54,7 @@ Loader {
                 if(Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab &&
                   !Runtime.screenplayEditorSettings.screenplayEditorAddButtonsAnimationShown &&
                    root.screenplayAdapter.elementCount === 1) {
-                    let highlight = _private.footerButtonsHighlighterComponent.createObject(_footerButtons, {"uiElement": _buttonsLayout})
+                    let highlight = _private.footerButtonsHighlighterComponent.createObject(_footerButtons, {"uiElement": _buttonsLayout}) as UiElementHighlight
                     highlight.done.connect(highlight.destroy)
                 }
             }

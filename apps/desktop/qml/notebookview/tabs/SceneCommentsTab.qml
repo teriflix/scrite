@@ -35,7 +35,7 @@ Item {
     required property Scene scene
 
     EventFilter.events: [EventFilter.Wheel]
-    EventFilter.onFilter: {
+    EventFilter.onFilter: (object,event,result) => {
         EventFilter.forwardEventTo(_textArea)
         result.filter = true
         result.accepted = true

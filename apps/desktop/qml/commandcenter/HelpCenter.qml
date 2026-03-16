@@ -14,7 +14,6 @@
 ****************************************************************************/
 
 pragma ComponentBehavior: Bound
-
 pragma Singleton
 
 import QtQuick
@@ -176,7 +175,7 @@ Popup {
 
                             color: Runtime.colors.primary.regular.text
                             elide: Text.ElideRight
-                            text: fullTitle
+                            text: _delegate.fullTitle
                             font.bold: _helpText.length > 0
                             font.family: Runtime.idealFontMetrics.font.family
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -196,7 +195,7 @@ Popup {
                             elide: Text.ElideRight
                             font: Runtime.minimumFontMetrics.font
                             maximumLineCount: 3
-                            text: _private.searchIndex.highlightFilter(plainText, _helpText.text, 240)
+                            text: _private.searchIndex.highlightFilter(_delegate.plainText, _helpText.text, 240)
                             textFormat: Text.RichText
                             visible: text !== ""
                             wrapMode: Text.WordWrap
@@ -216,7 +215,7 @@ Popup {
     ActionHandler {
         action: ActionHub.appOptions.find("helpCenter")
 
-        onTriggered: (source) => {
+        onTriggered: () => {
             root.open()
         }
     }

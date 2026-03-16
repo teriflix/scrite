@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Window
@@ -86,14 +88,14 @@ Item {
     MouseArea {
         anchors.fill: parent
 
-        enabled: annotation.movable
+        enabled: root.annotation.movable
         cursorShape: Qt.SizeAllCursor
         hoverEnabled: true
         acceptedButtons: Qt.LeftButton|Qt.RightButton
         propagateComposedEvents: true
 
         drag.axis: Drag.XAndYAxis
-        drag.target: annotationItem
+        drag.target: root.annotationItem
         drag.minimumX: 0
         drag.minimumY: 0
 
@@ -102,7 +104,7 @@ Item {
                 root.snapToGridRequest()
         }
 
-        onPressed: requestCanvasFocus()
+        onPressed: root.requestCanvasFocus()
 
         onDoubleClicked: {
             if(Runtime.structureCanvasSettings.displayAnnotationProperties === false)
@@ -161,7 +163,7 @@ Item {
         height: _private.gripSize
 
         color: Runtime.colors.accent.a700.background
-        visible: annotation.resizable
+        visible: root.annotation.resizable
         enabled: visible
 
         onXChanged: {
@@ -212,38 +214,38 @@ Item {
             switch(event.key) {
                 case Qt.Key_Left: {
                     if(event.shiftModifier) {
-                        root.width -= annotation.resizable ? dist : 0
+                        root.width -= root.annotation.resizable ? dist : 0
                         root.width = Math.max(root.width, 20)
                     } else {
-                        root.x -= annotation.movable ? dist : 0
+                        root.x -= root.annotation.movable ? dist : 0
                     }
                     result.accept = true
                     result.filter = true
                 } break
                 case Qt.Key_Right: {
                     if(event.shiftModifier) {
-                        root.width += annotation.resizable ? dist : 0
+                        root.width += root.annotation.resizable ? dist : 0
                     } else {
-                        root.x += annotation.movable ? dist : 0
+                        root.x += root.annotation.movable ? dist : 0
                     }
                     result.accept = true
                     result.filter = true
                 } break
                 case Qt.Key_Up: {
                     if(event.shiftModifier) {
-                        root.height -= annotation.resizable ? dist : 0
+                        root.height -= root.annotation.resizable ? dist : 0
                         root.height = Math.max(root.height, 20)
                     } else {
-                        root.y -= annotation.movable ? dist : 0
+                        root.y -= root.annotation.movable ? dist : 0
                     }
                     result.accept = true
                     result.filter = true
                 } break
                 case Qt.Key_Down: {
                     if(event.shiftModifier) {
-                        root.height += annotation.resizable ? dist : 0
+                        root.height += root.annotation.resizable ? dist : 0
                     } else {
-                        root.y += annotation.movable ? dist : 0
+                        root.y += root.annotation.movable ? dist : 0
                     }
                     result.accept = true
                     result.filter = true
@@ -263,7 +265,7 @@ Item {
         }
 
         function updateGeometry(rect) {
-            annotation.geometry = rect
+            root.annotation.geometry = rect
         }
     }
 }

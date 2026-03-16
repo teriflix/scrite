@@ -14,13 +14,10 @@
 ****************************************************************************/
 
 import QtQuick
-import QtQuick.Dialogs
-import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
 import io.scrite.components
-
 
 import "../../globals"
 import "../../controls"
@@ -136,7 +133,7 @@ Item {
         id: _private
 
         property string posterSourceUrl
-        property var posterQImage: Gui.blankQImage
+        property var posterQImage: Gui.emptyQImage
         property var posterSource
 
         readonly property int e_ImageKind: 0
@@ -145,7 +142,7 @@ Item {
 
         onPosterSourceChanged: {
             posterSourceUrl = ""
-            posterQImage = Gui.blankQImage
+            posterQImage = Gui.emptyQImage
 
             if(typeof posterSource === "string" || typeof posterSource === "url") {
                 posterSourceUrl = posterSource

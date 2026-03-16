@@ -68,8 +68,8 @@ Item {
         color: Runtime.colors.primary.c50.background
         visible: _contentLoader.visible
         opacity: _contentLoader.opacity
-        border.color: borderColor
-        border.width: borderWidth
+        border.color: root.borderColor
+        border.width: root.borderWidth
     }
 
     Item {
@@ -150,7 +150,7 @@ Item {
         color: Runtime.colors.primary.button.background
         radius: (1.0-_contentLoader.opacity) * 6
         border.width: _contentLoader.visible ? 0 : 1
-        border.color: root.expanded ? Runtime.colors.primary.windowColor : borderColor
+        border.color: root.expanded ? Runtime.colors.primary.windowColor : root.borderColor
 
         Behavior on height {
             enabled: Runtime.applicationSettings.enableAnimations
@@ -203,7 +203,7 @@ Item {
 
             width: 1
 
-            color: borderColor
+            color: root.borderColor
             visible: parent.x < 0
         }
     }

@@ -58,9 +58,9 @@ MouseArea {
         source: "qrc:/icons/action/add_annotation.png"
     }
 
-    onClicked: {
+    onClicked: (mouse) => {
         if(!Scrite.document.readOnly) {
-            root.createAnnotationRequest(mouse.x, mouse.y, annotationType)
+            root.createAnnotationRequest(mouse.x, mouse.y, root.annotationType)
             Qt.callLater(root.done)
         }
     }

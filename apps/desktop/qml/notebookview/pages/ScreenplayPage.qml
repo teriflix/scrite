@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
@@ -115,7 +117,7 @@ AbstractNotebookPage {
         enabled: true
         tooltip: "Export entire screenplay notes as PDF or ODT."
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          let generator = Scrite.document.createReportGenerator("Notebook Report")
                          generator.section = _private.screenplay
                          ReportConfigurationDialog.launch(generator)

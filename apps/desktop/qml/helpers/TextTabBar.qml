@@ -67,7 +67,7 @@ Item {
 
             rightPadding: 10
 
-            text: name + ": "
+            text: root.name + ": "
 
             font.bold: true
             font.family: Runtime.idealFontMetrics.font.family
@@ -78,7 +78,7 @@ Item {
         Repeater {
             id: _tabsRepeater
 
-            model: tabs
+            model: root.tabs
 
             delegate: VclLabel {
                 id: _tabDelegate

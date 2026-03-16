@@ -14,7 +14,6 @@
 ****************************************************************************/
 
 pragma ComponentBehavior: Bound
-
 pragma Singleton
 
 import QtQuick
@@ -83,7 +82,7 @@ DialogLauncher {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    color: Runtime.colors.primary.c10.transparent
+                    color: Runtime.colors.transparent
                     border.color: Runtime.colors.primary.borderColor
                     border.width: 1
 
@@ -125,6 +124,8 @@ DialogLauncher {
                         }
 
                         delegate: VclLabel {
+                            id: _delegate
+
                             required property int index
                             required property string item
 
@@ -134,7 +135,7 @@ DialogLauncher {
 
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: _listView.currentIndex = index
+                                onClicked: _listView.currentIndex = _delegate.index
                             }
                         }
                     }
@@ -162,7 +163,7 @@ DialogLauncher {
                 action: _dialog.acceptAction
                 enabled: _listView.count > 0 && _listView.currentIndex >= 0
 
-                onTriggered: (source) => {
+                onTriggered: () => {
                     const text = _listView.currentItem ? _listView.currentItem.text : ""
                     _dialog.itemSelected(text)
                     _dialog.close()

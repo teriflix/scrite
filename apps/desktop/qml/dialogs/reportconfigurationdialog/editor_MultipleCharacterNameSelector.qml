@@ -22,7 +22,6 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../controls"
 import "../../helpers"
@@ -35,12 +34,12 @@ ColumnLayout {
 
     property alias characterNames: _characterNameListView.selectedCharacters
     onCharacterNamesChanged: {
-        if(fieldInfo)
-            report.setConfigurationValue(fieldInfo.name, characterNames)
+        if(root.fieldInfo)
+            root.report.setConfigurationValue(root.fieldInfo.name, root.characterNames)
     }
 
     onFieldInfoChanged: {
-        _characterNameListView.selectedCharacters = report.getConfigurationValue(fieldInfo.name)
+        _characterNameListView.selectedCharacters = root.report.getConfigurationValue(root.fieldInfo.name)
         _characterNameListView.visible = _characterNameListView.selectedCharacters.length === 0
     }
 
@@ -53,7 +52,7 @@ ColumnLayout {
         wrapMode: Text.WordWrap
         maximumLineCount: 2
 
-        text: fieldInfo.label
+        text: root.fieldInfo.label
     }
 
     Loader {
@@ -68,16 +67,15 @@ ColumnLayout {
 
             VclLabel {
                 id: _charactersPrefix
-                text: characterNames.length === 0 ? "No Characters Selected" : "»"
+                text: root.characterNames.length === 0 ? "No Characters Selected" : "»"
                 topPadding: 0
                 bottomPadding: 5
             }
 
             Repeater {
-                model: characterNames
+                model: root.characterNames
 
                 delegate: TagText {
-                    id: _characterTag
                     required property int index
                     required property string modelData
 
@@ -87,7 +85,7 @@ ColumnLayout {
                     border.color: colors.text
                     color: colors.background
                     textColor: colors.text
-                    text: _characterTag.modelData
+                    text: modelData
                     leftPadding: 10
                     rightPadding: 10
                     topPadding: 2
@@ -95,7 +93,7 @@ ColumnLayout {
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     closable: true
                     onCloseRequest: {
-                        var list = _characterNameListView.selectedCharacters
+                        let list = _characterNameListView.selectedCharacters
                         list.splice( list.indexOf(text), 1 )
                         _characterNameListView.selectedCharacters = list
                     }
@@ -110,15 +108,17 @@ ColumnLayout {
                 visible: !_characterNameListView.visible
 
                 MouseArea {
+                    id: _addAnotherCharacterMouseArea
+
                     anchors.fill: parent
                     hoverEnabled: true
                     onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
                     onClicked: _characterNameListView.visible = true
 
                     ToolTipPopup {
-                        container: parent
+                        container: _addAnotherCharacterMouseArea
                         text: "Add another character."
-                        visible: parent.containsMouse
+                        visible: _addAnotherCharacterMouseArea.containsMouse
                     }
                 }
             }
@@ -131,6 +131,8 @@ ColumnLayout {
                 visible: _characterNameListView.selectedCharacters.length > 0
 
                 MouseArea {
+                    id: _clearAllMouseArea
+
                     anchors.fill: parent
                     hoverEnabled: true
 
@@ -141,9 +143,9 @@ ColumnLayout {
                     }
 
                     ToolTipPopup {
-                        container: parent
+                        container: _clearAllMouseArea
                         text: "Remove all characters and start fresh."
-                        visible: parent.containsMouse
+                        visible: _clearAllMouseArea.containsMouse
                     }
                 }
             }

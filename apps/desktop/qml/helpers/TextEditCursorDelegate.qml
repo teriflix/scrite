@@ -83,7 +83,7 @@ Item {
     QtObject {
         id: _private
 
-        property int cursorFlashTime: Qt.styleHints.cursorFlashTime
+        property int cursorFlashTime: Scrite.app.styleHints.cursorFlashTime
 
         property rect cursorRect: root.textEdit.cursorRectangle
 

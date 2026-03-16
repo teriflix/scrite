@@ -118,7 +118,7 @@ Application *Application::instance()
 }
 
 Application::Application(int &argc, char **argv, const QVersionNumber &version)
-    : QtApplicationClass(argc, argv), m_versionNumber(version)
+    : QApplication(argc, argv), m_versionNumber(version)
 {
     QFontDatabase::addApplicationFont(QStringLiteral(":/font/Rubik/Rubik-BoldItalic.ttf"));
     QFontDatabase::addApplicationFont(QStringLiteral(":/font/Rubik/Rubik-Regular.ttf"));
@@ -429,7 +429,7 @@ QDateTime Application::installationTimestamp() const
 
 int Application::appState() const
 {
-    return Scrite::ApplicationState((int)QtApplicationClass::applicationState());
+    return Scrite::ApplicationState((int)QApplication::applicationState());
 }
 
 int Application::launchCounter() const
@@ -635,7 +635,7 @@ bool Application::notify(QObject *object, QEvent *event)
 {
     // Note that notifyInternal() will be called first before we get here.
     if (event->type() == QEvent::DeferredDelete)
-        return QtApplicationClass::notify(object, event);
+        return QApplication::notify(object, event);
 
 #ifdef ENABLE_CRASHPAD_CRASH_TEST
     if (event->type() == QEvent::KeyPress) {
@@ -649,7 +649,7 @@ bool Application::notify(QObject *object, QEvent *event)
     }
 #endif
 
-    const bool ret = QtApplicationClass::notify(object, event);
+    const bool ret = QApplication::notify(object, event);
 
     // The only reason we reimplement the notify() method is because we sometimes want to
     // handle an event AFTER it is handled by the target object.
@@ -671,7 +671,7 @@ bool Application::notify(QObject *object, QEvent *event)
              * despatch ParentChange events.
              */
             QEvent parentChangeEvent(QEvent::ParentChange);
-            QtApplicationClass::notify(childObject, &parentChangeEvent);
+            QApplication::notify(childObject, &parentChangeEvent);
         }
     }
 
@@ -769,7 +769,7 @@ bool Application::event(QEvent *event)
         return true;
     }
 #endif
-    return QtApplicationClass::event(event);
+    return QApplication::event(event);
 }
 
 QScreen *Application::windowScreen(QObject *window)

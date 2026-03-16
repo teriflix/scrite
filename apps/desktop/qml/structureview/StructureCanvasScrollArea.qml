@@ -150,7 +150,7 @@ ScrollArea {
         onDenyCanvasPreviewRequest: () => { root.denyCanvasPreviewRequest() }
         onAllowCanvasPreviewRequest: () => { root.allowCanvasPreviewRequest() }
         onEnsureItemVisibleRequest: (item) => { root.ensureItemVisible(item) }
-        onEnsureAreaVisibleRequest: (area) => { root.ensureAreaVisible(area, suggestedScale, 0) }
+        onEnsureAreaVisibleRequest: (area) => { root.ensureAreaVisible(area, root.suggestedScale, 0) }
     }
 
     QtObject {
@@ -160,7 +160,7 @@ ScrollArea {
             shortcut: Gui.shortcut(Qt.Key_Escape)
             enabled: _canvas.editElementItem !== null
 
-            onTriggered: (source) => {
+            onTriggered: () => {
                              _canvas.editElementItem.focus = false
                          }
         }
@@ -178,11 +178,11 @@ ScrollArea {
         }
 
         function enablePanAndZoomAnimation(delay) {
-            if(animatePanAndZoom === true)
+            if(root.animatePanAndZoom === true)
                 return
 
             if(delay === undefined || delay === null)
-                animatePanAndZoom = true
+                root.animatePanAndZoom = true
             else
                 Runtime.execLater(root, delay, () => { root.animatePanAndZoom = true })
         }
@@ -194,7 +194,7 @@ ScrollArea {
             _canvas.itemsBoundingBox.recomputeBoundingBox()
 
             _private.zoomOneToCurrentItem()
-            animatePanAndZoom = true
+            root.animatePanAndZoom = true
 
             if(FocusInspector.hasFocus(root)) {
                 Scrite.window.activeFocusItem.focus = false

@@ -17,6 +17,7 @@ pragma ComponentBehavior: Bound
 
 import QtQml
 import QtQuick
+import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
@@ -161,7 +162,7 @@ Item {
                                 FlatToolButton {
                                     down: _photoSlideView.currentIndex === root.character.keyPhotoIndex
                                     enabled: root.character.photos.length > 0
-                                    iconSource: parent.fillWidth ? "qrc:/icons/action/pin_inverted.png" : "qrc:/icons/action/pin.png"
+                                    iconSource: "qrc:/icons/action/pin.png"
 
                                     onClicked: {
                                         if(_photoSlideView.currentIndex === root.character.keyPhotoIndex)
@@ -177,14 +178,14 @@ Item {
 
                                 FlatToolButton {
                                     enabled: _photoSlideView.currentIndex > 0
-                                    iconSource: parent.fillWidth ? "qrc:/icons/navigation/arrow_left_inverted.png" : "qrc:/icons/navigation/arrow_left.png"
+                                    iconSource: "qrc:/icons/navigation/arrow_left.png"
 
                                     onClicked: _photoSlideView.currentIndex = Math.max(_photoSlideView.currentIndex-1, 0)
                                 }
 
                                 FlatToolButton {
                                     enabled: _photoSlideView.currentIndex < _photoSlideView.count-1
-                                    iconSource: parent.fillWidth ? "qrc:/icons/navigation/arrow_right_inverted.png" : "qrc:/icons/navigation/arrow_right.png"
+                                    iconSource: "qrc:/icons/navigation/arrow_right.png"
 
                                     onClicked: _photoSlideView.currentIndex = Math.min(_photoSlideView.currentIndex+1, _photoSlideView.count-1)
                                 }
@@ -195,7 +196,7 @@ Item {
 
                                 FlatToolButton {
                                     enabled: _photoSlideView.currentIndex < _photoSlideView.count-1
-                                    iconSource: parent.fillWidth ? "qrc:/icons/action/delete_inverted.png" : "qrc:/icons/action/delete.png"
+                                    iconSource: "qrc:/icons/action/delete.png"
 
                                     onClicked: {
                                         var ci = _photoSlideView.currentIndex
@@ -422,7 +423,6 @@ Item {
                                     placeholderText: "<max 20 letters>"
                                     readOnly: Scrite.document.readOnly
                                     text: root.character.age
-                                    width: (parent.width - parent.spacing)/2
 
                                     onTextEdited: root.character.age = text
                                 }
@@ -511,7 +511,7 @@ Item {
                             }
                         }
 
-                        VclFileDialog {
+                        FileDialog {
                             id: _fileDialog
 
                             currentFolder: Runtime.workspaceSettings.lastOpenPhotosFolderUrl
@@ -520,7 +520,7 @@ Item {
                             onCurrentFolderChanged: Runtime.workspaceSettings.lastOpenPhotosFolderUrl = currentFolder
 
                             onAccepted: {
-                                if(fileUrl != "") {
+                                if(selectedFile != "") {
                                     root.character.addPhoto(Url.toPath(selectedFile))
                                     _photoSlideView.currentIndex = root.character.photos.length - 1
                                 }

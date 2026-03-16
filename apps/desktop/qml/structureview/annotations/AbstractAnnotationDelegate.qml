@@ -51,7 +51,7 @@ Rectangle {
 
     MouseArea {
         anchors.fill: parent
-        enabled: currentAnnotationItem !== root
+        enabled: root.currentAnnotationItem !== root
         onClicked: root.gripRequest(root, root.annotation)
         onDoubleClicked: {
             root.gripRequest(root, root.annotation)

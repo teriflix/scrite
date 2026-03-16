@@ -22,7 +22,6 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../controls"
 import "../../helpers"
@@ -46,7 +45,7 @@ ColumnLayout {
         font.pointSize: Runtime.idealFontMetrics.font.pointSize
         maximumLineCount: 2
 
-        text: fieldInfo.label
+        text: root.fieldInfo.label
     }
 
     VclLabel {
@@ -56,7 +55,7 @@ ColumnLayout {
         font.italic: true
         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
-        text: fieldInfo.note
+        text: root.fieldInfo.note
     }
 
     Rectangle {
@@ -77,28 +76,27 @@ ColumnLayout {
             anchors.fill: parent
             anchors.margins: 1
 
-            model: allLocations
+            model: root.allLocations
             clip: true
 
             delegate: VclCheckBox {
-                id: _locationDelegate
                 required property int index
                 required property var modelData
 
-                text: _locationDelegate.modelData
+                text: modelData
                 width: _locationListView.width-1
-                checked: selectedLocations.indexOf(_locationDelegate.modelData) >= 0
+                checked: root.selectedLocations.indexOf(modelData) >= 0
 
                 font.family: Scrite.document.formatting.defaultFont.family
 
                 onToggled: {
-                    var locs = selectedLocations
+                    let locs = root.selectedLocations
                     if(checked)
-                        locs.push(_locationDelegate.modelData)
+                        locs.push(modelData)
                     else
-                        locs.splice(locs.indexOf(_locationDelegate.modelData), 1)
-                    selectedLocations = locs
-                    report.setConfigurationValue(fieldInfo.name, locs)
+                        locs.splice(locs.indexOf(modelData), 1)
+                    root.selectedLocations = locs
+                    root.report.setConfigurationValue(root.fieldInfo.name, locs)
                 }
             }
         }
@@ -111,19 +109,19 @@ ColumnLayout {
 
         VclButton {
             text: "Select All"
-            enabled: selectedLocations.length < allLocations.length
+            enabled: root.selectedLocations.length < root.allLocations.length
             onClicked: {
-                selectedLocations = allLocations
-                report.setConfigurationValue(fieldInfo.name, selectedLocations)
+                root.selectedLocations = root.allLocations
+                root.report.setConfigurationValue(root.fieldInfo.name, root.selectedLocations)
             }
         }
 
         VclButton {
             text: "Unselect All"
-            enabled: selectedLocations.length > 0
+            enabled: root.selectedLocations.length > 0
             onClicked: {
-                selectedLocations = []
-                report.setConfigurationValue(fieldInfo.name, selectedLocations)
+                root.selectedLocations = []
+                root.report.setConfigurationValue(root.fieldInfo.name, root.selectedLocations)
             }
         }
     }

@@ -20,8 +20,6 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-
-
 import "../globals"
 import "../controls"
 import "../helpers"
@@ -29,7 +27,7 @@ import "../helpers"
 Rectangle {
     id: root
 
-    readonly property real preferredHeight: _screenplayTools.height
+    readonly property real preferredHeight: _screenplayToolsLayout.height
     property alias canZoomIn: _zoomIn.enabled
     property alias canZoomOut: _zoomOut.enabled
 

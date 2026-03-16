@@ -70,7 +70,7 @@ VclMenu {
                     border.width: 1
                     border.color: Runtime.colors.primary.borderColor
 
-                    enabled: Runtime.appFeatures.structure.enabled && sceneGroup.sceneCount > 0
+                    enabled: Runtime.appFeatures.structure.enabled && root.sceneGroup.sceneCount > 0
                     opacity: enabled ? 1 : 0.5
 
                     Rectangle {
@@ -91,8 +91,8 @@ VclMenu {
                         wrapMode: Text.WordWrap
 
                         text: {
-                            let ret = innerTitle
-                            if(sceneGroup.hasSceneStackIds) {
+                            let ret = root.innerTitle
+                            if(root.sceneGroup.hasSceneStackIds) {
                                 if(ret !== "")
                                     ret += "<br/>"
                                 ret += "<font size=\"-2\"><i>All scenes in the selected stack(s) are going to be tagged.</i></font>"
@@ -112,7 +112,7 @@ VclMenu {
                         id: _groupsView
 
                         property bool scrollBarVisible: _groupsView.height < _groupsView.contentHeight
-                        property bool showingFilteredItems: sceneGroup.hasSceneActs && sceneGroup.hasGroupActs
+                        property bool showingFilteredItems: root.sceneGroup.hasSceneActs && root.sceneGroup.hasGroupActs
 
                         function adjustScrolling() {
                             if(!showingFilteredItems) {
@@ -122,10 +122,10 @@ VclMenu {
 
                             let prefCategory = Scrite.document.structure.preferredGroupCategory
 
-                            let acts = sceneGroup.sceneActs
+                            let acts = root.sceneGroup.sceneActs
                             let index = -1
-                            for(let i=0; i<sceneGroup.count; i++) {
-                                let item = sceneGroup.at(i)
+                            for(let i=0; i<root.sceneGroup.count; i++) {
+                                let item = root.sceneGroup.at(i)
 
                                 if(item.category.toUpperCase() !== prefCategory)
                                     continue
@@ -183,7 +183,7 @@ VclMenu {
                             required property var arrayItem
 
                             property bool doesNotBelongToAnyAct: arrayItem.act === ""
-                            property bool filtered: doesNotBelongToAnyAct || sceneGroup.sceneActs.indexOf(arrayItem.act) >= 0
+                            property bool filtered: doesNotBelongToAnyAct || root.sceneGroup.sceneActs.indexOf(arrayItem.act) >= 0
 
                             width: _groupsView.width - (_groupsView.scrollBarVisible ? 20 : 1)
                             height: 30
@@ -223,7 +223,7 @@ VclMenu {
                                     elide: Text.ElideRight
                                     leftPadding: _groupsViewDelegate.arrayItem.type > 0 ? 20 : 0
 
-                                    font.bold: _groupsView.showingFilteredItems ? filtered : doesNotBelongToAnyAct
+                                    font.bold: _groupsView.showingFilteredItems ? _groupsViewDelegate.filtered :_groupsViewDelegate.doesNotBelongToAnyAct
                                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 }
                             }
@@ -236,7 +236,7 @@ VclMenu {
                                 hoverEnabled: true
 
                                 onClicked: {
-                                    sceneGroup.toggle(_groupsViewDelegate.index)
+                                    root.sceneGroup.toggle(_groupsViewDelegate.index)
                                     root.toggled(_groupsViewDelegate.index, _groupsViewDelegate.arrayItem.name)
                                     Scrite.user.logActivity2("structure", "tag: " + _groupsViewDelegate.arrayItem.name)
                                 }

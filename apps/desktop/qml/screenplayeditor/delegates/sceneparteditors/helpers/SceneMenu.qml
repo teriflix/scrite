@@ -83,7 +83,7 @@ MenuLoader {
         ColorMenu {
             title: "Color"
 
-            onMenuItemClicked: {
+            onMenuItemClicked: (color) => {
                 root.scene.color = color
                 _sceneMenu.close()
             }

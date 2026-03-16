@@ -76,7 +76,7 @@ FocusScope {
                 flat: true
 
                 ToolTip.text: _filterText.text === "" ? "Restore default shortcuts to all" : "Restore default shortcuts to the filtered list displayed below"
-                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                ToolTip.delay: Scrite.app.styleHints.mousePressAndHoldInterval
                 ToolTip.visible: hovered
 
                 icon.source: "qrc:/icons/content/undo.png"

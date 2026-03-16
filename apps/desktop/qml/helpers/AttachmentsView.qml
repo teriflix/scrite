@@ -142,23 +142,23 @@ ListView {
             opacity: 0.5
             text: "Attachments"
             verticalAlignment: Text.AlignVCenter
-            visible: attachments && attachments.attachmentCount === 0
+            visible: root.attachments && root.attachments.attachmentCount === 0
 
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
         }
     }
 
-    VclFileDialog {
+    FileDialog {
         id: _fileDialog
 
-        nameFilters: attachments ? attachments.nameFilters : ["All Types (*.*)"]
+        nameFilters: root.attachments ? root.attachments.nameFilters : ["All Types (*.*)"]
 
          // The default Ctrl+U interfers with underline
         onAccepted: {
-            if(attachments === null)
+            if(root.attachments === null)
                 return
             if(selectedFile !== "")
-                attachments.includeAttachmentFromFileUrl(selectedFile)
+                root.attachments.includeAttachmentFromFileUrl(selectedFile)
         }
     }
 
@@ -170,7 +170,7 @@ ListView {
             enabled: root.currentIndex >= 0
 
             onClicked: {
-                let attm = attachments.attachmentAt(root.currentIndex)
+                let attm = root.attachments.attachmentAt(root.currentIndex)
                 if(attm)
                     attm.openAttachmentInPlace()
             }
@@ -183,7 +183,7 @@ ListView {
             enabled: root.currentIndex >= 0
 
             onClicked: {
-                attachments.removeAttachment( attachments.attachmentAt(root.currentIndex) )
+                root.attachments.removeAttachment( root.attachments.attachmentAt(root.currentIndex) )
             }
         }
     }

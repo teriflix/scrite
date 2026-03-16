@@ -36,7 +36,7 @@ VclMenu {
 
     ColorMenu {
         title: "Note Color"
-        selectedColor: note.color
+        selectedColor: root.note.color
 
         onMenuItemClicked: (color) => {
                                root.note.color = color

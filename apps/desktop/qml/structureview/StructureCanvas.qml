@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Window
@@ -297,7 +299,7 @@ GridBackground {
 
         enabled: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI && _private.hasFocus
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          const cardIndex = Scrite.document.structure.currentElementIndex
                          const card = _elementLayer.elementItemAt(cardIndex)
                          if(card)

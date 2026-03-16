@@ -22,10 +22,10 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
+import "../"
 import "../../globals"
 import "../../controls"
 import "../../helpers"
-import ".."
 import "../../notifications"
 
 VclDialog {
@@ -37,7 +37,7 @@ VclDialog {
     height: Math.min(Scrite.window.height*0.9, 600)
 
     handleLanguageShortcuts: true
-    title: exporter ? ("Export to " + exporter.formatName) : "Export Configuration Dialog"
+    title: root.exporter ? ("Export to " + root.exporter.formatName) : "Export Configuration Dialog"
 
     content: visible ? (_private.exportEnabled ? _exportConfigContent : _exportFeatureDisabledContent) : null
     bottomBar: visible && _private.exportEnabled ? _exportButtonFooter : null
@@ -48,7 +48,7 @@ VclDialog {
 
         DisabledFeatureNotice {
             color: Qt.rgba(1,1,1,0.9)
-            featureName: exporter ? exporter.format : Scrite.ExportFeature
+            featureName: root.exporter ? root.exporter.format : Scrite.ExportFeature
         }
     }
 
@@ -71,13 +71,12 @@ VclDialog {
 
                 // Show file selector for non-PDF exporters
                 FileSelector {
-                    id: _fileSelector
                     Layout.fillWidth: true
 
                     label: "Select a file to export into"
-                    absoluteFilePath: exporter.fileName
-                    onAbsoluteFilePathChanged: exporter.fileName = absoluteFilePath
-                    nameFilters: exporter.nameFilters
+                    absoluteFilePath: root.exporter.fileName
+                    onAbsoluteFilePathChanged: root.exporter.fileName = absoluteFilePath
+                    nameFilters: root.exporter.nameFilters
                     tabSequenceManager: _tabSequence
                     visible: !_private.isPdfExport
                     enabled: visible && _private.exportSaveFeature.enabled
@@ -112,12 +111,13 @@ VclDialog {
                         required property var modelData
 
                         Layout.fillWidth: true
-                        source: _delegateChooser.delegateSource(_fieldLoader.modelData.editor)
+                        source: _delegateChooser.delegateSource(modelData.editor)
                         opacity: enabled ? 1 : 0.5
                         enabled: {
-                            if(_fieldLoader.modelData.feature !== "") {
-                                const afc = Qt.createQmlObject("import io.scrite.components 1.0; AppFeature { }", _fieldLoader)
-                                afc.featureName = _fieldLoader.modelData.feature
+                            if(modelData.feature !== "") {
+                                let afcObject = Qt.createQmlObject("import io.scrite.components; AppFeature { }", _fieldLoader)
+                                let afc = afcObject as AppFeature
+                                afc.featureName = modelData.feature
                                 const ret = afc.enabled
                                 afc.destroy()
                                 return ret
@@ -126,9 +126,9 @@ VclDialog {
                         }
 
                         onLoaded: {
-                            item.exporter = exporter
+                            item.exporter = root.exporter
                             item.tabSequence = _tabSequence
-                            item.fieldInfo = _fieldLoader.modelData
+                            item.fieldInfo = modelData
                         }
                     }
                 }
@@ -142,12 +142,12 @@ VclDialog {
                 }
 
                 Component.onCompleted: {
-                    if(Object.isOfType(exporter, "StructureExporter"))
+                    if(Object.isOfType(root.exporter, "StructureExporter"))
                         Runtime.activateMainWindowTab(Runtime.MainWindowTab.StructureTab)
 
-                    if(Object.isOfType(exporter, "AbstractTextDocumentExporter")) {
-                        exporter.capitalizeSentences = Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
-                        exporter.polishParagraphs = Runtime.screenplayEditorSettings.enableAutoPolishParagraphs
+                    if(Object.isOfType(root.exporter, "AbstractTextDocumentExporter")) {
+                        root.exporter.capitalizeSentences = Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
+                        root.exporter.polishParagraphs = Runtime.screenplayEditorSettings.enableAutoPolishParagraphs
                     }
                 }
             }
@@ -155,7 +155,7 @@ VclDialog {
             Component.onCompleted: {
                 if(_private.isPdfExport)
                     Runtime.showHelpTip("watermark")
-                Runtime.showHelpTip(Object.typeOf(exporter))
+                Runtime.showHelpTip(Object.typeOf(root.exporter))
             }
         }
     }
@@ -164,7 +164,6 @@ VclDialog {
         id: _exportButtonFooter
 
         Item {
-            id: _footerItem
             height: _footerLayout.height+20
 
             RowLayout {
@@ -176,8 +175,8 @@ VclDialog {
                 spacing: 20
 
                 VclButton {
-                    enabled: exporter.canCopyToClipboard
-                    visible: exporter.canCopyToClipboard
+                    enabled: root.exporter.canCopyToClipboard
+                    visible: root.exporter.canCopyToClipboard
                     text: "Copy to Clipboard"
                     onClicked: {
                         _exportJob.copyToClipboard = true
@@ -190,7 +189,7 @@ VclDialog {
 
                     Component.onCompleted: Qt.callLater(_exportButton.forceActiveFocus)
 
-                    enabled: exporter.fileName !== "" && _private.exportEnabled
+                    enabled: root.exporter.fileName !== "" && _private.exportEnabled
                     text: _private.isPdfExport ? "Generate PDF" : "Export"
                     onClicked: {
                         _exportJob.copyToClipboard = false
@@ -215,10 +214,10 @@ VclDialog {
                 // Launch wait dialog ..
                 ScriptAction {
                     script: {
-                        Object.save(exporter)
+                        Object.save(root.exporter)
 
-                        const message = _private.isPdfExport ? "Generating PDF ..." : ("Exporting to \"" + exporter.fileName + "\" ...")
-                        _private.waitDialog = WaitDialog.launch(message, Aggregation.progressReport(exporter))
+                        const message = _private.isPdfExport ? "Generating PDF ..." : ("Exporting to \"" + root.exporter.fileName + "\" ...")
+                        _private.waitDialog = WaitDialog.launch(message, Aggregation.progressReport(root.exporter))
                     }
                 }
 
@@ -230,31 +229,31 @@ VclDialog {
                 // Perform the export job ...
                 ScriptAction {
                     script: {
-                        const dlFileName = exporter.fileName
+                        const dlFileName = root.exporter.fileName
                         if(_private.isPdfExport) {
-                            exporter.fileName = Runtime.fileNamager.generateUniqueTemporaryFileName("pdf")
-                            Runtime.fileNamager.addToAutoDeleteList(exporter.fileName)
+                            root.exporter.fileName = Runtime.fileNamager.generateUniqueTemporaryFileName("pdf")
+                            Runtime.fileNamager.addToAutoDeleteList(root.exporter.fileName)
                         }
 
-                        const success = exporter.write(_exportJob.copyToClipboard ? AbstractExporter.ClipboardTarget : AbstractExporter.FileTarget)
+                        const success = root.exporter.write(_exportJob.copyToClipboard ? AbstractExporter.ClipboardTarget : AbstractExporter.FileTarget)
 
                         Qt.callLater(_private.waitDialog.close)
                         _private.waitDialog = null
 
                         if(success) {
                             if(_exportJob.copyToClipboard) {
-                                MessageBox.information(exporter.formatName + " - Export", "Successfully copied text to clipboard.", root.close)
+                                MessageBox.information(root.exporter.formatName + " - Export", "Successfully copied text to clipboard.", root.close)
                                 return
                             }
 
                             if(_private.isPdfExport) {
-                                PdfDialog.launch("Screenplay", exporter.fileName, dlFileName, 2, _private.exportSaveFeature.enabled)
+                                PdfDialog.launch("Screenplay", root.exporter.fileName, dlFileName, 2, _private.exportSaveFeature.enabled)
                             } else
-                                File.revealOnDesktop(exporter.fileName)
+                                File.revealOnDesktop(root.exporter.fileName)
                             Qt.callLater(root.close)
                         } else {
-                            const exporterErrors = Aggregation.errorReport(exporter)
-                            MessageBox.information(exporter.formatName + " - Export", exporterErrors.errorMessage, root.close)
+                            const exporterErrors = Aggregation.errorReport(root.exporter)
+                            MessageBox.information(root.exporter.formatName + " - Export", exporterErrors.errorMessage, root.close)
                         }
                     }
                 }
@@ -287,18 +286,18 @@ VclDialog {
     QtObject {
         id: _private
 
-        property var configuration: exporter ? exporter.configuration() : {"title": "Unknown", "fields": []}
-        property bool isPdfExport: exporter ? exporter.format === "Screenplay/PDF" : false
-        property bool exportEnabled: exporter ? exporter.featureEnabled : false
+        property var configuration: root.exporter ? root.exporter.configuration() : {"title": "Unknown", "fields": []}
+        property bool isPdfExport: root.exporter ? root.exporter.format === "Screenplay/PDF" : false
+        property bool exportEnabled: root.exporter ? root.exporter.featureEnabled : false
 
         property AppFeature exportSaveFeature: AppFeature {
-            featureName: exporter ? "export/" + exporter.format.toLowerCase() + (_private.isPdfExport ? "/save": "") : "export"
+            featureName: root.exporter ? "export/" + root.exporter.format.toLowerCase() + (_private.isPdfExport ? "/save": "") : "export"
         }
 
         property VclDialog waitDialog
     }
 
-    onClosed: Runtime.execLater(exporter, 100, () => { if(exporter) exporter.discard() } )
+    onClosed: Runtime.execLater(root.exporter, 100, () => { if(root.exporter) root.exporter.discard() } )
 
     Connections {
         target: root.exporter

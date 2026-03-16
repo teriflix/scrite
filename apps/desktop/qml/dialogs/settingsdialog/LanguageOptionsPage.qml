@@ -187,7 +187,7 @@ Item {
                             Layout.alignment: Qt.AlignHCenter
 
                             text: _private.language !== undefined ? _private.language.nativeName : "- NA -"
-                            font.family: _private.languageFont
+                            font.family: _private.languageFont.family
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 5
                         }
 
@@ -340,7 +340,7 @@ Item {
         VclCheckBox {
             id: _handleLanguageSwitch
 
-            action: ActionHub.languageOptions.find("handleLanguageSwitch")
+            action: ActionHub.languageOptions.find("handleLanguageSwitch") as Action
         }
     }
 
@@ -415,7 +415,7 @@ Item {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Add"
-                    enabled: _newLanguageDialogContent.text !== ""
+                    enabled: _languageNameField.text !== ""
 
                     onClicked: _newLanguageDialogContent.addLanguage(_languageNameField.text)
                 }

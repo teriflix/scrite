@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Controls
@@ -38,11 +40,12 @@ Rectangle {
 
     z: 1
 
+    height: implicitHeight
     implicitHeight: Math.max( (_sceneSizeHint.active ? (_headerLayout.height + _sceneSizeHint.height + _pageBreakAfter.height)
-                                                      : sceneDelegate.screenplayElement.heightHint * sceneDelegate.zoomLevel),
-                              (showSceneComments && sceneDelegate.spaceAvailableForScenePanel >= Runtime.minSceneSidePanelWidth ? 300 : 0) )
+                                                      : root.sceneDelegate.screenplayElement.heightHint * root.sceneDelegate.zoomLevel),
+                              (showSceneComments && root.sceneDelegate.spaceAvailableForScenePanel >= Runtime.minSceneSidePanelWidth ? 300 : 0) )
 
-    color: sceneDelegate.scene ? Runtime.colors.tint(sceneDelegate.scene.color, Runtime.colors.sceneHeadingTint) : Runtime.colors.primary.c300.background
+    color: root.sceneDelegate.scene ? Runtime.colors.tint(root.sceneDelegate.scene.color, Runtime.colors.sceneHeadingTint) : Runtime.colors.primary.c300.background
 
     Column {
         id: _headerLayout
@@ -53,7 +56,7 @@ Rectangle {
 
         Item {
             width: parent.width
-            height: sceneDelegate.screenplayElement.pageBreakBefore ? sceneDelegate.fontMetrics.lineSpacing*0.7 : 1
+            height: root.sceneDelegate.screenplayElement.pageBreakBefore ? root.sceneDelegate.fontMetrics.lineSpacing*0.7 : 1
         }
 
         Row {
@@ -62,33 +65,33 @@ Rectangle {
             width: parent.width
 
             VclLabel {
-                width: sceneDelegate.pageLeftMargin
+                width: root.sceneDelegate.pageLeftMargin
 
-                text: sceneDelegate.screenplayElement.resolvedSceneNumber
-                font: sceneDelegate.font
-                color: sceneDelegate.screenplayElement.hasUserSceneNumber ? "black" : "gray"
-                topPadding: sceneDelegate.fontMetrics.lineSpacing * 0.5
-                bottomPadding: sceneDelegate.fontMetrics.lineSpacing * 0.5
+                text: root.sceneDelegate.screenplayElement.resolvedSceneNumber
+                font: root.sceneDelegate.font
+                color: root.sceneDelegate.screenplayElement.hasUserSceneNumber ? "black" : "gray"
+                topPadding: root.sceneDelegate.fontMetrics.lineSpacing * 0.5
+                bottomPadding: root.sceneDelegate.fontMetrics.lineSpacing * 0.5
                 rightPadding: 20
                 horizontalAlignment: Text.AlignRight
             }
 
             VclLabel {
-                width: parent.width - sceneDelegate.pageLeftMargin - sceneDelegate.pageRightMargin
+                width: parent.width - root.sceneDelegate.pageLeftMargin - root.sceneDelegate.pageRightMargin
 
-                font: sceneDelegate.font
-                color: screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
+                font: root.sceneDelegate.font
+                color: root.sceneDelegate.screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
                 elide: Text.ElideMiddle
-                topPadding: sceneDelegate.fontMetrics.lineSpacing * 0.5
-                bottomPadding: sceneDelegate.fontMetrics.lineSpacing * 0.5
+                topPadding: root.sceneDelegate.fontMetrics.lineSpacing * 0.5
+                bottomPadding: root.sceneDelegate.fontMetrics.lineSpacing * 0.5
 
                 text: {
-                    if(sceneDelegate.screenplayElementType === ScreenplayElement.BreakElementType)
-                        return sceneDelegate.screenplayElement.breakTitle
-                    if(sceneDelegate.screenplayElement.omitted)
+                    if(root.sceneDelegate.screenplayElementType === ScreenplayElement.BreakElementType)
+                        return root.sceneDelegate.screenplayElement.breakTitle
+                    if(root.sceneDelegate.screenplayElement.omitted)
                         return "[OMITTED]"
-                    if(sceneDelegate.scene && sceneDelegate.scene.heading.enabled)
-                        return sceneDelegate.scene.heading.text
+                    if(root.sceneDelegate.scene && root.sceneDelegate.scene.heading.enabled)
+                        return root.sceneDelegate.scene.heading.text
                     return "NO SCENE HEADING"
                 }
             }
@@ -112,11 +115,11 @@ Rectangle {
         SceneSizeHintItem {
             id: _sceneSizeHint
 
-            width: contentWidth * zoomLevel
-            height: contentHeight * zoomLevel
+            width: contentWidth * root.sceneDelegate.zoomLevel
+            height: contentHeight * root.sceneDelegate.zoomLevel
 
-            scene: sceneDelegate.scene
-            active: sceneDelegate.screenplayElement.heightHint === 0
+            scene: root.sceneDelegate.scene
+            active: root.sceneDelegate.screenplayElement.heightHint === 0
             format: Scrite.document.printFormat
             visible: false
             asynchronous: false
@@ -130,7 +133,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
 
-        height: sceneDelegate.screenplayElement.pageBreakAfter ? sceneDelegate.fontMetrics.lineSpacing*0.7 : 1
+        height: root.sceneDelegate.screenplayElement.pageBreakAfter ? root.sceneDelegate.fontMetrics.lineSpacing*0.7 : 1
     }
 }
 

@@ -76,24 +76,24 @@ VclTextField {
         id: _private
 
         property string headingText: {
-            if(sceneOmitted)
-                return "[OMITTED] " + (hovered ? sceneHeading.displayText : "")
+            if(root.sceneOmitted)
+                return "[OMITTED] " + (root.hovered ? root.sceneHeading.displayText : "")
 
-            if(sceneHeading.enabled)
-                return activeFocus ? sceneHeading.editText : sceneHeading.displayText
+            if(root.sceneHeading.enabled)
+                return root.activeFocus ? root.sceneHeading.editText : root.sceneHeading.displayText
 
             return ""
         }
 
-        property int fontCapitalization: activeFocus ? (Runtime.language.active.charScript() === QtChar.Script_Latin ? Font.AllUppercase : Font.MixedCase) : Font.AllUppercase
+        property int fontCapitalization: root.activeFocus ? (Runtime.language.active.charScript() === QtChar.Script_Latin ? Font.AllUppercase : Font.MixedCase) : Font.AllUppercase
         property int previouslyActiveLanguageCode: QtLocale.English
         property font font: root.sceneHeadingFormat.font2
 
-        property int dotPosition: text.indexOf(".")
-        property int dashPosition: text.lastIndexOf("-")
-        property bool editingLocationTypePart: activeFocus ? dotPosition < 0 || cursorPosition < dotPosition : false
-        property bool editingMomentPart: activeFocus ? dashPosition > 0 && cursorPosition >= dashPosition : false
-        property bool editingLocationPart: activeFocus ? dotPosition > 0 ? (cursorPosition >= dotPosition && (dashPosition < 0 ? true : cursorPosition < dashPosition)) : false : false
+        property int dotPosition: root.text.indexOf(".")
+        property int dashPosition: root.text.lastIndexOf("-")
+        property bool editingLocationTypePart: root.activeFocus ? dotPosition < 0 || root.cursorPosition < dotPosition : false
+        property bool editingMomentPart: root.activeFocus ? dashPosition > 0 && root.cursorPosition >= dashPosition : false
+        property bool editingLocationPart: root.activeFocus ? dotPosition > 0 ? (root.cursorPosition >= dotPosition && (dashPosition < 0 ? true : root.cursorPosition < dashPosition)) : false : false
 
         property var completionStrings: {
             if(editingLocationPart)
@@ -108,11 +108,11 @@ VclTextField {
         property string completionPrefix: {
             let pickPrefix = () => {
                 if(editingLocationPart)
-                    return text.substring(dotPosition+1, dashPosition < 0 ? text.length : dashPosition).trim()
+                    return root.text.substring(dotPosition+1, dashPosition < 0 ? root.text.length : dashPosition).trim()
                 if(editingLocationTypePart)
-                    return dotPosition < 0 ? text : text.substring(0, dotPosition).trim()
+                    return dotPosition < 0 ? root.text : root.text.substring(0, dotPosition).trim()
                 if(editingMomentPart)
-                    return text.substring(dashPosition+1).trim()
+                    return root.text.substring(dashPosition+1).trim()
                 return ""
             }
             if(fontCapitalization == Font.AllUppercase)
@@ -121,19 +121,19 @@ VclTextField {
         }
 
         function updateText(text) {
-            if(readOnly)
+            if(root.readOnly)
                 return
 
-            sceneHeading.parseFrom(text)
+            root.sceneHeading.parseFrom(text)
         }
 
         function includeSuggestion(suggestion) {
             if(editingLocationPart || editingLocationTypePart || editingMomentPart) {
-                var one = editingLocationTypePart ? suggestion : text.substring(0, dotPosition).trim()
-                var two = editingLocationPart ? suggestion : (dotPosition > 0 ? text.substring(dotPosition+1, dashPosition < 0 ? text.length : dashPosition).trim() : "")
-                var three = editingMomentPart ? suggestion : (dashPosition < 0 ? "" : text.substring(dashPosition+1).trim())
+                let one = editingLocationTypePart ? suggestion : root.text.substring(0, dotPosition).trim()
+                let two = editingLocationPart ? suggestion : (dotPosition > 0 ? root.text.substring(dotPosition+1, dashPosition < 0 ? root.text.length : dashPosition).trim() : "")
+                let three = editingMomentPart ? suggestion : (dashPosition < 0 ? "" : root.text.substring(dashPosition+1).trim())
 
-                var cp = 0
+                let cp = 0
                 if(editingLocationTypePart)
                     cp = one.length + 2
                 else if(editingLocationPart)
@@ -145,7 +145,7 @@ VclTextField {
                     root.cursorPosition = cp
                 })
 
-                var ret = one + ". "
+                let ret = one + ". "
                 if(two.length > 0 || three.length > 0)
                     ret += two + " - " + three
                 return ret

@@ -13,11 +13,10 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
-import QtQuick.Controls
-import QtQuick.Layouts
-import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -62,7 +61,7 @@ Rectangle {
         Loader {
             id: _searchAgentLoader
 
-            property SearchAgent searchAgent: item ? Object.firstChildByType(item, "SearchAgent") : null
+            property SearchAgent searchAgent: item ? Object.firstChildByType(item, "SearchAgent") as SearchAgent : null
 
             active: _private.screenplay ? true : false
 
@@ -142,7 +141,7 @@ Rectangle {
             }
         }
 
-        onShowReplaceRequest: showReplace = flag
+        onShowReplaceRequest: (flag) => { showReplace = flag }
     }
 
     QtObject {

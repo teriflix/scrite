@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
@@ -75,13 +77,15 @@ AbstractScenePartEditor {
                     fillMode: Image.PreserveAspectFit
 
                     MouseArea {
+                        id: _warningIconMouseArea
+
                         anchors.fill: parent
 
                         hoverEnabled: enabled
 
                         ToolTipPopup {
                             text: "" + root.scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + ").\nRefer Settings > Screenplay > Options tab."
-                            visible: container.containsMouse
+                            visible: _warningIconMouseArea.containsMouse
                         }
 
                         onClicked: SettingsDialog.launch("Screenplay")
@@ -118,7 +122,7 @@ AbstractScenePartEditor {
                     action: ActionHub.editOptions.find("editSceneNumber")
                     enabled: root.isCurrent && !root.readOnly && !_sceneNumber.activeFocus
 
-                    onTriggered: (source) => {
+                    onTriggered: () => {
                                      _sceneNumber.selectAll()
                                      _sceneNumber.forceActiveFocus()
                                  }
@@ -165,7 +169,7 @@ AbstractScenePartEditor {
                 action: ActionHub.paragraphFormats.find("headingParagraph")
                 enabled: root.isCurrent && !root.readOnly && !_sceneHeading.activeFocus
 
-                onTriggered: (source) => {
+                onTriggered: () => {
                                  _sceneHeading.selectAll()
                                  _sceneHeading.forceActiveFocus()
                              }
@@ -221,14 +225,14 @@ AbstractScenePartEditor {
     QtObject {
         id: _private
 
-        readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent")
+        readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent") as Action
 
         property Component markSceneAsMenu: MarkSceneAsMenu {
             scene: root.scene
         }
 
         function popupMarkSceneAsMenu(parent) {
-            let menu = markSceneAsMenu.createObject(root)
+            let menu = markSceneAsMenu.createObject(root) as MarkSceneAsMenu
             menu.closed.connect(menu.destroy)
             menu.popup()
             return menu
@@ -242,7 +246,7 @@ AbstractScenePartEditor {
         }
 
         function popupFormalTagsMenu(parent) {
-            let menu = formalTagsMenu.createObject(root)
+            let menu = formalTagsMenu.createObject(root) as StructureGroupsMenu
             menu.closed.connect(menu.destroy)
             menu.popup()
             return menu

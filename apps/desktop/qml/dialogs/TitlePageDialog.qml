@@ -189,7 +189,7 @@ DialogLauncher {
                         }
                     }
 
-                    VclFileDialog {
+                    FileDialog {
                         id: _fileDialog
 
                         currentFolder: Runtime.workspaceSettings.lastOpenPhotosFolderUrl

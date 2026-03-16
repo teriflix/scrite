@@ -406,7 +406,7 @@ Item {
         }
 
         function loadTaxonomy() {
-            let api = Qt.createQmlObject("import io.scrite.components 1.0; AppPlanTaxonomyRestApiCall {}", _private)
+            let api = Qt.createQmlObject("import io.scrite.components; AppPlanTaxonomyRestApiCall {}", _private)
             api.finished.connect( () => {
                                      if(api.hasError || !api.hasResponse)
                                         Runtime.execLater(_private, 500, loadTaxonomy)

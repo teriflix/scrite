@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Controls
@@ -21,11 +23,11 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
+import "../"
 import "../../../globals"
 import "../../../dialogs"
 import "../../../helpers"
 import "../../../controls"
-import ".."
 import "../sidepanel"
 import "../sceneparteditors"
 import "../sceneparteditors/helpers"
@@ -36,6 +38,7 @@ Item {
     required property bool showSceneComments
     required property AbstractScreenplayElementSceneDelegate sceneDelegate
 
+    height: implicitHeight
     implicitHeight: Math.max(_layout.height + Runtime.sceneEditorFontMetrics.lineSpacing,
                              _sidePanelLoader.active && _sidePanelLoader.item.expanded ? _sidePanelLoader.height : 0)
 
@@ -56,7 +59,7 @@ Item {
             width: parent.width
             height: _headingLayout.height
 
-            color: Runtime.colors.tint(sceneDelegate.scene.color, sceneDelegate.isCurrent ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneHeadingTint)
+            color: Runtime.colors.tint(root.sceneDelegate.scene.color, root.sceneDelegate.isCurrent ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneHeadingTint)
 
             Column {
                 id: _headingLayout
@@ -72,23 +75,23 @@ Item {
 
                     width: parent.width
 
-                    index: sceneDelegate.index
-                    sceneID: sceneDelegate.sceneID
-                    screenplayElement: sceneDelegate.screenplayElement
-                    screenplayElementDelegateHasFocus: sceneDelegate.hasFocus
+                    index: root.sceneDelegate.index
+                    sceneID: root.sceneDelegate.sceneID
+                    screenplayElement: root.sceneDelegate.screenplayElement
+                    screenplayElementDelegateHasFocus: root.sceneDelegate.hasFocus
 
                     partName: "SceneHeading"
-                    isCurrent: sceneDelegate.isCurrent
-                    zoomLevel: sceneDelegate.zoomLevel
-                    fontMetrics: sceneDelegate.fontMetrics
-                    pageMargins: sceneDelegate.pageMargins
-                    screenplayAdapter: sceneDelegate.screenplayAdapter
+                    isCurrent: root.sceneDelegate.isCurrent
+                    zoomLevel: root.sceneDelegate.zoomLevel
+                    fontMetrics: root.sceneDelegate.fontMetrics
+                    pageMargins: root.sceneDelegate.pageMargins
+                    screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
-                    onEnsureVisible: (item, area) => { sceneDelegate.ensureVisible(item, area) }
+                    onEnsureVisible: (item, area) => { root.sceneDelegate.ensureVisible(item, area) }
 
                     onHasFocusChanged: {
                         if(hasFocus)
-                            sceneDelegate.currentParagraphType = SceneElement.Heading
+                            root.sceneDelegate.currentParagraphType = SceneElement.Heading
                     }
                 }
 
@@ -100,19 +103,19 @@ Item {
                     visible: active
 
                     sourceComponent: SceneStoryBeatTagsPartEditor {
-                        index: sceneDelegate.index
-                        sceneID: sceneDelegate.sceneID
-                        screenplayElement: sceneDelegate.screenplayElement
-                        screenplayElementDelegateHasFocus: sceneDelegate.hasFocus
+                        index: root.sceneDelegate.index
+                        sceneID: root.sceneDelegate.sceneID
+                        screenplayElement: root.sceneDelegate.screenplayElement
+                        screenplayElementDelegateHasFocus: root.sceneDelegate.hasFocus
 
                         partName: "StoryBeats"
-                        isCurrent: sceneDelegate.isCurrent
-                        zoomLevel: sceneDelegate.zoomLevel * 0.8
+                        isCurrent: root.sceneDelegate.isCurrent
+                        zoomLevel: root.sceneDelegate.zoomLevel * 0.8
                         fontMetrics: Runtime.idealFontMetrics
-                        pageMargins: sceneDelegate.pageMargins
-                        screenplayAdapter: sceneDelegate.screenplayAdapter
+                        pageMargins: root.sceneDelegate.pageMargins
+                        screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
-                        onEnsureVisible: (item, area) => { sceneDelegate.ensureVisible(item, area) }
+                        onEnsureVisible: (item, area) => { root.sceneDelegate.ensureVisible(item, area) }
 
                         // TODO
                         onSceneTagAdded: (tagName) => { }
@@ -128,19 +131,19 @@ Item {
                     visible: active
 
                     sourceComponent: SceneCharacterListPartEditor {
-                        index: sceneDelegate.index
-                        sceneID: sceneDelegate.sceneID
-                        screenplayElement: sceneDelegate.screenplayElement
-                        screenplayElementDelegateHasFocus: sceneDelegate.hasFocus
+                        index: root.sceneDelegate.index
+                        sceneID: root.sceneDelegate.sceneID
+                        screenplayElement: root.sceneDelegate.screenplayElement
+                        screenplayElementDelegateHasFocus: root.sceneDelegate.hasFocus
 
                         partName: "CharacterList"
-                        isCurrent: sceneDelegate.isCurrent
-                        zoomLevel: sceneDelegate.zoomLevel * 0.8
+                        isCurrent: root.sceneDelegate.isCurrent
+                        zoomLevel: root.sceneDelegate.zoomLevel * 0.8
                         fontMetrics: Runtime.idealFontMetrics
-                        pageMargins: sceneDelegate.pageMargins
-                        screenplayAdapter: sceneDelegate.screenplayAdapter
+                        pageMargins: root.sceneDelegate.pageMargins
+                        screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
-                        onEnsureVisible: (item, area) => { sceneDelegate.ensureVisible(item, area) }
+                        onEnsureVisible: (item, area) => { root.sceneDelegate.ensureVisible(item, area) }
 
                         onNewCharacterAdded: (characterName) => { }
                     }
@@ -154,25 +157,25 @@ Item {
                     visible: active
 
                     sourceComponent: SceneSynopsisPartEditor {
-                        index: sceneDelegate.index
-                        sceneID: sceneDelegate.sceneID
-                        screenplayElement: sceneDelegate.screenplayElement
-                        screenplayElementDelegateHasFocus: sceneDelegate.hasFocus
+                        index: root.sceneDelegate.index
+                        sceneID: root.sceneDelegate.sceneID
+                        screenplayElement: root.sceneDelegate.screenplayElement
+                        screenplayElementDelegateHasFocus: root.sceneDelegate.hasFocus
 
                         partName: "Synopsis"
-                        isCurrent: sceneDelegate.isCurrent
-                        zoomLevel: sceneDelegate.zoomLevel * 0.9
+                        isCurrent: root.sceneDelegate.isCurrent
+                        zoomLevel: root.sceneDelegate.zoomLevel * 0.9
                         fontMetrics: Runtime.idealFontMetrics
-                        pageMargins: sceneDelegate.pageMargins
-                        screenplayAdapter: sceneDelegate.screenplayAdapter
+                        pageMargins: root.sceneDelegate.pageMargins
+                        screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
-                        onEnsureVisible: (item, area) => { sceneDelegate.ensureVisible(item, area) }
+                        onEnsureVisible: (item, area) => { root.sceneDelegate.ensureVisible(item, area) }
                     }
                 }
 
                 Item {
                     width: parent.width
-                    height: sceneDelegate.fontMetrics.lineSpacing/2
+                    height: root.sceneDelegate.fontMetrics.lineSpacing/2
                     visible: Runtime.screenplayEditorSettings.displaySceneCharacters && !Runtime.screenplayEditorSettings.displaySceneSynopsis
                 }
             }
@@ -187,36 +190,36 @@ Item {
 
                 width: parent.width
 
-                index: sceneDelegate.index
-                sceneID: sceneDelegate.sceneID
-                screenplayElement: sceneDelegate.screenplayElement
-                screenplayElementDelegateHasFocus: sceneDelegate.hasFocus
+                index: root.sceneDelegate.index
+                sceneID: root.sceneDelegate.sceneID
+                screenplayElement: root.sceneDelegate.screenplayElement
+                screenplayElementDelegateHasFocus: root.sceneDelegate.hasFocus
 
                 focus: true
                 partName: "SceneContent"
-                listView: sceneDelegate.listView
-                isCurrent: sceneDelegate.isCurrent
-                zoomLevel: sceneDelegate.zoomLevel
-                fontMetrics: sceneDelegate.fontMetrics
-                pageMargins: sceneDelegate.pageMargins
-                screenplayAdapter: sceneDelegate.screenplayAdapter
-                ensureCursorCenteredAction: sceneDelegate.ensureCursorCenteredAction
+                listView: root.sceneDelegate.listView
+                isCurrent: root.sceneDelegate.isCurrent
+                zoomLevel: root.sceneDelegate.zoomLevel
+                fontMetrics: root.sceneDelegate.fontMetrics
+                pageMargins: root.sceneDelegate.pageMargins
+                screenplayAdapter: root.sceneDelegate.screenplayAdapter
+                ensureCursorCenteredAction: root.sceneDelegate.ensureCursorCenteredAction
 
                 onHasFocusChanged: {
                     if(hasFocus)
-                        sceneDelegate.currentParagraphType = Qt.binding( () => { return currentParagraphType } )
+                        root.sceneDelegate.currentParagraphType = Qt.binding( () => { return currentParagraphType } )
                 }
 
                 onEnsureVisible: (item, area) => {
                                      if(cursorPosition === 0) {
-                                        sceneDelegate.ensureVisible(_sceneHeadingEditor, Qt.rect(0, 0, area.width, area.height))
+                                        root.sceneDelegate.ensureVisible(_sceneHeadingEditor, Qt.rect(0, 0, area.width, area.height))
                                      } else
-                                        sceneDelegate.ensureVisible(item, area)
+                                        root.sceneDelegate.ensureVisible(item, area)
                                  }
-                onEnsureCentered: (item, area) => { sceneDelegate.ensureCentered(item, area) }
+                onEnsureCentered: (item, area) => { root.sceneDelegate.ensureCentered(item, area) }
 
-                onSplitSceneRequest: (paragraph, cursorPosition) => { sceneDelegate.splitSceneRequest(paragraph, cursorPosition) }
-                onMergeWithPreviousSceneRequest: () => { sceneDelegate.mergeWithPreviousSceneRequest() }
+                onSplitSceneRequest: (paragraph, cursorPosition) => { root.sceneDelegate.splitSceneRequest(paragraph, cursorPosition) }
+                onMergeWithPreviousSceneRequest: () => { root.sceneDelegate.mergeWithPreviousSceneRequest() }
             }
 
             SceneTextEditorPageNumbers {
@@ -224,15 +227,16 @@ Item {
 
                 anchors.fill: parent
 
-                isCurrent: sceneDelegate.isCurrent
-                zoomLevel: sceneDelegate.zoomLevel
+                isCurrent: root.sceneDelegate.isCurrent
+                zoomLevel: root.sceneDelegate.zoomLevel
                 fontMetrics: Runtime.idealFontMetrics
                 sceneTextEditor: _sceneContentEditor.editor
-                screenplayElement: sceneDelegate.screenplayElement
+                screenplayElement: root.sceneDelegate.screenplayElement
+                zeroPositionOffset: _headingLayout.height
             }
 
             Connections {
-                target: sceneDelegate
+                target: root.sceneDelegate
 
                 function on__ZoomLevelJustChanged() {
                     _sceneContentEditor.afterZoomLevelChange()
@@ -249,50 +253,50 @@ Item {
         id: _sidePanelLoader
 
         property real __screenY: __evaluateScreenY()
-        property real __maxTopMargin: sceneDelegate.height - height
+        property real __maxTopMargin: root.sceneDelegate.height - height
 
         anchors.top: parent.top
         anchors.left: parent.right
         anchors.topMargin: __screenY < 0 ? Math.min(-__screenY, __maxTopMargin) : 0
 
         active: root.showSceneComments &&
-                sceneDelegate.spaceAvailableForScenePanel >= Runtime.minSceneSidePanelWidth
+                root.sceneDelegate.spaceAvailableForScenePanel >= Runtime.minSceneSidePanelWidth
 
         sourceComponent: SceneSidePanel {
             height: 300
 
-            index: sceneDelegate.index
-            sceneID: sceneDelegate.sceneID
-            screenplayElement: sceneDelegate.screenplayElement
-            screenplayElementDelegateHasFocus: sceneDelegate.hasFocus
+            index: root.sceneDelegate.index
+            sceneID: root.sceneDelegate.sceneID
+            screenplayElement: root.sceneDelegate.screenplayElement
+            screenplayElementDelegateHasFocus: root.sceneDelegate.hasFocus
 
             partName: "SidePanel"
-            isCurrent: sceneDelegate.isCurrent
+            isCurrent: root.sceneDelegate.isCurrent
             zoomLevel: 1
             fontMetrics: Runtime.idealFontMetrics
             pageMargins: Runtime.margins(0, 0, 0, 0)
-            screenplayAdapter: sceneDelegate.screenplayAdapter
+            screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
             label: expanded ? evaluateLabel() : ""
-            readOnly: sceneDelegate.readOnly
-            listView: sceneDelegate.listView
-            maxPanelWidth: Math.min(sceneDelegate.spaceAvailableForScenePanel, Runtime.maxSceneSidePanelWidth)
+            readOnly: root.sceneDelegate.readOnly
+            listView: root.sceneDelegate.listView
+            maxPanelWidth: Math.min(root.sceneDelegate.spaceAvailableForScenePanel, Runtime.maxSceneSidePanelWidth)
 
-            onEnsureVisible: (item, area) => { sceneDelegate.ensureVisible(item, area) }
+            onEnsureVisible: (item, area) => { root.sceneDelegate.ensureVisible(item, area) }
 
             function evaluateLabel() {
-                let rsn = sceneDelegate.screenplayElement.resolvedSceneNumber
+                let rsn = root.sceneDelegate.screenplayElement.resolvedSceneNumber
                 if(rsn === "")
-                    rsn = "#" + (sceneDelegate.index + 1)
+                    rsn = "#" + (root.sceneDelegate.index + 1)
 
                 if(_sidePanelLoader.__screenY >= 0)
                     return "Scene " + rsn
-                return rsn + ". " + (sceneDelegate.scene.heading.enabled ? sceneDelegate.scene.heading.displayText : "NO SCENE HEADING")
+                return rsn + ". " + (root.sceneDelegate.scene.heading.enabled ? root.sceneDelegate.scene.heading.displayText : "NO SCENE HEADING")
             }
         }
 
         Connections {
-            target: sceneDelegate.listView
+            target: root.sceneDelegate.listView
 
             function onContentYChanged() {
                 _sidePanelLoader.__screenY = _sidePanelLoader.__evaluateScreenY()
@@ -300,12 +304,12 @@ Item {
         }
 
         function __evaluateScreenY() {
-            return sceneDelegate.listView.mapFromItem(sceneDelegate, 0, 0).y
+            return root.sceneDelegate.listView.mapFromItem(root.sceneDelegate, 0, 0).y
         }
     }
 
     Connections {
-        target: sceneDelegate
+        target: root.sceneDelegate
 
         function on__FocusIn(cursorPosition) {
             _sceneContentEditor.assumeFocusAt(cursorPosition)
@@ -325,7 +329,7 @@ Item {
     onHeightChanged: Qt.callLater(__updateHeightHint)
 
     function __updateHeightHint() {
-        if(height > 0 && sceneDelegate && sceneDelegate.screenplayElement && sceneDelegate.zoomLevel > 0)
-            sceneDelegate.screenplayElement.heightHint = height / zoomLevel
+        if(height > 0 && sceneDelegate && root.sceneDelegate.screenplayElement && root.sceneDelegate.zoomLevel > 0)
+            root.sceneDelegate.screenplayElement.heightHint = height / root.sceneDelegate.zoomLevel
     }
 }

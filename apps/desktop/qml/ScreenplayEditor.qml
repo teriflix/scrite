@@ -13,13 +13,12 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
-import QtQuick.Dialogs
 import QtQuick.Window
 import QtQuick.Controls
-import QtQuick.Layouts
-import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -123,7 +122,7 @@ Rectangle {
                 action: ActionHub.sceneListPanelOptions.find("sidePanelVisibility")
                 checked: _sceneListPanel.expanded
 
-                onToggled: (source) => {
+                onToggled: () => {
                                _sceneListPanel.expanded = !_sceneListPanel.expanded
                            }
             }
@@ -133,7 +132,7 @@ Rectangle {
                 checked: Runtime.screenplayTracksSettings.displayTracks
                 enabled: Runtime.appFeatures.structure.enabled
 
-                onToggled: (source) => {
+                onToggled: () => {
                                Runtime.screenplayTracksSettings.displayTracks = !Runtime.screenplayTracksSettings.displayTracks
                            }
             }
@@ -444,7 +443,7 @@ Rectangle {
 
         function saveLayoutDetails() {
             if(_sidePanelLoader.active) {
-                var userData = Scrite.document.userData
+                let userData = Scrite.document.userData || {}
                 userData["screenplayEditor"] = {
                     "version": 0,
                     "sceneListSidePanelExpaned": _sidePanelLoader.item.expanded
@@ -455,9 +454,10 @@ Rectangle {
 
         function restoreLayoutDetails() {
             if(_sidePanelLoader.active) {
-                var userData = Scrite.document.userData
-                if(userData.screenplayEditor && userData.screenplayEditor.version === 0)
-                    _sidePanelLoader.item.expanded = userData.screenplayEditor.sceneListSidePanelExpaned
+                const userData = Scrite.document.userData || {}
+                const screenplayEditor = userData.screenplayEditor
+                if(screenplayEditor && screenplayEditor.version === 0)
+                    _sidePanelLoader.item.expanded = screenplayEditor.sceneListSidePanelExpaned
             }
         }
 

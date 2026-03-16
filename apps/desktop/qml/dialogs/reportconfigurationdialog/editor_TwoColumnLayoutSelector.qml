@@ -22,7 +22,6 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../controls"
 import "../../helpers"
@@ -47,6 +46,7 @@ RowLayout {
 
         delegate: ColumnLayout {
             id: _layoutOptionDelegate
+
             required property int index
             required property var modelData
 
@@ -71,7 +71,7 @@ RowLayout {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
 
-                    onClicked: report.layout = _layoutOptionDelegate.modelData.value
+                    onClicked: root.report.layout = _layoutOptionDelegate.modelData.value
                 }
             }
 
@@ -79,8 +79,8 @@ RowLayout {
                 Layout.alignment: Qt.AlignHCenter
 
                 text: _layoutOptionDelegate.modelData.title
-                checked: report.layout === _layoutOptionDelegate.modelData.value
-                onToggled: report.layout = _layoutOptionDelegate.modelData.value
+                checked: root.report.layout === _layoutOptionDelegate.modelData.value
+                onToggled: root.report.layout = _layoutOptionDelegate.modelData.value
             }
         }
     }

@@ -39,7 +39,7 @@ ColumnLayout {
 
         wrapMode: Text.WordWrap
 
-        text: fieldInfo.label
+        text: root.fieldInfo.label
     }
 
     VclLabel {
@@ -49,7 +49,7 @@ ColumnLayout {
         font.italic: true
         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
-        text: fieldInfo.note
+        text: root.fieldInfo.note
     }
 
     ScrollView {
@@ -65,7 +65,7 @@ ColumnLayout {
         ListView {
             id: _groupsView
 
-            property var checkedTags: report.getConfigurationValue(fieldInfo.name)
+            property var checkedTags: root.report.getConfigurationValue(root.fieldInfo.name)
 
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
@@ -80,6 +80,7 @@ ColumnLayout {
             section.criteria: ViewSection.FullString
             section.delegate: Item {
                 id: _sectionDelegate
+
                 required property string section
 
                 width: _groupsView.width
@@ -89,6 +90,7 @@ ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 3
                     color: Runtime.colors.primary.windowColor
+
                     VclLabel {
                         text: _sectionDelegate.section
                         topPadding: 5
@@ -100,22 +102,21 @@ ColumnLayout {
             }
 
             delegate: VclCheckBox {
-                id: _tagGroupDelegate
                 required property int index
                 required property string name
                 required property string label
 
-                text: _tagGroupDelegate.label
-                checked: _groupsView.checkedTags.indexOf(_tagGroupDelegate.name) >= 0
+                text: label
+                checked: _groupsView.checkedTags.indexOf(name) >= 0
 
                 onToggled: {
                     var tags = _groupsView.checkedTags
                     if(checked)
-                        tags.push(_tagGroupDelegate.name)
+                        tags.push(name)
                     else
-                        tags.splice(tags.indexOf(_tagGroupDelegate.name), 1)
+                        tags.splice(tags.indexOf(name), 1)
                     _groupsView.checkedTags = tags
-                    report.setConfigurationValue(fieldInfo.name, tags)
+                    root.report.setConfigurationValue(root.fieldInfo.name, tags)
                 }
             }
         }

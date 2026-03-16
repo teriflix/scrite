@@ -76,7 +76,7 @@ VclMenu {
         title: "Color"
         enabled: !Scrite.document.readOnly && root.element
 
-        onMenuItemClicked: {
+        onMenuItemClicked: (color) => {
             for(var i=0; i<root.sceneGroup.sceneCount; i++) {
                 root.sceneGroup.sceneAt(i).color = color
             }
@@ -174,7 +174,7 @@ VclMenu {
         text: "Paste After\t" + ActionHub.sceneListPanelOptions.find("paste").shortcut
         enabled: Scrite.document.screenplay.canPaste
 
-        onClicked: Scrite.document.screenplay.pasteAfter( Scrite.document.screenplay.indexOfElement(element) )
+        onClicked: Scrite.document.screenplay.pasteAfter( Scrite.document.screenplay.indexOfElement(root.element) )
     }
 
     MenuSeparator { }

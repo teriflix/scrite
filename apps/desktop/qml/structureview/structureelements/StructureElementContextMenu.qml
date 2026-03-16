@@ -55,7 +55,7 @@ VclMenu {
         title: "Color"
         enabled: root.element
 
-        onMenuItemClicked: {
+        onMenuItemClicked: (color) => {
             root.element.scene.color = color
             root.element = null
         }

@@ -43,15 +43,15 @@ Item {
         anchors.fill: parent
 
         fillMode: {
-            if(!featuredImage)
-                return defaultFillMode
-            const ud = featuredImage.userData
-            if(ud[fillModeAttrib])
-                return ud[fillModeAttrib] === "fit" ? Image.PreserveAspectFit : Image.PreserveAspectCrop
-            return defaultFillMode
+            if(!root.featuredImage)
+                return root.defaultFillMode
+            const ud = root.featuredImage.userData
+            if(ud[root.fillModeAttrib])
+                return ud[root.fillModeAttrib] === "fit" ? Image.PreserveAspectFit : Image.PreserveAspectCrop
+            return root.defaultFillMode
         }
-        source: featuredImage ? featuredImage.fileSource : ""
-        visible: featuredImage
+        source: root.featuredImage ? root.featuredImage.fileSource : ""
+        visible: root.featuredImage
         mipmap: root.mipmap
 
         RoundButton {
@@ -70,9 +70,9 @@ Item {
                 else
                     parent.fillMode = Image.PreserveAspectFit
 
-                var ud = featuredImage.userData
-                ud[fillModeAttrib] = parent.fillMode === Image.PreserveAspectFit ? "fit" : "crop"
-                featuredImage.userData = ud
+                let ud = root.featuredImage.userData || {}
+                ud[root.fillModeAttrib] = parent.fillMode === Image.PreserveAspectFit ? "fit" : "crop"
+                root.featuredImage.userData = ud
             }
         }
 
@@ -132,7 +132,7 @@ Item {
 
                             onClicked: {
                                 Qt.callLater( () => {
-                                                 root.sceneAttachments.removeAttachment(featuredImage)
+                                                 root.sceneAttachments.removeAttachment(root.featuredImage)
                                                  _removeFeaturedImageDialog.active = false
                                              } )
                             }
@@ -155,7 +155,7 @@ Item {
 
         allowedType: Attachments.PhotosOnly
         target: root.sceneAttachments
-        visible: !featuredAttachment
+        visible: !root.featuredAttachment
         attachmentNoticeSuffix: "Drop this photo to tag it as featured image for this root.scene."
 
         onDropped: {
@@ -191,7 +191,7 @@ Item {
             }
         }
 
-        VclFileDialog {
+        FileDialog {
             id: _featuredAttachmentFileDialog
 
             nameFilters: root.sceneAttachments ? root.sceneAttachments.nameFilters : []

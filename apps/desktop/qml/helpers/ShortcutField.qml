@@ -60,14 +60,14 @@ Item {
 
         anchors.verticalCenter: parent.verticalCenter
 
-        spacing: fontMetrics.averageCharacterWidth * 0.4
+        spacing: root.fontMetrics.averageCharacterWidth * 0.4
 
         opacity: enabled ? 1 : 0.5
 
         Repeater {
             id: _modifiers
 
-            model: keyCombinations.modifiers
+            model: root.keyCombinations.modifiers
 
             delegate: KeyboardKey {
                 id: _delegate
@@ -75,15 +75,15 @@ Item {
                 required property string modelData
 
                 Layout.alignment: Qt.AlignVCenter
-                Layout.minimumWidth: __minimumKeyWidth
-                Layout.minimumHeight: __minimumKeyHeight
+                Layout.minimumWidth: root.__minimumKeyWidth
+                Layout.minimumHeight: root.__minimumKeyHeight
 
                 text: _delegate.modelData
             }
         }
 
         Repeater {
-            model: keyCombinations.keys
+            model: root.keyCombinations.keys
 
             delegate: KeyboardKey {
                 id: _delegate2
@@ -91,8 +91,8 @@ Item {
                 required property string modelData
 
                 Layout.alignment: Qt.AlignVCenter
-                Layout.minimumWidth: __minimumKeyWidth
-                Layout.minimumHeight: __minimumKeyHeight
+                Layout.minimumWidth: root.__minimumKeyWidth
+                Layout.minimumHeight: root.__minimumKeyHeight
 
                 text: _delegate2.modelData
             }
@@ -101,9 +101,9 @@ Item {
         Link {
             Layout.alignment: Qt.AlignVCenter
 
-            text: placeholderText
+            text: root.placeholderText
             font: root.font
-            visible: portableShortcut === ""
+            visible: root.portableShortcut === ""
         }
     }
 
@@ -116,7 +116,7 @@ Item {
         cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
         hoverEnabled: true
 
-        onClicked: editShortcut()
+        onClicked: root.editShortcut()
     }
 
     property real __minimumKeyWidth: fontMetrics.boundingRect("Ctrl").width + 6

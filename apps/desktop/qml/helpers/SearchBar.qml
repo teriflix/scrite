@@ -64,27 +64,27 @@ Item {
             height: Math.max(55, Math.max(Math.max(_txtSearch.height, _searchButtonsRow.height), (_replaceUiRect.visible ? _replaceUiRect.height : 0)))
 
             color: Runtime.colors.primary.c10.background
-            border.width: borderWidth
+            border.width: root.borderWidth
             border.color: Runtime.colors.primary.borderColor
 
-            enabled: searchEngine.searchAgentCount > 0
+            enabled: root.searchEngine.searchAgentCount > 0
 
             TextAreaInput {
                 id: _txtSearch
 
-                property bool canClear: searchEngine.searchResultCount > 0 || text !== ""
+                property bool canClear: root.searchEngine.searchResultCount > 0 || text !== ""
 
                 function triggerSearch() {
                     var ss = text.trim()
-                    if(searchEngine.searchString !== ss)
-                        searchEngine.searchString = ss
+                    if(root.searchEngine.searchString !== ss)
+                        root.searchEngine.searchString = ss
                     else
-                        searchEngine.cycleSearchResult()
+                        root.searchEngine.cycleSearchResult()
                 }
 
                 function clearSearch() {
                     clear()
-                    searchEngine.clearSearch()
+                    root.searchEngine.clearSearch()
                 }
 
                 Keys.onReturnPressed: (event) => {
@@ -137,18 +137,18 @@ Item {
 
                         VclMenuItem {
                             text: "Case Sensitive"
-                            checked: searchEngine.isSearchCaseSensitive
+                            checked: root.searchEngine.isSearchCaseSensitive
                             checkable: true
 
-                            onToggled: searchEngine.isSearchCaseSensitive = checked
+                            onToggled: root.searchEngine.isSearchCaseSensitive = checked
                         }
 
                         VclMenuItem {
                             text: "Whole Words"
-                            checked: searchEngine.isSearchWholeWords
+                            checked: root.searchEngine.isSearchWholeWords
                             checkable: true
 
-                            onToggled: searchEngine.isSearchWholeWords = checked
+                            onToggled: root.searchEngine.isSearchWholeWords = checked
                         }
                     }
 
@@ -161,8 +161,8 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
 
                     text: {
-                        if(searchEngine.searchResultCount > 0)
-                            return "  " +  (searchEngine.currentSearchResultIndex+1) + "/" + searchEngine.searchResultCount + "  "
+                        if(root.searchEngine.searchResultCount > 0)
+                            return "  " +  (root.searchEngine.currentSearchResultIndex+1) + "/" + root.searchEngine.searchResultCount + "  "
                         return ""
                     }
                 }
@@ -172,12 +172,12 @@ Item {
 
                     suggestedHeight: 40
 
-                    enabled: searchEngine.searchResultCount > 0 && searchEngine.currentSearchResultIndex > 0
+                    enabled: root.searchEngine.searchResultCount > 0 && root.searchEngine.currentSearchResultIndex > 0
                     hoverEnabled: false
 
                     icon.source: "qrc:/icons/action/keyboard_arrow_up.png"
 
-                    onClicked: searchEngine.previousSearchResult()
+                    onClicked: root.searchEngine.previousSearchResult()
                 }
 
                 VclToolButton {
@@ -185,12 +185,12 @@ Item {
 
                     suggestedHeight: 40
 
-                    enabled: searchEngine.searchResultCount > 0 && searchEngine.currentSearchResultIndex < searchEngine.searchResultCount
+                    enabled: root.searchEngine.searchResultCount > 0 && root.searchEngine.currentSearchResultIndex < root.searchEngine.searchResultCount
                     hoverEnabled: false
 
                     icon.source: "qrc:/icons/action/keyboard_arrow_down.png"
 
-                    onClicked: searchEngine.nextSearchResult()
+                    onClicked: root.searchEngine.nextSearchResult()
                 }
 
                 VclToolButton {
@@ -211,7 +211,7 @@ Item {
 
                     suggestedHeight: 40
                     toolTipText: {
-                        const replaceAction = ActionHub.editOptions.find("replace")
+                        const replaceAction = ActionHub.editOptions.find("replace") as Action
                         const replaceShortcut = Gui.nativeShortcut(replaceAction ? replaceAction.shortcut : "")
                         return (checked ? "Hide replace field." : "Show replace field.") +
                                 (replaceShortcut !== "" ? " (" + replaceShortcut + ")" : "")
@@ -219,13 +219,13 @@ Item {
 
                     down: checked
                     checked: _replaceUiRect.visible
-                    visible: allowReplace
+                    visible: root.allowReplace
                     checkable: true
                     hoverEnabled: true
 
                     icon.source: "qrc:/icons/action/find_replace.png"
 
-                    onToggled: showReplaceRequest(!showReplace)
+                    onToggled: root.showReplaceRequest(!root.showReplace)
                 }
             }
         }
@@ -237,10 +237,10 @@ Item {
             height: Math.max(_txtReplace.height, _replaceButtonsRow.height)
 
             color: Runtime.colors.primary.c10.background
-            visible: showReplace
-            enabled: searchEngine.searchAgentCount > 0
+            visible: root.showReplace
+            enabled: root.searchEngine.searchAgentCount > 0
 
-            border.width: borderWidth
+            border.width: root.borderWidth
             border.color: Runtime.colors.primary.borderColor
 
             TextAreaInput {
@@ -259,7 +259,7 @@ Item {
                 placeholderText: "Replace"
 
                 onActiveFocusChanged: {
-                    if(activeFocus && searchEngine.searchResultCount === 0)
+                    if(_txtReplace.activeFocus && root.searchEngine.searchResultCount === 0)
                         _txtSearch.triggerSearch()
                 }
             }
@@ -276,22 +276,22 @@ Item {
                     id: _cmdReplace
 
                     text: "Replace"
-                    enabled: _txtReplace.text.length > 0 && _txtSearch.text.length > 0 && searchEngine.currentSearchResultIndex >= 0 && searchEngine.searchResultCount > 0
+                    enabled: _txtReplace.text.length > 0 && _txtSearch.text.length > 0 && root.searchEngine.currentSearchResultIndex >= 0 && root.searchEngine.searchResultCount > 0
 
                     onClicked: click()
 
                     function click() {
-                        searchEngine.replace(_txtReplace.text)
-                        Runtime.execLater(searchEngine, 250, function() { searchEngine.nextSearchResult() })
+                        root.searchEngine.replace(_txtReplace.text)
+                        Runtime.execLater(root.searchEngine, 250, function() { root.searchEngine.nextSearchResult() })
                     }
                 }
 
                 VclButton {
                     text: "Replace All"
 
-                    enabled: _txtReplace.text.length > 0 && _txtSearch.text.length > 0 && searchEngine.searchResultCount > 0
+                    enabled: _txtReplace.text.length > 0 && _txtSearch.text.length > 0 && root.searchEngine.searchResultCount > 0
 
-                    onClicked: searchEngine.replaceAll(_txtReplace.text)
+                    onClicked: root.searchEngine.replaceAll(_txtReplace.text)
                 }
             }
         }

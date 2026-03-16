@@ -22,7 +22,6 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../controls"
 import "../../helpers"
@@ -44,7 +43,7 @@ ColumnLayout {
 
         wrapMode: Text.WordWrap
 
-        text: fieldInfo.label
+        text: root.fieldInfo.label
     }
 
     VclLabel {
@@ -54,7 +53,7 @@ ColumnLayout {
         font.italic: true
         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
-        text: fieldInfo.note
+        text: root.fieldInfo.note
     }
 
     ScrollView {
@@ -81,12 +80,12 @@ ColumnLayout {
         ListView {
             id: _episodeListView
 
-            property var episodeNumbers: fieldInfo ? report.getConfigurationValue(fieldInfo.name) : []
+            property var episodeNumbers: root.fieldInfo ? root.report.getConfigurationValue(root.fieldInfo.name) : []
 
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
             function select(episodeNumber, flag) {
-                var numbers = report.getConfigurationValue(fieldInfo.name)
+                var numbers = root.report.getConfigurationValue(root.fieldInfo.name)
                 var idx = numbers.indexOf(episodeNumber)
                 if(flag) {
                     if(idx < 0)
@@ -100,18 +99,17 @@ ColumnLayout {
                         return
                 }
                 episodeNumbers = numbers
-                report.setConfigurationValue(fieldInfo.name, numbers)
+                root.report.setConfigurationValue(root.fieldInfo.name, numbers)
             }
 
             clip: true
 
             delegate: VclCheckBox {
-                id: _episodeDelegate
                 required property int index
                 required property var modelData // This is a gadget of type ScreenplayBreakInfo
 
-                property int episodeNumber: _episodeDelegate.modelData.number
-                property string episodeName: _episodeDelegate.modelData.title + ": " + _episodeDelegate.modelData.subtitle
+                property int episodeNumber: modelData.number
+                property string episodeName: modelData.title + ": " + modelData.subtitle
 
                 width: _episodeListView.width-1
 

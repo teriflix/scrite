@@ -92,10 +92,10 @@ Item {
                 font.bold: true
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
 
-                topPadding: descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? _descIcon.height : 10
-                leftPadding: (descriptionPosition === Item.Right ? _descIcon.width : (descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? 20 : 0)) + 5
-                rightPadding: (descriptionPosition === Item.Left ? _descIcon.width : (descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? 20 : 0)) + 5
-                bottomPadding: descriptionPosition === Item.Top || descriptionPosition === Item.Bottom ? _descIcon.height : 10
+                topPadding: root.descriptionPosition === Item.Bottom || root.descriptionPosition === Item.Top ? _descIcon.height : 10
+                leftPadding: (root.descriptionPosition === Item.Right ? _descIcon.width : (root.descriptionPosition === Item.Bottom || root.descriptionPosition === Item.Top ? 20 : 0)) + 5
+                rightPadding: (root.descriptionPosition === Item.Left ? _descIcon.width : (root.descriptionPosition === Item.Bottom || root.descriptionPosition === Item.Top ? 20 : 0)) + 5
+                bottomPadding: root.descriptionPosition === Item.Top || root.descriptionPosition === Item.Bottom ? _descIcon.height : 10
 
                 Image {
                     id: _descIcon
@@ -105,7 +105,7 @@ Item {
                     smooth: true
 
                     source: {
-                        switch(descriptionPosition) {
+                        switch(root.descriptionPosition) {
                         case Item.Right:
                             return "qrc:/icons/navigation/arrow_left_inverted.png"
                         case Item.Right:
@@ -124,7 +124,7 @@ Item {
             }
 
             Component.onCompleted: {
-                switch(descriptionPosition) {
+                switch(root.descriptionPosition) {
                 case Item.Right:
                     _descTip.anchors.verticalCenter = _uiElementOverlay.verticalCenter
                     _descTip.anchors.left = _uiElementOverlay.right
@@ -140,10 +140,10 @@ Item {
                 case Item.Top:
                 case Item.TopLeft:
                 case Item.TopRight:
-                    if(descriptionPosition === Item.Top) {
+                    if(root.descriptionPosition === Item.Top) {
                         _descTip.anchors.horizontalCenter = _uiElementOverlay.horizontalCenter
                         _descIcon.anchors.horizontalCenter = _descLabel.horizontalCenter
-                    } else if(descriptionPosition === Item.TopRight) {
+                    } else if(root.descriptionPosition === Item.TopRight) {
                         _descTip.anchors.left = _uiElementOverlay.left
                         _descTip.anchors.leftMargin = _descLabel.leftPadding
                         _descIcon.anchors.left = _descLabel.left
@@ -160,10 +160,10 @@ Item {
                 case Item.Bottom:
                 case Item.BottomLeft:
                 case Item.BottomRight:
-                    if(descriptionPosition === Item.Top) {
+                    if(root.descriptionPosition === Item.Top) {
                         _descTip.anchors.horizontalCenter = _uiElementOverlay.horizontalCenter
                         _descIcon.anchors.horizontalCenter = _descLabel.horizontalCenter
-                    } else if(descriptionPosition === Item.BottomRight) {
+                    } else if(root.descriptionPosition === Item.BottomRight) {
                         _descTip.anchors.left = _uiElementOverlay.left
                         _descTip.anchors.leftMargin = _descLabel.leftPadding
                         _descIcon.anchors.left = _descLabel.left
@@ -186,9 +186,9 @@ Item {
         running: true
 
         NumberAnimation {
-            target: uiElement
+            target: root.uiElement
             property: "scale"
-            from: 1; to: highlightAnimationEnabled ? 2 : 1
+            from: 1; to: root.highlightAnimationEnabled ? 2 : 1
             duration: 500
         }
 
@@ -197,26 +197,26 @@ Item {
         }
 
         NumberAnimation {
-            target: uiElement
+            target: root.uiElement
             property: "scale"
-            from: highlightAnimationEnabled ? 2 : 1; to: 1
+            from: root.highlightAnimationEnabled ? 2 : 1; to: 1
             duration: 500
         }
 
         ScriptAction {
-            script: scaleAnimationDone()
+            script: root.scaleAnimationDone()
         }
     }
 
     MouseArea {
         anchors.fill: parent
-        onClicked: done()
+        onClicked: root.done()
     }
 
     Timer {
         running: true
         repeat: false
         interval: 4000
-        onTriggered: done()
+        onTriggered: root.done()
     }
 }

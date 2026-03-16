@@ -81,7 +81,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.margins: 8
 
-        text: "<b>" + episodeBox.name + "</b><font size=\"-2\">: " + episodeBox.sceneCount + (episodeBox.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
+        text: "<b>" + root.episodeBox.name + "</b><font size=\"-2\">: " + root.episodeBox.sceneCount + (root.episodeBox.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
         color: Runtime.colors.accent.c200.text
         elide: Text.ElideRight
 

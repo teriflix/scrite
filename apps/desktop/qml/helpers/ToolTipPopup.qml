@@ -35,7 +35,7 @@ ToolTip {
     x: 20
     y: container.height + 15
 
-    delay: DelayedProperty.value > 0 ? 0 : Qt.styleHints.mousePressAndHoldInterval
+    delay: DelayedProperty.value > 0 ? 0 : Scrite.app.styleHints.mousePressAndHoldInterval
     contentWidth: Math.min(_content.implicitWidth, maximumContentWidth)
 
     contentItem: RowLayout {

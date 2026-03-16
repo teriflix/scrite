@@ -47,7 +47,7 @@ Item {
             font.bold: true
             wrapMode: Text.WordWrap
 
-            text: target === e_CurrentDocumentTarget ? "Story beats used in the currently open document" : "Default story beats for use in all new documents created in the future"
+            text: root.target === root.e_CurrentDocumentTarget ? "Story beats used in the currently open document" : "Default story beats for use in all new documents created in the future"
         }
 
         VclLabel {
@@ -75,7 +75,7 @@ Item {
 
                 clip: true
                 color: Runtime.colors.primary.c50.text
-                text: target === e_CurrentDocumentTarget ? Scrite.document.structure.groupsData : File.read(Scrite.document.structure.defaultGroupsDataFile)
+                text: root.target === root.e_CurrentDocumentTarget ? Scrite.document.structure.groupsData : File.read(Scrite.document.structure.defaultGroupsDataFile)
 
                 font.family: "Courier Prime"
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -103,7 +103,7 @@ Item {
                 text: "Apply"
                 enabled: false
                 onClicked: {
-                    if(target === e_CurrentDocumentTarget)
+                    if(root.target === root.e_CurrentDocumentTarget)
                         Scrite.document.structure.groupsData = _storyBeatsEditor.text
                     else {
                         File.write(Scrite.document.structure.defaultGroupsDataFile, _storyBeatsEditor.text)

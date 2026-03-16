@@ -115,7 +115,7 @@ Item {
 
         onFinished: {
             if(hasResponse && !hasError) {
-                const wt = welcomeText
+                const wt = welcomeText || {}
                 switch(wt.format) {
                 case "html":
                     _welcomeText.textFormat = TextEdit.RichText

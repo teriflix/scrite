@@ -50,7 +50,7 @@ Item {
         Repeater {
             id: _tabRepeater
 
-            model: _tabBar.visible ? tabNames : 0
+            model: _tabBar.visible ? root.tabNames : 0
 
             delegate: TrapeziumTab {
                 id: _delegate
@@ -59,13 +59,13 @@ Item {
                 required property string modelData
 
                 currentTabIndex: _tabBar.currentIndex
-                tabBorderColor: Color.isVeryLight(tabColor) ? Runtime.colors.primary.borderColor : tabColor
+                tabBorderColor: Color.isVeryLight(root.tabColor) ? Runtime.colors.primary.borderColor : root.tabColor
                 tabBorderWidth: 1
                 tabCount: 2
-                tabFillColor: active ? tabColor : Runtime.colors.tint(tabColor, Runtime.colors.sceneControlTint)
+                tabFillColor: active ? root.tabColor : Runtime.colors.tint(root.tabColor, Runtime.colors.sceneControlTint)
                 tabIndex: index
                 text: modelData
-                textColor: active ? Color.textColorFor(tabColor) : Runtime.colors.primary.regular.text
+                textColor: active ? Color.textColorFor(root.tabColor) : Runtime.colors.primary.regular.text
 
                 onRequestActivation: _tabBar.currentIndex = index
             }
@@ -106,7 +106,7 @@ Item {
             color: Qt.rgba(0,0,0,0)
 
             border.width: 1
-            border.color: Color.isVeryLight(tabColor) ? Runtime.colors.primary.windowColor : tabColor
+            border.color: Color.isVeryLight(root.tabColor) ? Runtime.colors.primary.windowColor : root.tabColor
         }
     }
 
@@ -151,7 +151,9 @@ Item {
             outlineColor: _tabBarTab.tabBorderColor
             outlineWidth: _tabBarTab.tabBorderWidth
             renderingMechanism: PainterPathItem.UseAntialiasedQPainter
-            painterPath: _tabBarTab.alignment === Qt.AlignRight ? _rightPainterPath.createObject(_tabShapeItem) : _topPainterPath.createObject(_tabShapeItem)
+            painterPath: _tabBarTab.alignment === Qt.AlignRight ?
+                             _rightPainterPath.createObject(_tabShapeItem) as PainterPath :
+                             _topPainterPath.createObject(_tabShapeItem) as PainterPath
 
             VclLabel {
                 id: _tabText

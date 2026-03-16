@@ -20,13 +20,13 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
     id: root
+    
     property var fieldInfo
     property AbstractReportGenerator report
 
@@ -35,19 +35,19 @@ ColumnLayout {
     VclLabel {
         Layout.fillWidth: true
 
-        text: fieldInfo.label + ": "
+        text: root.fieldInfo.label + ": "
     }
 
     VclComboBox {
         Layout.fillWidth: true
         Layout.rightMargin: 30
 
-        model: fieldInfo.choices
+        model: root.fieldInfo.choices
         textRole: "key"
 
         onCurrentIndexChanged: {
-            if(report)
-                report.setConfigurationValue(fieldInfo.name, fieldInfo.choices[currentIndex].value)
+            if(root.report)
+                root.report.setConfigurationValue(root.fieldInfo.name, root.fieldInfo.choices[currentIndex].value)
         }
     }
 }

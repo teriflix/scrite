@@ -15,7 +15,6 @@
 
 import QtQml
 import QtQuick
-import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
@@ -42,7 +41,7 @@ ApplicationWindow {
     width: 1366
     height: 700
     visible: true
-    visibility: ApplicationWindow.Maximized
+    visibility: ApplicationWindow.Windowed
 
     color: Runtime.colors.primary.windowColor
 
@@ -108,7 +107,8 @@ ApplicationWindow {
 
         function determineDefaultFontSize() {
             if( Scrite.app.customFontPointSize === 0) {
-                var textItem = Qt.createQmlObject("import QtQuick 2.15; Text { text: \"Welcome to Scrite\" }", _contentLoader)
+                let textItemObj = Qt.createQmlObject("import QtQuick; Text { text: \"Welcome to Scrite\" }", _contentLoader)
+                let textItem = textItemObj as Text
                 if(textItem) {
                     Scrite.app.customFontPointSize = textItem.font.pointSize
                     textItem.destroy()

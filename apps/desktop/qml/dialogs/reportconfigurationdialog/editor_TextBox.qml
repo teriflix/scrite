@@ -20,13 +20,13 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
     id: root
+
     property var fieldInfo
     property AbstractReportGenerator report
 
@@ -39,7 +39,7 @@ ColumnLayout {
         font.pointSize: Runtime.idealFontMetrics.font.pointSize
         font.capitalization: Font.Capitalize
 
-        text: fieldInfo.name
+        text: root.fieldInfo.name
     }
 
     VclLabel {
@@ -50,20 +50,20 @@ ColumnLayout {
         font.italic: true
         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
-        text: fieldInfo.note
+        text: root.fieldInfo.note
     }
 
     VclTextField {
         Layout.fillWidth: true
 
         label: ""
-        placeholderText: fieldInfo.label
+        placeholderText: root.fieldInfo.label
 
-        text: report.getConfigurationValue(fieldInfo.name)
+        text: root.report.getConfigurationValue(root.fieldInfo.name)
 
         onTextChanged: {
-            if(report)
-                report.setConfigurationValue(fieldInfo.name, text)
+            if(root.report)
+                root.report.setConfigurationValue(root.fieldInfo.name, text)
         }
     }
 }

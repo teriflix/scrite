@@ -241,14 +241,14 @@ Item {
                 MessageBox.information("",
                     "Scenes must be added to the timeline before they can be stacked."
                 )
-                drop.ignore()
+                drop.accept(Qt.IgnoreAction)
                 return
             }
 
             const otherSceneId = otherScene.id
             const otherElement = Scrite.document.structure.findElementBySceneID(otherSceneId)
             if(otherElement === null) {
-                drop.ignore()
+                drop.accept(Qt.IgnoreAction)
                 return
             }
 

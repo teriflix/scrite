@@ -36,15 +36,15 @@ ColumnLayout {
 
         Layout.fillWidth: true
 
-        TabSequenceItem.manager: tabSequence
+        TabSequenceItem.manager: root.tabSequence
 
         font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-        text: fieldInfo.label
+        text: root.fieldInfo.label
         checkable: true
-        checked: exporter ? exporter.getConfigurationValue(fieldInfo.name) : false
+        checked: root.exporter ? root.exporter.getConfigurationValue(root.fieldInfo.name) : false
 
-        onToggled: exporter ? exporter.setConfigurationValue(fieldInfo.name, checked) : false
+        onToggled: root.exporter ? root.exporter.setConfigurationValue(root.fieldInfo.name, _checkBox.checked) : false
     }
 
     VclLabel {
@@ -56,6 +56,6 @@ ColumnLayout {
         leftPadding: 2*_checkBox.leftPadding + _checkBox.implicitIndicatorWidth
         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
-        text: fieldInfo.note
+        text: root.fieldInfo.note
     }
 }

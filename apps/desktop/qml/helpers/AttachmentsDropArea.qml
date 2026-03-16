@@ -48,11 +48,11 @@ BasicAttachmentsDropArea {
 
             anchors.centerIn: parent
 
-            width: parent.width * noticeWidthFactor
+            width: parent.width * root.noticeWidthFactor
 
             color: Runtime.colors.primary.c700.text
             horizontalAlignment: Text.AlignHCenter
-            text: parent.visible ? "<b>" + root.attachment.title + "</b><br/><br/>" + attachmentNoticeSuffix : ""
+            text: parent.visible ? "<b>" + root.attachment.title + "</b><br/><br/>" + root.attachmentNoticeSuffix : ""
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
             font.pointSize: Runtime.idealFontMetrics.font.pointSize

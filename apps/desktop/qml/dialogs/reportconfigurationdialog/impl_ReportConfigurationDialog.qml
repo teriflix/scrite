@@ -50,7 +50,7 @@ VclDialog {
 
         DisabledFeatureNotice {
             color: Qt.rgba(1,1,1,0.9)
-            featureName: report.title
+            featureName: root.report.title
         }
     }
 
@@ -74,13 +74,15 @@ VclDialog {
                 bottomPadding: 16
                 wrapMode: Text.WordWrap
 
-                text: report.description
+                text: root.report.description
             }
 
             PageView {
                 id: _reportConfigPageView
+
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+
                 pagesArray: _private.configuration.groups
                 pageTitleRole: "name"
                 pageListWidth: Math.max(width * 0.15, 150)
@@ -120,15 +122,15 @@ VclDialog {
                 }
 
                 Component.onCompleted: {
-                    if(Object.isOfType(report, "AbstractScreenplaySubsetReport")) {
-                        report.capitalizeSentences = Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
-                        report.polishParagraphs = Runtime.screenplayEditorSettings.enableAutoPolishParagraphs
+                    if(Object.isOfType(root.report, "AbstractScreenplaySubsetReport")) {
+                        root.report.capitalizeSentences = Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
+                        root.report.polishParagraphs = Runtime.screenplayEditorSettings.enableAutoPolishParagraphs
                     }
 
                     if(_private.isPdfExport)
                         Runtime.showHelpTip("watermark")
                     Runtime.showHelpTip("reports")
-                    Runtime.showHelpTip(Object.typeOf(report))
+                    Runtime.showHelpTip(Object.typeOf(root.report))
                 }
             }
         }
@@ -149,35 +151,35 @@ VclDialog {
                 Layout.fillWidth: true
 
                 label: "Select a file to export into"
-                absoluteFilePath: report.fileName
+                absoluteFilePath: root.report.fileName
                 enabled: _private.reportSaveFeature.enabled
                 allowedExtensions: [
                     {
                         "label": "PDF Format",
                         "suffix": "pdf",
                         "value": AbstractReportGenerator.PdfFormat,
-                        "enabled": report.supportsFormat(AbstractReportGenerator.PdfFormat)
+                        "enabled": root.report.supportsFormat(AbstractReportGenerator.PdfFormat)
                     },
                     {
                         "label": "Open Document Format",
                         "suffix": "odt",
                         "value": AbstractReportGenerator.OpenDocumentFormat,
-                        "enabled": report.supportsFormat(AbstractReportGenerator.OpenDocumentFormat) && _private.reportSaveFeature.enabled
+                        "enabled": root.report.supportsFormat(AbstractReportGenerator.OpenDocumentFormat) && _private.reportSaveFeature.enabled
                     }
                 ]
                 nameFilters: {
-                    if(report.format === AbstractReportGenerator.PdfFormat)
+                    if(root.report.format === AbstractReportGenerator.PdfFormat)
                         return "PDF (*.pdf)"
                     return "Open Document Format (*.odt)"
                 }
 
-                onSelectedExtensionChanged: report.format = selectedExtension.value
-                onAbsoluteFilePathChanged: report.fileName = absoluteFilePath
+                onSelectedExtensionChanged: root.report.format = _fileSelector.selectedExtension.value
+                onAbsoluteFilePathChanged: root.report.fileName = _fileSelector.absoluteFilePath
 
                 Component.onCompleted: {
-                    const aes = allowedExtensions
-                    const idx = report.format === AbstractReportGenerator.PdfFormat ? 0 : 1
-                    selectedExtension = aes[idx]
+                    const aes = _fileSelector.allowedExtensions
+                    const idx = root.report.format === AbstractReportGenerator.PdfFormat ? 0 : 1
+                    _fileSelector.selectedExtension = aes[idx]
                 }
             }
 
@@ -211,12 +213,13 @@ VclDialog {
         id: _reportConfigPageN
 
         ColumnLayout {
+            id: _reportConfigPageNLayout
             property int fieldGroupIndex: -1
 
             spacing: 5
 
             Repeater {
-                model: fieldGroupIndex > 0 && _private.configuration.groups[fieldGroupIndex] ? _private.configuration.groups[fieldGroupIndex].fields : []
+                model: _reportConfigPageNLayout.fieldGroupIndex > 0 && _private.configuration.groups[_reportConfigPageNLayout.fieldGroupIndex] ? _private.configuration.groups[_reportConfigPageNLayout.fieldGroupIndex].fields : []
                 delegate: _fieldEditorLoader
             }
         }
@@ -236,7 +239,7 @@ VclDialog {
 
             source: _delegateChooser.delegateSource(_fieldLoader.modelData.editor)
             onLoaded: {
-                item.report = report
+                item.report = root.report
                 item.fieldInfo = _fieldLoader.modelData
                 if(item.getReady)
                     item.getReady()
@@ -245,7 +248,8 @@ VclDialog {
             opacity: enabled ? 1 : 0.5
             enabled: {
                 if(_fieldLoader.modelData.feature !== "") {
-                    const afc = Qt.createQmlObject("import io.scrite.components 1.0; AppFeature { }", _fieldLoader)
+                    let afcObject = Qt.createQmlObject("import io.scrite.components; AppFeature { }", _fieldLoader)
+                    let afc = afcObject as AppFeature
                     afc.featureName = _fieldLoader.modelData.feature
                     const ret = afc.enabled
                     afc.destroy()
@@ -261,16 +265,18 @@ VclDialog {
 
         Item {
             id: _footerItem
+
             height: _footerLayout.height+20
 
             RowLayout {
                 id: _footerLayout
+
                 width: parent.width-32
                 anchors.centerIn: parent
 
                 VclButton {
                     Layout.alignment: Qt.AlignRight
-                    enabled: report.fileName !== "" && _private.reportEnabled
+                    enabled: root.report.fileName !== "" && _private.reportEnabled
                     text: "Generate"
                     onClicked: _generateReportJob.start()
 
@@ -290,8 +296,8 @@ VclDialog {
                 // Launch wait dialog ..
                 ScriptAction {
                     script: {
-                        Object.save(report)
-                        _private.waitDialog = WaitDialog.launch("Generating " + report.title + " ...", Aggregation.progressReport(report))
+                        Object.save(root.report)
+                        _private.waitDialog = WaitDialog.launch("Generating " + root.report.title + " ...", Aggregation.progressReport(root.report))
                     }
                 }
 
@@ -303,26 +309,26 @@ VclDialog {
                 // Perform the export job ...
                 ScriptAction {
                     script: {
-                        const dlFileName = report.fileName
+                        const dlFileName = root.report.fileName
                         if(_private.isPdfExport) {
-                            report.fileName = Runtime.fileNamager.generateUniqueTemporaryFileName("pdf")
-                            Runtime.fileNamager.addToAutoDeleteList(report.fileName)
+                            root.report.fileName = Runtime.fileNamager.generateUniqueTemporaryFileName("pdf")
+                            Runtime.fileNamager.addToAutoDeleteList(root.report.fileName)
                         }
 
-                        const success = report.generate()
+                        const success = root.report.generate()
 
                         Qt.callLater(_private.waitDialog.close)
                         _private.waitDialog = null
 
                         if(success) {
                             if(_private.isPdfExport) {
-                                PdfDialog.launch(report.title, report.fileName, dlFileName, report.singlePageReport ? 1 : 2, _private.reportSaveFeature.enabled)
+                                PdfDialog.launch(root.report.title, root.report.fileName, dlFileName, root.report.singlePageReport ? 1 : 2, _private.reportSaveFeature.enabled)
                             } else
-                                File.revealOnDesktop(report.fileName)
+                                File.revealOnDesktop(root.report.fileName)
                             Qt.callLater(root.close)
                         } else {
-                            const reportErrors = Aggregation.errorReport(report)
-                            MessageBox.information(report.title, reportErrors.errorMessage, () => {
+                            const reportErrors = Aggregation.errorReport(root.report)
+                            MessageBox.information(root.report.title, reportErrors.errorMessage, () => {
                                                        Qt.callLater(root.close)
                                                    } )
                         }
@@ -366,18 +372,18 @@ VclDialog {
     QtObject {
         id: _private
 
-        property var configuration: report ? report.configuration() : {"title": "Unknown", "description": "", "groups": []}
-        property bool isPdfExport: report ? report.format === AbstractReportGenerator.PdfFormat : false
-        property bool reportEnabled: report ? report.featureEnabled : false
+        property var configuration: root.report ? root.report.configuration() : {"title": "Unknown", "description": "", "groups": []}
+        property bool isPdfExport: root.report ? root.report.format === AbstractReportGenerator.PdfFormat : false
+        property bool reportEnabled: root.report ? root.report.featureEnabled : false
 
         property AppFeature reportSaveFeature: AppFeature {
-            featureName: report ? "report/" + report.title.toLowerCase() + "/save" : "report"
+            featureName: root.report ? "report/" + root.report.title.toLowerCase() + "/save" : "report"
         }
 
         property VclDialog waitDialog
     }
 
-    onClosed: Runtime.execLater(report, 100, report.discard)
+    onClosed: Runtime.execLater(root, 100, () => { if(root.report) root.report.discard() })
 
     Connections {
         target: root.report

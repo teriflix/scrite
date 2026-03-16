@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
@@ -73,6 +74,7 @@ DialogLauncher {
 
                     ListView {
                         id: _charactersListView
+
                         anchors.fill: parent
                         anchors.margins: 1
                         anchors.leftMargin: 5
@@ -94,30 +96,31 @@ DialogLauncher {
                             required property int index
                             required property string modelData
 
-                            property string thisCharacterName: SMath.titleCased(character.name)
+                            property string thisCharacterName: SMath.titleCased(_dialog.character.name)
                             property string otherCharacterName: modelData
-                            property bool   checked: relationshipName.length > 0
-                            property string relationship: relationshipName.text
+                            property bool   checked: _relationshipName.length > 0
+                            property string relationship: _relationshipName.text
 
                             property bool  highlight: false
                             property color backgroundColor: highlight ? Runtime.colors.accent.c100.background : Runtime.colors.primary.c10.background
                             property color foregroundColor: highlight ? Runtime.colors.accent.c100.text : Runtime.colors.primary.c10.text
 
                             width: _charactersListView.width
-                            height: characterRow.height*1.15
+                            height: _characterRow.height*1.15
                             color: backgroundColor
 
                             SearchAgent.engine: _searchBar.searchEngine
-                            SearchAgent.onSearchRequest: {
-                                SearchAgent.searchResultCount = SearchAgent.indexesOf(string, otherCharacterName).length > 0 ? 1 : 0
+                            SearchAgent.onSearchRequest: (string) => {
+                                SearchAgent.searchResultCount = SearchAgent.indexesOf(string, _characterRowItem.otherCharacterName).length > 0 ? 1 : 0
                             }
-                            SearchAgent.onCurrentSearchResultIndexChanged: {
+                            SearchAgent.onCurrentSearchResultIndexChanged: () => {
                                 highlight = SearchAgent.currentSearchResultIndex >= 0
                                 _charactersListView.currentIndex = index
                             }
 
                             RowLayout {
-                                id: characterRow
+                                id: _characterRow
+
                                 width: parent.width-20
                                 spacing: 10
 
@@ -126,40 +129,40 @@ DialogLauncher {
                                     Layout.preferredHeight: 24
 
                                     source: "qrc:/icons/navigation/check.png"
-                                    opacity: relationshipName.length > 0 ? 1 : 0.05
+                                    opacity: _relationshipName.length > 0 ? 1 : 0.05
                                 }
 
                                 VclLabel {
-                                    text: thisCharacterName + ": "
-                                    color: foregroundColor
+                                    text: _characterRowItem.thisCharacterName + ": "
+                                    color: _characterRowItem.foregroundColor
                                 }
 
                                 VclTextField {
-                                    id: relationshipName
+                                    id: _relationshipName
 
                                     Layout.fillWidth: true
 
-                                    Material.background: backgroundColor
-                                    Material.foreground: foregroundColor
+                                    Material.background: _characterRowItem.backgroundColor
+                                    Material.foreground: _characterRowItem.foregroundColor
 
                                     TabSequenceItem.manager: _characterListTabManager
-                                    TabSequenceItem.sequence: index
+                                    TabSequenceItem.sequence: _characterRowItem.index
 
                                     label: ""
-                                    color: foregroundColor
+                                    color: _characterRowItem.foregroundColor
                                     maximumLength: 50
                                     placeholderText: "husband of, wife of, friends with, reports to ..."
                                     enableTransliteration: true
 
                                     onActiveFocusChanged: {
                                         if(activeFocus)
-                                            _charactersListView.currentIndex = index
+                                            _charactersListView.currentIndex = _characterRowItem.index
                                     }
                                 }
 
                                 VclLabel {
-                                    text: SMath.titleCased(otherCharacterName) + "."
-                                    color: foregroundColor
+                                    text: SMath.titleCased(_characterRowItem.otherCharacterName) + "."
+                                    color: _characterRowItem.foregroundColor
                                 }
                             }
                         }

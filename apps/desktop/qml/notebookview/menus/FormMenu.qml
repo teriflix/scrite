@@ -48,8 +48,8 @@ VclMenu {
             text: objectItem.title
 
             onClicked: {
-                if(notes) {
-                    var note = notes.addFormNote(objectItem.id)
+                if(root.notes) {
+                    var note = root.notes.addFormNote(objectItem.id)
                     note.objectName = "_newNote"
                     root.noteAdded(note)
                 } else {
@@ -63,7 +63,7 @@ VclMenu {
         id: _model
 
         filterByProperty: "type"
-        filterValues: notes ? [notes.compatibleFormType] : []
+        filterValues: root.notes ? [root.notes.compatibleFormType] : []
         sortByProperty: "title"
         sourceModel: Scrite.document.globalForms
     }

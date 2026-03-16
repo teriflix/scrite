@@ -1378,7 +1378,7 @@ Item {
 //         }
 //     }
 
-//     VclFileDialog {
+//     FileDialog {
 //         id: _fileDialog
 
 //         currentFolder: Runtime.scritedSettings.lastOpenScritedFolderUrl

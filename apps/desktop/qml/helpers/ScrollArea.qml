@@ -178,19 +178,19 @@ Flickable {
     boundsBehavior: Flickable.StopAtBounds
 
     Behavior on contentX {
-        enabled: Runtime.applicationSettings.enableAnimations && animatePanAndZoom
+        enabled: Runtime.applicationSettings.enableAnimations && root.animatePanAndZoom
         NumberAnimation { id: contentXAnimation; duration: 250 }
     }
 
     Behavior on contentY {
-        enabled: Runtime.applicationSettings.enableAnimations && animatePanAndZoom
+        enabled: Runtime.applicationSettings.enableAnimations && root.animatePanAndZoom
         NumberAnimation { id: contentYAnimation; duration: 250 }
     }
 
     Behavior on zoomScale {
         id: _zoomScaleBehavior
         property bool allow: true
-        enabled: Runtime.applicationSettings.enableAnimations && animatePanAndZoom && allow
+        enabled: Runtime.applicationSettings.enableAnimations && root.animatePanAndZoom && allow
         NumberAnimation { id: zoomScaleAnimation; duration: 250 }
     }
 
@@ -235,12 +235,12 @@ Flickable {
         onScaleChanged: {
             _zoomScaleBehavior.allow = false;
 
-            const newScale = Math.max(minimumScale, Math.min(_pinchHandler.activeScale, maximumScale));
-            if (zoomScale !== newScale) {
-                const pinchCenter = _pinchHandler.centroid.position;
-                resizeContent(initialContentWidth * newScale, initialContentHeight * newScale, pinchCenter);
-                zoomScale = newScale;
-                zoomScaleChangedInteractively();
+            const newScale = Math.max(minimumScale, Math.min(activeScale, maximumScale));
+            if (root.zoomScale !== newScale) {
+                const pinchCenter = centroid.position;
+                root.resizeContent(root.initialContentWidth * newScale, root.initialContentHeight * newScale, pinchCenter);
+                root.zoomScale = newScale;
+                root.zoomScaleChangedInteractively();
             }
 
             _zoomScaleBehavior.allow = true;

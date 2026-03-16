@@ -63,13 +63,13 @@ Item {
                            if(root.active) {
                                _selection.from = pos
                                _selection.to = _selection.from
-                               selecting = true
+                               root.selecting = true
                                mouse.accepted = true
                            } else {
                                mouse.accepted = false
                            }
                        } else {
-                           _rubberband.active = false
+                           root.active = false
                            mouse.accepted = false
                        }
                    }
@@ -86,7 +86,7 @@ Item {
                          if(root.active) {
                              _selection.to = Qt.point(mouse.x, mouse.y)
                              root.select(_selection.rectangle)
-                             selecting = false
+                             root.selecting = false
                              root.active = false
                              mouse.accepted = true
                          } else {

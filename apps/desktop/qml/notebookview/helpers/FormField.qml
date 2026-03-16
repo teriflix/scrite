@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Controls
@@ -34,14 +36,14 @@ Column {
     property int tabSequenceIndex: 0
     property int nrQuestionDigits: 2
 
-    property bool cursorVisible: _answerItemLoader.lod === _answerItemLoader.LodLoader.LOD.High ? _answerItemLoader.item.cursorVisible : false
+    property bool cursorVisible: _answerItemLoader.lod === LodLoader.LOD.High ? _answerItemLoader.item.cursorVisible : false
     property bool enableUndoRedo: true
-    property bool textFieldHasActiveFocus: _answerItemLoader.lod === _answerItemLoader.LodLoader.LOD.High ? _answerItemLoader.item.activeFocus : false
+    property bool textFieldHasActiveFocus: _answerItemLoader.lod === LodLoader.LOD.High ? _answerItemLoader.item.activeFocus : false
 
     property real minHeight: _questionRow.height + _answerArea.minHeight + spacing
 
     property rect cursorRectangle: {
-        const cr = _answerItemLoader.lod === _answerItemLoader.LodLoader.LOD.High ? _answerItemLoader.item.cursorRectangle : Qt.rect(0,0,1,12)
+        const cr = _answerItemLoader.lod === LodLoader.LOD.High ? _answerItemLoader.item.cursorRectangle : Qt.rect(0,0,1,12)
         return mapFromItem(_answerItemLoader, cr.x, cr.y, cr.width, cr.height)
     }
 
@@ -51,7 +53,7 @@ Column {
     property string questionKey: questionNumber
     property string placeholderText
 
-    property TextArea textFieldItem: _answerItemLoader.item
+    property TextArea textFieldItem: _answerItemLoader.item as TextArea
     property TabSequenceManager tabSequenceManager
 
     signal focusNextRequest()
@@ -66,7 +68,7 @@ Column {
 
         anchors.right: parent.right
 
-        width: parent.width-indentation
+        width: parent.width-root.indentation
 
         spacing: 10
 
@@ -75,7 +77,7 @@ Column {
 
             anchors.top: parent.top
 
-            width: Runtime.idealFontMetrics.averageCharacterWidth * nrQuestionDigits
+            width: Runtime.idealFontMetrics.averageCharacterWidth * root.nrQuestionDigits
 
             font.bold: true
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
@@ -98,7 +100,7 @@ Column {
     Rectangle {
         id: _answerArea
 
-        property real minHeight: (Runtime.idealFontMetrics.lineSpacing + Runtime.idealFontMetrics.descent + Runtime.idealFontMetrics.ascent) * (answerLength == FormQuestion.ShortParagraph ? 1.1 : 3)
+        property real minHeight: (Runtime.idealFontMetrics.lineSpacing + Runtime.idealFontMetrics.descent + Runtime.idealFontMetrics.ascent) * (root.answerLength == FormQuestion.ShortParagraph ? 1.1 : 3)
 
         anchors.right: parent.right
 
@@ -112,8 +114,8 @@ Column {
         LodLoader {
             id: _answerItemLoader
 
-            TabSequenceItem.manager: tabSequenceManager
-            TabSequenceItem.sequence: tabSequenceIndex
+            TabSequenceItem.manager: root.tabSequenceManager
+            TabSequenceItem.sequence: root.tabSequenceIndex
             TabSequenceItem.onAboutToReceiveFocus: lod = LodLoader.LOD.High
 
             function assumeFocus(position) {
@@ -123,7 +125,7 @@ Column {
             }
 
             width: _answerArea.width
-            height: Math.max(_answerArea.minHeight-topPadding-bottomPadding, item ? item.contentHeight+20 : 0)
+            height: Math.max(_answerArea.minHeight-root.topPadding-root.bottomPadding, item ? item.contentHeight+20 : 0)
 
             lod: LodLoader.LOD.Low
 
@@ -185,7 +187,7 @@ Column {
                                           event.accepted = false
                                       else {
                                           event.accepted = true
-                                          Qt.callLater(focusPreviousRequest)
+                                          Qt.callLater(root.focusPreviousRequest)
                                       }
                                   }
 
@@ -194,7 +196,7 @@ Column {
                                             event.accepted = false
                                         else {
                                             event.accepted = true
-                                            Qt.callLater(focusNextRequest)
+                                            Qt.callLater(root.focusNextRequest)
                                         }
                                     }
 
@@ -210,7 +212,7 @@ Column {
                     }
                 ]
                 SyntaxHighlighter.textDocument: textDocument
-                SyntaxHighlighter.textDocumentUndoRedoEnabled: enableUndoRedo
+                SyntaxHighlighter.textDocumentUndoRedoEnabled: root.enableUndoRedo
 
                 DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
 
@@ -245,16 +247,16 @@ Column {
 
                 ActionHandler {
                     action: ActionHub.editOptions.find("undo")
-                    enabled: !_answerText.readOnly && _answerText.activeFocus && enableUndoRedo && _answerText.canUndo
+                    enabled: !_answerText.readOnly && _answerText.activeFocus && root.enableUndoRedo && _answerText.canUndo
 
-                    onTriggered: (source) => { _answerText.undo() }
+                    onTriggered: () => { _answerText.undo() }
                 }
 
                 ActionHandler {
                     action: ActionHub.editOptions.find("redo")
-                    enabled: !_answerText.readOnly && _answerText.activeFocus && enableUndoRedo && _answerText.canRedo
+                    enabled: !_answerText.readOnly && _answerText.activeFocus && root.enableUndoRedo && _answerText.canRedo
 
-                    onTriggered: (source) => { _answerText.redo() }
+                    onTriggered: () => { _answerText.redo() }
                 }
 
                 TextAreaSpellingSuggestionsMenu {
@@ -265,7 +267,7 @@ Column {
 
                 onActiveFocusChanged: {
                     if(!activeFocus && !persistentSelection) {
-                        _answerItemLoader.lod = _answerItemLoader.LodLoader.LOD.Low
+                        _answerItemLoader.lod = LodLoader.LOD.Low
                     }
                 }
             }

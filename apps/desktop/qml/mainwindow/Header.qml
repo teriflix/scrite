@@ -164,7 +164,7 @@ Rectangle {
             }
 
             ActionToolButton {
-                action: ActionHub.languageOptions.find("platformLanguage")
+                action: ActionHub.languageOptions.find("platformLanguage") as Action
                 display: ToolButton.TextBesideIcon
             }
 
@@ -193,7 +193,7 @@ Rectangle {
             }
 
             ActionToolButton {
-                action: ActionHub.languageOptions.find("platformLanguage")
+                action: ActionHub.languageOptions.find("platformLanguage") as Action
                 visible: !_group1.visible && action.visible
             }
 
@@ -217,21 +217,21 @@ Rectangle {
             }
 
             ActionToolButton {
-                action: ActionHub.editOptions.find("find")
+                action: ActionHub.editOptions.find("find") as Action
             }
 
             ActionToolButton {
-                action: ActionHub.editOptions.find("splitScene")
+                action: ActionHub.editOptions.find("splitScene") as Action
                 visible: root.width >= 1600
             }
 
             ActionToolButton {
-                action: ActionHub.editOptions.find("mergeScene")
+                action: ActionHub.editOptions.find("mergeScene") as Action
                 visible: root.width >= 1600
             }
 
             ActionToolButton {
-                action: ActionHub.applicationOptions.find("configureScreenplayEditorOptions")
+                action: ActionHub.applicationOptions.find("configureScreenplayEditorOptions") as Action
             }
 
             Rectangle {
@@ -280,6 +280,8 @@ Rectangle {
                 model: ActionHub.mainWindowTabs
 
                 delegate: ToolButton {
+                    id: _mainWindowTabDelegate
+
                     required property int index
                     required property var qmlAction
 
@@ -289,11 +291,12 @@ Rectangle {
 
                     ToolTipPopup {
                         text: {
+                            const qmlAction = _mainWindowTabDelegate.qmlAction as Action
                             const tt = qmlAction.tooltip !== undefined ? qmlAction.tooltip : qmlAction.text
                             const sc = Gui.nativeShortcut(qmlAction.shortcut)
                             return sc === "" ? tt : (tt + " (" + sc + ")")
                         }
-                        visible: container.hovered
+                        visible: _mainWindowTabDelegate.hovered
                     }
 
                     action: qmlAction
@@ -307,7 +310,7 @@ Rectangle {
                             anchors.fill: parent
                             anchors.margins: -5
 
-                            color: qmlAction.down ? Runtime.colors.primary.c300.background : Runtime.colors.transparent
+                            color: _mainWindowTabDelegate.qmlAction.down ? Runtime.colors.primary.c300.background : Runtime.colors.transparent
                         }
                     }
                 }

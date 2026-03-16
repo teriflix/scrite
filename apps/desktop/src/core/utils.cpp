@@ -1529,7 +1529,7 @@ Utils::FileInfo Utils::File::info(const QString &path)
  */
 void Utils::MouseCursor::setShape(Qt::CursorShape shape)
 {
-    QtApplicationClass::setOverrideCursor(QCursor(shape));
+    QApplication::setOverrideCursor(QCursor(shape));
 }
 
 /**
@@ -1537,7 +1537,7 @@ void Utils::MouseCursor::setShape(Qt::CursorShape shape)
  */
 void Utils::MouseCursor::unsetShape()
 {
-    QtApplicationClass::restoreOverrideCursor();
+    QApplication::restoreOverrideCursor();
 }
 
 /**

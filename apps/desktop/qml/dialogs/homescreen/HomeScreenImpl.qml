@@ -22,11 +22,10 @@ import QtQuick.Controls
 
 import io.scrite.components
 
+import "../"
 import "../../tasks"
-
 import "../../globals"
 import "../../helpers"
-import ".."
 import "../../controls"
 
 Item {
@@ -43,12 +42,14 @@ Item {
 
     Loader {
         anchors.fill: parent
+
         sourceComponent: {
-            switch(_private.layoutType) {
-            case 1: return _homeScreenLayout1
-            case 2: return _homeScreenLayout2
-            default:
-            }
+            if(_private.layoutType === 1)
+                return _homeScreenLayout1
+
+            if(_private.layoutType === 2)
+                return _homeScreenLayout2
+
             return _homeScreenLayout2
         }
     }
@@ -126,7 +127,7 @@ Item {
     component TopBanner : Image {
         id: _banner
 
-        readonly property StackView stackView: Aggregation.firstSiblingByType("QQuickStackView")
+        readonly property StackView stackView: Aggregation.firstSiblingByType("QQuickStackView") as StackView
 
         source: {
             if(stackView.currentItem && stackView.currentItem.bannerImage)
@@ -259,7 +260,7 @@ Item {
             fillMode: Image.PreserveAspectFit
 
             Image {
-                readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
+                readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView") as StackView
 
                 anchors.centerIn: parent
                 source: (stackView.currentItem && stackView.currentItem.bannerImage) ? "" : "qrc:/images/banner_logo_overlay.png"
@@ -345,6 +346,7 @@ Item {
 
                 ColumnLayout {
                     id: _sideBannerHelpButtons
+
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
@@ -500,6 +502,7 @@ Item {
 
     component LinkButton : Rectangle {
         id: _button
+
         property string text
         property string tooltip
         property string iconSource
@@ -535,16 +538,16 @@ Item {
                 Layout.preferredHeight: h
 
                 sourceComponent: {
-                    if(iconSource !== "")
+                    if(_button.iconSource !== "")
                         return _iconFromSource
                     return _iconFromImage
                 }
 
                 onLoaded: {
-                    if(iconSource !== "")
-                        item.source = Qt.binding( () => { return iconSource } )
+                    if(_button.iconSource !== "")
+                        item.source = Qt.binding( () => { return _button.iconSource } )
                     else
-                        item.image = Qt.binding( () => { return iconImage ? iconImage : Gui.emptyQImage } )
+                        item.image = Qt.binding( () => { return _button.iconImage ? _button.iconImage : Gui.emptyQImage } )
                 }
             }
 
@@ -558,15 +561,18 @@ Item {
                 elide: Text.ElideRight
                 padding: 3
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                font.underline: singleClick ? _buttonMouseArea.containsMouse : false
+                font.underline: _button.singleClick ? _buttonMouseArea.containsMouse : false
             }
         }
 
         MouseArea {
             id: _buttonMouseArea
+
             anchors.fill: parent
-            hoverEnabled: singleClick || _button.tooltip !== ""
-            cursorShape: singleClick ? Qt.PointingHandCursor : Qt.ArrowCursor
+
+            hoverEnabled: _button.singleClick || _button.tooltip !== ""
+            cursorShape: _button.singleClick ? Qt.PointingHandCursor : Qt.ArrowCursor
+
             onClicked: _button.clicked()
             onDoubleClicked: _button.doubleClicked()
             onEntered: {
@@ -597,8 +603,10 @@ Item {
 
             VclLabel {
                 id: _newFileLabel
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
                 text: "New File"
+
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
 
             Rectangle {
@@ -606,6 +614,7 @@ Item {
                 Layout.fillHeight: true
                 // Layout.leftMargin: 20
                 Layout.rightMargin: 20
+
                 color: Qt.rgba(0,0,0,0)
                 border.width: _templatesView.interactive ? 1 : 0
                 border.color: Runtime.colors.primary.borderColor
@@ -613,6 +622,7 @@ Item {
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 1
+
                     visible: !Runtime.appFeatures.templates.enabled
 
                     LinkButton {
@@ -638,14 +648,14 @@ Item {
                         Layout.fillWidth: true
 
                         text: "Blank Document"
-                        iconSource: "qrc:/icons/filetype/document.png"
                         tooltip: "A crisp and clean new document to write your next blockbuster!"
+                        iconSource: "qrc:/icons/filetype/document.png"
 
                         onClicked: {
                             SaveFileTask.save( () => {
                                                     root.enabled = false
                                                     Scrite.document.reset()
-                                                    closeRequest()
+                                                    root.closeRequest()
                                                 } )
                         }
                     }
@@ -653,6 +663,7 @@ Item {
                     DisabledFeatureNotice {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+
                         color: Qt.rgba(1,1,1,0.9)
                         featureName: "Screenplay Templates"
                         visible: !Runtime.appFeatures.templates.enabled
@@ -661,18 +672,22 @@ Item {
 
                 ListView {
                     id: _templatesView
-                    anchors.fill: parent
-                    anchors.margins: 1
-                    model: Runtime.appFeatures.templates.enabled ? Runtime.libraryService.templates : []
-                    visible: Runtime.appFeatures.templates.enabled
-                    currentIndex: -1
-                    clip: true
+
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                     ScrollBar.vertical: VclScrollBar {
                         flickable: _templatesView
                     }
+
+                    anchors.fill: parent
+                    anchors.margins: 1
+
+                    clip: true
+                    currentIndex: -1
                     highlightMoveDuration: 0
                     interactive: height < contentHeight
+                    model: Runtime.appFeatures.templates.enabled ? Runtime.libraryService.templates : []
+                    visible: Runtime.appFeatures.templates.enabled
+
                     header: LinkButton {
                         width: _templatesView.width
 
@@ -695,6 +710,7 @@ Item {
 
                     delegate: LinkButton {
                         id: _templateDelegate
+
                         required property int index
                         required property var record
 
@@ -708,7 +724,7 @@ Item {
                         onClicked: {
                             SaveFileTask.save( () => {
                                                     var task = OpenFromLibraryTask.openTemplateAt(Runtime.libraryService, _templateDelegate.index)
-                                                    task.finished.connect(closeRequest)
+                                                    task.finished.connect(root.closeRequest)
                                                 } )
                         }
                     }
@@ -716,6 +732,7 @@ Item {
 
                 BusyIndicator {
                     anchors.centerIn: parent
+
                     running: Runtime.libraryService.busy
                 }
             }
@@ -723,13 +740,15 @@ Item {
     }
 
     component OpenFileOptions : ColumnLayout {
-        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
+        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView") as StackView
 
         LinkButton {
+            Layout.fillWidth: true
+
             text: "Open ..."
             iconSource: "qrc:/icons/file/folder_open.png"
-            Layout.fillWidth: true
             tooltip: "Launches a file dialog box so you can select a .scrite file to load from disk."
+
             onClicked: {
                 SaveFileTask.save( () => {
                                         _openFileDialog.open()
@@ -738,12 +757,14 @@ Item {
         }
 
         LinkButton {
-            text: Runtime.recentFiles.count === 0 ? "Recent files ..." : "Scriptalay"
-            iconSource: Runtime.recentFiles.count === 0 ? "qrc:/icons/filetype/document.png" : "qrc:/icons/action/library.png"
             Layout.fillWidth: true
-            tooltip: Runtime.recentFiles.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online library."
-            onClicked: parent.stackView.push(_scriptalayPage)
+
             enabled: Runtime.recentFiles.count > 0
+            iconSource: Runtime.recentFiles.count === 0 ? "qrc:/icons/filetype/document.png" : "qrc:/icons/action/library.png"
+            text: Runtime.recentFiles.count === 0 ? "Recent files ..." : "Scriptalay"
+            tooltip: Runtime.recentFiles.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online library."
+
+            onClicked: parent.stackView.push(_scriptalayPage)
         }
     }
 
@@ -786,11 +807,11 @@ Item {
 
             onClicked: {
                 if(_quickRecentFile.fileInfo.filePath === Scrite.document.fileName)
-                    closeRequest()
+                    root.closeRequest()
                 else
                     SaveFileTask.save( () => {
                                             var task = OpenFileTask.open(_quickRecentFile.fileInfo.filePath)
-                                            task.finished.connect(closeRequest)
+                                            task.finished.connect(root.closeRequest)
                                         } )
             }
 
@@ -805,6 +826,7 @@ Item {
 
         LinkButton {
             id: _scriptalayDelegate
+
             required property int index
             required property var record
 
@@ -818,7 +840,7 @@ Item {
             onClicked: {
                 SaveFileTask.save( () => {
                                         var task = OpenFromLibraryTask.openScreenplayAt(Runtime.libraryService, _scriptalayDelegate.index)
-                                        task.finished.connect(closeRequest)
+                                        task.finished.connect(root.closeRequest)
                                     } )
             }
         }
@@ -827,6 +849,8 @@ Item {
     // This component should show "Recent Files", if recent files exist
     // It should show Scriptalay Scripts, if no recent files exist.
     component QuickFileOpenOptions : Item {
+        id: _quickFileOptions
+
         property bool scriptalayMode: Runtime.recentFiles.count === 0
 
         ColumnLayout {
@@ -855,7 +879,7 @@ Item {
                     Layout.fillWidth: true
 
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                    text: scriptalayMode ? "Scriptalay" : "Recent Files"
+                    text: _quickFileOptions.scriptalayMode ? "Scriptalay" : "Recent Files"
                 }
             }
 
@@ -864,31 +888,35 @@ Item {
                 Layout.fillHeight: true
                 // Layout.leftMargin: 20
                 // Layout.rightMargin: 20
+
                 color: Qt.rgba(0,0,0,0)
                 border.width: quickFilesView.interactive ? 1 : 0
                 border.color: Runtime.colors.primary.borderColor
 
                 ListView {
                     id: quickFilesView // shows either Scriptalay or Recent Files
-                    anchors.fill: parent
-                    anchors.margins: 1
-                    model: scriptalayMode ? Runtime.libraryService.screenplays : Runtime.recentFiles
-                    currentIndex: -1
-                    clip: true
+
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                     ScrollBar.vertical: VclScrollBar {
                         flickable: quickFilesView
                     }
+
+                    anchors.fill: parent
+                    anchors.margins: 1
+
+                    clip: true
+                    currentIndex: -1
+                    delegate: _quickFileOptions.scriptalayMode ? _quickFilesScriptalayDelegate : _quickFilesRecentFilesDelegate
                     highlightMoveDuration: 0
                     interactive: height < contentHeight
-                    delegate: scriptalayMode ? _quickFilesScriptalayDelegate : _quickFilesRecentFilesDelegate
+                    model: _quickFileOptions.scriptalayMode ? Runtime.libraryService.screenplays : Runtime.recentFiles
                 }
             }
         }
     }
 
     component ImportOptions : ColumnLayout {
-        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
+        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView") as StackView
 
         // Show restore and import options
         LinkButton {
@@ -913,6 +941,8 @@ Item {
     }
 
     component ScriptalayPage : Item {
+        id: _scriptalayPageContent
+
         // Show contents of Scriptalay
         property bool hasSelection: _screenplaysView.currentIndex >= 0
 
@@ -920,7 +950,7 @@ Item {
             SaveFileTask.save( () => {
                                     if(_screenplaysView.currentIndex >= 0) {
                                          var task = OpenFromLibraryTask.openScreenplayAt(Runtime.libraryService, _screenplaysView.currentIndex)
-                                         task.finished.connect(closeRequest)
+                                         task.finished.connect(root.closeRequest)
                                      }
                                 } )
         }
@@ -939,22 +969,27 @@ Item {
 
                 ListView {
                     id: _screenplaysView
-                    anchors.fill: parent
-                    anchors.margins: 1
-                    clip: true
-                    model: Runtime.libraryService.screenplays
-                    currentIndex: -1
+
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-                    highlight: Rectangle {
-                        color: Runtime.colors.primary.highlight.background
-                    }
                     ScrollBar.vertical: VclScrollBar {
                         flickable: _screenplaysView
                     }
+
+                    anchors.fill: parent
+                    anchors.margins: 1
+
+                    clip: true
+                    model: Runtime.libraryService.screenplays
+                    currentIndex: -1
+                    highlight: Rectangle {
+                        color: Runtime.colors.primary.highlight.background
+                    }
                     highlightMoveDuration: 0
                     highlightResizeDuration: 0
+
                     delegate: LinkButton {
                         id: _screenplayDelegate
+
                         required property int index
                         required property var record
 
@@ -967,7 +1002,7 @@ Item {
                         onClicked: _screenplaysView.currentIndex = _screenplayDelegate.index
                         onDoubleClicked: {
                             _screenplaysView.currentIndex = _screenplayDelegate.index
-                            Qt.callLater(openSelected)
+                            Qt.callLater(_scriptalayPageContent.openSelected)
                         }
                     }
                 }
@@ -982,7 +1017,7 @@ Item {
                     spacing: 20
 
                     Image {
-                        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
+                        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView") as StackView
 
                         Layout.fillWidth: true
                         Layout.preferredHeight: (_private.bannerSize.height / _private.bannerSize.width) * width
@@ -1026,38 +1061,45 @@ Item {
 
                         Flickable {
                             id: _screenplayDetailsFlick
-                            anchors.fill: parent
-                            anchors.margins: 1
-                            contentWidth: _screenplayDetailsText.width
-                            contentHeight: _screenplayDetailsText.height
-                            clip: true
-                            flickableDirection: Flickable.VerticalFlick
 
                             ScrollBar.vertical: VclScrollBar {
                                 flickable: _screenplayDetailsFlick
                             }
 
+                            anchors.fill: parent
+                            anchors.margins: 1
+
+                            contentWidth: _screenplayDetailsText.width
+                            contentHeight: _screenplayDetailsText.height
+                            clip: true
+                            flickableDirection: Flickable.VerticalFlick
+
                             TextArea {
                                 id: _screenplayDetailsText
-                                width: _screenplayDetailsFlick.width-20
+
                                 property var record: _screenplaysView.currentIndex >= 0 ? Runtime.libraryService.screenplays.recordAt(_screenplaysView.currentIndex) : undefined
-                                textFormat: record ? TextArea.RichText : TextArea.MarkdownText
-                                wrapMode: Text.WordWrap
+
+                                Component.onDestruction: {
+                                    _private.hideTooltipRequest(_screenplayDetailsText)
+                                    _private.hidePosterRequest(_screenplaysView.currentItem)
+                                }
+
+                                width: _screenplayDetailsFlick.width-20
+
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 padding: 8
                                 readOnly: true
-                                background: Item { }
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 text: record ? composeTextFromRecord(record) : defaultText
+                                textFormat: record ? TextArea.RichText : TextArea.MarkdownText
+                                wrapMode: Text.WordWrap
+
+                                background: Item { }
 
                                 onRecordChanged: {
                                     if(record) {
                                         _private.showTooltipRequest(_screenplaysView.currentItem, record.logline)
                                         _private.showPosterRequest(_screenplaysView.currentItem, _screenplaysView.currentItem.iconSource, record.logline)
                                     }
-                                }
-                                Component.onDestruction: {
-                                    _private.hideTooltipRequest(_screenplayDetailsText)
-                                    _private.hidePosterRequest(_screenplaysView.currentItem)
                                 }
 
                                 function composeTextFromRecord(_record) {
@@ -1082,6 +1124,8 @@ Item {
     }
 
     component VaultPage : Rectangle {
+        id: _vaultPageContent
+
         border.width: 1
         border.color: Runtime.colors.primary.borderColor
         color: Qt.rgba(0,0,0,0)
@@ -1094,7 +1138,7 @@ Item {
                                     root.enabled = false
 
                                     var task = OpenFileTask.openAnonymously(_vaultFilesView.currentItem.fileInfo.filePath)
-                                    task.finished.connect(closeRequest)
+                                    task.finished.connect(root.closeRequest)
                                 } )
         }
 
@@ -1113,25 +1157,39 @@ Item {
 
         ListView {
             id: _vaultFilesView
+
+            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+            ScrollBar.vertical: VclScrollBar { flickable: _vaultFilesView }
+
             anchors.fill: parent
             anchors.margins: 1
+
             clip: true
-            model: Scrite.vault
-            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
             currentIndex: count ? 0 : -1
+            highlightMoveDuration: 0
+            highlightResizeDuration: 0
+            model: Scrite.vault
             visible: count > 0
-            ScrollBar.vertical: VclScrollBar { flickable: documentsView }
+
             highlight: Rectangle {
                 color: Runtime.colors.primary.highlight.background
             }
-            highlightMoveDuration: 0
-            highlightResizeDuration: 0
+
             delegate: LinkButton {
                 id: _vaultFileDelegate
+
                 required property int index
                 required property var fileInfo
                 required property string timestampAsString
                 required property string relativeTime
+                property string fileSizeInfo: {
+                    const fileSize = _vaultFileDelegate.fileInfo.fileSize
+                    if(fileSize < 1024)
+                        return fileSize + " B"
+                    if(fileSize < 1024*1024)
+                        return Math.round(fileSize / 1024, 2) + " KB"
+                    return Math.round(fileSize / (1024*1024), 2) + " MB"
+                }
 
                 width: _vaultFilesView.width-1
                 height: 60
@@ -1142,19 +1200,10 @@ Item {
                 text: "<b>" + _vaultFileDelegate.fileInfo.title + "</b> (" + _vaultFileDelegate.fileInfo.sceneCount + (_vaultFileDelegate.fileInfo.sceneCount === 1 ? " Scene" : " Scenes") + ")<br/>" +
                       "<font size=\"-1\">" + fileSizeInfo + ", " + _vaultFileDelegate.relativeTime + " on " + _vaultFileDelegate.timestampAsString + "</font>"
 
-                property string fileSizeInfo: {
-                    const fileSize = _vaultFileDelegate.fileInfo.fileSize
-                    if(fileSize < 1024)
-                        return fileSize + " B"
-                    if(fileSize < 1024*1024)
-                        return Math.round(fileSize / 1024, 2) + " KB"
-                    return Math.round(fileSize / (1024*1024), 2) + " MB"
-                }
-
                 onClicked: _vaultFilesView.currentIndex = _vaultFileDelegate.index
                 onDoubleClicked: {
                     _vaultFilesView.currentIndex = _vaultFileDelegate.index
-                    Qt.callLater( openSelected )
+                    Qt.callLater(_vaultPageContent.openSelected)
                 }
             }
         }
@@ -1186,6 +1235,7 @@ Item {
     component ImportPage : Item {
         property bool hasActionButton: _importPageStackLayout.currentIndex >= 1
         property string actionButtonText: _importPageStackLayout.currentIndex === 1 ? "Browse" : "Import"
+
         function onActionButtonClicked() {
             if(_importPageStackLayout.currentIndex === 1)
                 _dropBrowseItem.doBrowse()
@@ -1209,16 +1259,21 @@ Item {
 
         BasicAttachmentsDropArea {
             id: _importDropArea
+
             anchors.fill: parent
+
             enabled: Runtime.appFeatures.importer.enabled
             allowedType: Attachments.NoMedia
             allowedExtensions: ["scrite", "fdx", "txt", "fountain", "html"]
+
             onDropped: _fileToImport.path = attachment.filePath
         }
 
         StackLayout {
             id: _importPageStackLayout
+
             anchors.fill: parent
+
             currentIndex: Runtime.appFeatures.importer.enabled ? (_fileToImport.valid ? 2 : 1) : 0
 
             DisabledFeatureNotice {
@@ -1229,15 +1284,16 @@ Item {
 
             Rectangle {
                 id: _dropBrowseItem
-                border.width: 1
-                border.color: Runtime.colors.primary.borderColor
-                color: Qt.rgba(0,0,0,0)
 
                 function doBrowse() {
                     _importFileDialog.open()
                 }
 
-                VclFileDialog {
+                color: Qt.rgba(0,0,0,0)
+                border.width: 1
+                border.color: Runtime.colors.primary.borderColor
+
+                FileDialog {
                     id: _importFileDialog
 
                     title: "Import Screenplay"
@@ -1260,57 +1316,67 @@ Item {
 
                     VclLabel {
                         Layout.fillWidth: true
+
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
                         text: _importDropArea.active ? _importDropArea.attachment.originalFileName : "Drop a file on to this area to import it."
+
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
                     }
 
                     VclLabel {
                         Layout.fillWidth: true
+
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize-1
                         color: Runtime.colors.primary.c700.background
                         text: _importDropArea.active ? "Drop to import this file." : "(Allowed file types: " + _importFileDialog.nameFilters.join(", ") + ")"
+
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize-1
                     }
                 }
             }
 
             Rectangle {
                 id: _importDroppedFileItem
-                border.width: 1
-                border.color: Runtime.colors.primary.borderColor
-                color: Qt.rgba(0,0,0,0)
 
                 function doImport() {
                     Runtime.workspaceSettings.lastOpenImportFolderUrl = "file://" + _fileToImport.folder
 
                     var task = OpenFileTask.openOrImport(_fileToImport.path)
-                    task.finished.connect(closeRequest)
+                    task.finished.connect(root.closeRequest)
                 }
 
+                color: Qt.rgba(0,0,0,0)
+                border.width: 1
+                border.color: Runtime.colors.primary.borderColor
+
                 ColumnLayout {
-                    width: parent.width-40
                     anchors.centerIn: parent
+
+                    width: parent.width-40
                     spacing: 20
 
                     VclLabel {
                         Layout.fillWidth: true
+
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
-                        font.bold: true
                         elide: Text.ElideMiddle
                         text: _fileToImport.name
+
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
+                        font.bold: true
                     }
 
                     VclLabel {
                         Layout.fillWidth: true
+
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         text: "Click on 'Import' _button to import this file."
+
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     }
                 }
             }
@@ -1329,7 +1395,7 @@ Item {
         property Component buttons
         property QtObject buttonsItem: _buttonsLoader.item
 
-        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
+        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView") as StackView
 
         Item {
             anchors.fill: parent
@@ -1340,42 +1406,51 @@ Item {
 
             Loader {
                 id: _contentLoader
-                width: parent.width
+
                 anchors.top: parent.top
                 anchors.bottom: _buttonsRow.top
                 anchors.bottomMargin: 20
+
+                width: parent.width
+
                 sourceComponent: _stackPage.content
             }
 
             RowLayout {
                 id: _buttonsRow
-                width: parent.width
+
                 anchors.bottom: parent.bottom
+
+                width: parent.width
 
                 VclButton {
                     text: "< Back"
-                    onClicked: _stackPage.stackView.pop()
 
                     EventFilter.target: Scrite.app
                     EventFilter.events: [EventFilter.KeyPress,EventFilter.KeyRelease,EventFilter.Shortcut]
                     EventFilter.onFilter: (watched,event,result) => {
-                                              if(event.key === Qt.Key_Escape) {
-                                                  result.acceptEvent = true
-                                                  result.filter = true
-                                                  _stackPage.stackView.pop()
-                                              }
-                                          }
+                        if(event.key === Qt.Key_Escape) {
+                            result.acceptEvent = true
+                            result.filter = true
+                            _stackPage.stackView.pop()
+                        }
+                    }
+
+                    onClicked: _stackPage.stackView.pop()
                 }
 
                 Loader {
                     id: _titleLoader
+
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+
                     sourceComponent: _stackPage.title
                 }
 
                 Loader {
                     id: _buttonsLoader
+
                     sourceComponent: _stackPage.buttons
                 }
             }
@@ -1387,8 +1462,11 @@ Item {
 
         StackPage {
             id: _scriptalayPageItem
+
             readonly property string bannerImage: "qrc:/images/homescreen_scriptalay_banner.png"
+
             content: ScriptalayPage { }
+
             title: Item {
                 Image {
                     anchors.centerIn: parent
@@ -1397,6 +1475,7 @@ Item {
                     fillMode: Image.PreserveAspectFit
                 }
             }
+
             buttons: VclButton {
                 text: "Open"
                 enabled: _scriptalayPageItem.contentItem.hasSelection && Runtime.libraryService.screenplays.count > 0
@@ -1410,7 +1489,9 @@ Item {
 
         StackPage {
             id: _vaultPageItem
+
             content: VaultPage { }
+
             title: VclLabel {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -1418,6 +1499,7 @@ Item {
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 elide: Text.ElideRight
             }
+
             buttons: RowLayout {
                 spacing: 10
 
@@ -1441,8 +1523,11 @@ Item {
 
         StackPage {
             id: _importPageItem
+
             content: ImportPage { }
+
             title: Item { }
+
             buttons: RowLayout {
                 VclButton {
                     visible: _importPageItem.contentItem.hasActionButton
@@ -1453,7 +1538,7 @@ Item {
         }
     }
 
-    VclFileDialog {
+    FileDialog {
         id: _openFileDialog
 
         title: "Open Scrite Document"
@@ -1469,7 +1554,7 @@ Item {
             const path = Url.toPath(selectedFile)
 
             let task = OpenFileTask.open(path)
-            task.finished.connect(closeRequest)
+            task.finished.connect(root.closeRequest)
         }
     }
 
@@ -1521,6 +1606,7 @@ Item {
 
                         delegate: VclText {
                             id: _missingFileDelegate
+
                             required property int index
                             required property string modelData
 
@@ -1529,12 +1615,13 @@ Item {
                             rightPadding: 20
                             elide: Text.ElideMiddle
                             text: _missingFileDelegate.modelData
-                            color: currentIndex === _missingFileDelegate.index ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c100.text
+                            color: _missingFilesList.currentIndex === _missingFileDelegate.index ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c100.text
 
                             MouseArea {
                                 id: _missingFileMouseArea
 
                                 anchors.fill: parent
+
                                 hoverEnabled: parent.truncated
 
                                 onClicked: _missingFilesList.currentIndex = _missingFileDelegate.index

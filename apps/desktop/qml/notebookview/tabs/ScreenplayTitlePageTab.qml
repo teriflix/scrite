@@ -298,7 +298,7 @@ Item {
     QtObject {
         id: _private
 
-        readonly property Action titlePageAction: ActionHub.screenplayOperations.find("titlePage")
+        readonly property Action titlePageAction: ActionHub.screenplayOperations.find("titlePage") as Action
 
         readonly property FontMetrics fontMetrics: FontMetrics {
             font.family: Runtime.sceneEditorFontMetrics.font.family

@@ -180,7 +180,7 @@ Item {
                 return Scrite.document.locked ? "qrc:/icons/action/lock_outline.png" : "qrc:/icons/action/lock_open.png"
             }
 
-            onTriggered: (source) => {
+            onTriggered: () => {
                 if(Scrite.user.loggedIn) {
                     CollaboratorsDialog.launch()
                 } else {
@@ -574,7 +574,7 @@ Item {
             objectName: "fullscreen"
             shortcut: defaultShortcut
 
-            icon.source: Scrite.window.visibility === AppWindow.FullScreen ? "qrc:/icons/navigation/fullscreen_exit.png" : "qrc:/icons/navigation/fullscreen.png"
+            icon.source: Scrite.window.visibility === Window.FullScreen ? "qrc:/icons/navigation/fullscreen_exit.png" : "qrc:/icons/navigation/fullscreen.png"
 
             onTriggered: Scrite.app.toggleFullscreen(Scrite.window)
         }
@@ -912,7 +912,7 @@ Item {
 
             icon.source: "qrc:/icons/content/undo.png"
 
-            onTriggered: (source) => {
+            onTriggered: () => {
                 if(!ActionHandler.canHandle) {
                     UndoHub.undo()
                 }
@@ -929,7 +929,7 @@ Item {
 
             icon.source: "qrc:/icons/content/redo.png"
 
-            onTriggered: (source) => {
+            onTriggered: () => {
                 if(!ActionHandler.canHandle) {
                     UndoHub.redo()
                 }
@@ -1151,7 +1151,7 @@ Item {
             shortcut: defaultShortcut
             text: "Jump to Scene Number"
 
-            onTriggered: (source) => {
+            onTriggered: () => {
                 if(ActionHandler.all.length === 0)
                     JumpToSceneNumberDialog.launch(Runtime.screenplayAdapter)
             }
@@ -1769,7 +1769,7 @@ Item {
             objectName: "renameLocation"
             text: "Rename Location"
 
-            onTriggered: (source) => {
+            onTriggered: () => {
                 const locations = Scrite.document.structure.allLocations()
                 if(!locations || locations.length === 0) {
                     MessageBox.information("Rename Location", "No locations in the screenplay to rename.")
@@ -1797,7 +1797,7 @@ Item {
             objectName: "renameCharacter"
             text: "Rename Character"
 
-            onTriggered: (source) => {
+            onTriggered: () => {
                 const characters = Scrite.document.structure.allCharacterNames()
                 if(!characters || characters.length === 0) {
                     MessageBox.information("Rename Character", "No characters in the screenplay to rename.")

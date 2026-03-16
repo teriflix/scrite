@@ -39,6 +39,8 @@ ListView {
     readonly property alias sceneGroup: _private.sceneGroup
     readonly property alias delegateCount: _private.delegateCount
 
+    signal collapseSidePanelRequest()
+
     function updateCacheBuffer() { _private.updateCacheBuffer() }
     function extents(startIndex, endIndex) { return _private.extents(startIndex, endIndex) }
 
@@ -126,7 +128,7 @@ ListView {
                               }
 
         onCollapseSideListPanelRequest: () => {
-                                            _sidePanel.expanded = false
+                                            root.collapseSidePanelRequest()
                                         }
     }
 
@@ -163,7 +165,7 @@ ListView {
         action: ActionHub.sceneListPanelOptions.find("copy")
         enabled: true
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          Scrite.document.screenplay.copySelection()
                      }
     }
@@ -172,7 +174,7 @@ ListView {
         action: ActionHub.sceneListPanelOptions.find("paste")
         enabled: !Scrite.document.readOnly && Scrite.document.screenplay.canPaste
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          Scrite.document.screenplay.pasteAfter(root.screenplayAdapter.currentIndex)
                      }
     }
@@ -181,7 +183,7 @@ ListView {
         action: ActionHub.sceneListPanelOptions.find("remove")
         enabled: !Scrite.document.readOnly && Scrite.document.screenplay.canPaste
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          if(_private.sceneGroup.sceneCount <= 1)
                              Scrite.document.screenplay.removeElement(root.screenplayAdapter.currentElement)
                          else
@@ -193,7 +195,7 @@ ListView {
         action: ActionHub.sceneListPanelOptions.find("keywords")
         enabled: !Scrite.document.readOnly
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          SceneGroupKeywordsDialog.launch(_private.sceneGroup)
                      }
     }
@@ -202,7 +204,7 @@ ListView {
         action: ActionHub.sceneListPanelOptions.find("clearSelection")
         enabled: root.screenplayAdapter.isSourceScreenplay && root.screenplayAdapter.screenplay.hasSelectedElements
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          root.screenplayAdapter.screenplay.clearSelection()
                      }
     }
@@ -211,7 +213,7 @@ ListView {
         action: ActionHub.sceneListPanelOptions.find("makeSequence")
         enabled: !Scrite.document.readOnly && root.sceneGroup.canBeStacked
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          if(!root.sceneGroup.stack()) {
                              MessageBox.information("Make Sequence Error",
                                                     "Couldn't stack these scenes to make a sequence. Please try doing this on the Structure Tab.")
@@ -223,7 +225,7 @@ ListView {
         action: ActionHub.sceneListPanelOptions.find("breakSequence")
         enabled: !Scrite.document.readOnly && root.sceneGroup.canBeUnstacked
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          if(!root.sceneGroup.unstack()) {
                              MessageBox.information("Break Sequence Error",
                                                     "Couldn't unstack these scenes to make a sequence. Please try doing this on the Structure Tab.")
@@ -238,7 +240,7 @@ ListView {
         action: ActionHub.sceneListPanelOptions.find("includeOmit")
         enabled: !Scrite.document.readOnly
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          if(omitted)
                              Scrite.document.screenplay.includeSelectedElements()
                          else
@@ -305,11 +307,11 @@ ListView {
         property int delegateCount: 0
 
         function updateCacheBuffer() {
-            if(tracksVisible) {
-                const idealCacheBuffer = Math.round(contentHeight * 1.25)
-                cacheBuffer = Math.max(idealCacheBuffer, cacheBuffer)
+            if(root.tracksVisible) {
+                const idealCacheBuffer = Math.round(root.contentHeight * 1.25)
+                root.cacheBuffer = Math.max(idealCacheBuffer, root.cacheBuffer)
             } else
-                cacheBuffer = 0
+                root.cacheBuffer = 0
         }
 
         Component.onCompleted: sceneGroup.refresh()

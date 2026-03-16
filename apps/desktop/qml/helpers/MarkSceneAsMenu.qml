@@ -47,14 +47,14 @@ VclMenu {
             required property string enumKey
             required property string enumIcon
 
-            text: enumKey + (scene ? (font.bold ? " ✔" : "") : "")
+            text: enumKey + (root.scene ? (font.bold ? " ✔" : "") : "")
             icon.source: enumIcon
-            enabled: enableValidation ? scene : true
-            font.bold: scene ? (enabled ? scene.type === enumValue : false) : false
+            enabled: root.enableValidation ? root.scene : true
+            font.bold: root.scene ? (enabled ? root.scene.type === enumValue : false) : false
 
             onClicked: {
-                if(scene)
-                    scene.type = enumValue
+                if(root.scene)
+                    root.scene.type = enumValue
                 root.triggered(enumValue)
             }
         }

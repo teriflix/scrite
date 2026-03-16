@@ -20,13 +20,13 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../controls"
 import "../../helpers"
 
 ColumnLayout {
     id: root
+    
     property var fieldInfo
     property AbstractExporter exporter
     property TabSequenceManager tabSequence
@@ -41,19 +41,20 @@ ColumnLayout {
         font.pointSize: Runtime.idealFontMetrics.font.pointSize
         maximumLineCount: 2
 
-        text: fieldInfo.label
+        text: root.fieldInfo.label
     }
 
     SpinBox {
-        to: fieldInfo.max
-        from: fieldInfo.min
+        TabSequenceItem.manager: root.tabSequence
 
-        value: exporter ? exporter.getConfigurationValue(fieldInfo.name) : 0
+        to: root.fieldInfo.max
+        from: root.fieldInfo.min
+
+        value: root.exporter ? root.exporter.getConfigurationValue(root.fieldInfo.name) : 0
+        
         onValueModified: {
-            if(exporter)
-                exporter.setConfigurationValue(fieldInfo.name, value)
+            if(root.exporter)
+                root.exporter.setConfigurationValue(root.fieldInfo.name, value)
         }
-
-        TabSequenceItem.manager: tabSequence
     }
 }

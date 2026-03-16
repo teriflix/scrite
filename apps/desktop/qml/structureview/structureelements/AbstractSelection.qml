@@ -26,6 +26,7 @@ Item {
 
     property bool hasItems: items.length > 0
     property bool canLayout: items.length >= 2
+    property bool interactive: false
 
     property alias active: _tightRect.visible
     property alias contextMenu: _selectionMenu.menu

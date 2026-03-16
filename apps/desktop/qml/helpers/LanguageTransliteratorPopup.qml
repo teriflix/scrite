@@ -54,12 +54,12 @@ Popup {
             }
 
             Layout.fillWidth: true
-            Layout.preferredWidth: GMath.horizontalAdvance(transliterator.suggestions, root.editorFont) + 30
+            Layout.preferredWidth: GMath.horizontalAdvance(root.transliterator.suggestions, root.editorFont) + 30
             Layout.preferredHeight: count ? itemAtIndex(0).height * Math.min(count, 5) : 30
 
             clip: contentHeight > height
-            model: transliterator.suggestions
-            currentIndex: transliterator.currentSuggestionIndex
+            model: root.transliterator.suggestions
+            currentIndex: root.transliterator.currentSuggestionIndex
 
             delegate: Label {
                 id: _delegate

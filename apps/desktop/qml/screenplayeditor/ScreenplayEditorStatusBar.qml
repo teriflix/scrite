@@ -89,7 +89,7 @@ Rectangle {
         spacing: 6
 
         IconButton {
-            readonly property Action shieldAction: ActionHub.fileOperations.find("shield")
+            readonly property Action shieldAction: ActionHub.fileOperations.find("shield") as Action
 
             enabled: !Scrite.document.readOnly
             tooltipText: shieldAction.tooltip
@@ -197,7 +197,7 @@ Rectangle {
 
             MouseArea {
                 ToolTip.text: "Displays 'current scene word count' / 'whole screenplay word count'."
-                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                ToolTip.delay: Scrite.app.styleHints.mousePressAndHoldInterval
                 ToolTip.visible: containsMouse
 
                 anchors.fill: parent
@@ -222,12 +222,12 @@ Rectangle {
             id: _contentViewPositionMapper
 
             to: _headingTextAreaOnStatusBar
-            from: screenplayEditorListView
+            from: root.screenplayEditorListView
             position: Qt.point(0,0)
         }
 
         Item {
-            width: screenplayEditorListView.width
+            width: root.screenplayEditorListView.width
             height: parent.height
 
             x: _contentViewPositionMapper.mappedPosition.x
@@ -237,13 +237,13 @@ Rectangle {
             VclLabel {
                 id: _currentSceneNumber
 
-                property real recommendedMargin: sceneHeadingFontMetrics.averageCharacterWidth*5 + pageMargins.left*0.075
+                property real recommendedMargin: root.sceneHeadingFontMetrics.averageCharacterWidth*5 + root.pageMargins.left*0.075
 
                 anchors.left: _currentSceneHeadingText.left
                 anchors.leftMargin: Math.min(-recommendedMargin, -contentWidth)
                 anchors.verticalCenter: _currentSceneHeadingText.verticalCenter
 
-                font.family: sceneHeadingFontMetrics.font.family
+                font.family: root.sceneHeadingFontMetrics.font.family
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 text: _private.currentSceneHeading ? _private.currentSceneElement.resolvedSceneNumber + ". " : ''
             }
@@ -253,14 +253,14 @@ Rectangle {
 
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.leftMargin: pageMargins.left
-                anchors.rightMargin: pageMargins.right
+                anchors.leftMargin: root.pageMargins.left
+                anchors.rightMargin: root.pageMargins.right
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.verticalCenterOffset: height*0.1
 
                 text: _private.currentSceneHeading ? _private.currentSceneHeading.text : ''
                 elide: Text.ElideRight
-                font.family: sceneHeadingFontMetrics.font.family
+                font.family: root.sceneHeadingFontMetrics.font.family
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
         }
@@ -325,7 +325,7 @@ Rectangle {
     ZoomSlider {
         id: _zoomSlider
 
-        property var zoomLevels: screenplayFormat.fontZoomLevels
+        property var zoomLevels: root.screenplayFormat.fontZoomLevels
         property int savedZoomValue: -1
 
         function zoomLevelModifierToApply() {
@@ -352,9 +352,9 @@ Rectangle {
 
         Component.onCompleted: {
             reset()
-            value = value + zoomLevelModifier
+            value = value + root.zoomLevelModifier
             zoomLevel = zoomLevels[value]
-            screenplayFormat.fontZoomLevelIndex = value
+            root.screenplayFormat.fontZoomLevelIndex = value
         }
 
         Announcement.onIncoming: (type, data) => {
@@ -394,11 +394,11 @@ Rectangle {
         }
 
         Connections {
-            target: screenplayFormat
+            target: root.screenplayFormat
 
             function onFontZoomLevelIndexChanged() {
                 if(!Scrite.document.empty)
-                    _zoomSlider.value = screenplayFormat.fontZoomLevelIndex
+                    _zoomSlider.value = root.screenplayFormat.fontZoomLevelIndex
             }
         }
 
@@ -407,13 +407,13 @@ Rectangle {
 
             function onScriptFontFamilyChanged() {
                 const oldValue = _zoomSlider.value
-                _zoomSlider.value = screenplayFormat.fontZoomLevelIndex
+                _zoomSlider.value = root.screenplayFormat.fontZoomLevelIndex
                 Qt.callLater( (val) => { _zoomSlider.value = val }, oldValue )
             }
         }
 
         onValueChanged: {
-            screenplayFormat.fontZoomLevelIndex = value
+            root.screenplayFormat.fontZoomLevelIndex = value
 
             root.zoomLevelIsAboutToChange()
             zoomLevel = zoomLevels[value]
@@ -430,6 +430,8 @@ Rectangle {
     }
 
     component IconButton : Image {
+        id: _iconButton
+
         property string tooltipText
 
         signal clicked()
@@ -453,7 +455,7 @@ Rectangle {
         }
 
         ToolTipPopup {
-            text: parent.tooltipText
+            text: _iconButton.tooltipText
             visible: _iconButtonMouseArea.containsMouse && !_iconButtonMouseArea.pressed
         }
     }

@@ -134,7 +134,7 @@ ListView {
             action: ActionHub.editOptions.find("jumpFirstScene")
             enabled: _private.currentIndex > _private.firstSceneElementIndex
 
-            onTriggered: (source) => {
+            onTriggered: () => {
                              _private.jumpToFirstScene()
                          }
         }
@@ -143,7 +143,7 @@ ListView {
             action: ActionHub.editOptions.find("jumpLastScene")
             enabled: _private.currentIndex < _private.lastSceneElementIndex
 
-            onTriggered: (source) => {
+            onTriggered: () => {
                              _private.jumpToLastScene()
                          }
         }
@@ -152,7 +152,7 @@ ListView {
             action: ActionHub.editOptions.find("jumpPreviousScene")
             enabled: _private.currentIndex > _private.firstSceneElementIndex
 
-            onTriggered: (source) => {
+            onTriggered: () => {
                              _private.jumpToPreviousScene()
                          }
         }
@@ -161,7 +161,7 @@ ListView {
             action: ActionHub.editOptions.find("jumpNextScene")
             enabled: _private.currentIndex < _private.lastSceneElementIndex
 
-            onTriggered: (source) => {
+            onTriggered: () => {
                              _private.jumpToNextScene()
                          }
         }
@@ -170,7 +170,7 @@ ListView {
             action: ActionHub.editOptions.find("scrollPreviousScene")
             enabled: _private.currentIndex > _private.firstSceneElementIndex
 
-            onTriggered: (source) => {
+            onTriggered: () => {
                              _private.scrollToPreviousScene()
                          }
         }
@@ -179,7 +179,7 @@ ListView {
             action: ActionHub.editOptions.find("scrollNextScene")
             enabled: _private.currentIndex < _private.lastSceneElementIndex
 
-            onTriggered: (source) => {
+            onTriggered: () => {
                              _private.scrollToNextScene()
                          }
         }
@@ -189,7 +189,7 @@ ListView {
         action: ActionHub.editOptions.find("jumpToSceneNumber")
         enabled: _private.firstSceneElementIndex !== _private.lastSceneElementIndex
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          JumpToSceneNumberDialog.launch(root.screenplayAdapter)
                      }
     }
@@ -197,9 +197,9 @@ ListView {
     QtObject {
         id: _private
 
-        readonly property Action editSceneHeading: ActionHub.paragraphFormats.find("headingParagraph")
-        readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent")
-        readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition")
+        readonly property Action editSceneHeading: ActionHub.paragraphFormats.find("headingParagraph") as Action
+        readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent") as Action
+        readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition") as Action
         readonly property Action ensureCursorCentered: Action {
             function go() {
                 root.returnToBounds()
@@ -214,8 +214,8 @@ ListView {
         property int currentIndex: root.screenplayAdapter ? root.screenplayAdapter.currentIndex : -1
         property int currentParagraphType: currentDelegate ? currentDelegate.currentParagraphType : -1
 
-        property Loader currentDelegateLoader: hasFocus || currentIndex >= 0 ? root.itemAtIndex(currentIndex) : null
-        property AbstractScreenplayElementDelegate currentDelegate: currentDelegateLoader ? currentDelegateLoader.item : null
+        property Loader currentDelegateLoader: hasFocus || currentIndex >= 0 ? root.itemAtIndex(currentIndex) as Loader : null
+        property AbstractScreenplayElementDelegate currentDelegate: currentDelegateLoader ? currentDelegateLoader.item as AbstractScreenplayElementDelegate : null
 
         property int lastItemIndex: -1
         property int firstItemIndex: -1
@@ -274,7 +274,7 @@ ListView {
         }
 
         readonly property Component actBreakDelegate: ScreenplayActBreakDelegate {
-            readonly property Loader delegateLoader: parent
+            readonly property Loader delegateLoader: parent as Loader
 
             readOnly: root.readOnly
             isCurrent: _private.currentIndex === index
@@ -300,7 +300,7 @@ ListView {
         }
 
         readonly property Component episodeBreakDelegate: ScreenplayEpisodeBreakDelegate {
-            readonly property Loader delegateLoader: parent
+            readonly property Loader delegateLoader: parent as Loader
 
             readOnly: root.readOnly
             isCurrent: _private.currentIndex === index
@@ -326,7 +326,7 @@ ListView {
         }
 
         readonly property Component intervalBreakDelegate: ScreenplayIntervalBreakDelegate {
-            readonly property Loader delegateLoader: parent
+            readonly property Loader delegateLoader: parent as Loader
 
             readOnly: root.readOnly
             isCurrent: _private.currentIndex === index
@@ -352,7 +352,7 @@ ListView {
         }
 
         readonly property Component omittedSceneDelegate: OmittedScreenplayElementDelegate {
-            readonly property Loader delegateLoader: parent
+            readonly property Loader delegateLoader: parent as Loader
 
             readOnly: root.readOnly
             isCurrent: _private.currentIndex === index
@@ -378,7 +378,7 @@ ListView {
         }
 
         readonly property Component sceneDelegate: ScreenplayElementSceneDelegate {
-            readonly property Loader delegateLoader: parent
+            readonly property Loader delegateLoader: parent as Loader
 
             readOnly: root.readOnly
             listView: root

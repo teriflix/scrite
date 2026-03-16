@@ -32,6 +32,8 @@ Loader {
     required property FontMetrics fontMetrics
     required property ScreenplayElement screenplayElement
 
+    required property real zeroPositionOffset
+
     Component.onCompleted: _private.displayPageNumbersIfPossible()
 
     active: false
@@ -54,7 +56,7 @@ Loader {
                 property rect cursorRect: _private.evaluateCursorRectAtPosition(cursorPosition)
 
                 x: 0
-                y: (cursorPosition >= 0 ? cursorRect.y : -_headingLayout.height)
+                y: (cursorPosition >= 0 ? cursorRect.y : -root.zeroPositionOffset)
                 width: parent.width
                 height: cursorRect.height
 
@@ -111,7 +113,7 @@ Loader {
         ScreenplayPaginatorWatcher {
             id: _paginatorWatcher
 
-            paginator: _private.showPageNumbers ? Runtime.paginator : nullptr
+            paginator: _private.showPageNumbers ? Runtime.paginator : null
             element: root.screenplayElement
         }
 
@@ -135,11 +137,11 @@ Loader {
             if(showPageNumbers)
                 Runtime.execLater(root, Runtime.stdAnimationDuration/2, () => { root.active = true })
             else
-                active = false
+                root.active = false
         }
 
         function evaluateCursorRectAtPosition(cursorPosition) {
-            return cursorPosition >= 0 ? sceneTextEditor.positionToRectangle(cursorPosition) : Qt.rect(0,0,0,0)
+            return cursorPosition >= 0 ? root.sceneTextEditor.positionToRectangle(cursorPosition) : Qt.rect(0,0,0,0)
         }
     }
 }

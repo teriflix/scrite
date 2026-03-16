@@ -58,7 +58,7 @@ Item {
                 if(_slider.stepSize > 0)
                     _slider.value = _slider.value-_slider.stepSize
                 else
-                    zoomOutRequest()
+                    root.zoomOutRequest()
             }
         }
 
@@ -97,7 +97,7 @@ Item {
                         stepSize: 0.1
                         orientation: Qt.Horizontal
 
-                        onMoved: sliderMoved()
+                        onMoved: root.sliderMoved()
                     }
                 }
             }
@@ -116,7 +116,7 @@ Item {
                 if(_slider.stepSize > 0)
                     _slider.value = _slider.value+_slider.stepSize
                 else
-                    zoomInRequest()
+                    root.zoomInRequest()
             }
         }
     }
@@ -138,7 +138,7 @@ Item {
             id: _iconButtonMouseArea
 
             ToolTip.text: parent.tooltipText
-            ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+            ToolTip.delay: Scrite.app.styleHints.mousePressAndHoldInterval
             ToolTip.visible: containsMouse && !pressed
 
             anchors.fill: parent

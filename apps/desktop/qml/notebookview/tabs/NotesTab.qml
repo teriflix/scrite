@@ -59,7 +59,7 @@ Item {
             width: _flickable.width
 
             Repeater {
-                model: notes
+                model: root.notes
 
                 delegate: Item {
                     id: _noteItem
@@ -67,7 +67,7 @@ Item {
                     required property int index
                     required property var modelData
 
-                    property Note note: modelData
+                    property Note note: modelData as Note
 
                     width: _private.noteSize
                     height: _private.noteSize
@@ -75,7 +75,7 @@ Item {
                     BoxShadow {
                         anchors.fill: _noteVisual
 
-                        visible: _flickable.currentIndex === index
+                        visible: _flickable.currentIndex === _noteItem.index
 
                         opacity: 0.5
                     }
@@ -86,7 +86,7 @@ Item {
                         anchors.fill: parent
                         anchors.margins: 10
 
-                        color: _flickable.currentIndex === index ? Runtime.colors.tint(_noteItem.note.color, Runtime.colors.currentNoteTint) : Runtime.colors.tint(_noteItem.note.color, Runtime.colors.sceneHeadingTint)
+                        color: _flickable.currentIndex === _noteItem.index ? Runtime.colors.tint(_noteItem.note.color, Runtime.colors.currentNoteTint) : Runtime.colors.tint(_noteItem.note.color, Runtime.colors.sceneHeadingTint)
 
                         Column {
                             anchors.fill: parent
@@ -99,7 +99,7 @@ Item {
 
                                 width: parent.width
 
-                                color: Color.isLight(parent.parent.color) ? Qt.rgba(0.2,0.2,0.2,1.0) : Qt.rgba(0.9,0.9,0.9,1.0)
+                                color: Color.isLight(_noteVisual.color) ? Qt.rgba(0.2,0.2,0.2,1.0) : Qt.rgba(0.9,0.9,0.9,1.0)
                                 elide: Text.ElideRight
                                 maximumLineCount: 1
                                 text: _noteItem.note.title
@@ -136,7 +136,7 @@ Item {
 
                         onClicked: (mouse) => {
                                        parent.forceActiveFocus()
-                                       _flickable.currentIndex = index
+                                       _flickable.currentIndex = _noteItem.index
                                        if(mouse.button === Qt.RightButton) {
                                            _private.popupNoteMenu(_noteItem.note, _noteItem)
                                        }
@@ -167,7 +167,7 @@ Item {
                     MouseArea {
                         ToolTip.text: "Add a new text or form note."
                         ToolTip.visible: containsMouse
-                        ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                        ToolTip.delay: Scrite.app.styleHints.mousePressAndHoldInterval
 
                         anchors.fill: parent
 
@@ -205,9 +205,9 @@ Item {
     ActionHandler {
         action: ActionHub.notebookOperations.find("report")
 
-        enabled: notes.ownerType === Notes.StructureOwner || notes.ownerType === Notes.SceneOwner
+        enabled: root.notes.ownerType === Notes.StructureOwner || root.notes.ownerType === Notes.SceneOwner
         tooltip: {
-            switch(notes.ownerType) {
+            switch(root.notes.ownerType) {
             case Notes.StructureOwner:
                 return "Exports all story notes into a PDF or ODT."
             case Notes.SceneOwner:
@@ -216,9 +216,9 @@ Item {
             return ""
         }
 
-        onTriggered: (source) => {
+        onTriggered: () => {
                          let generator = Scrite.document.createReportGenerator("Notebook Report")
-                         generator.section = notes.owner
+                         generator.section = root.notes.owner
                          ReportConfigurationDialog.launch(generator)
                      }
     }
@@ -253,7 +253,7 @@ Item {
         }
 
         function popupNoteMenu(note, source) {
-            let menu = noteMenu.createObject(source, {"note": note})
+            let menu = noteMenu.createObject(source, {"note": note}) as NoteMenu
             menu.aboutToHide.connect(menu.destroy)
             menu.popup()
             return menu
@@ -266,7 +266,7 @@ Item {
         }
 
         function popupNewNoteMenu(source) {
-            let menu = newNoteMenu.createObject(source)
+            let menu = newNoteMenu.createObject(source) as NewNoteMenu
             menu.aboutToHide.connect(menu.destroy)
             menu.popup()
             return menu

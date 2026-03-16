@@ -45,10 +45,10 @@ ToolButton {
         container: root
 
         text: {
-            const sc = Gui.portableShortcut(action.shortcut)
-            const tt = action.tooltip !== undefined ? action.tooltip : action.text
+            const sc = Gui.portableShortcut(root.action.shortcut)
+            const tt = root.action.tooltip !== undefined ? root.action.tooltip : root.action.text
             return sc === "" ? tt : (tt + " (" + sc + ")")
         }
-        visible: text !== "" && hovered
+        visible: text !== "" && root.hovered
     }
 }
