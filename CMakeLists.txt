@@ -5,6 +5,18 @@ if(APPLE)
   set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "macOS universal architectures" FORCE)
 endif()
 
+# Qt Creator can inject CMAKE_PROJECT_*_INCLUDE_BEFORE entries that point into a
+# per-build-directory helper location. If that helper file gets deleted, project()
+# fails before languages are enabled. Ignore only missing paths.
+foreach(_scrite_include_before_var CMAKE_PROJECT_INCLUDE_BEFORE CMAKE_PROJECT_Scrite_INCLUDE_BEFORE)
+  if(DEFINED ${_scrite_include_before_var} AND NOT EXISTS "${${_scrite_include_before_var}}")
+    message(WARNING
+      "Ignoring stale ${_scrite_include_before_var}='${${_scrite_include_before_var}}' because the file does not exist.")
+    unset(${_scrite_include_before_var})
+    unset(${_scrite_include_before_var} CACHE)
+  endif()
+endforeach()
+
 project(Scrite VERSION 2.0.21 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
