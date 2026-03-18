@@ -66,6 +66,8 @@ FocusScope {
 
                 DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
 
+                PlaceholderVisibility.visible: !activeFocus && text === ""
+
                 focus: true
                 placeholderText: "Filter by name"
 

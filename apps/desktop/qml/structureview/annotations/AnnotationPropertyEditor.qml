@@ -369,6 +369,8 @@ Item {
             TextField {
                 id: _urlField
 
+                PlaceholderVisibility.visible: !activeFocus && text === ""
+
                 width: parent.width
                 text: _urlEditor.propertyValue
                 placeholderText: "Enter URL and press " + (Platform.isMacOSDesktop ? "Return" : "Enter") + " key to set."

@@ -215,6 +215,8 @@ Column {
                 SyntaxHighlighter.textDocumentUndoRedoEnabled: root.enableUndoRedo
 
                 DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
+                
+                PlaceholderVisibility.visible: !activeFocus && text === ""
 
                 LanguageTransliterator.popup: LanguageTransliteratorPopup {
                     editorFont: _answerText.font

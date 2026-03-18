@@ -84,10 +84,6 @@ TextField {
         } else {
             leftPadding = 0
         }
-
-        const placeholderTextItem = Aggregation.firstChildByType("QQuickPlaceholderText") as Item
-        if(placeholderTextItem)
-            placeholderTextItem.visible = Qt.binding( () => { return !activeFocus && text === "" } )
     }
 
     Component.onDestruction: {
@@ -119,6 +115,8 @@ TextField {
     KeyNavigation.backtab: backTabItem
 
     DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
+
+    PlaceholderVisibility.visible: !activeFocus && text === ""
 
     LanguageTransliterator.popup: LanguageTransliteratorPopup {
         editorFont: root.font

@@ -105,6 +105,8 @@ AbstractScenePartEditor {
                                     }
                                 }
 
+                PlaceholderVisibility.visible: !activeFocus && text === ""
+
                 anchors.right: parent.right
                 anchors.rightMargin: root.pageLeftMargin * 0.1
                 anchors.verticalCenter: parent.verticalCenter

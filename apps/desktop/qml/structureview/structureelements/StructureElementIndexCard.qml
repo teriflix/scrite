@@ -411,6 +411,8 @@ AbstractStructureElementUI {
                                 SyntaxHighlighter.textDocument: textDocument
 
                                 DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
+                                
+                                PlaceholderVisibility.visible: !activeFocus && text === ""
 
                                 LanguageTransliterator.popup: LanguageTransliteratorPopup { }
                                 LanguageTransliterator.option: Runtime.language.activeTransliterationOption

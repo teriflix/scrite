@@ -127,6 +127,8 @@ set(SCRITE_DESKTOP_QML_SOURCES
   "src/quick/objects/notification.h"
   "src/quick/objects/notificationmanager.cpp"
   "src/quick/objects/notificationmanager.h"
+  "src/quick/objects/placeholdervisibility.cpp"
+  "src/quick/objects/placeholdervisibility.h"
   "src/quick/objects/progressreport.cpp"
   "src/quick/objects/progressreport.h"
   "src/quick/objects/propertyalias.cpp"

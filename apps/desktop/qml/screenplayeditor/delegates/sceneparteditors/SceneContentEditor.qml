@@ -100,6 +100,8 @@ AbstractScenePartEditor {
                               }
 
         DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
+        
+        PlaceholderVisibility.visible: !activeFocus && text === ""
 
         LanguageTransliterator.popup: LanguageTransliteratorPopup {
             editorFont: _sceneTextEditor.font

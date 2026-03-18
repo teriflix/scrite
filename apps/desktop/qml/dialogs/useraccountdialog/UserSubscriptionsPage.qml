@@ -156,6 +156,8 @@ Item {
 
                                         Layout.fillWidth: true
 
+                                        PlaceholderVisibility.visible: !activeFocus && text === ""
+
                                         focus: true
                                         maximumLength: Runtime.bounded(_queryUserSubsCall.responseData.minReferralCodeLength, _queryUserSubsCall.responseData.maxReferralCodeLength, 128)
                                         placeholderText: _queryUserSubsCall.responseData.referralCodeText

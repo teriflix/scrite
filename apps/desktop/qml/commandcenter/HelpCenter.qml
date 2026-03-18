@@ -97,6 +97,8 @@ Popup {
 
                 DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
 
+                PlaceholderVisibility.visible: !activeFocus && text === ""
+
                 focus: true
                 placeholderText: "Search for a help topic ..."
 

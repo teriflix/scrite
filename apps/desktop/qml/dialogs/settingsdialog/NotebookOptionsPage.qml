@@ -121,6 +121,7 @@ Item {
 
                             text: Runtime.notebookSettings.graphLayoutMaxTime
                             placeholderText: "if left empty, default of 1000 will be used"
+                            PlaceholderVisibility.visible: !activeFocus && text === ""
                             validator: IntValidator {
                                 bottom: 250
                                 top: 5000
@@ -156,7 +157,10 @@ Item {
 
                         TextField {
                             id: _txtMaxIterations
+
                             Layout.fillWidth: true
+
+                            PlaceholderVisibility.visible: !activeFocus && text === ""
 
                             text: Runtime.notebookSettings.graphLayoutMaxIterations
                             placeholderText: "if left empty, default of 50000 will be used"
