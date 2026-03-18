@@ -115,7 +115,7 @@ AbstractScenePartEditor {
         bottomPadding: Runtime.sceneEditorFontMetrics.height
 
         font: Scrite.document.displayFormat.defaultFont2
-        palette: Runtime.palette
+        // palette: Runtime.colors.palette
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         placeholderText: activeFocus ? "" : "Click here to type your scene content..."
 

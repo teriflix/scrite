@@ -91,7 +91,7 @@ VclMenu {
 
             width: _colorGrid.cellSize
             height: _colorGrid.cellSize
-            color: (_colorGrid.currentIndex === index) ? Color.translucent(Runtime.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
+            color: (_colorGrid.currentIndex === index) ? Color.translucent(Runtime.colors.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
 
             Rectangle {
                 anchors.fill: parent

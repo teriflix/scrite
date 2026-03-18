@@ -61,20 +61,14 @@ Item {
 
     property string currentTheme
 
-    // This property holds reference to an instance of ScreenplayEditor
     property Item screenplayEditor
-
-    // This property holds reference to an instance of StructureView
     property Item structureView
-
-    // This property holds reference to the global screenplay editor toolbar
     property Item screenplayEditorToolbar
 
     property ObjectListModel dialogs: ObjectListModel { }
 
     readonly property Language_RT language: Language_RT { }
 
-    // Persistent Settings
     readonly property UserAccountDialogSettings_RT userAccountDialogSettings: UserAccountDialogSettings_RT { }
     readonly property ScrollAreaSettings_RT scrollAreaSettings: ScrollAreaSettings_RT { }
     readonly property StructureCanvasSettings_RT structureCanvasSettings: StructureCanvasSettings_RT { }
@@ -90,10 +84,7 @@ Item {
     readonly property HelpNotificationSettings_RT helpNotificationSettings: HelpNotificationSettings_RT { }
     readonly property NotebookSettings_RT notebookSettings: NotebookSettings_RT { }
     readonly property WorkspaceSettings_RT workspaceSettings: WorkspaceSettings_RT { }
-
-    readonly property ApplicationSettings_RT applicationSettings: ApplicationSettings_RT {
-        id: _applicationSettings
-    }
+    readonly property ApplicationSettings_RT applicationSettings: ApplicationSettings_RT { id: _applicationSettings }
 
     // Global undo-redo stack
     readonly property UndoStack undoStack: UndoStack {
@@ -142,18 +133,18 @@ Item {
         font: Scrite.document.formatting.defaultFont2
     }
 
-    readonly property Colors_RT colors: Colors_RT { 
-        applicationSettings: _applicationSettings 
-    }
+    // Colors
+    readonly property Colors_RT colors: Colors_RT { applicationSettings: _applicationSettings  }
 
+    // Features
     readonly property AppFeatures_RT appFeatures: AppFeatures_RT { }
-    readonly property RecentFiles_RT recentFiles: RecentFiles_RT {
-        applicationSettings: _applicationSettings
-    }
 
+    // File bits
+    readonly property RecentFiles_RT recentFiles: RecentFiles_RT { applicationSettings: _applicationSettings }
+    readonly property FileManager fileNamager: FileManager { }
     readonly property LibraryService libraryService : LibraryService { }
 
-    // This model is how the screenplay of the current ScriteDocument is accessed.
+    // Document model bits
     readonly property ScreenplayAdapter screenplayAdapter: ScreenplayAdapter {
         property string sessionId
 
@@ -182,15 +173,13 @@ Item {
         screenplay: root.screenplayAdapter.screenplay
     }
 
-    // Announcement IDs
+    // Object communication
     readonly property AnnouncementIds_RT announcementIds: AnnouncementIds_RT { }
-
-    // Global file-manager
-    readonly property FileManager fileNamager: FileManager { }
 
     // Global user guide search index
     readonly property UserGuideSearchIndex userGuideSearchIndex: UserGuideSearchIndex { }
 
+    // Functions
     function init(_parent) {
         if( !(_parent && Object.isOfType(_parent, "QQuickItem")) )
             _parent = Scrite.window.contentItem

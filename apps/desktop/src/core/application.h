@@ -87,12 +87,6 @@ public:
     QString buildTimestamp() const;
 
     // clang-format off
-    Q_PROPERTY(QPalette palette
-               READ palette
-               CONSTANT )
-    // clang-format on
-
-    // clang-format off
     Q_PROPERTY(qreal devicePixelRatio
                READ devicePixelRatio
                CONSTANT )

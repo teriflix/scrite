@@ -56,6 +56,8 @@ Item {
         theme: root.theme
     }
 
+    readonly property SystemPalette palette: SystemPalette { }
+
     function tint(a, b) {
         return Color.stacked( Color.tint(a, b), theme === Material.Light ? "white" : "black" )
     }

@@ -45,8 +45,8 @@ Item {
         width: rectangle.width
         height: rectangle.height
 
-        color: Color.translucent(Runtime.palette.highlight,0.2)
-        border { width: 2; color: Runtime.palette.highlight }
+        color: Color.translucent(Runtime.colors.palette.highlight,0.2)
+        border { width: 2; color: Runtime.colors.palette.highlight }
         visible: root.active
     }
 

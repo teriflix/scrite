@@ -83,7 +83,7 @@ Loader {
                 if(SearchAgent.currentSearchResultIndex < 0)
                     return
                 var result = searchResults[SearchAgent.currentSearchResultIndex]
-                markupText = SearchAgent.createMarkupText(root.text, result.from, result.to, Runtime.palette.highlight, Runtime.palette.highlightedText)
+                markupText = SearchAgent.createMarkupText(root.text, result.from, result.to, Runtime.colors.palette.highlight, Runtime.colors.palette.highlightedText)
                 root.highlightRequest()
             }
 
@@ -151,7 +151,7 @@ Loader {
 
             text: root.text
             font: root.font
-            palette: Runtime.palette
+            // palette: Runtime.colors.palette
             opacity: activeFocus ? 1 : 0.5
             wrapMode: root.wrapMode
             selectByMouse: true

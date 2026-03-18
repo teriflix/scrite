@@ -64,7 +64,7 @@ TextArea {
         _contextMenu.popup()
     }
 
-    palette: Runtime.palette
+    // palette: Runtime.colors.palette
     selectByMouse: true
     selectByKeyboard: true
 

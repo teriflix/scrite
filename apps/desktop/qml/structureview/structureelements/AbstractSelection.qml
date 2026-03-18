@@ -186,8 +186,8 @@ Item {
 
         property point topLeft: Qt.point(0,0)
 
-        color: Color.translucent(Runtime.palette.highlight,0.2)
-        border { width: 2; color: Runtime.palette.highlight }
+        color: Color.translucent(Runtime.colors.palette.highlight,0.2)
+        border { width: 2; color: Runtime.colors.palette.highlight }
         visible: parent.items.length > 0
 
         MouseArea {
