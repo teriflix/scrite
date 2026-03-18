@@ -15,7 +15,6 @@
 
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -26,10 +25,6 @@ ScrollBar {
 
     property bool needed: DelayedProperty.get
     property Flickable flickable
-
-    Material.primary: Runtime.colors.primary.key
-    Material.accent: Runtime.colors.accent.key
-    Material.theme: Runtime.colors.theme
 
     DelayedProperty.initial: false
     DelayedProperty.set: (flickable ? (orientation === Qt.Vertical ? flickable.contentHeight : flickable.contentWidth) : 0) > (flickable ? (orientation === Qt.Vertical ? flickable.height : flickable.width) : 0)

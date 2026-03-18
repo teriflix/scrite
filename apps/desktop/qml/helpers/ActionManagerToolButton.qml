@@ -28,10 +28,7 @@ ToolButton {
 
     required property ActionManager actionManager
 
-    Material.accent: Runtime.colors.accent.key
     Material.background: Runtime.colors.primary.c10.background
-    Material.primary: Runtime.colors.primary.key
-    Material.theme: Runtime.colors.theme
 
     display: actionManager.iconSource !== undefined ? ToolButton.IconOnly : ToolButton.TextOnly
     down: _menu.visible

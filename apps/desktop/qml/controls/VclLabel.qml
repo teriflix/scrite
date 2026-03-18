@@ -23,7 +23,6 @@
 
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -31,9 +30,6 @@ import "../globals"
 
 Label {
     id: root
-    Material.primary: Runtime.colors.primary.key
-    Material.accent: Runtime.colors.accent.key
-    Material.theme: Runtime.colors.theme
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 }

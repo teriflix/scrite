@@ -40,9 +40,9 @@ Popup {
         visible = false
     }
 
-    Material.primary: Runtime.colors.primary.key
-    Material.accent: Runtime.colors.accent.key
-    Material.theme: Runtime.colors.theme
+    Material.elevation: 6
+    Material.containerStyle: Material.Filled
+    Material.roundedScale: Material.NotRounded
 
     anchors.centerIn: parent
 

@@ -17,7 +17,6 @@ import QtQml
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -29,9 +28,6 @@ VclMenu {
 
     required property ActionManager actionManager
 
-    Material.accent: Runtime.colors.accent.key
-    Material.primary: Runtime.colors.primary.key
-    Material.theme: Runtime.colors.theme
 
     title: actionManager ? actionManager.title : ""
     closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
@@ -58,9 +54,6 @@ VclMenu {
 
             property var qmlAction: modelData
 
-            Material.accent: Runtime.colors.accent.key
-            Material.primary: Runtime.colors.primary.key
-            Material.theme: Runtime.colors.theme
 
             action: qmlAction
             focusPolicy: Qt.NoFocus

@@ -16,8 +16,8 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Controls
 import QtQuick.Controls.Material
 
 import io.scrite.components
@@ -285,9 +285,6 @@ Rectangle {
                     required property int index
                     required property var qmlAction
 
-                    Material.theme: Runtime.colors.theme
-                    Material.accent: Runtime.colors.accent.key
-                    Material.primary: Runtime.colors.primary.key
 
                     ToolTipPopup {
                         text: {
@@ -338,6 +335,10 @@ Rectangle {
 
         Popup {
             id: _alphabetMappingsPopup
+
+            Material.elevation: 6
+            Material.containerStyle: Material.Filled
+            Material.roundedScale: Material.NotRounded
 
             width: _alphabetMappingsLoader.width + 30
             height: _alphabetMappingsLoader.height + 30

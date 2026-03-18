@@ -19,6 +19,7 @@ import QtQml
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -33,6 +34,10 @@ Popup {
     property LanguageTransliterator transliterator
 
     property rect textRect: transliterator ? Scrite.window.contentItem.mapFromItem(transliterator.editor, transliterator.textRect) : Qt.rgba(0,0,0,0)
+
+    Material.elevation: 6
+    Material.containerStyle: Material.Filled
+    Material.roundedScale: Material.NotRounded
 
     x: textRect.x + 10
     y: textRect.y + textRect.height + 5

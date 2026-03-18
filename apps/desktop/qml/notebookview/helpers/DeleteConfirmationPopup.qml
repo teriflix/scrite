@@ -16,6 +16,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -28,6 +29,10 @@ Popup {
     property alias message: _message.text
 
     signal deletionConfirmed()
+
+    Material.elevation: 6
+    Material.containerStyle: Material.Filled
+    Material.roundedScale: Material.NotRounded
 
     width: Math.min(parent ? parent.width * 0.75 : Scrite.window * 0.75, 400)
     height: _layout.implicitHeight + 22

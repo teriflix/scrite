@@ -47,10 +47,6 @@ import "../helpers"
 Dialog {
     id: root
 
-    Material.primary: Runtime.colors.primary.key
-    Material.accent: Runtime.colors.accent.key
-    Material.theme: Runtime.colors.theme
-
     // If this property is set to false, then the main-window's close button on
     // the title bar is disabled whenever the dialog box is active.
     property bool appCloseButtonVisible: true
@@ -105,6 +101,10 @@ Dialog {
 
     // This signal is emitted after the dialog box has been dismissed.
     signal dismissed()
+
+    Material.elevation: 6
+    Material.containerStyle: Material.Filled
+    Material.roundedScale: Material.NotRounded
 
     // Configure built-in properties of the Dialog
     parent: Overlay.overlay

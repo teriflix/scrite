@@ -39,8 +39,6 @@ import "../helpers"
 TextField {
     id: root
 
-    Material.primary: Runtime.colors.primary.key
-    Material.accent: Runtime.colors.accent.key
     Material.theme: Material.Light
 
     signal returnPressed()
@@ -83,7 +81,13 @@ TextField {
             background = _bgComp.createObject(root)
             topPadding = topPadding + 4
             bottomPadding = bottomPadding + 4
+        } else {
+            leftPadding = 0
         }
+
+        const placeholderTextItem = Aggregation.firstChildByType("QQuickPlaceholderText") as Item
+        if(placeholderTextItem)
+            placeholderTextItem.visible = Qt.binding( () => { return !activeFocus && text === "" } )
     }
 
     Component.onDestruction: {

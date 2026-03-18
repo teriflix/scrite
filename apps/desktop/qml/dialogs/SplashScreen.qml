@@ -23,7 +23,6 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../globals"
 import "../controls"
 import "../helpers"
@@ -38,6 +37,10 @@ DialogLauncher {
 
     dialogComponent: Dialog {
         id: _dialog
+
+        Material.elevation: 6
+        Material.containerStyle: Material.Filled
+        Material.roundedScale: Material.NotRounded
 
         parent: Overlay.overlay
         anchors.centerIn: parent

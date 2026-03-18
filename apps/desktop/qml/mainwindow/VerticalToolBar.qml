@@ -29,11 +29,8 @@ ToolBar {
 
     required property ActionManager actions
 
-    Material.accent: Runtime.colors.accent.key
     Material.background: Runtime.colors.primary.c10.background
     Material.elevation: 0
-    Material.primary: Runtime.colors.primary.key
-    Material.theme: Runtime.colors.theme
 
     Flow {
         id: _layout

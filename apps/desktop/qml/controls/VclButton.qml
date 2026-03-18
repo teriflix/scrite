@@ -17,7 +17,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -29,10 +28,6 @@ Button {
 
     property bool toolTipVisible: hovered
     property string toolTipText
-
-    Material.primary: Runtime.colors.primary.key
-    Material.accent: Runtime.colors.accent.key
-    Material.theme: Runtime.colors.theme
 
     Component.onCompleted: {
         if(!Scrite.app.usingMaterialTheme) {

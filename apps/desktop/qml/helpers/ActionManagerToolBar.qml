@@ -32,11 +32,8 @@ ToolBar {
     property int display: ToolButton.IconOnly
     property bool flat: true
 
-    Material.accent: Runtime.colors.accent.key
     Material.background: Runtime.colors.primary.c10.background
     Material.elevation: 0
-    Material.primary: Runtime.colors.primary.key
-    Material.theme: Runtime.colors.theme
 
     implicitWidth: _layout.width
     implicitHeight: _layout.height

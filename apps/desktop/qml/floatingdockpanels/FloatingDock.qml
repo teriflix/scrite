@@ -16,7 +16,6 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -49,9 +48,6 @@ Item {
     }
 
     // Implementation
-    Material.primary: Runtime.colors.primary.key
-    Material.accent: Runtime.colors.accent.key
-    Material.theme: Runtime.colors.theme
 
     parent: FloatingDockLayer.item
     x: 20

@@ -16,8 +16,8 @@
 pragma Singleton
 
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Controls
 import QtQuick.Controls.Material
 
 import io.scrite.components
@@ -41,9 +41,9 @@ Item {
     Popup {
         id: _popup
 
-        Material.primary: Runtime.colors.primary.key
-        Material.accent: Runtime.colors.accent.key
-        Material.theme: Runtime.colors.theme
+        Material.elevation: 6
+        Material.containerStyle: Material.Filled
+        Material.roundedScale: Material.NotRounded
 
         anchors.centerIn: parent
 

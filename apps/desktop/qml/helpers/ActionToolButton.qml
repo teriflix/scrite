@@ -26,10 +26,7 @@ import "../globals"
 ToolButton {
     id: root
 
-    Material.accent: Runtime.colors.accent.key
     Material.background: Runtime.colors.primary.c10.background
-    Material.primary: Runtime.colors.primary.key
-    Material.theme: Runtime.colors.theme
 
     flat: true
     down: action.down !== undefined ? action.down === true : (pressed || checked)

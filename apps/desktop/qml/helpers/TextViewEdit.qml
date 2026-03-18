@@ -17,6 +17,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -201,6 +202,10 @@ Loader {
 
             Popup {
                 id: _completionViewPopup
+
+                Material.elevation: 6
+                Material.containerStyle: Material.Filled
+                Material.roundedScale: Material.NotRounded
 
                 x: _textArea.cursorRectangle.x - GMath.boundingRect(_completionModel.completionPrefix, parent.font).width
                 y: _textArea.cursorRectangle.y + _textArea.cursorRectangle.height

@@ -15,7 +15,6 @@
 
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -28,8 +27,6 @@ TextArea {
     property bool undoRedoEnabled: false
     property bool spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
 
-    Material.accent: Runtime.colors.accent.key
-    Material.primary: Runtime.colors.primary.key
 
     SyntaxHighlighter.delegates: [
         LanguageFontSyntaxHighlighterDelegate {

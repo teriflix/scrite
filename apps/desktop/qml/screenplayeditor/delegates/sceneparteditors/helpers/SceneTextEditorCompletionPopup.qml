@@ -19,15 +19,15 @@ import QtQml
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
+import "../../../"
 import "../../../../helpers"
 import "../../../../globals"
 import "../../../../controls"
 import "../../../../structureview"
-import "../../.."
 
 Item {
     id: root
@@ -42,6 +42,10 @@ Item {
 
     Popup {
         id: _completionPopup
+
+        Material.elevation: 6
+        Material.containerStyle: Material.Filled
+        Material.roundedScale: Material.NotRounded
 
         x: -GMath.boundingRect(_private.completionModel.completionPrefix, Runtime.sceneEditorFontMetrics.font).width
         width: GMath.largestBoundingRect(_private.completionModel.strings, Runtime.sceneEditorFontMetrics.font).width + leftInset + rightInset + leftPadding + rightPadding + 30
