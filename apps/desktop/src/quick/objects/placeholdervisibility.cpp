@@ -48,6 +48,7 @@ void PlaceholderVisibility::implimentVisibility()
         m_placeholderItem = qobject_cast<QQuickItem *>(placeholderTextObject);
     }
 
-    if (m_placeholderItem != nullptr)
+    if (m_placeholderItem != nullptr) {
         m_placeholderItem->setVisible(m_visible);
+    }
 }

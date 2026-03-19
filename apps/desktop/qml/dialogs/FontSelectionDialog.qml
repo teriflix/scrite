@@ -176,8 +176,6 @@ DialogLauncher {
 
                     DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
 
-                    PlaceholderVisibility.visible: !activeFocus && text === ""
-
                     selectByMouse: true
                     placeholderText: "Search for a font"
 

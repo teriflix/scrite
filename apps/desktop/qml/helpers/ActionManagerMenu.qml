@@ -28,7 +28,6 @@ VclMenu {
 
     required property ActionManager actionManager
 
-
     title: actionManager ? actionManager.title : ""
     closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
     font.pointSize: Runtime.idealFontMetrics.font.pointSize

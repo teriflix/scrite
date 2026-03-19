@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 
@@ -26,7 +28,6 @@ TextArea {
 
     property bool undoRedoEnabled: false
     property bool spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
-
 
     SyntaxHighlighter.delegates: [
         LanguageFontSyntaxHighlighterDelegate {
@@ -44,7 +45,7 @@ TextArea {
     SyntaxHighlighter.textDocumentUndoRedoEnabled: undoRedoEnabled
 
     DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
-    
+
     PlaceholderVisibility.visible: !activeFocus && text === ""
 
     LanguageTransliterator.popup: LanguageTransliteratorPopup {
@@ -74,12 +75,12 @@ TextArea {
         color: enabled ? Runtime.colors.primary.c10.background : Runtime.colors.primary.button.background
 
         Rectangle {
+            anchors.bottom: parent.bottom
+
             width: parent.width
             height: root.activeFocus ? 2 : 1
             color: Runtime.colors.accent.c700.background
             visible: root.enabled
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 4
         }
     }
 

@@ -20,7 +20,6 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-
 import "../../../helpers"
 import "../../../globals"
 import "../../../controls"
@@ -28,11 +27,10 @@ import "../../../controls"
 AbstractScenePartEditor {
     id: root
 
-    implicitHeight: _synopsisInput.contentHeight + root.fontMetrics.lineSpacing
+    implicitHeight: _synopsisInput.contentHeight + _synopsisInput.topPadding + _synopsisInput.bottomPadding + root.fontMetrics.lineSpacing
 
     TextAreaInput {
         id: _synopsisInput
-
 
         Keys.onPressed: (event) => {
                             if(event.key === Qt.Key_Escape && root.isCurrent) {
@@ -43,18 +41,19 @@ AbstractScenePartEditor {
 
         anchors.left: parent.left
         anchors.right: parent.right
+        anchors.bottom: parent.bottom
         anchors.leftMargin: root.pageLeftMargin
         anchors.rightMargin: root.pageRightMargin
+        anchors.bottomMargin: root.fontMetrics.lineSpacing * root.zoomLevel * 0.5
 
         text: root.scene.synopsis
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         readOnly: root.readOnly
         placeholderText: "Scene Synopsis"
+        background: Item { }
 
         font.family: root.font.family
-        font.pointSize: Math.max( Math.ceil(root.font.pointSize * root.zoomLevel), Runtime.minimumFontMetrics.font.pointSize)
-
-        background: Item { }
+        font.pointSize: Math.max( Math.round(root.font.pointSize * root.zoomLevel), Runtime.minimumFontMetrics.font.pointSize)
 
         TextAreaSpellingSuggestionsMenu {
             textArea: _synopsisInput

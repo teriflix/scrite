@@ -74,8 +74,6 @@ Item {
 
                 DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
 
-                PlaceholderVisibility.visible: !activeFocus && text === ""
-
                 font.bold: true
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
                 placeholderText: "Verification Code"

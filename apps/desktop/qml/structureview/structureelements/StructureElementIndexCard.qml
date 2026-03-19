@@ -411,8 +411,6 @@ AbstractStructureElementUI {
                                 SyntaxHighlighter.textDocument: textDocument
 
                                 DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
-                                
-                                PlaceholderVisibility.visible: !activeFocus && text === ""
 
                                 LanguageTransliterator.popup: LanguageTransliteratorPopup { }
                                 LanguageTransliterator.option: Runtime.language.activeTransliterationOption
@@ -435,7 +433,6 @@ AbstractStructureElementUI {
                                 readOnly: Scrite.document.readOnly
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                                placeholderText: "Describe what happens in this scene."
 
                                 onTextChanged: root.element.scene.synopsis = text
 

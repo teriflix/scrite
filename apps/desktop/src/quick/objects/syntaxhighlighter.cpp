@@ -492,7 +492,6 @@ void LanguageFontSyntaxHighlighterDelegate::highlightBlock(const QString &text)
                 ? m_defaultFont.value<QFont>()
                 : doc->defaultFont();
         const QTextBlock block = this->currentBlock();
-        qDebug() << "PAF: " << defaultFont;
 
         QTextCharFormat defaultFormat;
         defaultFormat.setFont(defaultFont);

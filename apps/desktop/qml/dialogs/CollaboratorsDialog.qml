@@ -182,8 +182,6 @@ DialogLauncher {
 
                                 DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
 
-                                PlaceholderVisibility.visible: !activeFocus && text === ""
-
                                 Keys.onReturnPressed: addCollaborator()
 
                                 placeholderText: "Enter Email ID and hit Return"

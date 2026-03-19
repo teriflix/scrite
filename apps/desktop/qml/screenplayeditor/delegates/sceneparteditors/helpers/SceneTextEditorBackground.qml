@@ -52,4 +52,20 @@ Item {
             color: root.sceneDocumentBinder.scene.highlightColor
         }
     }
+
+    VclText {
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+
+        anchors.topMargin: root.sceneTextEditor.topPadding
+        anchors.leftMargin: root.sceneTextEditor.leftPadding
+        anchors.rightMargin: root.sceneTextEditor.rightPadding
+
+        font: root.sceneTextEditor.font
+
+        text: root.sceneTextEditor.activeFocus ? "Start typing scene content" : "Click here to type scene content ..."
+        visible: root.sceneTextEditor.text === ""
+        opacity: 0.5
+    }
 }

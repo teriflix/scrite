@@ -18,7 +18,6 @@ import QtQuick
 
 import io.scrite.components
 
-
 import "../../../globals"
 
 FocusScope {
