@@ -34,6 +34,8 @@ Item {
 
     property alias currentTab: _private.currentTab
 
+    signal currentTabEdited()
+
     function cycleTab() { _private.cycleTab() }
 
     height: _layout.height
@@ -61,7 +63,10 @@ Item {
                 iconSource: down ? modelData.invertedIcon : modelData.normalIcon
                 downIndicatorColor: root.downIndicatorColor
 
-                onClicked: _private.currentTab = modelData.tab
+                onClicked: {
+                    _private.currentTab = modelData.tab
+                    root.currentTabEdited()
+                }
 
                 onVisibleChanged: {
                     if(!visible && _private.currentTab === modelData.tab)
@@ -114,9 +119,14 @@ Item {
         function cycleTab() {
             const buttons = buttonsModel
             let tab = (currentTab+1)%buttons.length
+            let ct = currentTab
             while(1) {
                 if(buttons[tab].isVisible) {
-                    currentTab = buttons[tab].tab
+                    ct = buttons[tab].tab
+                    if(ct !== currentTab) {
+                        currentTab = ct
+                        root.currentTabEdited()
+                    }
                     return
                 }
                 tab = (tab+1)%buttons.length

@@ -45,6 +45,8 @@ Item {
 
     readonly property real minPanelWidth: 25
 
+    signal expandedEdited()
+
     width: expanded ? maxPanelWidth : minPanelWidth
 
     BorderImage {
@@ -179,7 +181,10 @@ Item {
             MouseArea {
                 anchors.fill: parent
 
-                onClicked: root.expanded = !root.expanded
+                onClicked: {
+                    root.expanded = !root.expanded
+                    root.expandedEdited()
+                }
             }
 
             Loader {

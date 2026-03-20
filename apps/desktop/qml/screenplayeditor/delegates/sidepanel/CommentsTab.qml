@@ -44,7 +44,6 @@ AbstractScenePartEditor {
         rightPadding: 10
         bottomPadding: 10
 
-
         background: Rectangle {
             color: Runtime.colors.tint(root.scene.color, Runtime.colors.sceneHeadingTint)
 

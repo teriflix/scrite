@@ -60,7 +60,7 @@ AbstractScenePartEditor {
             tabContentBorderVisible: false
         }
 
-        onExpandedChanged: Runtime.screenplayEditorSettings.sceneSidePanelOpen = expanded
+        onExpandedEdited: Runtime.screenplayEditorSettings.sceneSidePanelOpen = expanded
     }
 
     ActionHandler {
@@ -101,7 +101,7 @@ AbstractScenePartEditor {
             currentTab: Runtime.screenplayEditorSettings.sceneSidePanelActiveTab
             downIndicatorColor: Qt.rgba(0,0,0,0.5)
 
-            onCurrentTabChanged: Runtime.screenplayEditorSettings.sceneSidePanelActiveTab = currentTab
+            onCurrentTabEdited: Runtime.screenplayEditorSettings.sceneSidePanelActiveTab = currentTab
 
             ActionHandler {
                 action: ActionHub.editOptions.find("cycleCommentsPanelTab")
