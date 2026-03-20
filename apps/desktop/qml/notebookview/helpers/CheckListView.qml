@@ -332,7 +332,7 @@ Item {
                                        }
 
                 spellCheckEnabled: true
-                text: _checkListItem.text
+                initialText: _checkListItem.text
                 undoRedoEnabled: true
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 

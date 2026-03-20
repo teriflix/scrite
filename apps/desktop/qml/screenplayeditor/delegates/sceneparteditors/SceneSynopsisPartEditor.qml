@@ -27,7 +27,7 @@ import "../../../controls"
 AbstractScenePartEditor {
     id: root
 
-    implicitHeight: _synopsisInput.contentHeight + _synopsisInput.topPadding + _synopsisInput.bottomPadding + root.fontMetrics.lineSpacing
+    implicitHeight: _synopsisInput.contentHeight + root.fontMetrics.lineSpacing * 1.5
 
     TextAreaInput {
         id: _synopsisInput
@@ -46,18 +46,12 @@ AbstractScenePartEditor {
         anchors.rightMargin: root.pageRightMargin
         anchors.bottomMargin: root.fontMetrics.lineSpacing * root.zoomLevel * 0.5
 
-        text: root.scene.synopsis
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         readOnly: root.readOnly
+        font: root.font
+        initialText: root.scene.synopsis
         placeholderText: "Scene Synopsis"
         background: Item { }
-
-        font.family: root.font.family
-        font.pointSize: Math.max( Math.round(root.font.pointSize * root.zoomLevel), Runtime.minimumFontMetrics.font.pointSize)
-
-        TextAreaSpellingSuggestionsMenu {
-            textArea: _synopsisInput
-        }
 
         onTextChanged: if(activeFocus) root.scene.synopsis = text
         onEditingFinished: root.scene.synopsis = text

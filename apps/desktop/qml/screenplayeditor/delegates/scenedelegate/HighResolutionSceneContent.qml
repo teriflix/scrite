@@ -110,7 +110,7 @@ Item {
 
                         partName: "StoryBeats"
                         isCurrent: root.sceneDelegate.isCurrent
-                        zoomLevel: root.sceneDelegate.zoomLevel * 0.8
+                        zoomLevel: root.sceneDelegate.zoomLevel
                         fontMetrics: Runtime.idealFontMetrics
                         pageMargins: root.sceneDelegate.pageMargins
                         screenplayAdapter: root.sceneDelegate.screenplayAdapter
@@ -138,7 +138,7 @@ Item {
 
                         partName: "CharacterList"
                         isCurrent: root.sceneDelegate.isCurrent
-                        zoomLevel: root.sceneDelegate.zoomLevel * 0.8
+                        zoomLevel: root.sceneDelegate.zoomLevel
                         fontMetrics: Runtime.idealFontMetrics
                         pageMargins: root.sceneDelegate.pageMargins
                         screenplayAdapter: root.sceneDelegate.screenplayAdapter
@@ -164,12 +164,21 @@ Item {
 
                         partName: "Synopsis"
                         isCurrent: root.sceneDelegate.isCurrent
-                        zoomLevel: root.sceneDelegate.zoomLevel * 0.9
-                        fontMetrics: Runtime.idealFontMetrics
+                        zoomLevel: root.sceneDelegate.zoomLevel
+                        fontMetrics: _synopsisFontMetrics
                         pageMargins: root.sceneDelegate.pageMargins
                         screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
                         onEnsureVisible: (item, area) => { root.sceneDelegate.ensureVisible(item, area) }
+
+                        FontMetrics {
+                            id: _synopsisFontMetrics
+
+                            font.family: Runtime.idealFontMetrics.font.family
+                            font.pointSize: Math.min(
+                                                Math.max(Runtime.minimumFontMetrics.font.pointSize, Runtime.sceneEditorFontMetrics.font.pointSize - 2),
+                                                Runtime.idealFontMetrics.font.pointSize + 4 )
+                        }
                     }
                 }
 

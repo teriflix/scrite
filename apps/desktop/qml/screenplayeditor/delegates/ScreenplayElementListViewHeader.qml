@@ -378,7 +378,7 @@ Loader {
 
                         Component.onCompleted: SyntaxHighlighter.addDelegate(_loglineLimitHighlighter)
 
-                        text: _private.screenplay.logline
+                        initialText: _private.screenplay.logline
                         font: _private.fontMetrics.font
                         readOnly: root.readOnly
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere

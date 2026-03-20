@@ -26,8 +26,15 @@ import "../controls"
 TextArea {
     id: root
 
+    required property string initialText
+
     property bool undoRedoEnabled: false
     property bool spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
+
+    Component.onCompleted: {
+        // For some reason, setting the text property causes it to get reset shortly later.
+        Qt.callLater(() => { root.text = initialText })
+    }
 
     SyntaxHighlighter.delegates: [
         LanguageFontSyntaxHighlighterDelegate {
@@ -90,6 +97,10 @@ TextArea {
         textEditor: root
         textEditorHasCursorInterface: true
         enabled: !Scrite.document.readOnly
+    }
+
+    TextAreaSpellingSuggestionsMenu {
+        textArea: root
     }
 
     ActionHandler {

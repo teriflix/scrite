@@ -106,6 +106,7 @@ Item {
                 anchors.margins: 5
                 anchors.verticalCenter: parent.verticalCenter
 
+                initialText: ""
                 placeholderText: "Search"
 
                 onActiveFocusChanged: {
@@ -256,6 +257,7 @@ Item {
                 anchors.margins: 5
                 anchors.verticalCenter: parent.verticalCenter
 
+                initialText: ""
                 placeholderText: "Replace"
 
                 onActiveFocusChanged: {

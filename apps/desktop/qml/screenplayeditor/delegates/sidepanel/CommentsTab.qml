@@ -19,7 +19,6 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-
 import "../../../globals"
 import "../../../helpers"
 import "../sceneparteditors"
@@ -27,12 +26,16 @@ import "../sceneparteditors"
 AbstractScenePartEditor {
     id: root
 
+    implicitHeight: _commentsEdit.contentHeight + root.fontMetrics.lineSpacing * 1.5
+
     TextAreaInput {
         id: _commentsEdit
 
+        PlaceholderVisibility.visible: false
+
         anchors.fill: parent
 
-        text: root.scene.comments
+        initialText: root.scene.comments
         wrapMode: Text.WordWrap
         placeholderText: "Comments"
 
@@ -41,25 +44,24 @@ AbstractScenePartEditor {
         rightPadding: 10
         bottomPadding: 10
 
-        font.pointSize: Runtime.idealFontMetrics.font.pointSize + 1
 
         background: Rectangle {
             color: Runtime.colors.tint(root.scene.color, Runtime.colors.sceneHeadingTint)
+
+            Text {
+                anchors.fill: parent
+                anchors.margins: root.fontMetrics.averageCharacterWidth * 2
+
+                font: _commentsEdit.font
+                text: _commentsEdit.placeholderText
+                opacity: 0.5
+                wrapMode: Text.WordWrap
+                visible: _commentsEdit.text === ""
+            }
         }
+
+        font: root.font
         readOnly: Scrite.document.readOnly
-
-        SpecialSymbolsSupport {
-            anchors.top: parent.bottom
-            anchors.left: parent.left
-
-            enabled: !_commentsEdit.readOnly
-            textEditor: _commentsEdit
-            textEditorHasCursorInterface: true
-        }
-
-        TextAreaSpellingSuggestionsMenu {
-            textArea: _commentsEdit
-        }
 
         onTextChanged: () => {
                            if(activeFocus && root.scene && root.scene.comments !== text) {
