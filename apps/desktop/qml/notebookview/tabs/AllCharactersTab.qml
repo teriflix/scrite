@@ -47,7 +47,7 @@ Item {
         ScrollBar.vertical: _vscrollBar
 
         anchors.fill: parent
-        anchors.rightMargin: contentHeight > height ? 20 : 0
+        anchors.rightMargin: contentHeight > root.height ? 20 : 0
 
         cellHeight: 120
         cellWidth: width/__columnCount

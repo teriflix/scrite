@@ -239,7 +239,7 @@ Rectangle {
 
                             onTriggered: (source) => {
                                              _canvas.reloadIfDirty()
-                                             root.root.addNewRelationshipRequest(source)
+                                             root.addNewRelationshipRequest(source)
                                          }
                         }
 
@@ -543,28 +543,28 @@ Rectangle {
 
             Rectangle {
                 anchors.fill: parent
-                anchors.margins: -Math.min(width,height)*0.075
+                anchors.margins: -Math.min(_nodeItem.width,_nodeItem.height)*0.075
 
-                color: Color.translucent(root.character.color, 0.15)
+                color: Color.translucent(_nodeItem.character.color, 0.15)
                 radius: Math.min(width,height)*0.0375
-                visible: root.character.photos.length > 0
+                visible: _nodeItem.character.photos.length > 0
 
                 border.width: 1
-                border.color: Color.translucent(root.character.color, 0.5)
+                border.color: Color.translucent(_nodeItem.character.color, 0.5)
             }
 
             Image {
                 anchors.fill: parent
 
-                z: root.character === _canvas.activeCharacter ? 1 : 0
+                z: _nodeItem.character === _canvas.activeCharacter ? 1 : 0
 
                 fillMode: Image.PreserveAspectCrop
                 mipmap: true
                 smooth: true
 
                 source: {
-                    if(root.character.hasKeyPhoto > 0)
-                        return "file:///" + root.character.keyPhoto
+                    if(_nodeItem.character.hasKeyPhoto > 0)
+                        return "file:///" + _nodeItem.character.keyPhoto
                     return "qrc:/icons/content/character_icon.png"
                 }
 
@@ -572,8 +572,8 @@ Rectangle {
                     anchors.fill: _infoLabel
                     anchors.margins: -4
 
-                    color: _nodeItem.node.marked ? Runtime.colors.accent.a700.background : Runtime.colors.tint(root.character.color, Runtime.colors.sceneControlTint)
-                    opacity: root.character.photos.length === 0 ? 1 : 0.8
+                    color: _nodeItem.node.marked ? Runtime.colors.accent.a700.background : Runtime.colors.tint(_nodeItem.character.color, Runtime.colors.sceneControlTint)
+                    opacity: _nodeItem.character.photos.length === 0 ? 1 : 0.8
                     radius: 4
 
                     border.width: 1
@@ -598,18 +598,18 @@ Rectangle {
 
                     text: {
                         let fields = []
-                        fields.push("<b>" + root.character.name + "</b>");
-                        if(root.character.designation !== "")
-                            fields.push("<i>" + root.character.designation + "</i>")
+                        fields.push("<b>" + _nodeItem.character.name + "</b>");
+                        if(_nodeItem.character.designation !== "")
+                            fields.push("<i>" + _nodeItem.character.designation + "</i>")
                         return fields.join("<br/>")
                     }
                 }
 
                 Rectangle {
                     property real alpha: {
-                        if(!_canvas.activeCharacter || root.character === _canvas.activeCharacter)
+                        if(!_canvas.activeCharacter || _nodeItem.character === _canvas.activeCharacter)
                             return 0
-                        return root.character.isDirectlyRelatedTo(_canvas.activeCharacter) ? 0 : 0.75
+                        return _nodeItem.character.isDirectlyRelatedTo(_canvas.activeCharacter) ? 0 : 0.75
                     }
 
                     Behavior on alpha {
@@ -621,8 +621,8 @@ Rectangle {
 
                     color: Qt.rgba(1,1,1,alpha)
 
-                    border.width: root.character === _canvas.activeCharacter ? 3 : 1
-                    border.color: root.character === _canvas.activeCharacter ? "black" : Runtime.colors.primary.borderColor
+                    border.width: _nodeItem.character === _canvas.activeCharacter ? 3 : 1
+                    border.color: _nodeItem.character === _canvas.activeCharacter ? "black" : Runtime.colors.primary.borderColor
                 }
             }
 
@@ -637,9 +637,9 @@ Rectangle {
                 drag.target: !Scrite.document.readOnly ? parent : null
 
                 ToolTipPopup {
-                    text: (_graph.character && root.character.name === _graph.character.name) ?
+                    text: (_graph.character && _nodeItem.character.name === _graph.character.name) ?
                               "Double click to add a relationship to this character." :
-                              "Double click to switch to " + root.character.name + "'s notes."
+                              "Double click to switch to " + _nodeItem.character.name + "'s notes."
                     visible: _nodeItemMouseArea.containsMouse && !_removeRelationshipConfirmation.active && !_nodeItemMouseArea.pressed
                 }
 
@@ -649,7 +649,7 @@ Rectangle {
                     _canvas.reloadIfDirty()
                 }
                 onReleased: _canvasScroll.interactive = true
-                onDoubleClicked: root.characterDoubleClicked(root.character.name, parent)
+                onDoubleClicked: root.characterDoubleClicked(_nodeItem.character.name, parent)
             }
         }
     }

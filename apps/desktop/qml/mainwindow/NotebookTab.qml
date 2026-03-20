@@ -46,7 +46,6 @@ Item {
         }
     }
 
-
     DisabledFeatureNotice {
         anchors.fill: parent
 

@@ -331,12 +331,14 @@ Item {
     }
 
     onNoteChanged: {
-        if(note.objectName === "_newNote")
-            _description.forceActiveFocus()
-        else if(note.objectName === "_focusNote") {
-            _description.forceActiveFocus()
-            _tabManager.focusNext()
+        if(note) {
+            if(note.objectName === "_newNote")
+                _description.forceActiveFocus()
+            else if(note.objectName === "_focusNote") {
+                _description.forceActiveFocus()
+                _tabManager.focusNext()
+            }
+            note.objectName = ""
         }
-        note.objectName = ""
     }
 }

@@ -119,7 +119,7 @@ Item {
         anchors.topMargin: Runtime.idealFontMetrics.descent
 
         height: 2
-        width: _currentTabItemPositionMapper.from.width
+        width: _currentTabItemPositionMapper.from ? _currentTabItemPositionMapper.from.width : 2
 
         x: _currentTabItemPositionMapper.mappedPosition.x
 

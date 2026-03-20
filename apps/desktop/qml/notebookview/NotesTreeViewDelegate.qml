@@ -26,36 +26,27 @@ import "../globals"
 import "../helpers"
 import "../controls"
 
-Item {
+TreeViewDelegate {
     id: root
 
-    // This should be set to styleData context variable in NotesTreeView.
-    //
-    // In that case, why not just use styleData?
-    // I want to avoid using leap-of-faith variable names as much as possible.
-    // Within the context of this item, styleData would be leap-of-faith.
-    //
-    // Alright, fair enough. But why not just make styleData as required property?
-    // That would have been perfect, except QML Engine (atleast in 5.15.x) complains
-    // if we name a required property the same as context variable offered by the
-    // engine while instantiating TreeView delegates.
     required property var itemData
-
     required property real treeViewWidth
+    required property var modelIndex
 
-    signal makeCurrentRequest()
+    implicitHeight: Runtime.idealFontMetrics.height + 20
+
+    signal clicked(var index)
+    signal doubleClicked(var index)
     signal noteMenuRequest(Note note)
+    signal makeCurrentRequest()
     signal characterMenuRequest(Character character)
 
-    Rectangle {
+    background: Rectangle {
         id: _container
-
-        x: -parent.x
         width: root.treeViewWidth
-        height: _layout.height
-
+        height: root.implicitHeight
         color: {
-            if(root.itemData.selected)
+            if(root.current)
                 return Runtime.colors.primary.highlight.background
 
             let baseColor = undefined
@@ -79,22 +70,11 @@ Item {
         }
     }
 
-    Image {
-        anchors.right: _layout.left
-        anchors.verticalCenter: _layout.verticalCenter
-
-        width: Runtime.idealFontMetrics.height
-        height: Runtime.idealFontMetrics.height
-
-        source: root.itemData.isExpanded ? "qrc:/icons/navigation/arrow_down.png" : "qrc:/icons/navigation/arrow_right.png"
-        visible: root.itemData.hasChildren
-    }
-
-    Row {
+    contentItem: Row {
         id: _layout
 
-        width: root.treeViewWidth - parent.x
-        height: Runtime.idealFontMetrics.height + 20
+        width: Math.max(0, root.treeViewWidth - root.leftPadding - root.rightPadding)
+        height: root.implicitHeight
 
         spacing: 5
 
@@ -158,7 +138,7 @@ Item {
 
             anchors.verticalCenter: parent.verticalCenter
 
-            width: _layout.width-(_icon.visible ? (_icon.width+_layout.spacing) : 0)
+            width: _layout.width - (_icon.visible ? (_icon.width + _layout.spacing) : 0)
 
             color: Color.textColorFor(_container.color)
             elide: Text.ElideRight
@@ -175,25 +155,36 @@ Item {
     }
 
     MouseArea {
+        id: _mouseArea
+
         ToolTipPopup {
             text: _text.text
-            visible: container.containsMouse && _text.text !== "" && _text.truncated
+            visible: _mouseArea.containsMouse && _text.text !== "" && _text.truncated
         }
 
-        anchors.fill: parent
+        anchors.fill: root
 
-        acceptedButtons: Qt.RightButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
         hoverEnabled: _text.text !== "" && _text.truncated
 
-        onClicked: {
+        onClicked: (mouse) => {
             root.makeCurrentRequest()
 
-            if(root.itemData.value.notebookItemType === NotebookModel.NoteType) {
-                root.noteMenuRequest(root.itemData.value.notebookItemObject)
-            } else if(root.itemData.value.notebookItemType === NotebookModel.NotesType &&
-                      root.itemData.value.notebookItemObject.ownerType === Notes.CharacterOwner) {
-                root.characterMenuRequest(root.itemData.value.notebookItemObject.character)
+            if(mouse.button === Qt.RightButton) {
+                if(root.itemData.value.notebookItemType === NotebookModel.NoteType) {
+                    root.noteMenuRequest(root.itemData.value.notebookItemObject)
+                } else if(root.itemData.value.notebookItemType === NotebookModel.NotesType &&
+                          root.itemData.value.notebookItemObject.ownerType === Notes.CharacterOwner) {
+                    root.characterMenuRequest(root.itemData.value.notebookItemObject.character)
+                }
+            } else if(mouse.button === Qt.LeftButton) {
+                root.clicked(root.modelIndex)
             }
+        }
+
+        onDoubleClicked: (mouse) => {
+            if(mouse.button === Qt.LeftButton)
+                root.doubleClicked(root.modelIndex)
         }
     }
 }

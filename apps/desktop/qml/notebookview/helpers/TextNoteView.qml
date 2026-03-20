@@ -165,12 +165,14 @@ Item {
     }
 
     onNoteChanged: {
-        if(note.objectName === "_newNote")
-            _title.forceActiveFocus()
-        else if(note.objectName === "_focusNote") {
-            if(_fieldLoader.item)
-                _fieldLoader.item.assumeFocus()
+        if(note) {
+            if(note.objectName === "_newNote")
+                _title.forceActiveFocus()
+            else if(note.objectName === "_focusNote") {
+                if(_fieldLoader.item)
+                    _fieldLoader.item.assumeFocus()
+            }
+            note.objectName = ""
         }
-        note.objectName = ""
     }
 }
