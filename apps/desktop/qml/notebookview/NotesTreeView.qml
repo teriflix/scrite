@@ -183,8 +183,8 @@ TreeView {
     delegate: NotesTreeViewDelegate {
         id: _delegate
 
-        readonly property var rowModelIndex: root.index(row, 0)
-        readonly property var rowData: rowModelIndex && rowModelIndex.valid ? root.model.modelIndexData(rowModelIndex) : ({})
+        property var rowModelIndex: root.index(row, 0)
+        property var rowData: rowModelIndex && rowModelIndex.valid ? root.model.modelIndexData(rowModelIndex) : ({})
 
         itemData: ({
                        "selected": current,
@@ -200,11 +200,11 @@ TreeView {
             root.setCurrentIndex(rowModelIndex)
         }
 
-        onClicked: (index) => {
+        onModelIndexClicked: (index) => {
             root.handleClick(index)
         }
 
-        onDoubleClicked: (index) => {
+        onModelIndexDoubleClicked: (index) => {
             root.handleDoubleClick(index)
         }
 

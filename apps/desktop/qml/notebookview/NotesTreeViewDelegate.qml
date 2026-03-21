@@ -35,8 +35,8 @@ TreeViewDelegate {
 
     implicitHeight: Runtime.idealFontMetrics.height + 20
 
-    signal clicked(var index)
-    signal doubleClicked(var index)
+    signal modelIndexClicked(var index)
+    signal modelIndexDoubleClicked(var index)
     signal noteMenuRequest(Note note)
     signal makeCurrentRequest()
     signal characterMenuRequest(Character character)
@@ -178,13 +178,13 @@ TreeViewDelegate {
                     root.characterMenuRequest(root.itemData.value.notebookItemObject.character)
                 }
             } else if(mouse.button === Qt.LeftButton) {
-                root.clicked(root.modelIndex)
+                root.modelIndexClicked(root.modelIndex)
             }
         }
 
         onDoubleClicked: (mouse) => {
             if(mouse.button === Qt.LeftButton)
-                root.doubleClicked(root.modelIndex)
+                root.modelIndexDoubleClicked(root.modelIndex)
         }
     }
 }
