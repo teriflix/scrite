@@ -167,6 +167,8 @@ Flow {
                 _newInputLoader.active = false
             }
 
+            width: Math.max(contentWidth + leftPadding + rightPadding, Runtime.idealFontMetrics.averageCharacterWidth * 20)
+
             readOnly: false
             maximumLength: root.maxTextLength
             completionStrings: root.completionStrings

@@ -76,16 +76,6 @@ TextField {
     property Item tabItem
     property Item backTabItem
 
-    Component.onCompleted: {
-        if(!Scrite.app.usingMaterialTheme) {
-            background = _bgComp.createObject(root)
-            topPadding = topPadding + 4
-            bottomPadding = bottomPadding + 4
-        } else {
-            leftPadding = 0
-        }
-    }
-
     Component.onDestruction: {
         if(activeFocus) {
             editingComplete()
@@ -137,6 +127,21 @@ TextField {
     selectedTextColor: Runtime.colors.accent.c700.text
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+    leftPadding: 0
+    background: Item {
+        implicitWidth: root.width
+        implicitHeight: _fontMetrics.lineSpacing
+
+        Rectangle {
+            anchors.bottom: parent.bottom
+
+            width: parent.width
+            height: root.activeFocus ? 2 : 0.5
+
+            color: root.activeFocus ? Runtime.colors.accent.c900.background : Runtime.colors.primary.c900.background
+        }
+    }
 
     CompletionModel {
         id: _completionModel
@@ -321,24 +326,6 @@ TextField {
 
         onAboutToHide: {
             root.persistentSelection = __persistentSelection
-        }
-    }
-
-    Component {
-        id: _bgComp
-
-        Item {
-            implicitWidth: root.width
-            implicitHeight: _fontMetrics.lineSpacing
-
-            Rectangle {
-                anchors.bottom: parent.bottom
-
-                width: parent.width
-                height: 1
-
-                color: root.activeFocus ? Runtime.colors.primary.c700.background : Runtime.colors.primary.c300.background
-            }
         }
     }
 
