@@ -13,21 +13,21 @@
     <key>CFBundleName</key>
     <string>Scrite</string>
     <key>CFBundleGetInfoString</key>
-    <string>Scrite - Version 2.0.20</string>
+    <string>Scrite - Version 2.0.21</string>
     <key>CFBundleExecutable</key>
     <string>Scrite</string>
     <key>CFBundleIdentifier</key>
     <string>io.scrite</string>
     <key>CFBundleVersion</key>
-    <string>2.0.20</string>
+    <string>2.0.21</string>
     <key>CFBundleShortVersionString</key>
-    <string>2.0.20</string>
+    <string>2.0.21</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.productivity</string>
     <key>Vendor</key>
     <string>VCreate Logic Pvt. Ltd.</string>
     <key>NOTE</key>
-    <string>This product is built using Qt LGPL. Write to us for obtaining the source code.</string>
+    <string>This product is built using a commercial license of Qt, although the entire source code of Scrite is open source.</string>
     <key>NSSupportsAutomaticGraphicsSwitching</key>
     <true/>
     <key>CFBundleDocumentTypes</key>
@@ -47,7 +47,7 @@
             <string>Owner</string>
             <key>LSItemContentTypes</key>
             <array>
-                <string>com.teriflix.scrite</string>
+                <string>io.scrite</string>
             </array>
         </dict>
     </array>
@@ -63,7 +63,7 @@
             <key>UTTypeIconFile</key>
             <string>appicon.icns</string>
             <key>UTTypeIdentifier</key>
-            <string>com.teriflix.scrite</string>
+            <string>io.scrite</string>
             <key>UTTypeTagSpecification</key>
             <dict>
                     <key>public.filename-extension</key>

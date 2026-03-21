@@ -133,14 +133,36 @@ target_link_libraries(Scrite PRIVATE
 )
 
 if(APPLE)
+  set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/appicon.icns"
+    PROPERTIES MACOSX_PACKAGE_LOCATION Resources
+  )
+  target_sources(Scrite PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/appicon.icns")
+
   set_target_properties(Scrite PROPERTIES
     OSX_ARCHITECTURES "x86_64;arm64"
     MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist"
   )
   target_link_libraries(Scrite PRIVATE "-framework Carbon")
+
+  # Copy dynamic libraries and the kf6 plugins folder into the app bundle so
+  # that the self-contained Scrite.app finds them at runtime under Contents/MacOS.
+  add_custom_command(TARGET Scrite POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            "$<TARGET_FILE:KF6SonnetCore>"
+            "$<TARGET_FILE_DIR:Scrite>/$<TARGET_FILE_NAME:KF6SonnetCore>"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            "$<TARGET_FILE:phtranslator>"
+            "$<TARGET_FILE_DIR:Scrite>/$<TARGET_FILE_NAME:phtranslator>"
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory
+            "${CMAKE_SOURCE_DIR}/binary/kf6"
+            "$<TARGET_FILE_DIR:Scrite>/kf6"
+    COMMENT "Copying KF6SonnetCore, phtranslator, and kf6 plugins into Scrite.app/Contents/MacOS"
+    VERBATIM
+  )
 endif()
 
 if(WIN32)
+  target_sources(Scrite PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/appicon.rc")
   target_link_libraries(Scrite PRIVATE User32)
   target_compile_options(Scrite PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
