@@ -286,9 +286,7 @@ class SpellCheckThreadPool : public QThreadPool
 public:
     SpellCheckThreadPool()
     {
-        // #ifdef Q_OS_MAC
-        //         NSSpellCheckerClient::ensureSpellCheckerAvailability();
-        // #endif
+        // Load platform specific spell check plugins
         const QList<int> supportedLanguageCodes =
                 LanguageEngine::instance()->supportedLanguages()->languageCodes();
 
