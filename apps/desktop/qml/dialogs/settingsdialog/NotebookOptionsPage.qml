@@ -112,16 +112,16 @@ Item {
                             font.bold: false
                             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
-                            text: "Default: 1000"
+                            text: _txtMaxTime.activeFocus ? "if left empty, default of 1000 will be used" : "Default: 1000"
                         }
 
                         TextField {
                             id: _txtMaxTime
 
                             Layout.fillWidth: true
+                            KeyNavigation.tab: _txtMaxIterations
 
                             text: Runtime.notebookSettings.graphLayoutMaxTime
-                            placeholderText: "if left empty, default of 1000 will be used"
 
                             validator: IntValidator {
                                 bottom: 250
@@ -133,7 +133,6 @@ Item {
                                 else
                                     Runtime.notebookSettings.graphLayoutMaxTime = parseInt(text)
                             }
-                            KeyNavigation.tab: _txtMaxIterations
                         }
                     }
 
@@ -153,16 +152,16 @@ Item {
 
                             font.bold: false
                             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                            text: "Default: 50000"
+                            text: _txtMaxIterations.activeFocus ? "if left empty, default of 50000 will be used" : "Default: 50000"
                         }
 
                         TextField {
                             id: _txtMaxIterations
 
                             Layout.fillWidth: true
+                            KeyNavigation.tab: _txtMaxTime
 
                             text: Runtime.notebookSettings.graphLayoutMaxIterations
-                            placeholderText: "if left empty, default of 50000 will be used"
                             validator: IntValidator {
                                 bottom: 1000
                                 top: 250000
@@ -173,7 +172,6 @@ Item {
                                 else
                                     Runtime.notebookSettings.graphLayoutMaxIterations = parseInt(text)
                             }
-                            KeyNavigation.tab: _txtMaxTime
                         }
                     }
                 }

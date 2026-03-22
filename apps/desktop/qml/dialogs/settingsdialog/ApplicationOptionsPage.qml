@@ -52,16 +52,24 @@ Item {
                 spacing: 0
 
                 VclCheckBox {
+                    TabSequenceItem.sequence: 0
+                    TabSequenceItem.manager: _tabSequence
+
                     text: "Enable Animations"
                     checked: Runtime.applicationSettings.enableAnimations
+
                     onToggled: Runtime.applicationSettings.enableAnimations = checked
                 }
 
                 VclCheckBox {
                     id: _useNativeTextRendering
 
+                    TabSequenceItem.sequence: 1
+                    TabSequenceItem.manager: _tabSequence
+
                     text: "Use Native Text Rendering"
                     checked: Runtime.applicationSettings.useNativeTextRendering
+
                     onToggled: {
                         Runtime.applicationSettings.useNativeTextRendering = checked
 
@@ -80,6 +88,9 @@ Item {
 
                 VclCheckBox {
                     id: _useSoftwareRenderer
+
+                    TabSequenceItem.sequence: 2
+                    TabSequenceItem.manager: _tabSequence
 
                     text: "Use Software Renderer"
                     checked: Runtime.applicationSettings.useSoftwareRenderer
@@ -112,18 +123,26 @@ Item {
 
             GridLayout {
                 width: parent.width
+
                 columns: 2
+                rowSpacing: Runtime.idealFontMetrics.lineSpacing
 
                 VclLabel {
                     Layout.alignment: Qt.AlignVCenter
+
                     text: "DPI:"
                     padding: 5
                 }
 
                 VclTextField {
                     Layout.fillWidth: true
+
+                    TabSequenceItem.sequence: 3
+                    TabSequenceItem.manager: _tabSequence
+
+                    text: Scrite.document.displayFormat.pageLayout.customResolution > 0 ? (Scrite.document.displayFormat.pageLayout.customResolution + (activeFocus ? "" : " dpi")) : ""
                     placeholderText: "Default: " + Math.round(Scrite.document.displayFormat.pageLayout.defaultResolution) + ". Leave empty, or enter a custom value."
-                    text: Scrite.document.displayFormat.pageLayout.customResolution > 0 ? Scrite.document.displayFormat.pageLayout.customResolution : ""
+
                     onEditingComplete: {
                         var value = parseFloat(text)
                         if(isNaN(value))
@@ -135,15 +154,21 @@ Item {
 
                 VclLabel {
                     Layout.alignment: Qt.AlignVCenter
+
                     text: "Scale:"
                     padding: 5
                 }
 
                 VclTextField {
                     Layout.fillWidth: true
+
+                    TabSequenceItem.sequence: 4
+                    TabSequenceItem.manager: _tabSequence
+
                     enabled: Platform.isWindowsDesktop
-                    placeholderText: "Default: 1.0. Requires restart if changed."
                     text: Platform.isWindowsDesktop ? SystemEnvironment.get("SCRITE_UI_SCALE_FACTOR", "1.0") : "1.0"
+                    placeholderText: "Default: 1.0. Requires restart if changed."
+
                     onEditingComplete: {
                         var value = parseFloat(text)
                         if(isNaN(value))
@@ -159,17 +184,15 @@ Item {
 
                 VclLabel {
                     Layout.alignment: Qt.AlignVCenter
+
                     text: "Font Size:"
                     padding: 5
                 }
 
                 VclTextField {
                     Layout.fillWidth: true
-                    placeholderText: "Ideal font point-size to use for all text in the UI."
-                    text: Scrite.app.customFontPointSize === 0 ? Runtime.idealFontMetrics.font.pointSize : Scrite.app.customFontPointSize
-                    validator: IntValidator {
-                        bottom: 0; top: 100
-                    }
+                    TabSequenceItem.sequence: 5
+                    TabSequenceItem.manager: _tabSequence
                     Component.onDestruction: applyCustomFontSize()
 
                     function applyCustomFontSize() {
@@ -177,6 +200,13 @@ Item {
                             Scrite.app.customFontPointSize = parseInt(text)
                         else
                             Scrite.app.customFontPointSize = 0
+                    }
+
+                    text: (Scrite.app.customFontPointSize === 0 ? Runtime.idealFontMetrics.font.pointSize : Scrite.app.customFontPointSize) + (activeFocus ? "" : " pt")
+                    placeholderText: "Ideal font point-size to use for all text in the UI."
+
+                    validator: IntValidator {
+                        bottom: 0; top: 100
                     }
                 }
             }
@@ -208,10 +238,13 @@ Item {
 
                 VclCheckBox {
                     Layout.fillWidth: true
+                    TabSequenceItem.sequence: 6
+                    TabSequenceItem.manager: _tabSequence
 
                     text: "Stack Structure & Notebook"
                     checked: Runtime.showNotebookInStructure
                     enabled: Runtime.canShowNotebookInStructure
+
                     onToggled: {
                         Runtime.workspaceSettings.showNotebookInStructure = checked
                         if(checked) {
@@ -223,9 +256,12 @@ Item {
 
                 VclCheckBox {
                     Layout.fillWidth: true
+                    TabSequenceItem.sequence: 7
+                    TabSequenceItem.manager: _tabSequence
 
                     text: "Show Scrited Tab"
                     checked: Runtime.workspaceSettings.showScritedTab
+
                     onToggled: {
                         Runtime.workspaceSettings.showScritedTab = checked
                         if(!checked && Runtime.mainWindowTab === Runtime.MainWindowTab.ScritedTab) {
@@ -254,15 +290,24 @@ Item {
                 columns: 2
 
                 VclCheckBox {
+                    TabSequenceItem.sequence: 8
+                    TabSequenceItem.manager: _tabSequence
+
                     text: "Auto Save"
                     checked: Scrite.document.autoSave
+
                     onToggled: Scrite.document.autoSave = checked
                 }
 
                 VclTextField {
+                    TabSequenceItem.sequence: 9
+                    TabSequenceItem.manager: _tabSequence
+
                     label: enabled ? "Interval in seconds:" : ""
+
+                    text: enabled ? (Scrite.document.autoSaveDurationInSeconds + (activeFocus ? "" :  " seconds")): "No Auto Save"
                     enabled: Scrite.document.autoSave
-                    text: enabled ? Scrite.document.autoSaveDurationInSeconds : "No Auto Save"
+
                     validator: IntValidator {
                         bottom: 1; top: 3600
                     }
@@ -270,15 +315,23 @@ Item {
                 }
 
                 VclCheckBox {
+                    TabSequenceItem.sequence: 10
+                    TabSequenceItem.manager: _tabSequence
+
                     text: "Limit Backups"
                     checked: Scrite.document.maxBackupCount > 0
+
                     onToggled: Scrite.document.maxBackupCount = checked ? 20 : 0
                 }
 
                 VclTextField {
+                    TabSequenceItem.sequence: 11
+                    TabSequenceItem.manager: _tabSequence
+
                     label: enabled ? "Number of backups to retain:" : ""
+                    text: enabled ? (Scrite.document.maxBackupCount + (activeFocus ? "" : " backups")) : "Unlimited Backups"
                     enabled: Scrite.document.maxBackupCount > 0
-                    text: enabled ? Scrite.document.maxBackupCount : "Unlimited Backups"
+
                     validator: IntValidator {
                         bottom: 1; top: 3600
                     }
@@ -286,6 +339,9 @@ Item {
                 }
 
                 VclCheckBox {
+                    TabSequenceItem.sequence: 12
+                    TabSequenceItem.manager: _tabSequence
+
                     Layout.columnSpan: 2
                     Layout.fillWidth: true
 
@@ -295,6 +351,9 @@ Item {
                 }
 
                 VclCheckBox {
+                    TabSequenceItem.sequence: 13
+                    TabSequenceItem.manager: _tabSequence
+
                     Layout.columnSpan: 2
                     Layout.fillWidth: true
 
@@ -304,6 +363,9 @@ Item {
                 }
 
                 VclCheckBox {
+                    TabSequenceItem.sequence: 14
+                    TabSequenceItem.manager: _tabSequence
+
                     Layout.columnSpan: 2
                     Layout.fillWidth: true
 
@@ -331,6 +393,9 @@ Item {
 
                     Layout.fillWidth: true
 
+                    TabSequenceItem.sequence: 15
+                    TabSequenceItem.manager: _tabSequence
+
                     from: 0.1
                     to: 3
                     value: Runtime.workspaceSettings.flickScrollSpeedFactor
@@ -350,11 +415,19 @@ Item {
                 }
 
                 FlatToolButton {
+                    TabSequenceItem.sequence: 16
+                    TabSequenceItem.manager: _tabSequence
+
                     iconSource: "qrc:/icons/action/reset.png"
                     toolTipText: "Reset flick/scroll speed to 100%"
+
                     onClicked: Runtime.workspaceSettings.flickScrollSpeedFactor = 1
                 }
             }
         }
+    }
+
+    TabSequenceManager {
+        id: _tabSequence
     }
 }

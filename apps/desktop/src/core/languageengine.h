@@ -208,7 +208,11 @@ public:
         this->preferredTransliterationOptionId = other.preferredTransliterationOptionId;
         return *this;
     }
-    bool operator==(const Language &other) const { return code == other.code; }
+    bool operator==(const Language &other) const
+    {
+        return code == other.code && keySequence == other.keySequence
+                && preferredTransliterationOptionId == other.preferredTransliterationOptionId;
+    }
     bool operator!=(const Language &other) const { return !(*this == other); }
 
     static QChar::Script scriptForLanguage(QLocale::Language language,

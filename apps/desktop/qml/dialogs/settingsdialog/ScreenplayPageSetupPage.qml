@@ -299,13 +299,15 @@ Item {
                     text: "Font Size"
                 }
 
-                SpinBox {
+                VclSpinBox {
                     Layout.preferredWidth: 250
-                    from: 9; to: 200; stepSize: 1
+
                     editable: true
-                    value:  _private.pageSetupSettings.watermarkFontSize
-                    onValueModified:  _private.pageSetupSettings.watermarkFontSize = value
                     enabled:  _private.pageSetupSettings.watermarkEnabled
+                    from: 9; to: 200; stepSize: 1
+                    value:  _private.pageSetupSettings.watermarkFontSize
+
+                    onValueModified:  _private.pageSetupSettings.watermarkFontSize = value
                 }
 
                 VclLabel {
@@ -335,15 +337,17 @@ Item {
                     text: "Rotation"
                 }
 
-                SpinBox {
+                VclSpinBox {
                     Layout.preferredWidth: 250
-                    from: -180; to: 180
+
                     editable: true
-                    value: _private.pageSetupSettings.watermarkRotation
+                    enabled: _private.pageSetupSettings.watermarkEnabled
+                    from: -180; to: 180
                     textFromValue: function(value,locale) { return value + " degrees" }
                     validator: IntValidator { top: 360; bottom: 0 }
+                    value: _private.pageSetupSettings.watermarkRotation
+
                     onValueModified: _private.pageSetupSettings.watermarkRotation = value
-                    enabled: _private.pageSetupSettings.watermarkEnabled
                 }
             }
 

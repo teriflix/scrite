@@ -16,6 +16,7 @@ set(SCRITE_DESKTOP_QML_FILES
   "qml/controls/VclMenuItem.qml"
   "qml/controls/VclRadioButton.qml"
   "qml/controls/VclScrollBar.qml"
+  "qml/controls/VclSpinBox.qml"
   "qml/controls/VclText.qml"
   "qml/controls/VclTextField.qml"
   "qml/controls/VclToolButton.qml"

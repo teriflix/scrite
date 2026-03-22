@@ -53,9 +53,9 @@ ColumnLayout {
         text: root.fieldInfo.note
     }
 
-    SpinBox {
-        to: root.fieldInfo.max
+    VclSpinBox {
         from: root.fieldInfo.min
+        to: root.fieldInfo.max
 
         value: root.report ? root.report.getConfigurationValue(root.fieldInfo.name) : 0
 

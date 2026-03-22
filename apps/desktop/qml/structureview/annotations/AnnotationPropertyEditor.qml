@@ -268,12 +268,13 @@ Item {
             property var propertyValue: parent.propertyValue
             function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
 
-            SpinBox {
-                value: _numberEditor.propertyValue
-                from: _numberEditor.propertyInfo.min
-                to: _numberEditor.propertyInfo.max
-                stepSize: _numberEditor.propertyInfo.step
+            VclSpinBox {
                 editable: true
+                from: _numberEditor.propertyInfo.min
+                stepSize: _numberEditor.propertyInfo.step
+                to: _numberEditor.propertyInfo.max
+                value: _numberEditor.propertyValue
+
                 onValueModified: _numberEditor.changePropertyValue(value)
             }
         }

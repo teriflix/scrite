@@ -129,8 +129,9 @@ TextField {
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
     leftPadding: 0
+
     background: Item {
-        implicitWidth: root.width
+        implicitWidth: 120
         implicitHeight: _fontMetrics.lineSpacing
 
         Rectangle {
@@ -189,7 +190,7 @@ TextField {
         anchors.left: parent.left
 
         textEditor: root
-        includeEmojis: parent.includeEmojiSymbols
+        includeEmojis: root.includeEmojiSymbols
         textEditorHasCursorInterface: true
     }
 
@@ -201,10 +202,10 @@ TextField {
         anchors.verticalCenter: parent.top
         anchors.verticalCenterOffset: parent.topPadding/4
 
-        text: parent.placeholderText
-        visible: parent.labelAlwaysVisible ? true : parent.text !== ""
+        text: root.placeholderText
+        visible: root.labelAlwaysVisible ? true : root.text !== "" && root.activeFocus
 
-        font.pointSize: 2*Runtime.idealFontMetrics.font.pointSize/3
+        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
     }
 
     FontMetrics {

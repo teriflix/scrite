@@ -44,11 +44,11 @@ ColumnLayout {
         text: root.fieldInfo.label
     }
 
-    SpinBox {
+    VclSpinBox {
         TabSequenceItem.manager: root.tabSequence
 
-        to: root.fieldInfo.max
         from: root.fieldInfo.min
+        to: root.fieldInfo.max
 
         value: root.exporter ? root.exporter.getConfigurationValue(root.fieldInfo.name) : 0
         

@@ -150,10 +150,12 @@ Item {
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
                     VclLabel {
+                        Layout.preferredWidth: _sceneLoadingIntervalLabel.width
+
                         text: "Max Synopsis Lines: "
                     }
 
-                    SpinBox {
+                    VclSpinBox {
                         id: _slpSynopsisLineCount
 
                         Layout.fillWidth: true
@@ -161,6 +163,7 @@ Item {
                         value: Runtime.screenplayEditorSettings.slpSynopsisLineCount
                         from: 1; to: 5
                         hoverEnabled: true
+                        font: Runtime.idealFontMetrics.font
 
                         onValueChanged: Runtime.screenplayEditorSettings.slpSynopsisLineCount = value
 
@@ -185,6 +188,7 @@ Item {
                         Layout.fillWidth: true
 
                         text: Runtime.screenplayEditorSettings.longSceneWordTreshold
+
                         onTextEdited: Runtime.screenplayEditorSettings.longSceneWordTreshold = parseInt(text)
 
                         placeholderText: "Words Per Scene Treshold"
@@ -204,10 +208,12 @@ Item {
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
                     VclLabel {
+                        id: _sceneLoadingIntervalLabel
+
                         text: "Scene Loading Interval: "
                     }
 
-                    SpinBox {
+                    VclSpinBox {
                         id: _placeholderInterval
 
                         Layout.fillWidth: true
@@ -216,6 +222,7 @@ Item {
                         from: 50; to: 1000
                         hoverEnabled: true
                         editable: true
+                        font: Runtime.idealFontMetrics.font
 
                         onValueChanged: Runtime.screenplayEditorSettings.placeholderInterval = Runtime.bounded(from, value, to)
 

@@ -324,9 +324,9 @@ Item {
                             VclLabel {
                                 Layout.fillWidth: true
 
-                                visible: _private.spellCheckService.canCheckLanguage(_private.language.code)
+                                visible: _private.language !== undefined && _private.spellCheckService.canCheckLanguage(_private.language.code)
 
-                                text: "Spell check for " + _private.language.name + " is available through dictionaries offered by the OS."
+                                text: _private.language !== undefined ? "Spell check for " + _private.language.name + " is available through dictionaries offered by the OS." : ""
                                 wrapMode: Text.WordWrap
                                 maximumLineCount: 2
                                 elide: Text.ElideRight

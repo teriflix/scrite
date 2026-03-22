@@ -321,12 +321,13 @@ Item {
                     Popup {
                         id: _textLineHeightEditor
                         closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
-                        contentItem: SpinBox {
-                            from: 25
-                            to: 300
-                            stepSize: 5
+                        contentItem: VclSpinBox {
                             editable: true
+                            from: 25
+                            stepSize: 5
+                            to: 300
                             value: _textLineHeight.value * 100
+
                             onValueModified: {
                                 const v = value/100
                                 _textLineHeight.value = v
@@ -359,12 +360,13 @@ Item {
                     Popup {
                         id: _firstLineIndentEditor
                         closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
-                        contentItem: SpinBox {
-                            from: 0
-                            to: 100
-                            stepSize: 5
+                        contentItem: VclSpinBox {
                             editable: true
+                            from: 0
+                            stepSize: 5
+                            to: 100
                             value: _firstLineIndent.value
+
                             onValueModified: {
                                 const v = value
                                 _firstLineIndent.value = v
