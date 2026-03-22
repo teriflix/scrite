@@ -193,7 +193,6 @@ Item {
                     Layout.fillWidth: true
                     TabSequenceItem.sequence: 5
                     TabSequenceItem.manager: _tabSequence
-                    Component.onDestruction: applyCustomFontSize()
 
                     function applyCustomFontSize() {
                         if(length > 0)
@@ -204,6 +203,8 @@ Item {
 
                     text: (Scrite.app.customFontPointSize === 0 ? Runtime.idealFontMetrics.font.pointSize : Scrite.app.customFontPointSize) + (activeFocus ? "" : " pt")
                     placeholderText: "Ideal font point-size to use for all text in the UI."
+
+                    onEditingComplete: applyCustomFontSize()
 
                     validator: IntValidator {
                         bottom: 0; top: 100
