@@ -16,7 +16,9 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -29,39 +31,17 @@ Button {
     property bool toolTipVisible: hovered
     property string toolTipText
 
-    Component.onCompleted: {
-        if(!Scrite.app.usingMaterialTheme) {
-            background = _backgroundComponent.createObject(root)
-            font.pointSize = Runtime.idealFontMetrics.font.pointSize
-        }
-    }
+    Layout.minimumWidth: implicitWidth
+
+    Material.roundedScale: Material.NotRounded
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-    implicitWidth: Math.max(_private.textRect.width + 40, 120)
-    implicitHeight: Math.max(_private.textRect.height + 20, 50)
-
-    Component {
-        id: _backgroundComponent
-
-        Rectangle {
-            implicitWidth: 120
-            implicitHeight: 30
-            color: root.down ? border.color : Runtime.colors.primary.button.background
-            border.width: 1
-            border.color: Qt.darker(Runtime.colors.primary.button.background,1.25)
-        }
-    }
+    implicitWidth: Math.max(GMath.horizontalAdvance(text, font) + leftPadding + rightPadding + 20, 120)
 
     ToolTipPopup {
         container: root
         text: root.toolTipText
         visible: text !== "" && root.toolTipVisible
-    }
-
-    QtObject {
-        id: _private
-
-        property rect textRect: GMath.boundingRect(root.text, root.font)
     }
 }

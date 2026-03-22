@@ -316,17 +316,17 @@ DialogLauncher {
 
                     spacing: 20
 
-                    Button {
+                    VclButton {
                         text: "Website"
                         onClicked: Qt.openUrlExternally("https://www.scrite.io")
                     }
 
-                    Button {
+                    VclButton {
                         text: "Learning Guides"
                         onClicked: Qt.openUrlExternally(Runtime.userGuidesUrl)
                     }
 
-                    Button {
+                    VclButton {
                         text: "Discord"
                         onClicked: JoinDiscordCommunity.launch()
                     }
