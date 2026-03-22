@@ -172,7 +172,7 @@ DialogLauncher {
 
                             ListElement {
                                 credits: "<strong>Sonnet</strong> from KDE Frameworks for powering English spell check."
-                                url: "https://api.kde.org/frameworks/sonnet/html/index.html"
+                                url: "https://api.kde.org/sonnet-index.html"
                             }
 
                             ListElement {
