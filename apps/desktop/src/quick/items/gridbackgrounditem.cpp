@@ -22,6 +22,7 @@
 #include <QtQuick/QQuickWindow>
 
 #include <QtMath>
+#include <QVector>
 
 GridBackgroundItemBorder::GridBackgroundItemBorder(QObject *parent) : QObject(parent) { }
 
@@ -224,14 +225,45 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode,
     if (!m_gridIsVisible || qFuzzyIsNull(m_tickColorOpacity))
         return rootNode;
 
-    const int nrXTicks = int(qCeil(w / m_tickDistance)) - 1;
-    const int nrYTicks = int(qCeil(h / m_tickDistance)) - 1;
-    const int nrXMajorTicks = int(qCeil(w / (m_tickDistance * m_majorTickStride))) - 1;
-    const int nrYMajorTicks = int(qCeil(h / (m_tickDistance * m_majorTickStride))) - 1;
-    const int nrXMinorTicks = nrXTicks - nrXMajorTicks;
-    const int nrYMinorTicks = nrYTicks - nrYMajorTicks;
-    const int nrMinorTicks = nrXMinorTicks + nrYMinorTicks;
-    const int nrMajorTicks = nrXMajorTicks + nrYMajorTicks;
+    const int majorTickStride = qMax(1, m_majorTickStride);
+    QVector<QSGGeometry::Point2D> minorTickVertices;
+    QVector<QSGGeometry::Point2D> majorTickVertices;
+
+    auto appendLine = [](QVector<QSGGeometry::Point2D> &vertices, qreal x1, qreal y1, qreal x2,
+                         qreal y2) {
+        QSGGeometry::Point2D p1 = { float(x1), float(y1) };
+        QSGGeometry::Point2D p2 = { float(x2), float(y2) };
+        vertices.append(p1);
+        vertices.append(p2);
+    };
+
+    {
+        qreal x = m_tickDistance;
+        int xLineIndex = 1;
+        while (x <= w) {
+            if (xLineIndex % majorTickStride == 0)
+                appendLine(majorTickVertices, x, 0.0, x, h);
+            else
+                appendLine(minorTickVertices, x, 0.0, x, h);
+
+            x += m_tickDistance;
+            ++xLineIndex;
+        }
+    }
+
+    {
+        qreal y = m_tickDistance;
+        int yLineIndex = 1;
+        while (y <= h) {
+            if (yLineIndex % majorTickStride == 0)
+                appendLine(majorTickVertices, 0.0, y, w, y);
+            else
+                appendLine(minorTickVertices, 0.0, y, w, y);
+
+            y += m_tickDistance;
+            ++yLineIndex;
+        }
+    }
 
     {
         QSGNode *minorTicksNode = new QSGOpacityNode;
@@ -242,53 +274,15 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode,
         geometryNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial
                                | QSGNode::OwnedByParent);
 
-        QSGGeometry *geometry =
-                new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), nrMinorTicks * 2);
+        QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(),
+                                                minorTickVertices.size());
         geometry->setDrawingMode(QSGGeometry::DrawLines);
         geometry->setLineWidth(float(m_minorTickLineWidth));
         geometryNode->setGeometry(geometry);
 
         QSGGeometry::Point2D *points = geometry->vertexDataAsPoint2D();
-
-        qreal x = m_tickDistance, y = m_tickDistance;
-        int pointIndex = 0;
-        int xLineIndex = 1, yLineIndex = 1;
-
-        while (x <= w) {
-            points[pointIndex].x = float(x);
-            points[pointIndex].y = 0.f;
-            ++pointIndex;
-
-            points[pointIndex].x = float(x);
-            points[pointIndex].y = float(h);
-            ++pointIndex;
-
-            x += m_tickDistance;
-            ++xLineIndex;
-
-            if (xLineIndex % m_majorTickStride == 0) {
-                x += m_tickDistance;
-                ++xLineIndex;
-            }
-        }
-
-        while (y <= h) {
-            points[pointIndex].x = 0.f;
-            points[pointIndex].y = float(y);
-            ++pointIndex;
-
-            points[pointIndex].x = float(w);
-            points[pointIndex].y = float(y);
-            ++pointIndex;
-
-            y += m_tickDistance;
-            ++yLineIndex;
-
-            if (yLineIndex % m_majorTickStride == 0) {
-                y += m_tickDistance;
-                ++yLineIndex;
-            }
-        }
+        for (int i = 0; i < minorTickVertices.size(); ++i)
+            points[i] = minorTickVertices.at(i);
 
         QSGFlatColorMaterial *material = new QSGFlatColorMaterial();
         geometryNode->setMaterial(material);
@@ -310,40 +304,15 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode,
         geometryNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial
                                | QSGNode::OwnedByParent);
 
-        QSGGeometry *geometry =
-                new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), nrMajorTicks * 2);
+        QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(),
+                                                majorTickVertices.size());
         geometry->setDrawingMode(QSGGeometry::DrawLines);
         geometry->setLineWidth(float(m_majorTickLineWidth));
         geometryNode->setGeometry(geometry);
 
         QSGGeometry::Point2D *points = geometry->vertexDataAsPoint2D();
-
-        qreal x = m_tickDistance * m_majorTickStride, y = x;
-        int pointIndex = 0;
-
-        while (x < w) {
-            points[pointIndex].x = float(x);
-            points[pointIndex].y = 0.f;
-            ++pointIndex;
-
-            points[pointIndex].x = float(x);
-            points[pointIndex].y = float(h);
-            ++pointIndex;
-
-            x += m_tickDistance * m_majorTickStride;
-        }
-
-        while (y < h) {
-            points[pointIndex].x = 0.f;
-            points[pointIndex].y = float(y);
-            ++pointIndex;
-
-            points[pointIndex].x = float(w);
-            points[pointIndex].y = float(y);
-            ++pointIndex;
-
-            y += m_tickDistance * m_majorTickStride;
-        }
+        for (int i = 0; i < majorTickVertices.size(); ++i)
+            points[i] = majorTickVertices.at(i);
 
         QSGFlatColorMaterial *material = new QSGFlatColorMaterial();
         geometryNode->setMaterial(material);
@@ -365,8 +334,8 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode,
         geometryNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial
                                | QSGNode::OwnedByParent);
 
-        QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), 4);
-        geometry->setDrawingMode(QSGGeometry::DrawLineLoop);
+        QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), 8);
+        geometry->setDrawingMode(QSGGeometry::DrawLines);
         geometry->setLineWidth(float(m_border->width()));
         geometryNode->setGeometry(geometry);
 
@@ -374,15 +343,23 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode,
 
         points[0].x = 0.0f;
         points[0].y = 0.0f;
-
         points[1].x = float(w) - 1.0f;
         points[1].y = 0.0f;
 
         points[2].x = float(w) - 1.0f;
-        points[2].y = float(h) - 1.0f;
-
-        points[3].x = 0.0f;
+        points[2].y = 0.0f;
+        points[3].x = float(w) - 1.0f;
         points[3].y = float(h) - 1.0f;
+
+        points[4].x = float(w) - 1.0f;
+        points[4].y = float(h) - 1.0f;
+        points[5].x = 0.0f;
+        points[5].y = float(h) - 1.0f;
+
+        points[6].x = 0.0f;
+        points[6].y = float(h) - 1.0f;
+        points[7].x = 0.0f;
+        points[7].y = 0.0f;
 
         QSGFlatColorMaterial *material = new QSGFlatColorMaterial();
         geometryNode->setMaterial(material);
