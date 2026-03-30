@@ -1040,6 +1040,11 @@ QAbstractListModel *Utils::Object::typeEnumModel(const QString &typeName, const 
     return nullptr;
 }
 
+QVariant Utils::Object::clone(const QVariant &value)
+{
+    return value;
+}
+
 QVariant Utils::Object::convertToPropertyType(const QVariant &value, const QMetaProperty &prop)
 {
     if (!prop.isValid())

@@ -681,6 +681,8 @@ public:
     Q_INVOKABLE static QAbstractListModel *
     typeEnumModel(const QString &typeName, const QString &enumName, QObject *parent = nullptr);
 
+    Q_INVOKABLE static QVariant clone(const QVariant &value);
+
     static QVariant convertToPropertyType(const QVariant &value, const QMetaProperty &prop);
 };
 

@@ -232,8 +232,8 @@ DialogLauncher {
                                 checked: _dialog.keyCombinations.metaModifier
 
                                 onToggled: {
-                                    let newKc = _dialog.keyCombinations
-                                    newKc.metaModifier = !checked
+                                    let newKc = Object.clone(_dialog.keyCombinations)
+                                    newKc.metaModifier = !newKc.metaModifier
                                     _dialog.keyCombinations = newKc
                                 }
                             }
@@ -243,8 +243,8 @@ DialogLauncher {
                                 checked: _dialog.keyCombinations.controlModifier
 
                                 onToggled: {
-                                    let newKc = _dialog.keyCombinations
-                                    newKc.controlModifier = !checked
+                                    let newKc = Object.clone(_dialog.keyCombinations)
+                                    newKc.controlModifier = !newKc.controlModifier
                                     _dialog.keyCombinations = newKc
                                 }
                             }
@@ -254,8 +254,8 @@ DialogLauncher {
                                 checked: _dialog.keyCombinations.altModifier
 
                                 onToggled: {
-                                    let newKc = _dialog.keyCombinations
-                                    newKc.altModifier = !checked
+                                    let newKc = Object.clone(_dialog.keyCombinations)
+                                    newKc.altModifier = !newKc.altModifier
                                     _dialog.keyCombinations = newKc
                                 }
                             }
@@ -265,8 +265,8 @@ DialogLauncher {
                                 checked: _dialog.keyCombinations.shiftModifier
 
                                 onToggled: {
-                                    let newKc = _dialog.keyCombinations
-                                    newKc.shiftModifier = !checked
+                                    let newKc = Object.clone(_dialog.keyCombinations)
+                                    newKc.shiftModifier = !newKc.shiftModifier
                                     _dialog.keyCombinations = newKc
                                 }
                             }
@@ -334,6 +334,8 @@ DialogLauncher {
     }
 
     component ModifierButton: Rectangle {
+        id: _modifierButton
+
         required property int modifier
         property bool checked: false
 
@@ -353,11 +355,11 @@ DialogLauncher {
 
             anchors.horizontalCenter: parent.horizontalCenter
 
-            text: Platform.modifierDescription(parent.modifier) + (parent.checked ? " ✓" : "")
+            text: Platform.modifierDescription(_modifierButton.modifier) + (_modifierButton.checked ? " ✓" : "")
             color: Color.textColorFor(parent.color)
             padding: 12
 
-            font.bold: parent.checked
+            font.bold: _modifierButton.checked
             font.family: Runtime.shortcutFontMetrics.font.family
             font.pointSize: Runtime.shortcutFontMetrics.font.pointSize
         }
@@ -365,7 +367,7 @@ DialogLauncher {
         MouseArea {
             anchors.fill: parent
 
-            onClicked: parent.toggled()
+            onClicked: _modifierButton.toggled()
         }
     }
 }
