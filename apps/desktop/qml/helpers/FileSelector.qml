@@ -31,7 +31,7 @@ Item {
     property alias absoluteFilePath: _fileInfo.absoluteFilePath
 
     property var nameFilters // Unused, but here for backward compatibility
-    property var selectedExtension
+    property var selectedExtension: undefined
     property var allowedExtensions: []
 
     property string label: "Select a file to export into"
@@ -76,7 +76,7 @@ Item {
             lineHeight: 1.2
             lineHeightMode: Text.ProportionalHeight
             text: "<b>" + root.label + ":</b><br/>(" + root.filePathPrefix + "<u>" + _fileInfo.absoluteFilePath + "</u>. <a href=\"change\">Change path</a>.)</font>"
-            visible: root.selectedExtension && root.selectedExtension.value !== AbstractReportGenerator.PdfFormat
+            visible: root.selectedExtension !== undefined && root.selectedExtension.value !== AbstractReportGenerator.PdfFormat
             wrapMode: Text.WordWrap
 
             MouseArea {
@@ -100,7 +100,7 @@ Item {
             enabled: visible
             placeholderText: "File Name"
             text: _fileInfo.baseName
-            visible: root.selectedExtension.value !== AbstractReportGenerator.PdfFormat
+            visible: root.selectedExtension !== undefined && root.selectedExtension.value !== AbstractReportGenerator.PdfFormat
 
             onTextEdited: _fileInfo.baseName = text
         }
