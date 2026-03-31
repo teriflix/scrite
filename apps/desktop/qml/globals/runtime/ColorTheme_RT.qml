@@ -24,8 +24,8 @@ QtObject {
     required property int key
     required property int theme
 
-    property var button: c200
-    property var highlight: c400
+    property ColorPair_RT button: c200
+    property ColorPair_RT highlight: c400
 
     property color borderColor: c400.background
     property color separatorColor: c400.background

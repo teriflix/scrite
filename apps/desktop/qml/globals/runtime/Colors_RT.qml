@@ -27,7 +27,7 @@ Item {
 
     readonly property int   defaultAccentColor: Material.DeepPurple
     readonly property int   defaultPrimaryColor: Material.Grey
-    readonly property int   theme: Material.Light
+    readonly property int   theme: Material.Dark
 
     readonly property var   forDocument: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
     readonly property var   forScene: SceneColors.palette
@@ -47,6 +47,27 @@ Item {
 
         key: Material.Grey // applicationSettings.primaryColor
         theme: root.theme
+
+        button: ColorPair_RT {
+            background: root.palette.button
+            text: root.palette.buttonText
+        }
+
+        highlight: ColorPair_RT {
+            background: root.palette.highlight
+            text: root.palette.highlightedText
+        }
+
+        regular: ColorPair_RT {
+            background: root.palette.base
+            text: root.palette.text
+        }
+
+        c10: regular
+        editor: regular
+        borderColor: root.palette.mid
+        separatorColor: root.palette.mid
+        windowColor: root.palette.window
     }
 
     readonly property ColorTheme_RT accent: ColorTheme_RT {
@@ -55,8 +76,6 @@ Item {
         key: root.applicationSettings.accentColor
         theme: root.theme
     }
-
-    readonly property SystemPalette palette: SystemPalette { }
 
     function tint(a, b) {
         return Color.stacked( Color.tint(a, b), theme === Material.Light ? "white" : "black" )
