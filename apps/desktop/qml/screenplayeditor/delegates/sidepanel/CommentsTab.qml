@@ -45,7 +45,7 @@ AbstractScenePartEditor {
         bottomPadding: 10
 
         background: Rectangle {
-            color: Runtime.colors.tint(root.scene.color, Runtime.colors.sceneHeadingTint)
+            color: Runtime.colors.tintTx(root.scene.color, Runtime.colors.sceneHeadingTint)
 
             Text {
                 anchors.fill: parent

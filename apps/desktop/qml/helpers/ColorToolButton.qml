@@ -99,7 +99,7 @@ Item {
             height: _colorsGrid.cellSize
 
             Image {
-                source: "qrc:/icons/navigation/close.png"
+                source: Runtime.themedIcon("qrc:/icons/navigation/close.png")
                 anchors.fill: parent
                 anchors.margins: 5
                 mipmap: true

@@ -70,7 +70,7 @@ Loader {
                 VclToolButton {
                     toolTipText: "Add Scene (Ctrl+Shift+N)"
 
-                    icon.source: "qrc:/icons/action/add_scene.png"
+                    icon.source: Runtime.themedIcon("qrc:/icons/action/add_scene.png")
 
                     onClicked: {
                         Scrite.document.screenplay.currentElementIndex = Scrite.document.screenplay.lastSceneElementIndex()
@@ -82,7 +82,7 @@ Loader {
                 VclToolButton {
                     toolTipText: "Add Act Break (Ctrl+Shift+B)"
 
-                    icon.source: "qrc:/icons/action/add_act.png"
+                    icon.source: Runtime.themedIcon("qrc:/icons/action/add_act.png")
 
                     onClicked: Scrite.document.screenplay.addBreakElement(Screenplay.Act)
                 }
@@ -90,7 +90,7 @@ Loader {
                 VclToolButton {
                     toolTipText: "Add Episode Break (Ctrl+Shift+P)"
 
-                    icon.source: "qrc:/icons/action/add_episode.png"
+                    icon.source: Runtime.themedIcon("qrc:/icons/action/add_episode.png")
 
                     onClicked: Scrite.document.screenplay.addBreakElement(Screenplay.Episode)
                 }

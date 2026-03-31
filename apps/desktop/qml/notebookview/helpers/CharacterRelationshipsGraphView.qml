@@ -215,7 +215,7 @@ Rectangle {
 
                             text: "Refresh"
                             enabled: !Scrite.document.readOnly && (_graph.character ? _graph.character === _canvas.activeCharacter : true)
-                            icon.source: "qrc:/icons/navigation/refresh.png"
+                            icon.source: Runtime.themedIcon("qrc:/icons/navigation/refresh.png")
 
                             onTriggered: _graph.reset()
                         }
@@ -225,7 +225,7 @@ Rectangle {
 
                             text: "Export to PDF"
                             enabled: !Scrite.document.readOnly && (_graph.character ? _graph.character === _canvas.activeCharacter : true)
-                            icon.source: "qrc:/icons/file/generate_pdf.png"
+                            icon.source: Runtime.themedIcon("qrc:/icons/file/generate_pdf.png")
 
                             onTriggered: (source) => { root.exportToPdf(source) }
                         }
@@ -235,7 +235,7 @@ Rectangle {
 
                             text: "Add A New Relationship"
                             enabled: _graph.character && (_graph.character && _graph.character === _canvas.activeCharacter) && root.editRelationshipsEnabled && !Scrite.document.readOnly
-                            icon.source: "qrc:/icons/content/add_circle_outline.png"
+                            icon.source: Runtime.themedIcon("qrc:/icons/content/add_circle_outline.png")
 
                             onTriggered: (source) => {
                                              _canvas.reloadIfDirty()
@@ -248,7 +248,7 @@ Rectangle {
 
                             text: _canvas.activeCharacter ? ("Remove relationship with " + _canvas.activeCharacter.name) : "Remove Relationship"
                             enabled: _graph.character && _canvas.activeCharacter !== _graph.character && _canvas.activeCharacter && root.editRelationshipsEnabled && !Scrite.document.readOnly
-                            icon.source: "qrc:/icons/action/delete.png"
+                            icon.source: Runtime.themedIcon("qrc:/icons/action/delete.png")
 
                             onTriggered: _removeRelationshipConfirmation.active = true
                         }
@@ -420,7 +420,7 @@ Rectangle {
                 autoRepeat: false
                 checkable: true
                 checked: Runtime.workspaceSettings.mouseWheelZoomsInCharacterGraph
-                iconSource: "qrc:/icons/hardware/mouse.png"
+                iconSource: Runtime.themedIcon("qrc:/icons/hardware/mouse.png")
                 toolTipText: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
 
                 onCheckedChanged: Runtime.workspaceSettings.mouseWheelZoomsInCharacterGraph = checked
@@ -431,7 +431,7 @@ Rectangle {
                 suggestedHeight: parent.height
 
                 autoRepeat: true
-                iconSource: "qrc:/icons/navigation/zoom_one.png"
+                iconSource: Runtime.themedIcon("qrc:/icons/navigation/zoom_one.png")
                 toolTipText: "Zoom One"
 
                 onClicked: {
@@ -450,7 +450,7 @@ Rectangle {
                 suggestedHeight: parent.height
 
                 autoRepeat: true
-                iconSource: "qrc:/icons/navigation/zoom_fit.png"
+                iconSource: Runtime.themedIcon("qrc:/icons/navigation/zoom_fit.png")
                 toolTipText: "Zoom Fit"
 
                 onClicked: { _canvas.reloadIfDirty(); _canvas.zoomFit() }
@@ -539,7 +539,7 @@ Rectangle {
             width: node.rect.width
             height: node.rect.height
 
-            color: character.photos.length === 0 ? Runtime.colors.tint(character.color, Runtime.colors.sceneControlTint) : Qt.rgba(0,0,0,0)
+            color: character.photos.length === 0 ? Runtime.colors.tintTx(character.color, Runtime.colors.sceneControlTint) : Qt.rgba(0,0,0,0)
 
             Rectangle {
                 anchors.fill: parent
@@ -565,14 +565,14 @@ Rectangle {
                 source: {
                     if(_nodeItem.character.hasKeyPhoto > 0)
                         return "file:///" + _nodeItem.character.keyPhoto
-                    return "qrc:/icons/content/character_icon.png"
+                    return Runtime.themedIcon("qrc:/icons/content/character_icon.png")
                 }
 
                 Rectangle {
                     anchors.fill: _infoLabel
                     anchors.margins: -4
 
-                    color: _nodeItem.node.marked ? Runtime.colors.accent.a700.background : Runtime.colors.tint(_nodeItem.character.color, Runtime.colors.sceneControlTint)
+                    color: _nodeItem.node.marked ? Runtime.colors.accent.a700.background : Runtime.colors.tintTx(_nodeItem.character.color, Runtime.colors.sceneControlTint)
                     opacity: _nodeItem.character.photos.length === 0 ? 1 : 0.8
                     radius: 4
 

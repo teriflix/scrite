@@ -36,6 +36,7 @@ ToolButton {
     opacity: enabled ? 1 : 0.5
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
+    icon.source: Runtime.themedIcon(action.icon.source)
     icon.color: down ? Runtime.colors.accent.a200.background : action.icon.color
 
     ToolTipPopup {

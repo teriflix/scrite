@@ -175,6 +175,13 @@ Rectangle {
             resolution: _private.pageLayout.resolution
             leftMargin: _private.pageMargins.left
             rightMargin: _private.pageMargins.right
+            borderColor: Runtime.colors.primary.c300.background
+            paragraphColor: Runtime.colors.primary.c500.background
+            textColor: Runtime.colors.primary.editor.text
+            majorTickColor: textColor
+            minorTickColor: Runtime.colors.scheme === Qt.ColorScheme.Dark ? Qt.darker(textColor) : Qt.lighter(textColor)
+            backgroundColor: Runtime.colors.primary.c50.background
+            pageMarginColor: Runtime.colors.primary.c300.background
             paragraphLeftMargin: _private.currentParagraphMargins.left
             paragraphRightMargin: _private.currentParagraphMargins.left
 

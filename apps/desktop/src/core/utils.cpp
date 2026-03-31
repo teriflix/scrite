@@ -19,8 +19,10 @@
 #include "qobjectlistmodel.h"
 #include "enumerationmodel.h"
 #include "qobjectserializer.h"
+#include "themediconprovider.h"
 
 #include <QDir>
+#include <QFile>
 #include <QtMath>
 #include <QTimer>
 #include <QLocale>
@@ -311,6 +313,27 @@ QString Utils::Platform::architectureString()
 QImage Utils::Gui::emptyQImage()
 {
     return QImage();
+}
+
+QString Utils::Gui::themedIcon(const QString &source, Qt::ColorScheme colorScheme)
+{
+    if (source.isEmpty())
+        return source;
+
+    const QString prefix = "image://" + ThemedIconProvider::name() + "/";
+
+    QString actualSource = source;
+    if (actualSource.startsWith(prefix))
+        actualSource = actualSource.mid(prefix.size());
+
+    const QString theme = (colorScheme == Qt::ColorScheme::Dark ? "dark/" : "light/");
+    if (actualSource.startsWith(theme))
+        actualSource = actualSource.mid(theme.size());
+
+    if (!actualSource.startsWith("qrc:/"))
+        return actualSource;
+
+    return prefix + theme + actualSource;
 }
 
 QString Utils::Gui::shortcut(int k1, int k2, int k3, int k4)
@@ -1170,6 +1193,40 @@ void Utils::ObjectRegister::setName(const QString &val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+// We'll come back to this function when we implement dark mode
+inline qreal evaluateLuminance(const QColor &color, const QColor &background = Qt::white)
+{
+    const qreal alpha = color.alphaF();
+    if (alpha < 1.0) {
+        const qreal r = color.redF() * alpha + background.redF() * (1.0 - alpha);
+        const qreal g = color.greenF() * alpha + background.greenF() * (1.0 - alpha);
+        const qreal b = color.blueF() * alpha + background.blueF() * (1.0 - alpha);
+        return (0.299 * r) + (0.587 * g) + (0.114 * b);
+    }
+
+    return ((0.299 * color.redF()) + (0.587 * color.greenF()) + (0.114 * color.blueF()));
+}
+
+/**
+ * \brief Checks if a color is light.
+ * \param color The color to check.
+ * \return True if the color is light, false otherwise.
+ */
+bool Utils::Color::isLight(const QColor &color)
+{
+    return evaluateLuminance(color) > 0.5;
+}
+
+/**
+ * \brief Checks if a color is very light.
+ * \param color The color to check.
+ * \return True if the color is very light, false otherwise.
+ */
+bool Utils::Color::isVeryLight(const QColor &color)
+{
+    return evaluateLuminance(color) > 0.8;
+}
+
 /**
  * \brief Opens a color picker dialog and returns the selected color.
  * \param initial The initial color to show.
@@ -1292,40 +1349,6 @@ QColor Utils::Color::translucent(const QColor &input, qreal alpha)
     return ret;
 }
 
-// We'll come back to this function when we implement dark mode
-inline qreal evaluateLuminance(const QColor &color, const QColor &background = Qt::white)
-{
-    const qreal alpha = color.alphaF();
-    if (alpha < 1.0) {
-        const qreal r = color.redF() * alpha + background.redF() * (1.0 - alpha);
-        const qreal g = color.greenF() * alpha + background.greenF() * (1.0 - alpha);
-        const qreal b = color.blueF() * alpha + background.blueF() * (1.0 - alpha);
-        return (0.299 * r) + (0.587 * g) + (0.114 * b);
-    }
-
-    return ((0.299 * color.redF()) + (0.587 * color.greenF()) + (0.114 * color.blueF()));
-}
-
-/**
- * \brief Checks if a color is light.
- * \param color The color to check.
- * \return True if the color is light, false otherwise.
- */
-bool Utils::Color::isLight(const QColor &color)
-{
-    return evaluateLuminance(color) > 0.5;
-}
-
-/**
- * \brief Checks if a color is very light.
- * \param color The color to check.
- * \return True if the color is very light, false otherwise.
- */
-bool Utils::Color::isVeryLight(const QColor &color)
-{
-    return evaluateLuminance(color) > 0.8;
-}
-
 /**
  * \brief Returns the appropriate text color for a background color.
  * \param backgroundColor The background color.
@@ -1334,6 +1357,22 @@ bool Utils::Color::isVeryLight(const QColor &color)
 QColor Utils::Color::textColorFor(const QColor &backgroundColor)
 {
     return isLight(backgroundColor) ? Qt::black : Qt::white;
+}
+
+QColor Utils::Color::transform(const QColor &in, const QColor &backdrop,
+                               Qt::ColorScheme colorScheme)
+{
+    const QColor stackedColor = stacked(in, backdrop);
+
+    if (colorScheme == Qt::ColorScheme::Light)
+        return stackedColor;
+
+    // For dark mode, we need to alter the color so that it gives the same color perception - but in
+    // light mode. For example, dark-blue becomes light-blue. Black becomes white. And so on.
+    // Inverting the HSL lightness achieves this while preserving the hue and saturation.
+    float h, s, l, a;
+    stackedColor.getHslF(&h, &s, &l, &a);
+    return QColor::fromHslF(h, s, 1.0 - l, a);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

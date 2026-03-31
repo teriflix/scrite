@@ -81,7 +81,7 @@ AbstractScenePartEditor {
         property var tabComponentsArray: [_private.commentsTab,_private.featuredImageTab,_private.indexCardFieldsTab,_private.sceneMetaDataTab]
 
         property color indicatorColor: {
-            const ideally = Runtime.colors.tint(root.scene.color, root.isCurrent ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneControlTint)
+            const ideally = Runtime.colors.tintTx(root.scene.color, root.isCurrent ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneControlTint)
             return Color.isLight(root.scene.color) ? (root.isCurrent ? Runtime.colors.primary.c200.background : Runtime.colors.primary.c50.background) : ideally
         }
 

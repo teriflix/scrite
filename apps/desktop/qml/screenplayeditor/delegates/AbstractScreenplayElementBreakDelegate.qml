@@ -115,7 +115,7 @@ AbstractScreenplayElementDelegate {
                         ret += " break."
                         return ret
                     }
-                    iconSource: "qrc:/icons/action/delete.png"
+                    iconSource: Runtime.themedIcon("qrc:/icons/action/delete.png")
 
                     onClicked: Runtime.screenplayAdapter.screenplay.removeElement(root.screenplayElement)
                 }

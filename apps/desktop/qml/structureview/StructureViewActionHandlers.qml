@@ -164,7 +164,7 @@ Item {
                     required property var modelData
 
                     text: modelData.text
-                    icon.source: "qrc:/icons/action/" + modelData.icon
+                    icon.source: Runtime.themedIcon("qrc:/icons/action/" + modelData.icon)
 
                     onClicked: root.selectionLayoutRequest(modelData.type)
                 }
@@ -364,7 +364,7 @@ Item {
         enabled: (root.canvasScroll.selection.hasItems || root.canvasScroll.currentElementItem !== null)
         iconSource: {
             if(sceneType === Scene.Standard)
-                return "qrc:/icons/content/standard_scene.png"
+                return Runtime.themedIcon("qrc:/icons/content/standard_scene.png")
             return sceneTypeModel.valueToIcon(sceneType)
         }
 

@@ -999,6 +999,7 @@ bool Application::registerFileTypes()
 #include "qimageitem.h"
 #include "languageengine.h"
 #include "colorimageprovider.h"
+#include "themediconprovider.h"
 #include "basicfileiconprovider.h"
 
 void Application::initialize(QQmlEngine *engine)
@@ -1015,7 +1016,8 @@ void Application::initialize(QQmlEngine *engine)
     LanguageEngine::init(uri, engine);
 
     // Register image providers
-    engine->addImageProvider(ColorImageProvider::name(), new ColorImageProvider);
-    engine->addImageProvider(BasicFileIconProvider::name(), new BasicFileIconProvider);
     engine->addImageProvider(ImageIconProvider::name(), new ImageIconProvider);
+    engine->addImageProvider(ColorImageProvider::name(), new ColorImageProvider);
+    engine->addImageProvider(ThemedIconProvider::name(), new ThemedIconProvider);
+    engine->addImageProvider(BasicFileIconProvider::name(), new BasicFileIconProvider);
 }

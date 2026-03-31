@@ -419,7 +419,7 @@ Item {
                     TabSequenceItem.sequence: 16
                     TabSequenceItem.manager: _tabSequence
 
-                    iconSource: "qrc:/icons/action/reset.png"
+                    iconSource: Runtime.themedIcon("qrc:/icons/action/reset.png")
                     toolTipText: "Reset flick/scroll speed to 100%"
 
                     onClicked: Runtime.workspaceSettings.flickScrollSpeedFactor = 1

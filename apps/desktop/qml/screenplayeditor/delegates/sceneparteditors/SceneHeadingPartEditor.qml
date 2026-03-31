@@ -60,7 +60,7 @@ AbstractScenePartEditor {
                     visible: sceneType !== Scene.Standard
                     sceneType: root.scene ? root.scene.type : Scene.Standard
                     showTooltip: false
-                    lightBackground: Color.isLight(Runtime.colors.tint(root.scene.color, Runtime.colors.sceneHeadingTint))
+                    lightBackground: Color.isLight(Runtime.colors.tintTx(root.scene.color, Runtime.colors.sceneHeadingTint))
 
                     onClicked: _private.popupMarkSceneAsMenu(_sceneTypeIcon)
                 }
@@ -73,7 +73,7 @@ AbstractScenePartEditor {
                              root.scene.wordCount > Runtime.screenplayEditorSettings.longSceneWordTreshold
                     smooth: true
                     mipmap: true
-                    source: "qrc:/icons/content/warning.png"
+                    source: Runtime.themedIcon("qrc:/icons/content/warning.png")
                     fillMode: Image.PreserveAspectFit
 
                     MouseArea {
@@ -202,7 +202,7 @@ AbstractScenePartEditor {
                 suggestedWidth: Runtime.iconImageSize
                 suggestedHeight: Runtime.iconImageSize
 
-                iconSource: "qrc:/icons/navigation/menu.png"
+                iconSource: Runtime.themedIcon("qrc:/icons/navigation/menu.png")
 
                 onClicked: _sceneMenu.popup()
 

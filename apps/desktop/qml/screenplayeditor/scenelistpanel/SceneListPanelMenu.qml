@@ -37,7 +37,7 @@ VclMenu {
 
             readonly property string option: "HEADING"
 
-            icon.source: Runtime.sceneListPanelSettings.sceneTextMode === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+            icon.source: Runtime.sceneListPanelSettings.sceneTextMode === option ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
 
             onClicked: Runtime.sceneListPanelSettings.sceneTextMode = option
         }
@@ -47,7 +47,7 @@ VclMenu {
 
             readonly property string option: "SUMMARY"
 
-            icon.source: Runtime.sceneListPanelSettings.sceneTextMode === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+            icon.source: Runtime.sceneListPanelSettings.sceneTextMode === option ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
 
             onClicked: Runtime.sceneListPanelSettings.sceneTextMode = option
         }
@@ -57,7 +57,7 @@ VclMenu {
         VclMenuItem {
             text: "Show Tooltip"
 
-            icon.source: Runtime.sceneListPanelSettings.showTooltip ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+            icon.source: Runtime.sceneListPanelSettings.showTooltip ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
 
             onClicked: Runtime.sceneListPanelSettings.showTooltip = !Runtime.sceneListPanelSettings.showTooltip
         }
@@ -72,7 +72,7 @@ VclMenu {
             readonly property string option: "TIME"
 
             enabled: !Runtime.paginator.paused
-            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
 
             onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
         }
@@ -83,7 +83,7 @@ VclMenu {
             readonly property string option: "PAGE"
 
             enabled: !Runtime.paginator.paused
-            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
 
             onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
         }
@@ -94,7 +94,7 @@ VclMenu {
             readonly property string option: "NO"
 
             enabled: !Runtime.paginator.paused
-            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
 
             onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
         }
@@ -107,7 +107,7 @@ VclMenu {
             text: "Display"
 
             enabled: Runtime.appFeatures.structure.enabled && Runtime.screenplayTracksSettings.displayTracks
-            icon.source: Runtime.sceneListPanelSettings.displayTracks ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+            icon.source: Runtime.sceneListPanelSettings.displayTracks ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
 
             onClicked: Runtime.sceneListPanelSettings.displayTracks = !Runtime.sceneListPanelSettings.displayTracks
         }
@@ -116,7 +116,7 @@ VclMenu {
             text: "Configure"
 
             enabled: Runtime.appFeatures.structure.enabled
-            icon.source: "qrc:/icons/content/blank.png"
+            icon.source: Runtime.themedIcon("qrc:/icons/content/blank.png")
 
             onClicked: ScreenplayTracksDialog.launch()
         }

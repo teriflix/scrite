@@ -13,16 +13,21 @@
 **
 ****************************************************************************/
 
-import QtQuick
+#ifndef THEMEDICONPROVIDER_H
+#define THEMEDICONPROVIDER_H
 
-BorderImage {
-    id: root
+#include <QQuickImageProvider>
 
-    source: Runtime.themedIcon("qrc:/icons/content/shadow.png")
-    horizontalTileMode: BorderImage.Stretch
-    verticalTileMode: BorderImage.Stretch
-    anchors { leftMargin: -9; topMargin: -9; rightMargin: -9; bottomMargin: -9 }
-    border { left: 22; top: 22; right: 22; bottom: 22 }
-    smooth: true
-    opacity: 0.75
-}
+class ThemedIconProvider : public QQuickImageProvider
+{
+public:
+    explicit ThemedIconProvider();
+    ~ThemedIconProvider();
+
+    static QString name();
+
+    // QQuickImageProvider interface
+    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
+};
+
+#endif // THEMEDICONPROVIDER_H

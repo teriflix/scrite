@@ -67,17 +67,12 @@ VclMenu {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
+                    color: Qt.rgba(0,0,0,0)
                     border.width: 1
                     border.color: Runtime.colors.primary.borderColor
 
                     enabled: Runtime.appFeatures.structure.enabled && root.sceneGroup.sceneCount > 0
                     opacity: enabled ? 1 : 0.5
-
-                    Rectangle {
-                        anchors.fill: _innerTitleText
-                        color: Runtime.colors.primary.c700.background
-                        visible: _innerTitleText.visible
-                    }
 
                     VclLabel {
                         id: _innerTitleText
@@ -106,6 +101,10 @@ VclMenu {
                         color: Runtime.colors.primary.c700.text
                         padding: 5
                         horizontalAlignment: Text.AlignHCenter
+
+                        background: Rectangle {
+                            color: Runtime.colors.primary.c700.background
+                        }
                     }
 
                     ListView {
@@ -167,11 +166,14 @@ VclMenu {
 
                             VclLabel {
                                 id: _categoryLabel
+
+                                anchors.centerIn: parent
+
+                                bottomPadding: 5
+                                color: Runtime.colors.primary.button.text
                                 text: parent.section
                                 topPadding: 5
-                                bottomPadding: 5
-                                anchors.centerIn: parent
-                                color: Runtime.colors.primary.button.text
+
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             }
                         }
@@ -203,7 +205,7 @@ VclMenu {
 
                                     width: 24; height: 24
 
-                                    source: "qrc:/icons/navigation/check.png"
+                                    source: Runtime.themedIcon("qrc:/icons/navigation/check.png")
                                     opacity: {
                                         switch(_groupsViewDelegate.arrayItem.checked) {
                                         case "no": return 0

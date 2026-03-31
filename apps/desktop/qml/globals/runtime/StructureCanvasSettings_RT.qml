@@ -45,5 +45,4 @@ Settings {
 
     category: "Structure Tab"
     location: Platform.settingsLocation
-
 }

@@ -90,7 +90,7 @@ Item {
 
         visible: root.hasMenu
 
-        source: root.menuArrow === Qt.RightArrow ? "qrc:/icons/navigation/arrow_right.png" : "qrc:/icons/navigation/arrow_down.png"
+        source: root.menuArrow === Qt.RightArrow ? Runtime.themedIcon("qrc:/icons/navigation/arrow_right.png") : Runtime.themedIcon("qrc:/icons/navigation/arrow_down.png")
         opacity: _icon.opacity
         fillMode: Image.PreserveAspectFit
     }

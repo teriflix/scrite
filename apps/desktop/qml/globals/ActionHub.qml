@@ -13,6 +13,17 @@
 **
 ****************************************************************************/
 
+/**
+  This file is long, I know!
+
+  I hate to have QML files that are several thousands of lines in size. But
+  I am going to make an exception just for this one case because it makes sense.
+  We just want an ActionHub that contains a full and comprehensive list of all
+  ActionManagers in one place. Spliting them into separate files will not give us
+  any tangible benefit. Even from a maintenence perspective, having all action
+  managers in one file makes sense.
+  */
+
 pragma ComponentBehavior: Bound
 
 pragma Singleton
@@ -511,7 +522,7 @@ Item {
         objectName: "appOptions"
 
         Action {
-            readonly property var keywords: ["theme", "dark mode", "colors"]
+            readonly property var keywords: ["colors"]
             readonly property string defaultShortcut: "Ctrl+,"
 
             text: "Settings"
@@ -521,6 +532,36 @@ Item {
             icon.source: "qrc:/icons/action/settings_applications.png"
 
             onTriggered: SettingsDialog.launch()
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+
+            text: "Dark Mode (Color Theme)"
+            enabled: Runtime.applicationSettings.colorMode !== "Dark"
+            objectName: "darkModeTheme"
+
+            onTriggered: Runtime.applicationSettings.colorMode = "Dark"
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+
+            text: "Light Mode (Color Theme)"
+            enabled: Runtime.applicationSettings.colorMode !== "Light"
+            objectName: "lightModeTheme"
+
+            onTriggered: Runtime.applicationSettings.colorMode = "Light"
+        }
+
+        Action {
+            readonly property bool allowShortcut: true
+
+            text: "System/Auto (Color Theme)"
+            enabled: Runtime.applicationSettings.colorMode !== "System"
+            objectName: "systemModeTheme"
+
+            onTriggered: Runtime.applicationSettings.colorMode = "System"
         }
 
         Action {

@@ -39,7 +39,7 @@ AbstractNotebookPage {
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
     signal deleteNoteRequest(Note note)
 
-    backgroundColor: Runtime.colors.tint(_private.character.color, Runtime.colors.sceneHeadingTint)
+    backgroundColor: Runtime.colors.tintTx(_private.character.color, Runtime.colors.sceneHeadingTint)
 
     ColumnLayout {
         anchors.fill: parent

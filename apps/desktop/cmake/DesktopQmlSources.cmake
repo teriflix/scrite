@@ -91,6 +91,8 @@ set(SCRITE_DESKTOP_QML_SOURCES
   "src/quick/items/textdocumentitem.h"
   "src/quick/items/textshapeitem.cpp"
   "src/quick/items/textshapeitem.h"
+  "src/quick/items/themediconprovider.cpp"
+  "src/quick/items/themediconprovider.h"
   "src/quick/items/timelinecursoritem.cpp"
   "src/quick/items/timelinecursoritem.h"
   "src/quick/objects/aggregation.cpp"

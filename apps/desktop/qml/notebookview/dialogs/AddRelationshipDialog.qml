@@ -128,7 +128,7 @@ DialogLauncher {
                                     Layout.preferredWidth: 24
                                     Layout.preferredHeight: 24
 
-                                    source: "qrc:/icons/navigation/check.png"
+                                    source: Runtime.themedIcon("qrc:/icons/navigation/check.png")
                                     opacity: _relationshipName.length > 0 ? 1 : 0.05
                                 }
 

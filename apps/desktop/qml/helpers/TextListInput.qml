@@ -118,7 +118,6 @@ Flow {
 
             Component.onCompleted: configure()
 
-            border.color: colors.text
             border.width: root.textBorderWidth
 
             text: modelData
@@ -194,7 +193,7 @@ Flow {
     }
 
     Image {
-        source: "qrc:/icons/content/add_box.png"
+        source: Runtime.themedIcon("qrc:/icons/content/add_box.png")
 
         width: _label.height
         height: width

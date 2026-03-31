@@ -79,7 +79,7 @@ FocusScope {
                 ToolTip.delay: Scrite.app.styleHints.mousePressAndHoldInterval
                 ToolTip.visible: hovered
 
-                icon.source: "qrc:/icons/content/undo.png"
+                icon.source: Runtime.themedIcon("qrc:/icons/content/undo.png")
 
                 onClicked: {
                     const restoreCount = _actionsModel.restoreAllActionShortcuts()
@@ -188,7 +188,7 @@ FocusScope {
                             Layout.preferredWidth: _nameLabel.height * 0.5
 
                             fillMode: Image.PreserveAspectFit
-                            source: _delegate.qmlAction.icon.source !== "" ? _delegate.qmlAction.icon.source : "qrc:/icons/content/blank.png"
+                            source: _delegate.qmlAction.icon.source !== "" ? _delegate.qmlAction.icon.source : Runtime.themedIcon("qrc:/icons/content/blank.png")
                         }
 
                         ColumnLayout {
@@ -205,7 +205,7 @@ FocusScope {
                                 bottomPadding: _descriptionLabel.visible ? 2 : 10
                                 padding: 10
 
-                                color: Runtime.colors.primary.regular.text
+                                color: Runtime.colors.primary.editor.text
                                 elide: Text.ElideRight
                                 font: Runtime.idealFontMetrics.font
                                 text: _delegate.qmlAction.text + (_delegate.qmlAction.checkable & _delegate.qmlAction.checked ? " ✔" : "")
@@ -219,7 +219,7 @@ FocusScope {
                                 Layout.rightMargin: 10
                                 Layout.bottomMargin: 10
 
-                                color: Runtime.colors.primary.regular.text
+                                color: Runtime.colors.primary.editor.text
                                 opacity: 0.6
 
                                 elide: Text.ElideRight
@@ -262,7 +262,7 @@ FocusScope {
 
                             enabled: visible && _delegate.shortcutIsEditable && Gui.nativeShortcut(_delegate.qmlAction.defaultShortcut) !== Gui.nativeShortcut(_delegate.qmlAction.shortcut)
                             opacity: enabled ? 1 : (_delegate.shortcutIsEditable ? 0.5 : 0)
-                            icon.source: "qrc:/icons/content/undo.png"
+                            icon.source: Runtime.themedIcon("qrc:/icons/content/undo.png")
 
                             onClicked: {
                                 _actionsModel.restoreActionShortcut(_delegate.qmlAction)

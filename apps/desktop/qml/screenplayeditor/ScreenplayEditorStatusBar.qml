@@ -93,13 +93,13 @@ Rectangle {
 
             enabled: !Scrite.document.readOnly
             tooltipText: shieldAction.tooltip
-            source: shieldAction.icon.source
+            source: Runtime.themedIcon(shieldAction.icon.source)
 
             onClicked: shieldAction.trigger()
         }
 
         IconButton {
-            source: "qrc:/icons/navigation/refresh.png"
+            source: Runtime.themedIcon("qrc:/icons/navigation/refresh.png")
             visible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
             tooltipText: "Computes page layout from scratch, thereby reevaluating page count and time."
 
@@ -114,7 +114,7 @@ Rectangle {
             Layout.preferredWidth: Runtime.idealFontMetrics.height
             Layout.preferredHeight: Runtime.idealFontMetrics.height
 
-            source: "qrc:/icons/content/page_count.png"
+            source: Runtime.themedIcon("qrc:/icons/content/page_count.png")
             enabled: !Runtime.paginator.paused
             opacity: enabled ? 1 : 0.5
         }
@@ -151,7 +151,7 @@ Rectangle {
 
                 enabled: !Runtime.paginator.paused
                 opacity: enabled ? 1 : 0.5
-                source: "qrc:/icons/content/time.png"
+                source: Runtime.themedIcon("qrc:/icons/content/time.png")
                 visible: !Runtime.paginator.busy
             }
         }
@@ -276,7 +276,7 @@ Rectangle {
         spacing: 6
 
         IconButton {
-            source: "qrc:/icons/action/layout_grouping.png"
+            source: Runtime.themedIcon("qrc:/icons/action/layout_grouping.png")
             visible: Runtime.screenplayEditorSettings.allowTaggingOfScenes && Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
             tooltipText: "Grouping Options"
 
@@ -294,7 +294,7 @@ Rectangle {
                     VclMenuItem {
                         text: "None"
                         font.bold: Scrite.document.structure.preferredGroupCategory === ""
-                        icon.source: font.bold ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+                        icon.source: font.bold ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
 
                         onTriggered: Scrite.document.structure.preferredGroupCategory = ""
                     }
@@ -310,7 +310,7 @@ Rectangle {
 
                             text: SMath.titleCased(modelData)
                             font.bold: Scrite.document.structure.preferredGroupCategory === modelData
-                            icon.source: font.bold ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+                            icon.source: font.bold ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
 
                             onTriggered: Scrite.document.structure.preferredGroupCategory = modelData
                         }

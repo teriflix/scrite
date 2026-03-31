@@ -101,7 +101,7 @@ DialogLauncher {
                         addTextButtonTooltip: "Click here to " + _label.text.toLowerCase()
                         font: Runtime.idealFontMetrics.font
                         labelText: "Keywords"
-                        labelIconSource:  "qrc:/icons/action/keyword.png"
+                        labelIconSource:  Runtime.themedIcon("qrc:/icons/action/keyword.png")
                         labelIconVisible: true
 
                         readOnly: Scrite.document.readOnly

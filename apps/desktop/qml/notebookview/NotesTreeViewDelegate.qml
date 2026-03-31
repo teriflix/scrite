@@ -64,7 +64,7 @@ TreeViewDelegate {
                 baseColor = root.itemData.value.notebookItemObject.color
 
             if(baseColor)
-                return Runtime.colors.tint(baseColor, Runtime.colors.sceneHeadingTint)
+                return Runtime.colors.tintTx(baseColor, Runtime.colors.sceneHeadingTint)
 
             return Runtime.colors.primary.c10.background
         }
@@ -100,17 +100,17 @@ TreeViewDelegate {
             source: {
                 switch(root.itemData.value.notebookItemType) {
                 case NotebookModel.EpisodeBreakType:
-                    return "qrc:/icons/content/episode.png"
+                    return Runtime.themedIcon("qrc:/icons/content/episode.png")
                 case NotebookModel.ActBreakType:
-                    return "qrc:/icons/content/act.png"
+                    return Runtime.themedIcon("qrc:/icons/content/act.png")
                 case NotebookModel.NotesType:
                     switch(root.itemData.value.notebookItemObject.ownerType) {
                     case Notes.SceneOwner:
-                        return "qrc:/icons/content/scene.png"
+                        return Runtime.themedIcon("qrc:/icons/content/scene.png")
                     case Notes.CharacterOwner:
-                        return "qrc:/icons/content/person_outline.png"
+                        return Runtime.themedIcon("qrc:/icons/content/person_outline.png")
                     case Notes.BreakOwner:
-                        return "qrc:/icons/content/story.png"
+                        return Runtime.themedIcon("qrc:/icons/content/story.png")
                     default:
                         break
                     }
@@ -118,11 +118,11 @@ TreeViewDelegate {
                 case NotebookModel.NoteType:
                     switch(root.itemData.value.notebookItemObject.type) {
                     case Note.TextNoteType:
-                        return "qrc:/icons/content/note.png"
+                        return Runtime.themedIcon("qrc:/icons/content/note.png")
                     case Note.FormNoteType:
-                        return "qrc:/icons/content/form.png"
+                        return Runtime.themedIcon("qrc:/icons/content/form.png")
                     case Note.CheckListNoteType:
-                        return "qrc:/icons/content/checklist.png"
+                        return Runtime.themedIcon("qrc:/icons/content/checklist.png")
                     default:
                         break
                     }

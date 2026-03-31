@@ -249,7 +249,7 @@ DialogLauncher {
                         Layout.preferredWidth: 24
                         Layout.preferredHeight: 24
 
-                        source: "qrc:/icons/action/share.png"
+                        source: Runtime.themedIcon("qrc:/icons/action/share.png")
                     }
 
                     VclLabel {
@@ -269,7 +269,7 @@ DialogLauncher {
 
                             flat: true
                             toolTipText: "Post about Scrite on your Facebook page."
-                            icon.source: "qrc:/icons/action/share_on_facebook.png"
+                            icon.source: Runtime.themedIcon("qrc:/icons/action/share_on_facebook.png")
 
                             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_facebook")
                         }
@@ -280,7 +280,7 @@ DialogLauncher {
 
                             flat: true
                             toolTipText: "Post about Scrite on your LinkedIn page."
-                            icon.source: "qrc:/icons/action/share_on_linkedin.png"
+                            icon.source: Runtime.themedIcon("qrc:/icons/action/share_on_linkedin.png")
 
                             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_linkedin")
                         }
@@ -291,7 +291,7 @@ DialogLauncher {
 
                             flat: true
                             toolTipText: "Tweet about Scrite from your handle."
-                            icon.source: "qrc:/icons/action/share_on_twitter.png"
+                            icon.source: Runtime.themedIcon("qrc:/icons/action/share_on_twitter.png")
 
                             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_twitter")
                         }
@@ -304,7 +304,7 @@ DialogLauncher {
 
                             flat: true
                             toolTipText: "Send an email about Scrite."
-                            icon.source: "qrc:/icons/action/share_on_email.png"
+                            icon.source: Runtime.themedIcon("qrc:/icons/action/share_on_email.png")
 
                             onClicked: Qt.openUrlExternally(url)
                         }

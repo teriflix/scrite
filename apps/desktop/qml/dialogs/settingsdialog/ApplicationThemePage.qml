@@ -144,7 +144,7 @@ Item {
 
                     text: "Reset"
                     enabled: Runtime.colors.accent.key !== Runtime.colors.defaultAccentColor
-                    icon.source: "qrc:/icons/action/reset.png"
+                    icon.source: Runtime.themedIcon("qrc:/icons/action/reset.png")
 
                     onClicked: {
                         Runtime.colors.accent.key = Runtime.colors.defaultAccentColor
@@ -158,8 +158,6 @@ Item {
             Layout.alignment: Qt.AlignTop
             Layout.preferredWidth: (parent.width-(parent.columns-1)*parent.columnSpacing)/parent.columns
 
-            enabled: false
-
             label: VclLabel {
                 text: "UI Mode"
             }
@@ -167,23 +165,22 @@ Item {
             ColumnLayout {
                 width: parent.width
 
-                VclLabel {
-                    Layout.fillWidth: true
-
-                    text: "This feature is in the works, the options below will get enabled whenever its fully implemented."
-                    wrapMode: Text.WordWrap
-                }
-
                 VclRadioButton {
                     text: "Light"
+                    checked: Runtime.applicationSettings.colorMode === "Light"
+                    onClicked: Runtime.applicationSettings.colorMode = "Light"
                 }
 
                 VclRadioButton {
                     text: "Dark"
+                    checked: Runtime.applicationSettings.colorMode === "Dark"
+                    onClicked: Runtime.applicationSettings.colorMode = "Dark"
                 }
 
                 VclRadioButton {
                     text: "System"
+                    checked: Runtime.applicationSettings.colorMode === "System"
+                    onClicked: Runtime.applicationSettings.colorMode = "System"
                 }
             }
         }

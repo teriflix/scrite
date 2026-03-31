@@ -36,7 +36,7 @@ ToolButton {
     text: actionManager.title
 
     icon.color: "transparent"
-    icon.source: actionManager.iconSource !== undefined ? actionManager.iconSource : ""
+    icon.source: actionManager.iconSource !== undefined ? Runtime.themedIcon(actionManager.iconSource) : ""
 
     onClicked: _menu.open()
 

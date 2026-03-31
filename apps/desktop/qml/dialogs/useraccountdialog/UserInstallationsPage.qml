@@ -144,10 +144,10 @@ Item {
 
                                             source: {
                                                 switch(_deviceDelegate.modelData.platform.toLowerCase()) {
-                                                    case "windows": return "qrc:/icons/hardware/windows-platform.png"
-                                                    case "linux": return "qrc:/icons/hardware/linux-platform.png"
+                                                    case "windows": return Runtime.themedIcon("qrc:/icons/hardware/windows-platform.png")
+                                                    case "linux": return Runtime.themedIcon("qrc:/icons/hardware/linux-platform.png")
                                                 }
-                                                return "qrc:/icons/hardware/desktop-platform.png"
+                                                return Runtime.themedIcon("qrc:/icons/hardware/desktop-platform.png")
                                             }
                                         }
                                     }
@@ -244,7 +244,7 @@ Item {
                                         enabled: _deviceDelegate.modelData.activated
 
                                         text: "Sign Out"
-                                        icon.source: "qrc:/icons/action/logout.png"
+                                        icon.source: Runtime.themedIcon("qrc:/icons/action/logout.png")
                                         icon.width: 16
                                         icon.height: 16
 

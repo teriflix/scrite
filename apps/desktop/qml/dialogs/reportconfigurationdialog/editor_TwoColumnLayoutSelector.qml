@@ -64,7 +64,7 @@ RowLayout {
                     fillMode: Image.PreserveAspectFit
                     smooth: true
                     mipmap: true
-                    source: "qrc:/icons/reports/" + _layoutOptionDelegate.modelData.icon
+                    source: Runtime.themedIcon("qrc:/icons/reports/" + _layoutOptionDelegate.modelData.icon)
                 }
 
                 MouseArea {

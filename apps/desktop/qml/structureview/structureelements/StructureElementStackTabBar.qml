@@ -79,7 +79,7 @@ Item {
                 activeTabBorderWidth: (root.elementStack.hasCurrentElement ? 2 : 1)
 
                 activeTabIndex: root.elementStack.topmostElementIndex
-                activeTabColor: Runtime.colors.tint(root.elementStack.topmostElement.scene.color, (root.elementStack.hasCurrentElement ? Runtime.colors.sceneControlTint : Runtime.colors.selectedSceneControlTint))
+                activeTabColor: Runtime.colors.tintTx(root.elementStack.topmostElement.scene.color, (root.elementStack.hasCurrentElement ? Runtime.colors.sceneControlTint : Runtime.colors.selectedSceneControlTint))
                 activeTabFont.bold: true
                 activeTabTextColor: Color.textColorFor(activeTabColor)
                 activeTabBorderColor: Color.isLight(root.elementStack.topmostElement.scene.color) ? "black" : root.elementStack.topmostElement.scene.color
@@ -112,7 +112,7 @@ Item {
                     const element = root.elementStack.objectAt(index)
                     switch(attr) {
                     case SimpleTabBarItem.TabColor:
-                        requestedAttributeValue = Runtime.colors.tint(element.scene.color, Runtime.colors.selectedSceneControlTint)
+                        requestedAttributeValue = Runtime.colors.tintTx(element.scene.color, Runtime.colors.selectedSceneControlTint)
                         break
                     case SimpleTabBarItem.TabBorderColor:
                         requestedAttributeValue = Color.isLight(element.scene.color) ? Runtime.colors.primary.borderColor : element.scene.color

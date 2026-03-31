@@ -110,7 +110,7 @@ Rectangle {
             down: _structureViewOptionsMenu.active
             checkable: false
             autoRepeat: false
-            iconSource: "qrc:/icons/content/view_options.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/content/view_options.png")
             toolTipText: "Toggle between index-card view options."
 
             onClicked: _structureViewOptionsMenu.show()
@@ -128,7 +128,7 @@ Rectangle {
                                                 Scrite.document.structure.indexCardContent === Structure.Synopsis
 
                         text: "Index Cards"
-                        icon.source: _checked ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+                        icon.source: _checked ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
 
                         onClicked: {
                             if(!_checked) {
@@ -148,7 +148,7 @@ Rectangle {
                                                 Scrite.document.structure.indexCardContent === Structure.FeaturedPhoto
 
                         text: "Photo Cards"
-                        icon.source: _checked ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+                        icon.source: _checked ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
 
                         onClicked: {
                             if(!_checked)
@@ -166,7 +166,7 @@ Rectangle {
                         property bool _checked: Scrite.document.structure.canvasUIMode === Structure.SynopsisEditorUI
 
                         text: "Synopsis Cards"
-                        icon.source: _checked ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+                        icon.source: _checked ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
 
                         onClicked: {
                             if(!_checked) {
@@ -191,7 +191,7 @@ Rectangle {
             checked: Runtime.workspaceSettings.mouseWheelZoomsInStructureCanvas
             checkable: true
             autoRepeat: false
-            iconSource: "qrc:/icons/hardware/mouse.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/hardware/mouse.png")
             toolTipText: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
 
             onCheckedChanged: Runtime.workspaceSettings.mouseWheelZoomsInStructureCanvas = checked
@@ -204,7 +204,7 @@ Rectangle {
             down: root.canvasPreviewVisible
             checked: root.canvasPreviewVisible
             checkable: true
-            iconSource: "qrc:/icons/action/thumbnail.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/action/thumbnail.png")
             toolTipText: "Preview"
 
             onToggled: Runtime.structureCanvasSettings.showPreview = checked
@@ -224,7 +224,7 @@ Rectangle {
 
             enabled: root.canvasItemsBoundingBox.itemCount > 0
             autoRepeat: true
-            iconSource: "qrc:/icons/navigation/zoom_one.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/navigation/zoom_one.png")
             toolTipText: "Zoom One"
 
             onClicked: root.zoomOneRequest()
@@ -238,7 +238,7 @@ Rectangle {
 
             enabled: root.canvasItemsBoundingBox.itemCount > 0
             autoRepeat: true
-            iconSource: "qrc:/icons/navigation/zoom_fit.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/navigation/zoom_fit.png")
             toolTipText: "Zoom Fit"
 
             onClicked: root.zoomFitRequest(root.canvasItemsBoundingBox.boundingBox)

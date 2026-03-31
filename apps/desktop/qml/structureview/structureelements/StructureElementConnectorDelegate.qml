@@ -54,7 +54,7 @@ StructureElementConnector {
         height: width
         radius: width/2
 
-        color: Runtime.colors.tint(root.outlineColor, Runtime.colors.sceneControlTint)
+        color: Runtime.colors.tintTx(root.outlineColor, Runtime.colors.sceneControlTint)
         border.width: 1
         border.color: Runtime.colors.primary.borderColor
 

@@ -98,7 +98,7 @@ DialogLauncher {
                     }
 
                     ToolButton {
-                        icon.source: "qrc:/icons/content/content_copy.png"
+                        icon.source: Runtime.themedIcon("qrc:/icons/content/content_copy.png")
                         onClicked: {
                             _clipboard.text = root.inviteUrl
                             MessageBox.information("Copy Successful",

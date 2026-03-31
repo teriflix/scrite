@@ -182,7 +182,7 @@ Popup {
                             Layout.preferredWidth: _nameLabel.height * 0.5
 
                             fillMode: Image.PreserveAspectFit
-                            source: _delegate.qmlAction.icon.source !== "" ? _delegate.qmlAction.icon.source : "qrc:/icons/content/blank.png"
+                            source: Runtime.themedIcon(_delegate.qmlAction.icon.source !== "" ? _delegate.qmlAction.icon.source : "qrc:/icons/content/blank.png")
                         }
 
                         ColumnLayout {
@@ -199,7 +199,7 @@ Popup {
                                 bottomPadding: _descriptionLabel.visible ? 2 : 10
                                 padding: 10
 
-                                color: Runtime.colors.primary.regular.text
+                                color: Runtime.colors.primary.editor.text
                                 elide: Text.ElideRight
                                 font: Runtime.idealFontMetrics.font
                                 text: "<b>" + _delegate.actionManager.title + "</b>: " + _delegate.qmlAction.text + (_delegate.qmlAction.checkable & _delegate.qmlAction.checked ? " ✔" : "")
@@ -213,7 +213,7 @@ Popup {
                                 Layout.rightMargin: 10
                                 Layout.bottomMargin: 10
 
-                                color: Runtime.colors.primary.regular.text
+                                color: Runtime.colors.primary.editor.text
                                 opacity: 0.6
 
                                 elide: Text.ElideRight

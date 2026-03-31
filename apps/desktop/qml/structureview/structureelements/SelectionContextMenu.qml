@@ -68,7 +68,7 @@ VclMenu {
         VclMenuItem {
             text: "Layout Horizontally"
             enabled: !Scrite.document.readOnly && (root.selection.hasItems ? root.selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
-            icon.source: "qrc:/icons/action/layout_horizontally.png"
+            icon.source: Runtime.themedIcon("qrc:/icons/action/layout_horizontally.png")
 
             onClicked: {
                 const s = root.selection as StructureElementsSelection
@@ -77,7 +77,7 @@ VclMenu {
         }
 
         VclMenuItem {
-            icon.source: "qrc:/icons/action/layout_vertically.png"
+            icon.source: Runtime.themedIcon("qrc:/icons/action/layout_vertically.png")
             text: "Layout Vertically"
             enabled: !Scrite.document.readOnly && (root.selection.hasItems ? root.selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
 
@@ -88,7 +88,7 @@ VclMenu {
         }
 
         VclMenuItem {
-            icon.source: "qrc:/icons/action/layout_flow_horizontally.png"
+            icon.source: Runtime.themedIcon("qrc:/icons/action/layout_flow_horizontally.png")
             text: "Flow Horizontally"
             enabled: !Scrite.document.readOnly && (root.selection.hasItems ? root.selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
 
@@ -101,7 +101,7 @@ VclMenu {
         VclMenuItem {
             text: "Flow Vertically"
             enabled: !Scrite.document.readOnly && (root.selection.hasItems ? root.selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
-            icon.source: "qrc:/icons/action/layout_flow_vertically.png"
+            icon.source: Runtime.themedIcon("qrc:/icons/action/layout_flow_vertically.png")
 
             onClicked: {
                 const s = root.selection as StructureElementsSelection

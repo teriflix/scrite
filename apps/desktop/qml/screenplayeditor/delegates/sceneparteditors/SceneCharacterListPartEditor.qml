@@ -46,7 +46,7 @@ AbstractScenePartEditor {
         addTextButtonTooltip: "Click here to capture characters who don't have any dialogues in this scene, but are still required for the scene."
         completionStrings: Scrite.document.structure.characterNames
         font: root.font
-        labelIconSource: "qrc:/icons/content/persons_add.png"
+        labelIconSource: Runtime.themedIcon("qrc:/icons/content/persons_add.png")
         labelText: "Characters"
         readOnly: root.readOnly
         textBorderWidth: root.screenplayElementDelegateHasFocus ? 0 : Math.max(0.5, 1 * zoomLevel)

@@ -129,7 +129,7 @@ Item {
                                 addTextButtonTooltip: "Click here to include a keyword to allowed list, and eliminate others."
                                 font: Runtime.idealFontMetrics.font
                                 labelText: "Keywords"
-                                labelIconSource:  "qrc:/icons/action/keyword.png"
+                                labelIconSource:  Runtime.themedIcon("qrc:/icons/action/keyword.png")
                                 labelIconVisible: true
 
                                 readOnly: Scrite.document.readOnly

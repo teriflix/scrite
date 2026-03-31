@@ -86,7 +86,7 @@ Item {
                         anchors.fill: parent
                         anchors.margins: 10
 
-                        color: _flickable.currentIndex === _noteItem.index ? Runtime.colors.tint(_noteItem.note.color, Runtime.colors.currentNoteTint) : Runtime.colors.tint(_noteItem.note.color, Runtime.colors.sceneHeadingTint)
+                        color: _flickable.currentIndex === _noteItem.index ? Runtime.colors.tintTx(_noteItem.note.color, Runtime.colors.currentNoteTint) : Runtime.colors.tintTx(_noteItem.note.color, Runtime.colors.sceneHeadingTint)
 
                         Column {
                             anchors.fill: parent
@@ -182,7 +182,7 @@ Item {
 
                     anchors.centerIn: parent
 
-                    iconSource: "qrc:/icons/action/note_add.png"
+                    iconSource: Runtime.themedIcon("qrc:/icons/action/note_add.png")
                     toolTipText: "Add a new text or form note."
 
                     onClicked: _private.popupNewNoteMenu(_newNoteButton)

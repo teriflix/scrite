@@ -162,7 +162,7 @@ Rectangle {
                     sourceComponent: Image {
                         smooth: true
                         mipmap: true
-                        source: "qrc:/icons/content/warning.png"
+                        source: Runtime.themedIcon("qrc:/icons/content/warning.png")
                         fillMode: Image.PreserveAspectFit
 
                         MouseArea {
@@ -190,7 +190,7 @@ Rectangle {
                     Image {
                         anchors.fill: parent
 
-                        source: "qrc:/icons/navigation/arrow_right.png"
+                        source: Runtime.themedIcon("qrc:/icons/navigation/arrow_right.png")
                         fillMode: Image.PreserveAspectFit
                     }
 
@@ -258,7 +258,7 @@ Rectangle {
                     sourceComponent: Image {
                         smooth: true
                         mipmap: true
-                        source: "qrc:/icons/content/empty_scene.png"
+                        source: Runtime.themedIcon("qrc:/icons/content/empty_scene.png")
                         fillMode: Image.PreserveAspectFit
 
                         MouseArea {
@@ -412,8 +412,8 @@ Rectangle {
         property bool isSceneTextModeHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
 
         property color color: isSelection ? selectedColor : normalColor
-        property color normalColor: root.scene ? Runtime.colors.tint(delegateColor, Runtime.colors.sceneHeadingTint) : Qt.lighter(delegateColor, 1.25)
-        property color selectedColor: root.scene ? Runtime.colors.tint(delegateColor, Runtime.colors.selectedSceneHeadingTint) : delegateColor
+        property color normalColor: root.scene ? Runtime.colors.tintTx(delegateColor, Runtime.colors.sceneHeadingTint) : Qt.lighter(delegateColor, 1.25)
+        property color selectedColor: root.scene ? Runtime.colors.tintTx(delegateColor, Runtime.colors.selectedSceneHeadingTint) : delegateColor
 
         property string tooltipText: {
             if(root.screenplayElement.breakType === Screenplay.Interval)

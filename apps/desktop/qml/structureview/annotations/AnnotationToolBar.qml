@@ -45,7 +45,7 @@ Rectangle {
 
         FlatToolButton {
             down: AnnotationPropertyEditorDock.visible
-            iconSource: "qrc:/icons/action/edit.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/action/edit.png")
             toolTipText: "Edit properties of this annotation"
 
             onClicked: Runtime.structureCanvasSettings.displayAnnotationProperties = !Runtime.structureCanvasSettings.displayAnnotationProperties
@@ -53,7 +53,7 @@ Rectangle {
 
         FlatToolButton {
             enabled: Scrite.document.structure.canBringToFront(root.annotation)
-            iconSource: "qrc:/icons/action/keyboard_arrow_up.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/action/keyboard_arrow_up.png")
             toolTipText: "Bring this annotation to front"
 
             onClicked: {
@@ -63,7 +63,7 @@ Rectangle {
 
         FlatToolButton {
             enabled: Scrite.document.structure.canSendToBack(root.annotation)
-            iconSource: "qrc:/icons/action/keyboard_arrow_down.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/action/keyboard_arrow_down.png")
             toolTipText: "Send this annotation to back"
 
             onClicked: {
@@ -73,7 +73,7 @@ Rectangle {
         }
 
         FlatToolButton {
-            iconSource: "qrc:/icons/action/delete.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/action/delete.png")
             toolTipText: "Delete this annotation"
 
             onClicked: {

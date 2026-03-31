@@ -34,7 +34,7 @@ Rectangle {
     property alias text: _text.text
     property alias font: _text.font
     property alias closable: _closeButtonLoader.active
-    property alias textColor: _text.color
+    property alias textColor: _text._color
     property alias hoverEnabled: _mouseArea.hoverEnabled
     property alias containsMouse: _mouseArea.containsMouse
 
@@ -48,7 +48,7 @@ Rectangle {
     radius: height/2
 
     border.width: 1
-    border.color: Runtime.colors.primary.borderColor
+    border.color: _text.color
 
     Row {
         id: _layout
@@ -56,11 +56,13 @@ Rectangle {
         Text {
             id: _text
 
+            property color _color: Runtime.colors.primary.c10.text
+
             anchors.verticalCenter: parent.verticalCenter
 
             padding: 4
 
-            color: Runtime.colors.primary.c10.text
+            color: Runtime.colors.tx(_color, root.color)
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
             MouseArea {
@@ -98,7 +100,7 @@ Rectangle {
                         width: height
                         height: parent.height * 0.8
 
-                        source: _closeButtonMouseArea.pressed ? "qrc:/icons/navigation/close_inverted.png" : "qrc:/icons/navigation/close.png"
+                        source: _closeButtonMouseArea.pressed ? "qrc:/icons/navigation/close_inverted.png" : Runtime.themedIcon("qrc:/icons/navigation/close.png")
                         smooth: true
                     }
 

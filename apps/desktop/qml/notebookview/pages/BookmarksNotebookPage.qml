@@ -104,27 +104,27 @@ AbstractNotebookPage {
                                 if(Object.typeOf(_delegate.noteObject) === "Notes") {
                                     switch(_delegate.noteObject.ownerType) {
                                     case Notes.SceneOwner:
-                                        return "qrc:/icons/content/scene.png"
+                                        return Runtime.themedIcon("qrc:/icons/content/scene.png")
                                     case Notes.CharacterOwner:
-                                        return "qrc:/icons/content/person_outline.png"
+                                        return Runtime.themedIcon("qrc:/icons/content/person_outline.png")
                                     case Notes.BreakOwner:
-                                        return "qrc:/icons/content/story.png"
+                                        return Runtime.themedIcon("qrc:/icons/content/story.png")
                                     default:
                                         break
                                     }
                                 } else if(Object.typeOf(_delegate.noteObject) === "Character")
-                                    return "qrc:/icons/content/person_outline.png"
+                                    return Runtime.themedIcon("qrc:/icons/content/person_outline.png")
                                 else if(Object.typeOf(_delegate.noteObject) === "Note") {
                                     switch(_delegate.noteObject.type) {
                                     case Note.TextNoteType:
-                                        return "qrc:/icons/content/note.png"
+                                        return Runtime.themedIcon("qrc:/icons/content/note.png")
                                     case Note.FormNoteType:
-                                        return "qrc:/icons/content/form.png"
+                                        return Runtime.themedIcon("qrc:/icons/content/form.png")
                                     default:
                                         break
                                     }
                                 }
-                                return "qrc:/icons/content/bookmark.png"
+                                return Runtime.themedIcon("qrc:/icons/content/bookmark.png")
                             }
                         }
 

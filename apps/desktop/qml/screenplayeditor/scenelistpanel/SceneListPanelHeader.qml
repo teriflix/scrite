@@ -84,7 +84,7 @@ Rectangle {
             Layout.preferredWidth: _headingText.height * 0.6
             Layout.preferredHeight: _headingText.height * 0.6
 
-            source: Color.isLight(root.color) ? "qrc:/icons/content/view_options.png" : "qrc:/icons/content/view_options_inverted.png"
+            source: Color.isLight(root.color) ? Runtime.themedIcon("qrc:/icons/content/view_options.png") : "qrc:/icons/content/view_options_inverted.png"
             fillMode: Image.PreserveAspectFit
 
             MouseArea {

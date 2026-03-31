@@ -759,7 +759,7 @@ Item {
                         anchors.rightMargin: _textDocumentScrollBar.width + 4
 
                         enabled: visible
-                        iconSource: "qrc:/icons/navigation/arrow_down.png"
+                        iconSource: Runtime.themedIcon("qrc:/icons/navigation/arrow_down.png")
                         opacity: hovered ? 1 : 0.5
                         toolTipText: "Shows the video player."
                         visible: !_videoArea.visible
@@ -1290,7 +1290,7 @@ Item {
 
                             fillMode: Image.PreserveAspectFit
                             opacity: arrayItem.locked ? 1 : 0.1
-                            source: arrayItem.locked ? "qrc:/icons/action/lock_outline.png" : "qrc:/icons/action/lock_open.png"
+                            source: arrayItem.locked ? Runtime.themedIcon("qrc:/icons/action/lock_outline.png") : Runtime.themedIcon("qrc:/icons/action/lock_open.png")
                         }
 
                         MouseArea {

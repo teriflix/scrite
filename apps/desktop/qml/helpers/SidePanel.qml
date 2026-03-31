@@ -55,7 +55,7 @@ Item {
 
         border { left: 21; top: 21; right: 21; bottom: 21 }
 
-        source: "qrc:/icons/content/shadow.png"
+        source: Runtime.themedIcon("qrc:/icons/content/shadow.png")
         opacity: 0.25
         visible: _contentLoader.visible
         verticalTileMode: BorderImage.Stretch
@@ -174,7 +174,7 @@ Item {
                 width: parent.width
                 height: width
 
-                source: root.expanded ? "qrc:/icons/navigation/arrow_left.png" : "qrc:/icons/navigation/arrow_right.png"
+                source: root.expanded ? Runtime.themedIcon("qrc:/icons/navigation/arrow_left.png") : Runtime.themedIcon("qrc:/icons/navigation/arrow_right.png")
                 fillMode: Image.PreserveAspectFit
             }
 

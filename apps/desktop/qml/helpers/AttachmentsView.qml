@@ -117,7 +117,7 @@ ListView {
         height: root.delegateSize
 
         FlatToolButton {
-            iconSource: "qrc:/icons/action/attach_file.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/action/attach_file.png")
             anchors.centerIn: parent
             onClicked: if(!root.readonly) _fileDialog.open()
             visible: !root.readonly

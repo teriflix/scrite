@@ -121,7 +121,7 @@ DialogLauncher {
                                         currentIndex: _recentFileDelegate.fileInfo.hasCoverPage ? 1 : 0
 
                                         Image {
-                                            source: "qrc:/icons/filetype/document.png"
+                                            source: Runtime.themedIcon("qrc:/icons/filetype/document.png")
                                             fillMode: Image.PreserveAspectFit
                                         }
 
@@ -172,7 +172,7 @@ DialogLauncher {
                                 }
 
                                 VclToolButton {
-                                    icon.source: "qrc:/icons/action/delete.png"
+                                    icon.source: Runtime.themedIcon("qrc:/icons/action/delete.png")
                                     hoverEnabled: true
                                     opacity: hovered ? 1 : 0.25
 

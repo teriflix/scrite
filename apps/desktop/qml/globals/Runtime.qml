@@ -16,6 +16,7 @@
 pragma Singleton
 
 import QtQuick
+import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -290,6 +291,12 @@ Item {
         }
 
         return annot
+    }
+
+    function themedIcon(source) {
+        return Gui.themedIcon(source.toString(),
+                              colors.theme === Material.Dark ? Qt.ColorScheme.Dark
+                                                             : Qt.ColorScheme.Light)
     }
 
     function bounded(min, val, max) {

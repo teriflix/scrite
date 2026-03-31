@@ -173,7 +173,7 @@ Popup {
 
                             padding: 10
 
-                            color: Runtime.colors.primary.regular.text
+                            color: Runtime.colors.primary.editor.text
                             elide: Text.ElideRight
                             text: _delegate.fullTitle
                             font.bold: _helpText.length > 0
@@ -189,7 +189,7 @@ Popup {
                             Layout.rightMargin: 10
                             Layout.bottomMargin: 10
 
-                            color: Runtime.colors.primary.regular.text
+                            color: Runtime.colors.primary.editor.text
                             opacity: 0.6
 
                             elide: Text.ElideRight

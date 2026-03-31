@@ -84,7 +84,7 @@ DialogLauncher {
                                 source: {
                                     if(_dialog.ofCharacter.hasKeyPhoto > 0)
                                     return "file:///" + _dialog.ofCharacter.keyPhoto
-                                    return "qrc:/icons/content/character_icon.png"
+                                    return Runtime.themedIcon("qrc:/icons/content/character_icon.png")
                                 }
                                 fillMode: Image.PreserveAspectCrop
                                 mipmap: true; smooth: true
@@ -137,7 +137,7 @@ DialogLauncher {
                                 source: {
                                     if(_dialog.withCharacter.hasKeyPhoto > 0)
                                     return "file:///" + _dialog.withCharacter.keyPhoto
-                                    return "qrc:/icons/content/character_icon.png"
+                                    return Runtime.themedIcon("qrc:/icons/content/character_icon.png")
                                 }
                                 fillMode: Image.PreserveAspectCrop
                                 mipmap: true; smooth: true

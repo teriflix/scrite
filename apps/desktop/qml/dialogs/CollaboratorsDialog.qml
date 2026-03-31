@@ -157,7 +157,7 @@ DialogLauncher {
                                     Layout.alignment: Qt.AlignVCenter
 
                                     opacity: _delegateMouseArea.containsMouse || containsMouse ? (enabled ? 1 : 0.5) : 0
-                                    iconSource: "qrc:/icons/action/close.png"
+                                    iconSource: Runtime.themedIcon("qrc:/icons/action/close.png")
                                     enabled: Scrite.document.canModifyCollaborators
 
                                     onClicked: Scrite.document.removeCollaborator(_collaboratorDelegate.collaboratorEmail)
@@ -205,7 +205,7 @@ DialogLauncher {
 
                                 Layout.alignment: Qt.AlignVCenter
 
-                                iconSource: "qrc:/icons/content/add_box.png"
+                                iconSource: Runtime.themedIcon("qrc:/icons/content/add_box.png")
                                 onClicked: _newCollaboratorEmail.addCollaborator()
                                 enabled: _newCollaboratorEmail.acceptableInput
                             }

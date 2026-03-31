@@ -136,7 +136,7 @@ Rectangle {
                             width: 24
                             height: 24
 
-                            source: "qrc:/icons/navigation/arrow_right.png"
+                            source: Runtime.themedIcon("qrc:/icons/navigation/arrow_right.png")
                             visible: _pageList.currentIndex === _pageRepeaterDelegate.index
                         }
 

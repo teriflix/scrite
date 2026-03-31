@@ -246,7 +246,7 @@ Item {
                 visible: root.displayRefreshButton
                 toolTipText: "Regenerates this PDF and refreshes its content."
 
-                icon.source: "qrc:/icons/navigation/refresh.png"
+                icon.source: Runtime.themedIcon("qrc:/icons/navigation/refresh.png")
 
                 onClicked: root.refreshRequest()
             }
@@ -257,7 +257,7 @@ Item {
                 visible: (root.allowFileSave || root.saveFeatureDisabled)
                 toolTipText: "Save this PDF to your computer."
 
-                icon.source: "qrc:/icons/file/file_download.png"
+                icon.source: Runtime.themedIcon("qrc:/icons/file/file_download.png")
 
                 onClicked: {
                     if(root.saveFeatureDisabled)
@@ -311,7 +311,7 @@ Item {
                 visible: root.allowFileReveal
                 toolTipText: "Reveal the location of this PDF on your computer."
 
-                icon.source: "qrc:/icons/file/folder_open.png"
+                icon.source: Runtime.themedIcon("qrc:/icons/file/folder_open.png")
 
                 onClicked: File.revealOnDesktop( Url.toPath(_pdfDoc.source) )
             }

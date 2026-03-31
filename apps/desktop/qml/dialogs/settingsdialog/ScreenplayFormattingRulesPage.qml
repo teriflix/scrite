@@ -113,7 +113,7 @@ Item {
                 SimpleToolButton {
                     id: _boldButton
                     down: checked
-                    iconSource: "qrc:/icons/editor/format_bold.png"
+                    iconSource: Runtime.themedIcon("qrc:/icons/editor/format_bold.png")
                     onClicked: {
                         checked = !checked
                         _private.printElementFormat.fontBold = checked ? SceneElementFormat.Set : SceneElementFormat.Unset
@@ -124,7 +124,7 @@ Item {
                 SimpleToolButton {
                     id: _italicsButton
                     down: checked
-                    iconSource: "qrc:/icons/editor/format_italics.png"
+                    iconSource: Runtime.themedIcon("qrc:/icons/editor/format_italics.png")
                     onClicked: {
                         checked = !checked
                         _private.printElementFormat.fontItalics = checked ? SceneElementFormat.Set : SceneElementFormat.Unset
@@ -135,7 +135,7 @@ Item {
                 SimpleToolButton {
                     id: _underlineButton
                     down: checked
-                    iconSource: "qrc:/icons/editor/format_underline.png"
+                    iconSource: Runtime.themedIcon("qrc:/icons/editor/format_underline.png")
                     onClicked: {
                         checked = !checked
                         _private.printElementFormat.fontUnderline = checked ? SceneElementFormat.Set : SceneElementFormat.Unset
@@ -150,15 +150,15 @@ Item {
                 iconSource: {
                     switch(value) {
                     case Qt.AlignLeft:
-                        return "qrc:/icons/editor/format_align_left.png"
+                        return Runtime.themedIcon("qrc:/icons/editor/format_align_left.png")
                     case Qt.AlignHCenter:
-                        return "qrc:/icons/editor/format_align_center.png"
+                        return Runtime.themedIcon("qrc:/icons/editor/format_align_center.png")
                     case Qt.AlignRight:
-                        return "qrc:/icons/editor/format_align_right.png"
+                        return Runtime.themedIcon("qrc:/icons/editor/format_align_right.png")
                     case Qt.AlignJustify:
-                        return "qrc:/icons/editor/format_align_justify.png"
+                        return Runtime.themedIcon("qrc:/icons/editor/format_align_justify.png")
                     }
-                    return "qrc:/icons/editor/format_align_left.png"
+                    return Runtime.themedIcon("qrc:/icons/editor/format_align_left.png")
                 }
                 hoverEnabled: true
 
@@ -178,7 +178,7 @@ Item {
                             text: "Left"
                             checkable: true
                             checked: _textAlignment.value === Qt.AlignLeft
-                            icon.source: "qrc:/icons/editor/format_align_left.png"
+                            icon.source: Runtime.themedIcon("qrc:/icons/editor/format_align_left.png")
                             font.bold: _textAlignment.value === Qt.AlignLeft
                             onClicked: {
                                 _textAlignment.value = Qt.AlignLeft
@@ -191,7 +191,7 @@ Item {
                             text: "Center"
                             checkable: true
                             checked: _textAlignment.value === Qt.AlignHCenter
-                            icon.source: "qrc:/icons/editor/format_align_center.png"
+                            icon.source: Runtime.themedIcon("qrc:/icons/editor/format_align_center.png")
                             font.bold: _textAlignment.value === Qt.AlignHCenter
                             onClicked: {
                                 _textAlignment.value = Qt.AlignHCenter
@@ -204,7 +204,7 @@ Item {
                             text: "Right"
                             checkable: true
                             checked: _textAlignment.value === Qt.AlignRight
-                            icon.source: "qrc:/icons/editor/format_align_right.png"
+                            icon.source: Runtime.themedIcon("qrc:/icons/editor/format_align_right.png")
                             font.bold: _textAlignment.value === Qt.AlignRight
                             onClicked: {
                                 _textAlignment.value = Qt.AlignRight
@@ -217,7 +217,7 @@ Item {
                             text: "Justify"
                             checkable: true
                             checked: _textAlignment.value === Qt.AlignJustify
-                            icon.source: "qrc:/icons/editor/format_align_justify.png"
+                            icon.source: Runtime.themedIcon("qrc:/icons/editor/format_align_justify.png")
                             font.bold: _textAlignment.value === Qt.AlignJustify
                             onClicked: {
                                 _textAlignment.value = Qt.AlignJustify
@@ -306,7 +306,7 @@ Item {
                 id: _textLineHeight
                 property real value: 0.85
                 down: _textLineHeightEditor.visible
-                iconSource: "qrc:/icons/editor/format_line_spacing.png"
+                iconSource: Runtime.themedIcon("qrc:/icons/editor/format_line_spacing.png")
                 hoverEnabled: true
 
                 onClicked: _textLineHeightEditor.open()
@@ -345,7 +345,7 @@ Item {
                 property real value: 0
 
                 down: _firstLineIndentEditor.visible
-                iconSource: "qrc:/icons/editor/format_first_line_indent.png"
+                iconSource: Runtime.themedIcon("qrc:/icons/editor/format_first_line_indent.png")
                 hoverEnabled: true
 
                 onClicked: _firstLineIndentEditor.open()
@@ -388,7 +388,7 @@ Item {
                 }
 
                 hoverEnabled: true
-                iconSource: "qrc:/icons/action/done_all.png"
+                iconSource: Runtime.themedIcon("qrc:/icons/action/done_all.png")
                 onClicked: _copyAttribsDialog.open()
             }
         }

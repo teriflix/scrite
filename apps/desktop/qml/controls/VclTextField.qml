@@ -39,7 +39,7 @@ import "../helpers"
 TextField {
     id: root
 
-    Material.theme: Material.Light
+    Material.theme: Runtime.colors.theme
 
     signal returnPressed()
     signal editingComplete()

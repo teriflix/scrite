@@ -61,7 +61,7 @@ Item {
 
             enabled: !_removeFeaturedImageDialog.active
             hoverEnabled: true
-            icon.source: parent.fillMode === Image.PreserveAspectCrop ? "qrc:/icons/navigation/zoom_fit.png" : "qrc:/icons/navigation/zoom_one.png"
+            icon.source: parent.fillMode === Image.PreserveAspectCrop ? Runtime.themedIcon("qrc:/icons/navigation/zoom_fit.png") : Runtime.themedIcon("qrc:/icons/navigation/zoom_one.png")
             opacity: hovered ? 1 : 0.5
 
             onClicked: {
@@ -84,7 +84,7 @@ Item {
 
             enabled: !_removeFeaturedImageDialog.active
             hoverEnabled: true
-            icon.source: "qrc:/icons/action/delete.png"
+            icon.source: Runtime.themedIcon("qrc:/icons/action/delete.png")
             opacity: hovered ? 1 : 0.5
 
             onClicked: _removeFeaturedImageDialog.active = true

@@ -45,7 +45,7 @@ Rectangle {
                                                       : root.sceneDelegate.screenplayElement.heightHint * root.sceneDelegate.zoomLevel),
                               (showSceneComments && root.sceneDelegate.spaceAvailableForScenePanel >= Runtime.minSceneSidePanelWidth ? 300 : 0) )
 
-    color: root.sceneDelegate.scene ? Runtime.colors.tint(root.sceneDelegate.scene.color, Runtime.colors.sceneHeadingTint) : Runtime.colors.primary.c300.background
+    color: root.sceneDelegate.scene ? Runtime.colors.tintTx(root.sceneDelegate.scene.color, Runtime.colors.sceneHeadingTint) : Runtime.colors.primary.c300.background
 
     Column {
         id: _headerLayout

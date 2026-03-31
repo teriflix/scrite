@@ -81,7 +81,7 @@ Item {
                 if(_private.isBreakElement) {
                     return _private.active ? _private.delegateColor : Qt.lighter(_private.delegateColor, 1.5)
                 }
-                return Runtime.colors.tint(_private.delegateColor, _private.active ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneHeadingTint)
+                return Runtime.colors.tintTx(_private.delegateColor, _private.active ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneHeadingTint)
             }
             border.color: Color.isLight(color) ? Qt.rgba(0,0,0,0.25) : Qt.rgba(1,1,1,0.25)
             border.width: _private.active ? 2 : 1
@@ -104,8 +104,8 @@ Item {
                 sourceComponent: Image {
                     source: {
                         if(_private.isEpisodeBreak)
-                            return Color.isLight(_elementItemBox.color) ? "qrc:/icons/content/episode.png" : "qrc:/icons/content/episode_inverted.png"
-                        return Color.isLight(_elementItemBox.color) ? "qrc:/icons/content/act.png" : "qrc:/icons/content/act_inverted.png"
+                            return Color.isLight(_elementItemBox.color) ? Runtime.themedIcon("qrc:/icons/content/episode.png") : "qrc:/icons/content/episode_inverted.png"
+                        return Color.isLight(_elementItemBox.color) ? Runtime.themedIcon("qrc:/icons/content/act.png") : "qrc:/icons/content/act_inverted.png"
                     }
                 }
             }
@@ -237,7 +237,7 @@ Item {
                 opacity: 0.4
 
                 sourceComponent: Image {
-                    source: "qrc:/icons/content/bookmark_outline.png"
+                    source: Runtime.themedIcon("qrc:/icons/content/bookmark_outline.png")
                 }
             }
 
@@ -258,7 +258,7 @@ Item {
                     sourceComponent: Image {
                         smooth: true
                         mipmap: true
-                        source: Color.isLight(_elementItemBox.color) ? "qrc:/icons/content/warning.png" : "qrc:/icons/content/warning_inverted.png"
+                        source: Color.isLight(_elementItemBox.color) ? Runtime.themedIcon("qrc:/icons/content/warning.png") : "qrc:/icons/content/warning_inverted.png"
                         fillMode: Image.PreserveAspectFit
 
                         MouseArea {
@@ -300,7 +300,7 @@ Item {
                 anchors.rightMargin: parent.width > width+10 ? 5 : (parent.width - width)/2
 
                 scale: _dragMouseArea.containsMouse ? 2 : 1
-                source: "qrc:/icons/action/view_array.png"
+                source: Runtime.themedIcon("qrc:/icons/action/view_array.png")
                 opacity: _dragMouseArea.containsMouse ? 1 : 0.1
                 visible: !Scrite.document.readOnly && enableDragDrop
                 enabled: visible
@@ -339,7 +339,7 @@ Item {
                 active: root.screenplayElement.omitted
 
                 sourceComponent: Image {
-                    source: "qrc:/icons/content/omitted_scene.png"
+                    source: Runtime.themedIcon("qrc:/icons/content/omitted_scene.png")
                     fillMode: Image.PreserveAspectFit
                 }
             }

@@ -82,7 +82,7 @@ Dialog {
     property bool titleBarCloseButtonVisible: true
     property Component titleBarButtons: Image {
         width: 32; height: 32
-        source: "qrc:/icons/action/dialog_close_button.png"
+        source: Runtime.themedIcon("qrc:/icons/action/dialog_close_button.png")
         smooth: true; mipmap: true
         enabled: visible
         visible: root.titleBarCloseButtonVisible

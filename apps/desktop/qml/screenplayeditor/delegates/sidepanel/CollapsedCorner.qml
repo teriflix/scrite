@@ -41,13 +41,13 @@ Item {
 
         source: {
             if(_private.hasSceneComments)
-                return "qrc:/icons/content/note.png"
+                return Runtime.themedIcon("qrc:/icons/content/note.png")
 
             if(_private.sceneFeaturedImage)
-                return "qrc:/icons/filetype/photo.png"
+                return Runtime.themedIcon("qrc:/icons/filetype/photo.png")
 
             if(_private.hasIndexCardFields)
-                return "qrc:/icons/content/form.png"
+                return Runtime.themedIcon("qrc:/icons/content/form.png")
 
             return ""
         }

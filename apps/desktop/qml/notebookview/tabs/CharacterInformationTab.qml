@@ -162,7 +162,7 @@ Item {
                                 FlatToolButton {
                                     down: _photoSlideView.currentIndex === root.character.keyPhotoIndex
                                     enabled: root.character.photos.length > 0
-                                    iconSource: "qrc:/icons/action/pin.png"
+                                    iconSource: Runtime.themedIcon("qrc:/icons/action/pin.png")
 
                                     onClicked: {
                                         if(_photoSlideView.currentIndex === root.character.keyPhotoIndex)
@@ -178,14 +178,14 @@ Item {
 
                                 FlatToolButton {
                                     enabled: _photoSlideView.currentIndex > 0
-                                    iconSource: "qrc:/icons/navigation/arrow_left.png"
+                                    iconSource: Runtime.themedIcon("qrc:/icons/navigation/arrow_left.png")
 
                                     onClicked: _photoSlideView.currentIndex = Math.max(_photoSlideView.currentIndex-1, 0)
                                 }
 
                                 FlatToolButton {
                                     enabled: _photoSlideView.currentIndex < _photoSlideView.count-1
-                                    iconSource: "qrc:/icons/navigation/arrow_right.png"
+                                    iconSource: Runtime.themedIcon("qrc:/icons/navigation/arrow_right.png")
 
                                     onClicked: _photoSlideView.currentIndex = Math.min(_photoSlideView.currentIndex+1, _photoSlideView.count-1)
                                 }
@@ -196,7 +196,7 @@ Item {
 
                                 FlatToolButton {
                                     enabled: _photoSlideView.currentIndex < _photoSlideView.count-1
-                                    iconSource: "qrc:/icons/action/delete.png"
+                                    iconSource: Runtime.themedIcon("qrc:/icons/action/delete.png")
 
                                     onClicked: {
                                         var ci = _photoSlideView.currentIndex

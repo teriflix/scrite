@@ -59,7 +59,7 @@ Item {
             width: parent.width
             height: _headingLayout.height
 
-            color: Runtime.colors.tint(root.sceneDelegate.scene.color, root.sceneDelegate.isCurrent ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneHeadingTint)
+            color: Runtime.colors.tintTx(root.sceneDelegate.scene.color, root.sceneDelegate.isCurrent ? Runtime.colors.selectedSceneHeadingTint : Runtime.colors.sceneHeadingTint)
 
             Column {
                 id: _headingLayout

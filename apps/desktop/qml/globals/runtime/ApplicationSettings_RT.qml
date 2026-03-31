@@ -25,6 +25,8 @@ Settings {
     property int primaryColor: Runtime.colors.defaultPrimaryColor
     property int joinDiscordPromptCounter: 0
 
+    property string colorMode: "System"  // "Light", "Dark", "System"
+
     property real colorIntensity: 0.5
 
     property bool enableAnimations: true

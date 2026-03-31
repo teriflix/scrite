@@ -207,7 +207,7 @@ Item {
 
         action: ActionHub.notebookOperations.find("toggleBookmark")
         enabled: currentNote !== null
-        iconSource: currentNoteIsBookmarked ? "qrc:/icons/content/bookmark.png" : "qrc:/icons/content/bookmark_outline.png"
+        iconSource: currentNoteIsBookmarked ? Runtime.themedIcon("qrc:/icons/content/bookmark.png") : Runtime.themedIcon("qrc:/icons/content/bookmark_outline.png")
         tooltip: currentNoteIsBookmarked ? "Remove bookmark on this note" : "Bookmark this note"
 
         onTriggered: () => {

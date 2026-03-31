@@ -43,7 +43,7 @@ GridLayout {
             anchors.fill: parent
             anchors.margins: 5
 
-            source: "qrc:/icons/navigation/close.png"
+            source: Runtime.themedIcon("qrc:/icons/navigation/close.png")
             mipmap: true
         }
 

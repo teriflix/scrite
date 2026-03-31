@@ -101,7 +101,7 @@ ColumnLayout {
             }
 
             Image {
-                source: "qrc:/icons/content/add_box.png"
+                source: Runtime.themedIcon("qrc:/icons/content/add_box.png")
                 width: _charactersPrefix.height
                 height: _charactersPrefix.height
                 opacity: 0.5
@@ -124,7 +124,7 @@ ColumnLayout {
             }
 
             Image {
-                source: "qrc:/icons/content/clear_all.png"
+                source: Runtime.themedIcon("qrc:/icons/content/clear_all.png")
                 width: _charactersPrefix.height
                 height: _charactersPrefix.height
                 opacity: 0.5

@@ -116,7 +116,7 @@ Item {
 
                 enabled: Runtime.appFeatures.structure.enabled
                 opacity: enabled ? 1 : 0.5
-                iconSource: "qrc:/icons/action/tag.png"
+                iconSource: Runtime.themedIcon("qrc:/icons/action/tag.png")
                 toolTipText: "Formal Story Beats/Tags"
 
                 onClicked: _private.popupFormalTagsMenu()
@@ -152,7 +152,7 @@ Item {
                 width: _sceneTagsList.label.height
                 height: _sceneTagsList.label.height
 
-                source: "qrc:/icons/content/add_box.png"
+                source: Runtime.themedIcon("qrc:/icons/content/add_box.png")
 
                 opacity: enabled ? 1 : 0.5
                 visible: enabled && _private.presentableGroupNames === ""
@@ -175,7 +175,7 @@ Item {
 
             addTextButtonTooltip: "Click here to tag the scene with custom keywords."
             completionStrings: Scrite.document.structure.sceneTags
-            labelIconSource: "qrc:/icons/action/keyword.png"
+            labelIconSource: Runtime.themedIcon("qrc:/icons/action/keyword.png")
             labelIconVisible: true
             labelText: "Keywords"
             readOnly: !Runtime.appFeatures.structure.enabled && Scrite.document.readOnly
@@ -197,7 +197,7 @@ Item {
 
             addTextButtonTooltip: "Click here to capture characters who don't have any dialogues in this scene, but are still required for the scene."
             completionStrings: Scrite.document.structure.characterNames
-            labelIconSource: "qrc:/icons/content/persons_add.png"
+            labelIconSource: Runtime.themedIcon("qrc:/icons/content/persons_add.png")
             labelText: "Characters"
             readOnly: Scrite.document.readOnly
             textList: root.scene ? root.scene.characterNames : 0

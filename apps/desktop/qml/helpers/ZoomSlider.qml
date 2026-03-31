@@ -51,7 +51,7 @@ Item {
             id: _zoomOutButton
 
             enabled: _slider.value > _slider.from
-            source: "qrc:/icons/navigation/zoom_out.png"
+            source: Runtime.themedIcon("qrc:/icons/navigation/zoom_out.png")
             tooltipText: "Zoom Out"
 
             onClicked: {
@@ -108,7 +108,7 @@ Item {
 
             Layout.rightMargin: 10
 
-            source: "qrc:/icons/navigation/zoom_in.png"
+            source: Runtime.themedIcon("qrc:/icons/navigation/zoom_in.png")
             enabled: _slider.value < _slider.to
             tooltipText: "Zoom In"
 

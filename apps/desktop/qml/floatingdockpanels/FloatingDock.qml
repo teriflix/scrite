@@ -114,7 +114,7 @@ Item {
                 Layout.preferredWidth: Runtime.idealFontMetrics.height + _titleText.padding*2
                 Layout.preferredHeight: Runtime.idealFontMetrics.height + _titleText.padding*2
 
-                source: "qrc:/icons/action/dialog_close_button.png"
+                source: Runtime.themedIcon("qrc:/icons/action/dialog_close_button.png")
                 smooth: true
                 mipmap: true
 

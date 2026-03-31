@@ -53,7 +53,7 @@ Rectangle {
 
             down: _tagsMenu.visible
             enabled: _charactersModel.availableTags.length > 0
-            iconSource: "qrc:/icons/action/filter.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/action/filter.png")
             toolTipText: "Filter character names by their tags."
 
             onClicked: _tagsMenu.open()

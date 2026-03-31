@@ -62,10 +62,10 @@ Item {
                 tabBorderColor: Color.isVeryLight(root.tabColor) ? Runtime.colors.primary.borderColor : root.tabColor
                 tabBorderWidth: 1
                 tabCount: 2
-                tabFillColor: active ? root.tabColor : Runtime.colors.tint(root.tabColor, Runtime.colors.sceneControlTint)
+                tabFillColor: active ? root.tabColor : Runtime.colors.tintTx(root.tabColor, Runtime.colors.sceneControlTint)
                 tabIndex: index
                 text: modelData
-                textColor: active ? Color.textColorFor(root.tabColor) : Runtime.colors.primary.regular.text
+                textColor: active ? Color.textColorFor(root.tabColor) : Runtime.colors.primary.editor.text
 
                 onRequestActivation: _tabBar.currentIndex = index
             }
@@ -129,7 +129,7 @@ Item {
 
         property color tabBorderColor
         property color tabFillColor
-        property color textColor: Runtime.colors.primary.regular.text
+        property color textColor: Runtime.colors.primary.editor.text
 
         property string text
 

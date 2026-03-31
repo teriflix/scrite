@@ -133,7 +133,7 @@ AbstractStructureElementUI {
 
         anchors.fill: parent
 
-        color: Runtime.colors.tint(root.element.scene.color, _private.isSelected ? Runtime.colors.selectedSceneControlTint : Runtime.colors.sceneControlTint)
+        color: Runtime.colors.tintTx(root.element.scene.color, _private.isSelected ? Runtime.colors.selectedSceneControlTint : Runtime.colors.sceneControlTint)
         border.width: _private.isSelected ? 2 : 1
         border.color: _private.isSelected ? borderColor : Qt.lighter(borderColor)
 
@@ -597,7 +597,7 @@ AbstractStructureElementUI {
                 anchors.fill: parent
                 anchors.margins: -5
 
-                color: Runtime.colors.tint(baseColor, _private.isSelected ? Runtime.colors.selectedSceneControlTint : Runtime.colors.currentNoteTint)
+                color: Runtime.colors.tintTx(baseColor, _private.isSelected ? Runtime.colors.selectedSceneControlTint : Runtime.colors.currentNoteTint)
             }
 
             RowLayout {
@@ -668,8 +668,8 @@ AbstractStructureElementUI {
                         anchors.fill: parent
 
                         source: root.element.scene.addedToScreenplay || root.Drag.active ?
-                                    (_footerRow.lightBackground ? "qrc:/icons/action/view_array.png" : "qrc:/icons/action/view_array_inverted.png") :
-                                    (_footerRow.lightBackground ? "qrc:/icons/content/add_circle_outline.png" : "qrc:/icons/content/add_circle_outline_inverted.png")
+                                    (_footerRow.lightBackground ? Runtime.themedIcon("qrc:/icons/action/view_array.png") : "qrc:/icons/action/view_array_inverted.png") :
+                                    (_footerRow.lightBackground ? Runtime.themedIcon("qrc:/icons/content/add_circle_outline.png") : "qrc:/icons/content/add_circle_outline_inverted.png")
 
                         scale: _dragHandleMouseArea.pressed ? 2 : 1
                         opacity: _private.isSelected ? 1 : 0.1

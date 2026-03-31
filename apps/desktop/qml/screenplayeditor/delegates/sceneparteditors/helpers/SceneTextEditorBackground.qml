@@ -42,7 +42,7 @@ Item {
         width: parent.width
         height: root.sceneTextEditor.cursorRectangle.height+4*root.zoomLevel
 
-        color: Runtime.colors.tint(root.sceneDocumentBinder.scene.highlightColor, Runtime.colors.currentLineHightlightTint)
+        color: Runtime.colors.tintTx(root.sceneDocumentBinder.scene.highlightColor, Runtime.colors.currentLineHightlightTint)
         visible: root.sceneTextEditor.cursorVisible && root.sceneTextEditor.activeFocus && Runtime.screenplayEditorSettings.highlightCurrentLine && Scrite.app.usingMaterialTheme
 
         Rectangle {

@@ -76,7 +76,7 @@ AbstractScenePartEditor {
                 visible: root.screenplayAdapter.currentIndex === root.index
                 toolTipText: "Edit Index Card Fields"
 
-                icon.source: "qrc:/icons/action/edit.png"
+                icon.source: Runtime.themedIcon("qrc:/icons/action/edit.png")
 
                 onClicked: StructureIndexCardFieldsDialog.launch()
             }

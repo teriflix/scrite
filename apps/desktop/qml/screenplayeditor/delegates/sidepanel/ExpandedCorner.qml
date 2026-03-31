@@ -86,7 +86,7 @@ Item {
                 "tab": ExpandedCorner.Tab.CommentsTab,
                 "toolTip": "View/edit scene comments.",
                 "isVisible": true,
-                "normalIcon": "qrc:/icons/content/comments_panel.png",
+                "normalIcon": Runtime.themedIcon("qrc:/icons/content/comments_panel.png"),
                 "invertedIcon": "qrc:/icons/content/comments_panel_inverted.png",
                 "tabWhenNotVisible": ExpandedCorner.Tab.CommentsTab
             },
@@ -94,7 +94,7 @@ Item {
                 "tab": ExpandedCorner.Tab.FeaturedImageTab,
                 "toolTip": "View/edit featured image.",
                 "isVisible": true,
-                "normalIcon": "qrc:/icons/filetype/photo.png",
+                "normalIcon": Runtime.themedIcon("qrc:/icons/filetype/photo.png"),
                 "invertedIcon": "qrc:/icons/filetype/photo_inverted.png",
                 "tabWhenNotVisible": ExpandedCorner.Tab.FeaturedImageTab
             },
@@ -102,7 +102,7 @@ Item {
                 "tab": ExpandedCorner.Tab.IndexCardFieldsTab,
                 "toolTip":  "View/edit index card fields.",
                 "isVisible": Runtime.screenplayEditorSettings.displayIndexCardFields,
-                "normalIcon": "qrc:/icons/content/form.png",
+                "normalIcon": Runtime.themedIcon("qrc:/icons/content/form.png"),
                 "invertedIcon": "qrc:/icons/content/form_inverted.png",
                 "tabWhenNotVisible": ExpandedCorner.Tab.CommentsTab
             },
@@ -110,7 +110,7 @@ Item {
                 "tab": ExpandedCorner.Tab.SceneMetaDataTab,
                 "toolTip":  "View/edit scene meta data.",
                 "isVisible": !Runtime.screenplayEditorSettings.displaySceneSynopsis || !Runtime.screenplayEditorSettings.displaySceneCharacters,
-                "normalIcon": "qrc:/icons/action/description.png",
+                "normalIcon": Runtime.themedIcon("qrc:/icons/action/description.png"),
                 "invertedIcon": "qrc:/icons/action/description_inverted.png",
                 "tabWhenNotVisible": ExpandedCorner.Tab.CommentsTab
             }

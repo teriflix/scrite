@@ -83,7 +83,7 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 5
 
-                color: Runtime.colors.tint(_delegate.character.color, _charactersView.currentIndex === _delegate.index ? Runtime.colors.currentNoteTint : Runtime.colors.sceneHeadingTint)
+                color: Runtime.colors.tintTx(_delegate.character.color, _charactersView.currentIndex === _delegate.index ? Runtime.colors.currentNoteTint : Runtime.colors.sceneHeadingTint)
                 border.width: 1
                 border.color: Color.isLight(_delegate.character.color) ? (_charactersView.currentIndex === _delegate.index ? "darkgray" : Runtime.colors.primary.borderColor) : _delegate.character.color
 
@@ -104,7 +104,7 @@ Item {
                         source: {
                             if(_delegate.character.hasKeyPhoto > 0)
                                 return "file:///" + _delegate.character.keyPhoto
-                            return "qrc:/icons/content/character_icon.png"
+                            return Runtime.themedIcon("qrc:/icons/content/character_icon.png")
                         }
                     }
 
@@ -228,7 +228,7 @@ Item {
                     FlatToolButton {
                         id: _addButton
 
-                        iconSource: "qrc:/icons/content/person_add.png"
+                        iconSource: Runtime.themedIcon("qrc:/icons/content/person_add.png")
                         toolTipText: "Add Character"
 
                         onClicked: {
@@ -251,7 +251,7 @@ Item {
                     FlatToolButton {
                         id: _addAllButton
 
-                        iconSource: "qrc:/icons/content/persons_add.png"
+                        iconSource: Runtime.themedIcon("qrc:/icons/content/persons_add.png")
                         toolTipText: "Add Existing Characters"
 
                         onClicked: AddCharactersDialog.launch()

@@ -55,7 +55,7 @@ MouseArea {
         sourceSize.width: width
         sourceSize.height: height
 
-        source: "qrc:/icons/action/add_annotation.png"
+        source: Runtime.themedIcon("qrc:/icons/action/add_annotation.png")
     }
 
     onClicked: (mouse) => {

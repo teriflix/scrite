@@ -130,7 +130,7 @@ Item {
 
                         enabled: index < _indexCardFieldsModel.count
                         opacity: enabled ? 1 : 0.05
-                        icon.source: "qrc:/icons/action/delete.png"
+                        icon.source: Runtime.themedIcon("qrc:/icons/action/delete.png")
 
                         onClicked: _indexCardFieldsModel.remove(index, 1)
                     }

@@ -53,7 +53,7 @@ Rectangle {
 
         FlatToolButton {
             enabled: !Scrite.document.readOnly
-            iconSource: "qrc:/icons/content/clear_all.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/content/clear_all.png")
             toolTipText: "Clear the screenplay, while retaining the scenes."
 
             onClicked: root.clearRequest()
@@ -62,7 +62,7 @@ Rectangle {
         FlatToolButton {
             id: _zoomIn
             autoRepeat: true
-            iconSource: "qrc:/icons/navigation/zoom_in.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/navigation/zoom_in.png")
             toolTipText: "Increase size of blocks in this view."
 
             onClicked: root.zoomInRequest()
@@ -77,7 +77,7 @@ Rectangle {
         FlatToolButton {
             id: _zoomOut
             autoRepeat: true
-            iconSource: "qrc:/icons/navigation/zoom_out.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/navigation/zoom_out.png")
             toolTipText: "Decrease size of blocks in this view."
 
             onClicked: root.zoomOutRequest()

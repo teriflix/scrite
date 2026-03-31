@@ -89,7 +89,7 @@ Item {
                     }
 
                     FlatToolButton {
-                        iconSource: "qrc:/icons/action/reset.png"
+                        iconSource: Runtime.themedIcon("qrc:/icons/action/reset.png")
                         toolTipText: "Reset canvas color"
                         onClicked: Runtime.structureCanvasSettings.restoreDefaultCanvasColor()
                     }
@@ -113,7 +113,7 @@ Item {
                     }
 
                     FlatToolButton {
-                        iconSource: "qrc:/icons/action/reset.png"
+                        iconSource: Runtime.themedIcon("qrc:/icons/action/reset.png")
                         toolTipText: "Reset grid color"
                         onClicked: Runtime.structureCanvasSettings.restoreDefaultGridColor()
                     }
@@ -276,7 +276,7 @@ Item {
                 }
 
                 FlatToolButton {
-                    iconSource: "qrc:/icons/action/reset.png"
+                    iconSource: Runtime.themedIcon("qrc:/icons/action/reset.png")
                     toolTipText: "Reset default scene color"
                     onClicked: Runtime.workspaceSettings.defaultSceneColor = SceneColors.palette[0]
                 }

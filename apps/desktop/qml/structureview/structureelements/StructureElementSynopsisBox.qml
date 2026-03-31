@@ -81,7 +81,7 @@ AbstractStructureElementUI {
         anchors.fill: parent
         anchors.margins: -border.width
 
-        color: Runtime.colors.tint(root.element.scene.color, _private.isSelected ? Runtime.colors.selectedSceneControlTint : Runtime.colors.sceneControlTint)
+        color: Runtime.colors.tintTx(root.element.scene.color, _private.isSelected ? Runtime.colors.selectedSceneControlTint : Runtime.colors.sceneControlTint)
         border.width: _private.selected ? 2 : 1
         border.color: _private.isSelected ? borderColor : Qt.lighter(borderColor)
 
@@ -197,7 +197,7 @@ AbstractStructureElementUI {
         height: 18
 
         scale: _dragMouseArea.pressed ? 2 : 1
-        source: root.element.scene.addedToScreenplay || root.Drag.active ? "qrc:/icons/action/view_array.png" : "qrc:/icons/content/add_circle_outline.png"
+        source: root.element.scene.addedToScreenplay || root.Drag.active ? Runtime.themedIcon("qrc:/icons/action/view_array.png") : Runtime.themedIcon("qrc:/icons/content/add_circle_outline.png")
         visible: !_private.isEditing && !Scrite.document.readOnly
         enabled: /*!StructureModule.canvas.editElementItem &&*/ !Scrite.document.readOnly
         opacity: _private.isSelected ? 1 : 0.1

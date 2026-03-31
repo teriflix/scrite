@@ -27,18 +27,18 @@ Item {
 
     readonly property int   defaultAccentColor: Material.DeepPurple
     readonly property int   defaultPrimaryColor: Material.Grey
-    readonly property int   theme: Material.Dark
-
     readonly property var   forDocument: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
     readonly property var   forScene: SceneColors.palette
+    readonly property alias theme: _private.theme
+    readonly property alias scheme: _private.scheme
 
     property real sceneControlTint: applicationSettings.colorIntensity*0.4
     property real sceneHeadingTint: applicationSettings.colorIntensity*0.4
     property real currentNoteTint: applicationSettings.colorIntensity*0.4
     property real currentLineHightlightTint: applicationSettings.colorIntensity*0.2
     property real screenplayTracksTint: Runtime.bounded(0.4, applicationSettings.colorIntensity, 1)
-    property color selectedSceneControlTint: Color.translucent(primary.c100.background, Runtime.bounded(0.2,1-applicationSettings.colorIntensity,0.8))
-    property color selectedSceneHeadingTint:  Color.translucent(primary.c100.background, Runtime.bounded(0.2,1-applicationSettings.colorIntensity,0.8))
+    property color selectedSceneControlTint: Color.translucent(theme === Material.Light ? primary.c100.background : primary.c800.background, Runtime.bounded(0.2,1-applicationSettings.colorIntensity,0.8))
+    property color selectedSceneHeadingTint:  Color.translucent(theme === Material.Light ? primary.c100.background : primary.c800.background, Runtime.bounded(0.2,1-applicationSettings.colorIntensity,0.8))
 
     readonly property color transparent: "transparent"
 
@@ -47,27 +47,6 @@ Item {
 
         key: Material.Grey // applicationSettings.primaryColor
         theme: root.theme
-
-        button: ColorPair_RT {
-            background: root.palette.button
-            text: root.palette.buttonText
-        }
-
-        highlight: ColorPair_RT {
-            background: root.palette.highlight
-            text: root.palette.highlightedText
-        }
-
-        regular: ColorPair_RT {
-            background: root.palette.base
-            text: root.palette.text
-        }
-
-        c10: regular
-        editor: regular
-        borderColor: root.palette.mid
-        separatorColor: root.palette.mid
-        windowColor: root.palette.window
     }
 
     readonly property ColorTheme_RT accent: ColorTheme_RT {
@@ -78,8 +57,32 @@ Item {
     }
 
     function tint(a, b) {
-        return Color.stacked( Color.tint(a, b), theme === Material.Light ? "white" : "black" )
+        return Color.stacked( Color.tint(a, b), palette.window )
+    }
+
+    function tintTx(a, b) {
+        return Color.transform( Color.tint(a, b), palette.window, scheme )
+    }
+
+    function tx(c, backdrop) {
+        return Color.transform(c, backdrop !== undefined ? backdrop : palette.window, scheme)
     }
 
     ObjectRegister.name: "runtimeColors"
+
+    QtObject {
+        id: _private
+
+        property int   theme: {
+            if (root.applicationSettings.colorMode === "Light")
+                return Material.Light
+            if (root.applicationSettings.colorMode === "Dark")
+                return Material.Dark
+            // "System" follow OS preference
+            return Scrite.app.styleHints.colorScheme === Qt.ColorScheme.Dark ? Material.Dark : Material.Light
+        }
+        property int  scheme: theme === Material.Dark ? Qt.ColorScheme.Dark : Qt.ColorScheme.Light
+
+        onThemeChanged: Scrite.app.styleHints.colorScheme = scheme
+    }
 }

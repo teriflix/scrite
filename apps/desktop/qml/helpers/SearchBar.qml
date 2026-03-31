@@ -131,7 +131,7 @@ Item {
 
                     hoverEnabled: false
 
-                    icon.source: "qrc:/icons/action/search.png"
+                    icon.source: Runtime.themedIcon("qrc:/icons/action/search.png")
 
                     VclMenu {
                         id: _optionsMenu
@@ -176,7 +176,7 @@ Item {
                     enabled: root.searchEngine.searchResultCount > 0 && root.searchEngine.currentSearchResultIndex > 0
                     hoverEnabled: false
 
-                    icon.source: "qrc:/icons/action/keyboard_arrow_up.png"
+                    icon.source: Runtime.themedIcon("qrc:/icons/action/keyboard_arrow_up.png")
 
                     onClicked: root.searchEngine.previousSearchResult()
                 }
@@ -189,7 +189,7 @@ Item {
                     enabled: root.searchEngine.searchResultCount > 0 && root.searchEngine.currentSearchResultIndex < root.searchEngine.searchResultCount
                     hoverEnabled: false
 
-                    icon.source: "qrc:/icons/action/keyboard_arrow_down.png"
+                    icon.source: Runtime.themedIcon("qrc:/icons/action/keyboard_arrow_down.png")
 
                     onClicked: root.searchEngine.nextSearchResult()
                 }
@@ -202,7 +202,7 @@ Item {
                     enabled: _txtSearch.canClear
                     hoverEnabled: false
 
-                    icon.source: "qrc:/icons/navigation/close.png"
+                    icon.source: Runtime.themedIcon("qrc:/icons/navigation/close.png")
 
                     onClicked: _txtSearch.clearSearch()
                 }
@@ -224,7 +224,7 @@ Item {
                     checkable: true
                     hoverEnabled: true
 
-                    icon.source: "qrc:/icons/action/find_replace.png"
+                    icon.source: Runtime.themedIcon("qrc:/icons/action/find_replace.png")
 
                     onToggled: root.showReplaceRequest(!root.showReplace)
                 }

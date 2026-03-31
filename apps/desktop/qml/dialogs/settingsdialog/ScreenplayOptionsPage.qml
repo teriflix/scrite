@@ -198,7 +198,7 @@ Item {
                     }
 
                     ToolButton {
-                        icon.source: "qrc:/icons/action/help.png"
+                        icon.source: Runtime.themedIcon("qrc:/icons/action/help.png")
 
                         onClicked: Qt.openUrlExternally("https://www.scrite.io/advanced-editing-features/#chapter10_writing_with_scene-centric_precision_in_scrite")
                     }

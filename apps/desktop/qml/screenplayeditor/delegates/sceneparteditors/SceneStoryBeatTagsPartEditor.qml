@@ -56,12 +56,12 @@ AbstractScenePartEditor {
 
                 enabled: Runtime.appFeatures.structure.enabled
                 opacity: enabled ? 1 : 0.5
-                iconSource: "qrc:/icons/action/tag.png"
+                iconSource: Runtime.themedIcon("qrc:/icons/action/tag.png")
 
                 onClicked: _private.popupFormalTagsMenu()
             }
 
-            Text {
+            VclLabel {
                 font: _tagsInput.label.font
                 text: "Formal Tags"
                 visible: _private.presentableGroupNames === ""
@@ -75,6 +75,7 @@ AbstractScenePartEditor {
                 elide: Text.ElideRight
                 visible: _private.presentableGroupNames !== ""
                 enabled: Runtime.appFeatures.structure.enabled
+                defaultColor: Runtime.colors.primary.editor.text
                 opacity: enabled ? 1 : 0.5
                 topPadding: 5
                 bottomPadding: 5
@@ -86,7 +87,7 @@ AbstractScenePartEditor {
                 Layout.preferredWidth: _tagsInput.label.height
                 Layout.preferredHeight: _tagsInput.label.height
 
-                source: "qrc:/icons/content/add_box.png"
+                source: Runtime.themedIcon("qrc:/icons/content/add_box.png")
 
                 opacity: enabled ? 1 : 0.5
                 visible: enabled && _private.presentableGroupNames === ""
@@ -110,7 +111,7 @@ AbstractScenePartEditor {
             addTextButtonTooltip: "Click here to tag the scene with custom keywords."
             completionStrings: Scrite.document.structure.sceneTags
             font: root.font
-            labelIconSource: "qrc:/icons/action/keyword.png"
+            labelIconSource: Runtime.themedIcon("qrc:/icons/action/keyword.png")
             labelIconVisible: true
             labelText: "Keywords"
             readOnly: !Runtime.appFeatures.structure.enabled && root.readOnly

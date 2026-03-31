@@ -124,7 +124,7 @@ Item {
                                     opacity: hovered ? 1 : 0.5
                                     hoverEnabled: true
 
-                                    icon.source: "qrc:/icons/action/delete.png"
+                                    icon.source: Runtime.themedIcon("qrc:/icons/action/delete.png")
 
                                     onClicked: _private.deleteLanguage(_supportedLanguageDelegate.language)
                                 }
@@ -154,7 +154,7 @@ Item {
 
                                 text: "Add Language"
                                 flat: true
-                                icon.source: "qrc:/icons/content/add_box.png"
+                                icon.source: Runtime.themedIcon("qrc:/icons/content/add_box.png")
 
                                 onClicked: _newLanguageDialog.open()
                             }

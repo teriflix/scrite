@@ -39,6 +39,7 @@ Item {
 
         color: Runtime.structureCanvasSettings.canvasColor
         opacity: Runtime.applicationSettings.colorIntensity
+        visible: Runtime.structureCanvasSettings.showGrid
     }
 
     StructureCanvasScrollArea {

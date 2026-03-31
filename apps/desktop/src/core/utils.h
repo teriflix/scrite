@@ -612,6 +612,8 @@ public:
     // clang-format on
     static QImage emptyQImage();
 
+    Q_INVOKABLE static QString themedIcon(const QString &source, Qt::ColorScheme colorScheme);
+
     Q_INVOKABLE static QString shortcut(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
     Q_INVOKABLE static QKeySequence keySequence(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
     Q_INVOKABLE static Utils::KeyCombinations keyCombinations(const QString &shortcut);
@@ -751,16 +753,21 @@ class Color : public QObject
     QML_SINGLETON
 
 public:
-    Q_INVOKABLE static QString name(const QColor &color) { return color.name(); }
+    Q_INVOKABLE static bool isLight(const QColor &color);
+    Q_INVOKABLE static bool isVeryLight(const QColor &color);
+
     Q_INVOKABLE static QColor pick(const QColor &initial);
     Q_INVOKABLE static QColor whitewash(const QColor &c, qreal factor);
     Q_INVOKABLE static QColor mix(const QColor &a, const QColor &b);
     Q_INVOKABLE static QColor tint(const QColor &input, const QVariant &alpha);
     Q_INVOKABLE static QColor stacked(const QColor &foreground, const QColor &background);
     Q_INVOKABLE static QColor translucent(const QColor &input, qreal alpha = 0.5);
-    Q_INVOKABLE static bool isLight(const QColor &color);
-    Q_INVOKABLE static bool isVeryLight(const QColor &color);
     Q_INVOKABLE static QColor textColorFor(const QColor &backgroundColor);
+
+    Q_INVOKABLE static QColor transform(const QColor &in, const QColor &backdrop,
+                                        Qt::ColorScheme colorScheme);
+
+    Q_INVOKABLE static QString name(const QColor &color) { return color.name(); }
 };
 
 class SceneColors : public QObject

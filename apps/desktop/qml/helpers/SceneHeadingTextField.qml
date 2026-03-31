@@ -14,8 +14,6 @@
 ****************************************************************************/
 
 import QtQuick
-import QtQuick.Controls
-import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -32,7 +30,7 @@ VclTextField {
 
     label: ""
     text: _private.headingText
-    color: sceneOmitted ? "gray" : sceneHeadingFormat.textColor
+    color: Runtime.colors.tx(sceneOmitted ? "gray" : sceneHeadingFormat.textColor)
     readOnly: Scrite.document.readOnly || !(sceneHeading.enabled && !sceneOmitted)
     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
     hoverEnabled: sceneOmitted

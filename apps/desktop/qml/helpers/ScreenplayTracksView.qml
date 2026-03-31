@@ -159,7 +159,7 @@ Flickable {
                         width: _private.isHorizontalTrack ? extents.to - extents.from : _private.trackSize
                         height: _private.isHorizontalTrack ? _private.trackSize : extents.to - extents.from
 
-                        color: Runtime.colors.tint(modelData.color, Runtime.colors.screenplayTracksTint)
+                        color: Runtime.colors.tintTx(modelData.color, Runtime.colors.screenplayTracksTint)
                         visible: GMath.doRectanglesIntersect(itemRect, _private.viewportRect)
 
                         border.color: Qt.darker(modelData.color, 1.2)
@@ -175,7 +175,7 @@ Flickable {
 
                             font: Runtime.minimumFontMetrics.font
                             elide: Text.ElideMiddle
-                            color: Color.textColorFor(Color.mix(_track.color, _trackItem.color))
+                            color: Color.textColorFor(Color.stacked(_trackItem.color,_track.color))
                             horizontalAlignment: Text.AlignHCenter
 
                             text: _trackItem.name

@@ -137,13 +137,15 @@ Item {
         fillMode: Image.PreserveAspectFit
 
         Image {
+            Component.onCompleted: Runtime.execLater(_banner, 50, () => { visible = true } )
+
             anchors.centerIn: parent
+
             source: (_banner.stackView.currentItem && _banner.stackView.currentItem.bannerImage) ? "" : "qrc:/images/banner_logo_overlay.png"
             width: root.width * 0.3
             fillMode: Image.PreserveAspectFit
             smooth: true; mipmap: true
             visible: false
-            Component.onCompleted: Runtime.execLater(_banner, 50, () => { visible = true } )
         }
 
         RowLayout {
@@ -354,7 +356,7 @@ Item {
                         Layout.fillWidth: true
 
                         text: "Learning Guides"
-                        iconSource: "qrc:/icons/action/help.png"
+                        iconSource: Runtime.themedIcon("qrc:/icons/action/help.png")
 
                         onClicked: Qt.openUrlExternally(Runtime.userGuidesUrl)
                     }
@@ -363,7 +365,7 @@ Item {
                         Layout.fillWidth: true
 
                         text: "Discord Community"
-                        iconSource: "qrc:/icons/action/forum.png"
+                        iconSource: Runtime.themedIcon("qrc:/icons/action/forum.png")
 
                         onClicked: JoinDiscordCommunity.launch()
                     }
@@ -506,7 +508,7 @@ Item {
         property string text
         property string tooltip
         property string iconSource
-        property color  textColor: Runtime.colors.primary.regular.text
+        property color  textColor: Runtime.colors.primary.editor.text
         property var    iconImage: Gui.emptyQImage // has to be QImage
         property bool   singleClick: true
         property bool   showPoster: false
@@ -545,7 +547,7 @@ Item {
 
                 onLoaded: {
                     if(_button.iconSource !== "")
-                        item.source = Qt.binding( () => { return _button.iconSource } )
+                        item.source = Qt.binding( () => { return Runtime.themedIcon(_button.iconSource) } )
                     else
                         item.image = Qt.binding( () => { return _button.iconImage ? _button.iconImage : Gui.emptyQImage } )
                 }
@@ -631,7 +633,7 @@ Item {
                         text: "New from Clipboard"
                         enabled: Scrite.document.canImportFromClipboard
                         tooltip: "Create a new screenplay by interpreting text on the clipboard as fountain file."
-                        iconSource: "qrc:/icons/filetype/document.png"
+                        iconSource: Runtime.themedIcon("qrc:/icons/filetype/document.png")
 
                         onClicked: {
                             if(Scrite.document.canImportFromClipboard)
@@ -649,7 +651,7 @@ Item {
 
                         text: "Blank Document"
                         tooltip: "A crisp and clean new document to write your next blockbuster!"
-                        iconSource: "qrc:/icons/filetype/document.png"
+                        iconSource: Runtime.themedIcon("qrc:/icons/filetype/document.png")
 
                         onClicked: {
                             SaveFileTask.save( () => {
@@ -695,7 +697,7 @@ Item {
                         enabled: Scrite.document.canImportFromClipboard
                         tooltip: "Create a new screenplay by interpreting text on the clipboard as fountain file."
                         showPoster: false
-                        iconSource: "qrc:/icons/filetype/document.png"
+                        iconSource: Runtime.themedIcon("qrc:/icons/filetype/document.png")
 
                         onClicked: {
                             if(Scrite.document.canImportFromClipboard)
@@ -746,7 +748,7 @@ Item {
             Layout.fillWidth: true
 
             text: "Open ..."
-            iconSource: "qrc:/icons/file/folder_open.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/file/folder_open.png")
             tooltip: "Launches a file dialog box so you can select a .scrite file to load from disk."
 
             onClicked: {
@@ -760,7 +762,7 @@ Item {
             Layout.fillWidth: true
 
             enabled: Runtime.recentFiles.count > 0
-            iconSource: Runtime.recentFiles.count === 0 ? "qrc:/icons/filetype/document.png" : "qrc:/icons/action/library.png"
+            iconSource: Runtime.recentFiles.count === 0 ? Runtime.themedIcon("qrc:/icons/filetype/document.png") : Runtime.themedIcon("qrc:/icons/action/library.png")
             text: Runtime.recentFiles.count === 0 ? "Recent files ..." : "Scriptalay"
             tooltip: Runtime.recentFiles.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online library."
 
@@ -795,7 +797,7 @@ Item {
                 }
                 return ret
             }
-            iconSource: _quickRecentFile.fileInfo.hasCoverPage ? "" : "qrc:/icons/filetype/document.png"
+            iconSource: _quickRecentFile.fileInfo.hasCoverPage ? "" : Runtime.themedIcon("qrc:/icons/filetype/document.png")
             iconImage: _quickRecentFile.fileInfo.hasCoverPage ? _quickRecentFile.fileInfo.coverPageImage : null
             showPoster: _quickRecentFile.fileInfo.hasCoverPage
 
@@ -868,7 +870,7 @@ Item {
 
                     icon.width: _quickFileOptionsLabel.height * 0.75
                     icon.height: _quickFileOptionsLabel.height * 0.75
-                    icon.source: "qrc:/icons/action/edit.png"
+                    icon.source: Runtime.themedIcon("qrc:/icons/action/edit.png")
 
                     onClicked: EditRecentFilesDialog.launch()
                 }
@@ -924,7 +926,7 @@ Item {
 
             text: "Recover ..."
             tooltip: "Open cached files from your private on-disk vault."
-            iconSource: "qrc:/icons/file/backup_open.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/file/backup_open.png")
 
             onClicked: parent.stackView.push(_vaultPage)
         }
@@ -934,7 +936,7 @@ Item {
 
             text: "Import ..."
             tooltip: "Import a screenplay from Final Draft, Fountain or HTML formats."
-            iconSource: "qrc:/icons/file/import_export.png"
+            iconSource: Runtime.themedIcon("qrc:/icons/file/import_export.png")
 
             onClicked: parent.stackView.push(_importPage)
         }
@@ -1196,7 +1198,7 @@ Item {
 
                 singleClick: false
                 iconImage: _vaultFileDelegate.fileInfo.hasCoverPage ? _vaultFileDelegate.fileInfo.coverPageImage : null
-                iconSource: _vaultFileDelegate.fileInfo.hasCoverPage ? "" : "qrc:/icons/filetype/document.png"
+                iconSource: _vaultFileDelegate.fileInfo.hasCoverPage ? "" : Runtime.themedIcon("qrc:/icons/filetype/document.png")
                 text: "<b>" + _vaultFileDelegate.fileInfo.title + "</b> (" + _vaultFileDelegate.fileInfo.sceneCount + (_vaultFileDelegate.fileInfo.sceneCount === 1 ? " Scene" : " Scenes") + ")<br/>" +
                       "<font size=\"-1\">" + fileSizeInfo + ", " + _vaultFileDelegate.relativeTime + " on " + _vaultFileDelegate.timestampAsString + "</font>"
 

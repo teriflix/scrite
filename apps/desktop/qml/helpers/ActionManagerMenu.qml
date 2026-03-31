@@ -58,6 +58,8 @@ VclMenu {
             focusPolicy: Qt.NoFocus
             opacity: enabled ? 1 : 0.5
 
+            icon.source: action.icon.source !== undefined ? Runtime.themedIcon(action.icon.source) : ""
+
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
             icon.color: action.icon.color
 

@@ -65,7 +65,7 @@ VclMenu {
 
     VclMenuItem {
         text: "Character Notes"
-        icon.source: "qrc:/icons/content/note.png"
+        icon.source: Runtime.themedIcon("qrc:/icons/content/note.png")
 
         onTriggered: {
             let characterNotes = ActionHub.notebookOperations.find("characterNotes")
@@ -76,7 +76,7 @@ VclMenu {
 
     VclMenuItem {
         text: "Rename/Merge Character"
-        icon.source: "qrc:/icons/screenplay/character.png"
+        icon.source: Runtime.themedIcon("qrc:/icons/screenplay/character.png")
 
         onTriggered: {
             const character = Scrite.document.structure.addCharacter(root.characterName)

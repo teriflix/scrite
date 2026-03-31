@@ -60,7 +60,7 @@ ToolButton {
                 width: root.icon.width
                 height: root.icon.height
 
-                source: root.icon.source
+                source: Runtime.themedIcon(root.icon.source)
                 smooth: true
                 mipmap: true
                 visible: status === Image.Ready
