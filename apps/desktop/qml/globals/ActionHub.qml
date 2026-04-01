@@ -535,33 +535,19 @@ Item {
         }
 
         Action {
+            readonly property bool visible: false
             readonly property bool allowShortcut: true
 
-            text: "Dark Mode (Color Theme)"
-            enabled: Runtime.applicationSettings.colorMode !== "Dark"
-            objectName: "darkModeTheme"
+            text: "Toggle Color Theme (Dark <-> Light)"
+            objectName: "toggleColorTheme"
 
-            onTriggered: Runtime.applicationSettings.colorMode = "Dark"
-        }
-
-        Action {
-            readonly property bool allowShortcut: true
-
-            text: "Light Mode (Color Theme)"
-            enabled: Runtime.applicationSettings.colorMode !== "Light"
-            objectName: "lightModeTheme"
-
-            onTriggered: Runtime.applicationSettings.colorMode = "Light"
-        }
-
-        Action {
-            readonly property bool allowShortcut: true
-
-            text: "System/Auto (Color Theme)"
-            enabled: Runtime.applicationSettings.colorMode !== "System"
-            objectName: "systemModeTheme"
-
-            onTriggered: Runtime.applicationSettings.colorMode = "System"
+            onTriggered: {
+                if(Runtime.applicationSettings.colorMode === "Dark") {
+                    Runtime.applicationSettings.colorMode = "Light"
+                } else {
+                    Runtime.applicationSettings.colorMode = "Dark"
+                }
+            }
         }
 
         Action {

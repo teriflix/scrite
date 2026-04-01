@@ -29,7 +29,7 @@ Item {
     property alias source: _private.posterSource // can be a string path, url or QImage
     property string logline
 
-    visible: (_private.posterSourceUrl !== "" || _private.posterQImage !== undefined)
+    visible: _private.hasPoster
 
     // Background
     Item {
@@ -135,6 +135,7 @@ Item {
         property string posterSourceUrl
         property var posterQImage: Gui.emptyQImage
         property var posterSource
+        property bool hasPoster: false
 
         readonly property int e_ImageKind: 0
         readonly property int e_QImageKind: 1
@@ -143,13 +144,16 @@ Item {
         onPosterSourceChanged: {
             posterSourceUrl = ""
             posterQImage = Gui.emptyQImage
+            hasPoster = false
 
             if(typeof posterSource === "string" || typeof posterSource === "url") {
                 posterSourceUrl = posterSource
                 posterSourceKind = e_ImageKind
+                hasPoster = posterSourceUrl !== ""
             } else if(typeof posterSource === "object" && Object.isOfType(posterSource, "QImage")) {
                 posterQImage = posterSource
                 posterSourceKind = e_QImageKind
+                hasPoster = true
             }
         }
     }

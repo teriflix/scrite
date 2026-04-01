@@ -66,7 +66,7 @@ TreeViewDelegate {
             if(baseColor)
                 return Runtime.colors.tintTx(baseColor, Runtime.colors.sceneHeadingTint)
 
-            return Runtime.colors.primary.c10.background
+            return Runtime.colors.primary.editor.background
         }
     }
 
@@ -97,7 +97,9 @@ TreeViewDelegate {
                 return 1
             }
 
-            source: {
+            source: Runtime.themedIcon(_source)
+
+            property string _source: {
                 switch(root.itemData.value.notebookItemType) {
                 case NotebookModel.EpisodeBreakType:
                     return Runtime.themedIcon("qrc:/icons/content/episode.png")

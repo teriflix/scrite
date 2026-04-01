@@ -100,7 +100,7 @@ Rectangle {
                         width: height
                         height: parent.height * 0.8
 
-                        source: _closeButtonMouseArea.pressed ? "qrc:/icons/navigation/close_inverted.png" : Runtime.themedIcon("qrc:/icons/navigation/close.png")
+                        source: _closeButtonMouseArea.pressed ? "image://icon/dark/qrc:/icons/navigation/close.png" : Runtime.themedIcon("qrc:/icons/navigation/close.png")
                         smooth: true
                     }
 

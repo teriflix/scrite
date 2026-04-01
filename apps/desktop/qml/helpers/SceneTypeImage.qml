@@ -48,9 +48,9 @@ Image {
 
     source: {
         switch(sceneType) {
-        case Scene.Song: return lightBackground ? Runtime.themedIcon("qrc:/icons/content/music.png") : "qrc:/icons/content/music_inverted.png"
-        case Scene.Action: return lightBackground ? Runtime.themedIcon("qrc:/icons/content/fight.png") : "qrc:/icons/content/fight_inverted.png"
-        case Scene.Montage: return lightBackground ? Runtime.themedIcon("qrc:/icons/content/montage.png") : "qrc:/icons/content/montage_inverted.png"
+        case Scene.Song: return lightBackground ? Runtime.themedIcon("qrc:/icons/content/music.png") : "image://icon/dark/qrc:/icons/content/music.png"
+        case Scene.Action: return lightBackground ? Runtime.themedIcon("qrc:/icons/content/fight.png") : "image://icon/dark/qrc:/icons/content/fight.png"
+        case Scene.Montage: return lightBackground ? Runtime.themedIcon("qrc:/icons/content/montage.png") : "image://icon/dark/qrc:/icons/content/montage.png"
         default: break
         }
         return ""

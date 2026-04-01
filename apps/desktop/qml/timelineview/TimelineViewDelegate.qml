@@ -104,8 +104,8 @@ Item {
                 sourceComponent: Image {
                     source: {
                         if(_private.isEpisodeBreak)
-                            return Color.isLight(_elementItemBox.color) ? Runtime.themedIcon("qrc:/icons/content/episode.png") : "qrc:/icons/content/episode_inverted.png"
-                        return Color.isLight(_elementItemBox.color) ? Runtime.themedIcon("qrc:/icons/content/act.png") : "qrc:/icons/content/act_inverted.png"
+                            return Color.isLight(_elementItemBox.color) ? Runtime.themedIcon("qrc:/icons/content/episode.png") : "image://icon/dark/qrc:/icons/content/episode.png"
+                        return Color.isLight(_elementItemBox.color) ? Runtime.themedIcon("qrc:/icons/content/act.png") : "image://icon/dark/qrc:/icons/content/act.png"
                     }
                 }
             }
@@ -258,7 +258,7 @@ Item {
                     sourceComponent: Image {
                         smooth: true
                         mipmap: true
-                        source: Color.isLight(_elementItemBox.color) ? Runtime.themedIcon("qrc:/icons/content/warning.png") : "qrc:/icons/content/warning_inverted.png"
+                        source: Color.isLight(_elementItemBox.color) ? Runtime.themedIcon("qrc:/icons/content/warning.png") : "image://icon/dark/qrc:/icons/content/warning.png"
                         fillMode: Image.PreserveAspectFit
 
                         MouseArea {

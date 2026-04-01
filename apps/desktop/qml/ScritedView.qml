@@ -171,7 +171,7 @@ Item {
                         anchors.margins: 4
 
                         enabled: visible
-                        iconSource: "qrc:/icons/navigation/arrow_up_inverted.png"
+                        iconSource: "image://icon/dark/qrc:/icons/navigation/arrow_up.png"
                         onClicked: Runtime.scritedSettings.videoPlayerVisible = false
                         opacity: hovered ? 1 : 0.5
                         toolTipText: "Closes the video player until a video file is loaded."
@@ -334,7 +334,7 @@ Item {
                                     suggestedHeight: 36
                                     toolTipText: "Load a video file for this screenplay."
 
-                                    icon.source: "qrc:/icons/mediaplayer/movie_inverted.png"
+                                    icon.source: "image://icon/dark/qrc:/icons/mediaplayer/movie.png"
 
                                     onClicked: _fileDialog.open()
                                 }
@@ -347,8 +347,8 @@ Item {
 
                                     icon.source: {
                                         if(_mediaPlayer.playbackState === MediaPlayer.PlayingState)
-                                            return "qrc:/icons/mediaplayer/pause_inverted.png"
-                                        return "qrc:/icons/mediaplayer/play_arrow_inverted.png"
+                                            return "image://icon/dark/qrc:/icons/mediaplayer/pause.png"
+                                        return "image://icon/dark/qrc:/icons/mediaplayer/play_arrow.png"
                                     }
 
                                     onClicked: _mediaPlayer.togglePlayback()
@@ -388,7 +388,7 @@ Item {
                                     suggestedHeight: 36
                                     toolTipText: "Rewind by " + _private.skipDuration + " seconds"
 
-                                    icon.source: "qrc:/icons/mediaplayer/rewind_10_inverted.png"
+                                    icon.source: "image://icon/dark/qrc:/icons/mediaplayer/rewind_10.png"
 
                                     onClicked: _private.rewind()
                                 }
@@ -399,7 +399,7 @@ Item {
                                     toolTipText: "Forward by " + _private.skipDuration + " seconds"
                                     suggestedHeight: 36
 
-                                    icon.source: "qrc:/icons/mediaplayer/forward_10_inverted.png"
+                                    icon.source: "image://icon/dark/qrc:/icons/mediaplayer/forward_10.png"
                                     onClicked: _private.forward()
                                 }
 
@@ -409,7 +409,7 @@ Item {
                                     suggestedHeight: 36
                                     toolTipText: _videoOutput.fillMode === VideoOutput.PreserveAspectCrop ? "Fit video" : "Fill video"
 
-                                    icon.source: "qrc:/icons/navigation/zoom_fit_inverted.png"
+                                    icon.source: "image://icon/dark/qrc:/icons/navigation/zoom_fit.png"
 
                                     onClicked: {
                                         if(_videoOutput.fillMode === VideoOutput.PreserveAspectCrop)

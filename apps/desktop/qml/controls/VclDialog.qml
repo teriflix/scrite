@@ -179,6 +179,8 @@ Dialog {
     }
 
     header: Rectangle {
+        id: _header
+
         width: root.width
         height: _dialogHeaderLayout.height
 
@@ -195,7 +197,7 @@ Dialog {
                 Layout.alignment: Qt.AlignVCenter
                 Layout.fillWidth: true
 
-                color: Runtime.colors.accent.c600.text
+                color: Color.textColorFor(_header.color)
                 padding: 16
                 text: root.title
                 elide: Text.ElideRight

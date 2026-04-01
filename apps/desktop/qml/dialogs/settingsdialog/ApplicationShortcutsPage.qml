@@ -188,7 +188,7 @@ FocusScope {
                             Layout.preferredWidth: _nameLabel.height * 0.5
 
                             fillMode: Image.PreserveAspectFit
-                            source: _delegate.qmlAction.icon.source !== "" ? _delegate.qmlAction.icon.source : Runtime.themedIcon("qrc:/icons/content/blank.png")
+                            source: _delegate.qmlAction.icon.source !== "" ? Runtime.themedIcon(_delegate.qmlAction.icon.source) : Runtime.themedIcon("qrc:/icons/content/blank.png")
                         }
 
                         ColumnLayout {

@@ -122,7 +122,7 @@ Item {
                 onClicked: _private.popupFormalTagsMenu()
             }
 
-            Text {
+            VclLabel {
                 anchors.verticalCenter: parent.verticalCenter
 
                 font: _sceneTagsList.label.font
@@ -139,6 +139,7 @@ Item {
                 elide: Text.ElideRight
                 visible: _private.presentableGroupNames !== ""
                 enabled: Runtime.appFeatures.structure.enabled
+                defaultColor: Runtime.colors.primary.editor.text
                 opacity: enabled ? 1 : 0.5
                 topPadding: 5
                 bottomPadding: 5

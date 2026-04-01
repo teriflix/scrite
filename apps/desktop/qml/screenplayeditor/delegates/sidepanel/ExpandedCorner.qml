@@ -87,7 +87,7 @@ Item {
                 "toolTip": "View/edit scene comments.",
                 "isVisible": true,
                 "normalIcon": Runtime.themedIcon("qrc:/icons/content/comments_panel.png"),
-                "invertedIcon": "qrc:/icons/content/comments_panel_inverted.png",
+                "invertedIcon": "image://icon/dark/qrc:/icons/content/comments_panel.png",
                 "tabWhenNotVisible": ExpandedCorner.Tab.CommentsTab
             },
             {
@@ -95,7 +95,7 @@ Item {
                 "toolTip": "View/edit featured image.",
                 "isVisible": true,
                 "normalIcon": Runtime.themedIcon("qrc:/icons/filetype/photo.png"),
-                "invertedIcon": "qrc:/icons/filetype/photo_inverted.png",
+                "invertedIcon": "image://icon/dark/qrc:/icons/filetype/photo.png",
                 "tabWhenNotVisible": ExpandedCorner.Tab.FeaturedImageTab
             },
             {
@@ -103,7 +103,7 @@ Item {
                 "toolTip":  "View/edit index card fields.",
                 "isVisible": Runtime.screenplayEditorSettings.displayIndexCardFields,
                 "normalIcon": Runtime.themedIcon("qrc:/icons/content/form.png"),
-                "invertedIcon": "qrc:/icons/content/form_inverted.png",
+                "invertedIcon": "image://icon/dark/qrc:/icons/content/form.png",
                 "tabWhenNotVisible": ExpandedCorner.Tab.CommentsTab
             },
             {
@@ -111,7 +111,7 @@ Item {
                 "toolTip":  "View/edit scene meta data.",
                 "isVisible": !Runtime.screenplayEditorSettings.displaySceneSynopsis || !Runtime.screenplayEditorSettings.displaySceneCharacters,
                 "normalIcon": Runtime.themedIcon("qrc:/icons/action/description.png"),
-                "invertedIcon": "qrc:/icons/action/description_inverted.png",
+                "invertedIcon": "image://icon/dark/qrc:/icons/action/description.png",
                 "tabWhenNotVisible": ExpandedCorner.Tab.CommentsTab
             }
         ]

@@ -162,7 +162,7 @@ Item {
                 text: "Learning Guides"
                 color: Qt.rgba(0,0,0,0)
                 textColor: "white"
-                iconSource: "qrc:/icons/action/help_inverted.png"
+                iconSource: "image://icon/dark/qrc:/icons/action/help.png"
 
                 onClicked: Qt.openUrlExternally(Runtime.userGuidesUrl)
             }
@@ -173,7 +173,7 @@ Item {
                 text: "Discord Community"
                 color: Qt.rgba(0,0,0,0)
                 textColor: "white"
-                iconSource: "qrc:/icons/action/forum_inverted.png"
+                iconSource: "image://icon/dark/qrc:/icons/action/forum.png"
 
                 onClicked: JoinDiscordCommunity.launch()
             }

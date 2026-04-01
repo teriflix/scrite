@@ -108,7 +108,7 @@ MenuLoader {
                     required property var modelData
 
                     text: modelData.name
-                    icon.source: "qrc" + modelData.icon
+                    icon.source: Runtime.themedIcon("qrc" + modelData.icon)
 
                     onTriggered: {
                         let sceneNumbers = Scrite.document.screenplay.selectedElementIndexes()

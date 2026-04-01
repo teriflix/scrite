@@ -668,8 +668,8 @@ AbstractStructureElementUI {
                         anchors.fill: parent
 
                         source: root.element.scene.addedToScreenplay || root.Drag.active ?
-                                    (_footerRow.lightBackground ? Runtime.themedIcon("qrc:/icons/action/view_array.png") : "qrc:/icons/action/view_array_inverted.png") :
-                                    (_footerRow.lightBackground ? Runtime.themedIcon("qrc:/icons/content/add_circle_outline.png") : "qrc:/icons/content/add_circle_outline_inverted.png")
+                                    (_footerRow.lightBackground ? Runtime.themedIcon("qrc:/icons/action/view_array.png") : "image://icon/dark/qrc:/icons/action/view_array.png") :
+                                    (_footerRow.lightBackground ? Runtime.themedIcon("qrc:/icons/content/add_circle_outline.png") : "image://icon/dark/qrc:/icons/content/add_circle_outline.png")
 
                         scale: _dragHandleMouseArea.pressed ? 2 : 1
                         opacity: _private.isSelected ? 1 : 0.1

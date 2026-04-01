@@ -37,7 +37,7 @@ ToolButton {
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
     icon.source: Runtime.themedIcon(action.icon.source)
-    icon.color: down ? Runtime.colors.accent.a200.background : action.icon.color
+    icon.color: down ? Runtime.colors.buttonDownIconColor : action.icon.color
 
     ToolTipPopup {
         container: root

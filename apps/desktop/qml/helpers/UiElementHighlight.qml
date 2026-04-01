@@ -107,17 +107,17 @@ Item {
                     source: {
                         switch(root.descriptionPosition) {
                         case Item.Right:
-                            return "qrc:/icons/navigation/arrow_left_inverted.png"
+                            return "image://icon/dark/qrc:/icons/navigation/arrow_left.png"
                         case Item.Right:
-                            return "qrc:/icons/navigation/arrow_right_inverted.png"
+                            return "image://icon/dark/qrc:/icons/navigation/arrow_right.png"
                         case Item.Top:
                         case Item.TopLeft:
                         case Item.TopRight:
-                            return "qrc:/icons/navigation/arrow_down_inverted.png"
+                            return "image://icon/dark/qrc:/icons/navigation/arrow_down.png"
                         case Item.Bottom:
                         case Item.BottomLeft:
                         case Item.BottomRight:
-                            return "qrc:/icons/navigation/arrow_up_inverted.png"
+                            return "image://icon/dark/qrc:/icons/navigation/arrow_up.png"
                         }
                     }
                 }

@@ -37,6 +37,7 @@ Item {
     property real currentNoteTint: applicationSettings.colorIntensity*0.4
     property real currentLineHightlightTint: applicationSettings.colorIntensity*0.2
     property real screenplayTracksTint: Runtime.bounded(0.4, applicationSettings.colorIntensity, 1)
+    property color buttonDownIconColor: _private.theme === Material.Dark ? accent.c800.background : accent.c200.background
     property color selectedSceneControlTint: Color.translucent(theme === Material.Light ? primary.c100.background : primary.c800.background, Runtime.bounded(0.2,1-applicationSettings.colorIntensity,0.8))
     property color selectedSceneHeadingTint:  Color.translucent(theme === Material.Light ? primary.c100.background : primary.c800.background, Runtime.bounded(0.2,1-applicationSettings.colorIntensity,0.8))
 

@@ -48,7 +48,7 @@ VclMenu {
             required property string enumIcon
 
             text: enumKey + (root.scene ? (font.bold ? " ✔" : "") : "")
-            icon.source: enumIcon
+            icon.source: Runtime.themedIcon(enumIcon)
             enabled: root.enableValidation ? root.scene : true
             font.bold: root.scene ? (enabled ? root.scene.type === enumValue : false) : false
 
