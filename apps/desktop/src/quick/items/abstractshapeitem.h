@@ -70,16 +70,6 @@ public:
     Q_SIGNAL void outlineColorChanged();
 
     // clang-format off
-    Q_PROPERTY(QColor fillColor
-               READ fillColor
-               WRITE setFillColor
-               NOTIFY fillColorChanged)
-    // clang-format on
-    void setFillColor(const QColor &val);
-    QColor fillColor() const { return m_fillColor; }
-    Q_SIGNAL void fillColorChanged();
-
-    // clang-format off
     Q_PROPERTY(qreal outlineWidth
                READ outlineWidth
                WRITE setOutlineWidth
@@ -130,7 +120,6 @@ protected:
 
 private:
     QPainterPath m_path;
-    QColor m_fillColor = QColor(Qt::white);
     qreal m_outlineWidth = 1.0;
     QColor m_outlineColor = QColor(Qt::black);
     RenderType m_renderType = OutlineAndFill;

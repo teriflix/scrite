@@ -26,11 +26,17 @@
 
 namespace Utils {
 
+struct QImageValueType
+{
+    Q_GADGET
+    QML_FOREIGN(QImage)
+    QML_VALUE_TYPE(image)
+};
+
 struct KeyCombinations
 {
     Q_GADGET
-    QML_ANONYMOUS
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteKeyCombinations)
 
 public:
     // clang-format off
@@ -113,8 +119,7 @@ public:
 struct FileInfo
 {
     Q_GADGET
-    QML_ANONYMOUS
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteLocalFileInfo)
 
 public:
     QFileInfo info;
@@ -188,8 +193,7 @@ public:
 class ObjectConfigFieldChoice
 {
     Q_GADGET
-    QML_ANONYMOUS
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteObjectConfigFieldChoice)
 
 public:
     // clang-format off
@@ -223,8 +227,7 @@ public:
 struct ObjectConfigField
 {
     Q_GADGET
-    QML_ANONYMOUS
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteObjectConfigField)
 
 public:
     // clang-format off
@@ -332,8 +335,7 @@ public:
 struct ObjectConfigFieldGroup
 {
     Q_GADGET
-    QML_ANONYMOUS
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteObjectConfigFieldGroup)
 
 public:
     // clang-format off
@@ -379,8 +381,7 @@ public:
 struct ObjectConfig
 {
     Q_GADGET
-    QML_ANONYMOUS
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteObjectConfig)
 
 public:
     // clang-format off
@@ -436,9 +437,6 @@ public:
     }
     bool operator!=(const ObjectConfig &other) const { return !(*this == other); }
 };
-
-// Must be called from main() before QML engine is constructed
-void registerTypes();
 
 }
 

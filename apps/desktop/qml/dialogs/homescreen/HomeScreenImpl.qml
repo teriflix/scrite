@@ -777,7 +777,9 @@ Item {
             id: _quickRecentFile
 
             required property int index
-            required property var fileInfo
+            required property scriteFileInfo fileInfo
+
+            Component.onCompleted: Gui.log( "[" + index + "]: " + fileInfo.baseFileName + " => " + fileInfo.hasCoverPage + " / " + Object.typeOf(fileInfo.coverPageImage) )
 
             width: ListView.view.width
 
@@ -1025,7 +1027,7 @@ Item {
                         Layout.preferredHeight: (_private.bannerSize.height / _private.bannerSize.width) * width
 
                         visible: _private.layoutType === 2
-                        source: stackView.currentItem.bannerImage
+                        source: stackView.currentItem && stackView.currentItem.bannerImage ? stackView.currentItem.bannerImage : ""
                         fillMode: Image.PreserveAspectFit
 
                         Poster {
@@ -1181,7 +1183,7 @@ Item {
                 id: _vaultFileDelegate
 
                 required property int index
-                required property var fileInfo
+                required property scriteFileInfo fileInfo
                 required property string timestampAsString
                 required property string relativeTime
                 property string fileSizeInfo: {

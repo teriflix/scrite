@@ -78,7 +78,7 @@ DialogLauncher {
     dialogComponent: VclDialog {
         id: _dialog
 
-        property var language: Runtime.language.available.findLanguage(languageCode)
+        property scriteLanguage language: Runtime.language.available.findLanguage(languageCode)
         property int languageCode: QtLocale.English
         property bool languageUsesLatinScript: language.charScript() === QtChar.Script_Latin
         property string previewText: language.nativeName

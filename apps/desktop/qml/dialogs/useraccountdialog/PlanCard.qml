@@ -42,9 +42,8 @@ RowLayout {
     spacing: 10
 
     RowLayout {
-        Layout.minimumWidth: parent.width * 0.25
-        Layout.maximumWidth: parent.width * 0.25
-        Layout.preferredWidth: parent.width * 0.25
+        Layout.fillWidth: true
+        Layout.preferredWidth: 25
         z: 1
 
         spacing: 5
@@ -54,7 +53,7 @@ RowLayout {
             Layout.preferredHeight: 32
             Layout.preferredWidth: 32
 
-            source: root.icon
+            source: Runtime.themedIcon(root.icon)
             mipmap: true
             smooth: true
             fillMode: Image.PreserveAspectFit
@@ -70,9 +69,8 @@ RowLayout {
     }
 
     ColumnLayout {
-        Layout.minimumWidth: parent.width * 0.3
-        Layout.maximumWidth: parent.width * 0.3
-        Layout.preferredWidth: parent.width * 0.3
+        Layout.fillWidth: true
+        Layout.preferredWidth: 30
         z: 1
 
         LabelWithTooltip {
@@ -91,9 +89,8 @@ RowLayout {
     }
 
     ColumnLayout {
-        Layout.minimumWidth: parent.width * 0.3
-        Layout.maximumWidth: parent.width * 0.3
-        Layout.preferredWidth: parent.width * 0.3
+        Layout.fillWidth: true
+        Layout.preferredWidth: 30
         z: 1
 
         LabelWithTooltip {
@@ -113,6 +110,7 @@ RowLayout {
 
     Link {
         Layout.fillWidth: true
+        Layout.preferredWidth: 15
 
         text: root.actionLink
         enabled: root.actionLinkEnabled

@@ -26,7 +26,7 @@ import "../controls"
 Rectangle {
     id: root
 
-    required property var language
+    required property scriteLanguage language
 
     width: _layout.width + 20
     height: _layout.height + 20

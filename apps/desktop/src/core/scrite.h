@@ -33,8 +33,7 @@
 struct Country
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteCountry)
 
 public:
     // clang-format off
@@ -69,8 +68,7 @@ Q_DECLARE_METATYPE(Country)
 struct Currency
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteCurrency)
 
 public:
     // clang-format off
@@ -111,8 +109,7 @@ Q_DECLARE_METATYPE(Currency)
 struct Locale
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteLocale)
 
 public:
     // clang-format off

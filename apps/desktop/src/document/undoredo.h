@@ -33,7 +33,7 @@ class UndoHub : public QUndoGroup
 {
     Q_OBJECT
     QML_ELEMENT
-    QML_SINGLETON
+    QML_UNCREATABLE("Use this as a singleton instead.")
 
     // clang-format off
     Q_PROPERTY(bool canUndo

@@ -40,6 +40,7 @@ public:
 struct ScenePageBreak
 {
     Q_GADGET
+    QML_VALUE_TYPE(scriteScenePageBreak)
 
 public:
     // clang-format off
@@ -67,6 +68,7 @@ Q_DECLARE_METATYPE(QList<ScenePageBreak>)
 struct ScreenplayPaginatorRecord
 {
     Q_GADGET
+    QML_VALUE_TYPE(scriteScreenplayPaginatorRecord)
 
 public:
     // clang-format off

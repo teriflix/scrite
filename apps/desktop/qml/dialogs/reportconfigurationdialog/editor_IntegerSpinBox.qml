@@ -26,7 +26,7 @@ import "../../helpers"
 
 ColumnLayout {
     id: root
-    property var fieldInfo
+    property scriteObjectConfigField fieldInfo
     property AbstractReportGenerator report
 
     spacing: 6

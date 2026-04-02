@@ -322,7 +322,7 @@ Item {
 
         delegate: Action {
             required property int index
-            required property var fileInfo
+            required property scriteFileInfo fileInfo
 
             readonly property bool visible: true
             property var keywords: [fileInfo.subtitle, fileInfo.author, fileInfo.logline]
@@ -763,9 +763,7 @@ Item {
             readonly property bool hideInCommandCenter: true
 
             required property int index
-            required property var language // This is of type Language, but we have to use var here.
-            // You cannot use Q_GADGET struct names as type names in QML
-            // that privilege is only reserved for QObject types.
+            required property scriteLanguage language
 
             property int sortOrder: index
 

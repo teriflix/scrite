@@ -27,7 +27,7 @@ import "../../helpers"
 
 VclLabel {
     id: root
-    property var fieldInfo
+    property scriteObjectConfigField fieldInfo
     property AbstractReportGenerator report
 
     textFormat: Text.RichText

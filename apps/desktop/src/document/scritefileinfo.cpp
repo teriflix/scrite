@@ -16,11 +16,53 @@
 #include "documentfilesystem.h"
 #include "scritefileinfo.h"
 #include "screenplay.h"
+#include "utils.h"
 
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
+
+ScriteFileInfo::ScriteFileInfo() { }
+
+ScriteFileInfo::ScriteFileInfo(const ScriteFileInfo &other)
+    : filePath(other.filePath),
+      fileName(other.fileName),
+      baseFileName(other.baseFileName),
+      fileSize(other.fileSize),
+      fileInfo(other.fileInfo),
+      documentId(other.documentId),
+      title(other.title),
+      subtitle(other.subtitle),
+      author(other.author),
+      logline(other.logline),
+      version(other.version),
+      coverPageImage(other.coverPageImage),
+      hasCoverPage(other.hasCoverPage),
+      sceneCount(other.sceneCount)
+{
+}
+
+ScriteFileInfo &ScriteFileInfo::operator=(const ScriteFileInfo &other)
+{
+    if (this != &other) {
+        filePath = other.filePath;
+        fileName = other.fileName;
+        baseFileName = other.baseFileName;
+        fileSize = other.fileSize;
+        fileInfo = other.fileInfo;
+        documentId = other.documentId;
+        title = other.title;
+        subtitle = other.subtitle;
+        author = other.author;
+        logline = other.logline;
+        version = other.version;
+        coverPageImage = other.coverPageImage;
+        hasCoverPage = other.hasCoverPage;
+        sceneCount = other.sceneCount;
+    }
+    return *this;
+}
 
 bool ScriteFileInfo::isValid() const
 {
@@ -95,6 +137,9 @@ ScriteFileInfo ScriteFileInfo::load(const QFileInfo &fileInfo)
             ? QImage(coverPagePath).scaled(512, 512, Qt::KeepAspectRatio, Qt::SmoothTransformation)
             : QImage();
     ret.hasCoverPage = !ret.coverPageImage.isNull();
+
+    if (ret.hasCoverPage)
+        Utils::Gui::log("Cover photo available for " + ret.baseFileName);
 
     return ret;
 }

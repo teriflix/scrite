@@ -32,7 +32,7 @@ import "../../helpers"
 Item {
     id: root
 
-    property var userInfo: Scrite.user.info
+    property scriteUserInfo userInfo: Scrite.user.info
     property RestApiCallList callList : RestApiCallList {
         calls: [_refreshUserCall, _deactivateDeviceCall, _saveUserCall]
     }

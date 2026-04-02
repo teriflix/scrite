@@ -37,7 +37,7 @@ to let the report generator know which scenes the user has selected.
 ColumnLayout {
     id: root
 
-    property var fieldInfo
+    property scriteObjectConfigField fieldInfo
     property AbstractReportGenerator report
 
     spacing: 5

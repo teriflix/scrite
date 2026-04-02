@@ -34,8 +34,7 @@ class AbstractTransliterationEngine;
 struct TransliterationOption
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteTransliterationOption)
 
 public:
     // clang-format off
@@ -120,8 +119,7 @@ Q_DECLARE_METATYPE(QList<TransliterationOption>)
 struct Language
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteLanguage)
 
 public:
     // clang-format off
@@ -401,8 +399,7 @@ Helpers for using the static transliterator only.
 struct AlphabetMapping
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteAlphabetMapping)
 
 public:
     // clang-format off
@@ -429,8 +426,7 @@ Q_DECLARE_METATYPE(QList<AlphabetMapping>)
 struct AlphabetMappings
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteAlphabetMappings)
 
 public:
     // clang-format off
@@ -797,8 +793,7 @@ Code to evaluate language boundaries and perform operations on them.
 struct ScriptBoundary
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteScriptBoundary)
 
 public:
     // clang-format off
@@ -860,7 +855,7 @@ class LanguageEngine : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
-    QML_SINGLETON
+    QML_UNCREATABLE("Use it as a singleton instead.")
 
 public:
     static LanguageEngine *instance();

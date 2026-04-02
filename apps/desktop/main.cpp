@@ -47,7 +47,6 @@ int main(int argc, char **argv)
     if (!SystemRequirements::checkAndReport())
         return -1;
 
-    Utils::registerTypes();
     User::instance();
     LanguageEngine::instance();
     NotificationManager::instance();

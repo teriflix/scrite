@@ -24,7 +24,7 @@ QtObject {
 
     property int activeCode: supported.activeLanguageCode
 
-    property var active: supported.activeLanguage
+    property scriteLanguage active: supported.activeLanguage
     property var activeTransliterationOption: active.valid ? active.preferredTransliterationOption() : undefined
 
     property bool activeTransliterationIsInApp: activeTransliterationOption && activeTransliterationOption.valid ? activeTransliterationOption.inApp : false

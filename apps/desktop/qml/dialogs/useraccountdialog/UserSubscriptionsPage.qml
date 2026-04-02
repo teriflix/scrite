@@ -66,7 +66,7 @@ Item {
                     title: "Active Subscription"
 
                     PlanCard {
-                        property var activeSub: _queryUserSubsCall.activeSubscription
+                        property scriteUserSubscriptionInfo activeSub: Scrite.user.asSubscriptionInfo(_queryUserSubsCall.activeSubscription)
 
                         width: parent.width
 
@@ -94,7 +94,7 @@ Item {
                     title: "Upcoming Subscription"
 
                     PlanCard {
-                        property var upcomingSub: _queryUserSubsCall.upcomingSubscription
+                        property scriteUserSubscriptionInfo upcomingSub: Scrite.user.asSubscriptionInfo(_queryUserSubsCall.upcomingSubscription)
 
                         width: parent.width
 
@@ -211,12 +211,12 @@ Item {
                         spacing: 20
 
                         Repeater {
-                            model: _queryUserSubsCall.availablePlans
+                            model: Scrite.user.asSubscriptionPlanInfoList(_queryUserSubsCall.availablePlans)
 
                             delegate: PlanCard {
                                 id: _delegate2
                                 required property int index
-                                required property var modelData
+                                required property scriteUserSubscriptionPlanInfo modelData
 
                                 Layout.fillWidth: true
 
@@ -279,12 +279,12 @@ Item {
                         spacing: 20
 
                         Repeater {
-                            model: _queryUserSubsCall.pastSubscriptions
+                            model: Scrite.user.asSubscriptionInfoList(_queryUserSubsCall.pastSubscriptions)
 
                             delegate: PlanCard {
                                 id: _delegate3
                                 required property int index
-                                required property var modelData
+                                required property scriteUserSubscriptionInfo modelData
 
                                 Layout.fillWidth: true
 

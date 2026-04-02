@@ -417,8 +417,7 @@ private:
 struct ScreenplayBreakInfo
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteScreenplayBreakInfo)
 
 public:
     // clang-format off
@@ -1021,6 +1020,7 @@ private:
 struct ScreenplayTrackItem
 {
     Q_GADGET
+    QML_VALUE_TYPE(scriteScreenplayTrackItem)
 
 public:
     // Must be in the same order as ScreenplayTrack::Kind
@@ -1090,6 +1090,7 @@ Q_DECLARE_METATYPE(QList<ScreenplayTrackItem>)
 struct ScreenplayTrack
 {
     Q_GADGET
+    QML_VALUE_TYPE(scriteScreenplayTrack)
 
 public:
     // Must be in the same order as ScreenplayTrackItem::Kind

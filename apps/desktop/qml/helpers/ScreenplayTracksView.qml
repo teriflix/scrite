@@ -68,8 +68,7 @@ Flickable {
                 id: _track
 
                 required property int index
-                required property var track // of type ScreenplayTrack, a Q_GADGET declared in screenplay.h
-                                            // struct ScreenplayTrack { QString name; QList<ScreenplayTrackItem> items; }
+                required property scriteScreenplayTrack track
 
                 property var items: track.items
                 property string name: track.name
@@ -114,8 +113,7 @@ Flickable {
                         id: _trackItem
 
                         required property int index
-                        required property var modelData // of type ScreenplayTrackItem, a Q_GADGET declared in screenplay.h
-                                                        // struct ScreenplayTrackItem { int startIndex, endIndex; QString name; QColor color; }
+                        required property scriteScreenplayTrackItem modelData
 
                         property Extents extents: Extents {
                             from: {

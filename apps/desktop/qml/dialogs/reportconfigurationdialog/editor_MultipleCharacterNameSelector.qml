@@ -29,7 +29,7 @@ import "../../helpers"
 ColumnLayout {
     id: root
 
-    property var fieldInfo
+    property scriteObjectConfigField fieldInfo
     property AbstractReportGenerator report
 
     property alias characterNames: _characterNameListView.selectedCharacters

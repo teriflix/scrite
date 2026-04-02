@@ -42,29 +42,6 @@
 #include <QProcessEnvironment>
 #include <QOperatingSystemVersion>
 
-/**
- * \brief Registers meta types used by the Utils class.
- */
-void Utils::registerTypes()
-{
-    static bool typesRegistered = false;
-    if (!typesRegistered) {
-        qRegisterMetaType<Utils::KeyCombinations>("Utils::KeyCombinations");
-        qRegisterMetaType<Utils::FileInfo>("Utils::FileInfo");
-        qRegisterMetaType<Utils::ObjectConfigFieldChoice>("Utils::ObjectConfigFieldChoice");
-        qRegisterMetaType<QList<Utils::ObjectConfigFieldChoice>>(
-                "QList<Utils::ObjectConfigFieldChoice>");
-        qRegisterMetaType<Utils::ObjectConfigField>("Utils::ObjectConfigField");
-        qRegisterMetaType<QList<Utils::ObjectConfigField>>("QList<Utils::ObjectConfigField>");
-        qRegisterMetaType<Utils::ObjectConfigFieldGroup>("Utils::ObjectConfigFieldGroup");
-        qRegisterMetaType<QList<Utils::ObjectConfigFieldGroup>>(
-                "QList<Utils::ObjectConfigFieldGroup>");
-        qRegisterMetaType<Utils::ObjectConfig>("Utils::ObjectConfig");
-
-        typesRegistered = true;
-    }
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 QStringList Utils::KeyCombinations::modifiers() const

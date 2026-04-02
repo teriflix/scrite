@@ -75,7 +75,7 @@ Item {
                             id: _supportedLanguageDelegate
 
                             required property int index
-                            required property var language
+                            required property scriteLanguage language
 
                             width: _listView.delegateWidth
                             height: _delegateLayout.height

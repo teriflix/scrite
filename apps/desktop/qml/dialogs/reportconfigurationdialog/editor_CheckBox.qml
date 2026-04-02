@@ -27,7 +27,7 @@ import "../../helpers"
 
 VclCheckBox {
     id: root
-    property var fieldInfo
+    property scriteObjectConfigField fieldInfo
     property AbstractReportGenerator report
 
     checked: report ? report.getConfigurationValue(fieldInfo.name) : false

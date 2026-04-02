@@ -25,12 +25,11 @@
 struct ScriteFileInfo
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteFileInfo)
 
 public:
-    // Test whether a file info instance is valid or not
-    Q_INVOKABLE bool isValid() const;
+    Q_PROPERTY(bool valid READ isValid)
+    bool isValid() const;
 
     // Absolute file path
     // clang-format off
@@ -136,7 +135,13 @@ public:
     static ScriteFileInfo load(const QString &filePath);
     static ScriteFileInfo load(const QFileInfo &fileInfo);
 
+    ScriteFileInfo();
+    ScriteFileInfo(const ScriteFileInfo &other);
+    ScriteFileInfo &operator=(const ScriteFileInfo &other);
     bool operator==(const ScriteFileInfo &other) const { return this->filePath == other.filePath; }
+    bool operator!=(const ScriteFileInfo &other) const { return !(*this == other); }
 };
+
+Q_DECLARE_METATYPE(ScriteFileInfo)
 
 #endif // SCRITEFILEINFO_H

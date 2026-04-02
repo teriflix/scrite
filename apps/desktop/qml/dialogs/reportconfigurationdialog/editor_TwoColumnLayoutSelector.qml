@@ -29,7 +29,7 @@ import "../../helpers"
 RowLayout {
     id: root
 
-    property var fieldInfo
+    property scriteObjectConfigField fieldInfo
     property AbstractReportGenerator report
 
     Layout.topMargin: 20

@@ -27,7 +27,7 @@ import "../../helpers"
 ColumnLayout {
     id: root
     
-    property var fieldInfo
+    property scriteObjectConfigField fieldInfo
     property AbstractExporter exporter
     property TabSequenceManager tabSequence
 

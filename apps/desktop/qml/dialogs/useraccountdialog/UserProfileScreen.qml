@@ -48,6 +48,18 @@ Item {
             Runtime.showHelpTip("UserProfileDialog")
     }
 
+    TextMetrics {
+        id: _pageNameMetrics
+
+        font.pointSize: Runtime.idealFontMetrics.font.pointSize
+        text: {
+            const options = _userProfilePageView.pagesArray
+            let ret = ""
+            options.forEach(option => { if (option.length > ret.length) ret = option })
+            return ret
+        }
+    }
+
     PageView {
         id: _userProfilePageView
         anchors.fill: parent
@@ -60,27 +72,7 @@ Item {
 
         pagesArray: ["Profile", "Subscriptions", "Installations", "Notifications"]
         currentIndex: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription ? 0 : 1
-        maxPageListWidth: {
-            if(pagesArray.length < 2)
-                return 120
-
-            let textMetrics = Qt.createQmlObject("import QtQuick; TextMetrics { }", _userProfilePageView)
-            textMetrics.font.pointSize = Runtime.idealFontMetrics.font.pointSize
-            textMetrics.text = ( () => {
-                                    const options = pagesArray
-                                    let ret = ""
-                                    options.forEach( (option) => {
-                                                        if(option.length > ret.length)
-                                                        ret = option
-                                                    })
-                                    return ret
-                                })()
-
-            const ret = textMetrics.advanceWidth + 50
-            textMetrics.destroy()
-
-            return ret
-        }
+        maxPageListWidth: _pageNameMetrics.advanceWidth + 50
         pageContent: {
             switch(_userProfilePageView.currentIndex) {
             case 0: return _userProfilePageComponent
@@ -110,7 +102,7 @@ Item {
 
                     ToolTipPopup {
                         text: "Ask questions, post feedback, request features and connect with other Scrite users."
-                        visible: _discordButtonMouseArea.hovered
+                        visible: _discordButtonMouseArea.containsMouse
                     }
 
                     cursorShape: Qt.PointingHandCursor

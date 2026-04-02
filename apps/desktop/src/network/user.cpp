@@ -443,6 +443,83 @@ QDataStream &operator>>(QDataStream &ds, UserMessage &um)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+UserInstallationInfo User::asInstallationInfo(const QJsonObject &object)
+{
+    return UserInstallationInfo(object);
+}
+
+QList<UserInstallationInfo> User::asInstallationInfoList(const QJsonArray &array)
+{
+    QList<UserInstallationInfo> ret;
+    ret.reserve(array.size());
+    for (const QJsonValue &value : array)
+        ret.append(UserInstallationInfo(value.toObject()));
+    return ret;
+}
+
+UserSubscriptionPlanInfo User::asSubscriptionPlanInfo(const QJsonObject &object)
+{
+    return UserSubscriptionPlanInfo(object);
+}
+
+QList<UserSubscriptionPlanInfo> User::asSubscriptionPlanInfoList(const QJsonArray &array)
+{
+    QList<UserSubscriptionPlanInfo> ret;
+    ret.reserve(array.size());
+    for (const QJsonValue &value : array)
+        ret.append(UserSubscriptionPlanInfo(value.toObject()));
+    return ret;
+}
+
+UserSubscriptionInfo User::asSubscriptionInfo(const QJsonObject &object)
+{
+    return UserSubscriptionInfo(object);
+}
+
+QList<UserSubscriptionInfo> User::asSubscriptionInfoList(const QJsonArray &array)
+{
+    QList<UserSubscriptionInfo> ret;
+    ret.reserve(array.size());
+    for (const QJsonValue &value : array)
+        ret.append(UserSubscriptionInfo(value.toObject()));
+    return ret;
+}
+
+UserInfo User::asInfo(const QJsonObject &object)
+{
+    return UserInfo(object);
+}
+
+UserMessageButton User::asMessageButton(const QJsonObject &object)
+{
+    return UserMessageButton(object);
+}
+
+QList<UserMessageButton> User::asMessageButtonList(const QJsonArray &array)
+{
+    QList<UserMessageButton> ret;
+    ret.reserve(array.size());
+    for (const QJsonValue &value : array)
+        ret.append(UserMessageButton(value.toObject()));
+    return ret;
+}
+
+UserMessage User::asMessage(const QJsonObject &object)
+{
+    return UserMessage(object);
+}
+
+QList<UserMessage> User::asMessageList(const QJsonArray &array)
+{
+    QList<UserMessage> ret;
+    ret.reserve(array.size());
+    for (const QJsonValue &value : array)
+        ret.append(UserMessage(value.toObject()));
+    return ret;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 User *User::instance()
 {
     static bool firstTime = true;

@@ -19,14 +19,14 @@
 #include <QUrl>
 #include <QDateTime>
 #include <QQmlEngine>
+#include <QJsonArray>
 #include <QJsonValue>
 #include <QQuickImageProvider>
 
 struct UserInstallationInfo
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteUserInstallationInfo)
 
 public:
     UserInstallationInfo() { }
@@ -133,8 +133,7 @@ Q_DECLARE_METATYPE(QList<UserInstallationInfo>)
 struct UserSubscriptionPlanInfo
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteUserSubscriptionPlanInfo)
 
 public:
     UserSubscriptionPlanInfo() { }
@@ -217,8 +216,7 @@ Q_DECLARE_METATYPE(QList<UserSubscriptionPlanInfo>)
 struct UserSubscriptionInfo
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteUserSubscriptionInfo)
 
 public:
     UserSubscriptionInfo() { }
@@ -325,8 +323,7 @@ Q_DECLARE_METATYPE(QList<UserSubscriptionInfo>)
 struct UserInfo
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteUserInfo)
 
 public:
     UserInfo() { }
@@ -521,8 +518,7 @@ Q_DECLARE_METATYPE(UserInfo)
 struct UserMessageButton
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteUserMessageButton)
 
 public:
     UserMessageButton() { }
@@ -575,8 +571,7 @@ Q_DECLARE_METATYPE(QList<UserMessageButton>)
 struct UserMessage
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_VALUE_TYPE(scriteUserMessage)
 
 public:
     UserMessage() { }
@@ -742,6 +737,23 @@ public:
     Q_INVOKABLE void markMessagesAsRead();
 
     void checkIfVersionTypeUseIsAllowed();
+
+    Q_INVOKABLE static UserInstallationInfo asInstallationInfo(const QJsonObject &object);
+    Q_INVOKABLE static QList<UserInstallationInfo> asInstallationInfoList(const QJsonArray &array);
+
+    Q_INVOKABLE static UserSubscriptionPlanInfo asSubscriptionPlanInfo(const QJsonObject &object);
+    Q_INVOKABLE static QList<UserSubscriptionPlanInfo> asSubscriptionPlanInfoList(const QJsonArray &array);
+
+    Q_INVOKABLE static UserSubscriptionInfo asSubscriptionInfo(const QJsonObject &object);
+    Q_INVOKABLE static QList<UserSubscriptionInfo> asSubscriptionInfoList(const QJsonArray &array);
+
+    Q_INVOKABLE static UserInfo asInfo(const QJsonObject &object);
+
+    Q_INVOKABLE static UserMessageButton asMessageButton(const QJsonObject &object);
+    Q_INVOKABLE static QList<UserMessageButton> asMessageButtonList(const QJsonArray &array);
+
+    Q_INVOKABLE static UserMessage asMessage(const QJsonObject &object);
+    Q_INVOKABLE static QList<UserMessage> asMessageList(const QJsonArray &array);
 
 signals:
     void subscriptionAboutToExpire(int days);

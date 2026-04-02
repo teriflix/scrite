@@ -67,17 +67,6 @@ void AbstractShapeItem::setOutlineColor(const QColor &val)
     this->update();
 }
 
-void AbstractShapeItem::setFillColor(const QColor &val)
-{
-    if (m_fillColor == val)
-        return;
-
-    m_fillColor = val;
-    emit fillColorChanged();
-
-    this->update();
-}
-
 void AbstractShapeItem::setOutlineWidth(const qreal &val)
 {
     if (qFuzzyCompare(m_outlineWidth, val))
@@ -236,7 +225,7 @@ QSGNode *AbstractShapeItem::constructSceneGraph() const
         QSGFlatColorMaterial *fillMaterial = new QSGFlatColorMaterial();
         fillNode->setMaterial(fillMaterial);
 
-        QColor fillColor = m_fillColor;
+        QColor fillColor = this->fillColor();
         fillColor.setAlphaF(fillColor.alphaF() * this->opacity());
         fillMaterial->setFlag(QSGMaterial::Blending);
         fillMaterial->setColor(fillColor);
@@ -338,7 +327,7 @@ QSGNode *AbstractShapeItem::polishSceneGraph(QSGNode *rootNode) const
                 static_cast<QSGFlatColorMaterial *>(fillNode->material());
 
         if (fillMaterial != nullptr) {
-            QColor fillColor = m_fillColor;
+            QColor fillColor = this->fillColor();
             fillColor.setAlphaF(fillColor.alphaF() * this->opacity());
             fillMaterial->setColor(fillColor);
         }
@@ -371,7 +360,7 @@ QSGNode *AbstractShapeItem::polishSceneGraph(QSGNode *rootNode) const
 void AbstractShapeItem::paint(QPainter *paint)
 {
     if (m_renderType & FillAlso)
-        paint->setBrush(m_fillColor);
+        paint->setBrush(this->fillColor());
     else
         paint->setBrush(Qt::NoBrush);
 

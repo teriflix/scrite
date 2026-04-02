@@ -29,7 +29,7 @@ import "../../helpers"
 ColumnLayout {
     id: root
 
-    property var fieldInfo
+    property scriteObjectConfigField fieldInfo
     property AbstractReportGenerator report
 
     property var allLocations: Scrite.document.structure.allLocations()

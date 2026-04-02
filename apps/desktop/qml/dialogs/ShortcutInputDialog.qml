@@ -51,7 +51,7 @@ DialogLauncher {
         required property string shortcut
         required property string description
 
-        property var keyCombinations: Gui.keyCombinations(shortcut)
+        property scriteKeyCombinations keyCombinations: Gui.keyCombinations(shortcut)
 
         signal shortcutEdited(string newShortcut)
 

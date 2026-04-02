@@ -2023,21 +2023,6 @@ QImage LanguageIconProvider::requestImage(const QString &id, QSize *size,
 
 LanguageEngine *LanguageEngine::instance()
 {
-    static bool typesRegistered = false;
-    if (!typesRegistered) {
-        qRegisterMetaType<Language>("Language");
-        qRegisterMetaType<ScriptBoundary>("ScriptBoundary");
-        qRegisterMetaType<AlphabetMapping>("AlphabetMapping");
-        qRegisterMetaType<AlphabetMappings>("AlphabetMappings");
-        qRegisterMetaType<TransliterationOption>("TransliterationOption");
-
-        qRegisterMetaType<QList<AlphabetMapping>>("QList<AlphabetMapping>");
-        qRegisterMetaType<QList<ScriptBoundary>>("QList<ScriptBoundary>");
-        qRegisterMetaType<QList<TransliterationOption>>("QList<TransliterationOption>");
-
-        typesRegistered = true;
-    }
-
     static QPointer<LanguageEngine> theInstance(new LanguageEngine(qApp));
     return theInstance;
 }

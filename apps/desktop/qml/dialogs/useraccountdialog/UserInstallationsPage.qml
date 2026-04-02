@@ -92,7 +92,7 @@ Item {
                             id: _deviceDelegate
 
                             required property int index
-                            required property var modelData
+                            required property scriteUserInstallationInfo modelData
 
                             width: Math.min(450, (_devicesFlow.width - _devicesFlow.spacing) / 2 - 1)
                             height: _deviceCardLayout.implicitHeight + 40

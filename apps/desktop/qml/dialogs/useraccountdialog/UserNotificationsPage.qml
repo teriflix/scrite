@@ -95,7 +95,7 @@ Item {
             id: _userMessageDelegate
 
             required property int index
-            required property var modelData
+            required property scriteUserMessage modelData
 
             width: _userMessagesView.width
             height: _messageRect.height
@@ -183,7 +183,7 @@ Item {
                             id: _buttonDelegate
 
                             required property int index
-                            required property var modelData
+                            required property scriteUserMessageButton modelData
 
                             Layout.fillWidth: true
 

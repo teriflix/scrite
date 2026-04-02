@@ -39,7 +39,7 @@ Item {
     property font font: fontMetrics.font
     property FontMetrics fontMetrics: Runtime.shortcutFontMetrics
 
-    property var keyCombinations: Gui.keyCombinations(portableShortcut)
+    property scriteKeyCombinations keyCombinations: Gui.keyCombinations(portableShortcut)
 
     readonly property string delimiter: " + "
 

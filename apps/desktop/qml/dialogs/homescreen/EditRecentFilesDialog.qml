@@ -86,7 +86,7 @@ DialogLauncher {
                         delegate: Item {
                             id: _recentFileDelegate
                             required property int index
-                            required property var fileInfo
+                            required property scriteFileInfo fileInfo
 
                             width: _recentFilesView.width
                             height: _delegateLayout.height+20

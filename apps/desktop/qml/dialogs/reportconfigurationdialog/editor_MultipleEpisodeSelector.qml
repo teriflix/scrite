@@ -29,7 +29,7 @@ import "../../helpers"
 ColumnLayout {
     id: root
 
-    property var fieldInfo
+    property scriteObjectConfigField fieldInfo
     property AbstractReportGenerator report
 
     function getReady() {
@@ -106,7 +106,7 @@ ColumnLayout {
 
             delegate: VclCheckBox {
                 required property int index
-                required property var modelData // This is a gadget of type ScreenplayBreakInfo
+                required property scriteScreenplayBreakInfo modelData
 
                 property int episodeNumber: modelData.number
                 property string episodeName: modelData.title + ": " + modelData.subtitle

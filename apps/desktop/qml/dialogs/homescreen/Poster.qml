@@ -133,7 +133,7 @@ Item {
         id: _private
 
         property string posterSourceUrl
-        property var posterQImage: Gui.emptyQImage
+        property image posterQImage: Gui.emptyQImage
         property var posterSource
         property bool hasPoster: false
 
