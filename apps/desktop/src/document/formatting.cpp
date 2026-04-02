@@ -13,8 +13,8 @@
 **
 ****************************************************************************/
 
-#include "fountain.h"
 #include "utils.h"
+#include "fountain.h"
 #include "formatting.h"
 #include "application.h"
 #include "languageengine.h"
@@ -34,6 +34,7 @@
 #include <QTextCursor>
 #include <QPageLayout>
 #include <QJsonObject>
+#include <QStyleHints>
 #include <QFontDatabase>
 #include <QJsonDocument>
 #include <QTextBlockUserData>
@@ -3037,6 +3038,11 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
 
     // Spelling mistakes.
     const QList<TextFragment> fragments = userData->misspelledFragments();
+    const Qt::ColorScheme colorScheme = qApp->styleHints()->colorScheme();
+    const QColor spellingBackgroundColor = Utils::Color::transform(
+            QColor(255, 0, 0, 64), colorScheme == Qt::ColorScheme::Dark ? Qt::black : Qt::white,
+            colorScheme);
+    const QColor spellingTextColor = Utils::Color::textColorFor(spellingBackgroundColor);
     if (!fragments.isEmpty()) {
         for (const TextFragment &fragment : fragments) {
             if (!fragment.isValid())
@@ -3048,13 +3054,8 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
                 continue;
 
             QTextCharFormat spellingErrorFormat;
-#if 0
-            spellingErrorFormat.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
-            spellingErrorFormat.setUnderlineColor(Qt::red);
-            spellingErrorFormat.setFontUnderline(true);
-#else
-            spellingErrorFormat.setBackground(QColor(255, 0, 0, 32));
-#endif
+            spellingErrorFormat.setForeground(spellingTextColor);
+            spellingErrorFormat.setBackground(spellingBackgroundColor);
             this->mergeFormat(fragment.start(), fragment.length(), spellingErrorFormat);
         }
 

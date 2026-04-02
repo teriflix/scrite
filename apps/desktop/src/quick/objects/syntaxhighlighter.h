@@ -458,7 +458,7 @@ private:
 
 private:
     QColor m_textColor = QColor(0, 0, 0, 0);
-    QColor m_backgroundColor = QColor(255, 0, 0, 32);
+    QColor m_backgroundColor = QColor(255, 0, 0, 64);
 
     int m_cursorPosition = -1;
     bool m_wordUnderCursorIsMisspelled = false;

@@ -86,7 +86,7 @@ Item {
                 activeTabFont.pointSize: Runtime.idealFontMetrics.font.pointSize
 
                 inactiveTabFont.pointSize: Runtime.idealFontMetrics.font.pointSize-4
-                inactiveTabTextColor: Color.translucent(Color.textColorFor(inactiveTabColor), 0.75)
+                inactiveTabTextColor: Color.translucent(activeTabTextColor, 0.75)
 
                 minimumTabWidth: root.width*0.1
 

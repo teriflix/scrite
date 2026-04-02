@@ -227,9 +227,10 @@ AbstractStructureElementUI {
                 SyntaxHighlighter.textDocument: textDocument
 
                 text: root.element.hasTitle ? root.element.title : "Index Card Title"
-                color: root.element.hasTitle ? "black" : "gray"
+                color: Color.textColorFor(_background.color)
                 enabled: false
                 readOnly: true
+                opacity: root.element.hasTitle ? 1 : 0.5
 
                 topPadding: 4
                 leftPadding: 4
@@ -357,10 +358,11 @@ AbstractStructureElementUI {
                             bottomPadding: 4
 
                             text: root.element.scene.hasSynopsis ? root.element.scene.synopsis : "Describe what happens in this scene."
-                            color: root.element.hasTitle ? "black" : "gray"
+                            color: Color.textColorFor(_background.color)
                             enabled: false
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             readOnly: true
+                            opacity: root.element.scene.hasSynopsis ? 1 : 0.5
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
                             selectByMouse: false

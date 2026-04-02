@@ -32,15 +32,15 @@ Settings {
     property real annotationDockX: 80
     property real annotationDockY: 100
 
-    property color gridColor: Runtime.colors.accent.c400.background
-    property color canvasColor: Runtime.colors.accent.c50.background
+    property color gridColor: Runtime.colors.accent.a700.background
+    property color canvasColor: Runtime.colors.primary.c50.background
 
     function restoreDefaultGridColor() {
-        gridColor = Runtime.colors.accent.c400.background
+        gridColor = Runtime.colors.primary.a700.background
     }
 
     function restoreDefaultCanvasColor() {
-        canvasColor = Runtime.colors.accent.c50.background
+        canvasColor = Runtime.colors.primary.c50.background
     }
 
     category: "Structure Tab"

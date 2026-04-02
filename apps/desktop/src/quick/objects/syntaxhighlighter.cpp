@@ -13,12 +13,15 @@
 **
 ****************************************************************************/
 
+#include "utils.h"
 #include "application.h"
 #include "textlimiter.h"
 #include "scritedocument.h"
 #include "languageengine.h"
 #include "spellcheckservice.h"
 #include "syntaxhighlighter.h"
+
+#include <QStyleHints>
 
 AbstractSyntaxHighlighterDelegate::AbstractSyntaxHighlighterDelegate(QObject *parent)
     : QObject(parent)
@@ -773,6 +776,13 @@ void SpellCheckSyntaxHighlighterDelegate::highlightBlock(const QString &text)
 
     userData->checkSpellings(text);
 
+    const Qt::ColorScheme colorScheme = qApp->styleHints()->colorScheme();
+    const QColor spellingBackgroundColor = Utils::Color::transform(
+            m_backgroundColor, colorScheme == Qt::ColorScheme::Dark ? Qt::black : Qt::white,
+            colorScheme);
+    const QColor spellingTextColor =
+            Utils::Color::textColorFor(Utils::Color::stacked(m_textColor, spellingBackgroundColor));
+
     const QList<TextFragment> fragments = userData->misspelledFragments();
     if (!fragments.isEmpty()) {
         for (const TextFragment &fragment : fragments) {
@@ -785,10 +795,10 @@ void SpellCheckSyntaxHighlighterDelegate::highlightBlock(const QString &text)
                 continue;
 
             QTextCharFormat spellingErrorFormat;
-            if (m_backgroundColor.alpha() > 0)
-                spellingErrorFormat.setBackground(m_backgroundColor);
-            if (m_textColor.alpha() > 0)
-                spellingErrorFormat.setForeground(m_textColor);
+            if (spellingBackgroundColor.alpha() > 0)
+                spellingErrorFormat.setBackground(spellingBackgroundColor);
+            if (spellingTextColor.alpha() > 0)
+                spellingErrorFormat.setForeground(spellingTextColor);
 
             this->mergeFormat(fragment.start(), fragment.length(), spellingErrorFormat);
         }

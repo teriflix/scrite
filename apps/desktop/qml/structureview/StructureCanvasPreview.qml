@@ -84,7 +84,7 @@ Item {
             width: _geometry.get.width
             height: _geometry.get.height
 
-            color: Color.translucent(Runtime.colors.accent.highlight.background, 0.25)
+            color: Color.translucent(Runtime.colors.tx(Runtime.colors.accent.highlight.background), 0.25)
             border.width: 2
             border.color: Runtime.colors.accent.borderColor
 
