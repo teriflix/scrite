@@ -19,6 +19,65 @@
     body {
         overflow: hidden;
     }
+
+    /* Dark mode overrides */
+    body.dark-mode {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+    }
+    body.dark-mode .ql-toolbar.ql-snow {
+        background-color: #2d2d2d;
+        border-color: #555;
+    }
+    body.dark-mode .ql-toolbar.ql-snow .ql-stroke {
+        stroke: #c0c0c0;
+    }
+    body.dark-mode .ql-toolbar.ql-snow .ql-fill {
+        fill: #c0c0c0;
+    }
+    body.dark-mode .ql-toolbar.ql-snow .ql-picker-label {
+        color: #c0c0c0;
+    }
+    body.dark-mode .ql-toolbar.ql-snow .ql-picker-label::before {
+        color: #c0c0c0;
+    }
+    body.dark-mode .ql-toolbar.ql-snow button:hover .ql-stroke,
+    body.dark-mode .ql-toolbar.ql-snow button.ql-active .ql-stroke {
+        stroke: #ffffff;
+    }
+    body.dark-mode .ql-toolbar.ql-snow button:hover .ql-fill,
+    body.dark-mode .ql-toolbar.ql-snow button.ql-active .ql-fill {
+        fill: #ffffff;
+    }
+    body.dark-mode .ql-toolbar.ql-snow .ql-picker-options {
+        background-color: #2d2d2d;
+        border-color: #555;
+        color: #c0c0c0;
+    }
+    body.dark-mode .ql-container.ql-snow {
+        background-color: #1e1e1e;
+        border-color: #555;
+        color: #e0e0e0;
+    }
+    body.dark-mode .ql-editor {
+        color: #e0e0e0;
+    }
+    body.dark-mode .ql-editor.ql-blank::before {
+        color: #888;
+    }
+    body.dark-mode .ql-snow a {
+        color: #8ab4f8;
+    }
+    body.dark-mode .ql-tooltip {
+        background-color: #2d2d2d;
+        border-color: #555;
+        color: #c0c0c0;
+    }
+    body.dark-mode .ql-tooltip input {
+        background-color: #1e1e1e;
+        border-color: #555;
+        color: #e0e0e0;
+    }
     </style>
 </head>
 <body id="rte">
@@ -153,6 +212,14 @@
                 quill.history.redo()
             })
 
+            scrite.requestColorScheme.connect( function(isDark) {
+                var body = document.getElementById("rte")
+                if(isDark)
+                    body.classList.add("dark-mode")
+                else
+                    body.classList.remove("dark-mode")
+            })
+
             scrite.getInitialParameters( function(result) {
                 const toolbar = document.getElementById("toolbar-container")
                 var container = document.getElementById("snow-container")
@@ -163,6 +230,11 @@
                 var body = document.getElementById("rte")
                 body.style.fontSize = result.font.size + fontSizeUnit
                 body.style.fontFamily = result.font.family
+
+                if(result.isDark)
+                    body.classList.add("dark-mode")
+                else
+                    body.classList.remove("dark-mode")
 
                 quill.root.dataset.placeholder = result.placeholderText
                 quill.enable(!result.readOnly)

@@ -126,6 +126,9 @@ Item {
         function reportReadOnlyChange() {
             _scriteWebChannelObject.requestReadOnly(_webEngineView.readOnly)
         }
+
+        property bool isDark: Scrite.app.styleHints.colorScheme === Qt.ColorScheme.Dark
+        onIsDarkChanged: reload()
     }
 
     QtObject {
@@ -151,7 +154,8 @@ Item {
                     "family": _webEngineView.defaultFont.family,
                     "size": _webEngineView.defaultFont.pointSize
                 },
-                "readOnly": _webEngineView.readOnly
+                "readOnly": _webEngineView.readOnly,
+                "isDark": _webEngineView.isDark
             }
             return params
         }
@@ -170,6 +174,7 @@ Item {
         signal requestContent(var content)
         signal requestReadOnly(bool readOnly)
         signal requestFocus(bool focus)
+        signal requestColorScheme(bool isDark)
         signal requestUndo()
         signal requestRedo()
     }
