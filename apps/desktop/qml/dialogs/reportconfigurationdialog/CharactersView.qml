@@ -149,9 +149,6 @@ Rectangle {
 
                     Component.onCompleted: _charactersListLayout.columnWidth = Math.max(_charactersListLayout.columnWidth, implicitWidth)
 
-                    Material.background: highlight ? Runtime.colors.accent.c300.background : Runtime.colors.primary.c10.background
-                    Material.foreground: highlight ? Runtime.colors.accent.c300.text : Runtime.colors.primary.c10.text
-
                     SearchAgent.engine: _searchBar.searchEngine
                     SearchAgent.onSearchRequest: (string) => {
                         SearchAgent.searchResultCount = SearchAgent.indexesOf(string, _characterCheckBox.text).length > 0 ? 1 : 0
@@ -168,10 +165,6 @@ Rectangle {
                     text: _characterCheckBox.modelData
 
                     onToggled: _charactersModel.toggleSelection(_characterCheckBox.modelData)
-
-                    background: Rectangle {
-                        color: _characterCheckBox.Material.background
-                    }
 
                     Connections {
                         target: _charactersModel

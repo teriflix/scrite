@@ -27,8 +27,8 @@ VclLabel {
 
     property alias containsMouse: _mouseArea.containsMouse
 
-    property color hoverColor: palette.linkVisited
-    property color defaultColor: palette.link
+    property color hoverColor: Runtime.colors.hoveredLinkColor
+    property color defaultColor: Runtime.colors.defaultLinkColor
 
     signal clicked()
 

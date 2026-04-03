@@ -29,8 +29,7 @@ ToolBar {
 
     required property ActionManager actions
 
-    Material.background: Runtime.colors.primary.c10.background
-    Material.elevation: 0
+    Material.background: "transparent"
 
     Flow {
         id: _layout

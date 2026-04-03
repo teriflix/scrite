@@ -32,8 +32,7 @@ ToolBar {
     property int display: ToolButton.IconOnly
     property bool flat: true
 
-    Material.background: Runtime.colors.primary.c10.background
-    Material.elevation: 0
+    Material.background: "transparent"
 
     implicitWidth: _layout.width
     implicitHeight: _layout.height

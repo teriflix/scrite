@@ -219,7 +219,7 @@ DialogLauncher {
                             required property url url
 
                             text: credits
-                            color: _creditLabelMouseArea.containsMouse ? "blue" : "black"
+                            color: _creditLabelMouseArea.containsMouse ? Runtime.colors.hoveredLinkColor : Runtime.colors.primary.editor.text
                             width: _creditsView.width // - (_creditsView.ScrollBar.vertical.needed ? 20 : 0)
                             wrapMode: Text.WordWrap
                             font.pointSize: Runtime.minimumFontMetrics.font.pointSize

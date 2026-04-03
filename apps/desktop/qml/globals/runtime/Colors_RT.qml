@@ -31,6 +31,8 @@ Item {
     readonly property var   forScene: SceneColors.palette
     readonly property alias theme: _private.theme
     readonly property alias scheme: _private.scheme
+    readonly property alias defaultLinkColor: _private.defaultLinkColor
+    readonly property alias hoveredLinkColor: _private.hoveredLinkColor
 
     property real sceneControlTint: applicationSettings.colorIntensity*0.4
     property real sceneHeadingTint: applicationSettings.colorIntensity*0.4
@@ -58,7 +60,7 @@ Item {
     }
 
     function tint(a, b) {
-        return Color.stacked( Color.tint(a, b), _private.backdrop )
+        return Color.stacked( Color.tint(a, b), palette.window )
     }
 
     function tintTx(a, b) {
@@ -71,20 +73,13 @@ Item {
 
     ObjectRegister.name: "runtimeColors"
 
-    TrackerPack {
-        TrackSignal {
-            target: Scrite.app.styleHints
-            signal: "colorSchemeChanged(Qt::ColorScheme)"
-        }
-
-        delay: 50
-        onTracked: _private.updateColorScheme()
-    }
-
     QtObject {
         id: _private
 
         property int   theme: scheme === Qt.ColorScheme.Dark ? Material.Dark : Material.Light
         property int   scheme: Scrite.app.styleHints.colorScheme
+
+        property color defaultLinkColor: scheme === Qt.ColorScheme.Dark ? "#8AB4F8" : "#1A73E8"
+        property color hoveredLinkColor: scheme === Qt.ColorScheme.Dark ? "#AECBFA" : "#1558B0"
     }
 }

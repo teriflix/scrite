@@ -26,7 +26,7 @@ import "../globals"
 ToolButton {
     id: root
 
-    Material.background: Runtime.colors.primary.c10.background
+    Material.background: "transparent"
 
     flat: true
     down: action.down !== undefined ? action.down === true : (pressed || checked)

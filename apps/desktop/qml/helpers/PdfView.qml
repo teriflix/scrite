@@ -114,6 +114,11 @@ Item {
 
                                 width: _pdfView.pdfPageWidth
                                 height: _pdfView.pdfPageHeight
+                                color: {
+                                    if(Runtime.applicationSettings.useCustomPdfPageColor)
+                                        return Runtime.colors.scheme === Qt.ColorScheme.Dark ? Runtime.applicationSettings.darkModePdfPageColor : Runtime.applicationSettings.lightModePdfPageColor
+                                    return "white"
+                                }
 
                                 Image {
                                     id: _pdfPage

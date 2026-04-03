@@ -66,14 +66,14 @@ Item {
                 currentIndex: {
                     const idx = Scrite.app.availableThemes.indexOf(Runtime.applicationSettings.theme)
                     if(idx < 0)
-                        return materialStyleIndex
+                    return materialStyleIndex
                     return idx
                 }
 
                 onCurrentTextChanged: {
                     Runtime.applicationSettings.theme = currentText
                     if(Runtime.currentTheme !== currentText)
-                        MessageBox.information("Requires Restart", "Scrite will use <b>" + currentText + "</b> theme upon restart.")
+                    MessageBox.information("Requires Restart", "Scrite will use <b>" + currentText + "</b> theme upon restart.")
                 }
 
                 ToolTipPopup {
@@ -154,33 +154,136 @@ Item {
             }
         }
 
-        GroupBox {
+        ColumnLayout {
             Layout.alignment: Qt.AlignTop
             Layout.preferredWidth: (parent.width-(parent.columns-1)*parent.columnSpacing)/parent.columns
 
-            label: VclLabel {
-                text: "UI Mode"
+            GroupBox {
+                Layout.fillWidth: true
+
+                label: VclLabel {
+                    text: "UI / Color Mode"
+                }
+
+                ColumnLayout {
+                    width: parent.width
+
+                    VclRadioButton {
+                        text: "Light"
+                        checked: Runtime.applicationSettings.colorMode === "Light"
+                        onClicked: Runtime.applicationSettings.colorMode = "Light"
+                    }
+
+                    VclRadioButton {
+                        text: "Dark"
+                        checked: Runtime.applicationSettings.colorMode === "Dark"
+                        onClicked: Runtime.applicationSettings.colorMode = "Dark"
+                    }
+
+                    VclRadioButton {
+                        text: "System"
+                        checked: Runtime.applicationSettings.colorMode === "System"
+                        onClicked: Runtime.applicationSettings.colorMode = "System"
+                    }
+                }
             }
 
-            ColumnLayout {
-                width: parent.width
+            GroupBox {
+                Layout.fillWidth: true
 
-                VclRadioButton {
-                    text: "Light"
-                    checked: Runtime.applicationSettings.colorMode === "Light"
-                    onClicked: Runtime.applicationSettings.colorMode = "Light"
+                label: VclCheckBox {
+                    text: "Use Custom PDF Page Colors"
+                    checked: Runtime.applicationSettings.useCustomPdfPageColor
+                    onToggled: Runtime.applicationSettings.useCustomPdfPageColor = !Runtime.applicationSettings.useCustomPdfPageColor
                 }
 
-                VclRadioButton {
-                    text: "Dark"
-                    checked: Runtime.applicationSettings.colorMode === "Dark"
-                    onClicked: Runtime.applicationSettings.colorMode = "Dark"
-                }
+                ColumnLayout {
+                    width: parent.width
 
-                VclRadioButton {
-                    text: "System"
-                    checked: Runtime.applicationSettings.colorMode === "System"
-                    onClicked: Runtime.applicationSettings.colorMode = "System"
+                    enabled: Runtime.applicationSettings.useCustomPdfPageColor
+
+                    RowLayout {
+                        Rectangle {
+                            implicitWidth: _private.colorSelectorSize/2
+                            implicitHeight: _private.colorSelectorSize/2
+
+                            opacity: enabled ? 1 : 0.5
+                            color: Runtime.applicationSettings.lightModePdfPageColor
+                            border.width: 1
+                            border.color: "black"
+
+                            MouseArea {
+                                anchors.fill: parent
+
+                                onClicked: {
+                                    Runtime.applicationSettings.lightModePdfPageColor = Color.pick(parent.color)
+                                }
+                            }
+                        }
+
+                        VclLabel {
+                            Layout.fillWidth: true
+
+                            text: "Light Mode Page"
+                        }
+
+                        ToolButton {
+                            Layout.alignment: Qt.AlignHCenter
+
+                            text: "Reset"
+                            enabled: Color.name(Runtime.applicationSettings.lightModePdfPageColor) !== Color.name("white")
+                            icon.source: Runtime.themedIcon("qrc:/icons/action/reset.png")
+
+                            onClicked: {
+                                Runtime.applicationSettings.lightModePdfPageColor = "white"
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        Rectangle {
+                            implicitWidth: _private.colorSelectorSize/2
+                            implicitHeight: _private.colorSelectorSize/2
+
+                            opacity: enabled ? 1 : 0.5
+                            color: Runtime.applicationSettings.darkModePdfPageColor
+                            border.width: 1
+                            border.color: "black"
+
+                            MouseArea {
+                                anchors.fill: parent
+
+                                onClicked: {
+                                    Runtime.applicationSettings.darkModePdfPageColor = Color.pick(parent.color)
+                                }
+                            }
+                        }
+
+                        VclLabel {
+                            Layout.fillWidth: true
+
+                            text: "Dark Mode Page"
+                        }
+
+                        ToolButton {
+                            Layout.alignment: Qt.AlignHCenter
+
+                            text: "Reset"
+                            enabled: Color.name(Runtime.applicationSettings.darkModePdfPageColor) !== Color.name("lightgray")
+                            icon.source: Runtime.themedIcon("qrc:/icons/action/reset.png")
+
+                            onClicked: {
+                                Runtime.applicationSettings.darkModePdfPageColor = "lightgray"
+                            }
+                        }
+                    }
+
+                    VclLabel {
+                        Layout.fillWidth: true
+
+                        wrapMode: Text.WordWrap
+                        text: "While the generated PDF files will always have a white background, this setting allows you to customise the colors to use while displaying PDFs within the app."
+                    }
                 }
             }
         }
@@ -190,30 +293,30 @@ Item {
         id: _private
 
         readonly property var availableColorOptions: [
-                // Material.Red,
-                Material.Pink,
-                Material.Purple,
-                Material.DeepPurple,
+            // Material.Red,
+            Material.Pink,
+            Material.Purple,
+            Material.DeepPurple,
 
-                Material.Indigo,
-                Material.Blue,
-                Material.LightBlue,
-                Material.Cyan,
+            Material.Indigo,
+            Material.Blue,
+            Material.LightBlue,
+            Material.Cyan,
 
-                Material.Teal,
-                Material.Green,
-                Material.LightGreen,
-                // Material.Lime,
+            Material.Teal,
+            Material.Green,
+            Material.LightGreen,
+            // Material.Lime,
 
-                // Material.Yellow,
-                // Material.Amber,
-                // Material.Orange,
-                // Material.DeepOrange,
+            // Material.Yellow,
+            // Material.Amber,
+            // Material.Orange,
+            // Material.DeepOrange,
 
-                Material.Brown,
-                Material.Grey,
-                Material.BlueGrey
-            ]
+            Material.Brown,
+            Material.Grey,
+            Material.BlueGrey
+        ]
 
         readonly property real colorSelectorSize: 45
     }

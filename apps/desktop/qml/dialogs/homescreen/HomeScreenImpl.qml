@@ -779,8 +779,6 @@ Item {
             required property int index
             required property scriteFileInfo fileInfo
 
-            Component.onCompleted: Gui.log( "[" + index + "]: " + fileInfo.baseFileName + " => " + fileInfo.hasCoverPage + " / " + Object.typeOf(fileInfo.coverPageImage) )
-
             width: ListView.view.width
 
             text: {
@@ -1474,7 +1472,7 @@ Item {
             title: Item {
                 Image {
                     anchors.centerIn: parent
-                    source: "qrc:/images/library.png"
+                    source: Runtime.themedIcon("qrc:/images/library.png")
                     height: 36
                     fillMode: Image.PreserveAspectFit
                 }
