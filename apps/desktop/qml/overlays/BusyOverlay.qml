@@ -45,6 +45,8 @@ Item {
         Material.containerStyle: Material.Filled
         Material.roundedScale: Material.NotRounded
 
+        Overlay.modal: Rectangle { color: Qt.rgba(0,0,0,0.4) }
+
         anchors.centerIn: parent
 
         parent: Overlay.overlay

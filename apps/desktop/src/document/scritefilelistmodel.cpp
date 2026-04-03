@@ -240,7 +240,7 @@ void ScriteFileListModel::updateFromScriteFileInfo(const ScriteFileInfo &sfi)
     const QModelIndex index = this->index(idx);
 
     if (sfi.isValid()) {
-        m_files.replace(idx, sfi);
+        m_files[idx] = sfi;
         emit dataChanged(index, index);
     } else {
         m_watcher->removePath(sfi.filePath);

@@ -53,7 +53,7 @@ DialogLauncher {
 
             Image {
                 anchors.fill: parent
-                source: "qrc:/images/aboutbox.jpg"
+                source: "qrc:/images/aboutbox.png"
                 fillMode: Image.PreserveAspectCrop
                 smooth: true; mipmap: true
             }
@@ -89,7 +89,7 @@ DialogLauncher {
                     Layout.preferredWidth: _dialog.width * 0.3
                     Layout.preferredHeight: sourceSize.height * Layout.preferredWidth/sourceSize.width
 
-                    source: "qrc:/images/scrite_logo_for_report_header.png"
+                    source: Runtime.colors.scheme === Qt.ColorScheme.Dark ? "qrc:/images/scrite_logo_for_report_header_darkmode.png" : "qrc:/images/scrite_logo_for_report_header.png" 
                     fillMode: Image.PreserveAspectFit
                     mipmap: true; smooth: true
                 }
@@ -145,12 +145,10 @@ DialogLauncher {
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 }
 
-                Rectangle {
+                Item {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.preferredWidth: _dialog.width * 0.5
                     Layout.preferredHeight: (Runtime.minimumFontMetrics.height+_creditsView.spacing) * (_creditsView.model.count+1) + _creditsView.anchors.topMargin + _creditsView.anchors.bottomMargin
-
-                    // color: _creditsView.ScrollBar.vertical.needed ? Runtime.colors.primary.c100.background : Qt.rgba(0,0,0,0)
 
                     // Refactoring QML TODO: Add ScrollBar back to this.
                     ListView {
@@ -219,7 +217,7 @@ DialogLauncher {
                             required property url url
 
                             text: credits
-                            color: _creditLabelMouseArea.containsMouse ? "blue" : "black"
+                            color: _creditLabelMouseArea.containsMouse ? Runtime.colors.hoveredLinkColor : Runtime.colors.primary.editor.text
                             width: _creditsView.width // - (_creditsView.ScrollBar.vertical.needed ? 20 : 0)
                             wrapMode: Text.WordWrap
                             font.pointSize: Runtime.minimumFontMetrics.font.pointSize

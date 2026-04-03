@@ -149,8 +149,5 @@ ScriteFileInfo ScriteFileInfo::load(const QFileInfo &fileInfo)
             : QImage();
     ret.hasCoverPage = !ret.coverPageImage.isNull();
 
-    if (ret.hasCoverPage)
-        Utils::Gui::log("Cover photo available for " + ret.baseFileName);
-
     return ret;
 }

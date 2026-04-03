@@ -198,13 +198,14 @@ set(SCRITE_DESKTOP_ICON_FILES
 
 set(SCRITE_DESKTOP_IMAGE_FILES
   "images/appicon.png"
-  "images/aboutbox.jpg"
+  "images/aboutbox.png"
   "images/library.png"
   "images/library_woicon.png"
   "images/sample_scene.png"
   "images/white-paper-texture.jpg"
   "images/scrited_closing_frame.png"
   "images/scrite_logo_for_report_header.png"
+  "images/scrite_logo_for_report_header_darkmode.png"
   "images/scrite_discord_button.png"
   "images/feature_locked.png"
   "images/banner_logo_overlay.png"

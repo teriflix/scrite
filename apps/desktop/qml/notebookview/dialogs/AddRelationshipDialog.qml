@@ -23,7 +23,6 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../controls"
 import "../../helpers"
@@ -103,7 +102,7 @@ DialogLauncher {
 
                             property bool  highlight: false
                             property color backgroundColor: highlight ? Runtime.colors.accent.c100.background : Runtime.colors.primary.c10.background
-                            property color foregroundColor: highlight ? Runtime.colors.accent.c100.text : Runtime.colors.primary.c10.text
+                            property color foregroundColor: highlight ? Runtime.colors.accent.c100.text : Runtime.colors.primary.editor.text
 
                             width: _charactersListView.width
                             height: _characterRow.height*1.15

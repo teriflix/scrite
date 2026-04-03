@@ -305,7 +305,7 @@ Loader {
                         Layout.fillWidth: true
 
                         text: _private.screenplay.email
-                        color: "blue"
+                        color: Runtime.colors.defaultLinkColor
                         enabled: !root.readOnly
                         visible: text !== ""
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -327,7 +327,7 @@ Loader {
                         Layout.fillWidth: true
 
                         text: _private.screenplay.website
-                        color: "blue"
+                        color: Runtime.colors.defaultLinkColor
                         elide: Text.ElideRight
                         enabled: !root.readOnly
                         visible: text !== ""

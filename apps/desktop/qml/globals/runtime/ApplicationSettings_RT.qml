@@ -25,6 +25,10 @@ Settings {
     property int primaryColor: Runtime.colors.defaultPrimaryColor
     property int joinDiscordPromptCounter: 0
 
+    property bool useCustomPdfPageColor: true
+    property color darkModePdfPageColor: "lightgray"
+    property color lightModePdfPageColor: "white"
+
     property string colorMode: "System"  // "Light", "Dark", "System"
 
     property real colorIntensity: 0.5

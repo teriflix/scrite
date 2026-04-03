@@ -42,6 +42,8 @@ DialogLauncher {
         Material.containerStyle: Material.Filled
         Material.roundedScale: Material.NotRounded
 
+        Overlay.modal: Rectangle { color: Qt.rgba(0,0,0,0.4) }
+
         parent: Overlay.overlay
         anchors.centerIn: parent
 

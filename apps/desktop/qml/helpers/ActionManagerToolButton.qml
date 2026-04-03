@@ -28,7 +28,7 @@ ToolButton {
 
     required property ActionManager actionManager
 
-    Material.background: Runtime.colors.primary.c10.background
+    Material.background: "transparent"
 
     display: actionManager.iconSource !== undefined ? ToolButton.IconOnly : ToolButton.TextOnly
     down: _menu.visible

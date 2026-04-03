@@ -106,6 +106,8 @@ Dialog {
     Material.containerStyle: Material.Filled
     Material.roundedScale: Material.NotRounded
 
+    Overlay.modal: Rectangle { color: Qt.rgba(0,0,0,0.4) }
+
     // Configure built-in properties of the Dialog
     parent: Overlay.overlay
     anchors.centerIn: parent
