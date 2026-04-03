@@ -47,43 +47,44 @@ Item {
         ObjectRegister.name: "primaryColors"
 
         key: Material.Grey // applicationSettings.primaryColor
-        theme: root.theme
+        theme: _private.theme
     }
 
     readonly property ColorTheme_RT accent: ColorTheme_RT {
         ObjectRegister.name: "accentColors"
 
         key: root.applicationSettings.accentColor
-        theme: root.theme
+        theme: _private.theme
     }
 
     function tint(a, b) {
-        return Color.stacked( Color.tint(a, b), palette.window )
+        return Color.stacked( Color.tint(a, b), _private.backdrop )
     }
 
     function tintTx(a, b) {
-        return Color.transform( Color.tint(a, b), palette.window, scheme )
+        return Color.transform( Color.tint(a, b), "white", _private.scheme )
     }
 
     function tx(c, backdrop) {
-        return Color.transform(c, backdrop !== undefined ? backdrop : palette.window, scheme)
+        return Color.transform(c, backdrop !== undefined ? backdrop : "white", _private.scheme)
     }
 
     ObjectRegister.name: "runtimeColors"
 
+    TrackerPack {
+        TrackSignal {
+            target: Scrite.app.styleHints
+            signal: "colorSchemeChanged(Qt::ColorScheme)"
+        }
+
+        delay: 50
+        onTracked: _private.updateColorScheme()
+    }
+
     QtObject {
         id: _private
 
-        property int   theme: {
-            if (root.applicationSettings.colorMode === "Light")
-                return Material.Light
-            if (root.applicationSettings.colorMode === "Dark")
-                return Material.Dark
-            // "System" follow OS preference
-            return Scrite.app.styleHints.colorScheme === Qt.ColorScheme.Dark ? Material.Dark : Material.Light
-        }
-        property int  scheme: theme === Material.Dark ? Qt.ColorScheme.Dark : Qt.ColorScheme.Light
-
-        onThemeChanged: Scrite.app.styleHints.colorScheme = scheme
+        property int   theme: scheme === Qt.ColorScheme.Dark ? Material.Dark : Material.Light
+        property int   scheme: Scrite.app.styleHints.colorScheme
     }
 }

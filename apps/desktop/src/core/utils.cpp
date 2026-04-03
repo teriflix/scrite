@@ -32,6 +32,7 @@
 #include <QSslSocket>
 #include <QMetaObject>
 #include <QDataStream>
+#include <QStyleHints>
 #include <QPainterPath>
 #include <QColorDialog>
 #include <QKeySequence>
@@ -1339,17 +1340,24 @@ QColor Utils::Color::textColorFor(const QColor &backgroundColor)
 QColor Utils::Color::transform(const QColor &in, const QColor &backdrop,
                                Qt::ColorScheme colorScheme)
 {
-    const QColor stackedColor = stacked(in, backdrop);
+    QColor ret = stacked(in, backdrop);
+    if (colorScheme == Qt::ColorScheme::Dark) {
+        // For dark mode, we need to alter the color so that it gives the same color perception -
+        // but in light mode. For example, dark-blue becomes light-blue. Black becomes white. And so
+        // on. Inverting the HSL lightness achieves this while preserving the hue and saturation.
+        float h, s, l, a;
+        ret.getHslF(&h, &s, &l, &a);
+        ret = QColor::fromHslF(h, s, 1.0 - l, a);
+    }
 
-    if (colorScheme == Qt::ColorScheme::Light)
-        return stackedColor;
+    return ret;
+}
 
-    // For dark mode, we need to alter the color so that it gives the same color perception - but in
-    // light mode. For example, dark-blue becomes light-blue. Black becomes white. And so on.
-    // Inverting the HSL lightness achieves this while preserving the hue and saturation.
-    float h, s, l, a;
-    stackedColor.getHslF(&h, &s, &l, &a);
-    return QColor::fromHslF(h, s, 1.0 - l, a);
+QColor Utils::Color::transform(const QColor &in)
+{
+    Qt::ColorScheme colorScheme = qApp->styleHints()->colorScheme();
+    const QColor backdrop = colorScheme == Qt::ColorScheme::Dark ? Qt::black : Qt::white;
+    return transform(in, backdrop, colorScheme);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

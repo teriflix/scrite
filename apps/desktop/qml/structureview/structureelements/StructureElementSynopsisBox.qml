@@ -20,7 +20,6 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-
 import "../../globals"
 import "../../helpers"
 import "../../controls"
@@ -76,14 +75,12 @@ AbstractStructureElementUI {
     Rectangle {
         id: _background
 
-        property color borderColor: Color.isLight(root.element.scene.color) ? Qt.rgba(0.75,0.75,0.75,1.0) : root.element.scene.color
-
         anchors.fill: parent
         anchors.margins: -border.width
 
         color: Runtime.colors.tintTx(root.element.scene.color, _private.isSelected ? Runtime.colors.selectedSceneControlTint : Runtime.colors.sceneControlTint)
         border.width: _private.selected ? 2 : 1
-        border.color: _private.isSelected ? borderColor : Qt.lighter(borderColor)
+        border.color: _private.selected ? Runtime.colors.tx( Qt.darker(root.element.scene.color) ) : Runtime.colors.primary.editor.text
 
         Behavior on border.width {
             enabled: Runtime.applicationSettings.enableAnimations
@@ -103,6 +100,7 @@ AbstractStructureElementUI {
         width: 250
 
         text: root.element.scene.synopsis
+        textColor: Color.textColorFor(_background.color)
         readOnly: !(editMode && root.elementIndex === Scrite.document.structure.currentElementIndex)
         wrapMode: Text.WordWrap
         horizontalAlignment: Text.AlignLeft

@@ -21,10 +21,10 @@
 #include <QPainter>
 #include <QJsonDocument>
 #include <QFutureWatcher>
+#include <QFutureWatcher>
 #include <QtConcurrentRun>
 #include <QtConcurrentMap>
 #include <QQuickItemGrabResult>
-#include <QFutureWatcher>
 
 BoundingBoxEvaluator::BoundingBoxEvaluator(QObject *parent) : QObject(parent)
 {
@@ -754,6 +754,8 @@ void BoundingBoxPreview::setBackgroundColor(const QColor &val)
 
     m_backgroundColor = val;
     emit backgroundColorChanged();
+
+    this->update();
 }
 
 void BoundingBoxPreview::setBackgroundOpacity(qreal val)
@@ -763,6 +765,8 @@ void BoundingBoxPreview::setBackgroundOpacity(qreal val)
 
     m_backgroundOpacity = val;
     emit backgroundOpacityChanged();
+
+    this->update();
 }
 
 void BoundingBoxPreview::setEvaluator(BoundingBoxEvaluator *val)

@@ -138,7 +138,7 @@ public:
     ScriteFileInfo();
     ScriteFileInfo(const ScriteFileInfo &other);
     ScriteFileInfo &operator=(const ScriteFileInfo &other);
-    bool operator==(const ScriteFileInfo &other) const { return this->filePath == other.filePath; }
+    bool operator==(const ScriteFileInfo &other) const;
     bool operator!=(const ScriteFileInfo &other) const { return !(*this == other); }
 };
 

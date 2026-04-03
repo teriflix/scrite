@@ -766,6 +766,8 @@ public:
                                         Qt::ColorScheme colorScheme);
 
     Q_INVOKABLE static QString name(const QColor &color) { return color.name(); }
+
+    static QColor transform(const QColor &in);
 };
 
 class SceneColors : public QObject

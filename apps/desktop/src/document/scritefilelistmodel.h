@@ -121,6 +121,8 @@ signals:
     void filesMissing(const QStringList &files);
 
 private:
+    int indexOf(const ScriteFileInfo &sfi) const;
+
     void loadRecentFiles();
     void setFilesInternal(const QStringList &files);
     void updateFromScriteFileInfo(const ScriteFileInfo &sfi);

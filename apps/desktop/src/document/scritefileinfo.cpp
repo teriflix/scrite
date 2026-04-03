@@ -45,23 +45,34 @@ ScriteFileInfo::ScriteFileInfo(const ScriteFileInfo &other)
 
 ScriteFileInfo &ScriteFileInfo::operator=(const ScriteFileInfo &other)
 {
-    if (this != &other) {
-        filePath = other.filePath;
-        fileName = other.fileName;
-        baseFileName = other.baseFileName;
-        fileSize = other.fileSize;
-        fileInfo = other.fileInfo;
-        documentId = other.documentId;
-        title = other.title;
-        subtitle = other.subtitle;
-        author = other.author;
-        logline = other.logline;
-        version = other.version;
-        coverPageImage = other.coverPageImage;
-        hasCoverPage = other.hasCoverPage;
-        sceneCount = other.sceneCount;
-    }
+    this->filePath = other.filePath;
+    this->fileName = other.fileName;
+    this->baseFileName = other.baseFileName;
+    this->fileSize = other.fileSize;
+    this->fileInfo = other.fileInfo;
+    this->documentId = other.documentId;
+    this->title = other.title;
+    this->subtitle = other.subtitle;
+    this->author = other.author;
+    this->logline = other.logline;
+    this->version = other.version;
+    this->coverPageImage = other.coverPageImage;
+    this->hasCoverPage = other.hasCoverPage;
+    this->sceneCount = other.sceneCount;
     return *this;
+}
+
+bool ScriteFileInfo::operator==(const ScriteFileInfo &other) const
+{
+    return this->filePath == other.filePath && this->fileName == other.fileName
+            && this->baseFileName == other.baseFileName && this->fileSize == other.fileSize
+            && this->fileInfo == other.fileInfo && this->documentId == other.documentId
+            && this->title == other.title && this->subtitle == other.subtitle
+            && this->author == other.author && this->logline == other.logline
+            && this->version == other.version
+            /* because comparing whole image is expensive */
+            && this->coverPageImage.size() == other.coverPageImage.size()
+            && this->hasCoverPage == other.hasCoverPage && this->sceneCount == other.sceneCount;
 }
 
 bool ScriteFileInfo::isValid() const

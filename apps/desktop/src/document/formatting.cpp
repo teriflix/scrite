@@ -1319,7 +1319,7 @@ public:
     SceneElement *sceneElement() const { return m_sceneElement; }
 
     void resetFormat();
-    bool shouldUpdateFromFormat(const SceneElementFormat *format);
+    bool updateFromFormat(const SceneElementFormat *format);
 
     void initializeSpellCheck(SceneDocumentBinder *binder);
     bool shouldUpdateFromSpellCheck();
@@ -1330,6 +1330,7 @@ public:
     void polishTextLater();
     void autoCapitalizeLater();
 
+    static QBrush colorTransformBrush(const QBrush &brush);
     static SceneDocumentBlockUserData *get(const QTextBlock &block);
     static SceneDocumentBlockUserData *get(QTextBlockUserData *userData);
 
@@ -1384,9 +1385,19 @@ void SceneDocumentBlockUserData::resetFormat()
     charFormat = QTextCharFormat();
 }
 
-bool SceneDocumentBlockUserData::shouldUpdateFromFormat(const SceneElementFormat *format)
+bool SceneDocumentBlockUserData::updateFromFormat(const SceneElementFormat *format)
 {
-    return format->isModified(&m_formatMTime);
+    if (format->isModified(&m_formatMTime)) {
+        this->blockFormat = format->createBlockFormat(m_sceneElement->alignment());
+        this->charFormat = format->createCharFormat();
+        if (this->blockFormat.hasProperty(QTextFormat::BackgroundBrush))
+            this->blockFormat.setBackground(colorTransformBrush(this->blockFormat.background()));
+        if (this->charFormat.hasProperty(QTextFormat::ForegroundBrush))
+            this->charFormat.setForeground(colorTransformBrush(this->charFormat.foreground()));
+        return true;
+    }
+
+    return false;
 }
 
 void SceneDocumentBlockUserData::initializeSpellCheck(SceneDocumentBinder *binder)
@@ -1449,6 +1460,13 @@ void SceneDocumentBlockUserData::autoCapitalizeLater()
         m_pendingTasks += AutoCapitalizeTask;
         m_binder->m_sceneElementTaskTimer.start(500, m_binder);
     }
+}
+
+QBrush SceneDocumentBlockUserData::colorTransformBrush(const QBrush &brush)
+{
+    QBrush ret = brush;
+    ret.setColor(Utils::Color::transform(brush.color()));
+    return ret;
 }
 
 SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(const QTextBlock &block)
@@ -1736,6 +1754,9 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
 
     connect(LanguageEngine::instance(), &LanguageEngine::scriptFontFamilyChanged, this,
             &SceneDocumentBinder::refresh);
+
+    QStyleHints *styleHints = qApp->styleHints();
+    connect(styleHints, &QStyleHints::colorSchemeChanged, this, &SceneDocumentBinder::refresh);
 }
 
 SceneDocumentBinder::~SceneDocumentBinder() { }
@@ -3009,13 +3030,16 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
         return;
     }
 
+    auto colorTransformBrush = [](const QBrush &brush) -> QBrush {
+        QBrush ret = brush;
+        ret.setColor(Utils::Color::transform(brush.color()));
+        return ret;
+    };
+
     // Basic formatting
     const SceneElementFormat *format = m_screenplayFormat->elementFormat(element->type());
-    if (userData->shouldUpdateFromFormat(format)) {
-        userData->blockFormat = format->createBlockFormat(element->alignment());
-        userData->charFormat = format->createCharFormat();
+    if (userData->updateFromFormat(format))
         this->applyBlockFormatLater(block);
-    }
 
     this->mergeFormat(0, block.length(), userData->charFormat);
 
@@ -3038,10 +3062,7 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
 
     // Spelling mistakes.
     const QList<TextFragment> fragments = userData->misspelledFragments();
-    const Qt::ColorScheme colorScheme = qApp->styleHints()->colorScheme();
-    const QColor spellingBackgroundColor = Utils::Color::transform(
-            QColor(255, 0, 0, 64), colorScheme == Qt::ColorScheme::Dark ? Qt::black : Qt::white,
-            colorScheme);
+    const QColor spellingBackgroundColor = Utils::Color::transform(QColor(255, 0, 0, 64));
     const QColor spellingTextColor = Utils::Color::textColorFor(spellingBackgroundColor);
     if (!fragments.isEmpty()) {
         for (const TextFragment &fragment : fragments) {
@@ -3059,43 +3080,43 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
             this->mergeFormat(fragment.start(), fragment.length(), spellingErrorFormat);
         }
 
-        /*
-        Suppose that a paragraph of text has custom text and/or background
-        colors applied to one or more words in it. When spell check is enabled
-        and a paragraph of text has spelling mistakes, then the custom colors
-        are not rendered until all the spelling mistakes are fixed.
-
-        It appears that setting background color to light-red (as we do here)
-        for misspelled words, causes all colors to disappear in that paragraph.
-        I am unable to reproduce this issue on a separate sample Qt app; and I
-        am unable to find out why its causing this issue here.
-
-        Until we figure out why this is happening, we reapply background and
-        foreground colors whenever spelling mistakes are detected.
-        */
-
-        const QVector<QTextLayout::FormatRange> formats = block.textFormats();
-        for (const QTextLayout::FormatRange &format : formats) {
-            if (format.format.hasProperty(QTextFormat::BackgroundBrush)
-                || format.format.hasProperty(QTextFormat::ForegroundBrush)) {
-                QTextCharFormat charFormat;
-                if (format.format.hasProperty(QTextFormat::BackgroundBrush))
-                    charFormat.setBackground(format.format.background());
-                if (format.format.hasProperty(QTextFormat::ForegroundBrush))
-                    charFormat.setForeground(format.format.foreground());
-                this->mergeFormat(format.start, format.length, charFormat);
-            }
-        }
-
         emit spellingMistakesDetected();
     }
 
-    // Links should appear in blue text and underline format.
+    /*
+    Suppose that a paragraph of text has custom text and/or background
+    colors applied to one or more words in it. When spell check is enabled
+    and a paragraph of text has spelling mistakes, then the custom colors
+    are not rendered until all the spelling mistakes are fixed.
+
+         It appears that setting background color to light-red (as we do here)
+         for misspelled words, causes all colors to disappear in that paragraph.
+         I am unable to reproduce this issue on a separate sample Qt app; and I
+         am unable to find out why its causing this issue here.
+
+          Until we figure out why this is happening, we reapply background and
+          foreground colors whenever spelling mistakes are detected.
+          */
+
     const QVector<QTextLayout::FormatRange> formats = block.textFormats();
+    for (const QTextLayout::FormatRange &format : formats) {
+        if (format.format.hasProperty(QTextFormat::BackgroundBrush)
+            || format.format.hasProperty(QTextFormat::ForegroundBrush)) {
+            QTextCharFormat charFormat;
+            if (format.format.hasProperty(QTextFormat::BackgroundBrush))
+                charFormat.setBackground(colorTransformBrush(format.format.background()));
+            if (format.format.hasProperty(QTextFormat::ForegroundBrush))
+                charFormat.setForeground(colorTransformBrush(format.format.foreground()));
+            this->mergeFormat(format.start, format.length, charFormat);
+        }
+    }
+
+    // Links should appear in blue text and underline format.
+    // const QVector<QTextLayout::FormatRange> formats = block.textFormats();
     for (const QTextLayout::FormatRange &format : formats) {
         if (format.format.isAnchor() && !format.format.anchorHref().isEmpty()) {
             QTextCharFormat linkFormat;
-            linkFormat.setForeground(Qt::blue);
+            linkFormat.setForeground(Utils::Color::transform(Qt::blue));
             linkFormat.setFontUnderline(true);
             this->mergeFormat(format.start, format.length, linkFormat);
         }
@@ -3259,10 +3280,7 @@ void SceneDocumentBinder::initializeDocument()
         cursor = QTextCursor(block);
 
         userData->resetFormat();
-        if (userData->shouldUpdateFromFormat(format)) {
-            userData->blockFormat = format->createBlockFormat(element->alignment());
-            userData->charFormat = format->createCharFormat();
-        }
+        userData->updateFromFormat(format);
         cursor.setBlockFormat(userData->blockFormat);
 
         const QVector<QTextLayout::FormatRange> formatRanges =

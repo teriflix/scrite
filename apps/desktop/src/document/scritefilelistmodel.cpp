@@ -132,7 +132,7 @@ void ScriteFileListModel::add(const QString &filePath)
         return;
     }
 
-    const int idx = m_files.indexOf(sfi);
+    const int idx = this->indexOf(sfi);
     if (idx != 0) {
         if (idx > 0) {
             this->beginRemoveRows(QModelIndex(), idx, idx);
@@ -233,7 +233,7 @@ void ScriteFileListModel::updateFromScriteFileInfo(const ScriteFileInfo &sfi)
     if (sfi.filePath.isEmpty())
         return;
 
-    const int idx = m_files.indexOf(sfi);
+    const int idx = this->indexOf(sfi);
     if (idx < 0)
         return;
 
@@ -273,6 +273,15 @@ QVariant ScriteFileListModel::data(const QModelIndex &index, int role) const
 
     const ScriteFileInfo sfi = m_files.at(index.row());
     return QVariant::fromValue<ScriteFileInfo>(sfi);
+}
+
+int ScriteFileListModel::indexOf(const ScriteFileInfo &sfi) const
+{
+    for (int i = 0; i < m_files.size(); i++) {
+        if (m_files[i].fileInfo == sfi.fileInfo)
+            return i;
+    }
+    return -1;
 }
 
 void ScriteFileListModel::loadRecentFiles()

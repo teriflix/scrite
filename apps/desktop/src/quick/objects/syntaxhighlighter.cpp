@@ -21,8 +21,6 @@
 #include "spellcheckservice.h"
 #include "syntaxhighlighter.h"
 
-#include <QStyleHints>
-
 AbstractSyntaxHighlighterDelegate::AbstractSyntaxHighlighterDelegate(QObject *parent)
     : QObject(parent)
 {
@@ -776,10 +774,7 @@ void SpellCheckSyntaxHighlighterDelegate::highlightBlock(const QString &text)
 
     userData->checkSpellings(text);
 
-    const Qt::ColorScheme colorScheme = qApp->styleHints()->colorScheme();
-    const QColor spellingBackgroundColor = Utils::Color::transform(
-            m_backgroundColor, colorScheme == Qt::ColorScheme::Dark ? Qt::black : Qt::white,
-            colorScheme);
+    const QColor spellingBackgroundColor = Utils::Color::transform(m_backgroundColor);
     const QColor spellingTextColor =
             Utils::Color::textColorFor(Utils::Color::stacked(m_textColor, spellingBackgroundColor));
 
@@ -934,9 +929,9 @@ void TextLimiterSyntaxHighlighterDelegate::highlightBlock(const QString &text)
     if (count > 0) {
         QTextCharFormat charFormat;
         if (m_textColor.alpha() > 0)
-            charFormat.setForeground(m_textColor);
+            charFormat.setForeground(Utils::Color::transform(m_textColor));
         if (m_backgroundColor.alpha() > 0)
-            charFormat.setBackground(m_backgroundColor);
+            charFormat.setBackground(Utils::Color::transform(m_backgroundColor));
         this->mergeFormat(start, count, charFormat);
     }
 }

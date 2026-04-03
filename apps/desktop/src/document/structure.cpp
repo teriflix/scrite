@@ -41,6 +41,7 @@
 #include <QTextTable>
 #include <QTextFrame>
 #include <QClipboard>
+#include <QStyleHints>
 #include <QScopeGuard>
 #include <QQuickWindow>
 #include <QJsonDocument>
@@ -5243,6 +5244,10 @@ StructureElementConnector::StructureElementConnector(QQuickItem *parent)
             &StructureElementConnector::canBeVisibleChanged);
     connect(this, &StructureElementConnector::toElementChanged, this,
             &StructureElementConnector::canBeVisibleChanged);
+
+    QStyleHints *styleHints = qApp->styleHints();
+    connect(styleHints, &QStyleHints::colorSchemeChanged, this,
+            &StructureElementConnector::pickElementColor);
 }
 
 StructureElementConnector::~StructureElementConnector() { }
@@ -5536,6 +5541,8 @@ void StructureElementConnector::pickElementColor()
         const qreal luma = ((0.299 * mix.redF()) + (0.587 * mix.greenF()) + (0.114 * mix.blueF()));
         if (luma > 0.5)
             mix = mix.darker();
+
+        mix = Utils::Color::transform(mix);
 
         this->setOutlineColor(mix);
     }

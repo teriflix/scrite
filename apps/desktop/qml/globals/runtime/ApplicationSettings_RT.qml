@@ -43,8 +43,19 @@ Settings {
                          Runtime.currentTheme = theme
                          Runtime.currentUseSoftwareRenderer = useSoftwareRenderer
                      })
+        updateColorScheme()
     }
 
     category: "Application"
     location: Platform.settingsLocation
+
+    onColorModeChanged: Qt.callLater(updateColorScheme)
+    function updateColorScheme() {
+        let cs = Qt.ColorScheme.Unknown // Follow OS defaults
+        if(colorMode === "Light")
+            cs = Qt.ColorScheme.Light
+        else if(colorMode === "Dark")
+            cs = Qt.ColorScheme.Dark
+        Scrite.app.styleHints.colorScheme = cs
+    }
 }
