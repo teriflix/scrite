@@ -950,6 +950,16 @@ public:
     Q_SIGNAL void textWidthChanged();
 
     // clang-format off
+    Q_PROPERTY(qreal bottomMargin
+               READ bottomMargin
+               WRITE setBottomMargin
+               NOTIFY bottomMarginChanged)
+    // clang-format on
+    void setBottomMargin(qreal val);
+    qreal bottomMargin() const { return m_bottomMargin; }
+    Q_SIGNAL void bottomMarginChanged();
+
+    // clang-format off
     Q_PROPERTY(int cursorPosition
                READ cursorPosition
                WRITE setCursorPosition
@@ -1380,6 +1390,7 @@ private:
     bool m_wordUnderCursorIsMisspelled = false;
 
     qreal m_textWidth = 0;
+    qreal m_bottomMargin = 10;
 
     QString m_completionPrefix;
 

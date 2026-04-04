@@ -1950,6 +1950,25 @@ void SceneDocumentBinder::setTextWidth(qreal val)
     emit textWidthChanged();
 }
 
+void SceneDocumentBinder::setBottomMargin(qreal val)
+{
+    if (qFuzzyCompare(m_bottomMargin, val))
+        return;
+
+    m_bottomMargin = qMax(0.0, val);
+
+    if (m_textDocument != nullptr && !m_initializingDocument && m_documentLoadCount > 0) {
+        QTextDocument *document = m_textDocument->textDocument();
+        if (document != nullptr) {
+            QTextFrameFormat frameFormat = document->rootFrame()->frameFormat();
+            frameFormat.setBottomMargin(m_bottomMargin);
+            document->rootFrame()->setFrameFormat(frameFormat);
+        }
+    }
+
+    emit bottomMarginChanged();
+}
+
 void SceneDocumentBinder::setCursorPosition(int val)
 {
     if (qApp->closingDown())
@@ -3308,6 +3327,13 @@ void SceneDocumentBinder::initializeDocument()
 
     this->setDocumentLoadCount(m_documentLoadCount + 1);
     m_initializingDocument = false;
+
+    {
+        QTextFrameFormat frameFormat = document->rootFrame()->frameFormat();
+        frameFormat.setBottomMargin(m_bottomMargin);
+        document->rootFrame()->setFrameFormat(frameFormat);
+    }
+
     this->QSyntaxHighlighter::rehighlight();
     this->polishAllSceneElements();
 

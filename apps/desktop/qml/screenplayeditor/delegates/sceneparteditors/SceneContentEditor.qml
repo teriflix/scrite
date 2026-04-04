@@ -111,10 +111,11 @@ AbstractScenePartEditor {
 
         width: parent.width
 
+        clip: false
         topPadding: Runtime.sceneEditorFontMetrics.height
         leftPadding: root.pageLeftMargin
         rightPadding: root.pageRightMargin
-        bottomPadding: Runtime.sceneEditorFontMetrics.height
+        // bottomPadding: Runtime.sceneEditorFontMetrics.height
 
         font: Scrite.document.displayFormat.defaultFont2
         // palette: Runtime.colors.palette
@@ -320,6 +321,7 @@ AbstractScenePartEditor {
         shots: Scrite.document.structure.shots
         transitions: Scrite.document.structure.transitions
         textDocument: _sceneTextEditor.textDocument
+        bottomMargin: Runtime.sceneEditorFontMetrics.lineSpacing
         characterNames: Scrite.document.structure.characterNames
         cursorPosition: _sceneTextEditor.activeFocus && !root.readOnly ? _sceneTextEditor.cursorPosition : -1
         applyTextFormat: true
