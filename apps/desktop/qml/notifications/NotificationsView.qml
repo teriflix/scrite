@@ -82,7 +82,7 @@ Rectangle {
                     width: _flickable.width-1
                     height: Math.max(100, _delegateLayout.implicitHeight+44)
 
-                    color: notification.color
+                    color: Runtime.colors.tx(notification.color)
                     border { width: 1; color: Runtime.colors.primary.borderColor }
 
                     RowLayout {
@@ -140,7 +140,7 @@ Rectangle {
                             VclLabel {
                                 Layout.fillWidth: true
 
-                                color: _delegate.notification.textColor
+                                color: Runtime.colors.tx(_delegate.notification.textColor)
                                 font.bold: true
                                 text: _delegate.notification.title
                                 visible: text !== ""
@@ -152,7 +152,7 @@ Rectangle {
                             VclLabel {
                                 Layout.fillWidth: true
 
-                                color: _delegate.notification.textColor
+                                color: Runtime.colors.tx(_delegate.notification.textColor)
                                 text: _delegate.notification.text
                                 wrapMode: Text.WordWrap
 
