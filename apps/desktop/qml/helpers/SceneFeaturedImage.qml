@@ -98,7 +98,7 @@ Item {
             active: false
 
             sourceComponent: Rectangle {
-                color: Color.translucent(Runtime.colors.primary.c600.background,0.85)
+                color: Color.translucent(Runtime.colors.primary.editor.background,0.85)
 
                 MouseArea {
                     anchors.fill: parent
@@ -112,7 +112,6 @@ Item {
                     VclLabel {
                         width: parent.width
 
-                        color: Runtime.colors.primary.c600.text
                         horizontalAlignment: Text.AlignHCenter
                         text: "Are you sure you want to remove this photo?"
                         wrapMode: Text.WordWrap

@@ -97,7 +97,7 @@ Item {
                             width: Math.min(450, (_devicesFlow.width - _devicesFlow.spacing) / 2 - 1)
                             height: _deviceCardLayout.implicitHeight + 40
 
-                            color: Runtime.colors.primary.c10.background
+                            color: Runtime.colors.transparent
                             border.width: modelData.isCurrent ? 3 : 1
                             border.color: modelData.isCurrent ? Runtime.colors.accent.c600.background : Runtime.colors.primary.borderColor
 
@@ -163,8 +163,6 @@ Item {
                                             VclLabel {
                                                 Layout.fillWidth: true
 
-                                                font.bold: _deviceDelegate.modelData.isCurrent
-                                                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 1
                                                 text: {
                                                     let ret = ""
                                                     if(_deviceDelegate.modelData.hostName !== "")
@@ -176,6 +174,9 @@ Item {
                                                 elide: Text.ElideRight
                                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                                 maximumLineCount: 2
+
+                                                font.bold: _deviceDelegate.modelData.isCurrent
+                                                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 1
                                             }
 
                                             Rectangle {
@@ -204,7 +205,6 @@ Item {
 
                                             text: _deviceDelegate.modelData.platform + " " + _deviceDelegate.modelData.platformVersion
                                             elide: Text.ElideRight
-                                            color: Runtime.colors.primary.c600.text
                                         }
 
                                         VclLabel {
@@ -212,7 +212,6 @@ Item {
 
                                             text: "Scrite " + _deviceDelegate.modelData.appVersion
                                             elide: Text.ElideRight
-                                            color: Runtime.colors.primary.c600.text
                                         }
                                     }
                                 }
@@ -234,9 +233,9 @@ Item {
                                                     "Active since: " + Qt.formatDateTime(new Date(_deviceDelegate.modelData.lastSessionDate), "dddd, h:mm AP (MMM dd, yyyy)") :
                                                     "Last Login: " + TMath.relativeTime(new Date(_deviceDelegate.modelData.lastSessionDate))
                                         elide: Text.ElideRight
-                                        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                         maximumLineCount: 2
+                                        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                     }
 
                                     VclButton {

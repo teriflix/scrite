@@ -79,7 +79,7 @@ Item {
         property int   theme: scheme === Qt.ColorScheme.Dark ? Material.Dark : Material.Light
         property int   scheme: Scrite.app.styleHints.colorScheme
 
-        property color defaultLinkColor: scheme === Qt.ColorScheme.Dark ? "#8AB4F8" : "#1A73E8"
-        property color hoveredLinkColor: scheme === Qt.ColorScheme.Dark ? "#AECBFA" : "#1558B0"
+        property color defaultLinkColor: scheme === Qt.ColorScheme.Dark ? "#E9BF59" : "#583985"
+        property color hoveredLinkColor: scheme === Qt.ColorScheme.Dark ? "#A68433" : "#8356C4"
     }
 }

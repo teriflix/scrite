@@ -147,7 +147,7 @@ Item {
             anchors.fill: parent
             anchors.topMargin: _tabBarTab.active ? 0 : parent.height*0.1
 
-            fillColor: _tabBarTab.tabFillColor
+            backgroundColor: _tabBarTab.tabFillColor
             outlineColor: _tabBarTab.tabBorderColor
             outlineWidth: _tabBarTab.tabBorderWidth
             renderingMechanism: PainterPathItem.UseAntialiasedQPainter

@@ -20,14 +20,14 @@
         overflow: hidden;
     }
 
-    /* Dark mode overrides */
-    body.dark-mode {
-        background-color: #1e1e1e;
-        color: #e0e0e0;
+    /* Make all editor surfaces transparent so the QML backdrop shows through */
+    body, .ql-toolbar.ql-snow, .ql-container.ql-snow, .ql-editor {
+        background-color: transparent;
     }
-    body.dark-mode .ql-toolbar.ql-snow {
-        background-color: #2d2d2d;
-        border-color: #555;
+
+    /* Dark mode: text and icon color overrides only — no backgrounds */
+    body.dark-mode {
+        color: #e0e0e0;
     }
     body.dark-mode .ql-toolbar.ql-snow .ql-stroke {
         stroke: #c0c0c0;
@@ -35,9 +35,7 @@
     body.dark-mode .ql-toolbar.ql-snow .ql-fill {
         fill: #c0c0c0;
     }
-    body.dark-mode .ql-toolbar.ql-snow .ql-picker-label {
-        color: #c0c0c0;
-    }
+    body.dark-mode .ql-toolbar.ql-snow .ql-picker-label,
     body.dark-mode .ql-toolbar.ql-snow .ql-picker-label::before {
         color: #c0c0c0;
     }
@@ -49,14 +47,7 @@
     body.dark-mode .ql-toolbar.ql-snow button.ql-active .ql-fill {
         fill: #ffffff;
     }
-    body.dark-mode .ql-toolbar.ql-snow .ql-picker-options {
-        background-color: #2d2d2d;
-        border-color: #555;
-        color: #c0c0c0;
-    }
     body.dark-mode .ql-container.ql-snow {
-        background-color: #1e1e1e;
-        border-color: #555;
         color: #e0e0e0;
     }
     body.dark-mode .ql-editor {
@@ -69,14 +60,26 @@
         color: #8ab4f8;
     }
     body.dark-mode .ql-tooltip {
-        background-color: #2d2d2d;
-        border-color: #555;
         color: #c0c0c0;
     }
     body.dark-mode .ql-tooltip input {
-        background-color: #1e1e1e;
-        border-color: #555;
         color: #e0e0e0;
+    }
+
+    /* Dark mode scrollbar (overrides OS light-mode scrollbar inside WebEngine) */
+    body.dark-mode ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    body.dark-mode ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    body.dark-mode ::-webkit-scrollbar-thumb {
+        background-color: #555;
+        border-radius: 4px;
+    }
+    body.dark-mode ::-webkit-scrollbar-thumb:hover {
+        background-color: #777;
     }
     </style>
 </head>

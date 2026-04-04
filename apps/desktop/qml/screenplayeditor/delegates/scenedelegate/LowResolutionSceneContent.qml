@@ -108,7 +108,7 @@ Rectangle {
             anchors.fill: parent
 
             source: "qrc:/images/sample_scene.png"
-            opacity: 0.5
+            opacity: Runtime.colors.scheme === Qt.ColorScheme.Dark ? 0.25 : 0.5
             fillMode: Image.TileVertically
         }
 

@@ -56,6 +56,17 @@ void AbstractShapeItem::setRenderingMechanism(AbstractShapeItem::RenderingMechan
     this->update();
 }
 
+void AbstractShapeItem::setBackgroundColor(const QColor &val)
+{
+    if (m_backgroundColor == val)
+        return;
+
+    m_backgroundColor = val;
+    emit backgroundColorChanged();
+
+    this->update();
+}
+
 void AbstractShapeItem::setOutlineColor(const QColor &val)
 {
     if (m_outlineColor == val)
@@ -360,7 +371,7 @@ QSGNode *AbstractShapeItem::polishSceneGraph(QSGNode *rootNode) const
 void AbstractShapeItem::paint(QPainter *paint)
 {
     if (m_renderType & FillAlso)
-        paint->setBrush(this->fillColor());
+        paint->setBrush(this->backgroundColor());
     else
         paint->setBrush(Qt::NoBrush);
 

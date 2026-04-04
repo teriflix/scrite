@@ -60,6 +60,16 @@ public:
     Q_SIGNAL void renderingMechanismChanged();
 
     // clang-format off
+    Q_PROPERTY(QColor backgroundColor
+               READ backgroundColor
+               WRITE setBackgroundColor
+               NOTIFY backgroundColorChanged)
+    // clang-format on
+    void setBackgroundColor(const QColor &val);
+    QColor backgroundColor() const { return m_backgroundColor; }
+    Q_SIGNAL void backgroundColorChanged();
+
+    // clang-format off
     Q_PROPERTY(QColor outlineColor
                READ outlineColor
                WRITE setOutlineColor
@@ -122,6 +132,7 @@ private:
     QPainterPath m_path;
     qreal m_outlineWidth = 1.0;
     QColor m_outlineColor = QColor(Qt::black);
+    QColor m_backgroundColor = Qt::transparent;
     RenderType m_renderType = OutlineAndFill;
     OutlineStyle m_outlineStyle = SolidLine;
     RenderingMechanism m_renderingMechanism = UseOpenGL;

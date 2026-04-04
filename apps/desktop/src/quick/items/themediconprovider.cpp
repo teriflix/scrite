@@ -50,8 +50,22 @@ QImage ThemedIconProvider::requestImage(const QString &id, QSize *size, const QS
         *size = image.size();
 
     if (theme == QLatin1String("dark")) {
-        image = image.convertToFormat(QImage::Format_ARGB32);
-        image.invertPixels(QImage::InvertRgb); // invert RGB, preserve alpha
+        const int dotPos = imagePath.lastIndexOf(QLatin1Char('.'));
+        const QString darkImagePath = dotPos >= 0
+                ? imagePath.left(dotPos) + QStringLiteral("_darkmode") + imagePath.mid(dotPos)
+                : imagePath + QStringLiteral("_darkmode");
+
+        const QImage darkImage(darkImagePath);
+        if (!darkImage.isNull()) {
+            image = darkImage;
+            if (requestedSize.isValid() && requestedSize != image.size())
+                image = image.scaled(requestedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            if (size)
+                *size = image.size();
+        } else {
+            image = image.convertToFormat(QImage::Format_ARGB32);
+            image.invertPixels(QImage::InvertRgb); // invert RGB, preserve alpha
+        }
     }
 
     return image;
