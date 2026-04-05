@@ -183,21 +183,21 @@ TreeView {
     delegate: NotesTreeViewDelegate {
         id: _delegate
 
-        property var rowModelIndex: root.index(row, 0)
-        property var rowData: rowModelIndex && rowModelIndex.valid ? root.model.modelIndexData(rowModelIndex) : ({})
+        required property var notebookItemData
+        required property var notebookModelIndex
 
         itemData: ({
                        "selected": current,
-                       "value": rowData,
+                       "value": notebookItemData,
                        "isExpanded": expanded,
                        "hasChildren": hasChildren,
-                       "index": rowModelIndex
+                       "index": notebookModelIndex
                    })
+        modelIndex: notebookModelIndex
         treeViewWidth: root.width
-        modelIndex: rowModelIndex
 
         onMakeCurrentRequest: () => {
-            root.setCurrentIndex(rowModelIndex)
+            root.setCurrentIndex(notebookModelIndex)
         }
 
         onModelIndexClicked: (index) => {

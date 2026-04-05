@@ -30,8 +30,8 @@ TreeViewDelegate {
     id: root
 
     required property var itemData
-    required property real treeViewWidth
     required property var modelIndex
+    required property real treeViewWidth
 
     implicitHeight: Runtime.idealFontMetrics.height + 20
 
