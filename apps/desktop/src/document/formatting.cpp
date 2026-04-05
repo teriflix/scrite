@@ -3508,8 +3508,8 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element,
             // Text changes from scene element to block are not applied
             // Only element type changes can be applied.
             const SceneElementFormat *format = m_screenplayFormat->elementFormat(element->type());
-            userData->blockFormat = format->createBlockFormat(element->alignment());
-            userData->charFormat = format->createCharFormat();
+            userData->resetFormat();
+            userData->updateFromFormat(format);
 
             QTextCursor cursor(block);
             cursor.setBlockFormat(userData->blockFormat);
