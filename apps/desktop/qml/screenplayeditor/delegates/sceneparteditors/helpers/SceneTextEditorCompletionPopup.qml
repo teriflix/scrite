@@ -47,9 +47,9 @@ Item {
         Material.containerStyle: Material.Filled
         Material.roundedScale: Material.NotRounded
 
-        x: -GMath.boundingRect(_private.completionModel.completionPrefix, Runtime.sceneEditorFontMetrics.font).width
-        width: GMath.largestBoundingRect(_private.completionModel.strings, Runtime.sceneEditorFontMetrics.font).width + leftInset + rightInset + leftPadding + rightPadding + 30
-        height: _private.completionModel.count > 0 ? (_completionView.height + topInset + bottomInset + topPadding + bottomPadding) : 0
+        x: -GMath.boundingRect(_private.completionModel.completionPrefix, root.fontMetrics.font).width
+        width: root.fontMetrics.averageCharacterWidth + GMath.largestBoundingRect(_private.completionModel.strings, root.fontMetrics.font).width + leftMargin + leftPadding + rightMargin + rightPadding
+        height: _completionView.count > 0 ? (_completionView.implicitHeight + topMargin + topPadding + bottomMargin + bottomPadding) : 0
 
         focus: false
         closePolicy: Popup.NoAutoClose
@@ -59,13 +59,9 @@ Item {
 
             readonly property int maxVisibleItems: 7
 
-            ScrollBar.vertical: VclScrollBar {
-                flickable: _completionView
-            }
-
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-            height: Math.min(contentHeight, maxVisibleItems * root.fontMetrics.lineSpacing)
+            implicitHeight: (1+Math.min(maxVisibleItems,count)) * root.fontMetrics.lineSpacing
 
             clip: true
             model: _private.completionModel
@@ -84,13 +80,13 @@ Item {
                 required property int index
                 required property string completionString
 
-                width: _completionView.width-(_completionView.contentHeight > _completionView.height ? 20 : 1)
+                width: _completionView.width
 
                 padding: 5
 
                 text: completionString
-                font: Runtime.sceneEditorFontMetrics.font
-                color: index === _completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
+                font: root.fontMetrics.font
+                color: index === _completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.editor.text
 
                 MouseArea {
                     property bool singleClickAutoComplete: Runtime.screenplayEditorSettings.singleClickAutoComplete
@@ -155,9 +151,9 @@ Item {
                 }
             }
 
-            property int __completionMode: root.sceneDocumentBinder.completionMode
+            property int binderCompletionMode: root.sceneDocumentBinder.completionMode
 
-            on__CompletionModeChanged: {
+            onBinderCompletionModeChanged: {
                 completable = false
                 Runtime.execLater(_private, 250, updateModel)
             }
