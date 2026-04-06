@@ -394,7 +394,7 @@ Item {
 
     ActionHandler {
         action: ActionHub.structureCanvasOperations.find("delete")
-        enabled: (root.canvasScroll.selection.hasItems || root.canvasScroll.currentElementItem) && !Scrite.document.readOnly
+        enabled: (root.canvasScroll.selection.hasItems || root.canvasScroll.currentElementItem) && !Scrite.document.readOnly && root.canvasScroll.editElementItem === null
 
         onTriggered: (source) => {
                          // Don't delete if a shortcut was used to trigger it,
@@ -414,7 +414,7 @@ Item {
 
     ActionHandler {
         action: ActionHub.structureCanvasOperations.find("copy")
-        enabled: !root.canvasScroll.selection.hasItems && (root.canvasScroll.currentAnnotation != null || root.canvasScroll.currentElementItem !== null)
+        enabled: !root.canvasScroll.selection.hasItems && (root.canvasScroll.currentAnnotation != null || root.canvasScroll.currentElementItem !== null) && root.canvasScroll.editElementItem === null
 
         onTriggered: (source) => {
                          // Don't copy if a shortcut was used to trigger it,
@@ -438,7 +438,7 @@ Item {
 
     ActionHandler {
         action: ActionHub.structureCanvasOperations.find("paste")
-        enabled: !Scrite.document.readOnly && Scrite.document.structure.canPaste
+        enabled: !Scrite.document.readOnly && Scrite.document.structure.canPaste && root.canvasScroll.editElementItem === null
 
         onTriggered: (source) => {
                          // Don't paste if a shortcut was used to trigger it,
