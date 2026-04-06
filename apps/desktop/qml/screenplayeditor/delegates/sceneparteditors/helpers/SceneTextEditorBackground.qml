@@ -39,7 +39,7 @@ Item {
     Rectangle {
         x: 0
         y: root.sceneTextEditor.cursorRectangle.y-2*root.zoomLevel
-        width: parent.width
+        width: parent.width-1
         height: root.sceneTextEditor.cursorRectangle.height+4*root.zoomLevel
 
         color: Runtime.colors.tintTx(root.sceneDocumentBinder.scene.highlightColor, Runtime.colors.currentLineHightlightTint)
