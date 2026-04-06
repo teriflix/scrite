@@ -437,10 +437,15 @@ Item {
         }
 
         readonly property ScreenplayPaginatorWatcher sceneLengthWatcher: ScreenplayPaginatorWatcher {
-            property real normalizedRelativeCursorPosition: hasCursor ? Runtime.bounded(0.01, relativeCursorPixel/pixelLength, 0.99) : 0
+            property real normalizedRelativeCursorPosition: hasCursor &&
+                                                            pixelLength > 0 && relativeCursorPixel >= 0 &&
+                                                            relativeCursorPixel <= pixelLength ?
+                                                                Runtime.bounded(0.01, relativeCursorPixel/pixelLength, 0.99) :
+                                                                0
 
             paginator: Runtime.paginator
             element: root.screenplayElement
+
         }
 
         function evalToolTipText() {
