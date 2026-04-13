@@ -87,14 +87,6 @@ Item {
     readonly property WorkspaceSettings_RT workspaceSettings: WorkspaceSettings_RT { }
     readonly property ApplicationSettings_RT applicationSettings: ApplicationSettings_RT { id: _applicationSettings }
 
-    // Global undo-redo stack
-    readonly property UndoStack undoStack: UndoStack {
-        ObjectRegister.name: objectName
-
-        objectName: "MainUndoStack"
-        active: true
-    }
-
     // App-wide font-metrics
     readonly property FontMetrics minimumFontMetrics: FontMetrics {
         font.pointSize: root.idealFontMetrics.font.pointSize-2

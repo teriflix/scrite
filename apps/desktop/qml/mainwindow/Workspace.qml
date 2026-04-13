@@ -77,10 +77,41 @@ Rectangle {
     QtObject {
         id: _private
 
-        readonly property Component screenplayTab: ScreenplayTab { }
-        readonly property Component structureTab: StructureTab { }
-        readonly property Component notebookTab: NotebookTab { }
-        readonly property Component scritedTab: ScritedTab { }
+        readonly property Component screenplayTab: ScreenplayTab {
+            UndoStack {
+                ObjectRegister.name: "CurrentUndoStack"
+
+                objectName: "ScreenplayTabUndoStack"
+                active: true
+            }
+        }
+
+        readonly property Component structureTab: StructureTab {
+            UndoStack {
+                ObjectRegister.name: "CurrentUndoStack"
+
+                objectName: "StructureTabUndoStack"
+                active: true
+            }
+        }
+
+        readonly property Component notebookTab: NotebookTab {
+            UndoStack {
+                ObjectRegister.name: "CurrentUndoStack"
+
+                objectName: "NotebookTabUndoStack"
+                active: true
+            }
+        }
+
+        readonly property Component scritedTab: ScritedTab {
+            UndoStack {
+                ObjectRegister.name: "CurrentUndoStack"
+
+                objectName: "ScritedTabUndoStack"
+                active: true
+            }
+        }
         readonly property Component unknownTab: Item {
             VclLabel {
                 anchors.centerIn: parent

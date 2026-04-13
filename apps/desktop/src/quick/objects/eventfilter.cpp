@@ -14,7 +14,6 @@
 ****************************************************************************/
 
 #include "eventfilter.h"
-#include "application.h"
 
 #include <QEvent>
 #include <QtDebug>

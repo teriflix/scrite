@@ -141,7 +141,7 @@ Flickable {
 
         ActionHandler {
             action: ActionHub.editOptions.find("undo")
-            enabled: !_textArea.readOnly && _textArea.activeFocus && root.undoRedoEnabled && _textArea.canRedo
+            enabled: !_textArea.readOnly && _textArea.activeFocus && root.undoRedoEnabled && _textArea.canUndo
 
             onTriggered: () => { _textArea.undo() }
         }

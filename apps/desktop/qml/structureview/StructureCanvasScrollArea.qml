@@ -156,6 +156,8 @@ ScrollArea {
     QtObject {
         id: _private
 
+        readonly property UndoStack undoStack: ObjectRegistry.find("CurrentUndoStack") as UndoStack
+
         readonly property Action releaseFocusAction: Action {
             shortcut: Gui.shortcut(Qt.Key_Escape)
             enabled: _canvas.editElementItem !== null
@@ -258,9 +260,9 @@ ScrollArea {
                 return
 
             root.releaseEditorRequest()
-            Runtime.undoStack.active = false
+            undoStack.active = false
             Scrite.document.structure.removeElements([element])
-            Runtime.undoStack.active = true
+            undoStack.active = true
             root.editorRequest()
         }
 
