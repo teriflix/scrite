@@ -1316,6 +1316,8 @@ public:
     QTextBlockFormat blockFormat;
     QTextCharFormat charFormat;
 
+    bool isValid() const;
+
     SceneElement *sceneElement() const { return m_sceneElement; }
 
     void resetFormat();
@@ -1376,6 +1378,11 @@ SceneDocumentBlockUserData::~SceneDocumentBlockUserData()
 {
     if (m_spellCheckConnection)
         QObject::disconnect(m_spellCheckConnection);
+}
+
+bool SceneDocumentBlockUserData::isValid() const
+{
+    return m_textBlock.isValid() && !m_sceneElement.isNull();
 }
 
 void SceneDocumentBlockUserData::resetFormat()
@@ -1472,6 +1479,7 @@ QBrush SceneDocumentBlockUserData::colorTransformBrush(const QBrush &brush)
 SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(const QTextBlock &block)
 {
     SceneDocumentBlockUserData *ret = get(block.userData());
+
     if (ret && ret->m_textBlock != block)
         ret->m_textBlock = block;
 
@@ -1485,7 +1493,8 @@ SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(QTextBlockUserData *
 
     SceneDocumentBlockUserData *userData2 =
             reinterpret_cast<SceneDocumentBlockUserData *>(userData);
-    return userData2->type == SceneDocumentBlockUserData::Type ? userData2 : nullptr;
+    return userData2->type == SceneDocumentBlockUserData::Type && userData2->isValid() ? userData2
+                                                                                       : nullptr;
 }
 
 void SceneDocumentBlockUserData::polishTextNow()

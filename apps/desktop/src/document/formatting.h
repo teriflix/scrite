@@ -888,6 +888,11 @@ public:
     Q_SIGNAL void screenplayElementChanged();
 
     // clang-format off
+    Q_PROPERTY(QTextDocument *document
+               READ document
+               WRITE setDocument
+               NOTIFY textDocumentChanged
+               RESET resetTextDocument)
     Q_PROPERTY(QQuickTextDocument *textDocument
                READ textDocument
                WRITE setTextDocument
