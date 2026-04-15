@@ -281,8 +281,7 @@ SceneElementTextUndoCommand::~SceneElementTextUndoCommand() { }
 
 void SceneElementTextUndoCommand::undo()
 {
-    SceneElementTextUndoCommand::busy = true;
-    auto guard = qScopeGuard([]() { SceneElementTextUndoCommand::busy = false; });
+    QScopedValueRollback<bool> busyRollback(SceneElementTextUndoCommand::busy, true);
 
     this->lookupSceneElement();
     if (m_sceneElement.isNull()) {
@@ -296,8 +295,7 @@ void SceneElementTextUndoCommand::undo()
 
 void SceneElementTextUndoCommand::redo()
 {
-    SceneElementTextUndoCommand::busy = true;
-    auto guard = qScopeGuard([]() { SceneElementTextUndoCommand::busy = false; });
+    QScopedValueRollback<bool> busyRollback(SceneElementTextUndoCommand::busy, true);
 
     if (m_sceneElementId.isEmpty()) {
         if (m_sceneElement.isNull()) {
