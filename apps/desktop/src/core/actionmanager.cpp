@@ -60,7 +60,7 @@ static const char *_QQuickActionTriggerCountChanged = SIGNAL(triggerCountChanged
 
 static const QByteArray _QQuickActionTriggerMethod = QByteArrayLiteral("triggerMethod");
 
-#ifdef Q_OS_MAC
+#if 0 // This is no longer required in Qt 6 era.
 #define DEBUG_SHORTCUT_DELIVERY
 #endif
 
@@ -77,18 +77,22 @@ public:
     bool eventFilter(QObject *object, QEvent *event)
     {
         if (object == qApp->focusWindow() && event->type() == QEvent::ShortcutOverride) {
-            QKeyEvent *keyEvent = reinterpret_cast<QKeyEvent *>(event);
-            QKeySequence keySequence(int(keyEvent->modifiers()) + keyEvent->key());
-            QObject *qmlAction = keySequence.isEmpty()
-                    ? nullptr
-                    : ActionManager::findActionForShortcut(keySequence.toString());
-            if (qmlAction && qmlAction->property(_QQuickActionEnabledProperty).toBool()) {
-                this->addToPending(qmlAction, keySequence);
+            const QKeyEvent *keyEvent = reinterpret_cast<QKeyEvent *>(event);
+            if (keyEvent->modifiers() != Qt::NoModifier) {
+                const QKeySequence keySequence(keyEvent->keyCombination());
+                const QString shortcut = keySequence.toString();
+                QObject *qmlAction = keySequence.isEmpty()
+                        ? nullptr
+                        : ActionManager::findActionForShortcut(shortcut);
+                if (qmlAction && qmlAction->property(_QQuickActionEnabledProperty).toBool()) {
+                    this->addToPending(qmlAction, keySequence);
+                }
             }
-        } else if (event->type() == QEvent::Shortcut) {
-            QShortcutEvent *shortcutEvent = reinterpret_cast<QShortcutEvent *>(event);
-            this->removeFromPending(nullptr, shortcutEvent->key());
         }
+
+        // NOTE: In Qt 6, QML Action shortcuts are activated directly by QShortcutMap via an
+        // internal callback and do not dispatch QEvent::Shortcut through the event system.
+        // Removal from pending is handled by the triggered() connection made in addToPending().
 
         return false;
     }
@@ -100,7 +104,7 @@ public:
 
             while (!m_pendingShortcuts.isEmpty()) {
                 auto item = m_pendingShortcuts.takeFirst();
-                disconnect(item.first, &QObject::destroyed, this, &ActionManagers::objectDestroyed);
+                this->disconnectFromAction(item.first);
                 if (item.first->property(_QQuickActionEnabledProperty).toBool()) {
                     if (item.first->property(_QQuickActionCheckableProperty).toBool()) {
                         QMetaObject::invokeMethod(item.first, "toggled", Qt::DirectConnection,
@@ -111,6 +115,23 @@ public:
                 }
             }
         }
+    }
+
+    // Called when Qt 6 naturally delivers a shortcut to the QML Action directly
+    // (bypassing QEvent::Shortcut), so we cancel the pending timer-based trigger.
+    // Connected to both triggered() and toggled() because checkable actions emit
+    // toggled() instead of triggered() when activated via shortcut.
+    void onActionActivated()
+    {
+        QObject *action = this->sender();
+        for (int i = m_pendingShortcuts.size() - 1; i >= 0; i--) {
+            if (m_pendingShortcuts.at(i).first == action) {
+                m_pendingShortcuts.removeAt(i);
+            }
+        }
+        this->disconnectFromAction(action);
+        if (m_pendingShortcuts.isEmpty())
+            m_processPendingShortcuts.stop();
     }
 
 private:
@@ -139,6 +160,15 @@ private:
         if (this->findPending(object, sequence) < 0) {
             connect(object, &QObject::destroyed, this, &ActionManagers::objectDestroyed,
                     Qt::UniqueConnection);
+            // In Qt 6, QML Action shortcuts are dispatched directly by QShortcutMap without
+            // sending QEvent::Shortcut. Connect to triggered() / toggled() so that if Qt
+            // naturally delivers the shortcut we cancel our pending timer-based trigger before
+            // it fires. toggled() must also be covered because checkable actions emit toggled()
+            // instead of triggered() when activated via shortcut.
+            connect(object, SIGNAL(triggered(QObject *)), this, SLOT(onActionActivated()),
+                    Qt::UniqueConnection);
+            connect(object, SIGNAL(toggled(QObject *)), this, SLOT(onActionActivated()),
+                    Qt::UniqueConnection);
             m_pendingShortcuts.append({ object, sequence });
             m_processPendingShortcuts.start(m_delay, this);
         }
@@ -151,13 +181,23 @@ private:
 
         int index = this->findPending(object, sequence);
         if (index >= 0) {
+            QObject *actualObject = m_pendingShortcuts.at(index).first;
             m_pendingShortcuts.removeAt(index);
-            disconnect(object, &QObject::destroyed, this, &ActionManagers::objectDestroyed);
+            this->disconnectFromAction(actualObject);
             if (m_pendingShortcuts.isEmpty())
                 m_processPendingShortcuts.stop();
             else
                 m_processPendingShortcuts.start(m_delay, this);
         }
+    }
+
+    void disconnectFromAction(QObject *object)
+    {
+        if (object == nullptr)
+            return;
+        disconnect(object, &QObject::destroyed, this, &ActionManagers::objectDestroyed);
+        disconnect(object, SIGNAL(triggered(QObject *)), this, SLOT(onActionActivated()));
+        disconnect(object, SIGNAL(toggled(QObject *)), this, SLOT(onActionActivated()));
     }
 
     void objectDestroyed(QObject *object)
