@@ -145,19 +145,20 @@ Item {
             }
         }
 
-        function handleWindowClosing(close) {
+        function handleWindowClosing(ce) {
+            let closeEvent = ce as CloseEvent
             if(!Scrite.window.closeButtonVisible) {
-                close.accepted = false
+                closeEvent.accepted = false
                 return
             }
 
             if(!Scrite.user.canUseAppVersionType) {
-                close.accepted = true
+                closeEvent.accepted = true
                 return
             }
 
             if(handleCloseEvent) {
-                close.accepted = false
+                closeEvent.accepted = false
 
                 Scrite.app.saveWindowGeometry(Scrite.window, "Workspace")
 
@@ -166,10 +167,10 @@ Item {
                                       if( TrialNotActivatedDialog.launch() !== null)
                                         return
 
-                                      Scrite.window.close()
+                                      Qt.callLater(Scrite.window.close)
                                   } )
             } else
-                close.accepted = true
+                closeEvent.accepted = true
         }
 
         Announcement.onIncoming: (type, data) => {
