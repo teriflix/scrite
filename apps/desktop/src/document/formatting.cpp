@@ -1882,8 +1882,6 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
 
     this->evaluateAutoCompleteHintsAndCompletionPrefix();
 
-    emit textDocumentChanged();
-
     this->initializeDocumentLater();
 
     if (m_textDocument != nullptr) {
@@ -1905,6 +1903,8 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
         this->setCursorPosition(0);
     } else
         this->setCursorPosition(-1);
+
+    emit textDocumentChanged();
 }
 
 void SceneDocumentBinder::setSpellCheckEnabled(bool val)
@@ -3709,7 +3709,34 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
 
     bool doPolishElements = false;
 
-    m_scene->beginUndoCapture();
+    // Decide whether to activate the undo capture. The capture collapses all individual inserts,
+    // text updates, and removals into a single atomic undo step. This is required for:
+    //   • Paste / bulk import (one or more new blocks with text)
+    //   • Any operation that removes existing paragraphs (multi-paragraph delete, cut, or a
+    //     Backspace/Delete that merges two paragraphs)
+    // For an interactive Return keypress the capture is not needed — the lone
+    // SceneInsertElement command is sufficient — and adding it would create a redundant undo step.
+    //
+    // Heuristics for new-block classification:
+    //   1. More than one new block → definitely a paste / bulk insert.
+    //   2. Exactly one new block but it already carries text → a single pasted line.
+    //      A Return keypress always produces one new *empty* block.
+    int newBlockCount = 0;
+    bool anyNewBlockHasText = false;
+    for (QTextBlock b = this->document()->begin(); b.isValid(); b = b.next()) {
+        if (SceneDocumentBlockUserData::get(b) == nullptr) {
+            ++newBlockCount;
+            if (!b.text().isEmpty())
+                anyNewBlockHasText = true;
+        }
+    }
+    // elementsToRemove > 0 means the document now has fewer blocks than the scene has elements:
+    // paragraphs were deleted (selection-delete, cut, or paragraph-merge via Backspace/Delete).
+    const int elementsToRemove = m_scene->elementCount() - nrBlocks;
+    const bool needsUndoCapture = newBlockCount > 1 || anyNewBlockHasText || elementsToRemove > 0;
+
+    if (needsUndoCapture)
+        m_scene->beginUndoCapture();
 
     QList<SceneElement *> elementList;
     elementList.reserve(nrBlocks);
@@ -3773,7 +3800,9 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
     }
 
     m_scene->setElementsList(elementList);
-    m_scene->endUndoCapture();
+
+    if (needsUndoCapture)
+        m_scene->endUndoCapture();
 
     if (doPolishElements)
         this->polishAllSceneElements();
@@ -3964,9 +3993,9 @@ void SceneDocumentBinder::onSceneReset(int position)
         cursor.movePosition(QTextCursor::End);
         position = qBound(0, position, cursor.position());
         QTimer::singleShot(100, this, [=]() { emit requestCursorPosition(position); });
-
-        m_sceneIsBeingReset = false;
     }
+
+    m_sceneIsBeingReset = false;
 }
 
 void SceneDocumentBinder::onSceneRefreshed()

@@ -71,6 +71,8 @@ StructureElement::StructureElement(QObject *parent)
     connect(this, &StructureElement::heightChanged, this, &StructureElement::geometryChanged);
 
     if (m_structure) {
+        connect(m_structure, &Structure::undoRedoEnabledChanged, this,
+                &StructureElement::undoRedoEnabledChanged);
         connect(m_structure, &Structure::canvasWidthChanged, this, &StructureElement::xfChanged);
         connect(m_structure, &Structure::canvasHeightChanged, this, &StructureElement::yfChanged);
         connect(m_structure, &Structure::groupsModelChanged, this,
@@ -112,7 +114,7 @@ void StructureElement::setX(qreal val)
     if (!m_placed)
         m_placed = !qFuzzyIsNull(m_x) && !qFuzzyIsNull(m_y);
 
-    if (m_undoRedoEnabled) {
+    if (this->isUndoRedoEnabled()) {
         ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "position");
         QScopedPointer<PushObjectPropertyUndoCommand> cmd;
         if (!info->isLocked())
@@ -131,7 +133,7 @@ void StructureElement::setY(qreal val)
     if (!m_placed)
         m_placed = !qFuzzyIsNull(m_x) && !qFuzzyIsNull(m_y);
 
-    if (m_undoRedoEnabled) {
+    if (this->isUndoRedoEnabled()) {
         ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "position");
         QScopedPointer<PushObjectPropertyUndoCommand> cmd;
         if (!info->isLocked())
@@ -199,6 +201,11 @@ void StructureElement::setUndoRedoEnabled(bool val)
 
     m_undoRedoEnabled = val;
     emit undoRedoEnabledChanged();
+}
+
+bool StructureElement::isUndoRedoEnabled() const
+{
+    return m_undoRedoEnabled && (m_structure == nullptr || m_structure->isUndoRedoEnabled());
 }
 
 void StructureElement::setSyncWithFollow(bool val)
@@ -2729,6 +2736,15 @@ void Structure::setIndexCardContent(IndexCardContent val)
     emit indexCardContentChanged();
 }
 
+void Structure::setUndoRedoEnabled(bool val)
+{
+    if (m_undoRedoEnabled == val)
+        return;
+
+    m_undoRedoEnabled = val;
+    emit undoRedoEnabledChanged();
+}
+
 qreal Structure::snapToGrid(qreal val) const
 {
     return Structure::snapToGrid(val, this);
@@ -3102,6 +3118,8 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
 {
     QRectF newBoundingRect;
 
+    QScopedValueRollback<bool> _ure(m_undoRedoEnabled, false);
+
     QList<StructureElement *> elementsToLayout;
     for (StructureElement *element : m_elements.constList())
         if (element->isSelected())
@@ -3265,7 +3283,7 @@ void Structure::setForceBeatBoardLayout(bool val)
     emit forceBeatBoardLayoutChanged();
 }
 
-void Structure::placeElement(StructureElement *element, Screenplay *screenplay) const
+void Structure::placeElement(StructureElement *element, Screenplay *screenplay)
 {
     if (m_elements.isEmpty() || element == nullptr || m_elements.indexOf(element) < 0)
         return;
@@ -3296,6 +3314,7 @@ void Structure::placeElement(StructureElement *element, Screenplay *screenplay) 
     };
 
     if (screenplay == nullptr) {
+        QScopedValueRollback<bool> _ure(m_undoRedoEnabled, false);
         const QRectF boundingRect = evaluateBoundingRect();
         element->setX(boundingRect.right() + xSpacing);
         element->setY(boundingRect.top());
@@ -3306,6 +3325,8 @@ void Structure::placeElement(StructureElement *element, Screenplay *screenplay) 
         this->placeElementsInBeatBoardLayout(screenplay);
         return;
     }
+
+    QScopedValueRollback<bool> _ure(m_undoRedoEnabled, false);
 
     const QList<QPair<QString, QList<StructureElement *>>> beats =
             this->evaluateGroupsImpl(screenplay);
@@ -3338,12 +3359,14 @@ void Structure::placeElement(StructureElement *element, Screenplay *screenplay) 
     }
 }
 
-QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay) const
+QRectF Structure::placeElementsInBeatBoardLayout(Screenplay *screenplay)
 {
     QRectF newBoundingRect;
 
     if (screenplay == nullptr || this->elementCount() == 0)
         return newBoundingRect;
+
+    QScopedValueRollback<bool> _ure(m_undoRedoEnabled, false);
 
     const QList<QPair<QString, QList<StructureElement *>>> beats =
             this->evaluateGroupsImpl(screenplay);

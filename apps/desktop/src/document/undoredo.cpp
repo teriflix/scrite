@@ -135,6 +135,53 @@ public:
 };
 Q_GLOBAL_STATIC(ObjectPropertyInfoList, GlobalObjectPropertyInfoList);
 
+QString UndoStack::commandName(int id)
+{
+    switch (id) {
+    case SceneCommandID:
+        return QStringLiteral("Scene");
+    case SceneElementTextCommandID:
+        return QStringLiteral("Scene Element Text");
+    case RemoveNoteCommandID:
+        return QStringLiteral("Remove Note");
+    case ScreenplayElementsMoveCommandID:
+        return QStringLiteral("Move Screenplay Elements");
+    case ScreenplayRemoveElementsCommandID:
+        return QStringLiteral("Remove Screenplay Elements");
+    case UndoClearScreenplayCommandID:
+        return QStringLiteral("Clear Screenplay");
+    case SplitElementCommandID:
+        return QStringLiteral("Split Element");
+    case SceneNumbersCommandID:
+        return QStringLiteral("Scene Numbers");
+    case ScreenplayPasteCommandID:
+        return QStringLiteral("Paste Into Screenplay");
+    case ScreenplayPasteFromFountainCommandID:
+        return QStringLiteral("Paste Fountain Into Screenplay");
+    case SceneHeadingCommandID:
+        return QStringLiteral("Scene Heading");
+    case SceneElementTypeCommandID:
+        return QStringLiteral("Scene Element Type");
+    case SceneElementAlignmentCommandID:
+        return QStringLiteral("Scene Element Alignment");
+    case SceneElementTextFormatsCommandID:
+        return QStringLiteral("Scene Element Text Formats");
+    case SceneInsertElementCommandID:
+        return QStringLiteral("Insert Scene Element");
+    case SceneRemoveElementCommandID:
+        return QStringLiteral("Remove Scene Element");
+    default:
+        if (id > 1000) {
+            const ObjectPropertyInfoList &list = *::GlobalObjectPropertyInfoList();
+            for (const ObjectPropertyInfo *info : list) {
+                if (info->id == id)
+                    return info->description();
+            }
+        }
+        return QStringLiteral("Unknown");
+    }
+}
+
 static inline QList<QByteArray> queryPropertyBundle(QObject *object, const QByteArray &property)
 {
     QList<QByteArray> propertyBundle;
@@ -196,6 +243,12 @@ bool ObjectPropertyInfo::write(const QVariant &val)
     }
     this->unlock();
     return ret;
+}
+
+QString ObjectPropertyInfo::description() const
+{
+    return QString::fromLatin1(this->metaObject->className()) + "."
+            + QString::fromLatin1(this->property) + " Property.";
 }
 
 ObjectPropertyInfo *ObjectPropertyInfo::get(QObject *object, const QByteArray &property)

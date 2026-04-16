@@ -503,6 +503,8 @@ public:
 
     static QPointer<Note> noteCurrentlyBeingRemoved;
 
+    int id() const { return UndoStack::RemoveNoteCommandID; }
+
     void redo()
     {
         if (m_note == nullptr || m_notes == nullptr) {
@@ -519,6 +521,7 @@ public:
     }
     void undo()
     {
+        Utils::Gui::log(QStringLiteral("RemoveNoteUndoCommand::undo()"));
         if (m_notes == nullptr) {
             this->setObsolete(true);
             return;

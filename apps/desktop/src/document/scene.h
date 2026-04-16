@@ -45,7 +45,7 @@ class SceneHeading;
 class SceneElement;
 class StructureElement;
 class SceneDocumentBinder;
-class PushSceneUndoCommand;
+class SceneUndoCommand;
 
 class SceneHeading : public QObject, public Modifiable
 {
@@ -737,6 +737,14 @@ public:
     Q_INVOKABLE void beginUndoCapture(bool allowMerging = true);
     Q_INVOKABLE void endUndoCapture();
 
+    // clang-format off
+    Q_PROPERTY(bool inUndoCapture
+               READ inUndoCapture
+               NOTIFY inUndoCaptureChanged)
+    // clang-format on
+    bool inUndoCapture() const { return m_pushUndoCommand != nullptr; }
+    Q_SIGNAL void inUndoCaptureChanged();
+
     Q_INVOKABLE bool polishText(Scene *previousScene = nullptr);
     Q_INVOKABLE bool capitalizeSentences();
 
@@ -865,7 +873,7 @@ private:
 
     Attachments *m_attachments = new Attachments(this);
     Notes *m_notes = new Notes(this);
-    PushSceneUndoCommand *m_pushUndoCommand = nullptr;
+    SceneUndoCommand *m_pushUndoCommand = nullptr;
     SceneHeading *m_heading = new SceneHeading(this);
     StructureElement *m_structureElement = nullptr;
 

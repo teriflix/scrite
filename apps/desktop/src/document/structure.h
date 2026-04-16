@@ -136,7 +136,7 @@ public:
                NOTIFY undoRedoEnabledChanged)
     // clang-format on
     void setUndoRedoEnabled(bool val);
-    bool isUndoRedoEnabled() const { return m_undoRedoEnabled; }
+    bool isUndoRedoEnabled() const;
     Q_SIGNAL void undoRedoEnabledChanged();
 
     // clang-format off
@@ -1180,6 +1180,16 @@ public:
     IndexCardContent indexCardContent() const { return m_indexCardContent; }
     Q_SIGNAL void indexCardContentChanged();
 
+    // clang-format off
+    Q_PROPERTY(bool undoRedoEnabled
+               READ isUndoRedoEnabled
+               WRITE setUndoRedoEnabled
+               NOTIFY undoRedoEnabledChanged)
+    // clang-format on
+    void setUndoRedoEnabled(bool val);
+    bool isUndoRedoEnabled() const { return m_undoRedoEnabled; }
+    Q_SIGNAL void undoRedoEnabledChanged();
+
     Q_INVOKABLE qreal snapToGrid(qreal val) const;
     static qreal snapToGrid(qreal val, const Structure *structure, qreal defaultGridSize = 10.0);
 
@@ -1319,8 +1329,8 @@ public:
     Q_SIGNAL void forceBeatBoardLayoutChanged();
 
     Q_MOC_INCLUDE("screenplay.h")
-    Q_INVOKABLE void placeElement(StructureElement *element, Screenplay *screenplay) const;
-    Q_INVOKABLE QRectF placeElementsInBeatBoardLayout(Screenplay *screenplay) const;
+    Q_INVOKABLE void placeElement(StructureElement *element, Screenplay *screenplay);
+    Q_INVOKABLE QRectF placeElementsInBeatBoardLayout(Screenplay *screenplay);
     Q_INVOKABLE QJsonObject evaluateEpisodeAndGroupBoxes(Screenplay *screenplay,
                                                          const QString &category) const;
 
@@ -1608,6 +1618,7 @@ private:
     qreal m_canvasGridSize = 10;
     CanvasUIMode m_canvasUIMode = IndexCardUI;
     IndexCardContent m_indexCardContent = Synopsis;
+    bool m_undoRedoEnabled = false;
     ScriteDocument *m_scriteDocument = nullptr;
 
     static void staticAppendCharacter(QQmlListProperty<Character> *list, Character *ptr);

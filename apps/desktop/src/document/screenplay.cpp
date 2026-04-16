@@ -1144,6 +1144,7 @@ public:
     }
     QHash<ScreenplayElement *, QPair<int, int>> movement() const { return m_movement; }
 
+    int id() const { return UndoStack::ScreenplayElementsMoveCommandID; }
     void undo();
     void redo();
 
@@ -1386,7 +1387,7 @@ public:
     explicit ScreenplayRemoveElementsUndoCommand(Screenplay *screenplay);
     ~ScreenplayRemoveElementsUndoCommand() { }
 
-    int id() const { return -1; }
+    int id() const { return UndoStack::ScreenplayRemoveElementsCommandID; }
     void undo();
     void redo();
 
@@ -1625,6 +1626,7 @@ public:
     ~UndoClearScreenplayCommand();
 
     // QUndoCommand interface
+    int id() const { return UndoStack::UndoClearScreenplayCommandID; }
     void undo();
     void redo();
 
@@ -1752,6 +1754,7 @@ public:
     void commit(Scene *splitScene);
 
     // QUndoCommand interface
+    int id() const { return UndoStack::SplitElementCommandID; }
     void undo();
     void redo();
 
@@ -2700,6 +2703,7 @@ public:
 
     // QUndoCommand interface
 public:
+    int id() const { return UndoStack::SceneNumbersCommandID; }
     void undo();
     void redo();
 
@@ -2936,6 +2940,7 @@ public:
                                         int pasteAfter);
     ~ScreenplayPasteUndoCommand();
 
+    int id() const { return UndoStack::ScreenplayPasteCommandID; }
     void redo();
     void undo();
 
@@ -3032,6 +3037,7 @@ public:
                                                     const Fountain::Body &body, int pasteAfter);
     ~ScreenplayPasteFromFountainUndoCommand();
 
+    int id() const { return UndoStack::ScreenplayPasteFromFountainCommandID; }
     void redo();
     void undo();
 

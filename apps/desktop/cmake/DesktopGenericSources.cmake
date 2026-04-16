@@ -17,6 +17,8 @@ set(SCRITE_DESKTOP_GENERIC_SOURCES
   "src/crashpad/crashpadmodule_common.cpp"
   "src/document/documentfilesystem.cpp"
   "src/document/documentfilesystem.h"
+  "src/document/scene_p.cpp"
+  "src/document/scene_p.h"
   "src/document/screenplaypaginatorworker.cpp"
   "src/document/screenplaypaginatorworker.h"
   "src/exporters/characterrelationshipsgraphexporter.cpp"

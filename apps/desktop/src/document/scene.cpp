@@ -61,319 +61,7 @@ static QDataStream &operator>>(QDataStream &ds, QTextLayout::FormatRange &format
     return ds;
 }
 
-class PushSceneUndoCommand;
-class SceneUndoCommand : public QUndoCommand
-{
-public:
-    static SceneUndoCommand *current;
-
-    enum Kind {
-        UnknownKind = -1,
-        SceneHeadingLocationType,
-        SceneHeadingLocation,
-        SceneHeadingMoment,
-        SceneHeadingEnabled,
-        SceneElementType,
-        SceneElementText,
-        SceneElementAlignment,
-        SceneElementTextFormats,
-        SceneInsertElement,
-        SceneRemoveElement,
-        SceneUndoCapture,
-        SceneSplitScene
-    };
-
-    explicit SceneUndoCommand(Scene *scene, Kind kind, bool allowMerging = true);
-    ~SceneUndoCommand();
-
-    // QUndoCommand interface
-    enum { ID = 100 };
-    void undo();
-    void redo();
-    int id() const { return ID; }
-    bool mergeWith(const QUndoCommand *other);
-
-private:
-    QByteArray toByteArray(Scene *scene) const;
-    Scene *fromByteArray(const QByteArray &bytes) const;
-
-private:
-    friend class PushSceneUndoCommand;
-    bool m_allowMerging = true;
-    Kind m_kind = UnknownKind;
-    QString m_sceneId;
-    QByteArray m_after;
-    QByteArray m_before;
-    QDateTime m_timestamp;
-    Scene *m_scene = nullptr;
-};
-
-SceneUndoCommand *SceneUndoCommand::current = nullptr;
-
-SceneUndoCommand::SceneUndoCommand(Scene *scene, Kind kind, bool allowMerging)
-    : m_allowMerging(allowMerging), m_timestamp(QDateTime::currentDateTime()), m_scene(scene)
-{
-    m_sceneId = m_scene->id();
-    m_kind = kind;
-    m_before = this->toByteArray(scene);
-}
-
-SceneUndoCommand::~SceneUndoCommand() { }
-
-void SceneUndoCommand::undo()
-{
-    SceneUndoCommand::current = this;
-    Scene *scene = this->fromByteArray(m_before);
-    m_allowMerging = false;
-    SceneUndoCommand::current = nullptr;
-
-    if (scene == nullptr)
-        this->setObsolete(true);
-}
-
-void SceneUndoCommand::redo()
-{
-    if (m_scene != nullptr) {
-        m_after = this->toByteArray(m_scene);
-        m_scene = nullptr;
-        return;
-    }
-
-    SceneUndoCommand::current = this;
-    Scene *scene = this->fromByteArray(m_after);
-    m_allowMerging = false;
-    SceneUndoCommand::current = nullptr;
-
-    if (scene == nullptr)
-        this->setObsolete(true);
-}
-
-bool SceneUndoCommand::mergeWith(const QUndoCommand *other)
-{
-    if (m_allowMerging && this->id() == other->id()) {
-        const SceneUndoCommand *cmd = reinterpret_cast<const SceneUndoCommand *>(other);
-        if (!cmd->m_allowMerging || cmd->m_sceneId != m_sceneId || cmd->m_kind != m_kind
-            || cmd->m_kind == UnknownKind || m_kind == UnknownKind)
-            return false;
-
-        const qint64 timegap = qAbs(m_timestamp.msecsTo(cmd->m_timestamp));
-        static qint64 minTimegap = UndoHub::instance()->mergeTimeGap();
-        if (timegap < minTimegap) {
-            m_after = cmd->m_after;
-            m_timestamp = cmd->m_timestamp;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-QByteArray SceneUndoCommand::toByteArray(Scene *scene) const
-{
-    return scene->toByteArray();
-}
-
-Scene *SceneUndoCommand::fromByteArray(const QByteArray &bytes) const
-{
-    return Scene::fromByteArray(bytes);
-}
-
-class PushSceneUndoCommand
-{
-    friend class SceneElement;
-    static bool enabled;
-
-public:
-    PushSceneUndoCommand(Scene *scene, SceneUndoCommand::Kind kind, bool allowMerging = true);
-    ~PushSceneUndoCommand();
-
-private:
-    SceneUndoCommand *m_command = nullptr;
-};
-
-bool PushSceneUndoCommand::enabled = true;
-
-PushSceneUndoCommand::PushSceneUndoCommand(Scene *scene, SceneUndoCommand::Kind kind,
-                                           bool allowMerging)
-{
-    if (enabled && SceneUndoCommand::current == nullptr && UndoHub::active() && scene != nullptr
-        && scene->isUndoRedoEnabled())
-        m_command = new SceneUndoCommand(scene, kind, allowMerging);
-}
-
-PushSceneUndoCommand::~PushSceneUndoCommand()
-{
-    if (enabled && m_command != nullptr && UndoHub::active()) {
-        UndoHub::active()->push(m_command);
-    } else
-        delete m_command;
-}
-
-class SceneElementTextUndoCommand : public QUndoCommand
-{
-public:
-    static bool busy;
-
-    SceneElementTextUndoCommand(SceneElement *sceneElement);
-    ~SceneElementTextUndoCommand();
-
-    // QUndoCommand interface
-    enum { ID = 101 };
-    void undo();
-    void redo();
-    int id() const { return ID; }
-    bool mergeWith(const QUndoCommand *other);
-
-private:
-    void lookupSceneElement();
-
-private:
-    int m_oldCursorPosition = -1, m_newCursorPosition = -1;
-    QString m_sceneId;
-    QString m_sceneElementId;
-    QString m_oldText, m_newText;
-    QPointer<SceneElement> m_sceneElement;
-    qint64 m_timestamp = 0;
-};
-
-bool SceneElementTextUndoCommand::busy = false;
-
-class PushSceneElementTextUndoCommand
-{
-    friend class SceneElement;
-    static bool enabled;
-
-public:
-    PushSceneElementTextUndoCommand(SceneElement *sceneElement)
-    {
-        if (enabled && !SceneElementTextUndoCommand::busy && UndoHub::active()
-            && sceneElement != nullptr && sceneElement->scene() != nullptr
-            && sceneElement->scene()->isUndoRedoEnabled())
-            m_command = new SceneElementTextUndoCommand(sceneElement);
-    }
-    ~PushSceneElementTextUndoCommand()
-    {
-        if (enabled && m_command != nullptr && UndoHub::active()) {
-            UndoHub::active()->push(m_command);
-        } else
-            delete m_command;
-    }
-
-private:
-    SceneElementTextUndoCommand *m_command = nullptr;
-};
-
-bool PushSceneElementTextUndoCommand::enabled = true;
-
-SceneElementTextUndoCommand::SceneElementTextUndoCommand(SceneElement *sceneElement)
-    : m_sceneElement(sceneElement)
-{
-    if (sceneElement && sceneElement->scene()) {
-        const Scene *scene = sceneElement->scene();
-        m_oldCursorPosition = scene->cursorPosition();
-        m_oldText = m_sceneElement->text();
-    }
-
-    m_timestamp = QDateTime::currentMSecsSinceEpoch();
-}
-
-SceneElementTextUndoCommand::~SceneElementTextUndoCommand() { }
-
-void SceneElementTextUndoCommand::undo()
-{
-    QScopedValueRollback<bool> busyRollback(SceneElementTextUndoCommand::busy, true);
-
-    this->lookupSceneElement();
-    if (m_sceneElement.isNull()) {
-        this->setObsolete(true);
-        return;
-    }
-
-    m_sceneElement->setText(m_oldText);
-    m_sceneElement->scene()->sceneReset(m_oldCursorPosition);
-}
-
-void SceneElementTextUndoCommand::redo()
-{
-    QScopedValueRollback<bool> busyRollback(SceneElementTextUndoCommand::busy, true);
-
-    if (m_sceneElementId.isEmpty()) {
-        if (m_sceneElement.isNull()) {
-            this->setObsolete(true);
-            return;
-        }
-
-        const Scene *scene = m_sceneElement->scene();
-        if (scene == nullptr) {
-            this->setObsolete(true);
-            return;
-        }
-
-        m_sceneId = scene->id();
-        m_sceneElementId = m_sceneElement->id();
-        m_newCursorPosition = scene->cursorPosition();
-        m_newText = m_sceneElement->text();
-    } else {
-        this->lookupSceneElement();
-        if (m_sceneElement.isNull()) {
-            this->setObsolete(true);
-            return;
-        }
-
-        Scene *scene = m_sceneElement->scene();
-        m_sceneElement->setText(m_newText);
-        emit scene->sceneReset(m_newCursorPosition);
-    }
-}
-
-bool SceneElementTextUndoCommand::mergeWith(const QUndoCommand *other)
-{
-    if (ID != other->id())
-        return false;
-
-    const SceneElementTextUndoCommand *cmd =
-            reinterpret_cast<const SceneElementTextUndoCommand *>(other);
-
-    if (qAbs(cmd->m_newCursorPosition - m_newCursorPosition) >= 2)
-        return false;
-
-    if (qAbs(cmd->m_timestamp - m_timestamp) > 5000)
-        return false;
-
-    if (LanguageEngine::fastSentenceCount(m_newText)
-        == LanguageEngine::fastSentenceCount(cmd->m_newText)) {
-        m_newText = cmd->m_newText;
-        m_newCursorPosition = cmd->m_newCursorPosition;
-        return true;
-    }
-
-    return false;
-}
-
-void SceneElementTextUndoCommand::lookupSceneElement()
-{
-    if (m_sceneElement.isNull()) {
-        if (m_sceneId.isEmpty() || m_sceneElementId.isEmpty()) {
-            this->setObsolete(true);
-            return;
-        }
-
-        const StructureElement *structureElement =
-                ScriteDocument::instance()->structure()->findElementBySceneID(m_sceneId);
-        if (structureElement == nullptr) {
-            this->setObsolete(true);
-            return;
-        }
-
-        const Scene *scene = structureElement->scene();
-        if (scene == nullptr) {
-            this->setObsolete(true);
-            return;
-        }
-
-        m_sceneElement = scene->findElementById(m_sceneElementId);
-    }
-}
+#include "scene_p.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -399,7 +87,7 @@ void SceneHeading::setEnabled(bool val)
     if (m_enabled == val)
         return;
 
-    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneHeadingEnabled, false);
+    PushSceneUndoCommand cmd(new SceneHeadingUndoCommand(this));
 
     m_enabled = val;
     emit enabledChanged();
@@ -411,7 +99,7 @@ void SceneHeading::setLocationType(const QString &val2)
     if (m_locationType == val)
         return;
 
-    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneHeadingLocationType);
+    PushSceneUndoCommand cmd(new SceneHeadingUndoCommand(this));
 
     m_locationType = val;
     emit locationTypeChanged();
@@ -423,7 +111,7 @@ void SceneHeading::setLocation(const QString &val2)
     if (m_location == val)
         return;
 
-    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneHeadingLocation);
+    PushSceneUndoCommand cmd(new SceneHeadingUndoCommand(this));
 
     m_location = val;
     emit locationChanged();
@@ -435,7 +123,7 @@ void SceneHeading::setMoment(const QString &val2)
     if (m_moment == val)
         return;
 
-    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneHeadingMoment);
+    PushSceneUndoCommand cmd(new SceneHeadingUndoCommand(this));
 
     m_moment = val;
     emit momentChanged();
@@ -613,7 +301,7 @@ void SceneElement::setType(SceneElement::Type val)
     if (m_type == val)
         return;
 
-    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneElementType);
+    PushSceneUndoCommand cmd(new SceneElementTypeUndoCommand(this));
 
     m_type = val;
     emit typeChanged();
@@ -639,7 +327,7 @@ void SceneElement::setText(const QString &val)
     if (m_text == val)
         return;
 
-    PushSceneElementTextUndoCommand cmd(this);
+    PushSceneUndoCommand cmd(new SceneElementTextUndoCommand(this));
 
     m_text = val.trimmed();
     if (m_spellCheck != nullptr)
@@ -657,7 +345,7 @@ void SceneElement::setAlignment(Qt::Alignment val)
     if (m_alignment == val2)
         return;
 
-    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneElementAlignment);
+    PushSceneUndoCommand cmd(new SceneElementAlignmentUndoCommand(this));
 
     m_alignment = val2;
     emit alignmentChanged();
@@ -814,7 +502,7 @@ bool SceneElement::polishText(Scene *previousScene)
             polishedText += closeB;
     }
 
-    QScopedValueRollback<bool> undoStackRollback(PushSceneUndoCommand::enabled, false);
+    QScopedValueRollback<bool> undoStackRollback(SceneElementTextUndoCommand::enabled, false);
     const QString oldText = m_text;
     this->setText(polishedText);
     return oldText != m_text;
@@ -953,7 +641,7 @@ void SceneElement::setTextFormats(const QVector<QTextLayout::FormatRange> &forma
     if (!hasSomeFormatting && m_textFormats.isEmpty())
         return;
 
-    PushSceneUndoCommand cmd(m_scene, SceneUndoCommand::SceneElementTextFormats);
+    PushSceneUndoCommand cmd(new SceneElementTextFormatsUndoCommand(this));
 
     m_textFormats = formats;
     emit elementChanged();
@@ -1945,7 +1633,7 @@ void Scene::insertElementAt(SceneElement *ptr, int index)
     if (index < 0 || index > m_elements.size())
         return;
 
-    PushSceneUndoCommand cmd(this, SceneUndoCommand::SceneInsertElement);
+    PushSceneUndoCommand cmd(new SceneInsertElementUndoCommand(this, ptr, index));
 
     if (!m_inSetElementsList)
         this->beginInsertRows(QModelIndex(), index, index);
@@ -1976,7 +1664,7 @@ void Scene::removeElement(SceneElement *ptr)
     if (row < 0)
         return;
 
-    PushSceneUndoCommand cmd(this, SceneUndoCommand::SceneRemoveElement);
+    PushSceneUndoCommand cmd(new SceneRemoveElementUndoCommand(this, ptr, row));
 
     if (!m_inSetElementsList)
         this->beginRemoveRows(QModelIndex(), row, row);
@@ -2059,8 +1747,9 @@ void Scene::beginUndoCapture(bool allowMerging)
     if (m_pushUndoCommand != nullptr)
         return;
 
-    m_pushUndoCommand =
-            new PushSceneUndoCommand(this, SceneUndoCommand::SceneUndoCapture, allowMerging);
+    if (!AbstractSceneUndoCommand::hasCurrent() && UndoHub::active() && this->isUndoRedoEnabled())
+        m_pushUndoCommand = new SceneUndoCommand(this, allowMerging);
+    emit inUndoCaptureChanged();
 }
 
 void Scene::endUndoCapture()
@@ -2068,8 +1757,12 @@ void Scene::endUndoCapture()
     if (m_pushUndoCommand == nullptr)
         return;
 
-    delete m_pushUndoCommand;
+    if (UndoHub::active())
+        UndoHub::active()->push(m_pushUndoCommand);
+    else
+        delete m_pushUndoCommand;
     m_pushUndoCommand = nullptr;
+    emit inUndoCaptureChanged();
 }
 
 bool Scene::polishText(Scene *previousScene)
@@ -2138,7 +1831,7 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
     if (element->type() == SceneElement::Heading || element->type() == SceneElement::Parenthetical)
         return nullptr;
 
-    PushSceneUndoCommand cmd(this, SceneUndoCommand::SceneSplitScene);
+    PushSceneUndoCommand cmd(new SceneUndoCommand(this, true, QStringLiteral("Split Scene")));
 
     emit sceneAboutToReset();
 
@@ -2322,7 +2015,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
     ds >> moment;
     this->heading()->setMoment(moment);
 
-    int nrElements = 0;
+    qsizetype nrElements = 0;
     ds >> nrElements;
 
     struct _Paragraph
@@ -2337,7 +2030,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
     QStringList paragraphIds;
 
     paragraphs.reserve(nrElements);
-    for (int i = 0; i < nrElements; i++) {
+    for (qsizetype i = 0; i < nrElements; i++) {
         _Paragraph e;
         ds >> e.id;
         ds >> e.type;
@@ -2349,7 +2042,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
     }
 
     // Remove stale paragraphs
-    for (int i = m_elements.size() - 1; i >= 0; i--) {
+    for (qsizetype i = m_elements.size() - 1; i >= 0; i--) {
         SceneElement *para = m_elements.at(i);
         if (paragraphIds.removeOne(para->id()))
             continue;
@@ -2357,7 +2050,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
     }
 
     // Insert new paragraphs
-    for (int i = 0; i < paragraphs.size(); i++) {
+    for (qsizetype i = 0; i < paragraphs.size(); i++) {
         const _Paragraph para = paragraphs.at(i);
         SceneElement *element = i <= m_elements.size() - 1 ? m_elements.at(i) : nullptr;
 

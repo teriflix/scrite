@@ -25,6 +25,7 @@
 #include <QQmlEngine>
 #include <QUndoGroup>
 
+#include "utils.h"
 #include "qobjectfactory.h"
 #include "garbagecollector.h"
 #include "qobjectserializer.h"
@@ -97,6 +98,26 @@ public:
     explicit UndoStack(QObject *parent = nullptr);
     ~UndoStack();
 
+    enum CommandID {
+        SceneCommandID = 100,
+        SceneElementTextCommandID,
+        RemoveNoteCommandID,
+        ScreenplayElementsMoveCommandID,
+        ScreenplayRemoveElementsCommandID,
+        UndoClearScreenplayCommandID,
+        SplitElementCommandID,
+        SceneNumbersCommandID,
+        ScreenplayPasteCommandID,
+        ScreenplayPasteFromFountainCommandID,
+        SceneHeadingCommandID,
+        SceneElementTypeCommandID,
+        SceneElementAlignmentCommandID,
+        SceneElementTextFormatsCommandID,
+        SceneInsertElementCommandID,
+        SceneRemoveElementCommandID
+    };
+    static QString commandName(int id);
+
 signals:
     void activeChanged();
 
@@ -124,6 +145,8 @@ struct ObjectPropertyInfo
 
     QVariant read() const;
     bool write(const QVariant &val);
+
+    QString description() const;
 
     static ObjectPropertyInfo *get(QObject *object, const QByteArray &property);
     static void lockUndoRedoFor(QObject *object);
@@ -296,6 +319,10 @@ public:
     // QUndoCommand interface
     void undo()
     {
+        Utils::Gui::log(QStringLiteral("ObjectListCommand::undo() op=")
+                        + QString::number(m_operation) + QStringLiteral(" child=")
+                        + (m_child ? QString::fromLatin1(m_child->metaObject()->className())
+                                   : QStringLiteral("(null)")));
         if (m_operation == ObjectList::InsertOperation)
             this->remove();
         else
