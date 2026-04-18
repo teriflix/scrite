@@ -76,8 +76,8 @@ TextArea {
     selectByKeyboard: true
 
     // renderType: Text.NativeRendering
-    selectedTextColor: Runtime.colors.accent.c700.text
-    selectionColor: Runtime.colors.accent.c700.background
+    // selectionColor: Runtime.colors.accent.c700.background
+    // selectedTextColor: Runtime.colors.accent.c700.text
     background: Rectangle {
         color: enabled ? Runtime.colors.primary.c10.background : Runtime.colors.primary.button.background
 

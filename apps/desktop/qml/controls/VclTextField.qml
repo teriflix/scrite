@@ -122,9 +122,9 @@ TextField {
         _contextMenu.popup()
     }
 
-    selectionColor: Runtime.colors.accent.c700.background
     selectByMouse: true
-    selectedTextColor: Runtime.colors.accent.c700.text
+    // selectionColor: Runtime.colors.accent.c700.background
+    // selectedTextColor: Runtime.colors.accent.c700.text
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
@@ -240,8 +240,12 @@ TextField {
             model: _completionModel
             currentIndex: _completionModel.currentRow
             keyNavigationEnabled: false
+
             highlightMoveDuration: 0
             highlightResizeDuration: 0
+            highlight: Rectangle {
+                color: Runtime.colors.primary.highlight.background
+            }
 
             delegate: VclLabel {
                 id: _completionDelegate
@@ -254,7 +258,6 @@ TextField {
 
                 text: root.polishCompletionText(completionString)
                 font: root.font
-                color: index === _completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
                 padding: 5
                 elide: Text.ElideRight
 
@@ -282,10 +285,6 @@ TextField {
                             _completionModel.currentRow = _completionDelegate.index
                     }
                 }
-            }
-
-            highlight: Rectangle {
-                color: Runtime.colors.primary.highlight.background
             }
         }
     }
