@@ -124,88 +124,6 @@ Item {
 
                     title: "Available Plans"
 
-                    readonly property Component referralCodeLink : Link {
-                        anchors.right: parent.right
-                        anchors.bottom: parent.top
-                        anchors.bottomMargin: _availablePlansGroupBox.topPadding/3
-
-                        text: _queryUserSubsCall.responseData.referralCodeText + " »"
-                        font.bold: true
-
-                        onClicked: _referralCodeDialog.open()
-
-                        VclDialog {
-                            id: _referralCodeDialog
-
-                            width: 400
-                            height: 240
-                            title: _queryUserSubsCall.responseData.referralCodeText
-
-                            content: Item {
-                                ColumnLayout {
-                                    anchors.centerIn: parent
-
-                                    enabled: !_referralCodeApi.busy
-                                    opacity: enabled ? 1 : 0.5
-
-                                    width: parent.width-50
-                                    spacing: 20
-
-                                    TextField {
-                                        id: _txtReferralCode
-
-                                        Layout.fillWidth: true
-
-                                        focus: true
-                                        maximumLength: Runtime.bounded(_queryUserSubsCall.responseData.minReferralCodeLength, _queryUserSubsCall.responseData.maxReferralCodeLength, 128)
-                                        placeholderText: _queryUserSubsCall.responseData.referralCodeText
-                                        horizontalAlignment: Text.AlignHCenter
-                                    }
-
-                                    VclButton {
-                                        Layout.alignment: Qt.AlignHCenter
-
-                                        text: "Submit"
-                                        enabled: _txtReferralCode.length >= _queryUserSubsCall.responseData.minReferralCodeLength
-
-                                        onClicked: {
-                                            _referralCodeApi.code = _txtReferralCode.text.toUpperCase().trim()
-                                            _referralCodeApi.call()
-                                        }
-                                    }
-                                }
-
-                                BusyIndicator {
-                                    anchors.centerIn: parent
-                                    running: _referralCodeApi.busy
-                                }
-
-                                SubscriptionReferralCodeRestApiCall {
-                                    id: _referralCodeApi
-
-                                    onBusyChanged: _referralCodeDialog.titleBarCloseButtonVisible = !busy
-
-                                    onFinished: {
-                                        if(hasError) {
-                                            MessageBox.information("Error", errorText)
-                                            return
-                                        }
-
-                                        if(hasResponse) {
-                                            _queryUserSubsCall.go()
-                                            _referralCodeDialog.close()
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    Component.onCompleted: {
-                        if(_queryUserSubsCall.responseData.acceptingReferralCode === true)
-                            referralCodeLink.createObject(background)
-                    }
-
                     ColumnLayout {
                         width: parent.width
                         spacing: 20
@@ -234,6 +152,86 @@ Item {
                                 priceNote: _delegate2.modelData.subtitle
                                 actionLink: SubscriptionPlanOperations.planActionLinkText(_delegate2.modelData)
                                 onActionLinkClicked: SubscriptionPlanOperations.subscribeTo(_delegate2.modelData)
+                            }
+                        }
+                    }
+                }
+
+                Link {
+                    anchors.right: parent.right
+                    anchors.bottom: parent.top
+                    anchors.bottomMargin: _availablePlansLoader.topPadding/3
+
+                    z: 100
+
+                    text: _queryUserSubsCall.responseData.referralCodeText + " »"
+                    font.bold: true
+                    visible: _queryUserSubsCall.responseData.acceptingReferralCode === true
+
+                    onClicked: _referralCodeDialog.open()
+
+                    VclDialog {
+                        id: _referralCodeDialog
+
+                        width: 400
+                        height: 240
+                        title: _queryUserSubsCall.responseData.referralCodeText
+
+                        content: Item {
+                            ColumnLayout {
+                                anchors.centerIn: parent
+
+                                enabled: !_referralCodeApi.busy
+                                opacity: enabled ? 1 : 0.5
+
+                                width: parent.width-50
+                                spacing: 20
+
+                                TextField {
+                                    id: _txtReferralCode
+
+                                    Layout.fillWidth: true
+
+                                    focus: true
+                                    maximumLength: Runtime.bounded(_queryUserSubsCall.responseData.minReferralCodeLength, _queryUserSubsCall.responseData.maxReferralCodeLength, 128)
+                                    placeholderText: _queryUserSubsCall.responseData.referralCodeText
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+
+                                VclButton {
+                                    Layout.alignment: Qt.AlignHCenter
+
+                                    text: "Submit"
+                                    enabled: _txtReferralCode.length >= _queryUserSubsCall.responseData.minReferralCodeLength
+
+                                    onClicked: {
+                                        _referralCodeApi.code = _txtReferralCode.text.toUpperCase().trim()
+                                        _referralCodeApi.call()
+                                    }
+                                }
+                            }
+
+                            BusyIndicator {
+                                anchors.centerIn: parent
+                                running: _referralCodeApi.busy
+                            }
+
+                            SubscriptionReferralCodeRestApiCall {
+                                id: _referralCodeApi
+
+                                onBusyChanged: _referralCodeDialog.titleBarCloseButtonVisible = !busy
+
+                                onFinished: {
+                                    if(hasError) {
+                                        MessageBox.information("Error", errorText)
+                                        return
+                                    }
+
+                                    if(hasResponse) {
+                                        _queryUserSubsCall.go()
+                                        _referralCodeDialog.close()
+                                    }
+                                }
                             }
                         }
                     }
