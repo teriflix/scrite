@@ -97,7 +97,6 @@ DialogLauncher {
 
                         text: _dialog.subscription.plan.title
                         wrapMode: Text.WordWrap
-                        color: Runtime.colors.accent.c600.background
                         font.bold: true
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
                         horizontalAlignment: Text.AlignHCenter
