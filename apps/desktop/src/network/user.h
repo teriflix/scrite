@@ -130,6 +130,80 @@ public:
 Q_DECLARE_METATYPE(UserInstallationInfo)
 Q_DECLARE_METATYPE(QList<UserInstallationInfo>)
 
+struct UserSubscriptionPlanPricing
+{
+    Q_GADGET
+    QML_VALUE_TYPE(scriteUserSubscriptionPlanPricing)
+
+public:
+    UserSubscriptionPlanPricing() { }
+    UserSubscriptionPlanPricing(const QJsonObject &object);
+    UserSubscriptionPlanPricing(const UserSubscriptionPlanPricing &other);
+
+    bool operator==(const UserSubscriptionPlanPricing &other) const;
+    bool operator!=(const UserSubscriptionPlanPricing &other) const { return !(*this == other); }
+    UserSubscriptionPlanPricing &operator=(const UserSubscriptionPlanPricing &other);
+
+    // clang-format off
+    Q_PROPERTY(QString currency
+               MEMBER currency)
+    // clang-format on
+    QString currency;
+
+    // clang-format off
+    Q_PROPERTY(qreal price
+               MEMBER price)
+    // clang-format on
+    qreal price = 0;
+
+    // clang-format off
+    Q_PROPERTY(qreal actual
+               MEMBER actual)
+    // clang-format on
+    qreal actual = 0;
+
+    // clang-format off
+    Q_PROPERTY(QString html
+               MEMBER html)
+    // clang-format on
+    QString html;
+};
+Q_DECLARE_METATYPE(UserSubscriptionPlanPricing)
+
+struct UserSubscriptionPlanAction
+{
+    Q_GADGET
+    QML_VALUE_TYPE(scriteUserSubscriptionPlanAction)
+
+public:
+    UserSubscriptionPlanAction() { }
+    UserSubscriptionPlanAction(const QJsonObject &object);
+    UserSubscriptionPlanAction(const UserSubscriptionPlanAction &other);
+
+    bool operator==(const UserSubscriptionPlanAction &other) const;
+    bool operator!=(const UserSubscriptionPlanAction &other) const { return !(*this == other); }
+    UserSubscriptionPlanAction &operator=(const UserSubscriptionPlanAction &other);
+
+    // clang-format off
+    Q_PROPERTY(QString kind
+               MEMBER kind)
+    // clang-format on
+    QString kind;
+
+    // clang-format off
+    Q_PROPERTY(QString api
+               MEMBER api)
+    // clang-format on
+    QString api;
+
+    // clang-format off
+    Q_PROPERTY(QString url
+               MEMBER url)
+    // clang-format on
+    QString url;
+};
+Q_DECLARE_METATYPE(UserSubscriptionPlanAction)
+
 struct UserSubscriptionPlanInfo
 {
     Q_GADGET
@@ -193,6 +267,12 @@ public:
     qreal price = 0;
 
     // clang-format off
+    Q_PROPERTY(UserSubscriptionPlanPricing pricing
+               MEMBER pricing)
+    // clang-format on
+    UserSubscriptionPlanPricing pricing;
+
+    // clang-format off
     Q_PROPERTY(QStringList features
                MEMBER features)
     // clang-format on
@@ -209,6 +289,12 @@ public:
                MEMBER devices)
     // clang-format on
     int devices = 1;
+
+    // clang-format off
+    Q_PROPERTY(UserSubscriptionPlanAction action
+               MEMBER action)
+    // clang-format on
+    UserSubscriptionPlanAction action;
 };
 Q_DECLARE_METATYPE(UserSubscriptionPlanInfo)
 Q_DECLARE_METATYPE(QList<UserSubscriptionPlanInfo>)
@@ -742,7 +828,8 @@ public:
     Q_INVOKABLE static QList<UserInstallationInfo> asInstallationInfoList(const QJsonArray &array);
 
     Q_INVOKABLE static UserSubscriptionPlanInfo asSubscriptionPlanInfo(const QJsonObject &object);
-    Q_INVOKABLE static QList<UserSubscriptionPlanInfo> asSubscriptionPlanInfoList(const QJsonArray &array);
+    Q_INVOKABLE static QList<UserSubscriptionPlanInfo>
+    asSubscriptionPlanInfoList(const QJsonArray &array);
 
     Q_INVOKABLE static UserSubscriptionInfo asSubscriptionInfo(const QJsonObject &object);
     Q_INVOKABLE static QList<UserSubscriptionInfo> asSubscriptionInfoList(const QJsonArray &array);

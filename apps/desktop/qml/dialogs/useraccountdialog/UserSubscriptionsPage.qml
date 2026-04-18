@@ -225,11 +225,11 @@ Item {
                                 exclusive: _delegate2.modelData.exclusive
                                 durationNote: _delegate2.modelData.featureNote
                                 price: {
-                                    if(_delegate2.modelData.pricing.price === 0)
+                                    if(_delegate2.modelData.price === 0)
                                         return "FREE"
 
-                                    const currencySymbol = Scrite.currencySymbol(_delegate2.modelData.pricing.currency)
-                                    return currencySymbol + _delegate2.modelData.pricing.price + " *"
+                                    const currencySymbol = Scrite.currencySymbol(_delegate2.modelData.currency)
+                                    return currencySymbol + _delegate2.modelData.price + " *"
                                 }
                                 priceNote: _delegate2.modelData.subtitle
                                 actionLink: SubscriptionPlanOperations.planActionLinkText(_delegate2.modelData)

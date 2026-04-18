@@ -112,6 +112,61 @@ bool UserInstallationInfo::isCurrent() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+UserSubscriptionPlanPricing::UserSubscriptionPlanPricing(const QJsonObject &object)
+{
+    this->currency = object.value("currency").toString();
+    this->price = object.value("price").toDouble();
+    this->actual = object.value("actual").toDouble();
+    this->html = object.value("html").toString();
+}
+
+UserSubscriptionPlanPricing::UserSubscriptionPlanPricing(const UserSubscriptionPlanPricing &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+}
+
+bool UserSubscriptionPlanPricing::operator==(const UserSubscriptionPlanPricing &other) const
+{
+    return DeepCompareGadget(&staticMetaObject, static_cast<const void *>(&other),
+                             static_cast<const void *>(this));
+}
+
+UserSubscriptionPlanPricing &
+UserSubscriptionPlanPricing::operator=(const UserSubscriptionPlanPricing &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+    return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+UserSubscriptionPlanAction::UserSubscriptionPlanAction(const QJsonObject &object)
+{
+    this->kind = object.value("kind").toString();
+    this->api = object.value("api").toString();
+    this->url = object.value("url").toString();
+}
+
+UserSubscriptionPlanAction::UserSubscriptionPlanAction(const UserSubscriptionPlanAction &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+}
+
+bool UserSubscriptionPlanAction::operator==(const UserSubscriptionPlanAction &other) const
+{
+    return DeepCompareGadget(&staticMetaObject, static_cast<const void *>(&other),
+                             static_cast<const void *>(this));
+}
+
+UserSubscriptionPlanAction &
+UserSubscriptionPlanAction::operator=(const UserSubscriptionPlanAction &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+    return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 UserSubscriptionPlanInfo::UserSubscriptionPlanInfo(const QJsonObject &object)
 {
     this->name = object.value("name").toString();
@@ -124,11 +179,14 @@ UserSubscriptionPlanInfo::UserSubscriptionPlanInfo(const QJsonObject &object)
     const QJsonObject pricing = object.value("pricing").toObject();
     this->currency = pricing.value("currency").toString();
     this->price = pricing.value("price").toDouble();
+    this->pricing = UserSubscriptionPlanPricing(pricing);
 
     this->features = JsonArrayToStringList(object.value("features").toArray());
     this->featureNote = object.value("featureNote").toString();
 
     this->devices = object.value("devices").toInt();
+
+    this->action = UserSubscriptionPlanAction(object.value("action").toObject());
 }
 
 UserSubscriptionPlanInfo::UserSubscriptionPlanInfo(const UserSubscriptionPlanInfo &other)
