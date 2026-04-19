@@ -118,6 +118,9 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int, QByteArray> roleNames() const;
 
+protected:
+    bool eventFilter(QObject *object, QEvent *event);
+
 private:
     bool addInternal(QObject *action);
     bool removeInternal(QObject *action);

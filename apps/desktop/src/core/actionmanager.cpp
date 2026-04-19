@@ -60,167 +60,68 @@ static const char *_QQuickActionTriggerCountChanged = SIGNAL(triggerCountChanged
 
 static const QByteArray _QQuickActionTriggerMethod = QByteArrayLiteral("triggerMethod");
 
-#if 0 // This is no longer required in Qt 6 era.
-#define DEBUG_SHORTCUT_DELIVERY
-#endif
-
-#ifdef DEBUG_SHORTCUT_DELIVERY
-class ActionManagers : public QObjectListModel<ActionManager *>
+static QMetaProperty findQQuickActionProperty(const QObject *object, const QByteArray &propName)
 {
-public:
-    explicit ActionManagers(QObject *parent = nullptr) : QObjectListModel<ActionManager *>(parent)
+    struct Prop
     {
-        qApp->installEventFilter(this);
-    }
-    virtual ~ActionManagers() { }
+        bool initialized = false;
+        QMetaProperty property;
+    };
 
-    bool eventFilter(QObject *object, QEvent *event)
-    {
-        if (object == qApp->focusWindow() && event->type() == QEvent::ShortcutOverride) {
-            const QKeyEvent *keyEvent = reinterpret_cast<QKeyEvent *>(event);
-            if (keyEvent->modifiers() != Qt::NoModifier) {
-                const QKeySequence keySequence(keyEvent->keyCombination());
-                const QString shortcut = keySequence.toString();
-                QObject *qmlAction = keySequence.isEmpty()
-                        ? nullptr
-                        : ActionManager::findActionForShortcut(shortcut);
-                if (qmlAction && qmlAction->property(_QQuickActionEnabledProperty).toBool()) {
-                    this->addToPending(qmlAction, keySequence);
-                }
+    static QHash<QByteArray, Prop> propertyMap;
+    if (object != nullptr && object->inherits(_QQuickAction) && !propName.isEmpty()) {
+        Prop prop = propertyMap.value(propName);
+        if (!prop.initialized) {
+            prop.initialized = true;
+
+            static const QMetaObject *_QQuickActionMetaObject = nullptr;
+
+            if (_QQuickActionMetaObject == nullptr) {
+                const QMetaObject *mo = object->metaObject();
+                while (qstrcmp(mo->className(), _QQuickAction))
+                    mo = mo->superClass();
+                _QQuickActionMetaObject = mo;
             }
+
+            int propertyIndex = object->metaObject()->indexOfProperty(propName);
+            prop.property = _QQuickActionMetaObject != nullptr
+                            && propertyIndex < _QQuickActionMetaObject->propertyCount()
+                    ? object->metaObject()->property(propertyIndex)
+                    : QMetaProperty();
+            propertyMap[propName] = prop;
         }
 
-        // NOTE: In Qt 6, QML Action shortcuts are activated directly by QShortcutMap via an
-        // internal callback and do not dispatch QEvent::Shortcut through the event system.
-        // Removal from pending is handled by the triggered() connection made in addToPending().
-
-        return false;
+        return prop.property;
     }
 
-    void timerEvent(QTimerEvent *te)
-    {
-        if (te->timerId() == m_processPendingShortcuts.timerId()) {
-            m_processPendingShortcuts.stop();
+    return QMetaProperty();
+}
 
-            while (!m_pendingShortcuts.isEmpty()) {
-                auto item = m_pendingShortcuts.takeFirst();
-                this->disconnectFromAction(item.first);
-                if (item.first->property(_QQuickActionEnabledProperty).toBool()) {
-                    if (item.first->property(_QQuickActionCheckableProperty).toBool()) {
-                        QMetaObject::invokeMethod(item.first, "toggled", Qt::DirectConnection,
-                                                  Q_ARG(QObject *, item.first));
-                    }
-                    QMetaObject::invokeMethod(item.first, "triggered", Qt::DirectConnection,
-                                              Q_ARG(QObject *, item.first));
-                }
-            }
-        }
+static QVariant readQQuickActionProperty(const QObject *object, const QByteArray &propName)
+{
+    if (object != nullptr && !propName.isEmpty()) {
+        QMetaProperty property = findQQuickActionProperty(object, propName);
+        return property.isValid() ? property.read(object) : object->property(propName.constData());
     }
 
-    // Called when Qt 6 naturally delivers a shortcut to the QML Action directly
-    // (bypassing QEvent::Shortcut), so we cancel the pending timer-based trigger.
-    // Connected to both triggered() and toggled() because checkable actions emit
-    // toggled() instead of triggered() when activated via shortcut.
-    void onActionActivated()
-    {
-        QObject *action = this->sender();
-        for (int i = m_pendingShortcuts.size() - 1; i >= 0; i--) {
-            if (m_pendingShortcuts.at(i).first == action) {
-                m_pendingShortcuts.removeAt(i);
-            }
-        }
-        this->disconnectFromAction(action);
-        if (m_pendingShortcuts.isEmpty())
-            m_processPendingShortcuts.stop();
+    return QVariant();
+}
+
+static bool writeQQuickActionProperty(QObject *object, const QByteArray &propName,
+                                      const QVariant &value)
+{
+    if (object != nullptr && !propName.isEmpty()) {
+        QMetaProperty property = findQQuickActionProperty(object, propName);
+        return property.isValid() ? property.write(object, value)
+                                  : object->setProperty(propName.constData(), value);
     }
 
-private:
-    int findPending(QObject *object, const QKeySequence &sequence) const
-    {
-        if (m_pendingShortcuts.isEmpty() || sequence.isEmpty())
-            return -1;
+    return false;
+}
 
-        auto it = std::find_if(m_pendingShortcuts.begin(), m_pendingShortcuts.end(),
-                               [=](const QPair<QObject *, QKeySequence> &item) {
-                                   if (object == nullptr)
-                                       return sequence == item.second;
-                                   return object == item.first && sequence == item.second;
-                               });
-        if (it != m_pendingShortcuts.end())
-            return std::distance(m_pendingShortcuts.begin(), it);
+// #define DEBUG_SHORTCUT_DELIVERY
 
-        return -1;
-    }
-
-    void addToPending(QObject *object, const QKeySequence &sequence)
-    {
-        if (object == nullptr || sequence.isEmpty())
-            return;
-
-        if (this->findPending(object, sequence) < 0) {
-            connect(object, &QObject::destroyed, this, &ActionManagers::objectDestroyed,
-                    Qt::UniqueConnection);
-            // In Qt 6, QML Action shortcuts are dispatched directly by QShortcutMap without
-            // sending QEvent::Shortcut. Connect to triggered() / toggled() so that if Qt
-            // naturally delivers the shortcut we cancel our pending timer-based trigger before
-            // it fires. toggled() must also be covered because checkable actions emit toggled()
-            // instead of triggered() when activated via shortcut.
-            connect(object, SIGNAL(triggered(QObject *)), this, SLOT(onActionActivated()),
-                    Qt::UniqueConnection);
-            connect(object, SIGNAL(toggled(QObject *)), this, SLOT(onActionActivated()),
-                    Qt::UniqueConnection);
-            m_pendingShortcuts.append({ object, sequence });
-            m_processPendingShortcuts.start(m_delay, this);
-        }
-    }
-
-    void removeFromPending(QObject *object, const QKeySequence &sequence)
-    {
-        if (object == nullptr && sequence.isEmpty())
-            return;
-
-        int index = this->findPending(object, sequence);
-        if (index >= 0) {
-            QObject *actualObject = m_pendingShortcuts.at(index).first;
-            m_pendingShortcuts.removeAt(index);
-            this->disconnectFromAction(actualObject);
-            if (m_pendingShortcuts.isEmpty())
-                m_processPendingShortcuts.stop();
-            else
-                m_processPendingShortcuts.start(m_delay, this);
-        }
-    }
-
-    void disconnectFromAction(QObject *object)
-    {
-        if (object == nullptr)
-            return;
-        disconnect(object, &QObject::destroyed, this, &ActionManagers::objectDestroyed);
-        disconnect(object, SIGNAL(triggered(QObject *)), this, SLOT(onActionActivated()));
-        disconnect(object, SIGNAL(toggled(QObject *)), this, SLOT(onActionActivated()));
-    }
-
-    void objectDestroyed(QObject *object)
-    {
-        if (object == nullptr)
-            return;
-
-        for (int i = m_pendingShortcuts.size() - 1; i >= 0; i--) {
-            if (m_pendingShortcuts.at(i).first == object) {
-                m_pendingShortcuts.removeAt(i);
-                m_processPendingShortcuts.start(m_delay, this);
-            }
-        }
-    }
-
-private:
-    const int m_delay = 100;
-    QBasicTimer m_processPendingShortcuts;
-    QList<QPair<QObject *, QKeySequence>> m_pendingShortcuts;
-};
-#else
 typedef QObjectListModel<ActionManager *> ActionManagers;
-#endif
 
 Q_GLOBAL_STATIC(ActionManagers, ActionManagerModel)
 
@@ -246,6 +147,8 @@ static ActionManager *findActionManager(const QString &name)
 
 ActionManager::ActionManager(QObject *parent) : QAbstractListModel(parent)
 {
+    qApp->installEventFilter(this);
+
     ActionManagerModel->append(this);
 
     connect(this, &ActionManager::modelReset, this, &ActionManager::countChanged);
@@ -261,6 +164,8 @@ ActionManager::~ActionManager()
     this->saveShortcutMap();
 
     ActionManagerModel->remove(this);
+
+    qApp->removeEventFilter(this);
 }
 
 ActionManagerAttached *ActionManager::qmlAttachedProperties(QObject *object)
@@ -328,7 +233,7 @@ bool ActionManager::changeActionShortcut(QObject *action, const QString &shortcu
     if (!canChangeActionShortcut(action))
         return false;
 
-    return action->setProperty(_QQuickActionShortcutProperty, shortcut);
+    return writeQQuickActionProperty(action, _QQuickActionShortcutProperty, shortcut);
 }
 
 QKeySequence ActionManager::defaultActionShortcut(QObject *action)
@@ -336,7 +241,8 @@ QKeySequence ActionManager::defaultActionShortcut(QObject *action)
     if (!canChangeActionShortcut(action))
         return QKeySequence();
 
-    const QVariant defaultShortcutValue = action->property(_QQuickActionDefaultShortcutProperty);
+    const QVariant defaultShortcutValue =
+            readQQuickActionProperty(action, _QQuickActionDefaultShortcutProperty);
     if (defaultShortcutValue.isValid()) {
         const QKeySequence defaultShortcut = defaultShortcutValue.userType() == QMetaType::QString
                 ? QKeySequence::fromString(defaultShortcutValue.toString())
@@ -354,19 +260,22 @@ bool ActionManager::restoreActionShortcut(QObject *action)
 
     const QKeySequence defaultShortcut = defaultActionShortcut(action);
     if (defaultShortcut.isEmpty()) {
-        const QVariant currentShortcut = action->property(_QQuickActionShortcutProperty);
+        const QVariant currentShortcut =
+                readQQuickActionProperty(action, _QQuickActionShortcutProperty);
         if (currentShortcut.isValid() && !Utils::Gui::portableShortcut(currentShortcut).isEmpty()) {
-            return action->setProperty(_QQuickActionShortcutProperty, QVariant());
+            return writeQQuickActionProperty(action, _QQuickActionShortcutProperty, QVariant());
         }
         return false;
     }
 
-    const QString currentSequence = action->property(_QQuickActionShortcutProperty).toString();
+    const QString currentSequence =
+            readQQuickActionProperty(action, _QQuickActionShortcutProperty).toString();
     const QKeySequence currentShortcut = QKeySequence::fromString(currentSequence);
     if (currentShortcut == defaultShortcut)
         return false;
 
-    return action->setProperty(_QQuickActionShortcutProperty, defaultShortcut.toString());
+    return writeQQuickActionProperty(action, _QQuickActionShortcutProperty,
+                                     defaultShortcut.toString());
 }
 
 QObject *ActionManager::findActionForShortcut(const QString &shortcut)
@@ -433,11 +342,11 @@ QObject *ActionManager::findByShortcut(const QString &shortcut) const
         return nullptr;
 
     auto it = std::find_if(m_actions.begin(), m_actions.end(), [shortcut](QObject *action) {
-        const QVariant actionShortcutVariant = action->property(_QQuickActionShortcutProperty);
+        const QVariant actionShortcutVariant =
+                readQQuickActionProperty(action, _QQuickActionShortcutProperty);
         if (actionShortcutVariant.isValid()) {
             if (actionShortcutVariant.canConvert(QMetaType(QMetaType::QString))) {
-                const QString actionShortcut =
-                        action->property(_QQuickActionShortcutProperty).toString();
+                const QString actionShortcut = actionShortcutVariant.toString();
                 return actionShortcut == shortcut;
             }
             if (actionShortcutVariant.userType() == QMetaType::QKeySequence) {
@@ -462,7 +371,8 @@ QList<QObject *> ActionManager::visibleActions() const
         const QMetaProperty visibleProperty = action->metaObject()->property(
                 action->metaObject()->indexOfProperty(_QQuickActionVisibleProperty));
         if (visibleProperty.isValid() && visibleProperty.userType() == QMetaType::Bool) {
-            const QVariant visibleFlag = action->property(_QQuickActionVisibleProperty);
+            const QVariant visibleFlag =
+                    readQQuickActionProperty(action, _QQuickActionVisibleProperty);
             if (visibleFlag.isValid() && visibleFlag.userType() == QMetaType::Bool)
                 return visibleFlag.toBool();
         }
@@ -522,6 +432,57 @@ QVariant ActionManager::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> ActionManager::roleNames() const
 {
     return { { ActionRole, QByteArrayLiteral("qmlAction") } };
+}
+
+bool ActionManager::eventFilter(QObject *object, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress || event->type() == QEvent::ShortcutOverride) {
+        if (m_actions.contains(object) || object->inherits(_QQuickAction))
+            return false;
+
+        QKeyEvent *ke = static_cast<QKeyEvent *>(event);
+        QKeyCombination kc = ke->keyCombination();
+        const int key = kc.key();
+        const bool isModifierKey = (key >= Qt::Key_Shift && key <= Qt::Key_ScrollLock);
+        if (!isModifierKey && key != Qt::Key_unknown
+            && (kc.keyboardModifiers() != Qt::NoModifier || ke->text().isEmpty())) {
+#ifdef DEBUG_SHORTCUT_DELIVERY
+            const QString eventName =
+                    event->type() == QEvent::KeyPress ? "KeyPress" : "ShortcutOverride";
+#endif
+            QKeySequence ks(kc);
+            QObject *qmlAction = this->findByShortcut(ks.toString());
+
+            if (qmlAction) {
+                bool qmlActionEnabled =
+                        readQQuickActionProperty(qmlAction, _QQuickActionEnabledProperty).toBool();
+                if (qmlActionEnabled) {
+#ifdef DEBUG_SHORTCUT_DELIVERY
+                    Utils::Gui::log(QString("'%1' is dropping event %2 to %3.%4 because its "
+                                            "already handled by %5 (Key Sequence: %6)")
+                                            .arg(m_title)
+                                            .arg(eventName)
+                                            .arg(object->metaObject()->className())
+                                            .arg(object->objectName())
+                                            .arg(qmlAction->objectName())
+                                            .arg(ks.toString()));
+#endif
+                    return true;
+                }
+            }
+
+#ifdef DEBUG_SHORTCUT_DELIVERY
+            Utils::Gui::log(QString("'%1' is allowing event %2 to %3.%4 (Key Sequence: %4)")
+                                    .arg(m_title)
+                                    .arg(eventName)
+                                    .arg(object->metaObject()->className())
+                                    .arg(object->objectName())
+                                    .arg(ks.toString()));
+#endif
+        }
+    }
+
+    return QAbstractListModel::eventFilter(object, event);
 }
 
 bool ActionManager::addInternal(QObject *action)
@@ -951,10 +912,11 @@ void ActionHandler::onObjectDestroyed(QObject *ptr)
 void ActionHandler::checkTriggerCount()
 {
     if (m_action != nullptr && this->isComponentComplete() && this->isEnabled()) {
-        const QVariant tc = m_action->property(_QQuickActionTriggerCount);
+        const QVariant tc = readQQuickActionProperty(m_action, _QQuickActionTriggerCount);
         if (tc.userType() == QMetaType::Int && tc.toInt() > 0) {
             emit triggerCountChanged(tc.toInt());
-            m_action->setProperty(_QQuickActionTriggerCount, QVariant::fromValue<int>(0));
+            writeQQuickActionProperty(m_action, _QQuickActionTriggerCount,
+                                      QVariant::fromValue<int>(0));
         }
     }
 }
@@ -1606,7 +1568,8 @@ bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &sou
     }
 
     if (accept && m_filters.testFlag(ActionsWithText)) {
-        const QString actionText = action->property(_QQuickActionTextProperty).toString();
+        const QString actionText =
+                readQQuickActionProperty(action, _QQuickActionTextProperty).toString();
         accept &= !actionText.isEmpty();
 
         if (accept) {
@@ -1623,13 +1586,15 @@ bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &sou
 
     if (accept && m_filters.testFlag(ActionsWithShortcut)) {
         const QKeySequence shortcut =
-                action->property(_QQuickActionShortcutProperty).value<QKeySequence>();
+                readQQuickActionProperty(action, _QQuickActionShortcutProperty)
+                        .value<QKeySequence>();
         accept &= !shortcut.isEmpty();
     }
 
     if (accept && m_filters.testFlag(ActionsWithDefaultShortcut)) {
         const QKeySequence shortcut =
-                action->property(_QQuickActionDefaultShortcutProperty).value<QKeySequence>();
+                readQQuickActionProperty(action, _QQuickActionDefaultShortcutProperty)
+                        .value<QKeySequence>();
         accept &= !shortcut.isEmpty();
     }
 
@@ -1641,7 +1606,8 @@ bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &sou
         const QMetaProperty visibleProperty = action->metaObject()->property(
                 action->metaObject()->indexOfProperty(_QQuickActionVisibleProperty));
         if (visibleProperty.isValid() && visibleProperty.userType() == QMetaType::Bool) {
-            const QVariant visibleFlag = action->property(_QQuickActionVisibleProperty);
+            const QVariant visibleFlag =
+                    readQQuickActionProperty(action, _QQuickActionVisibleProperty);
             if (visibleFlag.isValid() && visibleFlag.userType() == QMetaType::Bool)
                 accept &= visibleFlag.toBool();
         } else
@@ -1649,7 +1615,7 @@ bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &sou
     }
 
     if (accept & m_filters.testFlag(EnabledActions)) {
-        const QVariant enabledFlag = action->property(_QQuickActionEnabledProperty);
+        const QVariant enabledFlag = readQQuickActionProperty(action, _QQuickActionEnabledProperty);
         accept &= enabledFlag.toBool();
     }
 
