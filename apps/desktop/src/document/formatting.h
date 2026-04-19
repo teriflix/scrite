@@ -529,7 +529,7 @@ public:
                RESET resetScreen
                STORED false)
     // clang-format on
-    Q_INVOKABLE void setScreen(QScreen *val);
+    Q_SLOT void setScreen(QScreen *val);
     QScreen *screen() const { return m_screen; }
     Q_SIGNAL void screenChanged();
 
