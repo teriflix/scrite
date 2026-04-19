@@ -1810,6 +1810,10 @@ void SceneDocumentBinder::setScene(Scene *val)
                    &SceneDocumentBinder::onSceneAboutToReset);
         disconnect(m_scene, &Scene::sceneReset, this, &SceneDocumentBinder::onSceneReset);
         disconnect(m_scene, &Scene::sceneRefreshed, this, &SceneDocumentBinder::onSceneRefreshed);
+        disconnect(m_scene, &QAbstractItemModel::rowsInserted, this,
+                   &SceneDocumentBinder::syncDocumentFromScene);
+        disconnect(m_scene, &QAbstractItemModel::rowsRemoved, this,
+                   &SceneDocumentBinder::syncDocumentFromScene);
     }
 
     m_scene = val;
@@ -1821,6 +1825,10 @@ void SceneDocumentBinder::setScene(Scene *val)
                 &SceneDocumentBinder::onSceneAboutToReset);
         connect(m_scene, &Scene::sceneReset, this, &SceneDocumentBinder::onSceneReset);
         connect(m_scene, &Scene::sceneRefreshed, this, &SceneDocumentBinder::onSceneRefreshed);
+        connect(m_scene, &QAbstractItemModel::rowsInserted, this,
+                &SceneDocumentBinder::syncDocumentFromScene);
+        connect(m_scene, &QAbstractItemModel::rowsRemoved, this,
+                &SceneDocumentBinder::syncDocumentFromScene);
     }
 
     emit sceneChanged();
@@ -3806,6 +3814,98 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
 
     if (doPolishElements)
         this->polishAllSceneElements();
+}
+
+void SceneDocumentBinder::syncDocumentFromScene()
+{
+    if (m_textDocument == nullptr || m_scene == nullptr || m_initializingDocument
+        || m_sceneIsBeingReset || m_sceneIsBeingRefreshed)
+        return;
+
+    QTextDocument *document = m_textDocument->textDocument();
+    const QList<SceneElement *> sceneElements = m_scene->elementsList();
+
+    // Block document signals so that cursor operations below do not trigger
+    // onContentsChange → syncSceneFromDocument, which would write stale text
+    // back into scene elements before reconciliation is complete.
+    QScopedValueRollback<bool> initGuard(m_initializingDocument, true);
+    QSignalBlocker signalBlocker(document);
+
+    // Pass 1: remove blocks whose scene element is no longer present in the scene.
+    const QSet<SceneElement *> sceneElementSet(sceneElements.begin(), sceneElements.end());
+
+    QList<QTextBlock> staleBlocks;
+    for (QTextBlock b = document->begin(); b.isValid(); b = b.next()) {
+        SceneDocumentBlockUserData *ud = SceneDocumentBlockUserData::get(b);
+        if (ud != nullptr && !sceneElementSet.contains(ud->sceneElement()))
+            staleBlocks.prepend(b); // reverse order: delete last-first
+    }
+
+    for (const QTextBlock &b : staleBlocks) {
+        QTextCursor cursor(document);
+        if (b.next().isValid()) {
+            // Select from start of this block through start of next block (includes separator).
+            cursor.setPosition(b.position());
+            cursor.setPosition(b.next().position(), QTextCursor::KeepAnchor);
+        } else if (b.previous().isValid()) {
+            // Last block: select the separator of the previous block through end of this block's
+            // content, so the previous block absorbs the end-of-document position.
+            cursor.setPosition(b.previous().position() + b.previous().length() - 1);
+            cursor.setPosition(b.position() + b.length() - 1, QTextCursor::KeepAnchor);
+        } else {
+            // Only block in document — just clear its content.
+            cursor.setPosition(b.position());
+            cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+        }
+        cursor.removeSelectedText();
+    }
+
+    // Pass 2: insert blocks for scene elements that have no corresponding block yet.
+    QMap<SceneElement *, QTextBlock> elementToBlock;
+    for (QTextBlock b = document->begin(); b.isValid(); b = b.next()) {
+        SceneDocumentBlockUserData *ud = SceneDocumentBlockUserData::get(b);
+        if (ud != nullptr)
+            elementToBlock[ud->sceneElement()] = b;
+    }
+
+    for (int i = 0; i < sceneElements.size(); i++) {
+        SceneElement *element = sceneElements.at(i);
+        if (elementToBlock.contains(element))
+            continue;
+
+        QTextCursor cursor(document);
+        if (i == 0) {
+            // Insert at document start: split at position 0, cursor moves to new block 1,
+            // then back to the new empty block 0.
+            cursor.movePosition(QTextCursor::Start);
+            cursor.insertBlock();
+            cursor.movePosition(QTextCursor::PreviousBlock);
+        } else {
+            QTextBlock prevBlock = elementToBlock.value(sceneElements.at(i - 1));
+            if (!prevBlock.isValid()) {
+                this->initializeDocumentLater();
+                return;
+            }
+            cursor = QTextCursor(prevBlock);
+            cursor.movePosition(QTextCursor::EndOfBlock);
+            cursor.insertBlock();
+        }
+
+        QTextBlock newBlock = cursor.block();
+        SceneDocumentBlockUserData *userData =
+                new SceneDocumentBlockUserData(newBlock, element, this);
+        cursor.insertText(element->text());
+
+        const SceneElementFormat *fmt = m_screenplayFormat->elementFormat(element->type());
+        userData->resetFormat();
+        userData->updateFromFormat(fmt);
+        QTextCursor fmtCursor(newBlock);
+        fmtCursor.setBlockFormat(userData->blockFormat);
+
+        elementToBlock[element] = newBlock;
+    }
+
+    this->rehighlightLater();
 }
 
 void SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix()
