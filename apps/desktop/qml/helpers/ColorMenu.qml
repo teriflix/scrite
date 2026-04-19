@@ -68,7 +68,7 @@ VclMenu {
                         colors.pop()
                     Runtime.workspaceSettings.customColors = colors
 
-                    root.menuItemClicked(color)
+                    Runtime.undoMacro("Change Scene Color", () => { root.menuItemClicked(color) })
                     root.close()
                 }
             }
@@ -108,7 +108,7 @@ VclMenu {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
-                    root.menuItemClicked(_colorDelegateItem.modelData)
+                    Runtime.undoMacro("Change Scene Color", () => { root.menuItemClicked(_colorDelegateItem.modelData) })
                     root.close()
                 }
                 onEntered: _colorGrid.currentIndex = _colorDelegateItem.index

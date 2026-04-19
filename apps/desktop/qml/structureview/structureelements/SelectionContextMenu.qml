@@ -42,9 +42,7 @@ VclMenu {
 
         onMenuItemClicked: (color) => {
             let items = root.selection.items
-            items.forEach( function(item) {
-                item.element.scene.color = color
-            })
+            items.forEach( function(item) { item.element.scene.color = color })
             root.close()
         }
     }
@@ -55,9 +53,7 @@ VclMenu {
 
         onTriggered: (type) => {
             let items = root.selection.items
-            items.forEach( function(item) {
-                item.element.scene.type = type
-            })
+            items.forEach( function(item) { item.element.scene.type = type })
             root.close()
         }
     }

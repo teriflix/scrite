@@ -250,6 +250,11 @@ Item {
             Runtime.shoutout(Runtime.announcementIds.showHelpTip, tipName)
     }
 
+    function undoMacro(name, fn) {
+        UndoHub.beginMacro(name)
+        try { fn() } finally { UndoHub.endMacro() }
+    }
+
     function execLater(contextObject, delay, callback, args) {
         let timer = Qt.createQmlObject("import QtQml; Timer { }", contextObject ? contextObject : root);
         timer.interval = delay === undefined ? 100 : delay

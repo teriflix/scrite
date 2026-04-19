@@ -771,7 +771,9 @@ AbstractScenePartEditor {
             if(_sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus) {
                 captureCursorOffset()
                 _sceneDocumentBinder.copy(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
-                _sceneTextEditor.remove(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
+                Runtime.undoMacro("Cut Paragraphs", () => {
+                    _sceneTextEditor.remove(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
+                })
                 Runtime.execLater(_private, Runtime.stdAnimationDuration, _private.restoreCursorOffset)
             }
         }
@@ -788,21 +790,23 @@ AbstractScenePartEditor {
             if(_sceneTextEditor.canPaste && _sceneTextEditor.activeFocus) {
                 captureCursorOffset()
 
-                // Fix for https://github.com/teriflix/scrite/issues/195
-                // [0.5.2 All] Pasting doesnt replace the selected text #195
-                if(_sceneTextEditor.hasSelection)
-                    _sceneTextEditor.remove(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
+                Runtime.undoMacro("Paste Paragraphs", () => {
+                    // Fix for https://github.com/teriflix/scrite/issues/195
+                    // [0.5.2 All] Pasting doesnt replace the selected text #195
+                    if(_sceneTextEditor.hasSelection)
+                        _sceneTextEditor.remove(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
 
-                const cursorPositionBeforePaste = _sceneTextEditor.cursorPosition
-                const cursorPositionAfterPaste = _sceneDocumentBinder.paste(_sceneTextEditor.cursorPosition)
-                if(cursorPositionAfterPaste < 0) {
-                    _sceneTextEditor.paste()
-                    discardCursorOffset()
-                } else {
-                    _sceneTextEditor.cursorPosition = 0
-                    placeCursorAt(cursorPositionAfterPaste)
-                    Runtime.execLater(_private, Runtime.stdAnimationDuration, _private.restoreCursorOffset)
-                }
+                    const cursorPositionBeforePaste = _sceneTextEditor.cursorPosition
+                    const cursorPositionAfterPaste = _sceneDocumentBinder.paste(_sceneTextEditor.cursorPosition)
+                    if(cursorPositionAfterPaste < 0) {
+                        _sceneTextEditor.paste()
+                        discardCursorOffset()
+                    } else {
+                        _sceneTextEditor.cursorPosition = 0
+                        placeCursorAt(cursorPositionAfterPaste)
+                        Runtime.execLater(_private, Runtime.stdAnimationDuration, _private.restoreCursorOffset)
+                    }
+                })
             }
         }
 

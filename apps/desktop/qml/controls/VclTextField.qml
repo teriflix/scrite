@@ -77,7 +77,7 @@ TextField {
     property Item backTabItem
 
     Component.onDestruction: {
-        if(activeFocus) {
+        if(activeFocus && !_editingCompleteEmitted) {
             editingComplete()
         }
     }
@@ -329,6 +329,8 @@ TextField {
         }
     }
 
+    property bool _editingCompleteEmitted: false
+
     function autoCompleteOrFocusNext(doTabItem) {
         if(_completionModel.hasSuggestion && _completionModel.suggestion !== text) {
             text = includeSuggestion(_completionModel.suggestion)
@@ -350,13 +352,18 @@ TextField {
 
     onEditingFinished: {
         _completionModel.allowEnable = false
-        editingComplete()
+        if(!_editingCompleteEmitted) {
+            _editingCompleteEmitted = true
+            editingComplete()
+        }
     }
 
     onActiveFocusChanged: {
-        if(activeFocus && !readOnly)
+        if(activeFocus && !readOnly) {
             selectAll()
-        else
+            _editingCompleteEmitted = false
+        } else {
             _completionPopup.close()
+        }
     }
 }

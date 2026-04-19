@@ -1239,6 +1239,11 @@ void Scene::setType(Scene::Type val)
     if (m_type == val)
         return;
 
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "type");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if (!info->isLocked() && m_undoRedoEnabled)
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
     m_type = val;
     emit typeChanged();
 }
@@ -1460,6 +1465,11 @@ void Scene::setGroups(const QStringList &val)
     if (m_groups == val)
         return;
 
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "groups");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if (!info->isLocked() && m_undoRedoEnabled)
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
     m_groups = QSet<QString>(val.begin(), val.end()).values();
     emit groupsChanged();
 }
@@ -1468,6 +1478,11 @@ void Scene::addToGroup(const QString &group)
 {
     if (group.isEmpty() || this->isInGroup(group))
         return;
+
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "groups");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if (!info->isLocked() && m_undoRedoEnabled)
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_groups.append(group);
     m_groups.sort(Qt::CaseInsensitive);
@@ -1485,6 +1500,11 @@ void Scene::removeFromGroup(const QString &group)
 
     if (index < 0)
         return;
+
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "groups");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if (!info->isLocked() && m_undoRedoEnabled)
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_groups.removeAt(index);
     emit groupsChanged();
@@ -1552,6 +1572,11 @@ void Scene::setTags(const QStringList &val)
     if (m_tags == val)
         return;
 
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "tags");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if (!info->isLocked() && m_undoRedoEnabled)
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
     m_tags = val;
     std::sort(m_tags.begin(), m_tags.end(), [](const QString &a, const QString &b) {
         return QString::localeAwareCompare(a.toLower(), b.toLower()) < 0;
@@ -1575,6 +1600,11 @@ void Scene::addTag(const QString &tag)
 void Scene::removeTag(const QString &tag)
 {
     if (this->hasTag(tag)) {
+        ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "tags");
+        QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+        if (!info->isLocked() && m_undoRedoEnabled)
+            cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
         m_tags.removeOne(tag);
         emit tagsChanged();
     }

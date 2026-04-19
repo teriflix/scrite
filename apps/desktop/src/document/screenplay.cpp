@@ -103,6 +103,11 @@ void ScreenplayElement::setBreakSubtitle(const QString &val)
     if (m_breakSubtitle == val2)
         return;
 
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "breakSubtitle");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if (!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
     m_breakSubtitle = val2;
     emit breakSubtitleChanged();
 }
@@ -224,6 +229,11 @@ void ScreenplayElement::setUserSceneNumber(const QString &val)
     if (m_userSceneNumber == val)
         return;
 
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "userSceneNumber");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if (!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
     m_userSceneNumber = val.toUpper().trimmed();
     emit userSceneNumberChanged();
 }
@@ -281,6 +291,11 @@ void ScreenplayElement::setOmitted(bool val)
     if (m_omitted == val || m_elementType != SceneElementType)
         return;
 
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "omitted");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if (!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
     m_omitted = val;
     emit omittedChanged();
 }
@@ -326,6 +341,11 @@ void ScreenplayElement::setBreakSummary(const QString &val)
     if (m_breakSummary == val)
         return;
 
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "breakSummary");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if (!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
     m_breakSummary = val;
     emit breakSummaryChanged();
 }
@@ -335,6 +355,11 @@ void ScreenplayElement::setPageBreakAfter(bool val)
     if (m_pageBreakAfter == val)
         return;
 
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "pageBreakAfter");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if (!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
     m_pageBreakAfter = val;
     emit pageBreakAfterChanged();
 }
@@ -343,6 +368,11 @@ void ScreenplayElement::setPageBreakBefore(bool val)
 {
     if (m_pageBreakBefore == val)
         return;
+
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "pageBreakBefore");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if (!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
     m_pageBreakBefore = val;
     emit pageBreakBeforeChanged();
@@ -2695,134 +2725,26 @@ int Screenplay::replace(const QString &text, const QString &replacementText, int
     return counter;
 }
 
-class SceneNumbersUndoCommand : public QUndoCommand
-{
-public:
-    SceneNumbersUndoCommand();
-    ~SceneNumbersUndoCommand() { }
-
-    // QUndoCommand interface
-public:
-    int id() const { return UndoStack::SceneNumbersCommandID; }
-    void undo();
-    void redo();
-
-private:
-    bool ensureValidity();
-    bool isValid() const;
-
-private:
-    struct Item
-    {
-        int serialNumber = -1;
-        QString sceneId;
-        QString oldUserSceneNumber;
-        QString newUserSceneNumber;
-    };
-    QList<Item> m_items;
-    bool m_itemsInited = false;
-};
-
-SceneNumbersUndoCommand::SceneNumbersUndoCommand()
-{
-    const Screenplay *screenplay = ScriteDocument::instance()->screenplay();
-    const QList<ScreenplayElement *> screenplayElements =
-            screenplay ? screenplay->getElements() : QList<ScreenplayElement *>();
-    for (const ScreenplayElement *screenplayElement : screenplayElements) {
-        m_items.append({ screenplayElement->serialNumber(), screenplayElement->sceneID(),
-                         screenplayElement->userSceneNumber() });
-    }
-}
-
-void SceneNumbersUndoCommand::redo()
-{
-    const Screenplay *screenplay = ScriteDocument::instance()->screenplay();
-    const QList<ScreenplayElement *> screenplayElements =
-            screenplay ? screenplay->getElements() : QList<ScreenplayElement *>();
-    if (m_itemsInited) {
-        if (!this->ensureValidity())
-            return;
-        for (int i = 0; i < m_items.size(); i++) {
-            screenplayElements[i]->setUserSceneNumber(m_items[i].newUserSceneNumber);
-        }
-    } else {
-        for (int i = 0; i < m_items.size(); i++) {
-            m_items[i].newUserSceneNumber = screenplayElements[i]->userSceneNumber();
-        }
-        m_itemsInited = true;
-    }
-}
-
-void SceneNumbersUndoCommand::undo()
-{
-    if (!this->ensureValidity())
-        return;
-
-    const Screenplay *screenplay = ScriteDocument::instance()->screenplay();
-    const QList<ScreenplayElement *> screenplayElements =
-            screenplay ? screenplay->getElements() : QList<ScreenplayElement *>();
-    for (int i = 0; i < m_items.size(); i++) {
-        screenplayElements[i]->setUserSceneNumber(m_items[i].oldUserSceneNumber);
-    }
-}
-
-bool SceneNumbersUndoCommand::isValid() const
-{
-    if (!m_itemsInited)
-        return false;
-
-    const Screenplay *screenplay = ScriteDocument::instance()->screenplay();
-    const QList<ScreenplayElement *> screenplayElements =
-            screenplay ? screenplay->getElements() : QList<ScreenplayElement *>();
-    if (m_items.size() != screenplayElements.size()) {
-        return false;
-    }
-
-    for (int i = 0; i < m_items.size(); i++) {
-        if (m_items[i].serialNumber != screenplayElements[i]->serialNumber())
-            return false;
-
-        if (m_items[i].sceneId != screenplayElements[i]->sceneID())
-            return false;
-    }
-
-    return true;
-}
-
-bool SceneNumbersUndoCommand::ensureValidity()
-{
-    if (!this->isValid()) {
-        this->setObsolete(true);
-        return false;
-    }
-    return true;
-}
 
 void Screenplay::removeUserSceneNumbers()
 {
-    SceneNumbersUndoCommand *cmd = new SceneNumbersUndoCommand;
+    UndoHub::beginMacro(QStringLiteral("Remove Scene Numbers"));
 
     for (ScreenplayElement *element : std::as_const(m_elements)) {
         element->setUserSceneNumber(QString());
     }
     this->evaluateSceneNumbers(true);
 
-    if (UndoHub::active())
-        UndoHub::active()->push(cmd);
-    else
-        delete cmd;
+    UndoHub::endMacro();
 }
 
 void Screenplay::reevaluateSceneNumbers()
 {
-    SceneNumbersUndoCommand *cmd = new SceneNumbersUndoCommand;
+    UndoHub::beginMacro(QStringLiteral("Reevaluate Scene Numbers"));
 
     this->evaluateSceneNumbers(true);
 
-    if (UndoHub::active())
-        UndoHub::active()->push(cmd);
-    else
-        delete cmd;
+    UndoHub::endMacro();
 }
 
 void Screenplay::resetTextAlignment(Qt::Alignment newAlignment)

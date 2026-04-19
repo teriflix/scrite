@@ -339,9 +339,7 @@ Item {
             onMenuItemClicked: (color) => {
                 if(root.canvasScroll.selection.hasItems) {
                     let items = root.canvasScroll.selection.items
-                    items.forEach( function(item) {
-                        item.element.scene.color = color
-                    })
+                    items.forEach( function(item) { item.element.scene.color = color })
                 } else {
                     root.canvasScroll.currentElementItem.element.scene.color = color
                 }
@@ -380,9 +378,7 @@ Item {
             onTriggered: (type) => {
                 if(root.canvasScroll.selection.hasItems) {
                     let items = root.canvasScroll.selection.items
-                    items.forEach( function(item) {
-                        item.element.scene.type = type
-                    })
+                    items.forEach( function(item) { item.element.scene.type = type })
                 } else {
                     root.canvasScroll.currentElementItem.element.scene.type = type
                 }

@@ -65,6 +65,9 @@ public:
     Q_INVOKABLE static QUndoStack *active(); // This is different from QUndoGroup::activeStack(), in
                                              // that it returns nullptr, if enabled = false
 
+    Q_INVOKABLE static void beginMacro(const QString &text);
+    Q_INVOKABLE static void endMacro();
+
     void setMergeTimeGap(int val);
     int mergeTimeGap() const { return m_mergeTimeGap; }
     Q_SIGNAL void mergeTimeGapChanged();
@@ -106,7 +109,6 @@ public:
         ScreenplayRemoveElementsCommandID,
         UndoClearScreenplayCommandID,
         SplitElementCommandID,
-        SceneNumbersCommandID,
         ScreenplayPasteCommandID,
         ScreenplayPasteFromFountainCommandID,
         SceneHeadingCommandID,

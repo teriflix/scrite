@@ -63,6 +63,18 @@ QUndoStack *UndoHub::active()
     return UndoHub::blocked ? nullptr : UndoHub::instance()->activeStack();
 }
 
+void UndoHub::beginMacro(const QString &text)
+{
+    if (QUndoStack *stack = UndoHub::active())
+        stack->beginMacro(text);
+}
+
+void UndoHub::endMacro()
+{
+    if (QUndoStack *stack = UndoHub::active())
+        stack->endMacro();
+}
+
 void UndoHub::setMergeTimeGap(int val)
 {
     if (m_mergeTimeGap == val)
@@ -152,8 +164,6 @@ QString UndoStack::commandName(int id)
         return QStringLiteral("Clear Screenplay");
     case SplitElementCommandID:
         return QStringLiteral("Split Element");
-    case SceneNumbersCommandID:
-        return QStringLiteral("Scene Numbers");
     case ScreenplayPasteCommandID:
         return QStringLiteral("Paste Into Screenplay");
     case ScreenplayPasteFromFountainCommandID:

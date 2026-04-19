@@ -53,9 +53,11 @@ VclMenu {
             font.bold: root.scene ? (enabled ? root.scene.type === enumValue : false) : false
 
             onClicked: {
-                if(root.scene)
-                    root.scene.type = enumValue
-                root.triggered(enumValue)
+                Runtime.undoMacro("Change Scene Type", () => {
+                    if(root.scene)
+                        root.scene.type = enumValue
+                    root.triggered(enumValue)
+                })
             }
         }
     }

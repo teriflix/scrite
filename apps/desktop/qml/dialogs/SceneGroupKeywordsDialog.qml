@@ -108,9 +108,9 @@ DialogLauncher {
 
                         onEnsureVisible: (item, area) => {  }
                         onTextClicked: (text, source) => {  }
-                        onTextCloseRequest: (text, source) => { _dialog.sceneGroup.removeOpenTag(text) }
+                        onTextCloseRequest: (text, source) => { Runtime.undoMacro("Remove Keyword", () => { _dialog.sceneGroup.removeOpenTag(text) }) }
                         onConfigureTextRequest: (text, tag) => { tag.closable = true }
-                        onNewTextRequest: (text) => { _dialog.sceneGroup.addOpenTag(text) }
+                        onNewTextRequest: (text) => { Runtime.undoMacro("Add Keyword", () => { _dialog.sceneGroup.addOpenTag(text) }) }
                         onNewTextCancelled: () => { }
                     }
                 }

@@ -238,8 +238,10 @@ VclMenu {
                                 hoverEnabled: true
 
                                 onClicked: {
-                                    root.sceneGroup.toggle(_groupsViewDelegate.index)
-                                    root.toggled(_groupsViewDelegate.index, _groupsViewDelegate.arrayItem.name)
+                                    Runtime.undoMacro("Tag Story Beat", () => {
+                                                          root.sceneGroup.toggle(_groupsViewDelegate.index)
+                                                          root.toggled(_groupsViewDelegate.index, _groupsViewDelegate.arrayItem.name)
+                                                      })
                                     Scrite.user.logActivity2("structure", "tag: " + _groupsViewDelegate.arrayItem.name)
                                 }
                             }

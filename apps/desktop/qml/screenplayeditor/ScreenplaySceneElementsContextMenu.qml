@@ -77,9 +77,9 @@ VclMenu {
         enabled: !Scrite.document.readOnly && root.element
 
         onMenuItemClicked: (color) => {
-            for(var i=0; i<root.sceneGroup.sceneCount; i++) {
+            const sceneCount = root.sceneGroup.sceneCount
+            for(var i=0; i<sceneCount; i++)
                 root.sceneGroup.sceneAt(i).color = color
-            }
             root.close()
         }
     }
@@ -90,9 +90,9 @@ VclMenu {
         enabled: !Scrite.document.readOnly && !_omitIncludeMenuItem.omitted
 
         onTriggered: {
-            for(var i=0; i<root.sceneGroup.sceneCount; i++) {
+            const sceneCount = root.sceneGroup.sceneCount
+            for(var i=0; i<sceneCount; i++)
                 root.sceneGroup.sceneAt(i).type = scene.type
-            }
             root.close()
         }
     }
