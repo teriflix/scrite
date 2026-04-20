@@ -67,18 +67,6 @@ private:
     int m_QListInt_type = -1;
     int m_QListReal_type = -1;
     int m_QListColor_type = -1;
-    int m_unused = 0;
-};
-
-class QRealHelper : public QObjectSerializer::Helper
-{
-public:
-    explicit QRealHelper();
-    ~QRealHelper() override;
-
-    bool canHandle(int type) const override;
-    QJsonValue toJson(const QVariant &value) const override;
-    QVariant fromJson(const QJsonValue &value, int type) const override;
 };
 
 class QFontHelper : public QObjectSerializer::Helper
@@ -114,7 +102,6 @@ public:
 
 ObjectSerializerHelperRegistry::ObjectSerializerHelperRegistry()
 {
-    // this->append(new QRealHelper);
     this->append(new QMarginsFHelper);
     this->append(new QListHelper);
     this->append(new QFontHelper);
@@ -167,20 +154,12 @@ QJsonObject QObjectSerializer::toJson(const QObject *object)
         interface->prepareForSerialization();
 
     QStack<const QMetaObject *> metaObjects;
-    // QStringList classNames;
     const QMetaObject *mo = object->metaObject();
     while (mo) {
-        metaObjects.push(mo);
-        if (interface != nullptr && interface->canSerialize(mo, QMetaProperty()) == false) {
-            mo = mo->superClass();
-            continue;
-        }
-
-        // classNames << QString::fromLatin1(mo->className());
+        if (interface == nullptr || interface->canSerialize(mo, QMetaProperty()))
+            metaObjects.push(mo);
         mo = mo->superClass();
     }
-
-    // ret.insert("_class", classNames.join(","));
 
     const QVariantMap defaultProperties =
             QObjectSerializer::cacheDefaultPropertyValues(object, true);
@@ -254,7 +233,6 @@ QJsonObject QObjectSerializer::toJson(const QObject *object)
                     const QObject *listItem = listRef.at(i);
                     if (listItem == nullptr)
                         continue;
-
                     QJsonObject item = QObjectSerializer::toJson(listItem);
                     list.append(item);
                 }
@@ -348,16 +326,10 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
         interface->prepareForDeserialization();
 
     QStack<const QMetaObject *> metaObjects;
-    // QStringList classNames;
     const QMetaObject *mo = object->metaObject();
     while (mo) {
-        metaObjects.push(mo);
-        if (interface != nullptr && interface->canSerialize(mo, QMetaProperty()) == false) {
-            mo = mo->superClass();
-            continue;
-        }
-
-        // classNames << QString::fromLatin1(mo->className());
+        if (interface == nullptr || interface->canSerialize(mo, QMetaProperty()))
+            metaObjects.push(mo);
         mo = mo->superClass();
     }
 
@@ -375,6 +347,12 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
             static const char *objectName = "objectName";
             if (!qstrcmp(prop.name(), objectName))
                 continue;
+
+#ifdef QT_WIDGETS_LIB
+            static const char *parentPropName = "parent";
+            if (mo == &QGraphicsObject::staticMetaObject && !qstrcmp(prop.name(), parentPropName))
+                continue;
+#endif
 
             if (!prop.isStored())
                 continue;
@@ -448,10 +426,12 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
             if (prop.isEnumType() || prop.isFlagType()) {
                 const QByteArray key = jsonPropValue.toString().toLatin1();
                 const QMetaEnum enumerator = prop.enumerator();
+                bool ok = false;
                 const int value = prop.isFlagType()
-                        ? (key.isEmpty() ? 0 : enumerator.keysToValue(key))
-                        : enumerator.keyToValue(key);
-                prop.write(object, value);
+                        ? (key.isEmpty() ? 0 : enumerator.keysToValue(key, &ok))
+                        : enumerator.keyToValue(key, &ok);
+                if (ok || (prop.isFlagType() && key.isEmpty()))
+                    prop.write(object, value);
                 continue;
             }
 
@@ -499,10 +479,9 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
             }
 
             const QObjectSerializer::Helper *helper = ::Helpers()->findHelper(prop.userType());
-            const QJsonValue propJsonValue = json.value(propName);
             const QVariant propValue = helper == nullptr
-                    ? propJsonValue.toVariant()
-                    : helper->fromJson(propJsonValue, prop.userType());
+                    ? jsonPropValue.toVariant()
+                    : helper->fromJson(jsonPropValue, prop.userType());
             prop.write(object, propValue);
         }
     }
@@ -661,7 +640,6 @@ QListHelper::QListHelper()
     m_QListInt_type = qRegisterMetaType<QList<int>>("QList<int>");
     m_QListReal_type = qRegisterMetaType<QList<qreal>>("QList<qreal>");
     m_QListColor_type = qRegisterMetaType<QList<QColor>>("QList<QColor>");
-    m_unused = 0;
 }
 
 QListHelper::~QListHelper() { }
@@ -725,32 +703,6 @@ QVariant QListHelper::fromJson(const QJsonValue &value, int type) const
     }
 
     return QVariant();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-QRealHelper::QRealHelper() { }
-
-QRealHelper::~QRealHelper() { }
-
-bool QRealHelper::canHandle(int type) const
-{
-    return type == QMetaType::QReal || type == QMetaType::Double || type == QMetaType::Float;
-}
-
-QJsonValue QRealHelper::toJson(const QVariant &value) const
-{
-    const qreal val = value.toReal();
-    return QString::number(val);
-}
-
-QVariant QRealHelper::fromJson(const QJsonValue &value, int type) const
-{
-    const double val = value.toDouble();
-
-    QVariant ret(val);
-    ret.convert(QMetaType(type));
-    return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -925,15 +877,10 @@ QVariantMap QObjectSerializer::cacheDefaultPropertyValues(const QObject *object,
             qobject_cast<QObjectSerializer::Interface *>(const_cast<QObject *>(object));
 
     QStack<const QMetaObject *> metaObjects;
-    // QStringList classNames;
     const QMetaObject *mo = object->metaObject();
     while (mo) {
-        metaObjects.push(mo);
-        if (interface != nullptr && interface->canSerialize(mo, QMetaProperty()) == false) {
-            mo = mo->superClass();
-            continue;
-        }
-
+        if (interface == nullptr || interface->canSerialize(mo, QMetaProperty()))
+            metaObjects.push(mo);
         mo = mo->superClass();
     }
 
