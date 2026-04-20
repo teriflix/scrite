@@ -48,8 +48,8 @@ Item {
     signal deleteSelectionRequest()
     signal deleteElementRequest(StructureElement element)
     signal selectionLayoutRequest(int layout) // here layout should be one of Structure.LayoutType which are
-                                              // Structure.HorizontalLayout, Structure.VerticalLayout,
-                                              // Structure.FlowHorizontalLayout, Structure.FlowVerticalLayout
+    // Structure.HorizontalLayout, Structure.VerticalLayout,
+    // Structure.FlowHorizontalLayout, Structure.FlowVerticalLayout
 
     ActionHandler {
         id: _newSceneHandler
@@ -61,8 +61,8 @@ Item {
         enabled: !Scrite.document.readOnly
 
         onTriggered: (source) => {
-                         _newSceneMenu.popup(source)
-                     }
+            _newSceneMenu.popup(source)
+        }
 
         VclMenu {
             id: _newSceneMenu
@@ -72,9 +72,9 @@ Item {
                 enabled: !Scrite.document.readOnly
 
                 onClicked: () => {
-                               Qt.callLater( _newSceneMenu.close )
-                               root.newSceneRequest()
-                           }
+                    Qt.callLater( _newSceneMenu.close )
+                    root.newSceneRequest()
+                }
             }
 
             ColorMenu {
@@ -83,10 +83,10 @@ Item {
                 selectedColor: _newSceneHandler.activeColor
 
                 onMenuItemClicked: (color) => {
-                                       Qt.callLater( _newSceneMenu.close )
-                                       _newSceneHandler.activeColor = color
-                                       root.newColoredSceneRequest( _newSceneHandler.activeColor)
-                                   }
+                    Qt.callLater( _newSceneMenu.close )
+                    _newSceneHandler.activeColor = color
+                    root.newColoredSceneRequest( _newSceneHandler.activeColor)
+                }
             }
         }
     }
@@ -97,8 +97,8 @@ Item {
         enabled: !Scrite.document.readOnly
 
         onTriggered: (source) => {
-                         _newAnnotationMenu.popup(source)
-                     }
+            _newAnnotationMenu.popup(source)
+        }
 
         VclMenu {
             id: _newAnnotationMenu
@@ -114,9 +114,9 @@ Item {
                     enabled: !Scrite.document.readOnly && modelData.what !== ""
 
                     onClicked: () => {
-                                   Qt.callLater( _newAnnotationMenu.close )
-                                   root.newAnnotationRequest(modelData.what)
-                               }
+                        Qt.callLater( _newAnnotationMenu.close )
+                        root.newAnnotationRequest(modelData.what)
+                    }
                 }
             }
         }
@@ -144,8 +144,8 @@ Item {
         enabled: !Scrite.document.readOnly && (root.canvasScroll.selection.hasItems ? root.canvasScroll.selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
 
         onTriggered: (source) => {
-                         _layoutOptionsMenu.popup(source)
-                     }
+            _layoutOptionsMenu.popup(source)
+        }
 
         VclMenu {
             id: _layoutOptionsMenu
@@ -180,20 +180,20 @@ Item {
         checked: Scrite.document.structure.forceBeatBoardLayout
 
         onToggled: () => {
-                       const canvasPreviewAllowed = root.canvasPreview.allowed
-                       root.canvasPreview.allowed = false
+            const canvasPreviewAllowed = root.canvasPreview.allowed
+            root.canvasPreview.allowed = false
 
-                       Scrite.document.structure.forceBeatBoardLayout = !checked
+            Scrite.document.structure.forceBeatBoardLayout = !checked
 
-                       if(checked && Scrite.document.structure.elementCount > 0) {
-                           Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
-                       }
+            if(checked && Scrite.document.structure.elementCount > 0) {
+                Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
+            }
 
-                       Runtime.execLater(root.canvasPreview, 1000, function() {
-                           root.zoomOneRequest()
-                           root.canvasPreview.allowed = canvasPreviewAllowed
-                       })
-                   }
+            Runtime.execLater(root.canvasPreview, 1000, function() {
+                root.zoomOneRequest()
+                root.canvasPreview.allowed = canvasPreviewAllowed
+            })
+        }
 
         Connections {
             target: Scrite.document.structure
@@ -223,8 +223,8 @@ Item {
         down: _layoutGroupingMenu.visible
 
         onTriggered: (source) => {
-                         _layoutGroupingMenu.popup(source)
-                     }
+            _layoutGroupingMenu.popup(source)
+        }
 
         VclMenu {
             id: _layoutGroupingMenu
@@ -278,17 +278,17 @@ Item {
         enabled: (root.canvasScroll.selection.hasItems || root.canvasScroll.currentElementItem !== null) && Scrite.document.structure.canvasUIMode === Structure.IndexCardUI
 
         onTriggered: (source) => {
-                         _structureGroupsMenu.popup(source)
-                     }
+            _structureGroupsMenu.popup(source)
+        }
 
         StructureGroupsMenu {
             id: _structureGroupsMenu
 
             innerTitle: {
                 if(root.canvasScroll.selection.hasItems)
-                    return "Tag the " + root.canvasScroll.selection.items.length + " selected index card(s)"
+                return "Tag the " + root.canvasScroll.selection.items.length + " selected index card(s)"
                 else if(root.canvasScroll.currentElementItem !== null)
-                    return "Tag the selected index card."
+                return "Tag the selected index card."
                 return ""
             }
 
@@ -298,7 +298,7 @@ Item {
 
             onToggled: {
                 if(root.canvasScroll.selection.hasItems)
-                    Runtime.execLater(root.canvasScroll.selection, 250, function() { root.canvasScroll.selection.refit() })
+                Runtime.execLater(root.canvasScroll.selection, 250, function() { root.canvasScroll.selection.refit() })
             }
 
             onAboutToShow: {
@@ -320,7 +320,7 @@ Item {
 
     ActionHandler {
         property Scene scene: root.canvasScroll.currentElementItem ? root.canvasScroll.currentElementItem.element.scene :
-                              (root.canvasScroll.selection.hasItems ? root.canvasScroll.selection.items[0].element.scene : null)
+                                                                     (root.canvasScroll.selection.hasItems ? root.canvasScroll.selection.items[0].element.scene : null)
 
         action: ActionHub.structureCanvasOperations.find("sceneColor")
         down: _sceneColorMenu.visible
@@ -328,8 +328,8 @@ Item {
         iconSource: scene ? "image://color/" + scene.color + "/1" : "image://color/gray/1"
 
         onTriggered: (source) => {
-                         _sceneColorMenu.popup(source)
-                     }
+            _sceneColorMenu.popup(source)
+        }
 
         ColorMenu {
             id: _sceneColorMenu
@@ -354,7 +354,7 @@ Item {
 
         readonly property var sceneTypeModel: Object.typeEnumModel("Scene", "Type", _sceneTypeActionHandler)
         property Scene scene: root.canvasScroll.currentElementItem ? root.canvasScroll.currentElementItem.element.scene :
-                              (root.canvasScroll.selection.hasItems ? root.canvasScroll.selection.items[0].element.scene : null)
+                                                                     (root.canvasScroll.selection.hasItems ? root.canvasScroll.selection.items[0].element.scene : null)
         property int sceneType: (scene && scene.type !== Scene.Standard) ? scene.type : Scene.Standard
 
         action: ActionHub.structureCanvasOperations.find("sceneType")
@@ -362,13 +362,13 @@ Item {
         enabled: (root.canvasScroll.selection.hasItems || root.canvasScroll.currentElementItem !== null)
         iconSource: {
             if(sceneType === Scene.Standard)
-                return Runtime.themedIcon("qrc:/icons/content/standard_scene.png")
+            return Runtime.themedIcon("qrc:/icons/content/standard_scene.png")
             return sceneTypeModel.valueToIcon(sceneType)
         }
 
         onTriggered: (source) => {
-                         _sceneTypeMenu.popup(source)
-                     }
+            _sceneTypeMenu.popup(source)
+        }
 
         MarkSceneAsMenu {
             id: _sceneTypeMenu
@@ -393,19 +393,19 @@ Item {
         enabled: (root.canvasScroll.selection.hasItems || root.canvasScroll.currentElementItem) && !Scrite.document.readOnly && root.canvasScroll.editElementItem === null
 
         onTriggered: (source) => {
-                         // Don't delete if a shortcut was used to trigger it,
-                         // and the focus is not with the canvas
-                         if(source && Object.isOfType(source, "QQuickAction") && !root.canvasScroll.canvas.hasFocus) {
-                             return
-                         }
+            // Don't delete if a shortcut was used to trigger it,
+            // and the focus is not with the canvas
+            if(source && Object.isOfType(source, "QQuickAction") && !root.canvasScroll.canvas.hasFocus) {
+                return
+            }
 
-                         if(root.canvasScroll.selection.hasItems) {
-                             root.deleteSelectionRequest()
-                         } else {
-                             const element = root.canvasScroll.currentElementItem.element
-                             root.deleteElementRequest(element)
-                         }
-                     }
+            if(root.canvasScroll.selection.hasItems) {
+                root.deleteSelectionRequest()
+            } else {
+                const element = root.canvasScroll.currentElementItem.element
+                root.deleteElementRequest(element)
+            }
+        }
     }
 
     ActionHandler {
@@ -413,23 +413,23 @@ Item {
         enabled: !root.canvasScroll.selection.hasItems && (root.canvasScroll.currentAnnotation != null || root.canvasScroll.currentElementItem !== null) && root.canvasScroll.editElementItem === null
 
         onTriggered: (source) => {
-                         // Don't copy if a shortcut was used to trigger it,
-                         // and the focus is not with the canvas
-                         if(source && Object.isOfType(source, "QQuickAction") && !root.canvasScroll.canvas.hasFocus) {
-                             return
-                         }
+            // Don't copy if a shortcut was used to trigger it,
+            // and the focus is not with the canvas
+            if(source && Object.isOfType(source, "QQuickAction") && !root.canvasScroll.canvas.hasFocus) {
+                return
+            }
 
-                         if(root.canvasScroll.currentAnnotation != null) {
-                             Scrite.document.structure.copy(root.canvasScroll.currentAnnotation)
-                             AnimatedTextOverlay.show("Annotation Copied")
-                         } else {
-                             let spe = Scrite.document.structure.elementAt(Scrite.document.structure.currentElementIndex)
-                             if(spe !== null) {
-                                 Scrite.document.structure.copy(spe)
-                                 AnimatedTextOverlay.show("Scene Copied")
-                             }
-                         }
-                     }
+            if(root.canvasScroll.currentAnnotation != null) {
+                Scrite.document.structure.copy(root.canvasScroll.currentAnnotation)
+                AnimatedTextOverlay.show("Annotation Copied")
+            } else {
+                let spe = Scrite.document.structure.elementAt(Scrite.document.structure.currentElementIndex)
+                if(spe !== null) {
+                    Scrite.document.structure.copy(spe)
+                    AnimatedTextOverlay.show("Scene Copied")
+                }
+            }
+        }
     }
 
     ActionHandler {
@@ -437,21 +437,21 @@ Item {
         enabled: !Scrite.document.readOnly && Scrite.document.structure.canPaste && root.canvasScroll.editElementItem === null
 
         onTriggered: (source) => {
-                         // Don't paste if a shortcut was used to trigger it,
-                         // and the focus is not with the canvas
-                         if(source && Object.isOfType(source, "QQuickAction") && !root.canvasScroll.canvas.hasFocus) {
-                             return
-                         }
+            // Don't paste if a shortcut was used to trigger it,
+            // and the focus is not with the canvas
+            if(source && Object.isOfType(source, "QQuickAction") && !root.canvasScroll.canvas.hasFocus) {
+                return
+            }
 
-                         let gpos = MouseCursor.position()
-                         let pos = root.canvasScroll.mapFromGlobal(gpos.x, gpos.y)
-                         if(pos.x < 0 || pos.y < 0 || pos.x >= root.canvasScroll.width || pos.y >= root.canvasScroll.height)
-                         Scrite.document.structure.paste()
-                         else {
-                             pos = root.canvasScroll.canvas.mapFromGlobal(gpos.x, gpos.y)
-                             Scrite.document.structure.paste(Qt.point(pos.x,pos.y))
-                         }
-                     }
+            let gpos = MouseCursor.position()
+            let pos = root.canvasScroll.mapFromGlobal(gpos.x, gpos.y)
+            if(pos.x < 0 || pos.y < 0 || pos.x >= root.canvasScroll.width || pos.y >= root.canvasScroll.height) {
+                Scrite.document.structure.paste()
+            } else {
+                pos = root.canvasScroll.canvas.mapFromGlobal(gpos.x, gpos.y)
+                Scrite.document.structure.paste(Qt.point(pos.x,pos.y))
+            }
+        }
     }
 
     ActionHandler {
