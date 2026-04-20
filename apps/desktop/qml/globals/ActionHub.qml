@@ -293,7 +293,7 @@ Item {
 
         Action {
             readonly property string defaultShortcut: "Ctrl+Shift+S"
-            property bool visible: Scrite.document.fileName !== ""
+            property bool visible: Scrite.document.fileName !== "" || Scrite.document.readOnly
 
             enabled: Runtime.allowAppUsage
             objectName: "fileSaveAs"
