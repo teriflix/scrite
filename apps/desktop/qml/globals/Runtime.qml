@@ -452,14 +452,15 @@ Item {
         target: Scrite.document
 
         function onJustReset() {
+            Runtime.resetMainWindowUi( () => {
+                                          Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
+                                      })
             Runtime.notebookSettings.characterPageTab = 0
             Runtime.notebookSettings.charactersPageTab = 0
             Runtime.notebookSettings.screenplayPageTab = 0
             Runtime.notebookSettings.sceneNotesPageTab = 0
             Runtime.notebookSettings.sceneSynopsisTabIndex = 0
             Runtime.screenplayEditorSettings.sceneSidePanelOpen = false
-            Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
-
             Scrite.document.displayFormat.activeLanguageCode = Runtime.language.activeCode
         }
 
