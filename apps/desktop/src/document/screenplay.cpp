@@ -1207,12 +1207,16 @@ ScreenplayElementsMoveCommand::~ScreenplayElementsMoveCommand()
 
 void ScreenplayElementsMoveCommand::undo()
 {
+    QScopedValueRollback<bool> undoLock(UndoHub::blocked, true);
+
     if (m_screenplay.isNull() || !this->restore(m_before, false))
         this->setObsolete(true);
 }
 
 void ScreenplayElementsMoveCommand::redo()
 {
+    QScopedValueRollback<bool> undoLock(UndoHub::blocked, true);
+
     if (!m_initialized) {
         m_initialized = true;
         if (m_screenplay.isNull())
@@ -1445,6 +1449,8 @@ ScreenplayRemoveElementsUndoCommand::ScreenplayRemoveElementsUndoCommand(Screenp
 
 void ScreenplayRemoveElementsUndoCommand::undo()
 {
+    QScopedValueRollback<bool> undoLock(UndoHub::blocked, true);
+
     if (m_screenplay.isNull()) {
         this->setObsolete(true);
         return;
@@ -1485,6 +1491,8 @@ void ScreenplayRemoveElementsUndoCommand::undo()
 
 void ScreenplayRemoveElementsUndoCommand::redo()
 {
+    QScopedValueRollback<bool> undoLock(UndoHub::blocked, true);
+
     if (m_screenplay.isNull()) {
         this->setObsolete(true);
         return;
@@ -2725,7 +2733,6 @@ int Screenplay::replace(const QString &text, const QString &replacementText, int
     return counter;
 }
 
-
 void Screenplay::removeUserSceneNumbers()
 {
     UndoHub::beginMacro(QStringLiteral("Remove Scene Numbers"));
@@ -2891,6 +2898,8 @@ ScreenplayPasteUndoCommand::~ScreenplayPasteUndoCommand() { }
 
 void ScreenplayPasteUndoCommand::redo()
 {
+    QScopedValueRollback<bool> _urb(UndoHub::blocked, true);
+
     for (int i = 0; i < m_screenplayElementsData.size(); i++) {
         const QJsonObject elementJson = m_screenplayElementsData.at(i).toObject();
         const QString sceneId = elementJson.value(QLatin1String("sceneID")).toString();
@@ -2919,6 +2928,7 @@ void ScreenplayPasteUndoCommand::redo()
 
             structureElement->setScene(scene);
             m_structure->addElement(structureElement);
+            m_scenes.append(scene);
         }
 
         ScreenplayElement *screenplayElement = new ScreenplayElement(m_screenplay);
@@ -2940,6 +2950,8 @@ void ScreenplayPasteUndoCommand::redo()
 
 void ScreenplayPasteUndoCommand::undo()
 {
+    QScopedValueRollback<bool> _urb(UndoHub::blocked, true);
+
     m_screenplay->removeElements(m_screenplayElements);
     m_screenplayElements.clear();
 
@@ -2982,6 +2994,8 @@ ScreenplayPasteFromFountainUndoCommand::~ScreenplayPasteFromFountainUndoCommand(
 
 void ScreenplayPasteFromFountainUndoCommand::redo()
 {
+    QScopedValueRollback<bool> _urb(UndoHub::blocked, true);
+
     for (const Fountain::Element &fElement : std::as_const(m_body)) {
         if (fElement.type == Fountain::Element::SceneHeading || m_scenes.isEmpty()) {
             StructureElement *newStructureElement = new StructureElement(m_structure);
@@ -3008,6 +3022,8 @@ void ScreenplayPasteFromFountainUndoCommand::redo()
 
 void ScreenplayPasteFromFountainUndoCommand::undo()
 {
+    QScopedValueRollback<bool> _urb(UndoHub::blocked, true);
+
     // Same as ScreenplayPasteUndoCommand::undo()
     m_screenplay->removeElements(m_screenplayElements);
     m_screenplayElements.clear();
