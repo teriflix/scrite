@@ -111,12 +111,16 @@ AbstractScenePartEditor {
                 anchors.rightMargin: root.pageLeftMargin * 0.1
                 anchors.verticalCenter: parent.verticalCenter
 
-                width: root.fontMetrics.averageCharacterWidth * 5
+                width: Math.ceil( Math.max( _private.textMetrics.width, root.fontMetrics.averageCharacterWidth*3 ) )
 
                 text: root.screenplayElement.hasUserSceneNumber ? root.screenplayElement.resolvedSceneNumber : ""
                 font: _sceneHeading.font
                 readOnly: root.readOnly
                 placeholderText: root.scene.heading.enabled ? root.screenplayElement.sceneNumber : "-"
+                leftPadding: 0
+                rightPadding: 0
+                maximumLength: 5
+                horizontalAlignment: Text.AlignRight
 
                 background: Item { }
 
@@ -228,6 +232,11 @@ AbstractScenePartEditor {
         id: _private
 
         readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent") as Action
+
+        readonly property TextMetrics textMetrics: TextMetrics {
+            font: root.font
+            text: root.screenplayElement.resolvedSceneNumber
+        }
 
         property Component markSceneAsMenu: MarkSceneAsMenu {
             scene: root.scene

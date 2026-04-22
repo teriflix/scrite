@@ -39,7 +39,7 @@ Item {
     required property AbstractScreenplayElementSceneDelegate sceneDelegate
 
     height: implicitHeight
-    implicitHeight: Math.max(_layout.height + Runtime.sceneEditorFontMetrics.lineSpacing,
+    implicitHeight: Math.max(_layout.height + sceneDelegate.fontMetrics.lineSpacing,
                              _sidePanelLoader.active && _sidePanelLoader.item.expanded ? _sidePanelLoader.height : 0)
 
     /**
