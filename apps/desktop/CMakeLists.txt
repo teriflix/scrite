@@ -57,8 +57,8 @@ target_sources(Scrite PRIVATE
 )
 
 target_compile_definitions(Scrite PRIVATE
-  SCRITE_VERSION="2.0.21"
-  SCRITE_VERSION_TYPE=""
+  SCRITE_VERSION="${PROJECT_VERSION}"
+  SCRITE_VERSION_TYPE="${SCRITE_VERSION_TYPE}"
   SCRITE_QML_URI="io.scrite.components"
   $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
 )
@@ -133,6 +133,10 @@ target_link_libraries(Scrite PRIVATE
 )
 
 if(APPLE)
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
+                 "${CMAKE_CURRENT_BINARY_DIR}/Info.plist"
+                 @ONLY)
+
   set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/appicon.icns"
     PROPERTIES MACOSX_PACKAGE_LOCATION Resources
   )
@@ -140,7 +144,7 @@ if(APPLE)
 
   set_target_properties(Scrite PROPERTIES
     OSX_ARCHITECTURES "x86_64;arm64"
-    MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist"
+    MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist"
   )
   target_link_libraries(Scrite PRIVATE "-framework Carbon")
 
@@ -241,4 +245,20 @@ add_custom_target(scrite_touch_build_timestamp ALL
           "${SCRITE_DESKTOP_SRC_DIR}/core/application_build_timestamp.cpp"
 )
 add_dependencies(Scrite scrite_touch_build_timestamp)
+
+# CPack install rules
+if(APPLE)
+  install(TARGETS Scrite BUNDLE DESTINATION .)
+elseif(WIN32)
+  install(TARGETS Scrite RUNTIME DESTINATION .)
+  install(FILES "${CMAKE_SOURCE_DIR}/packaging/assets/windows/qt.conf"
+          DESTINATION .)
+elseif(UNIX)
+  install(TARGETS Scrite RUNTIME DESTINATION bin)
+  install(FILES "${CMAKE_SOURCE_DIR}/packaging/assets/linux/Scrite.desktop"
+          DESTINATION share/applications)
+  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/images/appicon.png"
+          DESTINATION share/icons/hicolor/512x512/apps
+          RENAME Scrite.png)
+endif()
 

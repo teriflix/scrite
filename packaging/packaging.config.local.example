@@ -1,0 +1,62 @@
+# Example configuration for Scrite packaging.
+# Copy this to packaging/packaging.config.local and fill in your values.
+# DO NOT commit packaging.config.local to version control!
+
+# ============================================================================
+# macOS Signing & Notarization
+# ============================================================================
+# MACOS_SIGNING_IDENTITY — Your "Developer ID Application" identity
+# Example: "Developer ID Application: VCreate Logic (ABC123XYZ)"
+# Run 'security find-identity -v -p codesigning' to list your identities.
+export MACOS_SIGNING_IDENTITY=""
+
+# APPLE_TEAM_ID — Your Apple Developer Team ID (for notarization)
+export APPLE_TEAM_ID=""
+
+# APPLE_ID_USER — Your Apple ID email
+export APPLE_ID_USER=""
+
+# APPLE_NOTARIZE_PASSWORD — App-specific password from https://appleid.apple.com
+# Create an app-specific password under Security; do NOT use your regular Apple ID password.
+export APPLE_NOTARIZE_PASSWORD=""
+
+# ============================================================================
+# Windows Signing
+# ============================================================================
+# CODESIGN_TOOL — Path to code signing tool executable
+# Example: "C:\\Program Files (x86)\\CodeSignTool\\CodeSignTool.exe"
+#          or "signtool.exe" if in PATH
+export CODESIGN_TOOL=""
+
+# WIN_CERT_SUBJECT — Certificate CN (Common Name) for code signing
+# This should match the certificate CN from your code signing certificate.
+export WIN_CERT_SUBJECT=""
+
+# Windows dependencies (set these if not in standard locations)
+export SCRITE_OPENSSL_LIBS=""      # Root of OpenSSL 1.1 x64 DLLs
+export SCRITE_CRASHPAD_ROOT=""     # Root of Crashpad SDK
+
+# ============================================================================
+# Common
+# ============================================================================
+# SIGN_PACKAGES — Set to 1 to enable signing (macOS & Windows)
+export SIGN_PACKAGES=0
+
+# QT_BIN_DIR — Path to Qt bin directory
+# Example: "$HOME/Qt/6.8.0/macos/bin"
+#          or "$HOME/Qt/6.8.0/gcc_64/bin" on Linux
+#          or "C:\\Qt\\6.8.0\\msvc2022_64\\bin" on Windows
+# If not set, the scripts will search PATH.
+export QT_BIN_DIR=""
+
+# BUILD_DIR — CMake build directory (relative to project root)
+export BUILD_DIR="build"
+
+# ============================================================================
+# Linux-specific
+# ============================================================================
+# LINUXDEPLOYQT_PATH — Path to linuxdeployqt executable (auto-detected if not set)
+export LINUXDEPLOYQT_PATH=""
+
+# APPIMAGETOOL_PATH — Path to appimagetool executable (for --use-appimagetool)
+export APPIMAGETOOL_PATH=""

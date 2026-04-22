@@ -1,0 +1,22 @@
+import os
+
+base_path = os.getcwd()
+filename = 'Scrite-@VERSION@@VERSION_SUFFIX@.dmg'
+volume_name = 'Scrite-@VERSION@@VERSION_SUFFIX@'
+format = 'ULFO'
+filesystem = 'APFS'
+# Use absolute path for background to ensure dmgbuild can find it
+background = os.path.abspath(os.path.join(base_path, 'background.png'))
+window_rect = ((272, 136), (896, 720))
+show_status_bar = False
+show_tab_view = False
+show_toolbar = False
+show_pathbar = False
+show_sidebar = False
+icon_size = 128
+icon_locations = {
+    'Scrite.app': (292, 336),
+    'Applications': (620, 336)
+}
+files = [ os.path.join(base_path, 'Scrite.app') ]
+symlinks = { 'Applications': '/Applications' }

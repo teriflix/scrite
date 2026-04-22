@@ -17,7 +17,7 @@ foreach(_scrite_include_before_var CMAKE_PROJECT_INCLUDE_BEFORE CMAKE_PROJECT_Sc
   endif()
 endforeach()
 
-project(Scrite VERSION 2.0.21 LANGUAGES C CXX)
+project(Scrite VERSION 2.9.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -45,3 +45,6 @@ endif()
 add_subdirectory(thirdparty)
 add_subdirectory(tools)
 add_subdirectory(apps)
+
+# CPack configuration for distributable packages
+include("${CMAKE_SOURCE_DIR}/packaging/cmake/CPackConfig.cmake")

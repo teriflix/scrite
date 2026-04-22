@@ -78,3 +78,9 @@ thirdparty/static/quazip/vcpkg_installed
 /docs/userguide/site.zip
 /docs/userguide/__pycache__/
 
+# Packaging (local credentials, staging directories, and build artifacts)
+packaging/packaging.config.local
+packaging/_staging/
+packaging/assets/mac/background.png
+binary/packages/
+
