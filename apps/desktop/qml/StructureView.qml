@@ -66,13 +66,16 @@ Item {
     StructureCanvasPreview {
         id: _canvasPreview
 
+        DelayedProperty.watch: Runtime.colors.scheme
+        DelayedProperty.delay: 50
+
         anchors.right: _canvasScroll.right
         anchors.bottom: _canvasScroll.bottom
         anchors.margins: 30
 
         canvasScroll: _canvasScroll
 
-        visible: allowed && Runtime.structureCanvasSettings.showPreview && parent.width > 400 && isContentOverflowing
+        visible: Runtime.colors.scheme === DelayedProperty.value && allowed && Runtime.structureCanvasSettings.showPreview && parent.width > 400 && isContentOverflowing
     }
 
     BasicAttachmentsDropArea {
