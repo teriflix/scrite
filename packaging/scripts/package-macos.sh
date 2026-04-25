@@ -87,19 +87,24 @@ rm -rf "$APP_BUNDLE/Contents/PlugIns/sqldrivers"
 if [ $SIGN -eq 1 ] && [ -n "$MACOS_SIGNING_IDENTITY" ]; then
     echo "Code signing app bundle: $MACOS_SIGNING_IDENTITY"
 
-    # Sign nested binaries first (dylibs, plugins)
-    find "$APP_BUNDLE/Contents/Frameworks" "$APP_BUNDLE/Contents/PlugIns" -type f \( -name "*.dylib" -o -name "*.so" \) 2>/dev/null | while read -r dylib; do
-        echo "  Signing: $(basename "$dylib")"
-        codesign --force --options=runtime --sign "$MACOS_SIGNING_IDENTITY" "$dylib"
-    done
-
-    # Sign the main executable last
-    echo "  Signing: Scrite executable"
-    codesign --force --options=runtime --sign "$MACOS_SIGNING_IDENTITY" "$SCRITE_BINARY"
-
-    # Sign the entire app bundle to ensure everything is consistent
-    echo "  Signing: app bundle"
+    # Sign the entire app bundle with --deep to sign all frameworks and plugins
+    echo "  Signing: app bundle (deep)"
     codesign --force --deep --options=runtime --sign "$MACOS_SIGNING_IDENTITY" "$APP_BUNDLE"
+
+    # Then re-sign specific executables with WebEngine entitlements for V8 JIT support
+    # (This restores the entitlements that were needed for WebEngine to work)
+    QT_WEBENGINE_ENTITLEMENTS="$APP_BUNDLE/Contents/Frameworks/QtWebEngineCore.framework/Versions/A/Helpers/QtWebEngineProcess.app/Contents/Resources/QtWebEngineProcess.entitlements"
+
+    if [ -f "$QT_WEBENGINE_ENTITLEMENTS" ]; then
+        QT_WEBENGINE_PROCESS="$APP_BUNDLE/Contents/Frameworks/QtWebEngineCore.framework/Versions/A/Helpers/QtWebEngineProcess.app/Contents/MacOS/QtWebEngineProcess"
+        if [ -f "$QT_WEBENGINE_PROCESS" ]; then
+            echo "  Re-signing: QtWebEngineProcess with entitlements"
+            codesign --force --options=runtime --entitlements "$QT_WEBENGINE_ENTITLEMENTS" --sign "$MACOS_SIGNING_IDENTITY" "$QT_WEBENGINE_PROCESS"
+        fi
+
+        echo "  Re-signing: Scrite executable with entitlements"
+        codesign --force --options=runtime --entitlements "$QT_WEBENGINE_ENTITLEMENTS" --sign "$MACOS_SIGNING_IDENTITY" "$SCRITE_BINARY"
+    fi
 
     # Verify the signature
     echo "Verifying signature..."
