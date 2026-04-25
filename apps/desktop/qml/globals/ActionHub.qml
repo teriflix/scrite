@@ -538,7 +538,7 @@ Item {
             readonly property bool visible: false
             readonly property bool allowShortcut: true
 
-            text: "Toggle Color Theme (Dark <-> Light)"
+            text: "Toggle Color Theme (Light \u21D4 Dark)"
             objectName: "toggleColorTheme"
 
             onTriggered: {
