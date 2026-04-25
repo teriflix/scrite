@@ -569,6 +569,8 @@ Rectangle {
                 }
 
                 Rectangle {
+                    id: _infoLabelBackdrop
+
                     anchors.fill: _infoLabel
                     anchors.margins: -4
 
@@ -577,7 +579,7 @@ Rectangle {
                     radius: 4
 
                     border.width: 1
-                    border.color: _nodeItem.node.marked ? Runtime.colors.accent.a700.text : "black"
+                    border.color: _infoLabel.color
                 }
 
                 VclText {
@@ -589,7 +591,7 @@ Rectangle {
 
                     width: parent.width - 30
 
-                    color: _nodeItem.node.marked ? Runtime.colors.accent.a700.text : "black"
+                    color: Runtime.colors.tx("black", _infoLabelBackdrop.color)
                     horizontalAlignment: Text.AlignHCenter
                     maximumLineCount: 3
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -619,10 +621,10 @@ Rectangle {
 
                     anchors.fill: parent
 
-                    color: Qt.rgba(1,1,1,alpha)
+                    color: Runtime.colors.scheme === Qt.ColorScheme.Dark ? Qt.rgba(0,0,0,alpha) : Qt.rgba(1,1,1,alpha)
 
                     border.width: _nodeItem.character === _canvas.activeCharacter ? 3 : 1
-                    border.color: _nodeItem.character === _canvas.activeCharacter ? "black" : Runtime.colors.primary.borderColor
+                    border.color: _infoLabel.color
                 }
             }
 
