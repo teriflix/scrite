@@ -148,20 +148,29 @@ if(APPLE)
   )
   target_link_libraries(Scrite PRIVATE "-framework Carbon")
 
-  # Copy dynamic libraries and the kf6 plugins folder into the app bundle so
-  # that the self-contained Scrite.app finds them at runtime under Contents/MacOS.
+  # Copy dynamic libraries and the kf6 plugins folder into the app bundle.
+  # Dylibs go into Contents/Frameworks/ (standard macOS layout).
+  # Plugins go into Contents/PlugIns/ (Qt convention).
   add_custom_command(TARGET Scrite POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E make_directory
+            "$<TARGET_FILE_DIR:Scrite>/../Frameworks"
     COMMAND "${CMAKE_COMMAND}" -E copy_if_different
             "$<TARGET_FILE:KF6SonnetCore>"
-            "$<TARGET_FILE_DIR:Scrite>/$<TARGET_FILE_NAME:KF6SonnetCore>"
+            "$<TARGET_FILE_DIR:Scrite>/../Frameworks/$<TARGET_FILE_NAME:KF6SonnetCore>"
     COMMAND "${CMAKE_COMMAND}" -E copy_if_different
             "$<TARGET_FILE:phtranslator>"
-            "$<TARGET_FILE_DIR:Scrite>/$<TARGET_FILE_NAME:phtranslator>"
+            "$<TARGET_FILE_DIR:Scrite>/../Frameworks/$<TARGET_FILE_NAME:phtranslator>"
     COMMAND "${CMAKE_COMMAND}" -E copy_directory
             "${CMAKE_SOURCE_DIR}/binary/kf6"
-            "$<TARGET_FILE_DIR:Scrite>/kf6"
-    COMMENT "Copying KF6SonnetCore, phtranslator, and kf6 plugins into Scrite.app/Contents/MacOS"
+            "$<TARGET_FILE_DIR:Scrite>/../PlugIns/kf6"
+    COMMENT "Copying KF6SonnetCore, phtranslator, and kf6 plugins into Scrite.app"
     VERBATIM
+  )
+
+  # Set rpath so the executable finds dylibs in Contents/Frameworks/
+  set_target_properties(Scrite PROPERTIES
+    INSTALL_RPATH "@executable_path/../Frameworks"
+    BUILD_RPATH "$<TARGET_FILE_DIR:KF6SonnetCore>;$<TARGET_FILE_DIR:phtranslator>"
   )
 endif()
 

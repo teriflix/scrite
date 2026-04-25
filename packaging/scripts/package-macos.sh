@@ -88,7 +88,7 @@ if [ $SIGN -eq 1 ] && [ -n "$MACOS_SIGNING_IDENTITY" ]; then
     echo "Code signing app bundle: $MACOS_SIGNING_IDENTITY"
 
     # Sign nested binaries first (dylibs, plugins)
-    find "$APP_BUNDLE/Contents/MacOS" -type f \( -name "*.dylib" -o -name "*.so" \) | while read -r dylib; do
+    find "$APP_BUNDLE/Contents/Frameworks" "$APP_BUNDLE/Contents/PlugIns" -type f \( -name "*.dylib" -o -name "*.so" \) 2>/dev/null | while read -r dylib; do
         echo "  Signing: $(basename "$dylib")"
         codesign --force --options=runtime --sign "$MACOS_SIGNING_IDENTITY" "$dylib"
     done
