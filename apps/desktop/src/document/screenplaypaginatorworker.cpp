@@ -17,7 +17,7 @@
 #include "scene.h"
 #include "utils.h"
 #include "screenplay.h"
-#include "formatting.h"
+#include "screenplayformat.h"
 #include "languageengine.h"
 #include "timeprofiler.h"
 

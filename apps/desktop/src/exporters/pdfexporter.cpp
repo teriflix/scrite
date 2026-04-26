@@ -16,7 +16,7 @@
 #include "pdfexporter.h"
 // #include "application.h"
 #include "qtextdocumentpagedprinter.h"
-#include "formatting.h"
+#include "screenplayformat.h"
 #include "screenplay.h"
 #include "scritedocument.h"
 

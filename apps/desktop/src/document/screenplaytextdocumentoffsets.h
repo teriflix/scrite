@@ -20,7 +20,7 @@
 #include <QTextDocument>
 
 #include "screenplay.h"
-#include "formatting.h"
+#include "screenplayformat.h"
 #include "qobjectproperty.h"
 #include "genericarraymodel.h"
 

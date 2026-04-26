@@ -34,7 +34,7 @@
 #include <QAbstractTextDocumentLayout>
 
 #include "scene.h"
-#include "formatting.h"
+#include "screenplayformat.h"
 #include "screenplay.h"
 #include "qobjectproperty.h"
 

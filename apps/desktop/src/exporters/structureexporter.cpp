@@ -17,7 +17,7 @@
 #include "structureexporter_p.h"
 
 #include "application.h"
-#include "formatting.h"
+#include "screenplayformat.h"
 #include "screenplay.h"
 #include "scritedocument.h"
 

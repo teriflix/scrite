@@ -916,7 +916,7 @@ public:
     Q_SIGNAL void trackSceneChangesChanged();
 
     // clang-format off
-    Q_MOC_INCLUDE("formatting.h")
+    Q_MOC_INCLUDE("screenplayformat.h")
     Q_PROPERTY(ScreenplayFormat *format
                READ format
                WRITE setFormat

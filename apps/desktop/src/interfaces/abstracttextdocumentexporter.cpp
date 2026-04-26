@@ -15,7 +15,7 @@
 
 #include "abstracttextdocumentexporter.h"
 #include "screenplaytextdocument.h"
-#include "formatting.h"
+#include "screenplayformat.h"
 #include "screenplay.h"
 #include "scritedocument.h"
 

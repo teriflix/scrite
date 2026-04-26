@@ -20,7 +20,7 @@
 #include <QTextDocument>
 
 #include "screenplay.h"
-#include "formatting.h"
+#include "screenplayformat.h"
 
 class ScreenplayPaginatorBlockData : public QTextBlockUserData
 {

@@ -16,7 +16,7 @@
 #include "finaldraftexporter.h"
 #include "utils.h"
 #include "languageengine.h"
-#include "formatting.h"
+#include "screenplayformat.h"
 #include "screenplay.h"
 #include "scritedocument.h"
 

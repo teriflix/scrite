@@ -15,7 +15,7 @@
 
 #include "utils.h"
 #include "application.h"
-#include "formatting.h"
+#include "screenplayformat.h"
 #include "screenplay.h"
 #include "scritedocument.h"
 

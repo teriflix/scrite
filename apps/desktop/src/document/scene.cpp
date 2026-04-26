@@ -17,7 +17,7 @@
 #include "utils.h"
 #include "undoredo.h"
 #include "hourglass.h"
-#include "formatting.h"
+#include "screenplayformat.h"
 #include "application.h"
 #include "searchengine.h"
 #include "timeprofiler.h"

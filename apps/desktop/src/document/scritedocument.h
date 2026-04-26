@@ -22,7 +22,7 @@
 
 #include "screenplay.h"
 #include "structure.h"
-#include "formatting.h"
+#include "screenplayformat.h"
 #include "errorreport.h"
 #include "progressreport.h"
 #include "qobjectproperty.h"
@@ -648,7 +648,7 @@ public:
     Q_SIGNAL void screenplayChanged();
 
     // clang-format off
-    Q_MOC_INCLUDE("formatting.h")
+    Q_MOC_INCLUDE("screenplayformat.h")
     Q_PROPERTY(ScreenplayFormat *displayFormat
                READ formatting
                NOTIFY formattingChanged
