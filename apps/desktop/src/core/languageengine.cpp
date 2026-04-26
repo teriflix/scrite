@@ -1769,6 +1769,7 @@ bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
                     return false;
 
                 this->commitWordToEditor();
+                return (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter);
             }
         }
 
