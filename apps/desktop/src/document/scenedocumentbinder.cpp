@@ -3050,6 +3050,9 @@ void SceneDocumentBinder::onTextFormatChanged(const QList<int> &properties)
         || m_textFormat->isUpdatingFromCharFormat())
         return;
 
+    auto guard = qScopeGuard([=]() { m_scene->endUndoCapture(); });
+    m_scene->beginUndoCapture();
+
     const QTextCharFormat updatedFormat = m_textFormat->toCharFormat(properties);
 
     /**
