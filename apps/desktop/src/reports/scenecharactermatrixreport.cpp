@@ -34,6 +34,8 @@
 SceneCharacterMatrixReport::SceneCharacterMatrixReport(QObject *parent)
     : AbstractReportGenerator(parent)
 {
+    this->setFormat(OpenDocumentFormat);
+
     connect(this, &AbstractReportGenerator::documentChanged, [=]() {
         if (this->document() != nullptr)
             this->setCharacterNames(this->document()->structure()->characterNames());

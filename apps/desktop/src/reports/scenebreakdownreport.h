@@ -97,6 +97,97 @@ public:
     QString keywords() const { return m_keywords; }
     Q_SIGNAL void keywordsChanged();
 
+    // clang-format off
+    Q_CLASSINFO("showSynopsisColumn_FieldGroup", "Columns")
+    Q_CLASSINFO("showSynopsisColumn_FieldLabel", "Include 'Synopsis' column in the report")
+    Q_CLASSINFO("showSynopsisColumn_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool showSynopsisColumn
+               READ showSynopsisColumn
+               WRITE setShowSynopsisColumn
+               NOTIFY showSynopsisColumnChanged)
+    // clang-format on
+    void setShowSynopsisColumn(bool val);
+    bool showSynopsisColumn() const { return m_showSynopsisColumn; }
+    Q_SIGNAL void showSynopsisColumnChanged();
+
+    // clang-format off
+    Q_CLASSINFO("showGroupsColumn_FieldGroup", "Columns")
+    Q_CLASSINFO("showGroupsColumn_FieldLabel", "Include 'Formal Tags' column in the report")
+    Q_CLASSINFO("showGroupsColumn_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool showGroupsColumn
+               READ showGroupsColumn
+               WRITE setShowGroupsColumn
+               NOTIFY showGroupsColumnChanged)
+    // clang-format on
+    void setShowGroupsColumn(bool val);
+    bool showGroupsColumn() const { return m_showGroupsColumn; }
+    Q_SIGNAL void showGroupsColumnChanged();
+
+    // clang-format off
+    Q_CLASSINFO("showKeywordsColumn_FieldGroup", "Columns")
+    Q_CLASSINFO("showKeywordsColumn_FieldLabel", "Include 'Keywords' column in the report")
+    Q_CLASSINFO("showKeywordsColumn_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool showKeywordsColumn
+               READ showKeywordsColumn
+               WRITE setShowKeywordsColumn
+               NOTIFY showKeywordsColumnChanged)
+    // clang-format on
+    void setShowKeywordsColumn(bool val);
+    bool showKeywordsColumn() const { return m_showKeywordsColumn; }
+    Q_SIGNAL void showKeywordsColumnChanged();
+
+    // clang-format off
+    Q_CLASSINFO("showStartPageColumn_FieldGroup", "Columns")
+    Q_CLASSINFO("showStartPageColumn_FieldLabel", "Include 'Start Page' column in the report")
+    Q_CLASSINFO("showStartPageColumn_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool showStartPageColumn
+               READ showStartPageColumn
+               WRITE setShowStartPageColumn
+               NOTIFY showStartPageColumnChanged)
+    // clang-format on
+    void setShowStartPageColumn(bool val);
+    bool showStartPageColumn() const { return m_showStartPageColumn; }
+    Q_SIGNAL void showStartPageColumnChanged();
+
+    // clang-format off
+    Q_CLASSINFO("showPageCountColumn_FieldGroup", "Columns")
+    Q_CLASSINFO("showPageCountColumn_FieldLabel", "Include 'Page Length' column in the report to show 1/8th lengths")
+    Q_CLASSINFO("showPageCountColumn_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool showPageCountColumn
+               READ showPageCountColumn
+               WRITE setShowPageCountColumn
+               NOTIFY showPageCountColumnChanged)
+    // clang-format on
+    void setShowPageCountColumn(bool val);
+    bool showPageCountColumn() const { return m_showPageCountColumn; }
+    Q_SIGNAL void showPageCountColumnChanged();
+
+    // clang-format off
+    Q_CLASSINFO("showSceneTimeColumn_FieldGroup", "Columns")
+    Q_CLASSINFO("showSceneTimeColumn_FieldLabel", "Include 'Scene Time' column in the report")
+    Q_CLASSINFO("showSceneTimeColumn_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool showSceneTimeColumn
+               READ showSceneTimeColumn
+               WRITE setShowSceneTimeColumn
+               NOTIFY showSceneTimeColumnChanged)
+    // clang-format on
+    void setShowSceneTimeColumn(bool val);
+    bool showSceneTimeColumn() const { return m_showSceneTimeColumn; }
+    Q_SIGNAL void showSceneTimeColumnChanged();
+
+    // clang-format off
+    Q_CLASSINFO("showCharactersColumn_FieldGroup", "Columns")
+    Q_CLASSINFO("showCharactersColumn_FieldLabel", "Include 'Characters' column in the report")
+    Q_CLASSINFO("showCharactersColumn_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool showCharactersColumn
+               READ showCharactersColumn
+               WRITE setShowCharactersColumn
+               NOTIFY showCharactersColumnChanged)
+    // clang-format on
+    void setShowCharactersColumn(bool val);
+    bool showCharactersColumn() const { return m_showCharactersColumn; }
+    Q_SIGNAL void showCharactersColumnChanged();
+
 protected:
     // AbstractDeviceIO interface
     QString fileNameExtension() const;
@@ -119,6 +210,13 @@ private:
     QList<int> m_sceneNumbers;
     QStringList m_tags;
     QString m_keywords;
+    bool m_showSynopsisColumn = true;
+    bool m_showGroupsColumn = true;
+    bool m_showKeywordsColumn = true;
+    bool m_showStartPageColumn = true;
+    bool m_showPageCountColumn = true;
+    bool m_showSceneTimeColumn = true;
+    bool m_showCharactersColumn = true;
 };
 
 #endif // SCENEBREAKDOWNREPORT_H

@@ -44,17 +44,33 @@ const QString COL_LOCATION = QStringLiteral("Location Name");
 const QString COL_TIME_OF_DAY = QStringLiteral("Time of Day");
 const QString COL_SCENE_NUM = QStringLiteral("Scene #");
 const QString COL_SYNOPSIS = QStringLiteral("Synopsis");
-const QString COL_GROUPS = QStringLiteral("Groups");
+const QString COL_GROUPS = QStringLiteral("Formal Tags");
 const QString COL_KEYWORDS = QStringLiteral("Keywords");
 const QString COL_START_PAGE = QStringLiteral("Start Page");
 const QString COL_PAGE_COUNT = QStringLiteral("Page Count (1/8)");
 const QString COL_SCENE_TIME = QStringLiteral("Scene Time");
 const QString COL_CHARACTERS = QStringLiteral("Characters");
+
+// Column keys
+const QString COL_KEY_INT_EXT = QStringLiteral("intExt");
+const QString COL_KEY_LOCATION = QStringLiteral("location");
+const QString COL_KEY_TIME_OF_DAY = QStringLiteral("timeOfDay");
+const QString COL_KEY_SCENE_NUM = QStringLiteral("sceneNum");
+const QString COL_KEY_SYNOPSIS = QStringLiteral("synopsis");
+const QString COL_KEY_GROUPS = QStringLiteral("groups");
+const QString COL_KEY_KEYWORDS = QStringLiteral("keywords");
+const QString COL_KEY_START_PAGE = QStringLiteral("startPage");
+const QString COL_KEY_PAGE_COUNT = QStringLiteral("pageCount");
+const QString COL_KEY_SCENE_TIME = QStringLiteral("sceneTime");
+const QString COL_KEY_CHARACTERS = QStringLiteral("characters");
 } // namespace
 
 Q_DECL_IMPORT int qt_defaultDpi();
 
-SceneBreakdownReport::SceneBreakdownReport(QObject *parent) : AbstractReportGenerator(parent) { }
+SceneBreakdownReport::SceneBreakdownReport(QObject *parent) : AbstractReportGenerator(parent)
+{
+    this->setFormat(OpenDocumentFormat);
+}
 
 SceneBreakdownReport::~SceneBreakdownReport() { }
 
@@ -92,6 +108,69 @@ void SceneBreakdownReport::setKeywords(const QString &val)
 
     m_keywords = val;
     emit keywordsChanged();
+}
+
+void SceneBreakdownReport::setShowSynopsisColumn(bool val)
+{
+    if (m_showSynopsisColumn == val)
+        return;
+
+    m_showSynopsisColumn = val;
+    emit showSynopsisColumnChanged();
+}
+
+void SceneBreakdownReport::setShowGroupsColumn(bool val)
+{
+    if (m_showGroupsColumn == val)
+        return;
+
+    m_showGroupsColumn = val;
+    emit showGroupsColumnChanged();
+}
+
+void SceneBreakdownReport::setShowKeywordsColumn(bool val)
+{
+    if (m_showKeywordsColumn == val)
+        return;
+
+    m_showKeywordsColumn = val;
+    emit showKeywordsColumnChanged();
+}
+
+void SceneBreakdownReport::setShowStartPageColumn(bool val)
+{
+    if (m_showStartPageColumn == val)
+        return;
+
+    m_showStartPageColumn = val;
+    emit showStartPageColumnChanged();
+}
+
+void SceneBreakdownReport::setShowPageCountColumn(bool val)
+{
+    if (m_showPageCountColumn == val)
+        return;
+
+    m_showPageCountColumn = val;
+    emit showPageCountColumnChanged();
+}
+
+void SceneBreakdownReport::setShowSceneTimeColumn(bool val)
+{
+    if (m_showSceneTimeColumn == val)
+        return;
+
+    m_showSceneTimeColumn = val;
+    emit showSceneTimeColumnChanged();
+}
+
+void SceneBreakdownReport::setShowCharactersColumn(bool val)
+{
+    if (m_showCharactersColumn == val)
+        return;
+
+    m_showCharactersColumn = val;
+    emit showCharactersColumnChanged();
 }
 
 QString SceneBreakdownReport::fileNameExtension() const
@@ -253,6 +332,52 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
     cursor.insertBlock(blockFormat, charFormat);
     cursor.insertText("--");
 
+    // Build list of visible columns dynamically
+    struct ColumnInfo
+    {
+        QString header;
+        QString key;
+        int defaultWidth;
+    };
+
+    const QHash<QString, int> stdColumnWidths = { { COL_LOCATION, 100 },    { COL_SYNOPSIS, 300 },
+                                                  { COL_CHARACTERS, 150 },  { COL_INT_EXT, 50 },
+                                                  { COL_TIME_OF_DAY, 100 }, { COL_KEYWORDS, 75 },
+                                                  { COL_GROUPS, 75 } };
+
+    QList<ColumnInfo> columns = {
+        { COL_INT_EXT, COL_KEY_INT_EXT, 50 },          { COL_LOCATION, COL_KEY_LOCATION, 100 },
+        { COL_TIME_OF_DAY, COL_KEY_TIME_OF_DAY, 100 }, { COL_SCENE_NUM, COL_KEY_SCENE_NUM, -1 },
+        { COL_SYNOPSIS, COL_KEY_SYNOPSIS, 300 },       { COL_GROUPS, COL_KEY_GROUPS, 75 },
+        { COL_KEYWORDS, COL_KEY_KEYWORDS, 75 },        { COL_START_PAGE, COL_KEY_START_PAGE, -1 },
+        { COL_PAGE_COUNT, COL_KEY_PAGE_COUNT, -1 },    { COL_SCENE_TIME, COL_KEY_SCENE_TIME, -1 },
+        { COL_CHARACTERS, COL_KEY_CHARACTERS, 150 },
+    };
+
+    // Filter to visible columns only
+    QList<ColumnInfo> visibleColumns;
+    for (const auto &col : std::as_const(columns)) {
+        // First 4 columns are always visible
+        if (col.key == COL_KEY_INT_EXT || col.key == COL_KEY_LOCATION
+            || col.key == COL_KEY_TIME_OF_DAY || col.key == COL_KEY_SCENE_NUM) {
+            visibleColumns.append(col);
+        } else if (col.key == COL_KEY_SYNOPSIS && m_showSynopsisColumn) {
+            visibleColumns.append(col);
+        } else if (col.key == COL_KEY_GROUPS && m_showGroupsColumn) {
+            visibleColumns.append(col);
+        } else if (col.key == COL_KEY_KEYWORDS && m_showKeywordsColumn) {
+            visibleColumns.append(col);
+        } else if (col.key == COL_KEY_START_PAGE && m_showStartPageColumn) {
+            visibleColumns.append(col);
+        } else if (col.key == COL_KEY_PAGE_COUNT && m_showPageCountColumn) {
+            visibleColumns.append(col);
+        } else if (col.key == COL_KEY_SCENE_TIME && m_showSceneTimeColumn) {
+            visibleColumns.append(col);
+        } else if (col.key == COL_KEY_CHARACTERS && m_showCharactersColumn) {
+            visibleColumns.append(col);
+        }
+    }
+
     QTextTableFormat tableFormat;
     tableFormat.setCellSpacing(0);
     tableFormat.setCellPadding(5);
@@ -264,28 +389,18 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
     tableFormat.setTopMargin(0);
     tableFormat.setBottomMargin(0);
 
-    const QStringList headers = { COL_INT_EXT,    COL_LOCATION,   COL_TIME_OF_DAY, COL_SCENE_NUM,
-                                  COL_SYNOPSIS,   COL_GROUPS,     COL_KEYWORDS,    COL_START_PAGE,
-                                  COL_PAGE_COUNT, COL_SCENE_TIME, COL_CHARACTERS };
-    const QHash<QString, int> stdColumnWidths = { { COL_LOCATION, 100 },    { COL_SYNOPSIS, 300 },
-                                                  { COL_CHARACTERS, 150 },  { COL_INT_EXT, 50 },
-                                                  { COL_TIME_OF_DAY, 100 }, { COL_KEYWORDS, 75 },
-                                                  { COL_GROUPS, 75 } };
-
-    // Set column width constraints with specific widths for each column
+    // Set column width constraints based on visible columns
     QVector<QTextLength> columnWidths;
-    for (int i = 0; i < headers.size(); ++i) {
-        const QString header = headers.at(i);
-        if (stdColumnWidths.contains(header))
-            columnWidths.append(
-                    QTextLength(QTextLength::FixedLength, stdColumnWidths.value(header)));
+    for (const auto &col : std::as_const(visibleColumns)) {
+        if (col.defaultWidth > 0)
+            columnWidths.append(QTextLength(QTextLength::FixedLength, col.defaultWidth));
         else
             columnWidths.append(QTextLength(QTextLength::VariableLength, 1));
     }
     tableFormat.setColumnWidthConstraints(columnWidths);
 
     QTextTable *table =
-            cursor.insertTable(screenplayElements.size() + 1, headers.size(), tableFormat);
+            cursor.insertTable(screenplayElements.size() + 1, visibleColumns.size(), tableFormat);
 
     // Create cell format with borders
     QTextTableCellFormat cellFormatWithBorders;
@@ -293,7 +408,7 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
     cellFormatWithBorders.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
 
     // Write headers
-    for (int col = 0; col < headers.size(); col++) {
+    for (int col = 0; col < visibleColumns.size(); col++) {
         QTextTableCell cell = table->cellAt(0, col);
         cell.setFormat(cellFormatWithBorders);
 
@@ -303,7 +418,7 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
         headerFormat.setFontWeight(QFont::Bold);
         cellCursor.setCharFormat(headerFormat);
 
-        cellCursor.insertText(headers.at(col));
+        cellCursor.insertText(visibleColumns.at(col).header);
     }
 
     // Write data rows
@@ -315,72 +430,10 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
 
         // Get page and time info from paginated document
         const qreal pixelLength = ScreenplayPaginator::pixelLength(element, paginatedDoc.data());
-        const qreal pageLength =
-                ScreenplayPaginator::pixelToPageLength(pixelLength, paginatedDoc.data());
         const QTime timeLength =
                 ScreenplayPaginator::pixelToTimeLength(pixelLength, format, paginatedDoc.data());
 
-        int col = 0;
-
-        // INT/EXT
-        QTextTableCell cell = table->cellAt(row + 1, col++);
-        cell.setFormat(cellFormatWithBorders);
-        QTextCursor cellCursor = cell.firstCursorPosition();
-        if (scene->heading()->isEnabled()) {
-            cellCursor.insertText(scene->heading()->locationType());
-        } else {
-            cellCursor.insertText(DASH);
-        }
-
-        // Location Name
-        cell = table->cellAt(row + 1, col++);
-        cell.setFormat(cellFormatWithBorders);
-        cellCursor = cell.firstCursorPosition();
-        if (scene->heading()->isEnabled()) {
-            cellCursor.insertText(scene->heading()->location());
-        } else {
-            cellCursor.insertText(DASH);
-        }
-
-        // Time of Day
-        cell = table->cellAt(row + 1, col++);
-        cell.setFormat(cellFormatWithBorders);
-        cellCursor = cell.firstCursorPosition();
-        if (scene->heading()->isEnabled()) {
-            cellCursor.insertText(scene->heading()->moment());
-        } else {
-            cellCursor.insertText(DASH);
-        }
-
-        // Scene #
-        cell = table->cellAt(row + 1, col++);
-        cell.setFormat(cellFormatWithBorders);
-        cellCursor = cell.firstCursorPosition();
-        cellCursor.insertText(element->resolvedSceneNumber());
-
-        // Synopsis
-        cell = table->cellAt(row + 1, col++);
-        cell.setFormat(cellFormatWithBorders);
-        cellCursor = cell.firstCursorPosition();
-        cellCursor.insertText(scene->synopsis());
-
-        // Groups
-        cell = table->cellAt(row + 1, col++);
-        cell.setFormat(cellFormatWithBorders);
-        cellCursor = cell.firstCursorPosition();
-        cellCursor.insertText(scene->groups().join(COMMA_SPACE));
-
-        // Keywords
-        cell = table->cellAt(row + 1, col++);
-        cell.setFormat(cellFormatWithBorders);
-        cellCursor = cell.firstCursorPosition();
-        cellCursor.insertText(scene->tags().join(COMMA_SPACE));
-
-        // Start Page - We'll need to calculate cumulative page offset
-        cell = table->cellAt(row + 1, col++);
-        cell.setFormat(cellFormatWithBorders);
-        cellCursor = cell.firstCursorPosition();
-        // Get page offset by summing pixel lengths of all previous scenes
+        // Calculate cumulative pixel for start page (used by multiple columns)
         qreal cumulativePixel = 0;
         for (int i = 0; i < row; i++) {
             cumulativePixel +=
@@ -389,27 +442,43 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
         const int startPage = static_cast<int>(ScreenplayPaginator::pixelToPageLength(
                                       cumulativePixel, paginatedDoc.data()))
                 + 1;
-        cellCursor.insertText(QString::number(startPage));
 
-        // Page Count (1/8)
-        cell = table->cellAt(row + 1, col++);
-        cell.setFormat(cellFormatWithBorders);
-        cellCursor = cell.firstCursorPosition();
-        cellCursor.insertText(
-                ScreenplayPaginator::pixelToPageLength1_8(pixelLength, paginatedDoc.data()));
+        // Populate visible columns
+        for (int col = 0; col < visibleColumns.size(); col++) {
+            QTextTableCell cell = table->cellAt(row + 1, col);
+            cell.setFormat(cellFormatWithBorders);
+            QTextCursor cellCursor = cell.firstCursorPosition();
 
-        // Scene Time
-        cell = table->cellAt(row + 1, col++);
-        cell.setFormat(cellFormatWithBorders);
-        cellCursor = cell.firstCursorPosition();
-        cellCursor.insertText(Utils::TMath::timeLengthString(timeLength));
+            const QString &colKey = visibleColumns.at(col).key;
 
-        // Characters
-        cell = table->cellAt(row + 1, col++);
-        cell.setFormat(cellFormatWithBorders);
-        cellCursor = cell.firstCursorPosition();
-        const QStringList characters = scene->characterNames();
-        cellCursor.insertText(characters.join(COMMA_SPACE));
+            if (colKey == COL_KEY_INT_EXT) {
+                cellCursor.insertText(
+                        scene->heading()->isEnabled() ? scene->heading()->locationType() : DASH);
+            } else if (colKey == COL_KEY_LOCATION) {
+                cellCursor.insertText(scene->heading()->isEnabled() ? scene->heading()->location()
+                                                                    : DASH);
+            } else if (colKey == COL_KEY_TIME_OF_DAY) {
+                cellCursor.insertText(scene->heading()->isEnabled() ? scene->heading()->moment()
+                                                                    : DASH);
+            } else if (colKey == COL_KEY_SCENE_NUM) {
+                cellCursor.insertText(element->resolvedSceneNumber());
+            } else if (colKey == COL_KEY_SYNOPSIS) {
+                cellCursor.insertText(scene->synopsis());
+            } else if (colKey == COL_KEY_GROUPS) {
+                cellCursor.insertText(scene->groups().join(COMMA_SPACE));
+            } else if (colKey == COL_KEY_KEYWORDS) {
+                cellCursor.insertText(scene->tags().join(COMMA_SPACE));
+            } else if (colKey == COL_KEY_START_PAGE) {
+                cellCursor.insertText(QString::number(startPage));
+            } else if (colKey == COL_KEY_PAGE_COUNT) {
+                cellCursor.insertText(ScreenplayPaginator::pixelToPageLength1_8(
+                        pixelLength, paginatedDoc.data()));
+            } else if (colKey == COL_KEY_SCENE_TIME) {
+                cellCursor.insertText(Utils::TMath::timeLengthString(timeLength));
+            } else if (colKey == COL_KEY_CHARACTERS) {
+                cellCursor.insertText(scene->characterNames().join(COMMA_SPACE));
+            }
+        }
     }
 
     return true;
@@ -486,22 +555,56 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
         uint32_t rowIndex = 1;
         uint32_t colIndex = 1;
 
-        const QStringList headers = { COL_INT_EXT,    COL_LOCATION,   COL_TIME_OF_DAY,
-                                      COL_SCENE_NUM,  COL_SYNOPSIS,   COL_GROUPS,
-                                      COL_KEYWORDS,   COL_START_PAGE, COL_PAGE_COUNT,
-                                      COL_SCENE_TIME, COL_CHARACTERS };
+        // Build list of visible columns dynamically
+        struct ColumnInfo
+        {
+            QString header;
+            QString key;
+        };
+
+        QList<ColumnInfo> columns = {
+            { COL_INT_EXT, COL_KEY_INT_EXT },         { COL_LOCATION, COL_KEY_LOCATION },
+            { COL_TIME_OF_DAY, COL_KEY_TIME_OF_DAY }, { COL_SCENE_NUM, COL_KEY_SCENE_NUM },
+            { COL_SYNOPSIS, COL_KEY_SYNOPSIS },       { COL_GROUPS, COL_KEY_GROUPS },
+            { COL_KEYWORDS, COL_KEY_KEYWORDS },       { COL_START_PAGE, COL_KEY_START_PAGE },
+            { COL_PAGE_COUNT, COL_KEY_PAGE_COUNT },   { COL_SCENE_TIME, COL_KEY_SCENE_TIME },
+            { COL_CHARACTERS, COL_KEY_CHARACTERS },
+        };
+
+        // Filter to visible columns only
+        QList<ColumnInfo> visibleColumns;
+        for (const auto &col : std::as_const(columns)) {
+            // First 4 columns are always visible
+            if (col.key == COL_KEY_INT_EXT || col.key == COL_KEY_LOCATION
+                || col.key == COL_KEY_TIME_OF_DAY || col.key == COL_KEY_SCENE_NUM) {
+                visibleColumns.append(col);
+            } else if (col.key == COL_KEY_SYNOPSIS && m_showSynopsisColumn) {
+                visibleColumns.append(col);
+            } else if (col.key == COL_KEY_GROUPS && m_showGroupsColumn) {
+                visibleColumns.append(col);
+            } else if (col.key == COL_KEY_KEYWORDS && m_showKeywordsColumn) {
+                visibleColumns.append(col);
+            } else if (col.key == COL_KEY_START_PAGE && m_showStartPageColumn) {
+                visibleColumns.append(col);
+            } else if (col.key == COL_KEY_PAGE_COUNT && m_showPageCountColumn) {
+                visibleColumns.append(col);
+            } else if (col.key == COL_KEY_SCENE_TIME && m_showSceneTimeColumn) {
+                visibleColumns.append(col);
+            } else if (col.key == COL_KEY_CHARACTERS && m_showCharactersColumn) {
+                visibleColumns.append(col);
+            }
+        }
 
         // Track maximum text length in each column for auto-sizing
-        QVector<int> columnMaxWidths(headers.size(), 0);
-        for (int i = 0; i < headers.size(); ++i) {
-            columnMaxWidths[i] = headers.at(i).length();
+        QVector<int> columnMaxWidths(visibleColumns.size(), 0);
+        for (int i = 0; i < visibleColumns.size(); ++i) {
+            columnMaxWidths[i] = visibleColumns.at(i).header.length();
         }
 
         // Write headers
-        for (uint32_t headerCol = 0; headerCol < static_cast<uint32_t>(headers.size());
-             headerCol++) {
+        for (int headerCol = 0; headerCol < visibleColumns.size(); headerCol++) {
             auto cell = ws.cell(rowIndex, headerCol + 1);
-            cell.value() = headers.at(headerCol).toStdString();
+            cell.value() = visibleColumns.at(headerCol).header.toStdString();
 
             OpenXLSX::XLStyleIndex headerStyleIndex = styles.cellFormats().create();
             OpenXLSX::XLCellFormat headerCellFormat = styles.cellFormats()[headerStyleIndex];
@@ -531,71 +634,7 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
             const QTime timeLength = ScreenplayPaginator::pixelToTimeLength(pixelLength, format,
                                                                             paginatedDoc.data());
 
-            colIndex = 1;
-            int colIdx = 0;
-
-            // INT/EXT
-            QString val1 = scene->heading()->isEnabled() ? scene->heading()->locationType() : DASH;
-            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val1.length());
-            auto cell1 = ws.cell(rowIndex, colIndex);
-            cell1.value() = val1.toStdString();
-            cell1.setCellFormat(dataStyleIndex);
-            colIndex++;
-            colIdx++;
-
-            // Location Name
-            QString val2 = scene->heading()->isEnabled() ? scene->heading()->location() : DASH;
-            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val2.length());
-            auto cell2 = ws.cell(rowIndex, colIndex);
-            cell2.value() = val2.toStdString();
-            cell2.setCellFormat(dataStyleIndex);
-            colIndex++;
-            colIdx++;
-
-            // Time of Day
-            QString val3 = scene->heading()->isEnabled() ? scene->heading()->moment() : DASH;
-            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val3.length());
-            auto cell3 = ws.cell(rowIndex, colIndex);
-            cell3.value() = val3.toStdString();
-            cell3.setCellFormat(dataStyleIndex);
-            colIndex++;
-            colIdx++;
-
-            // Scene #
-            QString val4 = element->resolvedSceneNumber();
-            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val4.length());
-            auto cell4 = ws.cell(rowIndex, colIndex);
-            cell4.value() = val4.toStdString();
-            cell4.setCellFormat(dataStyleIndex);
-            colIndex++;
-            colIdx++;
-
-            // Synopsis - use wrap text style (skip width calculation)
-            auto cell5 = ws.cell(rowIndex, colIndex);
-            cell5.value() = scene->synopsis().toStdString();
-            cell5.setCellFormat(wrapTextStyleIndex);
-            colIndex++;
-            colIdx++;
-
-            // Groups
-            QString val6 = scene->groups().join(COMMA_SPACE);
-            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val6.length());
-            auto cell6 = ws.cell(rowIndex, colIndex);
-            cell6.value() = val6.toStdString();
-            cell6.setCellFormat(dataStyleIndex);
-            colIndex++;
-            colIdx++;
-
-            // Keywords
-            QString val7 = scene->tags().join(COMMA_SPACE);
-            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val7.length());
-            auto cell7 = ws.cell(rowIndex, colIndex);
-            cell7.value() = val7.toStdString();
-            cell7.setCellFormat(dataStyleIndex);
-            colIndex++;
-            colIdx++;
-
-            // Start Page - Calculate cumulative page offset
+            // Calculate cumulative pixel for start page (used by column)
             qreal cumulativePixel = 0;
             for (int i = 0; i < sceneRow; i++) {
                 cumulativePixel += ScreenplayPaginator::pixelLength(screenplayElements.at(i),
@@ -604,48 +643,59 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
             const int startPage = static_cast<int>(ScreenplayPaginator::pixelToPageLength(
                                           cumulativePixel, paginatedDoc.data()))
                     + 1;
-            QString val8 = QString::number(startPage);
-            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val8.length());
-            auto cellPageStart = ws.cell(rowIndex, colIndex);
-            cellPageStart.value() = val8.toStdString();
-            cellPageStart.setCellFormat(dataStyleIndex);
-            colIndex++;
-            colIdx++;
 
-            // Page Count (1/8)
-            QString val9 =
-                    ScreenplayPaginator::pixelToPageLength1_8(pixelLength, paginatedDoc.data());
-            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val9.length());
-            auto cellPageCount = ws.cell(rowIndex, colIndex);
-            cellPageCount.value() = val9.toStdString();
-            cellPageCount.setCellFormat(dataStyleIndex);
-            colIndex++;
-            colIdx++;
+            // Populate visible columns
+            for (int col = 0; col < visibleColumns.size(); ++col) {
+                const QString &colKey = visibleColumns.at(col).key;
+                QString cellValue;
 
-            // Scene Time
-            QString val10 = Utils::TMath::timeLengthString(timeLength);
-            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val10.length());
-            auto cell10 = ws.cell(rowIndex, colIndex);
-            cell10.value() = val10.toStdString();
-            cell10.setCellFormat(dataStyleIndex);
-            colIndex++;
-            colIdx++;
+                if (colKey == COL_KEY_INT_EXT) {
+                    cellValue =
+                            scene->heading()->isEnabled() ? scene->heading()->locationType() : DASH;
+                } else if (colKey == COL_KEY_LOCATION) {
+                    cellValue = scene->heading()->isEnabled() ? scene->heading()->location() : DASH;
+                } else if (colKey == COL_KEY_TIME_OF_DAY) {
+                    cellValue = scene->heading()->isEnabled() ? scene->heading()->moment() : DASH;
+                } else if (colKey == COL_KEY_SCENE_NUM) {
+                    cellValue = element->resolvedSceneNumber();
+                } else if (colKey == COL_KEY_SYNOPSIS) {
+                    cellValue = scene->synopsis();
+                } else if (colKey == COL_KEY_GROUPS) {
+                    cellValue = scene->groups().join(COMMA_SPACE);
+                } else if (colKey == COL_KEY_KEYWORDS) {
+                    cellValue = scene->tags().join(COMMA_SPACE);
+                } else if (colKey == COL_KEY_START_PAGE) {
+                    cellValue = QString::number(startPage);
+                } else if (colKey == COL_KEY_PAGE_COUNT) {
+                    cellValue = ScreenplayPaginator::pixelToPageLength1_8(pixelLength,
+                                                                          paginatedDoc.data());
+                } else if (colKey == COL_KEY_SCENE_TIME) {
+                    cellValue = Utils::TMath::timeLengthString(timeLength);
+                } else if (colKey == COL_KEY_CHARACTERS) {
+                    cellValue = scene->characterNames().join(COMMA_SPACE);
+                }
 
-            // Characters
-            QString val11 = scene->characterNames().join(COMMA_SPACE);
-            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val11.length());
-            auto cell11 = ws.cell(rowIndex, colIndex);
-            cell11.value() = val11.toStdString();
-            cell11.setCellFormat(dataStyleIndex);
+                auto cell = ws.cell(rowIndex, col + 1);
+                cell.value() = cellValue.toStdString();
+
+                // Use wrap text style for synopsis, data style for others
+                if (colKey == COL_KEY_SYNOPSIS)
+                    cell.setCellFormat(wrapTextStyleIndex);
+                else
+                    cell.setCellFormat(dataStyleIndex);
+
+                if (colKey != COL_KEY_SYNOPSIS)
+                    columnMaxWidths[col] = std::max(columnMaxWidths[col], (int)cellValue.length());
+            }
 
             rowIndex++;
             sceneRow++;
         }
 
         // Configure column widths based on content
-        for (int col = 0; col < headers.size(); ++col) {
-            if (col == 4) {
-                // Col 5 (index 4): Synopsis - fixed 300px (approx 42 character widths)
+        for (int col = 0; col < visibleColumns.size(); ++col) {
+            if (visibleColumns.at(col).key == COL_KEY_SYNOPSIS) {
+                // Synopsis - fixed 300px (approx 42 character widths)
                 ws.column(col + 1).setWidth(42);
             } else {
                 // All other columns: content width + 4 extra characters for breathing space
