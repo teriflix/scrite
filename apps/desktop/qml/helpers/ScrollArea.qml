@@ -224,6 +224,8 @@ Flickable {
     PinchHandler {
         id: _pinchHandler
 
+        property real pinchStartScale: 1.0
+
         target: null
 
         minimumScale: Math.min(parent.scale, 0.25)
@@ -232,10 +234,18 @@ Flickable {
         maximumRotation: 0
         minimumPointCount: 2
 
+        onActiveChanged: {
+            if (active)
+                pinchStartScale = root.zoomScale
+        }
+
         onScaleChanged: {
+            if (Math.abs(activeScale - 1.0) < 0.01)
+                return;
+
             _zoomScaleBehavior.allow = false;
 
-            const newScale = Math.max(minimumScale, Math.min(activeScale, maximumScale));
+            const newScale = Math.max(minimumScale, Math.min(pinchStartScale * activeScale, maximumScale));
             if (root.zoomScale !== newScale) {
                 const pinchCenter = centroid.position;
                 root.resizeContent(root.initialContentWidth * newScale, root.initialContentHeight * newScale, pinchCenter);
