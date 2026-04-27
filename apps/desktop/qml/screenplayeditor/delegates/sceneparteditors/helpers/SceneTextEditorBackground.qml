@@ -65,7 +65,7 @@ Item {
         font: root.sceneTextEditor.font
 
         text: "Click here to type scene content ..."
-        visible: !root.sceneTextEditor.activeFocus
+        visible: text === "" && !root.sceneTextEditor.activeFocus
         opacity: 0.5
     }
 }

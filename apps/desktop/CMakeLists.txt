@@ -82,6 +82,7 @@ target_include_directories(Scrite PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/src/restapikey"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/crashpad"
   "${CMAKE_SOURCE_DIR}/thirdparty/static/quazip/quazip/quazip"
+  "${CMAKE_SOURCE_DIR}/thirdparty/static/openxlsx/openxlsx/OpenXLSX/headers"
   "${SCRITE_SONNET_INCLUDE_ROOT}"
   "${SCRITE_SONNET_BUILD_INCLUDE_ROOT}"
   "${SCRITE_SONNET_BUILD_CORE_INCLUDE_DIR}"
@@ -126,6 +127,7 @@ target_link_libraries(Scrite PRIVATE
   Qt6::Core5Compat
 
   QuaZip::QuaZip
+  OpenXLSX
   poly2tri
   simplecrypt
   phtranslator

@@ -26,6 +26,10 @@
 #include <QSettings>
 #include <QPdfWriter>
 #include <QTextTable>
+#include <QFile>
+#include <QStandardPaths>
+#include <QRandomGenerator>
+#include <OpenXLSX.hpp>
 
 SceneCharacterMatrixReport::SceneCharacterMatrixReport(QObject *parent)
     : AbstractReportGenerator(parent)
@@ -88,7 +92,7 @@ void SceneCharacterMatrixReport::setTags(const QStringList &val)
 
 QString SceneCharacterMatrixReport::fileNameExtension() const
 {
-    return this->format() == OpenDocumentFormat ? QStringLiteral("csv") : QStringLiteral("pdf");
+    return this->format() == OpenDocumentFormat ? QStringLiteral("xlsx") : QStringLiteral("pdf");
 }
 
 struct CreateColumnHeadingImageFunctor
@@ -331,84 +335,135 @@ bool SceneCharacterMatrixReport::canDirectExportToOdf() const
 
 bool SceneCharacterMatrixReport::directExportToOdf(QIODevice *device)
 {
-    QList<ScreenplayElement *> screenplayElements = this->getScreenplayElements();
-    this->finalizeCharacterNames();
+    try {
+        QList<ScreenplayElement *> screenplayElements = this->getScreenplayElements();
+        this->finalizeCharacterNames();
 
-    QTextStream ts(device);
-    ts.setEncoding(QStringConverter::Utf8);
-    ts.setAutoDetectUnicode(true);
+        const int nrRows =
+                m_type == SceneVsCharacter ? screenplayElements.size() : m_characterNames.size();
+        const int nrCols =
+                m_type == SceneVsCharacter ? m_characterNames.size() : screenplayElements.size();
 
-    const int nrRows =
-            m_type == SceneVsCharacter ? screenplayElements.size() : m_characterNames.size();
-    const int nrCols =
-            m_type == SceneVsCharacter ? m_characterNames.size() : screenplayElements.size();
-    auto escapeComma = [](const QString &text) {
-        if (!text.contains(QChar(',')))
-            return text;
-        const QString quote = QStringLiteral("\"");
-        return quote + text + quote;
-    };
+        const QString tempPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation)
+                + QStringLiteral("/") + QStringLiteral("scrite_matrix_")
+                + QString::number(QRandomGenerator::global()->generate()) + QStringLiteral(".xlsx");
 
-    if (m_type == SceneVsCharacter)
-        ts << "SNo.,Type,Location,Time";
+        OpenXLSX::XLDocument doc;
+        doc.create(tempPath.toStdString(), true);
+        OpenXLSX::XLWorksheet ws = doc.workbook().sheet(1);
 
-    // Column headings
-    for (int j = 0; j < nrCols; j++) {
-        const QString colName = m_type == SceneVsCharacter
-                ? m_characterNames.at(j)
-                : screenplayElements.at(j)->resolvedSceneNumber();
-        ts << "," << escapeComma(colName);
-    }
-    ts << "\n";
+        auto &styles = doc.styles();
 
-    // Check if invisible characters are being captured
-    const bool invisibleCharactersCaptured =
-            Application::instance()
-                    ->settings()
-                    ->value("Screenplay Editor/captureInvisibleCharacters")
-                    .toBool();
+        OpenXLSX::XLStyleIndex boldFontIndex = styles.fonts().create();
+        OpenXLSX::XLFont boldFont = styles.fonts()[boldFontIndex];
+        boldFont.setBold(true);
 
-    // Row contents
-    const QString checkMark = m_marker.isEmpty() ? QStringLiteral("-") : escapeComma(m_marker);
-    for (int i = 0; i < nrRows; i++) {
+        OpenXLSX::XLStyleIndex boldStyleIndex = styles.cellFormats().create();
+        OpenXLSX::XLCellFormat boldCellFormat = styles.cellFormats()[boldStyleIndex];
+        boldCellFormat.setFontIndex(boldFontIndex);
+        boldCellFormat.setApplyFont(true);
+
+        OpenXLSX::XLStyleIndex centerStyleIndex = styles.cellFormats().create();
+        OpenXLSX::XLCellFormat centerCellFormat = styles.cellFormats()[centerStyleIndex];
+        centerCellFormat.alignment(OpenXLSX::XLCreateIfMissing)
+                .setHorizontal(OpenXLSX::XLAlignCenter);
+        centerCellFormat.setApplyAlignment(true);
+
+        uint32_t rowIndex = 1;
+        uint32_t colIndex = 1;
+
         if (m_type == SceneVsCharacter) {
-            Scene *scene = screenplayElements.at(i)->scene();
-            ts << screenplayElements.at(i)->resolvedSceneNumber() << ",";
-            if (scene->heading()->isEnabled())
-                ts << escapeComma(scene->heading()->locationType()) << ","
-                   << escapeComma(scene->heading()->location()) << ","
-                   << escapeComma(scene->heading()->moment());
-            else
-                ts << "-,-,-";
-        } else
-            ts << escapeComma(m_characterNames.at(i));
-
-        for (int j = 0; j < nrCols; j++) {
-            ts << ",";
-
-            Scene *scene = nullptr;
-            QString characterName;
-
-            if (m_type == SceneVsCharacter) {
-                scene = screenplayElements.at(i)->scene();
-                characterName = m_characterNames.at(j);
-            } else {
-                scene = screenplayElements.at(j)->scene();
-                characterName = m_characterNames.at(i);
-            }
-
-            const QStringList sceneCharacters = scene->characterNames();
-            if (sceneCharacters.contains(characterName)
-                && (invisibleCharactersCaptured ? scene->isCharacterVisible(characterName) : true))
-                ts << checkMark;
+            ws.cell(rowIndex, colIndex++).value() = "SNo.";
+            ws.cell(rowIndex, colIndex++).value() = "Type";
+            ws.cell(rowIndex, colIndex++).value() = "Location";
+            ws.cell(rowIndex, colIndex++).value() = "Time";
         }
 
-        ts << "\n";
+        for (int j = 0; j < nrCols; j++) {
+            const QString colName = m_type == SceneVsCharacter
+                    ? m_characterNames.at(j)
+                    : screenplayElements.at(j)->resolvedSceneNumber();
+            ws.cell(rowIndex, colIndex++).value() = colName.toStdString();
+        }
+        rowIndex++;
+
+        const bool invisibleCharactersCaptured =
+                Application::instance()
+                        ->settings()
+                        ->value("Screenplay Editor/captureInvisibleCharacters")
+                        .toBool();
+
+        const QString checkMark = m_marker.isEmpty() ? QStringLiteral("-") : m_marker;
+
+        for (int i = 0; i < nrRows; i++) {
+            colIndex = 1;
+
+            if (m_type == SceneVsCharacter) {
+                Scene *scene = screenplayElements.at(i)->scene();
+                auto cell = ws.cell(rowIndex, colIndex++);
+                cell.value() = screenplayElements.at(i)->resolvedSceneNumber().toStdString();
+                cell.setCellFormat(centerStyleIndex);
+                if (scene->heading()->isEnabled()) {
+                    ws.cell(rowIndex, colIndex++).value() =
+                            scene->heading()->locationType().toStdString();
+                    ws.cell(rowIndex, colIndex++).value() =
+                            scene->heading()->location().toStdString();
+                    ws.cell(rowIndex, colIndex++).value() =
+                            scene->heading()->moment().toStdString();
+                } else {
+                    ws.cell(rowIndex, colIndex++).value() = "-";
+                    ws.cell(rowIndex, colIndex++).value() = "-";
+                    ws.cell(rowIndex, colIndex++).value() = "-";
+                }
+            } else {
+                ws.cell(rowIndex, colIndex++).value() = m_characterNames.at(i).toStdString();
+            }
+
+            for (int j = 0; j < nrCols; j++) {
+                Scene *scene = nullptr;
+                QString characterName;
+
+                if (m_type == SceneVsCharacter) {
+                    scene = screenplayElements.at(i)->scene();
+                    characterName = m_characterNames.at(j);
+                } else {
+                    scene = screenplayElements.at(j)->scene();
+                    characterName = m_characterNames.at(i);
+                }
+
+                const QStringList sceneCharacters = scene->characterNames();
+                if (sceneCharacters.contains(characterName)
+                    && (invisibleCharactersCaptured ? scene->isCharacterVisible(characterName)
+                                                    : true)) {
+                    auto cell = ws.cell(rowIndex, colIndex);
+                    cell.value() = checkMark.toStdString();
+                    cell.setCellFormat(centerStyleIndex);
+                }
+                colIndex++;
+            }
+
+            rowIndex++;
+        }
+
+        doc.save();
+
+        QFile tempFile(tempPath);
+        if (!tempFile.open(QIODevice::ReadOnly)) {
+            return false;
+        }
+
+        const QByteArray data = tempFile.readAll();
+        tempFile.close();
+        tempFile.remove();
+
+        if (device->write(data) < 0)
+            return false;
+
+        return true;
+    } catch (const std::exception &e) {
+        qWarning() << "Error generating XLSX:" << QString::fromStdString(e.what());
+        return false;
     }
-
-    ts.flush();
-
-    return true;
 }
 
 Q_DECL_IMPORT int qt_defaultDpi();

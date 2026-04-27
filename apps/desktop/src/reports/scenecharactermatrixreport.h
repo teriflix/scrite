@@ -59,8 +59,8 @@ public:
 
     // clang-format off
     Q_CLASSINFO("marker_FieldGroup", "Characters")
-    Q_CLASSINFO("marker_FieldLabel", "Marker (CSV/ODF Only)")
-    Q_CLASSINFO("marker_FieldNote", "Marker text to use while generating CSV.")
+    Q_CLASSINFO("marker_FieldLabel", "Marker (Excel Only)")
+    Q_CLASSINFO("marker_FieldNote", "Marker text to use while generating Excel file.")
     Q_CLASSINFO("marker_FieldEditor", "TextBox")
     Q_PROPERTY(QString marker
                READ marker
@@ -139,7 +139,7 @@ private:
     QStringList m_characterNames;
     int m_type = SceneVsCharacter;
     QList<int> m_episodeNumbers;
-    QString m_marker = QStringLiteral("YES");
+    QString m_marker = QChar(0x2705); // ✅
 };
 
 #endif // SCENECHARACTERMATRIXREPORT_H

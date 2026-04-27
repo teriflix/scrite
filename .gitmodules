@@ -7,3 +7,6 @@
 [submodule "thirdparty/source/ecm"]
 	path = thirdparty/source/ecm
 	url = https://github.com/KDE/extra-cmake-modules.git
+[submodule "thirdparty/static/openxlsx/openxlsx"]
+	path = thirdparty/static/openxlsx/openxlsx
+	url = https://github.com/troldal/OpenXLSX.git

@@ -184,6 +184,11 @@ DialogLauncher {
                             }
 
                             ListElement {
+                                credits: "<strong>OpenXLSX</strong> for exporting reports to Excel format."
+                                url: "https://github.com/troldal/OpenXLSX"
+                            }
+
+                            ListElement {
                                 credits: "<strong>Curved-Arrows</strong> library for evaluating curved arrow connectors."
                                 url: "https://github.com/dragonman225/curved-arrows"
                             }
