@@ -58,7 +58,9 @@ Item {
     property bool currentUseSoftwareRenderer
     property bool loadMainUiContent: true
     property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
-    property bool allowDiacriticEditing: Platform.isMacOSDesktop ? (screenplayEditorSettings.allowDiacriticEditing && !language.activeTransliterationIsInApp) : false
+    property bool allowDiacriticEditing: Platform.isMacOSDesktop ?
+                                             (screenplayEditorSettings.allowDiacriticEditing &&
+                                              language.active.charScript() === QtChar.Script_Latin) : false
 
     property string currentTheme
 

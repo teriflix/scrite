@@ -36,13 +36,17 @@ public:
 
 protected:
     static AbstractSceneUndoCommand *current;
+
     explicit AbstractSceneUndoCommand(Scene *scene);
+
     Scene *scene();
+
     void setSceneId(const QString &id);
-    const QString &sceneId() const { return m_sceneId; }
+    QString sceneId() const { return m_sceneId; }
 
 private:
     friend class PushSceneUndoCommand;
+
     QString m_sceneId;
     QPointer<Scene> m_scene;
 };
@@ -56,13 +60,13 @@ class PushSceneUndoCommand
 public:
     PushSceneUndoCommand(AbstractSceneUndoCommand *cmd)
     {
-        m_enabled = AbstractSceneUndoCommand::current == nullptr;
+        m_enabled = !AbstractSceneUndoCommand::hasCurrent();
         m_command = cmd;
     }
     ~PushSceneUndoCommand()
     {
         if (m_command != nullptr && m_enabled && UndoHub::active() != nullptr
-                && !m_command->isObsolete())
+            && !m_command->isObsolete())
             UndoHub::active()->push(m_command);
         else
             delete m_command;
