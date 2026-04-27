@@ -156,7 +156,8 @@ signals:
     void cursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber, qreal page,
                              const QTime &time, const ScreenplayPaginatorRecord &cursorRecord);
     void paginationComplete(const QList<ScreenplayPaginatorRecord> &items, qreal pixelLength,
-                            int pageCount, const QTime &totalTime);
+                            int pageCount, const QTime &totalTime,
+                            const QString &totalPageLength1_8);
     void paginationStart();
 
 private:
@@ -222,7 +223,8 @@ signals:
     void cursorQueryResponse(int cursorPosition, qreal pixelOffset, int pageNumber, qreal page,
                              const QTime &time, const ScreenplayPaginatorRecord &cursorRecord);
     void paginationComplete(const QList<ScreenplayPaginatorRecord> &items, qreal pixelLength,
-                            int pageCount, const QTime &totalTime);
+                            int pageCount, const QTime &totalTime,
+                            const QString &totalPageLength1_8);
 
 private:
     void markBusy() { this->setBusy(true); }

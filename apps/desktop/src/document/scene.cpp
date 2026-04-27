@@ -3329,6 +3329,11 @@ int SceneGroup::pixelLength() const
     return m_paginator == nullptr ? 0 : m_paginator->totalPixelLength();
 }
 
+QString SceneGroup::pageLength1_8() const
+{
+    return m_paginator == nullptr ? QString() : m_paginator->totalPageLength1_8();
+}
+
 SceneGroup *SceneGroup::clone(QObject *parent) const
 {
     SceneGroup *newSceneGroup = new SceneGroup(parent);

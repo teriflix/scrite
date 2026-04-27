@@ -21,7 +21,7 @@ Settings {
     property bool showTooltip: true
 
     property bool displayTracks: true
-    property string displaySceneLength: "TIME" // can be NO, PAGE, TIME
+    property string displaySceneLength: "TIME" // can be NO, PAGE, TIME, PAGE_1_8
     property string sceneTextMode: "HEADING" // can be SUMMARY also
 
     category: "Scene List Panel"

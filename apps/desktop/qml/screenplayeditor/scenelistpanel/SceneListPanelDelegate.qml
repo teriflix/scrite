@@ -422,7 +422,7 @@ Rectangle {
             const lengthMode = Runtime.sceneListPanelSettings.displaySceneLength
             const starts = "<b>Starts</b> " + TMath.timeLengthString(sceneLengthWatcher.timeOffset) +
                            " on Pg. " + (1+Math.floor(_private.sceneLengthWatcher.pageOffset))
-            const pgCount = "<b>Length</b> " + sceneLengthWatcher.pageLength.toFixed(2) + " pages"
+            const pgCount = "<b>Length</b> " + sceneLengthWatcher.pageLength.toFixed(2) + " or " + sceneLengthWatcher.pageLength1_8 + " pages"
             const duration = "<b>Duration</b> " + TMath.timeLengthString(sceneLengthWatcher.timeLength)
             let fields = []
             if(isBreak) {
@@ -517,6 +517,9 @@ Rectangle {
 
                 if(Runtime.sceneListPanelSettings.displaySceneLength === "PAGE")
                     return pageLength.toFixed(2)
+
+                if(Runtime.sceneListPanelSettings.displaySceneLength === "PAGE_1_8")
+                    return pageLength1_8
 
                 return ""
             }

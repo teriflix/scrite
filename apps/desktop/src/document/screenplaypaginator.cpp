@@ -60,8 +60,9 @@ bool ScreenplayPaginatorRecord::operator==(const ScreenplayPaginatorRecord &othe
             && this->firstParagraphCursorPosition == other.firstParagraphCursorPosition
             && this->lastCursorPosition == other.lastCursorPosition
             && this->pageLength == other.pageLength && this->timeLength == other.timeLength
-            && this->pixelOffset == other.pixelOffset && this->pageOffset == other.pageOffset
-            && this->timeOffset == other.timeOffset && this->pageBreaks == other.pageBreaks
+            && this->pageLength1_8 == other.pageLength1_8 && this->pixelOffset == other.pixelOffset
+            && this->pageOffset == other.pageOffset && this->timeOffset == other.timeOffset
+            && this->pageBreaks == other.pageBreaks
             && this->screenplayElement == other.screenplayElement;
 }
 
@@ -79,6 +80,7 @@ ScreenplayPaginatorRecord::operator=(const ScreenplayPaginatorRecord &other)
     this->lastCursorPosition = other.lastCursorPosition;
     this->pixelLength = other.pixelLength;
     this->pageLength = other.pageLength;
+    this->pageLength1_8 = other.pageLength1_8;
     this->timeLength = other.timeLength;
     this->pixelOffset = other.pixelOffset;
     this->pageOffset = other.pageOffset;
@@ -440,7 +442,7 @@ qreal ScreenplayPaginator::pixelToPageLength(qreal pixelLength, const QTextDocum
 QString ScreenplayPaginator::pixelToPageLength1_8(qreal pixelLength, const QTextDocument *document)
 {
     const qreal pageLength = pixelToPageLength(pixelLength, document);
-    const int eighthsCount = qRound(pageLength * 8.0);
+    const int eighthsCount = qMax(1, qRound(pageLength * 8.0));
     return QString::number(eighthsCount) + QStringLiteral("/8");
 }
 
@@ -547,12 +549,13 @@ void ScreenplayPaginator::clear()
 
 void ScreenplayPaginator::clearRecords()
 {
-    if (!m_records.isEmpty() || m_pageCount >= 0 || m_totalTime.isValid()
-        || m_totalPixelLength > 0) {
+    if (!m_records.isEmpty() || m_pageCount >= 0 || m_totalTime.isValid() || m_totalPixelLength > 0
+        || !m_totalPageLength1_8.isEmpty()) {
         m_records.clear();
         m_pageCount = 0;
         m_totalTime = QTime(0, 0, 0);
         m_totalPixelLength = 0;
+        m_totalPageLength1_8.clear();
         emit paginationUpdated();
     }
 }
@@ -728,12 +731,14 @@ void ScreenplayPaginator::onCursorQueryResponse(int cursorPosition, qreal cursor
 
 void ScreenplayPaginator::onPaginationComplete(const QList<ScreenplayPaginatorRecord> &records,
                                                qreal pixelLength, int pageCount,
-                                               const QTime &totalTime)
+                                               const QTime &totalTime,
+                                               const QString &totalPageLength1_8)
 {
     m_records = records;
     m_pageCount = pageCount;
     m_totalTime = totalTime;
     m_totalPixelLength = pixelLength;
+    m_totalPageLength1_8 = totalPageLength1_8;
 
     if (m_screenplay != nullptr) {
         QMap<int, int> serialNumberMap;

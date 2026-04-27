@@ -1187,6 +1187,13 @@ public:
     // clang-format on
     int pixelLength() const;
 
+    // clang-format off
+    Q_PROPERTY(QString pageLength1_8
+               READ pageLength1_8
+               NOTIFY lengthsUpdated)
+    // clang-format on
+    QString pageLength1_8() const;
+
     Q_INVOKABLE SceneGroup *clone(QObject *parent = nullptr) const;
 
 signals:

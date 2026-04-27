@@ -89,6 +89,17 @@ VclMenu {
         }
 
         VclMenuItem {
+            text: "1/8th Length"
+
+            readonly property string option: "PAGE_1_8"
+
+            enabled: !Runtime.paginator.paused
+            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
+
+            onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
+        }
+
+        VclMenuItem {
             text: "None"
 
             readonly property string option: "NO"

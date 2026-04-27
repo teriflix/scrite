@@ -162,7 +162,7 @@ Item {
                         const fields = [
                                          sceneGroup.sceneCount + " scene(s)",
                                          "<b>Duration</b> " + (sceneGroup.evaluatingLengths ? "...." : TMath.timeLengthString(sceneGroup.timeLength)),
-                                         "<b>Page Count</b> " + (sceneGroup.evaluatingLengths ? "...." : sceneGroup.pageCount + " page(s)")
+                                         "<b>Page Count</b> " + (sceneGroup.evaluatingLengths ? "...." : sceneGroup.pageCount + " or " + sceneGroup.pageLength1_8 + " page(s)")
                                      ]
                         return "<p>Scene Selection:</p>" + SMath.formatAsBulletPoints(fields)
                     }

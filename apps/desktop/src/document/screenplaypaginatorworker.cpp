@@ -498,7 +498,7 @@ void ScreenplayPaginatorWorker::syncDocument()
             m_document->clear();
         m_records.clear();
 
-        paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime());
+        paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime(), QString());
         return;
     }
 
@@ -598,7 +598,7 @@ void ScreenplayPaginatorWorker::syncDocument()
 
     for (const SceneContent &content : std::as_const(m_screenplayContent)) {
         if (maybeAbort()) {
-            paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime());
+            paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime(), QString());
             return;
         }
 
@@ -623,7 +623,7 @@ void ScreenplayPaginatorWorker::syncDocument()
 
         for (const SceneParagraph &paragraph : std::as_const(content.paragraphs)) {
             if (maybeAbort()) {
-                paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime());
+                paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime(), QString());
                 return;
             }
 
@@ -677,7 +677,7 @@ void ScreenplayPaginatorWorker::syncDocument()
 
     for (const SceneContent &sceneContent : std::as_const(m_screenplayContent)) {
         if (maybeAbort()) {
-            paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime());
+            paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime(), QString());
             return;
         }
 
@@ -708,7 +708,8 @@ void ScreenplayPaginatorWorker::syncDocument()
 
         record.pixelLength = ScreenplayPaginator::pixelLength(range.from, range.until, m_document);
         record.pageLength = ScreenplayPaginator::pixelToPageLength(record.pixelLength, m_document);
-        record.pageLength1_8 = ScreenplayPaginator::pixelToPageLength1_8(record.pixelLength, m_document);
+        record.pageLength1_8 =
+                ScreenplayPaginator::pixelToPageLength1_8(record.pixelLength, m_document);
         record.timeLength =
                 ScreenplayPaginator::pixelToTimeLength(record.pixelLength, m_format, m_document);
         record.pageBreaks = this->evaluateScenePageBreaks(range, lastPageNr);
@@ -731,7 +732,7 @@ void ScreenplayPaginatorWorker::syncDocument()
     // Reconcile lengths for break elements.
     for (ScreenplayPaginatorRecord &record : records) {
         if (maybeAbort()) {
-            paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime());
+            paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime(), QString());
             return;
         }
 
@@ -745,7 +746,8 @@ void ScreenplayPaginatorWorker::syncDocument()
         record.pixelLength = ScreenplayPaginator::pixelLength(breakBlockExtent.from,
                                                               breakBlockExtent.until, m_document);
         record.pageLength = ScreenplayPaginator::pixelToPageLength(record.pixelLength, m_document);
-        record.pageLength1_8 = ScreenplayPaginator::pixelToPageLength1_8(record.pixelLength, m_document);
+        record.pageLength1_8 =
+                ScreenplayPaginator::pixelToPageLength1_8(record.pixelLength, m_document);
         record.timeLength =
                 ScreenplayPaginator::pixelToTimeLength(record.pixelLength, m_format, m_document);
 
@@ -767,10 +769,12 @@ void ScreenplayPaginatorWorker::syncDocument()
             qMax(qCeil(ScreenplayPaginator::pixelToPageLength(pixelLength, m_document)), 1);
     const QTime totalTime =
             ScreenplayPaginator::pixelToTimeLength(pixelLength, m_format, m_document);
+    const QString totalPageLength1_8 =
+            ScreenplayPaginator::pixelToPageLength1_8(pixelLength, m_document);
 
     // All done, emit result.
     m_records = records;
-    emit paginationComplete(records, pixelLength, pageCount, totalTime);
+    emit paginationComplete(records, pixelLength, pageCount, totalTime, totalPageLength1_8);
 
     // Adjust the sync-interval based on the time taken.
     // The minimum sync-interval is always 500ms.

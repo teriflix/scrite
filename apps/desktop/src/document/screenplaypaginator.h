@@ -279,6 +279,13 @@ public:
     qreal totalPixelLength() const { return m_totalPixelLength; }
 
     // clang-format off
+    Q_PROPERTY(QString totalPageLength1_8
+               READ totalPageLength1_8
+               NOTIFY paginationUpdated)
+    // clang-format on
+    QString totalPageLength1_8() const { return m_totalPageLength1_8; }
+
+    // clang-format off
     Q_PROPERTY(int cursorPosition
                READ cursorPosition
                WRITE setCursorPosition
@@ -362,7 +369,8 @@ private:
                                qreal cursorPage, const QTime &cursorTime,
                                const ScreenplayPaginatorRecord &cursorRecord);
     void onPaginationComplete(const QList<ScreenplayPaginatorRecord> &items, qreal pixelLength,
-                              int pageCount, const QTime &totalTime);
+                              int pageCount, const QTime &totalTime,
+                              const QString &totalPageLength1_8);
 
     bool aggregate(ScreenplayElement *from, ScreenplayElement *until, qreal *pixelLength,
                    qreal *pageLength, QTime *timeLength) const;
@@ -381,6 +389,7 @@ private:
     int m_pageCount = 0;
     qreal m_totalPixelLength = 0;
     QTime m_totalTime;
+    QString m_totalPageLength1_8;
 
     QList<ScreenplayPaginatorRecord> m_records;
 
@@ -456,6 +465,13 @@ public:
                NOTIFY recordChanged)
     // clang-format on
     QTime timeLength() const { return m_record.timeLength; }
+
+    // clang-format off
+    Q_PROPERTY(QString pageLength1_8
+               READ pageLength1_8
+               NOTIFY recordChanged)
+    // clang-format on
+    QString pageLength1_8() const { return m_record.pageLength1_8; }
 
     // clang-format off
     Q_PROPERTY(QList<ScenePageBreak> pageBreaks

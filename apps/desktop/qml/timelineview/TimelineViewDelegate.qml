@@ -459,7 +459,8 @@ Item {
                     fields.push("<b>Starts</b> " + TMath.timeLengthString(_private.sceneLengthWatcher.timeOffset) +
                                 " on Pg. " + (1+Math.floor(_private.sceneLengthWatcher.pageOffset)))
                     fields.push("<b>Duration</b> " + TMath.timeLengthString(_private.sceneLengthWatcher.timeLength) +
-                                ", " + _private.sceneLengthWatcher.pageLength.toFixed(2) + " pages")
+                                ", " + _private.sceneLengthWatcher.pageLength.toFixed(2) + " or " +
+                                _private.sceneLengthWatcher.pageLength1_8 + " pages")
                 }
             };
 
