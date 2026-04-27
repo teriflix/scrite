@@ -37,7 +37,6 @@ namespace {
 const QString COMMA_SPACE = QStringLiteral(", ");
 const QString DASH = QStringLiteral("-");
 const QString SLASH_EIGHT = QStringLiteral("/8");
-const QString TIME_FORMAT = QStringLiteral("hh:mm:ss");
 
 // Column headers
 const QString COL_INT_EXT = QStringLiteral("INT/EXT");
@@ -366,7 +365,7 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
         // Scene Time
         cell = table->cellAt(row + 1, col++);
         cellCursor = cell.firstCursorPosition();
-        cellCursor.insertText(timeLength.toString(TIME_FORMAT));
+        cellCursor.insertText(Utils::TMath::timeLengthString(timeLength));
 
         // Characters
         cell = table->cellAt(row + 1, col++);
@@ -498,8 +497,7 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
             int colIdx = 0;
 
             // INT/EXT
-            QString val1 =
-                    scene->heading()->isEnabled() ? scene->heading()->locationType() : DASH;
+            QString val1 = scene->heading()->isEnabled() ? scene->heading()->locationType() : DASH;
             columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val1.length());
             auto cell1 = ws.cell(rowIndex, colIndex);
             cell1.value() = val1.toStdString();
@@ -508,8 +506,7 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
             colIdx++;
 
             // Location Name
-            QString val2 =
-                    scene->heading()->isEnabled() ? scene->heading()->location() : DASH;
+            QString val2 = scene->heading()->isEnabled() ? scene->heading()->location() : DASH;
             columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val2.length());
             auto cell2 = ws.cell(rowIndex, colIndex);
             cell2.value() = val2.toStdString();
@@ -518,8 +515,7 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
             colIdx++;
 
             // Time of Day
-            QString val3 =
-                    scene->heading()->isEnabled() ? scene->heading()->moment() : DASH;
+            QString val3 = scene->heading()->isEnabled() ? scene->heading()->moment() : DASH;
             columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val3.length());
             auto cell3 = ws.cell(rowIndex, colIndex);
             cell3.value() = val3.toStdString();
@@ -589,7 +585,7 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
             colIdx++;
 
             // Scene Time
-            QString val10 = timeLength.toString(TIME_FORMAT);
+            QString val10 = Utils::TMath::timeLengthString(timeLength);
             columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val10.length());
             auto cell10 = ws.cell(rowIndex, colIndex);
             cell10.value() = val10.toStdString();
