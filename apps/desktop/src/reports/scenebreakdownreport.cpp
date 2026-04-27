@@ -52,6 +52,8 @@ const QString COL_SCENE_TIME = QStringLiteral("Scene Time");
 const QString COL_CHARACTERS = QStringLiteral("Characters");
 } // namespace
 
+Q_DECL_IMPORT int qt_defaultDpi();
+
 SceneBreakdownReport::SceneBreakdownReport(QObject *parent) : AbstractReportGenerator(parent) { }
 
 SceneBreakdownReport::~SceneBreakdownReport() { }
@@ -198,8 +200,8 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
 
     QTextBlockFormat blockFormat = defaultBlockFormat;
     blockFormat.setAlignment(Qt::AlignHCenter);
-    blockFormat.setTopMargin(20);
-    blockFormat.setBottomMargin(20);
+    blockFormat.setTopMargin(5);
+    blockFormat.setBottomMargin(3);
     QTextCharFormat charFormat = defaultCharFormat;
     charFormat.setFontPointSize(16);
     charFormat.setFontWeight(QFont::Bold);
@@ -208,7 +210,7 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
 
     blockFormat = defaultBlockFormat;
     blockFormat.setAlignment(Qt::AlignHCenter);
-    blockFormat.setBottomMargin(10);
+    blockFormat.setBottomMargin(2);
     charFormat = defaultCharFormat;
     charFormat.setFontPointSize(10);
     cursor.insertBlock(blockFormat, charFormat);
@@ -243,7 +245,7 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
 
     blockFormat = defaultBlockFormat;
     blockFormat.setAlignment(Qt::AlignHCenter);
-    blockFormat.setBottomMargin(20);
+    blockFormat.setBottomMargin(2);
     charFormat = defaultCharFormat;
     cursor.insertBlock(blockFormat, charFormat);
     cursor.insertHtml("This report was generated using <strong>Scrite</strong><br/>(<a "
@@ -258,22 +260,47 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
     tableFormat.setBorderCollapse(true);
     tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
     tableFormat.setHeaderRowCount(1);
+    tableFormat.setAlignment(Qt::AlignHCenter);
+    tableFormat.setTopMargin(0);
+    tableFormat.setBottomMargin(0);
 
-    QStringList headers = { COL_INT_EXT,    COL_LOCATION,   COL_TIME_OF_DAY, COL_SCENE_NUM,
-                            COL_SYNOPSIS,   COL_GROUPS,     COL_KEYWORDS,    COL_START_PAGE,
-                            COL_PAGE_COUNT, COL_SCENE_TIME, COL_CHARACTERS };
+    const QStringList headers = { COL_INT_EXT,    COL_LOCATION,   COL_TIME_OF_DAY, COL_SCENE_NUM,
+                                  COL_SYNOPSIS,   COL_GROUPS,     COL_KEYWORDS,    COL_START_PAGE,
+                                  COL_PAGE_COUNT, COL_SCENE_TIME, COL_CHARACTERS };
+    const QHash<QString, int> stdColumnWidths = { { COL_LOCATION, 100 },    { COL_SYNOPSIS, 300 },
+                                                  { COL_CHARACTERS, 150 },  { COL_INT_EXT, 50 },
+                                                  { COL_TIME_OF_DAY, 100 }, { COL_KEYWORDS, 75 },
+                                                  { COL_GROUPS, 75 } };
+
+    // Set column width constraints with specific widths for each column
+    QVector<QTextLength> columnWidths;
+    for (int i = 0; i < headers.size(); ++i) {
+        const QString header = headers.at(i);
+        if (stdColumnWidths.contains(header))
+            columnWidths.append(
+                    QTextLength(QTextLength::FixedLength, stdColumnWidths.value(header)));
+        else
+            columnWidths.append(QTextLength(QTextLength::VariableLength, 1));
+    }
+    tableFormat.setColumnWidthConstraints(columnWidths);
 
     QTextTable *table =
             cursor.insertTable(screenplayElements.size() + 1, headers.size(), tableFormat);
 
+    // Create cell format with borders
+    QTextTableCellFormat cellFormatWithBorders;
+    cellFormatWithBorders.setBorder(1);
+    cellFormatWithBorders.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+
     // Write headers
     for (int col = 0; col < headers.size(); col++) {
         QTextTableCell cell = table->cellAt(0, col);
+        cell.setFormat(cellFormatWithBorders);
+
         QTextCursor cellCursor = cell.firstCursorPosition();
 
         QTextCharFormat headerFormat = defaultCharFormat;
         headerFormat.setFontWeight(QFont::Bold);
-        headerFormat.setBackground(Qt::lightGray);
         cellCursor.setCharFormat(headerFormat);
 
         cellCursor.insertText(headers.at(col));
@@ -297,6 +324,7 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
 
         // INT/EXT
         QTextTableCell cell = table->cellAt(row + 1, col++);
+        cell.setFormat(cellFormatWithBorders);
         QTextCursor cellCursor = cell.firstCursorPosition();
         if (scene->heading()->isEnabled()) {
             cellCursor.insertText(scene->heading()->locationType());
@@ -306,6 +334,7 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
 
         // Location Name
         cell = table->cellAt(row + 1, col++);
+        cell.setFormat(cellFormatWithBorders);
         cellCursor = cell.firstCursorPosition();
         if (scene->heading()->isEnabled()) {
             cellCursor.insertText(scene->heading()->location());
@@ -315,6 +344,7 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
 
         // Time of Day
         cell = table->cellAt(row + 1, col++);
+        cell.setFormat(cellFormatWithBorders);
         cellCursor = cell.firstCursorPosition();
         if (scene->heading()->isEnabled()) {
             cellCursor.insertText(scene->heading()->moment());
@@ -324,26 +354,31 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
 
         // Scene #
         cell = table->cellAt(row + 1, col++);
+        cell.setFormat(cellFormatWithBorders);
         cellCursor = cell.firstCursorPosition();
         cellCursor.insertText(element->resolvedSceneNumber());
 
         // Synopsis
         cell = table->cellAt(row + 1, col++);
+        cell.setFormat(cellFormatWithBorders);
         cellCursor = cell.firstCursorPosition();
         cellCursor.insertText(scene->synopsis());
 
         // Groups
         cell = table->cellAt(row + 1, col++);
+        cell.setFormat(cellFormatWithBorders);
         cellCursor = cell.firstCursorPosition();
         cellCursor.insertText(scene->groups().join(COMMA_SPACE));
 
         // Keywords
         cell = table->cellAt(row + 1, col++);
+        cell.setFormat(cellFormatWithBorders);
         cellCursor = cell.firstCursorPosition();
         cellCursor.insertText(scene->tags().join(COMMA_SPACE));
 
         // Start Page - We'll need to calculate cumulative page offset
         cell = table->cellAt(row + 1, col++);
+        cell.setFormat(cellFormatWithBorders);
         cellCursor = cell.firstCursorPosition();
         // Get page offset by summing pixel lengths of all previous scenes
         qreal cumulativePixel = 0;
@@ -358,17 +393,20 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
 
         // Page Count (1/8)
         cell = table->cellAt(row + 1, col++);
+        cell.setFormat(cellFormatWithBorders);
         cellCursor = cell.firstCursorPosition();
         cellCursor.insertText(
                 ScreenplayPaginator::pixelToPageLength1_8(pixelLength, paginatedDoc.data()));
 
         // Scene Time
         cell = table->cellAt(row + 1, col++);
+        cell.setFormat(cellFormatWithBorders);
         cellCursor = cell.firstCursorPosition();
         cellCursor.insertText(Utils::TMath::timeLengthString(timeLength));
 
         // Characters
         cell = table->cellAt(row + 1, col++);
+        cell.setFormat(cellFormatWithBorders);
         cellCursor = cell.firstCursorPosition();
         const QStringList characters = scene->characterNames();
         cellCursor.insertText(characters.join(COMMA_SPACE));
@@ -643,29 +681,12 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
     }
 }
 
-Q_DECL_IMPORT int qt_defaultDpi();
-
 void SceneBreakdownReport::configureWriterImpl(QPagedPaintDevice *ppd,
                                                const QTextDocument *document) const
 {
-    const QSizeF idealSizeInPixels = document->size();
-    if (idealSizeInPixels.width() > idealSizeInPixels.height())
-        ppd->setPageOrientation(QPageLayout::Landscape);
-    else
-        ppd->setPageOrientation(QPageLayout::Portrait);
-
-    const QSizeF pdfPageSizeInPixels = ppd->pageLayout().pageSize().sizePixels(qt_defaultDpi());
-    const qreal scale = idealSizeInPixels.width() / pdfPageSizeInPixels.width();
-
-    if (scale < 1 || qFuzzyCompare(scale, 1.0))
-        return;
-
-    const qreal margin = 1.0 / 2.54;
-    QSizeF requiredPdfPageSize = ppd->pageLayout().pageSize().size(QPageSize::Inch);
-    requiredPdfPageSize *= scale;
-    requiredPdfPageSize += QSizeF(margin, margin); // margin
-    ppd->setPageSize(
-            QPageSize(requiredPdfPageSize, QPageSize::Inch, "Custom", QPageSize::FuzzyMatch));
+    // Use A3 landscape page size for scene breakdown report
+    ppd->setPageSize(QPageSize::A3);
+    ppd->setPageOrientation(QPageLayout::Landscape);
 }
 
 QList<ScreenplayElement *> SceneBreakdownReport::getScreenplayElements()
