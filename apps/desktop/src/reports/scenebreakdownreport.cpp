@@ -1,0 +1,688 @@
+/****************************************************************************
+**
+** Copyright (C) 2024 Prashanth N Udupa
+** Author: Prashanth N Udupa (prashanth@scrite.io,
+**                            prashanth.udupa@gmail.com,
+**                            prashanth@vcreatelogic.com)
+**
+** This code is distributed under GPL v3. Complete text of the license
+** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/
+
+#include "scenebreakdownreport.h"
+#include "application.h"
+
+#include "scene.h"
+#include "screenplay.h"
+#include "structure.h"
+#include "scritedocument.h"
+#include "screenplaypaginator.h"
+
+#include <QPrinter>
+#include <QPainter>
+#include <QSettings>
+#include <QPdfWriter>
+#include <QTextTable>
+#include <QFile>
+#include <QStandardPaths>
+#include <QRandomGenerator>
+#include <QScopedPointer>
+#include <OpenXLSX.hpp>
+
+namespace {
+const QString COMMA_SPACE = QStringLiteral(", ");
+const QString DASH = QStringLiteral("-");
+const QString SLASH_EIGHT = QStringLiteral("/8");
+const QString TIME_FORMAT = QStringLiteral("hh:mm:ss");
+
+// Column headers
+const QString COL_INT_EXT = QStringLiteral("INT/EXT");
+const QString COL_LOCATION = QStringLiteral("Location Name");
+const QString COL_TIME_OF_DAY = QStringLiteral("Time of Day");
+const QString COL_SCENE_NUM = QStringLiteral("Scene #");
+const QString COL_SYNOPSIS = QStringLiteral("Synopsis");
+const QString COL_GROUPS = QStringLiteral("Groups");
+const QString COL_KEYWORDS = QStringLiteral("Keywords");
+const QString COL_START_PAGE = QStringLiteral("Start Page");
+const QString COL_PAGE_COUNT = QStringLiteral("Page Count (1/8)");
+const QString COL_SCENE_TIME = QStringLiteral("Scene Time");
+const QString COL_CHARACTERS = QStringLiteral("Characters");
+} // namespace
+
+SceneBreakdownReport::SceneBreakdownReport(QObject *parent) : AbstractReportGenerator(parent) { }
+
+SceneBreakdownReport::~SceneBreakdownReport() { }
+
+void SceneBreakdownReport::setEpisodeNumbers(const QList<int> &val)
+{
+    if (m_episodeNumbers == val)
+        return;
+
+    m_episodeNumbers = val;
+    emit episodeNumbersChanged();
+}
+
+void SceneBreakdownReport::setSceneNumbers(const QList<int> &val)
+{
+    if (m_sceneNumbers == val)
+        return;
+
+    m_sceneNumbers = val;
+    emit sceneNumbersChanged();
+}
+
+void SceneBreakdownReport::setTags(const QStringList &val)
+{
+    if (m_tags == val)
+        return;
+
+    m_tags = val;
+    emit tagsChanged();
+}
+
+void SceneBreakdownReport::setKeywords(const QString &val)
+{
+    if (m_keywords == val)
+        return;
+
+    m_keywords = val;
+    emit keywordsChanged();
+}
+
+QString SceneBreakdownReport::fileNameExtension() const
+{
+    return this->format() == OpenDocumentFormat ? QStringLiteral("xlsx") : QStringLiteral("pdf");
+}
+
+bool SceneBreakdownReport::passesFilter(const ScreenplayElement *element) const
+{
+    if (element->scene() == nullptr || element->isOmitted())
+        return false;
+
+    // Filter by scene numbers
+    if (!m_sceneNumbers.isEmpty() && !m_sceneNumbers.contains(element->elementIndex()))
+        return false;
+
+    // Filter by episodes
+    if (!m_episodeNumbers.isEmpty()) {
+        const Screenplay *screenplay = this->document()->screenplay();
+        const bool hasEpisodes = screenplay->episodeCount() > 0;
+
+        if (hasEpisodes) {
+            int currentEpisode = 0;
+            bool foundInEpisode = false;
+
+            for (int i = 0; i < screenplay->elementCount(); i++) {
+                if (i == 0)
+                    ++currentEpisode;
+
+                if (screenplay->elementAt(i) == element) {
+                    foundInEpisode = m_episodeNumbers.contains(currentEpisode);
+                    break;
+                }
+
+                if (screenplay->elementAt(i)->elementType() == ScreenplayElement::BreakElementType
+                    && screenplay->elementAt(i)->breakType() == Screenplay::Episode)
+                    ++currentEpisode;
+            }
+
+            if (!foundInEpisode)
+                return false;
+        }
+    }
+
+    // Filter by tags
+    if (!m_tags.isEmpty()) {
+        const Scene *scene = element->scene();
+        const QStringList sceneTags = scene->groups();
+
+        bool hasMatchingTag = false;
+        for (const QString &sceneTag : sceneTags) {
+            if (m_tags.contains(sceneTag)) {
+                hasMatchingTag = true;
+                break;
+            }
+        }
+
+        if (!hasMatchingTag)
+            return false;
+    }
+
+    // Filter by keywords
+    if (!m_keywords.isEmpty()) {
+        const Scene *scene = element->scene();
+        const QStringList keywordList = m_keywords.split(QStringLiteral(","), Qt::SkipEmptyParts);
+
+        bool foundKeyword = false;
+        for (const QString &keyword : keywordList) {
+            const QString trimmed = keyword.trimmed().toLower();
+            if (scene->heading()->text().toLower().contains(trimmed)
+                || scene->synopsis().toLower().contains(trimmed)) {
+                foundKeyword = true;
+                break;
+            }
+        }
+
+        if (!foundKeyword && !keywordList.isEmpty())
+            return false;
+    }
+
+    return true;
+}
+
+bool SceneBreakdownReport::doGenerate(QTextDocument *document)
+{
+    const Screenplay *screenplay = this->document()->screenplay();
+    const ScreenplayFormat *format = this->document()->printFormat();
+    QList<ScreenplayElement *> screenplayElements = this->getScreenplayElements();
+
+    // Create paginated document for page/time calculations
+    QScopedPointer<QTextDocument> paginatedDoc(
+            ScreenplayPaginator::paginatedDocument(screenplay, format));
+    if (!paginatedDoc)
+        return false;
+
+    const QFont defaultFont = format->defaultFont();
+
+    QTextBlockFormat defaultBlockFormat;
+
+    QTextCharFormat defaultCharFormat;
+    defaultCharFormat.setFontFamilies({ defaultFont.family() });
+    defaultCharFormat.setFontPointSize(12);
+
+    QTextCursor cursor(document);
+    cursor.movePosition(QTextCursor::Start);
+
+    QTextBlockFormat blockFormat = defaultBlockFormat;
+    blockFormat.setAlignment(Qt::AlignHCenter);
+    blockFormat.setTopMargin(20);
+    blockFormat.setBottomMargin(20);
+    QTextCharFormat charFormat = defaultCharFormat;
+    charFormat.setFontPointSize(16);
+    charFormat.setFontWeight(QFont::Bold);
+    cursor.insertBlock(blockFormat, charFormat);
+    cursor.insertText(QStringLiteral("Scene Breakdown Report"));
+
+    blockFormat = defaultBlockFormat;
+    blockFormat.setAlignment(Qt::AlignHCenter);
+    blockFormat.setBottomMargin(10);
+    charFormat = defaultCharFormat;
+    charFormat.setFontPointSize(10);
+    cursor.insertBlock(blockFormat, charFormat);
+
+    if (!m_episodeNumbers.isEmpty() || !m_sceneNumbers.isEmpty() || !m_tags.isEmpty()
+        || !m_keywords.isEmpty()) {
+        QStringList filters;
+
+        if (!m_episodeNumbers.isEmpty()) {
+            QStringList epNos;
+            for (int epNo : std::as_const(m_episodeNumbers))
+                epNos << QString::number(epNo);
+            filters << QStringLiteral("Episode(s): ") + epNos.join(COMMA_SPACE);
+        }
+
+        if (!m_sceneNumbers.isEmpty()) {
+            filters << QStringLiteral("Selected scenes");
+        }
+
+        if (!m_tags.isEmpty()) {
+            filters << QStringLiteral("Tag(s): ") + m_tags.join(COMMA_SPACE);
+        }
+
+        if (!m_keywords.isEmpty()) {
+            filters << QStringLiteral("Keywords: ") + m_keywords;
+        }
+
+        cursor.insertText(filters.join(QStringLiteral(" | ")));
+    } else {
+        cursor.insertText(QStringLiteral("All scenes"));
+    }
+
+    blockFormat = defaultBlockFormat;
+    blockFormat.setAlignment(Qt::AlignHCenter);
+    blockFormat.setBottomMargin(20);
+    charFormat = defaultCharFormat;
+    cursor.insertBlock(blockFormat, charFormat);
+    cursor.insertHtml("This report was generated using <strong>Scrite</strong><br/>(<a "
+                      "href=\"https://www.scrite.io\">https://www.scrite.io</a>)");
+    cursor.insertBlock(blockFormat, charFormat);
+    cursor.insertText("--");
+
+    QTextTableFormat tableFormat;
+    tableFormat.setCellSpacing(0);
+    tableFormat.setCellPadding(5);
+    tableFormat.setBorder(1);
+    tableFormat.setBorderCollapse(true);
+    tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+    tableFormat.setHeaderRowCount(1);
+
+    QStringList headers = { COL_INT_EXT,    COL_LOCATION,   COL_TIME_OF_DAY, COL_SCENE_NUM,
+                            COL_SYNOPSIS,   COL_GROUPS,     COL_KEYWORDS,    COL_START_PAGE,
+                            COL_PAGE_COUNT, COL_SCENE_TIME, COL_CHARACTERS };
+
+    QTextTable *table =
+            cursor.insertTable(screenplayElements.size() + 1, headers.size(), tableFormat);
+
+    // Write headers
+    for (int col = 0; col < headers.size(); col++) {
+        QTextTableCell cell = table->cellAt(0, col);
+        QTextCursor cellCursor = cell.firstCursorPosition();
+
+        QTextCharFormat headerFormat = defaultCharFormat;
+        headerFormat.setFontWeight(QFont::Bold);
+        headerFormat.setBackground(Qt::lightGray);
+        cellCursor.setCharFormat(headerFormat);
+
+        cellCursor.insertText(headers.at(col));
+    }
+
+    // Write data rows
+    for (int row = 0; row < screenplayElements.size(); row++) {
+        ScreenplayElement *element = screenplayElements.at(row);
+        Scene *scene = element->scene();
+        if (!scene)
+            continue;
+
+        // Get page and time info from paginated document
+        const qreal pixelLength = ScreenplayPaginator::pixelLength(element, paginatedDoc.data());
+        const qreal pageLength =
+                ScreenplayPaginator::pixelToPageLength(pixelLength, paginatedDoc.data());
+        const QTime timeLength =
+                ScreenplayPaginator::pixelToTimeLength(pixelLength, format, paginatedDoc.data());
+
+        int col = 0;
+
+        // INT/EXT
+        QTextTableCell cell = table->cellAt(row + 1, col++);
+        QTextCursor cellCursor = cell.firstCursorPosition();
+        if (scene->heading()->isEnabled()) {
+            cellCursor.insertText(scene->heading()->locationType());
+        } else {
+            cellCursor.insertText(DASH);
+        }
+
+        // Location Name
+        cell = table->cellAt(row + 1, col++);
+        cellCursor = cell.firstCursorPosition();
+        if (scene->heading()->isEnabled()) {
+            cellCursor.insertText(scene->heading()->location());
+        } else {
+            cellCursor.insertText(DASH);
+        }
+
+        // Time of Day
+        cell = table->cellAt(row + 1, col++);
+        cellCursor = cell.firstCursorPosition();
+        if (scene->heading()->isEnabled()) {
+            cellCursor.insertText(scene->heading()->moment());
+        } else {
+            cellCursor.insertText(DASH);
+        }
+
+        // Scene #
+        cell = table->cellAt(row + 1, col++);
+        cellCursor = cell.firstCursorPosition();
+        cellCursor.insertText(element->resolvedSceneNumber());
+
+        // Synopsis
+        cell = table->cellAt(row + 1, col++);
+        cellCursor = cell.firstCursorPosition();
+        cellCursor.insertText(scene->synopsis());
+
+        // Groups
+        cell = table->cellAt(row + 1, col++);
+        cellCursor = cell.firstCursorPosition();
+        cellCursor.insertText(scene->groups().join(COMMA_SPACE));
+
+        // Keywords
+        cell = table->cellAt(row + 1, col++);
+        cellCursor = cell.firstCursorPosition();
+        cellCursor.insertText(scene->tags().join(COMMA_SPACE));
+
+        // Start Page - We'll need to calculate cumulative page offset
+        cell = table->cellAt(row + 1, col++);
+        cellCursor = cell.firstCursorPosition();
+        // Get page offset by summing pixel lengths of all previous scenes
+        qreal cumulativePixel = 0;
+        for (int i = 0; i < row; i++) {
+            cumulativePixel +=
+                    ScreenplayPaginator::pixelLength(screenplayElements.at(i), paginatedDoc.data());
+        }
+        const int startPage = static_cast<int>(ScreenplayPaginator::pixelToPageLength(
+                                      cumulativePixel, paginatedDoc.data()))
+                + 1;
+        cellCursor.insertText(QString::number(startPage));
+
+        // Page Count (1/8)
+        cell = table->cellAt(row + 1, col++);
+        cellCursor = cell.firstCursorPosition();
+        cellCursor.insertText(
+                ScreenplayPaginator::pixelToPageLength1_8(pixelLength, paginatedDoc.data()));
+
+        // Scene Time
+        cell = table->cellAt(row + 1, col++);
+        cellCursor = cell.firstCursorPosition();
+        cellCursor.insertText(timeLength.toString(TIME_FORMAT));
+
+        // Characters
+        cell = table->cellAt(row + 1, col++);
+        cellCursor = cell.firstCursorPosition();
+        const QStringList characters = scene->characterNames();
+        cellCursor.insertText(characters.join(COMMA_SPACE));
+    }
+
+    return true;
+}
+
+void SceneBreakdownReport::configureWriter(QPdfWriter *pdfWriter,
+                                           const QTextDocument *document) const
+{
+    this->configureWriterImpl(pdfWriter, document);
+}
+
+void SceneBreakdownReport::configureWriter(QPrinter *printer, const QTextDocument *document) const
+{
+    this->configureWriterImpl(printer, document);
+}
+
+bool SceneBreakdownReport::canDirectExportToOdf() const
+{
+    return true;
+}
+
+bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
+{
+    try {
+        const Screenplay *screenplay = this->document()->screenplay();
+        const ScreenplayFormat *format = this->document()->printFormat();
+        QList<ScreenplayElement *> screenplayElements = this->getScreenplayElements();
+
+        // Create paginated document for page/time calculations
+        QScopedPointer<QTextDocument> paginatedDoc(
+                ScreenplayPaginator::paginatedDocument(screenplay, format));
+        if (!paginatedDoc)
+            return false;
+
+        const QString tempPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation)
+                + QStringLiteral("/") + QStringLiteral("scrite_breakdown_")
+                + QString::number(QRandomGenerator::global()->generate()) + QStringLiteral(".xlsx");
+
+        OpenXLSX::XLDocument doc;
+        doc.create(tempPath.toStdString(), true);
+        OpenXLSX::XLWorksheet ws = doc.workbook().sheet(1);
+
+        auto &styles = doc.styles();
+
+        OpenXLSX::XLStyleIndex boldFontIndex = styles.fonts().create();
+        OpenXLSX::XLFont boldFont = styles.fonts()[boldFontIndex];
+        boldFont.setBold(true);
+
+        OpenXLSX::XLStyleIndex boldStyleIndex = styles.cellFormats().create();
+        OpenXLSX::XLCellFormat boldCellFormat = styles.cellFormats()[boldStyleIndex];
+        boldCellFormat.setFontIndex(boldFontIndex);
+        boldCellFormat.setApplyFont(true);
+
+        OpenXLSX::XLStyleIndex centerStyleIndex = styles.cellFormats().create();
+        OpenXLSX::XLCellFormat centerCellFormat = styles.cellFormats()[centerStyleIndex];
+        centerCellFormat.alignment(OpenXLSX::XLCreateIfMissing)
+                .setHorizontal(OpenXLSX::XLAlignCenter);
+        centerCellFormat.setApplyAlignment(true);
+
+        OpenXLSX::XLStyleIndex wrapTextStyleIndex = styles.cellFormats().create();
+        OpenXLSX::XLCellFormat wrapTextCellFormat = styles.cellFormats()[wrapTextStyleIndex];
+        auto wrapAlign = wrapTextCellFormat.alignment(OpenXLSX::XLCreateIfMissing);
+        wrapAlign.setWrapText(true);
+        wrapAlign.setVertical(OpenXLSX::XLAlignCenter);
+        wrapTextCellFormat.setApplyAlignment(true);
+
+        OpenXLSX::XLStyleIndex dataStyleIndex = styles.cellFormats().create();
+        OpenXLSX::XLCellFormat dataCellFormat = styles.cellFormats()[dataStyleIndex];
+        auto dataAlign = dataCellFormat.alignment(OpenXLSX::XLCreateIfMissing);
+        dataAlign.setIndent(1);
+        dataAlign.setVertical(OpenXLSX::XLAlignCenter);
+        dataCellFormat.setApplyAlignment(true);
+
+        uint32_t rowIndex = 1;
+        uint32_t colIndex = 1;
+
+        const QStringList headers = { COL_INT_EXT,    COL_LOCATION,   COL_TIME_OF_DAY,
+                                      COL_SCENE_NUM,  COL_SYNOPSIS,   COL_GROUPS,
+                                      COL_KEYWORDS,   COL_START_PAGE, COL_PAGE_COUNT,
+                                      COL_SCENE_TIME, COL_CHARACTERS };
+
+        // Track maximum text length in each column for auto-sizing
+        QVector<int> columnMaxWidths(headers.size(), 0);
+        for (int i = 0; i < headers.size(); ++i) {
+            columnMaxWidths[i] = headers.at(i).length();
+        }
+
+        // Write headers
+        for (uint32_t headerCol = 0; headerCol < static_cast<uint32_t>(headers.size());
+             headerCol++) {
+            auto cell = ws.cell(rowIndex, headerCol + 1);
+            cell.value() = headers.at(headerCol).toStdString();
+
+            OpenXLSX::XLStyleIndex headerStyleIndex = styles.cellFormats().create();
+            OpenXLSX::XLCellFormat headerCellFormat = styles.cellFormats()[headerStyleIndex];
+            headerCellFormat.setFontIndex(boldFontIndex);
+            headerCellFormat.setApplyFont(true);
+            auto headerAlign = headerCellFormat.alignment(OpenXLSX::XLCreateIfMissing);
+            headerAlign.setIndent(1);
+            headerAlign.setVertical(OpenXLSX::XLAlignCenter);
+            headerCellFormat.setApplyAlignment(true);
+
+            cell.setCellFormat(headerStyleIndex);
+        }
+        rowIndex++;
+
+        // Write data rows
+        int sceneRow = 0;
+        for (ScreenplayElement *element : screenplayElements) {
+            Scene *scene = element->scene();
+            if (!scene)
+                continue;
+
+            // Get page and time info from paginated document
+            const qreal pixelLength =
+                    ScreenplayPaginator::pixelLength(element, paginatedDoc.data());
+            const qreal pageLength =
+                    ScreenplayPaginator::pixelToPageLength(pixelLength, paginatedDoc.data());
+            const QTime timeLength = ScreenplayPaginator::pixelToTimeLength(pixelLength, format,
+                                                                            paginatedDoc.data());
+
+            colIndex = 1;
+            int colIdx = 0;
+
+            // INT/EXT
+            QString val1 =
+                    scene->heading()->isEnabled() ? scene->heading()->locationType() : DASH;
+            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val1.length());
+            auto cell1 = ws.cell(rowIndex, colIndex);
+            cell1.value() = val1.toStdString();
+            cell1.setCellFormat(dataStyleIndex);
+            colIndex++;
+            colIdx++;
+
+            // Location Name
+            QString val2 =
+                    scene->heading()->isEnabled() ? scene->heading()->location() : DASH;
+            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val2.length());
+            auto cell2 = ws.cell(rowIndex, colIndex);
+            cell2.value() = val2.toStdString();
+            cell2.setCellFormat(dataStyleIndex);
+            colIndex++;
+            colIdx++;
+
+            // Time of Day
+            QString val3 =
+                    scene->heading()->isEnabled() ? scene->heading()->moment() : DASH;
+            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val3.length());
+            auto cell3 = ws.cell(rowIndex, colIndex);
+            cell3.value() = val3.toStdString();
+            cell3.setCellFormat(dataStyleIndex);
+            colIndex++;
+            colIdx++;
+
+            // Scene #
+            QString val4 = element->resolvedSceneNumber();
+            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val4.length());
+            auto cell4 = ws.cell(rowIndex, colIndex);
+            cell4.value() = val4.toStdString();
+            cell4.setCellFormat(dataStyleIndex);
+            colIndex++;
+            colIdx++;
+
+            // Synopsis - use wrap text style (skip width calculation)
+            auto cell5 = ws.cell(rowIndex, colIndex);
+            cell5.value() = scene->synopsis().toStdString();
+            cell5.setCellFormat(wrapTextStyleIndex);
+            colIndex++;
+            colIdx++;
+
+            // Groups
+            QString val6 = scene->groups().join(COMMA_SPACE);
+            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val6.length());
+            auto cell6 = ws.cell(rowIndex, colIndex);
+            cell6.value() = val6.toStdString();
+            cell6.setCellFormat(dataStyleIndex);
+            colIndex++;
+            colIdx++;
+
+            // Keywords
+            QString val7 = scene->tags().join(COMMA_SPACE);
+            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val7.length());
+            auto cell7 = ws.cell(rowIndex, colIndex);
+            cell7.value() = val7.toStdString();
+            cell7.setCellFormat(dataStyleIndex);
+            colIndex++;
+            colIdx++;
+
+            // Start Page - Calculate cumulative page offset
+            qreal cumulativePixel = 0;
+            for (int i = 0; i < sceneRow; i++) {
+                cumulativePixel += ScreenplayPaginator::pixelLength(screenplayElements.at(i),
+                                                                    paginatedDoc.data());
+            }
+            const int startPage = static_cast<int>(ScreenplayPaginator::pixelToPageLength(
+                                          cumulativePixel, paginatedDoc.data()))
+                    + 1;
+            QString val8 = QString::number(startPage);
+            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val8.length());
+            auto cellPageStart = ws.cell(rowIndex, colIndex);
+            cellPageStart.value() = val8.toStdString();
+            cellPageStart.setCellFormat(dataStyleIndex);
+            colIndex++;
+            colIdx++;
+
+            // Page Count (1/8)
+            QString val9 =
+                    ScreenplayPaginator::pixelToPageLength1_8(pixelLength, paginatedDoc.data());
+            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val9.length());
+            auto cellPageCount = ws.cell(rowIndex, colIndex);
+            cellPageCount.value() = val9.toStdString();
+            cellPageCount.setCellFormat(dataStyleIndex);
+            colIndex++;
+            colIdx++;
+
+            // Scene Time
+            QString val10 = timeLength.toString(TIME_FORMAT);
+            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val10.length());
+            auto cell10 = ws.cell(rowIndex, colIndex);
+            cell10.value() = val10.toStdString();
+            cell10.setCellFormat(dataStyleIndex);
+            colIndex++;
+            colIdx++;
+
+            // Characters
+            QString val11 = scene->characterNames().join(COMMA_SPACE);
+            columnMaxWidths[colIdx] = std::max(columnMaxWidths[colIdx], (int)val11.length());
+            auto cell11 = ws.cell(rowIndex, colIndex);
+            cell11.value() = val11.toStdString();
+            cell11.setCellFormat(dataStyleIndex);
+
+            rowIndex++;
+            sceneRow++;
+        }
+
+        // Configure column widths based on content
+        for (int col = 0; col < headers.size(); ++col) {
+            if (col == 4) {
+                // Col 5 (index 4): Synopsis - fixed 300px (approx 42 character widths)
+                ws.column(col + 1).setWidth(42);
+            } else {
+                // All other columns: content width + 4 extra characters for breathing space
+                double columnWidth = columnMaxWidths[col] + 4.0;
+                ws.column(col + 1).setWidth(columnWidth);
+            }
+        }
+
+        // Set row height for better readability with padding
+        ws.row(1).setHeight(25); // Header row
+        for (uint32_t row = 2; row < rowIndex; ++row) {
+            ws.row(row).setHeight(30); // Data rows with more height for wrapped text
+        }
+
+        doc.save();
+
+        QFile tempFile(tempPath);
+        if (!tempFile.open(QIODevice::ReadOnly)) {
+            return false;
+        }
+
+        const QByteArray data = tempFile.readAll();
+        tempFile.close();
+        tempFile.remove();
+
+        if (device->write(data) < 0)
+            return false;
+
+        return true;
+    } catch (const std::exception &e) {
+        qWarning() << "Error generating XLSX:" << QString::fromStdString(e.what());
+        return false;
+    }
+}
+
+Q_DECL_IMPORT int qt_defaultDpi();
+
+void SceneBreakdownReport::configureWriterImpl(QPagedPaintDevice *ppd,
+                                               const QTextDocument *document) const
+{
+    const QSizeF idealSizeInPixels = document->size();
+    if (idealSizeInPixels.width() > idealSizeInPixels.height())
+        ppd->setPageOrientation(QPageLayout::Landscape);
+    else
+        ppd->setPageOrientation(QPageLayout::Portrait);
+
+    const QSizeF pdfPageSizeInPixels = ppd->pageLayout().pageSize().sizePixels(qt_defaultDpi());
+    const qreal scale = idealSizeInPixels.width() / pdfPageSizeInPixels.width();
+
+    if (scale < 1 || qFuzzyCompare(scale, 1.0))
+        return;
+
+    const qreal margin = 1.0 / 2.54;
+    QSizeF requiredPdfPageSize = ppd->pageLayout().pageSize().size(QPageSize::Inch);
+    requiredPdfPageSize *= scale;
+    requiredPdfPageSize += QSizeF(margin, margin); // margin
+    ppd->setPageSize(
+            QPageSize(requiredPdfPageSize, QPageSize::Inch, "Custom", QPageSize::FuzzyMatch));
+}
+
+QList<ScreenplayElement *> SceneBreakdownReport::getScreenplayElements()
+{
+    const Screenplay *screenplay = this->document()->screenplay();
+    QList<ScreenplayElement *> screenplayElements;
+
+    for (int i = 0; i < screenplay->elementCount(); i++) {
+        ScreenplayElement *element = screenplay->elementAt(i);
+
+        if (this->passesFilter(element))
+            screenplayElements.append(element);
+    }
+
+    return screenplayElements;
+}

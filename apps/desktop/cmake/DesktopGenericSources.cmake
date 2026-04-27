@@ -75,6 +75,8 @@ set(SCRITE_DESKTOP_GENERIC_SOURCES
   "src/reports/locationreport.h"
   "src/reports/notebookreport.cpp"
   "src/reports/notebookreport.h"
+  "src/reports/scenebreakdownreport.cpp"
+  "src/reports/scenebreakdownreport.h"
   "src/reports/scenecharactermatrixreport.cpp"
   "src/reports/scenecharactermatrixreport.h"
   "src/reports/screenplaysubsetreport.cpp"

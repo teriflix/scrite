@@ -114,6 +114,12 @@ public:
     qreal pageLength = 0;
 
     // clang-format off
+    Q_PROPERTY(QString pageLength1_8
+               MEMBER pageLength1_8)
+    // clang-format on
+    QString pageLength1_8;
+
+    // clang-format off
     Q_PROPERTY(QTime timeLength
                MEMBER timeLength)
     // clang-format on
@@ -238,10 +244,11 @@ public:
     static qreal pixelLength(const QTextBlock &from, const QTextBlock &until,
                              const QTextDocument *document);
     static qreal pixelToPageLength(qreal pixelLength, const QTextDocument *document);
-    static QTime pixelToTimeLength(qreal pixelLength, ScreenplayFormat *format,
+    static QTime pixelToTimeLength(qreal pixelLength, const ScreenplayFormat *format,
                                    const QTextDocument *document);
-    static QTime pageToTimeLength(qreal pixelLength, ScreenplayFormat *format,
+    static QTime pageToTimeLength(qreal pageLength, const ScreenplayFormat *format,
                                   const QTextDocument *document);
+    static QString pixelToPageLength1_8(qreal pixelLength, const QTextDocument *document);
 
     // clang-format off
     Q_PROPERTY(int recordCount

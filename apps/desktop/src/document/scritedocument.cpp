@@ -50,6 +50,7 @@
 // #include "locationscreenplayreport.h"
 #include "qtextdocumentpagedprinter.h"
 #include "characterscreenplayreport.h"
+#include "scenebreakdownreport.h"
 #include "scenecharactermatrixreport.h"
 
 #include <QDir>
@@ -711,6 +712,7 @@ DeviceIOFactories::DeviceIOFactories()
     // ReportsFactory.addClass<LocationScreenplayReport>();
     ReportsFactory.addClass<CharacterReport>();
     ReportsFactory.addClass<CharacterScreenplayReport>();
+    ReportsFactory.addClass<SceneBreakdownReport>();
     ReportsFactory.addClass<SceneCharacterMatrixReport>();
     ReportsFactory.addClass<StatisticsReport>();
     ReportsFactory.addClass<NotebookReport>();

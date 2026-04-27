@@ -437,7 +437,14 @@ qreal ScreenplayPaginator::pixelToPageLength(qreal pixelLength, const QTextDocum
     return pixelLength / pageLength;
 }
 
-QTime ScreenplayPaginator::pixelToTimeLength(qreal pixelLength, ScreenplayFormat *format,
+QString ScreenplayPaginator::pixelToPageLength1_8(qreal pixelLength, const QTextDocument *document)
+{
+    const qreal pageLength = pixelToPageLength(pixelLength, document);
+    const int eighthsCount = qRound(pageLength * 8.0);
+    return QString::number(eighthsCount) + QStringLiteral("/8");
+}
+
+QTime ScreenplayPaginator::pixelToTimeLength(qreal pixelLength, const ScreenplayFormat *format,
                                              const QTextDocument *document)
 {
     if (qFuzzyIsNull(pixelLength) || pixelLength < 0 || format == nullptr || document == nullptr)
@@ -451,7 +458,7 @@ QTime ScreenplayPaginator::pixelToTimeLength(qreal pixelLength, ScreenplayFormat
             qCeil(qreal(format->secondsPerPage()) * pixelToPageLength(pixelLength, document)));
 }
 
-QTime ScreenplayPaginator::pageToTimeLength(qreal pageLength, ScreenplayFormat *format,
+QTime ScreenplayPaginator::pageToTimeLength(qreal pageLength, const ScreenplayFormat *format,
                                             const QTextDocument *document)
 {
     if (qFuzzyIsNull(pageLength) || pageLength < 0 || format == nullptr || document == nullptr)

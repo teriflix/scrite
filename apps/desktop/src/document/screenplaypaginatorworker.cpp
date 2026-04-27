@@ -708,6 +708,7 @@ void ScreenplayPaginatorWorker::syncDocument()
 
         record.pixelLength = ScreenplayPaginator::pixelLength(range.from, range.until, m_document);
         record.pageLength = ScreenplayPaginator::pixelToPageLength(record.pixelLength, m_document);
+        record.pageLength1_8 = ScreenplayPaginator::pixelToPageLength1_8(record.pixelLength, m_document);
         record.timeLength =
                 ScreenplayPaginator::pixelToTimeLength(record.pixelLength, m_format, m_document);
         record.pageBreaks = this->evaluateScenePageBreaks(range, lastPageNr);
@@ -744,6 +745,7 @@ void ScreenplayPaginatorWorker::syncDocument()
         record.pixelLength = ScreenplayPaginator::pixelLength(breakBlockExtent.from,
                                                               breakBlockExtent.until, m_document);
         record.pageLength = ScreenplayPaginator::pixelToPageLength(record.pixelLength, m_document);
+        record.pageLength1_8 = ScreenplayPaginator::pixelToPageLength1_8(record.pixelLength, m_document);
         record.timeLength =
                 ScreenplayPaginator::pixelToTimeLength(record.pixelLength, m_format, m_document);
 
