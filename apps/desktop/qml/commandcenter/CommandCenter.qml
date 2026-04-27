@@ -96,8 +96,6 @@ Popup {
                 Keys.onEnterPressed: _actionsView.triggerCurrentItem()
                 Keys.onReturnPressed: _actionsView.triggerCurrentItem()
 
-                DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
-
                 focus: true
                 placeholderText: "Search for a command ..."
 

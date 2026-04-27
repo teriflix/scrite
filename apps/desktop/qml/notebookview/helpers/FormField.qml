@@ -214,8 +214,6 @@ Column {
                 SyntaxHighlighter.textDocument: textDocument
                 SyntaxHighlighter.textDocumentUndoRedoEnabled: root.enableUndoRedo
 
-                DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
-                
                 PlaceholderVisibility.visible: !activeFocus && text === ""
 
                 LanguageTransliterator.popup: LanguageTransliteratorPopup {

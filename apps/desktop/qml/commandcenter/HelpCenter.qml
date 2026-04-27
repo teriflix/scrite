@@ -95,8 +95,6 @@ Popup {
                 Keys.onEnterPressed: _helpTopics.triggerCurrentItem()
                 Keys.onReturnPressed: _helpTopics.triggerCurrentItem()
 
-                DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
-
                 focus: true
                 placeholderText: "Search for a help topic ..."
 

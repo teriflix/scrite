@@ -72,8 +72,6 @@ Item {
 
                 Layout.fillWidth: true
 
-                DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
-
                 font.bold: true
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
                 placeholderText: "Verification Code"

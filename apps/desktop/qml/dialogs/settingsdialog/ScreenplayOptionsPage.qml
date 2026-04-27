@@ -137,15 +137,6 @@ Item {
                     }
                 }
 
-                VclCheckBox {
-                    Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
-
-                    text: "Diacritic Editing"
-                    enabled: Platform.isMacOSDesktop
-                    checked: Runtime.screenplayEditorSettings.allowDiacriticEditing
-                    onToggled: Runtime.screenplayEditorSettings.allowDiacriticEditing = checked
-                }
-
                 RowLayout {
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 

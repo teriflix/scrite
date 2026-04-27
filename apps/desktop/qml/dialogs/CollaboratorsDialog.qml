@@ -180,8 +180,6 @@ DialogLauncher {
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
 
-                                DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
-
                                 Keys.onReturnPressed: addCollaborator()
 
                                 placeholderText: "Enter Email ID and hit Return"

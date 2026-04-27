@@ -114,8 +114,6 @@ set(SCRITE_DESKTOP_QML_SOURCES
   "src/quick/objects/delayedproperty.h"
   "src/quick/objects/deltadocument.cpp"
   "src/quick/objects/deltadocument.h"
-  "src/quick/objects/diacritichandler.cpp"
-  "src/quick/objects/diacritichandler.h"
   "src/quick/objects/errorreport.cpp"
   "src/quick/objects/errorreport.h"
   "src/quick/objects/eventfilter.cpp"

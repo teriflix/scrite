@@ -104,8 +104,6 @@ TextField {
     KeyNavigation.tab: tabItem
     KeyNavigation.backtab: backTabItem
 
-    DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
-
     PlaceholderVisibility.visible: !activeFocus && text === ""
 
     LanguageTransliterator.popup: LanguageTransliteratorPopup {

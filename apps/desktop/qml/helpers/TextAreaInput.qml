@@ -51,8 +51,6 @@ TextArea {
     SyntaxHighlighter.textDocument: textDocument
     SyntaxHighlighter.textDocumentUndoRedoEnabled: undoRedoEnabled
 
-    DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
-
     PlaceholderVisibility.visible: !activeFocus && text === ""
 
     LanguageTransliterator.popup: LanguageTransliteratorPopup {

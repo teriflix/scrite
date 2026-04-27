@@ -319,8 +319,6 @@ Item {
             ]
             SyntaxHighlighter.textDocument: textDocument
 
-            DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
-
             LanguageTransliterator.popup: LanguageTransliteratorPopup {
                 editorFont: _textEditor.font
             }

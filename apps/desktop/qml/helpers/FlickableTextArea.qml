@@ -79,8 +79,6 @@ Flickable {
 
         font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-        DiacriticHandler.enabled: Runtime.allowDiacriticEditing && activeFocus
-        
         PlaceholderVisibility.visible: !activeFocus && text === ""
 
         KeyNavigation.tab: root.tabItem
