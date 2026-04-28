@@ -8,14 +8,16 @@
 
 set(CPACK_GENERATOR "NSIS")
 
-# Include version suffix if provided (e.g., SCRITE_VERSION_SUFFIX="-beta")
+# Build the display version string (e.g. "1.0.0" or "1.0.0-beta")
 if(DEFINED SCRITE_VERSION_SUFFIX)
-    set(CPACK_PACKAGE_FILE_NAME "Scrite-${PROJECT_VERSION}${SCRITE_VERSION_SUFFIX}-64bit-Setup")
+    set(_scrite_display_version "${PROJECT_VERSION}${SCRITE_VERSION_SUFFIX}")
 else()
-    set(CPACK_PACKAGE_FILE_NAME "Scrite-${PROJECT_VERSION}-64bit-Setup")
+    set(_scrite_display_version "${PROJECT_VERSION}")
 endif()
-set(CPACK_NSIS_PACKAGE_NAME "Scrite")
-set(CPACK_NSIS_DISPLAY_NAME "Scrite ${PROJECT_VERSION}")
+
+set(CPACK_PACKAGE_FILE_NAME    "Scrite-${_scrite_display_version}-64bit-Setup")
+set(CPACK_NSIS_PACKAGE_NAME    "Scrite ${_scrite_display_version}")
+set(CPACK_NSIS_DISPLAY_NAME    "Scrite ${_scrite_display_version}")
 set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
 set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 
@@ -43,13 +45,15 @@ set(CPACK_NSIS_CONTACT "support@scrite.io")
 # Single-quoted NSIS strings avoid embedded double-quotes in the cmake string,
 # which prevents cmake from mis-parsing CPackConfig.cmake.
 set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS
-    "WriteRegStr HKCU 'Software\\\\Classes\\\\.scrite' '' 'Scrite.Document'\n\
+    "ExecWait 'TaskKill /IM Scrite.exe /F'\n\
+  WriteRegStr HKCU 'Software\\\\Classes\\\\.scrite' '' 'Scrite.Document'\n\
   WriteRegStr HKCU 'Software\\\\Classes\\\\Scrite.Document' '' 'Scrite Screenplay Document'\n\
   WriteRegStr HKCU 'Software\\\\Classes\\\\Scrite.Document\\\\DefaultIcon' '' '$INSTDIR\\\\appicon.ico,0'\n\
   WriteRegStr HKCU 'Software\\\\Classes\\\\Scrite.Document\\\\shell' '' 'open'\n\
-  WriteRegStr HKCU 'Software\\\\Classes\\\\Scrite.Document\\\\shell\\\\open\\\\command' '' '\"$INSTDIR\\\\Scrite.exe\" \"%1\"'\n\
+  IntFmt $R0 '%c' 34\n\
+  WriteRegStr HKCU 'Software\\\\Classes\\\\Scrite.Document\\\\shell\\\\open\\\\command' '' '$R0$INSTDIR\\\\Scrite.exe$R0 $R0%1$R0'\n\
   System::Call 'shell32.dll::SHChangeNotify(i, i, i, i) v (0x08000000, 0, 0, 0)'\n\
-  ExecWait '\"$INSTDIR\\\\vcredist_x64.exe\" /q'"
+  ExecWait '$R0$INSTDIR\\\\vcredist_x64.exe$R0 /q'"
 )
 
 set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS

@@ -9,13 +9,6 @@ This directory contains the CPack-based cross-platform packaging system for Scri
 ./scripts/build.sh
 ```
 
-### Package (Platform Auto-Detection)
-```bash
-./scripts/package.sh
-```
-
-The dispatcher script automatically detects your platform and invokes the appropriate packaging script. All packages are created in `binary/packages/`.
-
 ## Platform-Specific Usage
 
 ### macOS
@@ -44,8 +37,8 @@ export MACOS_SIGNING_IDENTITY="Developer ID Application: VCreate Logic (ABC123)"
 ```
 
 ### Windows
-```bash
-./scripts/package-windows.sh [--build] [--sign]
+```bat
+.\scripts\package-windows.bat [--build] [--sign]
 ```
 
 Creates an NSIS installer with optional code signing.
@@ -54,26 +47,22 @@ Creates an NSIS installer with optional code signing.
 - Visual Studio (MSVC 2022+)
 - Qt 6.8+
 - NSIS 3.0+
-- Git Bash or MSYS2
 - Code signing tool (optional, e.g., CodeSignTool or signtool.exe)
-- Visual C++ redistributable `.exe` (place in `packaging/assets/windows/vcredist_x64.exe`)
 
 **Setup (one-time):**
-```bash
-cp packaging.config.local.example packaging.config.local
-# Edit packaging.config.local with your environment
-# Set SCRITE_OPENSSL_LIBS, SCRITE_CRASHPAD_ROOT, code signing tool path, etc.
-
-# Download and place Visual C++ redistributable:
-# Download from: https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
-# Save as: packaging/assets/windows/vcredist_x64.exe
+```bat
+copy packaging.config.local.bat.example packaging.config.local.bat
+:: Edit packaging.config.local.bat with your environment
+:: Set QT_BIN_DIR, CMAKE_DIR, SCRITE_OPENSSL_LIBS, SCRITE_CRASHPAD_ROOT, etc.
 ```
 
-**Example (Git Bash):**
-```bash
-export SCRITE_OPENSSL_LIBS="C:/path/to/openssl-1.1"
-export SCRITE_CRASHPAD_ROOT="C:/path/to/crashpad"
-./scripts/package-windows.sh --build
+The Visual C++ redistributable is downloaded automatically by the script if not already present.
+
+**Example:**
+```bat
+set SCRITE_OPENSSL_LIBS=C:\path\to\openssl-1.1
+set SCRITE_CRASHPAD_ROOT=C:\path\to\crashpad
+.\scripts\package-windows.bat --build
 ```
 
 ### Linux
@@ -111,10 +100,14 @@ cp packaging.config.local.example packaging.config.local
 By default, signing is disabled. Code signing is opt-in and only happens if credentials are configured:
 
 ```bash
-# Build and package without signing (all platforms)
-./scripts/package.sh --build
+# macOS / Linux — build and package without signing
+./scripts/package-macos.sh --build
+./scripts/package-linux.sh --build
+```
 
-# No certificates required — useful for testing, CI dry-runs, etc.
+```bat
+:: Windows — build and package without signing
+.\scripts\package-windows.bat --build
 ```
 
 ## CI/CD Integration
@@ -159,17 +152,15 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Qt
-        run: choco install qt-online
       - name: Build
-        run: ./packaging/scripts/build.sh
+        run: .\packaging\scripts\build.bat
       - name: Package
         env:
-          CODESIGN_TOOL: ${{ secrets.CODESIGN_TOOL_PATH }}
-          WIN_CERT_SUBJECT: ${{ secrets.WIN_CERT_SUBJECT }}
-          SCRITE_OPENSSL_LIBS: C:/openssl
-          SCRITE_CRASHPAD_ROOT: C:/crashpad
-        run: ./packaging/scripts/package-windows.sh --sign
+          CodeSignTool: ${{ secrets.CODESIGN_TOOL_PATH }}
+          SCRITE_BUSINESS_NAME: ${{ secrets.WIN_CERT_SUBJECT }}
+          SCRITE_OPENSSL_LIBS: C:\openssl
+          SCRITE_CRASHPAD_ROOT: C:\crashpad
+        run: .\packaging\scripts\package-windows.bat --sign
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -195,17 +186,21 @@ jobs:
 
 ## Configuration Files
 
-### `packaging.config.local` (git-ignored)
+### `packaging.config.local` / `packaging.config.local.bat` (git-ignored)
 
-Developer-specific configuration. Copy from `packaging.config.local.example` and fill in your values:
+Developer-specific configuration. Copy the appropriate example for your platform and fill in your values:
 
+**macOS / Linux:**
 ```bash
-export MACOS_SIGNING_IDENTITY="Developer ID Application: ..."
-export APPLE_ID_USER="your.email@apple.com"
-export APPLE_NOTARIZE_PASSWORD="xxxx-xxxx-xxxx-xxxx"
+cp packaging.config.local.example packaging.config.local
 ```
 
-This file is **never committed** (in `.gitignore`) — each developer maintains their own.
+**Windows:**
+```bat
+copy packaging.config.local.bat.example packaging.config.local.bat
+```
+
+These files are **never committed** (in `.gitignore`) — each developer maintains their own.
 
 ### Environment Variables
 
@@ -237,18 +232,17 @@ packaging/
 │   │   └── Scrite.desktop
 │   └── windows/
 │       ├── FileAssociation.nsh      # NSIS helper
-│       ├── installer.nsi.in         # NSIS template
 │       ├── license.txt
-│       ├── qt.conf
-│       └── vcredist_x64.exe         # (must be added manually)
+│       └── vcredist_x64.exe         # (automatically downloaded by the package script)
 ├── scripts/
-│   ├── _common.sh                   # Shared functions
-│   ├── build.sh                     # CMake build
-│   ├── package.sh                   # Platform dispatcher
+│   ├── _common.sh                   # Shared functions (sourced by shell scripts)
+│   ├── build.sh                     # CMake build (macOS/Linux)
+│   ├── build.bat                    # CMake build (Windows)
 │   ├── package-macos.sh
-│   ├── package-windows.sh
+│   ├── package-windows.bat
 │   └── package-linux.sh
 ├── packaging.config.local.example   # Config template
+├── packaging.config.local.bat.example  # Config template (Windows)
 └── README.md                        # This file
 ```
 
@@ -269,7 +263,7 @@ packaging/
 - Use `--use-appimagetool` for a smaller build if you want system Qt instead
 
 ### All platforms: "binary/packages" directory not found
-- Run `build.sh` first to generate the executable
+- Run `build.sh` (macOS/Linux) or `build.bat` (Windows) first to generate the executable
 
 ## Notes
 
