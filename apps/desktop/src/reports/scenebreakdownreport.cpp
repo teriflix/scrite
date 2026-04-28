@@ -188,7 +188,8 @@ bool SceneBreakdownReport::passesFilter(const ScreenplayElement *element) const
         return false;
 
     // Filter by episodes
-    if (!m_episodeNumbers.isEmpty()) {
+    if (!m_episodeNumbers.isEmpty()
+        && element->elementType() == ScreenplayElement::SceneElementType) {
         const Screenplay *screenplay = this->document()->screenplay();
         const bool hasEpisodes = screenplay->episodeCount() > 0;
 
@@ -197,10 +198,9 @@ bool SceneBreakdownReport::passesFilter(const ScreenplayElement *element) const
             bool foundInEpisode = false;
 
             for (int i = 0; i < screenplay->elementCount(); i++) {
-                if (i == 0)
-                    ++currentEpisode;
-
                 if (screenplay->elementAt(i) == element) {
+                    if (i == 0)
+                        ++currentEpisode;
                     foundInEpisode = m_episodeNumbers.contains(currentEpisode);
                     break;
                 }
