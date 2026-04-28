@@ -115,8 +115,7 @@ AbstractScenePartEditor {
             labelIconVisible: true
             labelText: "Keywords"
             readOnly: !Runtime.appFeatures.structure.enabled && root.readOnly
-            textBorderWidth: root.screenplayElementDelegateHasFocus ? 0 : Math.max(0.5, 1 * zoomLevel)
-            textColors: root.screenplayElementDelegateHasFocus ? Runtime.colors.accent.c600 : Runtime.colors.accent.c10
+            textBorderWidth: Math.max(0.5, 1 * zoomLevel)
             textList: root.scene ? root.scene.tags : 0
             zoomLevel: root.zoomLevel
 

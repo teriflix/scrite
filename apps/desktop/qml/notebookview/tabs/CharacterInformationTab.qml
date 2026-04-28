@@ -268,13 +268,11 @@ Item {
                                             required property int index
                                             required property string modelData
 
-                                            property var colors: containsMouse ? Runtime.colors.accent.c900 : Runtime.colors.accent.c500
+                                            color: Runtime.colors.scheme === Qt.ColorScheme.Dark ? Qt.rgba(1, 1, 1, containsMouse ? 0.5 : 0.25) : Qt.rgba(0, 0, 0, containsMouse ? 0.25 : 0.1)
+                                            textColor: Runtime.colors.scheme === Qt.ColorScheme.Dark ? "white" : "black"
 
-                                            color: colors.background
-                                            textColor: colors.text
-
-                                            border.color: colors.text
-                                            border.width: 1
+                                            border.color: textColor
+                                            border.width: containsMouse ? 2 : 1
 
                                             closable: Scrite.document.readOnly ? false : true
                                             text: modelData

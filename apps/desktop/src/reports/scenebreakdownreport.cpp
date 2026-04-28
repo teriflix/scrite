@@ -14,7 +14,6 @@
 ****************************************************************************/
 
 #include "scenebreakdownreport.h"
-#include "application.h"
 
 #include "scene.h"
 #include "screenplay.h"
@@ -22,15 +21,18 @@
 #include "scritedocument.h"
 #include "screenplaypaginator.h"
 
+#include <QFile>
 #include <QPrinter>
 #include <QPainter>
 #include <QSettings>
 #include <QPdfWriter>
 #include <QTextTable>
-#include <QFile>
+#include <QFontMetricsF>
 #include <QStandardPaths>
-#include <QRandomGenerator>
 #include <QScopedPointer>
+#include <QGuiApplication>
+#include <QRandomGenerator>
+
 #include <OpenXLSX.hpp>
 
 namespace {
@@ -188,7 +190,8 @@ bool SceneBreakdownReport::passesFilter(const ScreenplayElement *element) const
         return false;
 
     // Filter by episodes
-    if (!m_episodeNumbers.isEmpty()) {
+    if (!m_episodeNumbers.isEmpty()
+        && element->elementType() == ScreenplayElement::SceneElementType) {
         const Screenplay *screenplay = this->document()->screenplay();
         const bool hasEpisodes = screenplay->episodeCount() > 0;
 
@@ -197,10 +200,9 @@ bool SceneBreakdownReport::passesFilter(const ScreenplayElement *element) const
             bool foundInEpisode = false;
 
             for (int i = 0; i < screenplay->elementCount(); i++) {
-                if (i == 0)
-                    ++currentEpisode;
-
                 if (screenplay->elementAt(i) == element) {
+                    if (i == 0)
+                        ++currentEpisode;
                     foundInEpisode = m_episodeNumbers.contains(currentEpisode);
                     break;
                 }
@@ -619,6 +621,11 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
         }
         rowIndex++;
 
+        // Set row height for better readability with padding
+        ws.row(1).setHeight(25); // Header row
+
+        QFontMetricsF fontMetrics(qApp->font());
+
         // Write data rows
         int sceneRow = 0;
         for (ScreenplayElement *element : screenplayElements) {
@@ -645,6 +652,8 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
                     + 1;
 
             // Populate visible columns
+            const qreal synopsisColumnWidth = 300;
+            float rowHeight = 30;
             for (int col = 0; col < visibleColumns.size(); ++col) {
                 const QString &colKey = visibleColumns.at(col).key;
                 QString cellValue;
@@ -660,6 +669,12 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
                     cellValue = element->resolvedSceneNumber();
                 } else if (colKey == COL_KEY_SYNOPSIS) {
                     cellValue = scene->synopsis();
+                    if (!cellValue.isEmpty()
+                        && fontMetrics.horizontalAdvance(cellValue) >= synopsisColumnWidth)
+                        rowHeight += (float)fontMetrics
+                                             .boundingRect(QRectF(0, 0, synopsisColumnWidth, 20000),
+                                                           Qt::TextWordWrap, cellValue)
+                                             .height();
                 } else if (colKey == COL_KEY_GROUPS) {
                     cellValue = scene->groups().join(COMMA_SPACE);
                 } else if (colKey == COL_KEY_KEYWORDS) {
@@ -686,6 +701,8 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
 
                 if (colKey != COL_KEY_SYNOPSIS)
                     columnMaxWidths[col] = std::max(columnMaxWidths[col], (int)cellValue.length());
+
+                ws.row(rowIndex).setHeight(rowHeight);
             }
 
             rowIndex++;
@@ -702,12 +719,6 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
                 double columnWidth = columnMaxWidths[col] + 4.0;
                 ws.column(col + 1).setWidth(columnWidth);
             }
-        }
-
-        // Set row height for better readability with padding
-        ws.row(1).setHeight(25); // Header row
-        for (uint32_t row = 2; row < rowIndex; ++row) {
-            ws.row(row).setHeight(30); // Data rows with more height for wrapped text
         }
 
         doc.save();

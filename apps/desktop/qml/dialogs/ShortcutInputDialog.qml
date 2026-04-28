@@ -130,7 +130,7 @@ DialogLauncher {
 
                                 Layout.alignment: Qt.AlignBaseline
 
-                                Layout.preferredWidth: Math.max(Runtime.shortcutFontMetrics.averageCharacterWidth*8, contentWidth)
+                                Layout.preferredWidth: Math.max(Runtime.shortcutFontMetrics.averageCharacterWidth*12, contentWidth)
 
                                 EventFilter.target: Scrite.app
                                 EventFilter.events: [EventFilter.KeyPress,EventFilter.KeyRelease]
@@ -190,8 +190,8 @@ DialogLauncher {
                                         ColorAnimation {
                                             target: _keysField
                                             properties: "color"
-                                            from: "black"
-                                            to: "red"
+                                            from: Runtime.colors.tx("black")
+                                            to: Runtime.colors("red")
                                             duration: Runtime.stdAnimationDuration
                                         }
                                     }
@@ -211,8 +211,8 @@ DialogLauncher {
                                         ColorAnimation {
                                             target: _keysField
                                             properties: "color"
-                                            from: "red"
-                                            to: "black"
+                                            from: Runtime.colors.tx("red")
+                                            to: Runtime.colors.tx("black")
                                             duration: Runtime.stdAnimationDuration
                                         }
                                     }

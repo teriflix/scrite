@@ -49,8 +49,7 @@ AbstractScenePartEditor {
         labelIconSource: Runtime.themedIcon("qrc:/icons/content/persons_add.png")
         labelText: "Characters"
         readOnly: root.readOnly
-        textBorderWidth: root.screenplayElementDelegateHasFocus ? 0 : Math.max(0.5, 1 * zoomLevel)
-        textColors: root.screenplayElementDelegateHasFocus ? Runtime.colors.accent.c600 : Runtime.colors.accent.c10
+        textBorderWidth: Math.max(0.5, 1 * zoomLevel)
         textList: root.scene ? root.scene.characterNames : 0
         zoomLevel: root.zoomLevel
 

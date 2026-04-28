@@ -23,6 +23,7 @@ import io.scrite.components
 
 import "../globals"
 import "../controls"
+import "../globals/runtime"
 
 Flow {
     id: root
@@ -34,12 +35,19 @@ Flow {
     required property string addTextButtonTooltip
 
     property int maxTextLength: 30
-    property var highlightedTextColors: Runtime.colors.accent.c900
-    property var textColors: Runtime.colors.accent.c10
     property bool readOnly: false
     property font font: Runtime.idealFontMetrics.font
     property real textBorderWidth: 1
     property real zoomLevel: 1.0
+
+    property ColorPair_RT textColors: ColorPair_RT {
+        text: Runtime.colors.scheme === Qt.ColorScheme.Dark ? "white" : "black"
+        background: Runtime.colors.scheme === Qt.ColorScheme.Dark ? Qt.rgba(0, 0, 0, 0.25) : Qt.rgba(1, 1, 1, 0.25)
+    }
+    property ColorPair_RT highlightedTextColors: ColorPair_RT {
+        text: Runtime.colors.scheme === Qt.ColorScheme.Dark ? "white" : "black"
+        background: Runtime.colors.scheme === Qt.ColorScheme.Dark ? Qt.rgba(0, 0, 0, 0.5) : Qt.rgba(1, 1, 1, 0.5)
+    }
 
     property alias header: _headerLoader.sourceComponent
     property alias labelIconVisible: _labelIcon.visible
