@@ -34,14 +34,14 @@ Item {
     readonly property alias defaultLinkColor: _private.defaultLinkColor
     readonly property alias hoveredLinkColor: _private.hoveredLinkColor
 
-    property real sceneControlTint: applicationSettings.colorIntensity*0.4
-    property real sceneHeadingTint: applicationSettings.colorIntensity*0.4
-    property real currentNoteTint: applicationSettings.colorIntensity*0.4
-    property real currentLineHightlightTint: applicationSettings.colorIntensity*0.2
-    property real screenplayTracksTint: Runtime.bounded(0.4, applicationSettings.colorIntensity, 1)
+    property real sceneControlTint: _private.colorIntensity*0.4
+    property real sceneHeadingTint: _private.colorIntensity*0.4
+    property real currentNoteTint: _private.colorIntensity*0.4
+    property real currentLineHightlightTint: _private.colorIntensity*0.2
+    property real screenplayTracksTint: Runtime.bounded(0.4, _private.colorIntensity, 1)
     property color buttonDownIconColor: _private.theme === Material.Dark ? accent.c800.background : accent.c200.background
-    property color selectedSceneControlTint: Color.translucent(theme === Material.Light ? primary.c100.background : primary.c800.background, Runtime.bounded(0.2,1-applicationSettings.colorIntensity,0.8))
-    property color selectedSceneHeadingTint:  Color.translucent(theme === Material.Light ? primary.c100.background : primary.c800.background, Runtime.bounded(0.2,1-applicationSettings.colorIntensity,0.8))
+    property color selectedSceneControlTint: Color.translucent(theme === Material.Light ? primary.c100.background : primary.c800.background, Runtime.bounded(0.2,1-_private.colorIntensity,0.8))
+    property color selectedSceneHeadingTint:  Color.translucent(theme === Material.Light ? primary.c100.background : primary.c800.background, Runtime.bounded(0.2,1-_private.colorIntensity,0.8))
 
     readonly property color transparent: "transparent"
 
@@ -78,6 +78,8 @@ Item {
 
         property int   theme: scheme === Qt.ColorScheme.Dark ? Material.Dark : Material.Light
         property int   scheme: Scrite.app.styleHints.colorScheme
+
+        property real colorIntensity: (scheme === Qt.ColorScheme.Dark ? 1.5 : 1) * root.applicationSettings.colorIntensity
 
         property color defaultLinkColor: scheme === Qt.ColorScheme.Dark ? "#E9BF59" : "#583985"
         property color hoveredLinkColor: scheme === Qt.ColorScheme.Dark ? "#A68433" : "#8356C4"
