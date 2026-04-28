@@ -1,0 +1,30 @@
+:: Windows packaging configuration.
+:: Copy this to packaging\packaging.config.local.bat and fill in your values.
+:: DO NOT commit packaging.config.local.bat to version control!
+::
+:: Note: CodeSignTool, SCRITE_BUSINESS_NAME, SCRITE_OPENSSL_LIBS, and
+:: SCRITE_CRASHPAD_ROOT are expected to already be set as system environment
+:: variables. Only set them here if you need to override them.
+
+:: Path to cmake bin directory (contains cmake.exe and cpack.exe)
+set "CMAKE_DIR=C:\Qt\Tools\CMake_64\bin"
+
+:: Path to ninja.exe — enables the Ninja generator for parallel QML compilation.
+:: Qt ships Ninja at C:\Qt\Tools\Ninja. Leave unset to use MSBuild (default).
+set "NINJA_DIR=C:\Qt\Tools\Ninja"
+
+:: Path to vcvarsall.bat — required when NINJA_DIR is set (Ninja needs the MSVC environment).
+:: Adjust the Visual Studio edition (Community / Professional / Enterprise) as needed.
+set "VCVARS_BAT=C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat"
+
+:: MSVC target architecture passed to vcvarsall.bat (default: amd64)
+set "MSVC_ARCH=amd64"
+
+:: Path to Qt bin directory (contains windeployqt.exe)
+set "QT_BIN_DIR=C:\Qt\6.11.0\msvc2022_64\bin"
+
+:: CMake build directory (default: build)
+set "BUILD_DIR=build"
+
+:: Number of parallel build jobs (default: 4)
+set "PARALLEL_JOBS=4"

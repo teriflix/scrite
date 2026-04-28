@@ -26,6 +26,8 @@ find_package(Qt6 6.8 REQUIRED COMPONENTS
 if(APPLE)
   enable_language(OBJCXX)
   qt_add_executable(Scrite MACOSX_BUNDLE)
+elseif(WIN32)
+  qt_add_executable(Scrite WIN32)
 else()
   qt_add_executable(Scrite)
 endif()
@@ -262,8 +264,6 @@ if(APPLE)
   install(TARGETS Scrite BUNDLE DESTINATION .)
 elseif(WIN32)
   install(TARGETS Scrite RUNTIME DESTINATION .)
-  install(FILES "${CMAKE_SOURCE_DIR}/packaging/assets/windows/qt.conf"
-          DESTINATION .)
 elseif(UNIX)
   install(TARGETS Scrite RUNTIME DESTINATION bin)
   install(FILES "${CMAKE_SOURCE_DIR}/packaging/assets/linux/Scrite.desktop"

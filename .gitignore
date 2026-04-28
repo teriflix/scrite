@@ -80,6 +80,7 @@ thirdparty/static/quazip/vcpkg_installed
 
 # Packaging (local credentials, staging directories, and build artifacts)
 packaging/packaging.config.local
+packaging/packaging.config.local.bat
 packaging/_staging/
 packaging/assets/mac/background.png
 binary/packages/
