@@ -23,8 +23,8 @@ import QtQuick.Controls.Material
 import io.scrite.components
 
 import "../../globals"
-import "../../controls"
 import "../../helpers"
+import "../../controls"
 
 ColumnLayout {
     id: root
@@ -75,27 +75,34 @@ ColumnLayout {
             Repeater {
                 model: root.characterNames
 
-                delegate: TagText {
+                delegate: Item {
                     required property int index
                     required property string modelData
 
-                    property var colors: Runtime.colors.accent.c600
+                    width: _characterName.width
+                    height: _charactersPrefix.height
 
-                    border.width: 1
-                    border.color: colors.text
-                    color: colors.background
-                    textColor: colors.text
-                    text: modelData
-                    leftPadding: 10
-                    rightPadding: 10
-                    topPadding: 2
-                    bottomPadding: 2
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                    closable: true
-                    onCloseRequest: {
-                        let list = _characterNameListView.selectedCharacters
-                        list.splice( list.indexOf(text), 1 )
-                        _characterNameListView.selectedCharacters = list
+                    TagText {
+                        id: _characterName
+
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        border.width: 1
+                        border.color: textColor
+                        color: Runtime.colors.scheme === Qt.ColorScheme.Dark ? Qt.rgba(1, 1, 1, containsMouse ? 0.5 : 0.25) : Qt.rgba(0, 0, 0, containsMouse ? 0.25 : 0.1)
+                        textColor: Runtime.colors.scheme === Qt.ColorScheme.Dark ? "white" : "black"
+                        text: parent.modelData
+                        leftPadding: 10
+                        rightPadding: 10
+                        topPadding: 5
+                        bottomPadding: 5
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                        closable: true
+                        onCloseRequest: {
+                            let list = _characterNameListView.selectedCharacters
+                            list.splice( list.indexOf(text), 1 )
+                            _characterNameListView.selectedCharacters = list
+                        }
                     }
                 }
             }

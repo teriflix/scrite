@@ -34,7 +34,7 @@ Rectangle {
     property alias text: _text.text
     property alias font: _text.font
     property alias closable: _closeButtonLoader.active
-    property alias textColor: _text._color
+    property alias textColor: _text.color
     property alias hoverEnabled: _mouseArea.hoverEnabled
     property alias containsMouse: _mouseArea.containsMouse
 
@@ -56,13 +56,9 @@ Rectangle {
         Text {
             id: _text
 
-            property color _color: Runtime.colors.primary.c10.text
-
             anchors.verticalCenter: parent.verticalCenter
 
             padding: 4
-
-            color: Runtime.colors.tx(_color, root.color)
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
             MouseArea {
