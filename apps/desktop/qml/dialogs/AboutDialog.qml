@@ -159,17 +159,17 @@ DialogLauncher {
                         clip: true
                         model: ListModel {
                             ListElement {
-                                credits: "<strong>Phonetic Translator</strong> library for providing static transliteration."
+                                credits: "<strong>Phonetic Translator</strong> library for static transliteration of Indian languages."
                                 url: "https://sourceforge.net/projects/phtranslator/"
                             }
 
                             ListElement {
-                                credits: "<strong>Alar</strong> and <strong>Olam</strong> Dictpress dictionaries for phonetic transliteration in Kannada and Malayalam."
+                                credits: "<strong>Alar</strong> and <strong>Olam</strong> Dictpress dictionaries for phonetic transliteration of Kannada and Malayalam."
                                 url: "https://dict.press/"
                             }
 
                             ListElement {
-                                credits: "<strong>Sonnet</strong> from KDE Frameworks for powering English spell check."
+                                credits: "<strong>Sonnet</strong> from KDE Frameworks for powering spell check."
                                 url: "https://api.kde.org/sonnet-index.html"
                             }
 
