@@ -55,8 +55,22 @@ export BUILD_DIR="build"
 # ============================================================================
 # Linux-specific
 # ============================================================================
-# LINUXDEPLOYQT_PATH — Path to linuxdeployqt executable (auto-detected if not set)
-export LINUXDEPLOYQT_PATH=""
+# LINUXDEPLOY_PATH — Path to linuxdeploy executable (auto-detected from PATH if not set)
+# Download: https://github.com/linuxdeploy/linuxdeploy/releases
+# Example: "$HOME/deploy-tools/linuxdeploy-x86_64.AppImage"
+export LINUXDEPLOY_PATH=""
 
-# APPIMAGETOOL_PATH — Path to appimagetool executable (for --use-appimagetool)
+# LINUXDEPLOY_QT_PLUGIN_PATH — Path to linuxdeploy-plugin-qt executable
+# Download: https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases
+# Example: "$HOME/deploy-tools/linuxdeploy-plugin-qt-x86_64.AppImage"
+export LINUXDEPLOY_QT_PLUGIN_PATH=""
+
+# APPIMAGETOOL_PATH — Path to appimagetool executable (only needed with --use-appimagetool)
+# Download: https://github.com/AppImage/AppImageKit/releases
 export APPIMAGETOOL_PATH=""
+
+# APPIMAGE_RUNTIME_PATH — Path to a cached AppImage type-2 runtime binary.
+# If not set, the runtime is cached next to the linuxdeploy executable.
+# Downloaded automatically on first use from:
+#   https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64
+export APPIMAGE_RUNTIME_PATH=""

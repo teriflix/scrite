@@ -55,14 +55,17 @@ need_tool() {
 find_qt_tool() {
     local tool=$1
 
-    # Check if already in PATH
+    # Use PATH only if the tool is Qt 6
     if command -v "$tool" &> /dev/null; then
-        command -v "$tool"
-        return 0
+        local tool_path
+        tool_path=$(command -v "$tool")
+        if "$tool_path" --version 2>/dev/null | grep -q "Qt version 6"; then
+            echo "$tool_path"
+            return 0
+        fi
     fi
 
-    # Search Qt 6.x versions first (sorted by version descending to get latest)
-    # This ensures we skip Qt 5.x and pick the latest Qt 6
+    # Search Qt 6.x versions (sorted descending to prefer the latest)
     for qt_version_dir in $(find "$HOME/Qt" -maxdepth 1 -name "6.*" -type d 2>/dev/null | sort -rV); do
         for platform in macos gcc_64 msvc2022_64; do
             if [ -x "$qt_version_dir/$platform/bin/$tool" ]; then
@@ -70,20 +73,6 @@ find_qt_tool() {
                 return 0
             fi
         done
-    done
-
-    # Fallback to any Qt version if no Qt 6 found
-    for qt_bin_path in \
-        "$HOME/Qt/Tools/Qt_Creator/bin" \
-        "$HOME/Qt/"*"/macos/bin" \
-        "$HOME/Qt/"*"/gcc_64/bin" \
-        "$HOME/Qt/"*"/msvc2022_64/bin" \
-        "/Applications/Qt/"*"/macos/bin"; do
-
-        if [ -x "$qt_bin_path/$tool" ]; then
-            echo "$qt_bin_path/$tool"
-            return 0
-        fi
     done
 
     return 1
@@ -104,52 +93,86 @@ print_manifest() {
     echo "  Path: $pkg_file"
 }
 
+_cmake_meets_min_version() {
+    local cmake_bin=$1
+    local required="3.27"
+    local actual
+    actual=$("$cmake_bin" --version 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?')
+    [ "$(printf '%s\n' "$required" "$actual" | sort -V | head -1)" = "$required" ]
+}
+
+_use_cmake() {
+    local cmake_bin=$1
+    local qt_root=$2
+    export PATH="$(dirname "$cmake_bin"):$PATH"
+    echo "Using cmake: $cmake_bin ($("$cmake_bin" --version | head -1))"
+    if [ -n "$qt_root" ] && [ -z "${CMAKE_PREFIX_PATH:-}" ]; then
+        export CMAKE_PREFIX_PATH="$qt_root"
+        echo "Set CMAKE_PREFIX_PATH to: $CMAKE_PREFIX_PATH"
+    fi
+}
+
 ensure_cmake_in_path() {
-    if ! command -v cmake &> /dev/null; then
-        echo "cmake not found in PATH. Searching Qt installations..."
-
-        # Try Qt Tools CMake (standard location from Qt Online Installer)
-        if [ -x "$HOME/Qt/Tools/CMake/CMake.app/Contents/bin/cmake" ]; then
-            echo "Found cmake at: $HOME/Qt/Tools/CMake/CMake.app/Contents/bin/cmake"
-            export PATH="$HOME/Qt/Tools/CMake/CMake.app/Contents/bin:$PATH"
-
-            # Also set CMAKE_PREFIX_PATH to find Qt libraries
-            # Detect Qt version by looking for recent directories
-            for qt_version_dir in "$HOME"/Qt/6.*; do
-                if [ -d "$qt_version_dir/macos" ]; then
-                    export CMAKE_PREFIX_PATH="$qt_version_dir/macos:${CMAKE_PREFIX_PATH:-}"
-                    echo "Set CMAKE_PREFIX_PATH to: $qt_version_dir/macos"
-                    return 0
-                fi
+    # Use cmake already in PATH only if it meets the minimum version requirement.
+    if command -v cmake &> /dev/null && _cmake_meets_min_version "$(command -v cmake)"; then
+        # Ensure CMAKE_PREFIX_PATH points to Qt 6 if not already set
+        if [ -z "${CMAKE_PREFIX_PATH:-}" ]; then
+            for qt_version_dir in $(find "$HOME/Qt" -maxdepth 1 -name "6.*" -type d 2>/dev/null | sort -rV); do
+                for platform in macos gcc_64 msvc2022_64; do
+                    if [ -d "$qt_version_dir/$platform" ]; then
+                        export CMAKE_PREFIX_PATH="$qt_version_dir/$platform"
+                        echo "Set CMAKE_PREFIX_PATH to: $CMAKE_PREFIX_PATH"
+                        break 2
+                    fi
+                done
             done
+        fi
+        return 0
+    fi
+
+    if command -v cmake &> /dev/null; then
+        echo "System cmake is too old ($(cmake --version | head -1)), searching Qt installations..."
+    else
+        echo "cmake not found in PATH. Searching Qt installations..."
+    fi
+
+    # Try Qt Tools CMake (standard location from Qt Online Installer)
+    for cmake_candidate in \
+        "$HOME/Qt/Tools/CMake/bin/cmake" \
+        "$HOME/Qt/Tools/CMake/CMake.app/Contents/bin/cmake"; do
+
+        if [ -x "$cmake_candidate" ] && _cmake_meets_min_version "$cmake_candidate"; then
+            qt_root=""
+            for qt_version_dir in $(find "$HOME/Qt" -maxdepth 1 -name "6.*" -type d 2>/dev/null | sort -rV); do
+                for platform in macos gcc_64 msvc2022_64; do
+                    if [ -d "$qt_version_dir/$platform" ]; then
+                        qt_root="$qt_version_dir/$platform"
+                        break 2
+                    fi
+                done
+            done
+            _use_cmake "$cmake_candidate" "$qt_root"
             return 0
         fi
+    done
 
-        # Try common Qt component locations (macos, gcc_64, msvc2022_64)
-        for qt_path in \
-            "$HOME/Qt/"*"/macos/libexec" \
-            "$HOME/Qt/"*"/macos/bin" \
-            "$HOME/Qt/"*"/gcc_64/libexec" \
-            "$HOME/Qt/"*"/gcc_64/bin" \
-            "$HOME/Qt/"*"/msvc2022_64/libexec" \
-            "$HOME/Qt/"*"/msvc2022_64/bin"; do
+    # Try cmake bundled inside Qt 6 component directories (libexec preferred, then bin)
+    for qt_path in \
+        "$HOME"/Qt/6.*/macos/libexec \
+        "$HOME"/Qt/6.*/macos/bin \
+        "$HOME"/Qt/6.*/gcc_64/libexec \
+        "$HOME"/Qt/6.*/gcc_64/bin \
+        "$HOME"/Qt/6.*/msvc2022_64/libexec \
+        "$HOME"/Qt/6.*/msvc2022_64/bin; do
 
-            if [ -x "$qt_path/cmake" ]; then
-                echo "Found cmake at: $qt_path/cmake"
-                export PATH="$qt_path:$PATH"
+        if [ -x "$qt_path/cmake" ] && _cmake_meets_min_version "$qt_path/cmake"; then
+            qt_root=$(echo "$qt_path" | sed -E 's|(.*/Qt/6\.[^/]+/[^/]+).*|\1|')
+            _use_cmake "$qt_path/cmake" "$qt_root"
+            return 0
+        fi
+    done
 
-                # Extract Qt root from path (e.g., ~/Qt/6.8.0)
-                qt_root=$(echo "$qt_path" | sed -E 's|(.*/Qt/[^/]+).*|\1|')
-                if [ -d "$qt_root" ]; then
-                    export CMAKE_PREFIX_PATH="$qt_root:${CMAKE_PREFIX_PATH:-}"
-                    echo "Set CMAKE_PREFIX_PATH to: $qt_root"
-                fi
-                return 0
-            fi
-        done
-
-        die "cmake not found. Install Qt with cmake or add it to PATH manually."
-    fi
+    die "cmake >= 3.27 not found. Install a newer cmake or install Qt (which bundles cmake)."
 }
 
 ensure_build() {
@@ -169,3 +192,4 @@ print_hint() {
     echo "$*"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 }
+

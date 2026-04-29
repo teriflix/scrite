@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
-# Linux packaging script: builds AppImage using linuxdeployqt or appimagetool.
+# Linux packaging script: builds AppImage using linuxdeploy + linuxdeploy-plugin-qt.
 # Usage:
 #   ./package-linux.sh [--build] [--use-appimagetool] [--type=<version-type>]
 #
 # Environment variables (or set in packaging.config.local):
-#   QT_BIN_DIR                  Path to Qt bin directory (optional, uses PATH if not set)
-#   LINUXDEPLOYQT_PATH          Path to linuxdeployqt executable (auto-detected if not set)
-#   APPIMAGETOOL_PATH           Path to appimagetool executable (used if --use-appimagetool)
+#   LINUXDEPLOY_PATH            Path to linuxdeploy executable (auto-detected if not set)
+#   LINUXDEPLOY_QT_PLUGIN_PATH  Path to linuxdeploy-plugin-qt executable (auto-detected if not set)
+#   APPIMAGETOOL_PATH           Path to appimagetool executable (used with --use-appimagetool)
+#
+# Download tools from:
+#   linuxdeploy:           https://github.com/linuxdeploy/linuxdeploy/releases
+#   linuxdeploy-plugin-qt: https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases
 
 set -e
 
@@ -41,7 +45,8 @@ if [ $BUILD -eq 1 ]; then
 fi
 
 # Verify executable exists
-EXE="${PROJECT_ROOT}/${BUILD_DIR}/Scrite"
+# CMake outputs runtime artifacts to binary/ (set via CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+EXE="${PROJECT_ROOT}/binary/Scrite"
 if [ ! -f "$EXE" ]; then
     die "Executable not found: $EXE\nHave you built the project? Try --build flag."
 fi
@@ -61,56 +66,196 @@ cmake --install "${PROJECT_ROOT}/${BUILD_DIR}" \
     --prefix "${APPDIR}/usr" \
     --component Unspecified
 
+# Remove dev-only and debug artifacts not needed at runtime
+rm -rf "${APPDIR}/usr/include" \
+       "${APPDIR}/usr/lib/cmake" \
+       "${APPDIR}/usr/lib/pkgconfig"
+find "${APPDIR}" -name "*.debug" -type f -delete
+
 # Ensure desktop file is present
 mkdir -p "${APPDIR}/usr/share/applications"
 cp "${ASSETS_DIR}/Scrite.desktop" "${APPDIR}/usr/share/applications/"
 
+APPIMAGE="${PROJECT_ROOT}/binary/packages/Scrite-${VERSION}${VERSION_SUFFIX}-x86_64.AppImage"
+mkdir -p "$(dirname "$APPIMAGE")"
+
 # Step 3: Deploy Qt and dependencies
 if [ $USE_APPIMAGETOOL -eq 1 ]; then
-    # Use appimagetool directly (manual dependency bundling)
+    # Use appimagetool directly — Qt libraries must already be bundled in AppDir
     echo "Using appimagetool for AppImage creation..."
 
-    APPIMAGETOOL="${APPIMAGETOOL_PATH:-$(command -v appimagetool)}"
+    APPIMAGETOOL="${APPIMAGETOOL_PATH:-$(command -v appimagetool 2>/dev/null)}"
     if [ -z "$APPIMAGETOOL" ] || [ ! -x "$APPIMAGETOOL" ]; then
-        die "appimagetool not found. Set APPIMAGETOOL_PATH or install appimagetool."
+        die "appimagetool not found. Set APPIMAGETOOL_PATH or download from https://github.com/AppImage/AppImageKit/releases"
     fi
-
-    # Create AppImage directly
-    APPIMAGE="${PROJECT_ROOT}/binary/packages/Scrite-${VERSION}${VERSION_SUFFIX}-x86_64.AppImage"
-    mkdir -p "$(dirname "$APPIMAGE")"
 
     "$APPIMAGETOOL" "${APPDIR}" "$APPIMAGE"
 else
-    # Use linuxdeployqt (preferred)
-    echo "Using linuxdeployqt for AppImage creation..."
+    # Use linuxdeploy + linuxdeploy-plugin-qt (Qt 6 compatible)
+    echo "Using linuxdeploy for AppImage creation..."
+    echo "  LINUXDEPLOY_PATH=${LINUXDEPLOY_PATH:-<not set>}"
+    echo "  LINUXDEPLOY_QT_PLUGIN_PATH=${LINUXDEPLOY_QT_PLUGIN_PATH:-<not set>}"
+    echo "  APPIMAGETOOL_PATH=${APPIMAGETOOL_PATH:-<not set>}"
 
-    LINUXDEPLOYQT="${LINUXDEPLOYQT_PATH:-$(command -v linuxdeployqt)}"
-    if [ -z "$LINUXDEPLOYQT" ] || [ ! -x "$LINUXDEPLOYQT" ]; then
-        die "linuxdeployqt not found. Set LINUXDEPLOYQT_PATH or install linuxdeployqt."
+    LINUXDEPLOY="${LINUXDEPLOY_PATH:-$(command -v linuxdeploy 2>/dev/null)}"
+    if [ -z "$LINUXDEPLOY" ] || [ ! -x "$LINUXDEPLOY" ]; then
+        die "linuxdeploy not found. Set LINUXDEPLOY_PATH or download from https://github.com/linuxdeploy/linuxdeploy/releases"
     fi
 
-    # linuxdeployqt expects the desktop file to be in a specific location
-    DESKTOP_FILE="${APPDIR}/usr/share/applications/Scrite.desktop"
-    if [ ! -f "$DESKTOP_FILE" ]; then
-        die "Desktop file not found: $DESKTOP_FILE"
+    LINUXDEPLOY_QT_PLUGIN="${LINUXDEPLOY_QT_PLUGIN_PATH:-$(command -v linuxdeploy-plugin-qt 2>/dev/null)}"
+    if [ -z "$LINUXDEPLOY_QT_PLUGIN" ] || [ ! -x "$LINUXDEPLOY_QT_PLUGIN" ]; then
+        die "linuxdeploy-plugin-qt not found. Set LINUXDEPLOY_QT_PLUGIN_PATH or download from https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases"
     fi
 
-    APPIMAGE="${PROJECT_ROOT}/binary/packages/Scrite-${VERSION}-x86_64.AppImage"
-    mkdir -p "$(dirname "$APPIMAGE")"
-
-    # Run linuxdeployqt to bundle Qt and create AppImage
-    "$LINUXDEPLOYQT" "$DESKTOP_FILE" \
-        -appimage \
-        -qmldir="${PROJECT_ROOT}/apps/desktop/qml" \
-        -no-translations \
-        -no-copy-copyright-files \
-        -unsupported-allow-new-glibc
-
-    # linuxdeployqt outputs the AppImage in the current directory
-    TEMP_APPIMAGE="$(find . -maxdepth 1 -name '*.AppImage' -type f | head -1)"
-    if [ -n "$TEMP_APPIMAGE" ]; then
-        mv "$TEMP_APPIMAGE" "$APPIMAGE"
+    # Locate Qt 6 qmake — linuxdeploy-plugin-qt uses it to find Qt libraries
+    QT_QMAKE=$(find_qt_tool qmake)
+    if [ -z "$QT_QMAKE" ]; then
+        die "qmake (Qt 6) not found. Add Qt 6 bin directory to PATH or install Qt 6."
     fi
+    echo "Using qmake: $QT_QMAKE"
+
+    # Both the Qt plugin and Qt bin must be in PATH for linuxdeploy to find them
+    export PATH="$(dirname "$LINUXDEPLOY_QT_PLUGIN"):$(dirname "$QT_QMAKE"):$PATH"
+
+    # linuxdeploy uses ldd to resolve ELF dependencies; ldd won't find Qt libs
+    # unless their directory is in LD_LIBRARY_PATH
+    QT_LIB_DIR="$(dirname "$QT_QMAKE")/../lib"
+    export LD_LIBRARY_PATH="${QT_LIB_DIR}:${PROJECT_ROOT}/binary:${LD_LIBRARY_PATH:-}"
+    echo "  QT_LIB_DIR=${QT_LIB_DIR}"
+
+    # Cache the AppImage type-2 runtime next to linuxdeploy so it is only
+    # downloaded once. It is passed via APPIMAGETOOL_ADDITIONAL_ARGS at package
+    # time so appimagetool (called internally by linuxdeploy) uses it without fetching.
+    APPIMAGE_RUNTIME="${APPIMAGE_RUNTIME_PATH:-$(dirname "$LINUXDEPLOY")/runtime-x86_64}"
+    if [ ! -f "$APPIMAGE_RUNTIME" ]; then
+        echo "Downloading AppImage runtime (one-time) to: $APPIMAGE_RUNTIME"
+        curl -fsSL -o "$APPIMAGE_RUNTIME" \
+            "https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64"
+    fi
+    echo "Using AppImage runtime: $APPIMAGE_RUNTIME"
+
+    # linuxdeploy-plugin-qt's QMLPATHS env var is silently ignored when the plugin
+    # runs as a nested AppImage (env vars don't survive AppImage FUSE mount).
+    # Workaround: run qmlimportscanner ourselves against the project QML source
+    # directory and pre-populate AppDir/usr/qml/ before linuxdeploy runs.
+    # linuxdeploy's ELF scanner then picks up the library deps for the copied plugins.
+    QT_QML_DIR="$("$QT_QMAKE" -query QT_INSTALL_QML)"
+    QML_SOURCE_DIR="${PROJECT_ROOT}/apps/desktop/qml"
+    QMLIMPORTSCANNER="$(dirname "$QT_QMAKE")/../libexec/qmlimportscanner"
+    echo "Pre-deploying QML modules from: $QT_QML_DIR"
+    mkdir -p "$APPDIR/usr/qml"
+    if [ -x "$QMLIMPORTSCANNER" ]; then
+        _SCANNER_JSON=$(mktemp /tmp/qml_imports_XXXXXX.json)
+        _DEPLOY_PY=$(mktemp /tmp/deploy_qml_XXXXXX.py)
+
+        "$QMLIMPORTSCANNER" \
+            -rootPath "$QML_SOURCE_DIR" \
+            -importPath "$QT_QML_DIR" \
+            > "$_SCANNER_JSON" 2>/dev/null
+
+        cat > "$_DEPLOY_PY" <<'PYEOF'
+import json, sys, os, shutil
+qt_qml, dest, scanner_file = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(scanner_file) as f:
+    raw = f.read().strip()
+if not raw:
+    sys.exit(0)
+try:
+    data = json.loads(raw)
+except json.JSONDecodeError as e:
+    print(f"WARNING: qmlimportscanner output could not be parsed: {e}", flush=True)
+    sys.exit(0)
+for item in data:
+    path = item.get("path", "")
+    if not path or not os.path.isdir(path):
+        continue
+    rel = os.path.relpath(path, qt_qml)
+    if rel.startswith(".."):
+        continue
+    dst = os.path.join(dest, rel)
+    if not os.path.exists(dst):
+        print(f"  Copying QML module: {rel}", flush=True)
+        shutil.copytree(path, dst)
+PYEOF
+
+        python3 "$_DEPLOY_PY" "$QT_QML_DIR" "$APPDIR/usr/qml" "$_SCANNER_JSON"
+        rm -f "$_SCANNER_JSON" "$_DEPLOY_PY"
+    else
+        echo "WARNING: qmlimportscanner not found at $QMLIMPORTSCANNER — QML modules may be missing"
+    fi
+
+    # linuxdeploy only scans usr/bin/Scrite for deps in its initial pass; it never
+    # walks usr/qml/. For each pre-populated QML plugin, copy the real (versioned)
+    # .so file and recreate the .so.N symlink so nothing in AppDir is dangling.
+    echo "Deploying library dependencies for pre-populated QML modules..."
+    mkdir -p "$APPDIR/usr/lib"
+    _install_lib() {
+        local dep_path=$1
+        [ -e "$dep_path" ] || return
+        local real_path link_name real_name
+        real_path=$(realpath "$dep_path")
+        real_name=$(basename "$real_path")
+        link_name=$(basename "$dep_path")
+        if [ ! -f "$APPDIR/usr/lib/$real_name" ]; then
+            echo "  $real_name"
+            cp "$real_path" "$APPDIR/usr/lib/$real_name"
+        fi
+        if [ "$link_name" != "$real_name" ] && [ ! -e "$APPDIR/usr/lib/$link_name" ]; then
+            ln -sf "$real_name" "$APPDIR/usr/lib/$link_name"
+        fi
+    }
+    while IFS= read -r -d '' qml_so; do
+        while IFS= read -r dep_path; do
+            _install_lib "$dep_path"
+        done < <(
+            LD_LIBRARY_PATH="$QT_LIB_DIR:${PROJECT_ROOT}/binary:${LD_LIBRARY_PATH:-}" \
+            ldd "$qml_so" 2>/dev/null \
+            | awk '/=>/ { print $3 }' \
+            | grep -v "^/lib\|^/usr/lib/x86_64\|^/usr/lib/aarch64"
+        )
+    done < <(find "$APPDIR/usr/qml" -name "*.so" -type f -print0)
+
+    # linuxdeploy-plugin-qt deploys ALL Qt SQL drivers, which pull in optional external
+    # database client libraries (MySQL, Firebird, PostgreSQL, ODBC, …) that are unlikely
+    # to be installed on every build machine, and that Scrite doesn't use anyway.
+    # Solution: temporarily move sqldrivers out of the Qt plugins directory so the Qt
+    # plugin never sees them. A trap guarantees they are restored even on failure.
+    QT_PLUGINS_DIR="$(realpath "$(dirname "$QT_QMAKE")/../plugins")"
+    QT_SQLDRIVERS_DIR="$QT_PLUGINS_DIR/sqldrivers"
+    _SQLDRIVERS_TMP=""
+    if [ -d "$QT_SQLDRIVERS_DIR" ]; then
+        _SQLDRIVERS_TMP=$(mktemp -d)
+        mv "$QT_SQLDRIVERS_DIR" "$_SQLDRIVERS_TMP/"
+        echo "Temporarily moved Qt SQL drivers to: $_SQLDRIVERS_TMP"
+    fi
+    _restore_sqldrivers() {
+        if [ -n "$_SQLDRIVERS_TMP" ] && [ -d "$_SQLDRIVERS_TMP/sqldrivers" ]; then
+            mv "$_SQLDRIVERS_TMP/sqldrivers" "$QT_SQLDRIVERS_DIR"
+            rm -rf "$_SQLDRIVERS_TMP"
+            _SQLDRIVERS_TMP=""
+        fi
+    }
+    trap _restore_sqldrivers EXIT INT TERM
+
+    # Phase 1: Deploy Qt libraries, plugins, and QML modules into AppDir.
+    echo "Running linuxdeploy + Qt plugin (deploy phase)..."
+    QMAKE="$QT_QMAKE" \
+    "$LINUXDEPLOY" --appdir "$APPDIR" --plugin qt
+
+    _restore_sqldrivers
+    trap - EXIT INT TERM
+
+    # Remove debug symbols the Qt plugin may have copied in.
+    find "$APPDIR" -name "*.debug" -type f -delete
+
+    # Phase 2: Create the AppImage from the prepared AppDir.
+    echo "Creating AppImage..."
+    VERSION="$VERSION" \
+    APPIMAGETOOL_ADDITIONAL_ARGS="--runtime-file $APPIMAGE_RUNTIME" \
+    "$LINUXDEPLOY" --appdir "$APPDIR" --output appimage
+
+    TEMP_APPIMAGE="$(find . -maxdepth 1 -name 'Scrite*.AppImage' -type f | head -1)"
+    [ -n "$TEMP_APPIMAGE" ] && mv "$TEMP_APPIMAGE" "$APPIMAGE"
 fi
 
 # Verify AppImage was created
