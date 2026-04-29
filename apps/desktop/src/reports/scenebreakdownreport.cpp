@@ -39,11 +39,16 @@ namespace {
 const QString COMMA_SPACE = QStringLiteral(", ");
 const QString DASH = QStringLiteral("-");
 const QString SLASH_EIGHT = QStringLiteral("/8");
+const QString COLON_SPACE = QStringLiteral(": ");
+const QString ACT_PREFIX = QStringLiteral("ACT ");
+const QString EPISODE_PREFIX = QStringLiteral("EPISODE ");
 
 // Column headers
 const QString COL_INT_EXT = QStringLiteral("INT/EXT");
 const QString COL_LOCATION = QStringLiteral("Location Name");
 const QString COL_TIME_OF_DAY = QStringLiteral("Time of Day");
+const QString COL_ACT = QStringLiteral("Act #");
+const QString COL_EPISODE = QStringLiteral("Episode #");
 const QString COL_SCENE_NUM = QStringLiteral("Scene #");
 const QString COL_SYNOPSIS = QStringLiteral("Synopsis");
 const QString COL_GROUPS = QStringLiteral("Formal Tags");
@@ -58,6 +63,8 @@ const QString COL_KEY_INT_EXT = QStringLiteral("intExt");
 const QString COL_KEY_LOCATION = QStringLiteral("location");
 const QString COL_KEY_TIME_OF_DAY = QStringLiteral("timeOfDay");
 const QString COL_KEY_SCENE_NUM = QStringLiteral("sceneNum");
+const QString COL_KEY_ACT_NUM = QStringLiteral("actNum");
+const QString COL_KEY_EPISODE_NUM = QStringLiteral("episodeNum");
 const QString COL_KEY_SYNOPSIS = QStringLiteral("synopsis");
 const QString COL_KEY_GROUPS = QStringLiteral("groups");
 const QString COL_KEY_KEYWORDS = QStringLiteral("keywords");
@@ -380,6 +387,14 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
         }
     }
 
+    if (screenplay->actCount() > 0) {
+        visibleColumns.insert(4, { COL_ACT, COL_KEY_ACT_NUM, 100 });
+    }
+
+    if (screenplay->episodeCount() > 0) {
+        visibleColumns.insert(4, { COL_EPISODE, COL_KEY_EPISODE_NUM, 100 });
+    }
+
     QTextTableFormat tableFormat;
     tableFormat.setCellSpacing(0);
     tableFormat.setCellPadding(5);
@@ -424,11 +439,31 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
     }
 
     // Write data rows
+    int currentEpisodeNr = 0, currentActNr = 0;
+    ScreenplayElement *currentEpisode = nullptr, *currentAct = nullptr;
     for (int row = 0; row < screenplayElements.size(); row++) {
         ScreenplayElement *element = screenplayElements.at(row);
+
+        if (element->elementType() == ScreenplayElement::BreakElementType) {
+            if (element->breakType() == Screenplay::Act) {
+                currentAct = element;
+                ++currentActNr;
+            } else if (element->breakType() == Screenplay::Episode) {
+                currentEpisode = element;
+                ++currentEpisodeNr;
+                currentActNr = 1;
+            }
+            continue;
+        }
+
         Scene *scene = element->scene();
         if (!scene)
             continue;
+
+        if (currentEpisodeNr <= 0)
+            currentEpisodeNr = 1;
+        if (currentActNr <= 0)
+            currentActNr = 1;
 
         // Get page and time info from paginated document
         const qreal pixelLength = ScreenplayPaginator::pixelLength(element, paginatedDoc.data());
@@ -462,6 +497,24 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
             } else if (colKey == COL_KEY_TIME_OF_DAY) {
                 cellCursor.insertText(scene->heading()->isEnabled() ? scene->heading()->moment()
                                                                     : DASH);
+            } else if (colKey == COL_KEY_EPISODE_NUM) {
+                QString epLabel;
+                if (currentEpisode) {
+                    epLabel = currentEpisode->breakTitle();
+                    if (!currentEpisode->breakSubtitle().isEmpty())
+                        epLabel += COLON_SPACE + currentEpisode->breakSubtitle();
+                } else
+                    epLabel = EPISODE_PREFIX + QString::number(currentEpisodeNr);
+                cellCursor.insertText(epLabel);
+            } else if (colKey == COL_KEY_ACT_NUM) {
+                QString actLabel;
+                if (currentAct) {
+                    actLabel = currentAct->breakTitle();
+                    if (!currentAct->breakSubtitle().isEmpty())
+                        actLabel += COLON_SPACE + currentAct->breakSubtitle();
+                } else
+                    actLabel = ACT_PREFIX + QString::number(currentActNr);
+                cellCursor.insertText(actLabel);
             } else if (colKey == COL_KEY_SCENE_NUM) {
                 cellCursor.insertText(element->resolvedSceneNumber());
             } else if (colKey == COL_KEY_SYNOPSIS) {
@@ -597,6 +650,14 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
             }
         }
 
+        if (screenplay->actCount() > 0) {
+            visibleColumns.insert(4, { COL_ACT, COL_KEY_ACT_NUM });
+        }
+
+        if (screenplay->episodeCount() > 0) {
+            visibleColumns.insert(4, { COL_EPISODE, COL_KEY_EPISODE_NUM });
+        }
+
         // Track maximum text length in each column for auto-sizing
         QVector<int> columnMaxWidths(visibleColumns.size(), 0);
         for (int i = 0; i < visibleColumns.size(); ++i) {
@@ -628,10 +689,29 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
 
         // Write data rows
         int sceneRow = 0;
-        for (ScreenplayElement *element : screenplayElements) {
+        int currentEpisodeNr = 0, currentActNr = 0;
+        ScreenplayElement *currentEpisode = nullptr, *currentAct = nullptr;
+        for (ScreenplayElement *element : std::as_const(screenplayElements)) {
+            if (element->elementType() == ScreenplayElement::BreakElementType) {
+                if (element->breakType() == Screenplay::Act) {
+                    currentAct = element;
+                    ++currentActNr;
+                } else if (element->breakType() == Screenplay::Episode) {
+                    currentEpisode = element;
+                    ++currentEpisodeNr;
+                    currentActNr = 1;
+                }
+                continue;
+            }
+
             Scene *scene = element->scene();
             if (!scene)
                 continue;
+
+            if (currentEpisodeNr <= 0)
+                currentEpisodeNr = 1;
+            if (currentActNr <= 0)
+                currentActNr = 1;
 
             // Get page and time info from paginated document
             const qreal pixelLength =
@@ -665,6 +745,20 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
                     cellValue = scene->heading()->isEnabled() ? scene->heading()->location() : DASH;
                 } else if (colKey == COL_KEY_TIME_OF_DAY) {
                     cellValue = scene->heading()->isEnabled() ? scene->heading()->moment() : DASH;
+                } else if (colKey == COL_KEY_EPISODE_NUM) {
+                    if (currentEpisode) {
+                        cellValue = currentEpisode->breakTitle();
+                        if (!currentEpisode->breakSubtitle().isEmpty())
+                            cellValue += COLON_SPACE + currentEpisode->breakSubtitle();
+                    } else
+                        cellValue = EPISODE_PREFIX + QString::number(currentEpisodeNr);
+                } else if (colKey == COL_KEY_ACT_NUM) {
+                    if (currentAct) {
+                        cellValue = currentAct->breakTitle();
+                        if (!currentAct->breakSubtitle().isEmpty())
+                            cellValue += COLON_SPACE + currentAct->breakSubtitle();
+                    } else
+                        cellValue = ACT_PREFIX + QString::number(currentActNr);
                 } else if (colKey == COL_KEY_SCENE_NUM) {
                     cellValue = element->resolvedSceneNumber();
                 } else if (colKey == COL_KEY_SYNOPSIS) {
@@ -758,7 +852,8 @@ QList<ScreenplayElement *> SceneBreakdownReport::getScreenplayElements()
     for (int i = 0; i < screenplay->elementCount(); i++) {
         ScreenplayElement *element = screenplay->elementAt(i);
 
-        if (this->passesFilter(element))
+        if (element->elementType() == ScreenplayElement::BreakElementType
+            || this->passesFilter(element))
             screenplayElements.append(element);
     }
 
