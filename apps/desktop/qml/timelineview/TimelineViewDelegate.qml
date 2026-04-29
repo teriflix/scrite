@@ -181,7 +181,7 @@ Item {
 
                 onPressed: screenplayElementList.forceActiveFocus()
 
-                onClicked: {
+                onClicked: (mouse) => {
                     if(mouse.button === Qt.RightButton) {
                         if(root.screenplayElementType === ScreenplayElement.BreakElementType) {
                             _breakElementContextMenu.element = screenplayElement
