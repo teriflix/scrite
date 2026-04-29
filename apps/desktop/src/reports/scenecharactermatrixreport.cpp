@@ -365,27 +365,59 @@ bool SceneCharacterMatrixReport::directExportToOdf(QIODevice *device)
         boldCellFormat.setFontIndex(boldFontIndex);
         boldCellFormat.setApplyFont(true);
 
+        // Horizontal + vertical center (for SNo. and checkmark cells)
         OpenXLSX::XLStyleIndex centerStyleIndex = styles.cellFormats().create();
         OpenXLSX::XLCellFormat centerCellFormat = styles.cellFormats()[centerStyleIndex];
-        centerCellFormat.alignment(OpenXLSX::XLCreateIfMissing)
-                .setHorizontal(OpenXLSX::XLAlignCenter);
+        auto centerAlign = centerCellFormat.alignment(OpenXLSX::XLCreateIfMissing);
+        centerAlign.setHorizontal(OpenXLSX::XLAlignCenter);
+        centerAlign.setVertical(OpenXLSX::XLAlignCenter);
         centerCellFormat.setApplyAlignment(true);
+
+        // Vertical center + indent for padding (for all other text cells)
+        OpenXLSX::XLStyleIndex vCenterStyleIndex = styles.cellFormats().create();
+        OpenXLSX::XLCellFormat vCenterCellFormat = styles.cellFormats()[vCenterStyleIndex];
+        auto vCenterAlign = vCenterCellFormat.alignment(OpenXLSX::XLCreateIfMissing);
+        vCenterAlign.setIndent(1);
+        vCenterAlign.setVertical(OpenXLSX::XLAlignCenter);
+        vCenterCellFormat.setApplyAlignment(true);
+
+        // Track max content character width per column (0-based)
+        const int fixedCols = m_type == SceneVsCharacter ? 4 : 1;
+        const int totalCols = fixedCols + nrCols;
+        std::vector<int> colMaxWidths(totalCols, 0);
+
+        auto trackWidth = [&](uint32_t colIdx, const QString &content) {
+            int idx = static_cast<int>(colIdx) - 1;
+            if (idx >= 0 && idx < totalCols)
+                colMaxWidths[idx] = std::max(colMaxWidths[idx], static_cast<int>(content.length()));
+        };
+
+        // 30px row height: at 96 DPI, 1pt = 96/72 px, so 30px = 30 * 72/96 = 22.5pt
+        const float rowHeightPt = 22.5f;
 
         uint32_t rowIndex = 1;
         uint32_t colIndex = 1;
 
+        ws.row(rowIndex).setHeight(rowHeightPt);
+
         if (m_type == SceneVsCharacter) {
-            ws.cell(rowIndex, colIndex++).value() = "SNo.";
-            ws.cell(rowIndex, colIndex++).value() = "Type";
-            ws.cell(rowIndex, colIndex++).value() = "Location";
-            ws.cell(rowIndex, colIndex++).value() = "Time";
+            const QStringList fixedHeaders = { "SNo.", "Type", "Location", "Time" };
+            for (const QString &h : fixedHeaders) {
+                ws.cell(rowIndex, colIndex).value() = h.toStdString();
+                ws.cell(rowIndex, colIndex).setCellFormat(vCenterStyleIndex);
+                trackWidth(colIndex, h);
+                colIndex++;
+            }
         }
 
         for (int j = 0; j < nrCols; j++) {
             const QString colName = m_type == SceneVsCharacter
                     ? m_characterNames.at(j)
                     : screenplayElements.at(j)->resolvedSceneNumber();
-            ws.cell(rowIndex, colIndex++).value() = colName.toStdString();
+            ws.cell(rowIndex, colIndex).value() = colName.toStdString();
+            ws.cell(rowIndex, colIndex).setCellFormat(vCenterStyleIndex);
+            trackWidth(colIndex, colName);
+            colIndex++;
         }
         rowIndex++;
 
@@ -400,25 +432,47 @@ bool SceneCharacterMatrixReport::directExportToOdf(QIODevice *device)
         for (int i = 0; i < nrRows; i++) {
             colIndex = 1;
 
+            ws.row(rowIndex).setHeight(rowHeightPt);
+
             if (m_type == SceneVsCharacter) {
                 Scene *scene = screenplayElements.at(i)->scene();
-                auto cell = ws.cell(rowIndex, colIndex++);
-                cell.value() = screenplayElements.at(i)->resolvedSceneNumber().toStdString();
+                const QString sceneNum = screenplayElements.at(i)->resolvedSceneNumber();
+                auto cell = ws.cell(rowIndex, colIndex);
+                cell.value() = sceneNum.toStdString();
                 cell.setCellFormat(centerStyleIndex);
+                trackWidth(colIndex, sceneNum);
+                colIndex++;
+
                 if (scene->heading()->isEnabled()) {
-                    ws.cell(rowIndex, colIndex++).value() =
-                            scene->heading()->locationType().toStdString();
-                    ws.cell(rowIndex, colIndex++).value() =
-                            scene->heading()->location().toStdString();
-                    ws.cell(rowIndex, colIndex++).value() =
-                            scene->heading()->moment().toStdString();
+                    const QString locType = scene->heading()->locationType();
+                    const QString location = scene->heading()->location();
+                    const QString moment = scene->heading()->moment();
+                    ws.cell(rowIndex, colIndex).value() = locType.toStdString();
+                    ws.cell(rowIndex, colIndex).setCellFormat(vCenterStyleIndex);
+                    trackWidth(colIndex, locType);
+                    colIndex++;
+                    ws.cell(rowIndex, colIndex).value() = location.toStdString();
+                    ws.cell(rowIndex, colIndex).setCellFormat(vCenterStyleIndex);
+                    trackWidth(colIndex, location);
+                    colIndex++;
+                    ws.cell(rowIndex, colIndex).value() = moment.toStdString();
+                    ws.cell(rowIndex, colIndex).setCellFormat(vCenterStyleIndex);
+                    trackWidth(colIndex, moment);
+                    colIndex++;
                 } else {
-                    ws.cell(rowIndex, colIndex++).value() = "-";
-                    ws.cell(rowIndex, colIndex++).value() = "-";
-                    ws.cell(rowIndex, colIndex++).value() = "-";
+                    for (int k = 0; k < 3; k++) {
+                        ws.cell(rowIndex, colIndex).value() = "-";
+                        ws.cell(rowIndex, colIndex).setCellFormat(vCenterStyleIndex);
+                        trackWidth(colIndex, QStringLiteral("-"));
+                        colIndex++;
+                    }
                 }
             } else {
-                ws.cell(rowIndex, colIndex++).value() = m_characterNames.at(i).toStdString();
+                const QString charName = m_characterNames.at(i);
+                ws.cell(rowIndex, colIndex).value() = charName.toStdString();
+                ws.cell(rowIndex, colIndex).setCellFormat(vCenterStyleIndex);
+                trackWidth(colIndex, charName);
+                colIndex++;
             }
 
             for (int j = 0; j < nrCols; j++) {
@@ -440,11 +494,18 @@ bool SceneCharacterMatrixReport::directExportToOdf(QIODevice *device)
                     auto cell = ws.cell(rowIndex, colIndex);
                     cell.value() = checkMark.toStdString();
                     cell.setCellFormat(centerStyleIndex);
+                    trackWidth(colIndex, checkMark);
                 }
                 colIndex++;
             }
 
             rowIndex++;
+        }
+
+        // Set column widths to max content length + 4 characters of padding
+        for (int c = 0; c < totalCols; c++) {
+            ws.column(static_cast<uint16_t>(c + 1))
+                    .setWidth(static_cast<float>(colMaxWidths[c] + 4));
         }
 
         doc.save();
