@@ -353,6 +353,7 @@ TextField {
         if(!_editingCompleteEmitted) {
             _editingCompleteEmitted = true
             editingComplete()
+            Qt.callLater(function() { _editingCompleteEmitted = false })
         }
     }
 
