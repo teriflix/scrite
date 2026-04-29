@@ -210,6 +210,7 @@ Item {
                                 id: _designationField
 
                                 Layout.fillWidth: true
+                                Layout.bottomMargin: 20
 
                                 TabSequenceItem.sequence: 0
                                 TabSequenceItem.manager: _tabSequence
@@ -230,7 +231,7 @@ Item {
                             ColumnLayout {
                                 Layout.fillWidth: true
 
-                                spacing: parent.spacing/2
+                                spacing: 10
 
                                 VclTextField {
                                     id: _newTagField
@@ -291,10 +292,14 @@ Item {
                                 }
                             }
 
-                            ColumnLayout {
+                            RowLayout {
                                 Layout.fillWidth: true
 
+                                spacing: 10
+
                                 VclLabel {
+                                    Layout.preferredWidth: parent.width * 0.4
+
                                     function priority(val) {
                                         var ret = ""
                                         if(val >= -2 && val <= 2)
@@ -311,12 +316,8 @@ Item {
                                         return ret += " (" + val + ")"
                                     }
 
-                                    Layout.fillWidth: true
-
-                                    text: "Priority: " + priority(root.character.priority) + ""
+                                    text: "Priority:\n" + priority(root.character.priority) + ""
                                     elide: Text.ElideMiddle
-
-                                    font.pointSize: 2*Runtime.idealFontMetrics.font.pointSize/3
                                 }
 
                                 Slider {
@@ -327,11 +328,11 @@ Item {
                                     TabSequenceItem.sequence: 2
                                     TabSequenceItem.manager: _tabSequence
 
-                                    orientation: Qt.Horizontal
                                     from: -10
-                                    to: 10
+                                    orientation: Qt.Horizontal
                                     padding: 0
                                     stepSize: 1
+                                    to: 10
                                     value: root.character.priority
 
                                     onValueChanged: {
@@ -344,6 +345,7 @@ Item {
                                 id: _aliasesField
 
                                 Layout.fillWidth: true
+                                Layout.topMargin: 20
 
                                 TabSequenceItem.sequence: 3
                                 TabSequenceItem.manager: _tabSequence
@@ -363,8 +365,11 @@ Item {
 
                             GridLayout {
                                 Layout.fillWidth: true
+                                Layout.topMargin: 20
+                                Layout.bottomMargin: 20
 
                                 columns: 2
+                                rowSpacing: 20
 
                                 VclTextField {
                                     id: _typeField
