@@ -32,6 +32,7 @@ Rectangle {
     color: Runtime.colors.primary.c50.background
 
     implicitHeight: _layout.height
+    enabled: Runtime.dialogs.objectCount === 0
 
     RowLayout {
         id: _layout

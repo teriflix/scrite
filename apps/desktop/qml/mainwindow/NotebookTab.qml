@@ -36,6 +36,7 @@ Item {
             Layout.fillHeight: true
 
             actions: ActionHub.notebookOperations
+            enabled: Runtime.dialogs.objectCount === 0
         }
 
         NotebookView {

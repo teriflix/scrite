@@ -78,6 +78,7 @@ Item {
                             Layout.fillHeight: true
 
                             actions: _contentLoader.item ? _contentLoader.item.toolbarActions : null
+                            enabled: Runtime.dialogs.objectCount === 0
                         }
 
                         Loader {

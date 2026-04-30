@@ -399,7 +399,7 @@ Item {
             ActionManager.target: root.templateOperations
 
             text: record.name
-            enabled: true
+            enabled: Runtime.dialogs.objectCount === 0
 
             icon.color: "transparent"
             icon.source: index === 0 ? record.poster : Runtime.libraryService.templates.baseUrl + "/" + record.poster
@@ -440,7 +440,7 @@ Item {
             ActionManager.target: root.scriptalayOperations
 
             text: record.name
-            enabled: true
+            enabled: Runtime.dialogs.objectCount === 0
 
             icon.color: "transparent"
             icon.source: Runtime.libraryService.screenplays.baseUrl + "/" + record.poster
@@ -930,7 +930,7 @@ Item {
         Action {
             property bool visible: ActionHandler.canHandle
 
-            enabled: true
+            enabled: Runtime.dialogs.objectCount === 0
             objectName: "undo"
             shortcut: Gui.standardShortcut(StandardKey.Undo)
             text: "Undo"
@@ -947,7 +947,7 @@ Item {
         Action {
             property bool visible: ActionHandler.canHandle
 
-            enabled: true
+            enabled: Runtime.dialogs.objectCount === 0
             objectName: "redo"
             shortcut: Gui.standardShortcut(StandardKey.Redo)
             text: "Redo"
@@ -1171,7 +1171,7 @@ Item {
             readonly property bool visible: false
             readonly property string defaultShortcut: "Ctrl+G"
 
-            enabled: true
+            enabled: Runtime.dialogs.objectCount === 0
             objectName: "jumpToSceneNumber"
             shortcut: defaultShortcut
             text: "Jump to Scene Number"
@@ -1790,7 +1790,7 @@ Item {
             readonly property bool visible: false
             readonly property bool allowShortcut: true
 
-            enabled: true
+            enabled: Runtime.dialogs.objectCount === 0
             objectName: "renameLocation"
             text: "Rename Location"
 
@@ -1818,7 +1818,7 @@ Item {
             readonly property bool visible: false
             readonly property bool allowShortcut: true
 
-            enabled: true
+            enabled: Runtime.dialogs.objectCount === 0
             objectName: "renameCharacter"
             text: "Rename Character"
 

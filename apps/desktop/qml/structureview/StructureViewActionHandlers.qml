@@ -51,6 +51,8 @@ Item {
     // Structure.HorizontalLayout, Structure.VerticalLayout,
     // Structure.FlowHorizontalLayout, Structure.FlowVerticalLayout
 
+    enabled: Runtime.dialogs.objectCount === 0
+
     ActionHandler {
         id: _newSceneHandler
 
