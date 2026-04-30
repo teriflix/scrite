@@ -15,7 +15,7 @@ qt_add_resources(Scrite SCRITE_MISC_RESOURCES_2
   FILES
     "misc/annotations_metadata.json"
     "misc/fetchogattribs.js"
-    "misc/structure_groups.lst"
+    "misc/storybeats.lst"
     "misc/scrited_closing_frame_video.mp4"
     "misc/scriptalay_info.md"
     "misc/homescreen_info.md"

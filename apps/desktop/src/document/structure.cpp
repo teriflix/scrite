@@ -4082,8 +4082,7 @@ void Structure::clearAnnotations()
 
 QString Structure::defaultGroupsDataFile() const
 {
-    static const QString ret =
-            Utils::Platform::configPath(QStringLiteral("structure_categories_and_groups.lst"));
+    static const QString ret = Utils::Platform::configPath(QStringLiteral("storybeats.lst"));
     return ret;
 }
 
@@ -4092,7 +4091,7 @@ void Structure::loadDefaultGroupsData()
     static const QString groupsListFileName = this->defaultGroupsDataFile();
 
     if (!QFile::exists(groupsListFileName)) {
-        QFile inFile(QStringLiteral(":/misc/structure_groups.lst"));
+        QFile inFile(QStringLiteral(":/misc/storybeats.lst"));
         if (inFile.open(QFile::ReadOnly)) {
             const QByteArray inFileData = inFile.readAll();
             QFile outFile(groupsListFileName);
