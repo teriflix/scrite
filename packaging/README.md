@@ -20,7 +20,7 @@ Creates a signed DMG with optional notarization.
 
 **Prerequisites:**
 - Xcode Command Line Tools
-- Qt 6.8+
+- Qt 6.11+
 - Optional: `macdeployqt`, `dmgbuild` (from pip), `qmlscene`
 
 **Setup (one-time):**
@@ -45,7 +45,7 @@ Creates an NSIS installer with optional code signing.
 
 **Prerequisites:**
 - Visual Studio (MSVC 2022+)
-- Qt 6.8+
+- Qt 6.11+
 - NSIS 3.0+
 - Code signing tool (optional, e.g., CodeSignTool or signtool.exe)
 
@@ -74,7 +74,7 @@ Creates an AppImage using `linuxdeployqt` (default) or `appimagetool`.
 
 **Prerequisites:**
 - GCC/Clang
-- Qt 6.8+
+- Qt 6.11+
 - `linuxdeployqt` (recommended; auto-detects or set `LINUXDEPLOYQT_PATH`)
   - Get: https://github.com/probonopd/linuxdeployqt/releases
 - OR `appimagetool` with `--use-appimagetool` flag

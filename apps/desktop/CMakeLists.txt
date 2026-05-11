@@ -4,7 +4,7 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DesktopPlatformSources.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DesktopGenericSources.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DesktopQmlAndAssetFiles.cmake")
 
-find_package(Qt6 6.8 REQUIRED COMPONENTS
+find_package(Qt6 6.11 REQUIRED COMPONENTS
   Core
   Gui
   Qml

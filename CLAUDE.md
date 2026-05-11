@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Scrite is an open-source desktop screenwriting application built with Qt/QML. It supports Windows, macOS, and Linux. The active development branch is `qt6`, which is an in-progress port from Qt 5.15.19 to Qt 6.8+.
+Scrite is an open-source desktop screenwriting application built with Qt/QML. It supports Windows, macOS, and Linux. The active development branch is `qt6`, which is an in-progress port from Qt 5.15.19 to Qt 6.11+.
 
 ## Build System
 
-The project uses CMake 3.27+ with Qt 6.8+. Open the project in Qt Creator and build, or use the command line:
+The project uses CMake 3.27+ with Qt 6.11+. Open the project in Qt Creator and build, or use the command line:
 
 ```bash
 cmake -B build -S .
@@ -88,7 +88,7 @@ The `Scrite` QML singleton (defined in `core/`) is the primary bridge between QM
 
 ## Qt6 Port Status
 
-The `qt6` branch is an active migration from Qt 5.15 to Qt 6.8. Commits are prefixed with `[Qt6-Port]`. When editing QML, prefer Qt 6 APIs — avoid deprecated Qt 5 QML APIs. SystemPalette is used for theming colors.
+The `qt6` branch is an active migration from Qt 5.15 to Qt 6.11. Commits are prefixed with `[Qt6-Port]`. When editing QML, prefer Qt 6 APIs — avoid deprecated Qt 5 QML APIs. SystemPalette is used for theming colors.
 
 ## Documentation
 

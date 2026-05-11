@@ -32,9 +32,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-# Sonnet's vendored CMake requires Qt 6.8+ (and uses Qt targets).
-find_package(Qt6 6.8 REQUIRED COMPONENTS Core)
-qt_standard_project_setup(REQUIRES 6.8)
+# Sonnet's vendored CMake requires Qt 6.11+ (and uses Qt targets).
+find_package(Qt6 6.11 REQUIRED COMPONENTS Core)
+qt_standard_project_setup(REQUIRES 6.11)
 
 # Sonnet (and some app sources) include Objective-C++ files on macOS.
 # Enable this before adding subdirectories so CMAKE_OBJCXX_* rules exist.

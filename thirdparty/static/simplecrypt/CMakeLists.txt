@@ -1,4 +1,4 @@
-find_package(Qt6 6.8 REQUIRED COMPONENTS
+find_package(Qt6 6.11 REQUIRED COMPONENTS
   Core
   Core5Compat
 )
