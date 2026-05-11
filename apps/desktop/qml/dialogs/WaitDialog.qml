@@ -92,7 +92,14 @@ Item {
                     to: 1
                     from: 0
                     value: _dialog.progressReport ? _dialog.progressReport.progress : 0
-                    visible: _dialog.progressReport !== null
+                    visible: !Platform.isMacOSDesktop && _dialog.progressReport !== null
+                }
+
+                BusyIndicator {
+                    Layout.alignment: Qt.AlignHCenter
+
+                    running: Platform.isMacOSDesktop
+                    visible: Platform.isMacOSDesktop
                 }
 
                 VclLabel {
