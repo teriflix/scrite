@@ -27,17 +27,13 @@ import "../../../controls"
 AbstractScenePartEditor {
     id: root
 
-    implicitHeight: _synopsisInput.contentHeight + root.fontMetrics.lineSpacing * 1.5
+    implicitHeight: _synopsisLoader.height + root.fontMetrics.lineSpacing * 1.5
 
-    TextAreaInput {
-        id: _synopsisInput
+    LodLoader {
+        id: _synopsisLoader
 
-        Keys.onPressed: (event) => {
-                            if(event.key === Qt.Key_Escape && root.isCurrent) {
-                                const editSceneContent = ActionHub.editOptions.find("editSceneContent") as Action
-                                editSceneContent.trigger()
-                            }
-                        }
+        function lowLod() { lod = LodLoader.LOD.Low }
+        function highLod() { lod = LodLoader.LOD.High }
 
         anchors.left: parent.left
         anchors.right: parent.right
@@ -46,37 +42,74 @@ AbstractScenePartEditor {
         anchors.rightMargin: root.pageRightMargin
         anchors.bottomMargin: root.fontMetrics.lineSpacing * root.zoomLevel * 0.5
 
-        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        readOnly: root.readOnly
-        font: root.font
-        initialText: root.scene.synopsis
-        undoRedoEnabled: true
-        placeholderText: "Scene Synopsis"
-        background: Item { }
+        lod: LodLoader.LOD.Low
 
-        onTextEdited: root.scene.setSynopsisDirectly(text)
-        onEditingFinished: root.scene.setSynopsisDirectly(text)
+        lowDetailComponent: Item {
+            height: _synopsisView.contentHeight
 
-        onActiveFocusChanged: {
-            if(activeFocus)
-                root.ensureVisible(_synopsisInput, Qt.rect(0, -10, cursorRectangle.width, cursorRectangle.height+20))
+            TextArea {
+                id: _synopsisView
+
+                width: parent.width
+
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                font: root.font
+                text: root.scene && root.scene.hasSynopsis ? root.scene.synopsis : "Scene Synopsis"
+                opacity: root.scene && root.scene.hasSynopsis ? 1 : 0.5
+                readOnly: true
+                background: Item { }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.IBeamCursor
+
+                onClicked: Qt.callLater(_synopsisLoader.highLod)
+            }
+
+            ActionHandler {
+                action: ActionHub.editOptions.find("editSceneSynopsis")
+                enabled: root.isCurrent && !root.readOnly
+
+                onTriggered: () => { Qt.callLater(_synopsisLoader.highLod) }
+            }
         }
 
-        Binding {
-            when: !_synopsisInput.activeFocus
-            target: _synopsisInput
-            property: "text"
-            value: root.scene.synopsis
+        highDetailComponent: TextAreaInput {
+            id: _synopsisInput
+
+            Keys.onPressed: (event) => {
+                                if(event.key === Qt.Key_Escape && root.isCurrent) {
+                                    const editSceneContent = ActionHub.editOptions.find("editSceneContent") as Action
+                                    editSceneContent.trigger()
+                                }
+                            }
+
+            Component.onCompleted: {
+                Qt.callLater(() => {
+                                 text = root.scene.synopsis
+                                 forceActiveFocus()
+                                 selectAll()
+                             })
+            }
+
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            readOnly: root.readOnly
+            font: root.font
+            initialText: ""
+            undoRedoEnabled: true
+            placeholderText: "Scene Synopsis"
+            background: Item { }
+
+            onTextEdited: root.scene.setSynopsisDirectly(text)
+            onEditingFinished: root.scene.setSynopsisDirectly(text)
+
+            onActiveFocusChanged: {
+                if(activeFocus)
+                    root.ensureVisible(_synopsisInput, Qt.rect(0, -10, cursorRectangle.width, cursorRectangle.height+20))
+                else
+                    Qt.callLater(_synopsisLoader.lowLod)
+            }
         }
-    }
-
-    ActionHandler {
-        action: ActionHub.editOptions.find("editSceneSynopsis")
-        enabled: root.isCurrent && !root.readOnly && !_synopsisInput.activeFocus
-
-        onTriggered: () => {
-                         _synopsisInput.selectAll()
-                         _synopsisInput.forceActiveFocus()
-                     }
     }
 }

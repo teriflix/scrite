@@ -33,7 +33,7 @@ TextArea {
 
     Component.onCompleted: {
         // For some reason, setting the text property causes it to get reset shortly later.
-        Qt.callLater(() => { root.text = initialText })
+        Qt.callLater(() => { if(root.text !== root.initialText) root.text = root.initialText })
     }
 
     SyntaxHighlighter.delegates: [
@@ -105,14 +105,20 @@ TextArea {
         action: ActionHub.editOptions.find("undo")
         enabled: !root.readOnly && root.activeFocus && root.undoRedoEnabled && root.canUndo
 
-        onTriggered: () => { root.undo() }
+        onTriggered: () => {
+            root.undo()
+            root.textEdited()
+        }
     }
 
     ActionHandler {
         action: ActionHub.editOptions.find("redo")
         enabled: !root.readOnly && root.activeFocus && root.undoRedoEnabled && root.canRedo
 
-        onTriggered: () => { root.redo() }
+        onTriggered: () => {
+            root.redo()
+            root.textEdited()
+        }
     }
 
     TextAreaSpellingSuggestionsMenu {

@@ -103,7 +103,7 @@ AbstractStructureElementUI {
         textColor: Color.textColorFor(_background.color)
         readOnly: !(editMode && root.elementIndex === Scrite.document.structure.currentElementIndex)
         wrapMode: Text.WordWrap
-        undoRedoEnabled: true
+        undoRedoEnabled: activeFocus
         horizontalAlignment: Text.AlignLeft
 
         topPadding: 5

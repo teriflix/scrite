@@ -411,6 +411,7 @@ AbstractStructureElementUI {
                                     }
                                 ]
                                 SyntaxHighlighter.textDocument: textDocument
+                                SyntaxHighlighter.textDocumentUndoRedoEnabled: activeFocus
 
                                 LanguageTransliterator.popup: LanguageTransliteratorPopup { }
                                 LanguageTransliterator.option: Runtime.language.activeTransliterationOption
@@ -466,6 +467,26 @@ AbstractStructureElementUI {
 
                                 cursorDelegate: TextEditCursorDelegate {
                                     textEdit: _synopsisField
+                                }
+
+                                ActionHandler {
+                                    action: ActionHub.editOptions.find("undo")
+                                    enabled: !_synopsisField.readOnly && _synopsisField.activeFocus && _synopsisField.canUndo
+
+                                    onTriggered: () => {
+                                        _synopsisField.undo()
+                                        _synopsisField.textEdited()
+                                    }
+                                }
+
+                                ActionHandler {
+                                    action: ActionHub.editOptions.find("redo")
+                                    enabled: !_synopsisField.readOnly && _synopsisField.activeFocus && _synopsisField.canRedo
+
+                                    onTriggered: () => {
+                                        _synopsisField.redo()
+                                        _synopsisField.textEdited()
+                                    }
                                 }
                             }
                         }
