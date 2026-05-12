@@ -103,6 +103,7 @@ AbstractStructureElementUI {
         textColor: Color.textColorFor(_background.color)
         readOnly: !(editMode && root.elementIndex === Scrite.document.structure.currentElementIndex)
         wrapMode: Text.WordWrap
+        undoRedoEnabled: true
         horizontalAlignment: Text.AlignLeft
 
         topPadding: 5
@@ -112,7 +113,9 @@ AbstractStructureElementUI {
 
         font.pointSize: 13
 
-        onTextEdited: root.element.scene.synopsis = text
+        onTextChangedDuringEdit: (newText) => {
+                                     root.element.scene.setSynopsisDirectly(newText)
+                                 }
 
         onHighlightRequest: Scrite.document.structure.currentElementIndex = root.elementIndex
 

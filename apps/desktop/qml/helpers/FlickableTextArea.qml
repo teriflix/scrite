@@ -170,7 +170,7 @@ Flickable {
             root.contentY = cy
         }
 
-        onTextChanged: if(activeFocus) root.textEdited()
+        onTextEdited: root.textEdited()
         onEditingFinished: root.editingFinished()
     }
 

@@ -461,6 +461,8 @@ public:
     QString synopsis() const { return m_synopsis; }
     Q_SIGNAL void synopsisChanged();
 
+    Q_INVOKABLE void setSynopsisDirectly(const QString &val);
+
     void inferSynopsisFromContent();
 
     // clang-format off

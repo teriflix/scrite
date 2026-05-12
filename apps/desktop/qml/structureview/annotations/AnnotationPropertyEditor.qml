@@ -341,7 +341,7 @@ Item {
                 border.color: Runtime.colors.primary.borderColor
             }
 
-            onTextChanged: Qt.callLater(commitTextChanges)
+            onTextEdited: Qt.callLater(commitTextChanges)
 
             onCursorRectangleChanged: {
                 if(activeFocus) {

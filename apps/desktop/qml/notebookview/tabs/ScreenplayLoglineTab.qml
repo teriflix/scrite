@@ -80,7 +80,7 @@ Item {
                 opacity: 0.15
             }
 
-            onTextChanged: root.screenplay.logline = text
+            onTextEdited: root.screenplay.logline = text
         }
 
         VclLabel {

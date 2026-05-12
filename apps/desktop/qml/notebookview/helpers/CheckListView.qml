@@ -61,7 +61,7 @@ Item {
             font.bold: true
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
 
-            onTextChanged: {
+            onTextEdited: {
                 if(root.note)
                     root.note.title = text
             }
@@ -80,7 +80,7 @@ Item {
 
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-            onTextChanged: {
+            onTextEdited: {
                 if(root.note)
                     root.note.summary = text
             }
@@ -150,7 +150,7 @@ Item {
                                           _checkListModel.modelUpdated()
                                       }
 
-                    onTextEdited: (text) => {
+                    onTextChangedDuringEdit: (text) => {
                                       _text = text
                                       _checkListModel.setProperty(index, "_text", _text)
                                       _checkListModel.modelUpdated()
@@ -257,7 +257,7 @@ Item {
 
         property string text
 
-        signal textEdited(string text)
+        signal textChangedDuringEdit(string text)
         signal editingFinished()
         signal scrollToPreviousItem(bool tabReason)
         signal scrollToNextItem(bool tabReason)
@@ -336,10 +336,9 @@ Item {
                 undoRedoEnabled: true
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
-                onTextChanged: {
+                onTextEdited: {
                     _checkListItem.text = text
-                    if(activeFocus)
-                        _checkListItem.textEdited(text)
+                    _checkListItem.textChangedDuringEdit(text)
                 }
             }
         }

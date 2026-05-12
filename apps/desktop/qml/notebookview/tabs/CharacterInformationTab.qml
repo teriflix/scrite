@@ -573,10 +573,7 @@ Item {
                                     opacity: 0.15
                                 }
 
-                                onTextChanged: {
-                                    if(textArea.activeFocus)
-                                        root.character.summary = text
-                                }
+                                onTextEdited: root.character.summary = text
                             }
 
                             highDetailComponent: RichTextEdit {
@@ -586,9 +583,7 @@ Item {
                                 tabSequenceManager: _tabSequence
                                 text: root.character.summary
 
-                                onTextChanged: {
-                                    root.character.summary = text
-                                }
+                                onTextEdited: root.character.summary = text
                             }
                         }
 

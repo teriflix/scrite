@@ -1107,6 +1107,16 @@ void Scene::setSynopsis(const QString &val)
     emit synopsisChanged();
 }
 
+void Scene::setSynopsisDirectly(const QString &val)
+{
+    // Change synopsis without undo capture.
+    if (m_synopsis == val)
+        return;
+
+    m_synopsis = val;
+    emit synopsisChanged();
+}
+
 void Scene::inferSynopsisFromContent()
 {
     /**

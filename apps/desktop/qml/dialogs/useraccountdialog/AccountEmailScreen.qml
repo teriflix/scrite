@@ -118,7 +118,7 @@ Item {
                 Connections {
                     target: _emailField
 
-                    function onTextChanged() {
+                    function onTextEdited() {
                         Qt.callLater(_submit.determineEnabled)
                     }
                 }

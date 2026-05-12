@@ -384,7 +384,7 @@ Loader {
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         placeholderText: "Type your logline here, max " + _loglineLimiter.maxWordCount + " words or " + _loglineLimiter.maxLetterCount + " letters."
 
-                        onTextChanged: _private.screenplay.logline = text
+                        onTextEdited: _private.screenplay.logline = text
                     }
 
                     Item {

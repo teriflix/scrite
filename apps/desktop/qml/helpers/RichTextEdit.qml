@@ -46,6 +46,8 @@ Item {
 
     property TabSequenceManager tabSequenceManager
 
+    signal textEdited()
+
     clip: true
 
     WebEngineView {
@@ -184,4 +186,6 @@ Item {
 
         registeredObjects: [_scriteWebChannelObject]
     }
+
+    onTextChanged: root.textEdited()
 }

@@ -71,7 +71,7 @@ Item {
             font.bold: true
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
 
-            onTextChanged: {
+            onTextEdited: {
                 if(root.note)
                     root.note.title = text
             }
@@ -113,7 +113,7 @@ Item {
                     opacity: 0.15
                 }
 
-                onTextChanged: if(textArea.activeFocus) root.note.content = text
+                onTextEdited: root.note.content = text
 
                 function assumeFocus() {
                     textArea.forceActiveFocus()
@@ -131,7 +131,7 @@ Item {
                 tabSequenceManager: _tabManager
                 text: root.note.content
 
-                onTextChanged: {
+                onTextEdited: {
                     root.note.content = text
                 }
             }

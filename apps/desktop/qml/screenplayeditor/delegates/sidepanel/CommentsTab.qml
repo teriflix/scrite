@@ -62,8 +62,8 @@ AbstractScenePartEditor {
         font: root.font
         readOnly: Scrite.document.readOnly
 
-        onTextChanged: () => {
-                           if(activeFocus && root.scene && root.scene.comments !== text) {
+        onTextEdited: () => {
+                           if(root.scene && root.scene.comments !== text) {
                                root.scene.comments = text
                            }
                        }

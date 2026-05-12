@@ -50,15 +50,23 @@ AbstractScenePartEditor {
         readOnly: root.readOnly
         font: root.font
         initialText: root.scene.synopsis
+        undoRedoEnabled: true
         placeholderText: "Scene Synopsis"
         background: Item { }
 
-        onTextChanged: if(activeFocus) root.scene.synopsis = text
-        onEditingFinished: root.scene.synopsis = text
+        onTextEdited: root.scene.setSynopsisDirectly(text)
+        onEditingFinished: root.scene.setSynopsisDirectly(text)
 
         onActiveFocusChanged: {
             if(activeFocus)
                 root.ensureVisible(_synopsisInput, Qt.rect(0, -10, cursorRectangle.width, cursorRectangle.height+20))
+        }
+
+        Binding {
+            when: !_synopsisInput.activeFocus
+            target: _synopsisInput
+            property: "text"
+            value: root.scene.synopsis
         }
     }
 

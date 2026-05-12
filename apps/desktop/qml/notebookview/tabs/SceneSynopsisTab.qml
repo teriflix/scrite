@@ -281,9 +281,9 @@ Item {
                 EventFilter.active: textArea.activeFocus
                 EventFilter.onFilter: (watched, event) => {
                                           if(event.key === Qt.Key_Tab)
-                                          TabSequenceItem.focusNext()
+                                            TabSequenceItem.focusNext()
                                           else if(event.key === Qt.Key_Backtab)
-                                          TabSequenceItem.focusPrevious()
+                                            TabSequenceItem.focusPrevious()
                                       }
 
                 Component.onCompleted: _private.sceneSynopsisField = _sceneSynopsisField
@@ -298,8 +298,9 @@ Item {
                 placeholderText: "Scene Synopsis"
                 undoRedoEnabled: true
                 adjustTextWidthBasedOnScrollBar: false
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
 
-                onTextChanged: root.scene.synopsis = text
+                onTextEdited: root.scene.setSynopsisDirectly(text)
             }
 
             IndexCardFields {

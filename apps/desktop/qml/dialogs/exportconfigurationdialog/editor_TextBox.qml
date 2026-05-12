@@ -52,6 +52,6 @@ ColumnLayout {
         label: ""
 
         placeholderText: root.fieldInfo.label
-        onTextChanged: root.exporter.setConfigurationValue(root.fieldInfo.name, text)
+        onTextEdited: root.exporter.setConfigurationValue(root.fieldInfo.name, text)
     }
 }

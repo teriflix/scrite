@@ -434,7 +434,7 @@ AbstractStructureElementUI {
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-                                onTextChanged: root.element.scene.synopsis = text
+                                onTextEdited: root.element.scene.setSynopsisDirectly(text)
 
                                 onActiveFocusChanged: {
                                     if(activeFocus)

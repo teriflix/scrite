@@ -135,7 +135,7 @@ Item {
                     font.bold: true
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
 
-                    onTextChanged: {
+                    onTextEdited: {
                         if(root.note)
                             root.note.title = text
                     }
@@ -160,7 +160,7 @@ Item {
 
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-                    onTextChanged: {
+                    onTextEdited: {
                         if(root.note)
                             root.note.summary = text
                     }

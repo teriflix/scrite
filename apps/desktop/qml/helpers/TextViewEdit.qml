@@ -38,6 +38,7 @@ Loader {
     property bool readOnly: true
     property bool hasFocus: item ? item.activeFocus : false
     property bool frameVisible: false
+    property bool undoRedoEnabled: true
 
     property real topPadding: 0
     property real leftPadding: 0
@@ -56,7 +57,7 @@ Loader {
 
     property SearchEngine searchEngine
 
-    signal textEdited(string text)
+    signal textChangedDuringEdit(string text)
     signal editingFinished()
     signal highlightRequest()
 
@@ -135,6 +136,7 @@ Loader {
             }
 
             SyntaxHighlighter.textDocument: textDocument
+            SyntaxHighlighter.textDocumentUndoRedoEnabled: root.undoRedoEnabled
             SyntaxHighlighter.delegates: [
                 LanguageFontSyntaxHighlighterDelegate {
                     enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
@@ -169,6 +171,20 @@ Loader {
                 visible: root.frameVisible
                 border.width: 1
                 border.color: Runtime.colors.primary.borderColor
+            }
+
+            ActionHandler {
+                action: ActionHub.editOptions.find("undo")
+                enabled: !_textArea.readOnly && _textArea.activeFocus && root.undoRedoEnabled && _textArea.canUndo
+
+                onTriggered: () => { _textArea.undo() }
+            }
+
+            ActionHandler {
+                action: ActionHub.editOptions.find("redo")
+                enabled: !_textArea.readOnly && _textArea.activeFocus && root.undoRedoEnabled && _textArea.canRedo
+
+                onTriggered: () => { _textArea.redo() }
             }
 
             CompletionModel {
@@ -246,8 +262,8 @@ Loader {
                 }
             }
 
-            onTextChanged: {
-                root.textEdited(text);
+            onTextEdited: {
+                root.textChangedDuringEdit(text);
                 _completionModel.allowEnable = true
             }
 

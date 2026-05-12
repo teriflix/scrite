@@ -263,7 +263,7 @@ Column {
                     textArea: _answerText
                 }
 
-                onTextChanged: root.answer = text
+                onTextEdited: root.answer = text
 
                 onActiveFocusChanged: {
                     if(!activeFocus && !persistentSelection) {

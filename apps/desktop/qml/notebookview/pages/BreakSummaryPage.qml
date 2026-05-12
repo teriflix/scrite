@@ -70,7 +70,7 @@ AbstractNotebookPage {
 
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 5
 
-                onTextChanged: _private.breakElement.breakSubtitle = text
+                onTextEdited: _private.breakElement.breakSubtitle = text
             }
 
             FlickableTextArea {
@@ -91,7 +91,7 @@ AbstractNotebookPage {
                     opacity: 0.15
                 }
 
-                onTextChanged: _private.breakElement.breakSummary = text
+                onTextEdited: _private.breakElement.breakSummary = text
             }
         }
 

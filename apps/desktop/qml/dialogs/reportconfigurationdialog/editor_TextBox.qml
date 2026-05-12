@@ -61,7 +61,7 @@ ColumnLayout {
 
         text: root.report.getConfigurationValue(root.fieldInfo.name)
 
-        onTextChanged: {
+        onTextEdited: {
             if(root.report)
                 root.report.setConfigurationValue(root.fieldInfo.name, text)
         }
