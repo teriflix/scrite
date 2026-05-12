@@ -192,11 +192,6 @@ Item {
                         Qt.callLater(reset)
                     }
 
-                    function reset() {
-                        checked = false
-                        text = ""
-                    }
-
                     Connections {
                         target: _checkListView
                         function onAssumeFocusRequest(focusItemIndex, tabReason) {
@@ -266,6 +261,12 @@ Item {
             _textField.forceActiveFocus()
             if(tabReason)
                 _textField.selectAll()
+        }
+
+        function reset() {
+            checked = false
+            text = ""
+            _textField.text = ""
         }
 
         height: _checkListItemLayout.height + topPadding + leftPadding
