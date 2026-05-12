@@ -189,6 +189,22 @@ QString TextExporter::toString() const
 
         if (screenplayElement->elementType() == ScreenplayElement::SceneElementType) {
             const Scene *scene = screenplayElement->scene();
+            const SceneHeading *heading = scene->heading();
+
+            if (screenplayElement->isOmitted()) {
+                ts << newline;
+
+                if (m_includeSceneNumbers)
+                    ts << "[" << screenplayElement->resolvedSceneNumber() << "] ";
+
+                if (heading->isEnabled())
+                    ts << heading->text() << " ";
+
+                ts << (heading->isEnabled() ? "[" : QString()) << "OMITTED"
+                   << (heading->isEnabled() ? "]" : QString()) << newline;
+
+                continue;
+            }
 
             if (m_includeSceneSynopsis) {
                 if (scene->structureElement()->hasNativeTitle() || !scene->synopsis().isEmpty()) {
@@ -205,7 +221,6 @@ QString TextExporter::toString() const
                 }
             }
 
-            const SceneHeading *heading = scene->heading();
             if (heading->isEnabled()) {
                 ts << newline;
 
