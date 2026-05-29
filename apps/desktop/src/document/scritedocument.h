@@ -882,6 +882,14 @@ public:
     Q_INVOKABLE bool exportToImage(int fromSceneIdx, int fromParaIdx, int toSceneIdx, int toParaIdx,
                                    const QString &imageFileName);
 
+    Q_PROPERTY(QStringList importFileNameFilters READ importFileNameFilters CONSTANT)
+    Q_INVOKABLE QStringList importFileNameFilters() const;
+
+    // clang-format off
+    Q_PROPERTY(QStringList supportedImportFileExtensions READ supportedImportFileExtensions CONSTANT)
+    // clang-format on
+    Q_INVOKABLE QStringList supportedImportFileExtensions() const;
+
     Q_MOC_INCLUDE("abstractexporter.h")
     Q_INVOKABLE AbstractExporter *createExporter(const QString &format);
 

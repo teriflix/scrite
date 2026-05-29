@@ -35,7 +35,7 @@ BasicAttachmentsDropArea {
     property string droppedFileName
 
     allowedType: Attachments.NoMedia
-    allowedExtensions: ["scrite", "fdx", "txt", "fountain", "html"]
+    allowedExtensions: Scrite.document.supportedImportFileExtensions
 
     VclDialog {
         id: _dialog

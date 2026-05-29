@@ -45,6 +45,8 @@
 #include "qobjectserializer.h"
 #include "finaldraftimporter.h"
 #include "finaldraftexporter.h"
+#include "osfimporter.h"
+#include "osfexporter.h"
 #include "screenplaysubsetreport.h"
 #include "filemodificationtracker.h"
 // #include "locationscreenplayreport.h"
@@ -699,6 +701,7 @@ DeviceIOFactories::DeviceIOFactories()
     ImporterFactory.addClass<HtmlImporter>();
     ImporterFactory.addClass<FountainImporter>();
     ImporterFactory.addClass<FinalDraftImporter>();
+    ImporterFactory.addClass<OsfImporter>();
 
     ExporterFactory.addClass<OdtExporter>();
     ExporterFactory.addClass<PdfExporter>();
@@ -706,6 +709,7 @@ DeviceIOFactories::DeviceIOFactories()
     ExporterFactory.addClass<TextExporter>();
     ExporterFactory.addClass<FountainExporter>();
     ExporterFactory.addClass<FinalDraftExporter>();
+    ExporterFactory.addClass<OsfExporter>();
 
     ReportsFactory.addClass<ScreenplaySubsetReport>();
     ReportsFactory.addClass<LocationReport>();
@@ -1353,6 +1357,12 @@ void ScriteDocument::reset()
     this->setModified(false);
     this->clearModifiedLater();
     emit emptyChanged();
+
+    // Paper size should be copied from pagesetup into formatting.
+    m_formatting->pageLayout()->setPaperSize(
+            ScreenplayPageLayout::PaperSize(m_pageSetup->paperSize()));
+    m_printFormat->pageLayout()->setPaperSize(
+            ScreenplayPageLayout::PaperSize(m_pageSetup->paperSize()));
 
     connect(m_structure, &Structure::currentElementIndexChanged, this,
             &ScriteDocument::structureElementIndexChanged);
@@ -2004,6 +2014,60 @@ bool ScriteDocument::exportToImage(int fromSceneIdx, int fromParaIdx, int toScen
     const QString format = QFileInfo(imageFileName).suffix().toUpper();
 
     return image.save(imageFileName, qPrintable(format));
+}
+
+QStringList ScriteDocument::importFileNameFilters() const
+{
+    static QStringList ret;
+
+    if (ret.isEmpty()) {
+        const QList<QByteArray> keys = deviceIOFactories->ImporterFactory.keys();
+        for (const QByteArray &key : keys) {
+            const QMetaObject *mo = deviceIOFactories->ImporterFactory.find(key);
+            if (!mo)
+                continue;
+            const int ciIndex = mo->indexOfClassInfo("NameFilters");
+            if (ciIndex >= 0)
+                ret << QString::fromLatin1(mo->classInfo(ciIndex).value());
+        }
+    }
+
+    return ret;
+}
+
+QStringList ScriteDocument::supportedImportFileExtensions() const
+{
+    static QStringList ret;
+
+    if (ret.isEmpty()) {
+        const QList<QByteArray> keys = deviceIOFactories->ImporterFactory.keys();
+        for (const QByteArray &key : keys) {
+            const QMetaObject *mo = deviceIOFactories->ImporterFactory.find(key);
+            if (!mo)
+                continue;
+            const int ciIndex = mo->indexOfClassInfo("NameFilters");
+            if (ciIndex < 0)
+                continue;
+
+            // NameFilters format: "Description (*.ext1 *.ext2)"
+            // Extract the parenthesised glob section and strip "*." from each token.
+            const QString nameFilter = QString::fromLatin1(mo->classInfo(ciIndex).value());
+            const int open = nameFilter.indexOf(QLatin1Char('('));
+            const int close = nameFilter.lastIndexOf(QLatin1Char(')'));
+            if (open < 0 || close <= open)
+                continue;
+
+            const QString globs = nameFilter.mid(open + 1, close - open - 1).trimmed();
+            const QStringList tokens = globs.split(QLatin1Char(' '), Qt::SkipEmptyParts);
+            for (const QString &token : tokens) {
+                const QString ext = token.startsWith(QStringLiteral("*.")) ? token.mid(2) : token;
+                if (!ext.isEmpty() && !ret.contains(ext))
+                    ret << ext;
+            }
+        }
+    }
+
+    return ret;
 }
 
 inline QString createTimestampString(const QDateTime &dt = QDateTime::currentDateTime())
@@ -3052,6 +3116,12 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
             m_valueIndexLookups.append(lookup);
         }
     }
+
+    // Paper size should be copied from pagesetup into formatting.
+    m_formatting->pageLayout()->setPaperSize(
+            ScreenplayPageLayout::PaperSize(m_pageSetup->paperSize()));
+    m_printFormat->pageLayout()->setPaperSize(
+            ScreenplayPageLayout::PaperSize(m_pageSetup->paperSize()));
 }
 
 QString ScriteDocument::polishFileName(const QString &givenFileName) const

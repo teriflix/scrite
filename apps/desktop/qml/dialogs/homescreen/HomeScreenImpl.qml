@@ -1300,7 +1300,7 @@ Item {
 
                     title: "Import Screenplay"
                     objectName: "Import Dialog Box"
-                    nameFilters: ["*.scrite *.fdx *.fountain *.txt *.html"]
+                    nameFilters: Scrite.document.importFileNameFilters
                     currentFolder: Runtime.workspaceSettings.lastOpenImportFolderUrl
 
                     onCurrentFolderChanged: Runtime.workspaceSettings.lastOpenImportFolderUrl = currentFolder
