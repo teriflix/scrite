@@ -15,7 +15,7 @@ syncing. You can find more information on our [official website](https://www.scr
 
 A complete user guide can be found [here](https://www.scrite.io/docs/userguide).
 
-<img src="./docs/screenshots/banner.png" alt="Banner" width="720"/>
+<img src="./docs/screenshots/banner.jpeg" alt="Banner" width="720"/>
 
 ## Building from source
 Scrite is developed using Qt 6.11. To build Scrite, install Qt 6.11+ on your computer (Windows,
