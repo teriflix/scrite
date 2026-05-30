@@ -72,6 +72,61 @@ rm -rf "${APPDIR}/usr/include" \
        "${APPDIR}/usr/lib/pkgconfig"
 find "${APPDIR}" -name "*.debug" -type f -delete
 
+# Copy Sonnet plugins into Qt's plugin tree.
+# cmake --install has no install() rules for these plugins; they are only
+# built to binary/kf6/sonnet/ as build artifacts. Sonnet's loader appends
+# /kf6/sonnet/ to each Qt library path, and linuxdeploy-plugin-qt's qt.conf
+# sets Plugins = ../plugins (= usr/plugins/), so the plugins must live at
+# usr/plugins/kf6/sonnet/ to be found at runtime inside the AppImage.
+SONNET_BUILD_DIR="${PROJECT_ROOT}/binary/kf6/sonnet"
+SONNET_DST="${APPDIR}/usr/plugins/kf6/sonnet"
+if [ -d "$SONNET_BUILD_DIR" ] && [ -n "$(ls -A "$SONNET_BUILD_DIR"/*.so 2>/dev/null)" ]; then
+    echo "Copying Sonnet plugins to AppDir: usr/plugins/kf6/sonnet/"
+    mkdir -p "$SONNET_DST"
+    cp -a "$SONNET_BUILD_DIR"/. "$SONNET_DST/"
+else
+    die "Sonnet plugins not found at $SONNET_BUILD_DIR — build may be incomplete"
+fi
+
+# The Sonnet plugins are built with an absolute RPATH pointing to the
+# developer's machine (e.g. /home/user/.../binary). Fix this to a relative
+# $ORIGIN path so the plugins can find their dependencies (libhunspell, etc.)
+# inside the AppImage regardless of which machine it runs on.
+# Also explicitly bundle libhunspell — it is not a system-essential library
+# and may not be present on all target distributions (openSUSE, minimal Ubuntu).
+mkdir -p "${APPDIR}/usr/lib"
+for _sonnet_so in "${SONNET_DST}"/*.so; do
+    [ -f "$_sonnet_so" ] || continue
+
+    # Patch RPATH to $ORIGIN/../../../lib (resolves to usr/lib/ from usr/plugins/kf6/sonnet/)
+    if command -v patchelf &>/dev/null; then
+        patchelf --set-rpath '$ORIGIN/../../../lib' "$_sonnet_so"
+        echo "  Patched RPATH: $(basename "$_sonnet_so")"
+    else
+        echo "WARNING: patchelf not found — Sonnet plugin RPATH not patched; spell check may fail"
+    fi
+
+    # Bundle libhunspell (and any other non-system deps the plugin needs).
+    # Filter out only the truly non-portable low-level glibc/libstdc++ libs.
+    while IFS= read -r _dep; do
+        case "$(basename "$_dep")" in
+            linux-vdso*|ld-linux*|libgcc_s*|libstdc++*|libc.so*|libm.so*|libpthread*|libdl.so*|librt.so*) continue ;;
+        esac
+        [ -f "$_dep" ] || continue
+        _real=$(realpath "$_dep")
+        _rname=$(basename "$_real")
+        _lname=$(basename "$_dep")
+        if [ ! -f "${APPDIR}/usr/lib/$_rname" ]; then
+            echo "  Bundling dep: $_rname (for $(basename "$_sonnet_so"))"
+            cp "$_real" "${APPDIR}/usr/lib/$_rname"
+        fi
+        if [ "$_lname" != "$_rname" ] && [ ! -e "${APPDIR}/usr/lib/$_lname" ]; then
+            ln -sf "$_rname" "${APPDIR}/usr/lib/$_lname"
+        fi
+    done < <(ldd "$_sonnet_so" 2>/dev/null | awk '/=>/ { print $3 }')
+done
+unset _sonnet_so _dep _real _rname _lname
+
 # Ensure desktop file is present
 mkdir -p "${APPDIR}/usr/share/applications"
 cp "${ASSETS_DIR}/Scrite.desktop" "${APPDIR}/usr/share/applications/"
