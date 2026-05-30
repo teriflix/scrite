@@ -1443,7 +1443,7 @@ bool ScriteDocument::openOrImport(const QString &fileName)
     for (const QByteArray &key : keys) {
         QScopedPointer<AbstractImporter> importer(
                 ::deviceIOFactories->ImporterFactory.create<AbstractImporter>(key, this));
-        if (importer->canImport(absFileName))
+        if (importer->isFeatureEnabled() && importer->canImport(absFileName))
             return this->importFile(importer.data(), fileName);
     }
 
@@ -1885,7 +1885,7 @@ bool ScriteDocument::importFile(const QString &fileName, const QString &format)
     QScopedPointer<AbstractImporter> importer(
             deviceIOFactories->ImporterFactory.create<AbstractImporter>(formatKey, this));
 
-    if (importer.isNull()) {
+    if (importer.isNull() || !importer->isFeatureEnabled() || !importer->canImport(fileName)) {
         m_errorReport->setErrorMessage("Cannot import from this format.");
         return false;
     }
@@ -1895,6 +1895,9 @@ bool ScriteDocument::importFile(const QString &fileName, const QString &format)
 
 bool ScriteDocument::importFile(AbstractImporter *importer, const QString &fileName)
 {
+    if (!importer->isFeatureEnabled() || !importer->canImport(fileName))
+        return false;
+
     this->setLoading(true);
 
     Aggregation aggregation;
