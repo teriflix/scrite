@@ -304,8 +304,8 @@ QVersionNumber Application::prepare()
     qInstallMessageHandler(ApplicationQtMessageHandler);
 
     Application::setApplicationName(QStringLiteral("Scrite"));
-    Application::setOrganizationName(QStringLiteral("VCreate Logic Pvt. Ltd."));
-    Application::setOrganizationDomain(QStringLiteral("vcreatelogic.com"));
+    Application::setOrganizationName(QStringLiteral("IEDN Technologies Pvt. Ltd."));
+    Application::setOrganizationDomain(QStringLiteral("scrite.io"));
 
     const QDir oldAppDataFolder =
             QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
