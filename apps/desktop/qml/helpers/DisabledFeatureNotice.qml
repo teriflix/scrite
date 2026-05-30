@@ -31,7 +31,7 @@ Rectangle {
 
     signal clicked()
 
-    color: Runtime.colors.primary.c100.background
+    color: Runtime.colors.scheme === Qt.ColorScheme.Dark ? Qt.rgba(0,0,0,0.5) : Qt.rgba(1,1,1,0.5)
     clip: true
 
     MouseArea {
@@ -43,7 +43,8 @@ Rectangle {
         anchors.leftMargin: -20
         anchors.rightMargin: -20
 
-        color: Runtime.colors.primary.c100.background
+        color: Runtime.colors.scheme === Qt.ColorScheme.Dark ? Qt.rgba(0,0,0,0.5) : Qt.rgba(1,1,1,0.5)
+
         border.width: 1
         border.color: Runtime.colors.primary.borderColor
     }

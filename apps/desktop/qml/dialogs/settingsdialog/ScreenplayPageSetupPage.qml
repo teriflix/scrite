@@ -355,7 +355,6 @@ Item {
             DisabledFeatureNotice {
                 anchors.fill: parent
                 visible: !Runtime.appFeatures.watermark.enabled
-                color: Qt.rgba(1,1,1,0.9)
                 featureName: "Watermark Settings"
             }
         }

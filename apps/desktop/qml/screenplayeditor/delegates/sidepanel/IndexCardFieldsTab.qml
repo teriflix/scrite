@@ -86,7 +86,6 @@ AbstractScenePartEditor {
     DisabledFeatureNotice {
         anchors.fill: parent
 
-        color: Qt.rgba(0,0,0,0)
         visible: !Runtime.appFeatures.structure.enabled
 
         featureName: "Index Card Fields"

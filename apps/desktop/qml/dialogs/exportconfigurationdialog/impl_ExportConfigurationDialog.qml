@@ -47,7 +47,6 @@ VclDialog {
         id: _exportFeatureDisabledContent
 
         DisabledFeatureNotice {
-            color: Qt.rgba(1,1,1,0.9)
             featureName: root.exporter ? root.exporter.format : Scrite.ExportFeature
         }
     }

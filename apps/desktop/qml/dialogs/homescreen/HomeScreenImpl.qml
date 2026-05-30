@@ -666,7 +666,6 @@ Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        color: Qt.rgba(1,1,1,0.9)
                         featureName: "Screenplay Templates"
                         visible: !Runtime.appFeatures.templates.enabled
                     }
@@ -1280,7 +1279,6 @@ Item {
 
             DisabledFeatureNotice {
                 visible: !Runtime.appFeatures.importer.enabled
-                color: Qt.rgba(1,1,1,0.9)
                 featureName: "Import from 3rd Party Formats"
             }
 

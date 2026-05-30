@@ -49,7 +49,6 @@ VclDialog {
         id: _reportFeatureDisabledContent
 
         DisabledFeatureNotice {
-            color: Qt.rgba(1,1,1,0.9)
             featureName: root.report.title
         }
     }

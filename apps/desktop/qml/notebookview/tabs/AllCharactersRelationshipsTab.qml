@@ -37,7 +37,6 @@ Item {
     DisabledFeatureNotice {
         anchors.fill: parent
 
-        color: Qt.rgba(0,0,0,0)
         featureName: "Relationship Map"
         visible: !Runtime.appFeatures.characterRelationshipGraph.enabled
     }
