@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(ls /c/Workspace/ScriteProject/scrite/apps/desktop/icons/action/*.png)",
-      "Bash(ls /c/Workspace/ScriteProject/scrite/apps/desktop/icons/action/*inverted.png)",
-      "Bash(git add *)"
-    ]
-  }
-}
