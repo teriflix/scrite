@@ -209,7 +209,7 @@ By default the report is saved as an **XLSX** spreadsheet. Columns are auto‑si
 content; the Synopsis column uses word‑wrap so long synopses remain readable. If you switch the
 format to PDF, the report is rendered on **A3 landscape** pages to accommodate the wide table.
 
-<img src="../images/reports/025-scene-metadata-report.jpg" width="85%"/>
+<img src="../images/reports/025-scene-metadata-report.jpg" width="100%"/>
 
 ## Screenplay Subset
 

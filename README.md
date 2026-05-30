@@ -104,7 +104,7 @@ Once you have python and pip installed,
     pip install mkdocs mkdocs-material mkdocs-video
 
     # Serve docs
-    mkdocs serve
+    python -m mkdocs serve
 
     # Open http://127.0.0.1:8000 on your browser
 
