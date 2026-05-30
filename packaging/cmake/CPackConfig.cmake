@@ -2,7 +2,7 @@
 # Included from the root CMakeLists.txt (before include(CPack)).
 
 set(CPACK_PACKAGE_NAME "Scrite")
-set(CPACK_PACKAGE_VENDOR "VCreate Logic Pvt. Ltd.")
+set(CPACK_PACKAGE_VENDOR "IEDN Technologies Pvt. Ltd.")
 set(CPACK_PACKAGE_CONTACT "support@scrite.io")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://www.scrite.io")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Multilingual Screenplay Writing App")

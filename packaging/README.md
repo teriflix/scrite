@@ -32,7 +32,7 @@ cp packaging.config.local.example packaging.config.local
 
 **Example:**
 ```bash
-export MACOS_SIGNING_IDENTITY="Developer ID Application: VCreate Logic (ABC123)"
+export MACOS_SIGNING_IDENTITY="Developer ID Application: IEDN Technologies (ABC123)"
 ./scripts/package-macos.sh --build
 ```
 

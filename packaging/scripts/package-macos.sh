@@ -4,7 +4,7 @@
 #   ./package-macos.sh [--build] [--no-sign] [--notarize] [--type=<version-type>]
 #
 # Environment variables (or set in packaging.config.local):
-#   MACOS_SIGNING_IDENTITY      Developer ID Application identity (e.g. "Developer ID Application: VCreate Logic (ABC123)")
+#   MACOS_SIGNING_IDENTITY      Developer ID Application identity (e.g. "Developer ID Application: IEDN Technologies Pvt. Ltd. (ABC123)")
 #   APPLE_TEAM_ID               Team ID for notarization
 #   APPLE_ID_USER               Apple ID email for notarization
 #   APPLE_NOTARIZE_PASSWORD     App-specific password from appleid.apple.com

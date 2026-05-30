@@ -6,7 +6,7 @@
 # macOS Signing & Notarization
 # ============================================================================
 # MACOS_SIGNING_IDENTITY — Your "Developer ID Application" identity
-# Example: "Developer ID Application: VCreate Logic (ABC123XYZ)"
+# Example: "Developer ID Application: IEDN Technologies (ABC123XYZ)"
 # Run 'security find-identity -v -p codesigning' to list your identities.
 export MACOS_SIGNING_IDENTITY=""
 
