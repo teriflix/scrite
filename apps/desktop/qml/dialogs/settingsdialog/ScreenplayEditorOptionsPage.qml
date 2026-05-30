@@ -33,6 +33,7 @@ Item {
         anchors.fill: _flickable
         anchors.margins: -3
 
+        color: Runtime.colors.primary.c10.background
         visible: _flickable.clip
 
         border.width: 1

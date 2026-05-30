@@ -44,6 +44,10 @@ DialogLauncher {
 
         title: "Screenplay Editor Options"
 
-        content: ScreenplayEditorOptionsPage { }
+        content: Item {
+            ScreenplayEditorOptionsPage {
+                anchors.fill: parent
+            }
+        }
     }
 }
