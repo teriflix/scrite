@@ -239,6 +239,7 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 #ifdef Q_OS_UNIX
     const QString libPath = Application::applicationDirPath() + "/../lib";
     Application::addLibraryPath(libPath);
+    Application::addLibraryPath(Application::applicationDirPath());
 #endif
 #endif
 
