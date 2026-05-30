@@ -13,7 +13,7 @@
 **
 ****************************************************************************/
 
-#include "scenebreakdownreport.h"
+#include "scenemetadatareport.h"
 
 #include "scene.h"
 #include "screenplay.h"
@@ -76,14 +76,14 @@ const QString COL_KEY_CHARACTERS = QStringLiteral("characters");
 
 Q_DECL_IMPORT int qt_defaultDpi();
 
-SceneBreakdownReport::SceneBreakdownReport(QObject *parent) : AbstractReportGenerator(parent)
+SceneMetadataReport::SceneMetadataReport(QObject *parent) : AbstractReportGenerator(parent)
 {
     this->setFormat(OpenDocumentFormat);
 }
 
-SceneBreakdownReport::~SceneBreakdownReport() { }
+SceneMetadataReport::~SceneMetadataReport() { }
 
-void SceneBreakdownReport::setEpisodeNumbers(const QList<int> &val)
+void SceneMetadataReport::setEpisodeNumbers(const QList<int> &val)
 {
     if (m_episodeNumbers == val)
         return;
@@ -92,7 +92,7 @@ void SceneBreakdownReport::setEpisodeNumbers(const QList<int> &val)
     emit episodeNumbersChanged();
 }
 
-void SceneBreakdownReport::setSceneNumbers(const QList<int> &val)
+void SceneMetadataReport::setSceneNumbers(const QList<int> &val)
 {
     if (m_sceneNumbers == val)
         return;
@@ -101,7 +101,7 @@ void SceneBreakdownReport::setSceneNumbers(const QList<int> &val)
     emit sceneNumbersChanged();
 }
 
-void SceneBreakdownReport::setTags(const QStringList &val)
+void SceneMetadataReport::setTags(const QStringList &val)
 {
     if (m_tags == val)
         return;
@@ -110,7 +110,7 @@ void SceneBreakdownReport::setTags(const QStringList &val)
     emit tagsChanged();
 }
 
-void SceneBreakdownReport::setKeywords(const QString &val)
+void SceneMetadataReport::setKeywords(const QString &val)
 {
     if (m_keywords == val)
         return;
@@ -119,7 +119,7 @@ void SceneBreakdownReport::setKeywords(const QString &val)
     emit keywordsChanged();
 }
 
-void SceneBreakdownReport::setShowSynopsisColumn(bool val)
+void SceneMetadataReport::setShowSynopsisColumn(bool val)
 {
     if (m_showSynopsisColumn == val)
         return;
@@ -128,7 +128,7 @@ void SceneBreakdownReport::setShowSynopsisColumn(bool val)
     emit showSynopsisColumnChanged();
 }
 
-void SceneBreakdownReport::setShowGroupsColumn(bool val)
+void SceneMetadataReport::setShowGroupsColumn(bool val)
 {
     if (m_showGroupsColumn == val)
         return;
@@ -137,7 +137,7 @@ void SceneBreakdownReport::setShowGroupsColumn(bool val)
     emit showGroupsColumnChanged();
 }
 
-void SceneBreakdownReport::setShowKeywordsColumn(bool val)
+void SceneMetadataReport::setShowKeywordsColumn(bool val)
 {
     if (m_showKeywordsColumn == val)
         return;
@@ -146,7 +146,7 @@ void SceneBreakdownReport::setShowKeywordsColumn(bool val)
     emit showKeywordsColumnChanged();
 }
 
-void SceneBreakdownReport::setShowStartPageColumn(bool val)
+void SceneMetadataReport::setShowStartPageColumn(bool val)
 {
     if (m_showStartPageColumn == val)
         return;
@@ -155,7 +155,7 @@ void SceneBreakdownReport::setShowStartPageColumn(bool val)
     emit showStartPageColumnChanged();
 }
 
-void SceneBreakdownReport::setShowPageCountColumn(bool val)
+void SceneMetadataReport::setShowPageCountColumn(bool val)
 {
     if (m_showPageCountColumn == val)
         return;
@@ -164,7 +164,7 @@ void SceneBreakdownReport::setShowPageCountColumn(bool val)
     emit showPageCountColumnChanged();
 }
 
-void SceneBreakdownReport::setShowSceneTimeColumn(bool val)
+void SceneMetadataReport::setShowSceneTimeColumn(bool val)
 {
     if (m_showSceneTimeColumn == val)
         return;
@@ -173,7 +173,7 @@ void SceneBreakdownReport::setShowSceneTimeColumn(bool val)
     emit showSceneTimeColumnChanged();
 }
 
-void SceneBreakdownReport::setShowCharactersColumn(bool val)
+void SceneMetadataReport::setShowCharactersColumn(bool val)
 {
     if (m_showCharactersColumn == val)
         return;
@@ -182,12 +182,12 @@ void SceneBreakdownReport::setShowCharactersColumn(bool val)
     emit showCharactersColumnChanged();
 }
 
-QString SceneBreakdownReport::fileNameExtension() const
+QString SceneMetadataReport::fileNameExtension() const
 {
     return this->format() == OpenDocumentFormat ? QStringLiteral("xlsx") : QStringLiteral("pdf");
 }
 
-bool SceneBreakdownReport::passesFilter(const ScreenplayElement *element) const
+bool SceneMetadataReport::passesFilter(const ScreenplayElement *element) const
 {
     if (element->scene() == nullptr || element->isOmitted())
         return false;
@@ -263,7 +263,7 @@ bool SceneBreakdownReport::passesFilter(const ScreenplayElement *element) const
     return true;
 }
 
-bool SceneBreakdownReport::doGenerate(QTextDocument *document)
+bool SceneMetadataReport::doGenerate(QTextDocument *document)
 {
     const Screenplay *screenplay = this->document()->screenplay();
     const ScreenplayFormat *format = this->document()->printFormat();
@@ -294,7 +294,7 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
     charFormat.setFontPointSize(16);
     charFormat.setFontWeight(QFont::Bold);
     cursor.insertBlock(blockFormat, charFormat);
-    cursor.insertText(QStringLiteral("Scene Breakdown Report"));
+    cursor.insertText(QStringLiteral("Scene Metadata Report"));
 
     blockFormat = defaultBlockFormat;
     blockFormat.setAlignment(Qt::AlignHCenter);
@@ -539,23 +539,23 @@ bool SceneBreakdownReport::doGenerate(QTextDocument *document)
     return true;
 }
 
-void SceneBreakdownReport::configureWriter(QPdfWriter *pdfWriter,
+void SceneMetadataReport::configureWriter(QPdfWriter *pdfWriter,
                                            const QTextDocument *document) const
 {
     this->configureWriterImpl(pdfWriter, document);
 }
 
-void SceneBreakdownReport::configureWriter(QPrinter *printer, const QTextDocument *document) const
+void SceneMetadataReport::configureWriter(QPrinter *printer, const QTextDocument *document) const
 {
     this->configureWriterImpl(printer, document);
 }
 
-bool SceneBreakdownReport::canDirectExportToOdf() const
+bool SceneMetadataReport::canDirectExportToOdf() const
 {
     return true;
 }
 
-bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
+bool SceneMetadataReport::directExportToOdf(QIODevice *device)
 {
     try {
         const Screenplay *screenplay = this->document()->screenplay();
@@ -836,15 +836,15 @@ bool SceneBreakdownReport::directExportToOdf(QIODevice *device)
     }
 }
 
-void SceneBreakdownReport::configureWriterImpl(QPagedPaintDevice *ppd,
+void SceneMetadataReport::configureWriterImpl(QPagedPaintDevice *ppd,
                                                const QTextDocument *document) const
 {
-    // Use A3 landscape page size for scene breakdown report
+    // Use A3 landscape page size for scene metadata report
     ppd->setPageSize(QPageSize::A3);
     ppd->setPageOrientation(QPageLayout::Landscape);
 }
 
-QList<ScreenplayElement *> SceneBreakdownReport::getScreenplayElements()
+QList<ScreenplayElement *> SceneMetadataReport::getScreenplayElements()
 {
     const Screenplay *screenplay = this->document()->screenplay();
     QList<ScreenplayElement *> screenplayElements;

@@ -175,7 +175,7 @@ set(SCRITE_DESKTOP_ICON_FILES
   "icons/reports/location_report.png"
   "icons/reports/notebook_report.png"
   "icons/reports/reports_menu_item.png"
-  "icons/reports/scene_breakdown_report.png"
+  "icons/reports/scene_metadata_report.png"
   "icons/reports/scene_character_matrix_report.png"
   "icons/reports/screenplay_subset_report.png"
   "icons/reports/statistics_report.png"

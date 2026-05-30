@@ -13,26 +13,26 @@
 **
 ****************************************************************************/
 
-#ifndef SCENEBREAKDOWNREPORT_H
-#define SCENEBREAKDOWNREPORT_H
+#ifndef SCENEMETADATAREPORT_H
+#define SCENEMETADATAREPORT_H
 
 #include "abstractreportgenerator.h"
 
 class ScreenplayElement;
 class ScreenplayPaginator;
 
-class SceneBreakdownReport : public AbstractReportGenerator
+class SceneMetadataReport : public AbstractReportGenerator
 {
     Q_OBJECT
     // clang-format off
-    Q_CLASSINFO("Title", "Scene Breakdown")
-    Q_CLASSINFO("Description", "Generate a breakdown report of scenes with location, time, page numbers, and characters.")
-    Q_CLASSINFO("Icon", ":/icons/reports/scene_breakdown_report.png")
+    Q_CLASSINFO("Title", "Scene Metadata")
+    Q_CLASSINFO("Description", "Generate a metadata report of scenes with location, time, page numbers, and characters.")
+    Q_CLASSINFO("Icon", ":/icons/reports/scene_metadata_report.png")
     // clang-format on
 
 public:
-    Q_INVOKABLE explicit SceneBreakdownReport(QObject *parent = nullptr);
-    ~SceneBreakdownReport();
+    Q_INVOKABLE explicit SceneMetadataReport(QObject *parent = nullptr);
+    ~SceneMetadataReport();
 
     bool requiresConfiguration() const { return true; }
     bool isSinglePageReport() const { return false; }
@@ -219,4 +219,4 @@ private:
     bool m_showCharactersColumn = true;
 };
 
-#endif // SCENEBREAKDOWNREPORT_H
+#endif // SCENEMETADATAREPORT_H
