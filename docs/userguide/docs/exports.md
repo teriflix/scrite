@@ -6,6 +6,8 @@ for different purposes:
 - [PDF](#pdf) — Share a read-only copy with others
 - [Final Draft](#final-draft) — Use with production planning and script
   breakdown software
+- [Open Screenplay Format](#open-screenplay-format) — Exchange screenplays
+  with other OSF-compatible screenwriting applications
 - [Fountain](#fountain) or [Plain Text](#plain-text) — Edit with markdown
   editors
 - [Open Document Format](#open-document-format) — Edit in word processing
@@ -118,6 +120,38 @@ Draft](./imports.md#drag-and-drop) file back into Scrite and continue
 working on it. Successive export & imports will not result in loss of screenplay
 content itself, but may lead to loss of other meta data like notes, tags and so
 on.
+
+## Open Screenplay Format
+
+The [Open Screenplay Format](https://github.com/OpenScreenplayFormat/osf-sdk)
+(OSF) is an open XML-based standard designed to make screenplays interoperable
+across different screenwriting applications. Exporting to OSF lets you move your
+screenplay to any other OSF-compatible tool without losing scene structure or
+formatting.
+
+When you select Open Screenplay Format from the [export menu](#export-menu), or
+[Command Center](./user-interface.md#command-center), you will see a dialog box
+with the following options.
+
+|Option|Description|
+|------|-----------|
+|Include scene synopsis.|When checked, the synopsis for each scene is embedded in the exported OSF file wherever available.|
+|Include scene notes.|When checked, notes attached to each scene are embedded in the exported OSF file wherever available.|
+
+Both options are checked by default. Once you are done with the configuration,
+click the `Export` button. Scrite will write an `.xml` file and typically launch
+a `Finder` or `File Explorer` window with the exported file selected, so that
+you can quickly open it in another app.
+
+At any point you can import the OSF file back into Scrite using the
+[import](./imports.md) options. Successive export and import round-trips
+preserve screenplay content and structure, though Scrite-specific metadata such
+as tags, colors, and notebook notes are not part of the OSF format and will not
+be retained.
+
+> OSF files exported by Scrite conform to the Open Screenplay Format
+> specification. Compatibility with a specific third-party application depends
+> on that application's level of OSF support.
 
 ## Fountain
 

@@ -1,9 +1,9 @@
 # Scrite
 
-Scrite is an open-source desktop screenwriting app. Its an offline app, with no 
-built-in cloud syncing. You can find more information on our [official website](https://www.scrite.io).
+Scrite is an open-source desktop screenwriting app. Its an offline app, with no built-in cloud
+syncing. You can find more information on our [official website](https://www.scrite.io).
 
-<img src="./images/scrite_logo_for_report_header.png" alt="Scrite Logo" width="320"/>
+<img src="./apps/desktop/images/scrite_logo_for_report_header.png" alt="Scrite Logo" width="320"/>
 
 ## Features
 - Create screenplays and format elements appropriately.
@@ -15,24 +15,34 @@ built-in cloud syncing. You can find more information on our [official website](
 
 A complete user guide can be found [here](https://www.scrite.io/docs/userguide).
 
-## Building from source
-Scrite is developed using Qt 5.15.19. To build scrite, simply install
-this version of Qt on your computer (Windows, macOS or Linux).
+<img src="./docs/screenshots/banner.png" alt="Banner" width="720"/>
 
-Open `scrite.pro` in Qt Creator and build.
+## Building from source
+Scrite is developed using Qt 6.11. To build Scrite, install Qt 6.11+ on your computer (Windows,
+macOS, or Linux) and CMake 3.27+.
+
+Open the project in Qt Creator (it auto-detects CMakeLists.txt) and set the build configuration to
+**Release**, or build from the command line:
+
+```bash
+cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+```
+
+Build artifacts are placed in the `binary/` directory.
 
 ## Reporting Issues
-If you run into bugs, crashes or find missing features OR features that
-are not working as expected, we recommend that you post a message on
-our Discord server, discuss it with us there before creating a bug
-ticket on GitHub.
+If you run into bugs, crashes or find missing features OR features that are not working as expected,
+we recommend that you post a message on our Discord server, discuss it with us there before creating
+a bug ticket on GitHub.
 
 Here is a link to our Discord server: https://discord.gg/bGHquFX5jK
 
 ## Conference Talks based on Scrite
 These talks may help you find your way around the code.
 
-- Solving Problems for Yourself, and Accidentally Thousands More - [IndiaFOSS 2025](https://www.youtube.com/watch?v=2O9A4HRlJAY)
+- Solving Problems for Yourself, and Accidentally Thousands More - [IndiaFOSS
+  2025](https://www.youtube.com/watch?v=2O9A4HRlJAY)
 - Closing The Gaps - QML on the Desktop - [Qt DevCon 2022](https://youtu.be/tyn90zQZTEg)
 - Building Beautiful Desktop Apps Using QML - [Qt DevDes Days 2021](https://youtu.be/zQAGs8cuGv8)
 - Insights from Building Scrite Using QML - [Qt Desktop Days 2020](https://youtu.be/z7GEUrRyh0U)
@@ -47,7 +57,8 @@ These talks may help you find your way around the code.
 ## Reviews
 
 - [ScreenwritingScribe reviews Scrite, Jan 2025](https://www.youtube.com/watch?v=8PXrQ6DUw9o)
-- [Sarvana from Film Psychology reviews Scrite, in Tamil](https://www.youtube.com/watch?v=ipWjr_33iIk)
+- [Sarvana from Film Psychology reviews Scrite, in
+  Tamil](https://www.youtube.com/watch?v=ipWjr_33iIk)
 - [Rahul, Pooja of Paramvah Studios talk about their Film and Scrite](https://youtu.be/niG2X6nCYCA)
 - [Nhân Trương reviews Scrite, in Vietnamese](https://www.youtube.com/watch?v=oY4kQrzIgvU)
 - [James K Martin reviews Scrite](https://www.youtube.com/watch?v=_JkTx75oVbE)
@@ -55,13 +66,13 @@ These talks may help you find your way around the code.
 ## Dependencies
 
 ### mkdocs
-If you want to generate documentation from the docs folder, you will also need
-to install Python and mkdocs.
+If you want to generate documentation from the docs folder, you will also need to install Python and
+mkdocs.
 
 #### On macOS
 
-Most users prefer to install python from homebrew on macOS. In such cases, it
-works best if a separate environment is created for serving docs.
+Most users prefer to install python from homebrew on macOS. In such cases, it works best if a
+separate environment is created for serving docs.
 
     # Switch to docs/userguide
     cd ./docs/userguide
@@ -100,40 +111,27 @@ Once you have python and pip installed,
 Further reading: https://www.mkdocs.org/user-guide/installation/
 
 ### Qt
-We use a commercial license of Qt 5.15.19 for all production and beta builds. 
-You should be able to use any available Qt 5.15 LTS for building Scrite. The
-code is organized to work well with our webservices in production, so if you 
-build from the source code here - it may not work with our production servers.
-You should be able to comment away all references to our webservices and 
-construct a purely open-source build. At some point, we will introduce compile
-time config settings to make this easy.
+We use a commercial license of Qt 6.11 for all production and beta builds. You should be able to use
+any Qt 6.11+ release for building Scrite. The code is organized to work well with our webservices in
+production, so if you build from the source code here — it may not work with our production servers.
+You should be able to comment away all references to our webservices and construct a purely
+open-source build. At some point, we will introduce compile time config settings to make this easy.
 
 ### Windows
-Ensure that you have OpenSSL 1.1.1 installed. The app is unlikely to work with 
-any other version of OpenSSL.
-
-We use Windows 11 for development, although we know that the app works on Windows
-10 as well. Any previous version of Windows, we are not sure.
+Ensure that you have OpenSSL 3 installed. We use Windows 11 for development, although the app also
+works on Windows 10. Earlier versions of Windows are not supported.
 
 ### macOS
-Any version of macOS supported by Qt 5.15 LTS should work.
+Any version of macOS supported by Qt 6.11 should work. macOS builds are universal binaries (x86_64 +
+arm64).
 
 ### Linux
-To build the app on Linux, there are a couple of dependencies to take care of
-first.
+To build the app on Linux, there are a couple of dependencies to take care of first.
 
 #### Hunspell (for spellcheck)
-To build Scrite with Hunspell support on Linux, please install hunspell-dev
-On Ubuntu, you can do this by executing the following command
+To build Scrite with Hunspell support on Linux, install hunspell-dev. On Ubuntu:
 
     sudo apt-get install libhunspell-dev
-
-Depending on the version number of hunspell installed on your computer, you
-will have to update config-hunspell.h. Comments in this file should help you
-understand what changes you should be making.
-
-For more information about this package, please visit
-https://packages.debian.org/sid/libhunspell-dev
 
 #### xcb and xinerama
 Make sure that you have cursor, xinerama installed
@@ -141,11 +139,9 @@ Make sure that you have cursor, xinerama installed
     sudo apt install libxcb-cursor0 libxcb-xinerama0
 
 #### OpenSSL
-You will also need OpenSSL version 1.1.1
+You will also need OpenSSL 3:
 
-    sudo add-apt-repository ppa:nrbrtx/libssl1 -y
-    sudo apt update
-    sudo apt install libssl1.1 libssl-dev=1.1.1*
+    sudo apt install libssl-dev
 
 #### imagemagick
 For running the package scripts, you will need imagemagick and linuxdeployqt
@@ -173,4 +169,4 @@ You may also need to include the following lines into environment variables.
 
 ## Screenshots
 
-<img src="./docs/screenshots/gallery.png" alt="Screenshot Gallery" width="720"/>
+<img src="./docs/screenshots/preview.png" alt="Preview" width="720"/>

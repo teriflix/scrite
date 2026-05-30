@@ -88,11 +88,6 @@ to limit write access to one or more users identified by their email.
 
 > Real-time collaboration is planned for a future update.
 
-### Dark Mode <span class="red-x">✗</span>
-Dark mode is one of our most‑requested features. We appreciate how helpful it is
-and plan to add it. For now, Scrite doesn’t include a dark theme, and we
-apologise if this is a deal breaker for you.
-
 ### AI Copilot <span class="red-x">✗</span>
 Scrite doesn’t include built‑in AI features today. If you prefer an AI copilot,
 you can use tools like ChatGPT, Claude, Grok, or Gemini alongside Scrite.
