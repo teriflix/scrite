@@ -32,6 +32,12 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
+# Generate a PDB for Release builds on Windows so crash dumps can be symbolicated.
+if(MSVC)
+  add_compile_options(/Zi)
+  add_link_options(/DEBUG /OPT:REF /OPT:ICF)
+endif()
+
 # Sonnet's vendored CMake requires Qt 6.11+ (and uses Qt targets).
 find_package(Qt6 6.11 REQUIRED COMPONENTS Core)
 qt_standard_project_setup(REQUIRES 6.11)

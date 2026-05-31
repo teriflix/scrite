@@ -199,6 +199,36 @@ if not exist "%SETUP_EXE%" (
     exit /b 1
 )
 
+:: Create symbols zip for crash dump analysis
+for /f %%h in ('git rev-parse --short HEAD 2^>nul') do set "GIT_COMMIT=%%h"
+if not defined GIT_COMMIT set "GIT_COMMIT=unknown"
+
+set "SYMBOLS_NAME=Scrite-%VERSION%%VERSION_SUFFIX%-%GIT_COMMIT%-64bit-Symbols"
+set "SYMBOLS_STAGE=%PROJECT_ROOT%\packaging\_staging\%SYMBOLS_NAME%"
+set "SYMBOLS_ZIP=%PROJECT_ROOT%\binary\packages\%SYMBOLS_NAME%.zip"
+
+echo Creating symbols zip %SYMBOLS_NAME%.zip...
+if exist "%SYMBOLS_STAGE%" rmdir /s /q "%SYMBOLS_STAGE%"
+mkdir "%SYMBOLS_STAGE%"
+
+for %%f in ("%PROJECT_ROOT%\binary\*.pdb") do copy /y "%%f" "%SYMBOLS_STAGE%" >nul
+if exist "%PROJECT_ROOT%\binary\kf6\*.pdb" (
+    mkdir "%SYMBOLS_STAGE%\kf6"
+    copy /y "%PROJECT_ROOT%\binary\kf6\*.pdb" "%SYMBOLS_STAGE%\kf6" >nul
+)
+
+if not exist "%SYMBOLS_STAGE%\Scrite.pdb" (
+    echo WARNING: Scrite.pdb not found -- symbols zip may be incomplete.
+)
+
+powershell -NoProfile -Command "Compress-Archive -Path '%SYMBOLS_STAGE%' -DestinationPath '%SYMBOLS_ZIP%' -Force"
+if errorlevel 1 (
+    echo WARNING: Failed to create symbols zip.
+) else (
+    echo Symbols zip created: %SYMBOLS_NAME%.zip
+)
+rmdir /s /q "%SYMBOLS_STAGE%"
+
 :: Step 11: Sign installer if requested
 if "%SIGN%"=="1" (
     if defined CodeSignTool (
