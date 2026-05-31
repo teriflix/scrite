@@ -546,16 +546,6 @@ public:
     // clang-format on
     static QString openSslVersionString();
 
-    enum Architecture { x86, x64 };
-    Q_ENUM(Architecture)
-
-    // clang-format off
-    Q_PROPERTY(Architecture architecture
-               READ architecture
-               CONSTANT )
-    // clang-format on
-    static Architecture architecture();
-
     // clang-format off
     Q_PROPERTY(QString architectureString
                READ architectureString

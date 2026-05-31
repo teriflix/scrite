@@ -43,6 +43,10 @@
 #include <QProcessEnvironment>
 #include <QOperatingSystemVersion>
 
+#ifdef Q_OS_MACOS
+#include <sys/sysctl.h>
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 
 QStringList Utils::KeyCombinations::modifiers() const
@@ -259,27 +263,40 @@ QString Utils::Platform::modifierDescription(int modifier)
 }
 
 /**
- * \brief Returns the architecture of the platform.
- * \return The architecture as Utils::Platform::Architecture.
- */
-Utils::Platform::Architecture Utils::Platform::architecture()
-{
-    return QSysInfo::WordSize == 32 ? x86 : x64;
-}
-
-/**
- * \brief Returns the architecture of the platform as a string
- * \return Either "x86" or "x64"
+ * \brief Returns the CPU architecture of the platform as a human-readable string.
+ *
+ * Returns values such as "Intel x86_64", "Apple Silicon M2 Pro", or "ARM 64".
+ * On macOS arm64, sysctlbyname("machdep.cpu.brand_string") is used to obtain the
+ * exact Apple Silicon chip name. Falls back to QSysInfo::currentCpuArchitecture()
+ * for unrecognised architectures.
  */
 QString Utils::Platform::architectureString()
 {
-    switch (architecture()) {
-    case x86:
-        return "x86";
-    case x64:
-        return "x64";
+    const QString qtArch = QSysInfo::currentCpuArchitecture();
+
+#ifdef Q_OS_MACOS
+    if (qtArch == QStringLiteral("arm64")) {
+        // Ask the kernel for the CPU brand string, e.g. "Apple M2 Pro"
+        char brand[256] = {};
+        size_t size = sizeof(brand);
+        if (sysctlbyname("machdep.cpu.brand_string", brand, &size, nullptr, 0) == 0 && size > 0) {
+            QString chip = QString::fromUtf8(brand).trimmed();
+            // Strip the leading "Apple " prefix so we can label it ourselves
+            if (chip.startsWith(QStringLiteral("Apple ")))
+                chip = chip.mid(6); // e.g. "M2 Pro"
+            return QStringLiteral("Apple Silicon ") + chip;
+        }
+        return QStringLiteral("Apple Silicon");
     }
-    return "unknown";
+#endif
+
+    if (qtArch == QStringLiteral("x86_64"))
+        return QStringLiteral("Intel x86_64");
+
+    if (qtArch == QStringLiteral("arm64") || qtArch == QStringLiteral("aarch64"))
+        return QStringLiteral("ARM 64");
+
+    return qtArch;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
