@@ -131,7 +131,8 @@ unset _sonnet_so _dep _real _rname _lname
 mkdir -p "${APPDIR}/usr/share/applications"
 cp "${ASSETS_DIR}/Scrite.desktop" "${APPDIR}/usr/share/applications/"
 
-APPIMAGE="${PROJECT_ROOT}/binary/packages/Scrite-${VERSION}${VERSION_SUFFIX}-x86_64.AppImage"
+ARCH="$(uname -m)"
+APPIMAGE="${PROJECT_ROOT}/binary/packages/Scrite-${VERSION}${VERSION_SUFFIX}-${ARCH}.AppImage"
 mkdir -p "$(dirname "$APPIMAGE")"
 
 # Step 3: Deploy Qt and dependencies
@@ -181,11 +182,11 @@ else
     # Cache the AppImage type-2 runtime next to linuxdeploy so it is only
     # downloaded once. It is passed via APPIMAGETOOL_ADDITIONAL_ARGS at package
     # time so appimagetool (called internally by linuxdeploy) uses it without fetching.
-    APPIMAGE_RUNTIME="${APPIMAGE_RUNTIME_PATH:-$(dirname "$LINUXDEPLOY")/runtime-x86_64}"
+    APPIMAGE_RUNTIME="${APPIMAGE_RUNTIME_PATH:-$(dirname "$LINUXDEPLOY")/runtime-${ARCH}}"
     if [ ! -f "$APPIMAGE_RUNTIME" ]; then
         echo "Downloading AppImage runtime (one-time) to: $APPIMAGE_RUNTIME"
         curl -fsSL -o "$APPIMAGE_RUNTIME" \
-            "https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64"
+            "https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-${ARCH}"
     fi
     echo "Using AppImage runtime: $APPIMAGE_RUNTIME"
 
@@ -266,7 +267,7 @@ PYEOF
             LD_LIBRARY_PATH="$QT_LIB_DIR:${PROJECT_ROOT}/binary:${LD_LIBRARY_PATH:-}" \
             ldd "$qml_so" 2>/dev/null \
             | awk '/=>/ { print $3 }' \
-            | grep -v "^/lib\|^/usr/lib/x86_64\|^/usr/lib/aarch64"
+            | grep -v "^/lib\|^/usr/lib/${ARCH}"
         )
     done < <(find "$APPDIR/usr/qml" -name "*.so" -type f -print0)
 
