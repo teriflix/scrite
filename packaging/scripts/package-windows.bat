@@ -203,6 +203,8 @@ if not exist "%SETUP_EXE%" (
 if "%SIGN%"=="1" (
     if defined CodeSignTool (
         echo Signing installer...
+        :: Wait for the OS to release any handles CPack/NSIS held on the new installer
+        timeout /t 3 /nobreak >nul
         !CodeSignTool! sign /tr http://timestamp.sectigo.com /td sha256 /fd sha256 /n "!SCRITE_BUSINESS_NAME!" "!SETUP_EXE!"
         if errorlevel 1 goto :error
     )
