@@ -110,6 +110,11 @@ QString NotebookReport::polishFileName(const QString &fileName) const
     return folder.absoluteFilePath(m_title + QLatin1String(" - ") + m_subtitle + suffix);
 }
 
+QString NotebookReport::personalizedFileName(const QString &fileName) const
+{
+    return fileName;
+}
+
 bool NotebookReport::doGenerate(QTextDocument *doc)
 {
     ScriteDocument *scriteDocument = this->document();

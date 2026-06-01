@@ -308,6 +308,9 @@ VclDialog {
                 // Perform the export job ...
                 ScriptAction {
                     script: {
+                        if(_private.shouldPersonalizeFileName())
+                            root.report.personalizeFileName()
+
                         const dlFileName = root.report.fileName
                         if(_private.isPdfExport) {
                             root.report.fileName = Runtime.fileNamager.generateUniqueTemporaryFileName("pdf")
@@ -371,6 +374,7 @@ VclDialog {
     QtObject {
         id: _private
 
+        property string initialFileName: ""
         property var configuration: root.report ? root.report.configuration() : {"title": "Unknown", "description": "", "groups": []}
         property bool isPdfExport: root.report ? root.report.format === AbstractReportGenerator.PdfFormat : false
         property bool reportEnabled: root.report ? root.report.featureEnabled : false
@@ -380,6 +384,25 @@ VclDialog {
         }
 
         property VclDialog waitDialog
+
+        function shouldPersonalizeFileName() {
+            if(!root.report || root.report.fileName === "")
+                return false
+            const currentBase = _private.fileBaseName(root.report.fileName)
+            const initialBase = _private.fileBaseName(_private.initialFileName)
+            return currentBase === initialBase
+        }
+
+        function fileBaseName(path) {
+            const slashIdx = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'))
+            const name = slashIdx >= 0 ? path.substring(slashIdx + 1) : path
+            const dotIdx = name.lastIndexOf('.')
+            return dotIdx >= 0 ? name.substring(0, dotIdx) : name
+        }
+    }
+
+    Component.onCompleted: {
+        _private.initialFileName = root.report ? root.report.fileName : ""
     }
 
     onClosed: Runtime.execLater(root, 100, () => { if(root.report) root.report.discard() })

@@ -22,16 +22,16 @@
 #include "screenplaypaginator.h"
 
 #include <QFile>
-#include <QPrinter>
-#include <QPainter>
-#include <QSettings>
-#include <QPdfWriter>
-#include <QTextTable>
 #include <QFontMetricsF>
-#include <QStandardPaths>
-#include <QScopedPointer>
 #include <QGuiApplication>
+#include <QPainter>
+#include <QPdfWriter>
+#include <QPrinter>
 #include <QRandomGenerator>
+#include <QScopedPointer>
+#include <QSettings>
+#include <QStandardPaths>
+#include <QTextTable>
 
 #include <OpenXLSX.hpp>
 
@@ -82,6 +82,39 @@ SceneMetadataReport::SceneMetadataReport(QObject *parent) : AbstractReportGenera
 }
 
 SceneMetadataReport::~SceneMetadataReport() { }
+
+QString SceneMetadataReport::personalizedFileName(const QString &fileName) const
+{
+    QString appendix;
+
+    if (!m_episodeNumbers.isEmpty()) {
+        QStringList epStrings;
+        epStrings.reserve(m_episodeNumbers.size());
+        for (int ep : m_episodeNumbers)
+            epStrings << QString::number(ep);
+        appendix = QStringLiteral("Ep ") + listToPersonalizedNameString(epStrings);
+    } else if (!m_tags.isEmpty()) {
+        appendix = tagsToPersonalizedNameString(m_tags);
+    } else if (!m_keywords.trimmed().isEmpty()) {
+        const QString kw = m_keywords.trimmed();
+        appendix = kw.length() > 40 ? kw.left(37) + QStringLiteral("...") : kw;
+    } else if (!m_sceneNumbers.isEmpty()) {
+        if (m_sceneNumbers.size() <= 3) {
+            QStringList scStrings;
+            scStrings.reserve(m_sceneNumbers.size());
+            for (int sc : m_sceneNumbers)
+                scStrings << QString::number(sc);
+            appendix = QStringLiteral("Scenes ") + scStrings.join(QStringLiteral(", "));
+        } else {
+            appendix = QString::number(m_sceneNumbers.size()) + QStringLiteral(" Scenes");
+        }
+    }
+
+    if (appendix.isEmpty())
+        return fileName;
+
+    return buildPersonalizedFileName(fileName, appendix);
+}
 
 void SceneMetadataReport::setEpisodeNumbers(const QList<int> &val)
 {

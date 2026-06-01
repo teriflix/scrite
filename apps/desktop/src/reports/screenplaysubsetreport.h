@@ -60,6 +60,9 @@ public:
     Q_SIGNAL void generateSummaryChanged();
 
 protected:
+    // AbstractReportGenerator interface
+    QString personalizedFileName(const QString &fileName) const override;
+
     // AbstractScreenplaySubsetReport interface
     bool includeScreenplayElement(const ScreenplayElement *) const;
     QString screenplaySubtitle() const;

@@ -69,6 +69,14 @@ void CharacterReport::setIncludeNotes(bool val)
     emit includeNotesChanged();
 }
 
+QString CharacterReport::personalizedFileName(const QString &fileName) const
+{
+    if (m_characterNames.isEmpty())
+        return fileName;
+
+    return buildPersonalizedFileName(fileName, listToPersonalizedNameString(m_characterNames));
+}
+
 bool CharacterReport::doGenerate(QTextDocument *textDocument)
 {
     if (m_characterNames.isEmpty()) {

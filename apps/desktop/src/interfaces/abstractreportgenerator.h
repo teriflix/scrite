@@ -138,6 +138,7 @@ public:
     Q_INVOKABLE Utils::ObjectConfig configuration() const;
 
     Q_INVOKABLE bool generate();
+    Q_INVOKABLE void personalizeFileName();
     Q_INVOKABLE void discard() { GarbageCollector::instance()->add(this); }
 
 protected:
@@ -147,12 +148,17 @@ protected:
 protected:
     AbstractReportGenerator(QObject *parent = nullptr);
     virtual bool usePdfWriter() const;
+    virtual QString personalizedFileName(const QString &fileName) const;
     virtual bool doGenerate(QTextDocument *) { return false; }
     virtual void configureWriter(QTextDocumentWriter *, const QTextDocument *) const { }
     virtual void configureWriter(QPdfWriter *, const QTextDocument *) const { }
     virtual void configureWriter(QPrinter *, const QTextDocument *) const { }
     virtual void configureTextDocumentPrinter(QTextDocumentPagedPrinter *, const QTextDocument *) {
     }
+
+    static QString listToPersonalizedNameString(const QStringList &names);
+    static QString tagsToPersonalizedNameString(const QStringList &tags);
+    QString buildPersonalizedFileName(const QString &fileName, const QString &appendix) const;
 
     virtual bool canDirectPrintToPdf() const { return false; }
     virtual bool directPrintToPdf(QPdfWriter *) { return false; }

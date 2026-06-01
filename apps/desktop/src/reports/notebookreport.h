@@ -94,8 +94,10 @@ protected:
     // AbstractDeviceIO interface
     QString polishFileName(const QString &fileName) const;
 
-public:
     // AbstractReportGenerator interface
+    QString personalizedFileName(const QString &fileName) const override;
+
+public:
     bool requiresConfiguration() const { return false; }
     void polishFormInfo(Utils::ObjectConfig &) const;
 

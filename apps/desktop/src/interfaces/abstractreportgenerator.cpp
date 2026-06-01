@@ -33,6 +33,21 @@
 #include <QMetaClassInfo>
 #include <QTextDocumentWriter>
 
+static QString toTitleCase(const QString &str)
+{
+    QString result = str.toLower();
+    bool capitalizeNext = true;
+    for (QChar &ch : result) {
+        if (ch.isSpace())
+            capitalizeNext = true;
+        else if (capitalizeNext) {
+            ch = ch.toUpper();
+            capitalizeNext = false;
+        }
+    }
+    return result;
+}
+
 AbstractReportGenerator::AbstractReportGenerator(QObject *parent) : AbstractDeviceIO(parent)
 {
     connect(User::instance(), &User::infoChanged, this,
@@ -286,6 +301,93 @@ bool AbstractReportGenerator::generate()
     this->progress()->finish();
 
     return ret;
+}
+
+void AbstractReportGenerator::personalizeFileName()
+{
+    const QString personalized = this->personalizedFileName(this->fileName());
+    if (personalized != this->fileName())
+        this->setFileName(personalized);
+}
+
+QString AbstractReportGenerator::personalizedFileName(const QString &fileName) const
+{
+    return fileName;
+}
+
+QString AbstractReportGenerator::listToPersonalizedNameString(const QStringList &names)
+{
+    if (names.isEmpty())
+        return QString();
+
+    const int maxNames = 3;
+    if (names.size() <= maxNames)
+        return names.join(QStringLiteral(", "));
+
+    const QStringList first = names.mid(0, maxNames);
+    return first.join(QStringLiteral(", ")) + QStringLiteral(" and ")
+            + QString::number(names.size() - maxNames) + QStringLiteral(" more");
+}
+
+QString AbstractReportGenerator::tagsToPersonalizedNameString(const QStringList &tags)
+{
+    if (tags.isEmpty())
+        return QString();
+
+    // Detect GROUP/BEAT format. If all tags share the same group, format as
+    // "Beat1, Beat2 & N more from Group beats"; otherwise fall back to a plain list.
+    QString commonGroup;
+    QStringList beatNames;
+    bool allSameGroup = true;
+
+    for (const QString &tag : tags) {
+        const int slashIdx = tag.indexOf(QLatin1Char('/'));
+        if (slashIdx < 0) {
+            allSameGroup = false;
+            break;
+        }
+        const QString group = tag.left(slashIdx).trimmed();
+        const QString beat = tag.mid(slashIdx + 1).trimmed();
+        if (commonGroup.isEmpty())
+            commonGroup = group;
+        else if (group.compare(commonGroup, Qt::CaseInsensitive) != 0) {
+            allSameGroup = false;
+            break;
+        }
+        beatNames << beat;
+    }
+
+    if (allSameGroup && !commonGroup.isEmpty()) {
+        const int maxBeats = 2;
+        QStringList display;
+        display.reserve(qMin(maxBeats, beatNames.size()));
+        for (int i = 0; i < qMin(maxBeats, beatNames.size()); ++i)
+            display << toTitleCase(beatNames.at(i));
+
+        QString result = display.join(QStringLiteral(", "));
+        const int remaining = beatNames.size() - maxBeats;
+        if (remaining > 0)
+            result += QStringLiteral(" & ") + QString::number(remaining) + QStringLiteral(" more");
+        result += QStringLiteral(" from ") + toTitleCase(commonGroup) + QStringLiteral(" beats");
+        return result;
+    }
+
+    return listToPersonalizedNameString(tags);
+}
+
+QString AbstractReportGenerator::buildPersonalizedFileName(const QString &fileName,
+                                                           const QString &appendix) const
+{
+    const QFileInfo fi(fileName);
+    QString baseName = fi.completeBaseName();
+
+    const int idx = baseName.indexOf(this->name());
+    if (idx >= 0)
+        baseName.insert(idx, appendix + QStringLiteral(" "));
+    else
+        baseName += QStringLiteral(" - ") + appendix;
+
+    return fi.absoluteDir().absoluteFilePath(baseName + QStringLiteral(".") + fi.suffix());
 }
 
 bool AbstractReportGenerator::setConfigurationValue(const QString &name, const QVariant &value)

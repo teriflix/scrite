@@ -88,6 +88,7 @@ public:
 
 protected:
     // AbstractReportGenerator interface
+    QString personalizedFileName(const QString &fileName) const override;
     bool doGenerate(QTextDocument *textDocument);
 
 private:

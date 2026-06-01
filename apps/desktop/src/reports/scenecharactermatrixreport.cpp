@@ -21,14 +21,14 @@
 #include "structure.h"
 #include "scritedocument.h"
 
-#include <QPrinter>
-#include <QPainter>
-#include <QSettings>
-#include <QPdfWriter>
-#include <QTextTable>
 #include <QFile>
-#include <QStandardPaths>
+#include <QPainter>
+#include <QPdfWriter>
+#include <QPrinter>
 #include <QRandomGenerator>
+#include <QSettings>
+#include <QStandardPaths>
+#include <QTextTable>
 #include <OpenXLSX.hpp>
 
 SceneCharacterMatrixReport::SceneCharacterMatrixReport(QObject *parent)
@@ -43,6 +43,35 @@ SceneCharacterMatrixReport::SceneCharacterMatrixReport(QObject *parent)
 }
 
 SceneCharacterMatrixReport::~SceneCharacterMatrixReport() { }
+
+QString SceneCharacterMatrixReport::personalizedFileName(const QString &fileName) const
+{
+    const QStringList allCharacters =
+            this->document() ? this->document()->structure()->characterNames() : QStringList();
+    const bool hasCharacterFilter =
+            !m_characterNames.isEmpty() && m_characterNames != allCharacters;
+    const bool hasEpisodeFilter = !m_episodeNumbers.isEmpty();
+    const bool hasTagFilter = !m_tags.isEmpty();
+
+    if (!hasCharacterFilter && !hasEpisodeFilter && !hasTagFilter)
+        return fileName;
+
+    QStringList parts;
+    if (hasCharacterFilter)
+        parts << listToPersonalizedNameString(m_characterNames);
+    if (hasEpisodeFilter) {
+        QStringList epStrings;
+        epStrings.reserve(m_episodeNumbers.size());
+        for (int ep : m_episodeNumbers)
+            epStrings << QString::number(ep);
+        parts << QStringLiteral("Ep ") + listToPersonalizedNameString(epStrings);
+    }
+
+    if (hasTagFilter)
+        parts << tagsToPersonalizedNameString(m_tags);
+
+    return buildPersonalizedFileName(fileName, parts.join(QStringLiteral(", ")));
+}
 
 void SceneCharacterMatrixReport::setType(int val)
 {

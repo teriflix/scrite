@@ -46,6 +46,38 @@ void ScreenplaySubsetReport::setGenerateSummary(bool val)
     emit generateSummaryChanged();
 }
 
+QString ScreenplaySubsetReport::personalizedFileName(const QString &fileName) const
+{
+    QString appendix;
+
+    if (!this->episodeNumbers().isEmpty()) {
+        QStringList epStrings;
+        epStrings.reserve(this->episodeNumbers().size());
+        for (int ep : this->episodeNumbers())
+            epStrings << QString::number(ep);
+        appendix = QStringLiteral("Ep ") + listToPersonalizedNameString(epStrings);
+    } else if (!this->tags().isEmpty()) {
+        appendix = tagsToPersonalizedNameString(this->tags());
+    } else if (!this->keywords().isEmpty()) {
+        appendix = listToPersonalizedNameString(this->keywords());
+    } else if (!m_sceneNumbers.isEmpty()) {
+        if (m_sceneNumbers.size() <= 3) {
+            QStringList scStrings;
+            scStrings.reserve(m_sceneNumbers.size());
+            for (int sc : m_sceneNumbers)
+                scStrings << QString::number(sc);
+            appendix = QStringLiteral("Scenes ") + scStrings.join(QStringLiteral(", "));
+        } else {
+            appendix = QString::number(m_sceneNumbers.size()) + QStringLiteral(" Scenes");
+        }
+    }
+
+    if (appendix.isEmpty())
+        return fileName;
+
+    return buildPersonalizedFileName(fileName, appendix);
+}
+
 bool ScreenplaySubsetReport::includeScreenplayElement(const ScreenplayElement *element) const
 {
     if (element->scene() == nullptr || element->isOmitted())

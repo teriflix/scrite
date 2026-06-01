@@ -18,6 +18,7 @@
 #include "user.h"
 #include "scrite.h"
 
+
 LocationScreenplayReport::LocationScreenplayReport(QObject *parent)
     : AbstractScreenplaySubsetReport(parent)
 {
@@ -41,6 +42,14 @@ void LocationScreenplayReport::setGenerateSummary(bool val)
 
     m_generateSummary = val;
     emit generateSummaryChanged();
+}
+
+QString LocationScreenplayReport::personalizedFileName(const QString &fileName) const
+{
+    if (m_locations.isEmpty())
+        return fileName;
+
+    return buildPersonalizedFileName(fileName, listToPersonalizedNameString(m_locations));
 }
 
 bool LocationScreenplayReport::includeScreenplayElement(const ScreenplayElement *element) const

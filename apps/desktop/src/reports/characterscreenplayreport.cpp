@@ -20,6 +20,7 @@
 #include "screenplay.h"
 #include "structure.h"
 
+
 CharacterScreenplayReport::CharacterScreenplayReport(QObject *parent)
     : AbstractScreenplaySubsetReport(parent)
 {
@@ -43,6 +44,14 @@ void CharacterScreenplayReport::setCharacterNames(const QStringList &val)
 
     m_characterNames = val;
     emit characterNamesChanged();
+}
+
+QString CharacterScreenplayReport::personalizedFileName(const QString &fileName) const
+{
+    if (m_characterNames.isEmpty())
+        return fileName;
+
+    return buildPersonalizedFileName(fileName, listToPersonalizedNameString(m_characterNames));
 }
 
 bool CharacterScreenplayReport::includeScreenplayElement(const ScreenplayElement *element) const

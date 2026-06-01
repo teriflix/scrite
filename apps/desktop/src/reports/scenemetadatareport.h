@@ -193,6 +193,7 @@ protected:
     QString fileNameExtension() const;
 
     // AbstractReportGenerator interface
+    QString personalizedFileName(const QString &fileName) const override;
     bool usePdfWriter() const { return false; }
     bool doGenerate(QTextDocument *document);
     void configureWriter(QPdfWriter *pdfWriter, const QTextDocument *document) const;
