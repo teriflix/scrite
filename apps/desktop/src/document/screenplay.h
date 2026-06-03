@@ -1087,6 +1087,13 @@ public:
 Q_DECLARE_METATYPE(ScreenplayTrackItem)
 Q_DECLARE_METATYPE(QList<ScreenplayTrackItem>)
 
+struct ScreenplayTrackItemNamespace
+{
+    Q_GADGET
+    QML_FOREIGN_NAMESPACE(ScreenplayTrackItem)
+    QML_NAMED_ELEMENT(ScreenplayTrackItem)
+};
+
 struct ScreenplayTrack
 {
     Q_GADGET
@@ -1148,6 +1155,13 @@ public:
 };
 Q_DECLARE_METATYPE(ScreenplayTrack)
 Q_DECLARE_METATYPE(QList<ScreenplayTrack>)
+
+struct ScreenplayTrackNamespace
+{
+    Q_GADGET
+    QML_FOREIGN_NAMESPACE(ScreenplayTrack)
+    QML_NAMED_ELEMENT(ScreenplayTrack)
+};
 
 /**
  * Looks up scenes in a screenplay and determines tracks that it can overlay on top of scenes

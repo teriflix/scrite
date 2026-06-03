@@ -654,6 +654,13 @@ public:
 Q_DECLARE_METATYPE(UserMessageButton)
 Q_DECLARE_METATYPE(QList<UserMessageButton>)
 
+struct UserMessageButtonNamespace
+{
+    Q_GADGET
+    QML_FOREIGN_NAMESPACE(UserMessageButton)
+    QML_NAMED_ELEMENT(UserMessageButton)
+};
+
 struct UserMessage
 {
     Q_GADGET
@@ -748,6 +755,13 @@ public:
 };
 Q_DECLARE_METATYPE(UserMessage)
 Q_DECLARE_METATYPE(QList<UserMessage>)
+
+struct UserMessageNamespace
+{
+    Q_GADGET
+    QML_FOREIGN_NAMESPACE(UserMessage)
+    QML_NAMED_ELEMENT(UserMessage)
+};
 
 class User : public QObject
 {
