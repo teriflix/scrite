@@ -42,6 +42,6 @@ Item {
 
         visible: !Runtime.appFeatures.scrited.enabled
 
-        featureName: "Notebook"
+        featureName: "Scrited"
     }
 }

@@ -29,21 +29,24 @@ import "../notifications"
 Item {
     id: root
 
-    RowLayout {
+    Loader {
         anchors.fill: parent
 
-        VerticalToolBar {
-            Layout.fillHeight: true
+        active: Runtime.appFeatures.notebook.enabled
 
-            actions: ActionHub.notebookOperations
-            enabled: Runtime.dialogs.objectCount === 0
-        }
+        sourceComponent: RowLayout {
+            VerticalToolBar {
+                Layout.fillHeight: true
 
-        NotebookView {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+                actions: ActionHub.notebookOperations
+                enabled: Runtime.dialogs.objectCount === 0
+            }
 
-            enabled: Runtime.appFeatures.notebook.enabled
+            NotebookView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+            }
         }
     }
 

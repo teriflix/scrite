@@ -125,8 +125,8 @@ Item {
 
                 anchors.fill: parent
 
-                enabled: Runtime.appFeatures.structure.enabled && visible
-                visible: height > DelayedProperty.value
+                enabled: visible
+                visible: height > DelayedProperty.value && Runtime.appFeatures.structure.enabled
                 showCursor: Runtime.timelineViewSettings.showCursor && _screenplayEditor.hasFocus
                 showNotesIcon: Runtime.showNotebookInStructure
             }
@@ -137,7 +137,7 @@ Item {
                 elide: Text.ElideRight
                 horizontalAlignment: Text.AlignHCenter
                 text: "Timeline hidden due to space constraint."
-                visible: !_timeline.visible
+                visible: !_timeline.visible && Runtime.appFeatures.structure.enabled
                 width: _row2.width * 0.5
             }
 
@@ -188,11 +188,13 @@ Item {
 
                 sourceComponent: StructureView {
                     onEditorRequest: () => {
-                                          // TODO
+                                         // No need to implement, because currentIndex change in ScreenplayAdapter
+                                         // causes the editor to become visible anyway
                                      }
 
                     onReleaseEditorRequest: () => {
-                                                // TODO
+                                                // No need to implement, because currentIndex change in ScreenplayAdapter
+                                                // causes the editor to get released anyway
                                             }
                 }
             }
