@@ -1,5 +1,5 @@
 set(ECM_FOUND TRUE)
-set(ECM_VERSION "6.23.0")
+set(ECM_VERSION "6.28.0")
 
 if(DEFINED SCRITE_VENDORED_ECM_ROOT AND EXISTS "${SCRITE_VENDORED_ECM_ROOT}/modules/ECMSetupVersion.cmake")
   set(_scrite_ecm_root "${SCRITE_VENDORED_ECM_ROOT}")
