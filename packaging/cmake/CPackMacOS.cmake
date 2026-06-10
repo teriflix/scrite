@@ -15,3 +15,6 @@ set(CPACK_PACKAGE_FILE_NAME "Scrite-${PROJECT_VERSION}")
 
 # Install the app bundle into the root of the DMG staging area.
 install(TARGETS Scrite BUNDLE DESTINATION .)
+
+# Install LICENSE.txt to the root of the DMG
+install(FILES "${CMAKE_SOURCE_DIR}/packaging/assets/mac/license.txt" DESTINATION .)

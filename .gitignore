@@ -87,5 +87,6 @@ packaging/packaging.config.local
 packaging/packaging.config.local.bat
 packaging/_staging/
 packaging/assets/mac/background.png
+packaging/assets/*/license.txt
 binary/packages/
 

@@ -22,3 +22,7 @@ install(FILES
     "${CMAKE_SOURCE_DIR}/apps/desktop/images/appicon.png"
     DESTINATION share/icons/hicolor/512x512/apps
     RENAME Scrite.png)
+
+install(FILES
+    "${CMAKE_SOURCE_DIR}/packaging/assets/linux/license.txt"
+    DESTINATION share/doc/scrite)

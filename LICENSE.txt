@@ -1,3 +1,20 @@
+================================================================================
+SCRITE - LICENSING INFORMATION
+================================================================================
+
+Scrite Copyright (C) 2020-2026 Prashanth N Udupa
+Copyright (C) 2026-present IEDN Technologies Pvt. Ltd.
+All rights reserved.
+
+================================================================================
+SCRITE - GNU GENERAL PUBLIC LICENSE v3 (SOURCE CODE)
+================================================================================
+
+The source code of Scrite is licensed under the GNU General Public License
+version 3. This applies to all source code available on GitHub.
+
+See the full GPLv3 license text below.
+
 GNU GENERAL PUBLIC LICENSE
    Version 3, 29 June 2007
 
@@ -672,3 +689,245 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <https://www.gnu.org/licenses/why-not-lgpl.html>.
+
+================================================================================
+SCRITE COMMERCIAL BINARY LICENSE AGREEMENT
+================================================================================
+
+This license applies to precompiled binary distributions of Scrite offered
+by IEDN Technologies Pvt. Ltd., including those available via download,
+installer, or app store.
+
+1. GRANT OF LICENSE
+
+You are granted a non-exclusive, non-transferable license to use this
+precompiled binary for evaluation during a 30-day trial period. After the
+30-day trial expires, continued use of the software requires a paid
+subscription. Use of this software implies acceptance of these terms.
+
+2. TRIAL PERIOD
+
+A time-limited free trial period may be offered to new users, subject to
+the terms below. Availability of a trial is offered at our sole discretion.
+
+TRIAL AVAILABILITY: We reserve the right to limit, restrict, or deny free
+trial access to any user or device at any time, without notice or explanation.
+Continued or repeated misuse of the free trial may result in permanent denial
+of trial access. Access to a free trial is NOT guaranteed.
+
+TRIAL ACTIVATION: Certain information may be required to activate a free trial.
+Failure to provide valid information will result in trial access being withheld.
+
+TRIAL DURATION: If a trial is made available to you, it is for evaluation
+purposes only, to test the application and ensure compatibility with your
+computer. You may cancel at any time during the trial period.
+
+POST-TRIAL: After the trial period expires, continued use of the software
+and access to cloud features, web services, and authentication services
+requires a paid subscription plan.
+
+OFFICIAL BINARIES ONLY: Access to premium features and subscription benefits
+is contingent upon the use of the official, untampered binaries provided by
+us on https://www.scrite.io. We do not service or support binaries created
+by third parties from our source code, even if unmodified. Subscription
+benefits apply only to the latest version of official binaries.
+
+3. PROPRIETARY COMPONENTS
+
+This binary may include proprietary (closed-source) components, plugins,
+and features that are NOT part of the open-source GPLv3 version available
+on GitHub. These proprietary components may not be:
+  • Reverse engineered or decompiled
+  • Modified, adapted, or extended
+  • Distributed separately or included in derivative works
+  • Used for commercial purposes without explicit written consent
+
+4. OPEN SOURCE COMPONENTS
+
+This binary includes software licensed under the GNU General Public License
+v3 and other open-source licenses (LGPL, MIT, BSD). The complete source code
+for GPL and LGPL components is available at:
+  https://github.com/teriflix/scrite
+
+Users retain the right to download, build, and use the open-source version
+for free at any time.
+
+5. RESTRICTIONS
+
+You may not:
+  • Sublicense, sell, rent, lease, transfer, assign, or otherwise convey
+    this software
+  • Remove or alter any proprietary notices, labels, or marks
+  • Use this software to develop competing products or services
+  • Use this software on behalf of any third party without explicit consent
+
+6. SUBSCRIPTION AND PAYMENT
+
+Subscription fees, billing cycles, and cancellation policies are governed
+by the Subscription Agreement available at https://scrite.io/terms-of-use or as
+provided during purchase. Payment information is processed securely by our
+payment partners.
+
+7. CLOUD SERVICES AND API ACCESS
+
+Use of cloud features, user authentication, and web services requires valid
+API keys and active subscription credentials. These services are provided
+"as-is" and may be subject to:
+  • Rate limiting
+  • Service interruptions for maintenance
+  • Discontinuation with notice
+  • Modification of features or pricing
+
+8. USER RIGHTS REGARDING OPEN SOURCE
+
+This license does not restrict your rights under the GNU General Public
+License. You may always:
+  • Download the complete source code from GitHub
+  • Build and run the open-source version for free
+  • Modify the open-source version for personal use
+  • Redistribute modified versions under GPLv3
+
+The choice between using the open-source version or the commercial binary
+is entirely yours.
+
+9. PROPRIETARY PLUGINS (FUTURE)
+
+Official Scrite binaries may include proprietary plugins in future releases.
+These plugins will not be available in the open-source GPLv3 version. Such
+proprietary components will be subject to this Commercial Binary License and
+may only be used within the scope of an active subscription. Attempts to
+extract, reverse engineer, or redistribute these components are prohibited.
+
+10. DISCLAIMER OF WARRANTIES
+
+THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL
+IEDN TECHNOLOGIES OR ITS LICENSORS BE LIABLE FOR ANY CLAIM, DAMAGES, OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE,
+ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+11. LIMITATION OF LIABILITY
+
+To the maximum extent permitted by applicable law, in no event shall IEDN
+Technologies be liable for any indirect, incidental, special, consequential,
+or punitive damages, including lost profits, data loss, or business
+interruption, even if advised of the possibility of such damages.
+
+12. TERMINATION
+
+Your license is automatically terminated if you violate any terms of this
+agreement. Upon termination, you must cease all use of the proprietary
+components. Termination does not affect your rights under GPLv3 regarding
+the open-source version.
+
+13. GOVERNING LAW
+
+This agreement is governed by applicable laws, without regard to its conflict
+of law principles.
+
+================================================================================
+THIRD-PARTY LICENSES
+================================================================================
+
+Scrite is built using the following third-party libraries and components.
+The linking method (static or dynamic) is determined by each library's
+license terms to ensure compliance.
+
+COMPONENT SOURCES:
+
+  • Git Submodules: Source code fetched from external repositories as git submodules
+    (KDE Sonnet, OpenXLSX, QuaZip, Extra CMake Modules)
+
+  • Included in Repository: Source code included in thirdparty/ directory
+    (poly2tri, SimpleCrypt, phtranslator, OpenSSL, Quill, Curved-Arrows)
+
+  • Pre-installed: Expected to be pre-installed on the build system
+    (Qt Framework)
+
+  • Baked into Executable: JavaScript/resources compiled into the binary
+    (Quill, Curved-Arrows)
+
+DYNAMICALLY LINKED LIBRARIES:
+(License terms require dynamic linking to allow users to relink with modified versions)
+
+  • Qt Framework 6.11+
+    License: LGPL 3.0
+    Linking: Dynamic
+    Source: Pre-installed on build system (not in repository)
+    https://www.qt.io/
+
+  • KDE Sonnet (Spell Checking)
+    License: LGPL 2.1+
+    Linking: Dynamic
+    Source: Git submodule (https://invent.kde.org/frameworks/sonnet)
+    https://invent.kde.org/frameworks/sonnet
+
+  • phtranslator (Phonetic Translator)
+    License: LGPL 2.1
+    Linking: Dynamic
+    Source: Included in repository (thirdparty/dynamic/phtranslator)
+    https://phtranslator.sourceforge.net/
+
+  • OpenSSL (TLS/Cryptography)
+    License: Apache 2.0 + Original SSLeay License
+    Linking: Dynamic (pre-built binaries)
+    Source: Included in repository source (thirdparty/source/openssl) but not
+            built; pre-built DLLs bundled in official binaries
+    https://www.openssl.org/
+
+STATICALLY LINKED LIBRARIES:
+(License terms permit or explicitly allow static linking)
+
+  • QuaZip (ZIP Archive Support)
+    License: LGPL 2.1 with static linking exception
+    Linking: Static
+    Source: Git submodule (https://github.com/stachenov/quazip)
+    https://github.com/stachenov/quazip
+
+  • poly2tri (Polygon Triangulation)
+    License: BSD 3-Clause
+    Linking: Static
+    Source: Included in repository (thirdparty/static/poly2tri)
+    http://code.google.com/p/poly2tri/
+
+  • SimpleCrypt (Encryption Utility)
+    License: BSD 3-Clause
+    Linking: Static
+    Source: Included in repository (thirdparty/static/simplecrypt)
+    https://wiki.qt.io/Simple_encryption_with_SimpleCrypt
+
+  • OpenXLSX (Spreadsheet Support)
+    License: MIT
+    Linking: Static
+    Source: Git submodule (https://github.com/troldal/OpenXLSX)
+    https://github.com/troldal/OpenXLSX
+
+JAVASCRIPT PACKAGES:
+(Baked into executable as resources; loaded in WebView or executed as modules)
+
+  • Quill (Rich Text Editor)
+    License: BSD 3-Clause
+    Source: Baked into executable as resources (thirdparty/source/quill)
+    https://quilljs.com/
+
+  • Curved-Arrows (SVG Drawing Library)
+    License: MIT
+    Source: Baked into executable as resources (thirdparty/source/dragonman225-curved-arrows)
+    https://github.com/dragonman225/curved-arrows
+
+BUILD TOOLS:
+(Used during build process; not included in final binaries)
+
+  • Extra CMake Modules (KDE ECM)
+    License: BSD 3-Clause
+    Source: Git submodule (https://invent.kde.org/frameworks/extra-cmake-modules)
+    Purpose: CMake modules and macros for building with Qt and KDE frameworks
+    https://invent.kde.org/frameworks/extra-cmake-modules
+
+For complete license texts and additional information, please refer to the
+'thirdparty' directory in the source repository or visit the project
+website at https://scrite.io.
+
+================================================================================

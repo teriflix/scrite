@@ -48,6 +48,18 @@ if(APPLE)
   enable_language(OBJCXX)
 endif()
 
+# Copy LICENSE.txt to packaging directories for distribution
+# (Windows NSIS installer, macOS DMG, Linux AppImage)
+configure_file(LICENSE.txt
+               "${CMAKE_SOURCE_DIR}/packaging/assets/windows/license.txt"
+               COPYONLY)
+configure_file(LICENSE.txt
+               "${CMAKE_SOURCE_DIR}/packaging/assets/mac/license.txt"
+               COPYONLY)
+configure_file(LICENSE.txt
+               "${CMAKE_SOURCE_DIR}/packaging/assets/linux/license.txt"
+               COPYONLY)
+
 add_subdirectory(thirdparty)
 add_subdirectory(tools)
 add_subdirectory(apps)

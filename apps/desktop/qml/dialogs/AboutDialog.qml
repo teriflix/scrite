@@ -127,6 +127,17 @@ DialogLauncher {
                     }
 
                     Link {
+                        text: "License"
+                        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io/license/")
+                    }
+
+                    VclText {
+                        text: "•"
+                        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                    }
+
+                    Link {
                         text: "Refund Policy"
                         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                         onClicked: Qt.openUrlExternally("https://www.scrite.io/refund-and-cancellation-policy/")
