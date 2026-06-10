@@ -333,37 +333,7 @@ QVersionNumber Application::prepare()
 #endif
 
 #ifdef Q_OS_WIN
-    if (QSysInfo::WordSize == 32)
-        Application::setApplicationVersion(applicationVersionString + " (Windows 32-bit)");
-    else
-        Application::setApplicationVersion(applicationVersionString + " (Windows 64-bit)");
-#endif
-
-#ifdef Q_OS_WIN
-    Application::setAttribute(Qt::AA_UseDesktopOpenGL);
-
-    // Maybe helps address https://www.github.com/teriflix/scrite/issues/247
-    const QByteArray dpiMode = qgetenv("SCRITE_DPI_MODE").trimmed();
-    if (dpiMode.isEmpty()) {
-        const qreal uiScaleFactor =
-                Utils::SystemEnvironment::get(QLatin1String("SCRITE_UI_SCALE_FACTOR"),
-                                              QLatin1String("1.0"))
-                        .toDouble();
-        const QByteArray qtScaleFactor =
-                QByteArray::number(qRound(qBound(0.1, uiScaleFactor, 10.0) * 100) / 100.0);
-        Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
-        Application::setAttribute(Qt::AA_DisableHighDpiScaling);
-        Application::setAttribute(Qt::AA_Use96Dpi);
-        qputenv("QT_SCALE_FACTOR", qtScaleFactor);
-    } else {
-        if (dpiMode == QByteArrayLiteral("HIGH_DPI")) {
-            Application::setAttribute(Qt::AA_EnableHighDpiScaling);
-            Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
-        } else /*if (dpiMode == QByteArrayLiteral("96_DPI_ONLY"))*/ {
-            Application::setAttribute(Qt::AA_DisableHighDpiScaling);
-            Application::setAttribute(Qt::AA_Use96Dpi);
-        }
-    }
+    Application::setApplicationVersion(applicationVersionString + " (Windows 64-bit)");
 #endif
 
     QPalette palette = Application::palette();

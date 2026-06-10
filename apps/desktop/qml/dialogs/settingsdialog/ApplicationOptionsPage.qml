@@ -165,21 +165,8 @@ Item {
                     TabSequenceItem.sequence: 4
                     TabSequenceItem.manager: _tabSequence
 
-                    enabled: Platform.isWindowsDesktop
-                    text: Platform.isWindowsDesktop ? SystemEnvironment.get("SCRITE_UI_SCALE_FACTOR", "1.0") : "1.0"
-                    placeholderText: "Default: 1.0. Requires restart if changed."
-
-                    onEditingComplete: {
-                        var value = parseFloat(text)
-                        if(isNaN(value))
-                            value = 1.0
-
-                        value = Math.min(Math.max(0.1,value),10)
-                        value = Math.round(value*100)/100
-
-                        SystemEnvironment.remove("SCRITE_DPI_MODE")
-                        SystemEnvironment.set("SCRITE_UI_SCALE_FACTOR", ""+value)
-                    }
+                    enabled: false
+                    text: "Follows OS Settings"
                 }
 
                 VclLabel {
