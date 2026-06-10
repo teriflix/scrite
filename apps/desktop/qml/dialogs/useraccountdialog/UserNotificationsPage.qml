@@ -153,7 +153,7 @@ Item {
                         MouseArea {
                             anchors.fill: parent
 
-                            enabled: _buttonsRepeater.count === 1
+                            enabled: _buttonsRepeater.count >= 1
                             cursorShape: Qt.PointingHandCursor
                             onClicked: _buttonsRepeater.itemAt(0).handleClick()
                         }
