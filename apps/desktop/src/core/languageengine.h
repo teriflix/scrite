@@ -740,7 +740,7 @@ public:
                READ currentSuggestionIndex
                NOTIFY currentSuggestionIndexChanged)
     // clang-format on
-    int currentSuggestionIndex() const { return m_currentWord.m_currentSuggestionIndex; }
+    int currentSuggestionIndex() const { return m_currentWord.currentSuggestionIndex; }
     Q_SIGNAL void currentSuggestionIndexChanged();
 
     // clang-format off
@@ -778,7 +778,7 @@ private:
         QRect textRect;
         QString originalString;
         QStringList suggestions;
-        int m_currentSuggestionIndex = 0;
+        int currentSuggestionIndex = 0;
     } m_currentWord;
 
     bool m_enabled = false;

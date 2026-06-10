@@ -1750,14 +1750,13 @@ bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
             }
 
             if (keyEvent->key() == Qt::Key_Up) {
-                this->setCurrentSuggestionIndex(
-                        qMax(0, m_currentWord.m_currentSuggestionIndex - 1));
+                this->setCurrentSuggestionIndex(qMax(0, m_currentWord.currentSuggestionIndex - 1));
                 return false;
             }
 
             if (keyEvent->key() == Qt::Key_Down) {
                 this->setCurrentSuggestionIndex(qMin(m_currentWord.suggestions.size() - 1,
-                                                     m_currentWord.m_currentSuggestionIndex + 1));
+                                                     m_currentWord.currentSuggestionIndex + 1));
                 return false;
             }
 
@@ -1765,7 +1764,8 @@ bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
                 const QList<int> exceptions = { Qt::Key_Backspace, Qt::Key_Delete, Qt::Key_Shift,
                                                 Qt::Key_Control,   Qt::Key_Alt,    Qt::Key_Meta,
                                                 Qt::Key_CapsLock,  Qt::Key_NumLock };
-                if (exceptions.contains(keyEvent->key()))
+                if ((m_currentWord.originalString.isEmpty() && m_currentWord.suggestions.isEmpty())
+                    || exceptions.contains(keyEvent->key()))
                     return false;
 
                 this->commitWordToEditor();
@@ -1829,10 +1829,10 @@ bool LanguageTransliterator::commitWordToEditor()
     if (m_editor == nullptr || m_currentWord.originalString.isEmpty())
         return false;
 
-    const QString commitString = m_currentWord.m_currentSuggestionIndex < 0
-                    || m_currentWord.m_currentSuggestionIndex >= m_currentWord.suggestions.size()
+    const QString commitString = m_currentWord.currentSuggestionIndex < 0
+                    || m_currentWord.currentSuggestionIndex >= m_currentWord.suggestions.size()
             ? QString()
-            : m_currentWord.suggestions.at(m_currentWord.m_currentSuggestionIndex);
+            : m_currentWord.suggestions.at(m_currentWord.currentSuggestionIndex);
 
     if (commitString.isEmpty() || commitString == m_currentWord.originalString) {
         this->resetCurrentWord();
@@ -1861,7 +1861,7 @@ void LanguageTransliterator::resetCurrentWord()
     m_currentWord.suggestions.clear();
     emit suggestionsChanged();
 
-    m_currentWord.m_currentSuggestionIndex = -1;
+    m_currentWord.currentSuggestionIndex = -1;
     emit currentSuggestionIndexChanged();
 
     QTimer::singleShot(100, this, [=]() {
@@ -1888,7 +1888,7 @@ void LanguageTransliterator::setCurrentSuggestions(const QStringList &suggestion
         return;
 
     m_currentWord.suggestions = suggestions2;
-    m_currentWord.m_currentSuggestionIndex = 0;
+    m_currentWord.currentSuggestionIndex = 0;
 
     emit suggestionsChanged();
     emit currentSuggestionIndexChanged();
@@ -1896,10 +1896,10 @@ void LanguageTransliterator::setCurrentSuggestions(const QStringList &suggestion
 
 void LanguageTransliterator::setCurrentSuggestionIndex(int val)
 {
-    if (m_currentWord.m_currentSuggestionIndex == val)
+    if (m_currentWord.currentSuggestionIndex == val)
         return;
 
-    m_currentWord.m_currentSuggestionIndex = val;
+    m_currentWord.currentSuggestionIndex = val;
     emit currentSuggestionIndexChanged();
 }
 
