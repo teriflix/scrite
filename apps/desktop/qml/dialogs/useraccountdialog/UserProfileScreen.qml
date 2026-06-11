@@ -55,22 +55,28 @@ Item {
         text: {
             const options = _userProfilePageView.pagesArray
             let ret = ""
-            options.forEach(option => { if (option.length > ret.length) ret = option })
+            options.forEach(option => { if (option.title.length > ret.length) ret = option.title })
             return ret
         }
     }
 
     PageView {
         id: _userProfilePageView
+
         anchors.fill: parent
 
         Announcement.onIncoming: (type, data) => {
                                      if(type === Runtime.announcementIds.userProfileScreenPage) {
-                                         currentIndex = Math.max(0, pagesArray.indexOf(data))
+                                         currentIndex = Math.max(0, _userProfilePageView.indexOfPage(data))
                                      }
                                  }
 
-        pagesArray: ["Profile", "Subscriptions", "Installations", "Notifications"]
+        pagesArray: [ {"title": "Profile", "counter": 0},
+                      {"title": "Subscriptions", "counter": 0},
+                      {"title": "Installations"},
+                      {"title": "Notifications", "counter": Scrite.user.unreadMessageCount} ]
+        pageTitleRole: "title"
+        pageCounterRole: "counter"
         currentIndex: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription ? 0 : 1
         maxPageListWidth: _pageNameMetrics.advanceWidth + 50
         pageContent: {

@@ -763,6 +763,7 @@ struct UserMessageNamespace
     QML_NAMED_ELEMENT(UserMessage)
 };
 
+class UserMeRestApiCall;
 class User : public QObject
 {
     Q_OBJECT
@@ -881,6 +882,8 @@ protected:
     void childEvent(QChildEvent *e);
 
 private:
+    friend class UserMeRestApiCall;
+
     UserInfo m_info;
     QList<UserMessage> m_messages;
     QTimer *m_checkForMessagesTimer = nullptr;

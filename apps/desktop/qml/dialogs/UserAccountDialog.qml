@@ -28,8 +28,6 @@ import "../globals"
 import "../controls"
 import "../helpers"
 
-// TODO: Needs to be reviewed and tested.
-
 Item {
     id: root
 

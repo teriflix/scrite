@@ -42,9 +42,18 @@ Rectangle {
     property real maxPageListWidth: 220
     property real pageListWidth: Math.max(width * 0.2, maxPageListWidth)
 
+    property bool highlightPageWithCounter: pageCounterRole !== ""
     property string pageTitleRole
+    property string pageCounterRole // Can be used to show count of unread messages for example
 
     color: Runtime.colors.primary.c50.background
+
+    function indexOfPage(pageTitle) {
+        for(var i=0; i<_pageRepeater.count; i++)
+            if(_pageRepeater.itemAt(i).pageTitle === pageTitle)
+                return i
+        return -1
+    }
 
     RowLayout {
         anchors.fill: parent
@@ -95,6 +104,10 @@ Rectangle {
                         required property int index
                         required property var modelData
 
+                        property int pageCounter: root.pageCounterRole === "" ? -1 : (_pageRepeaterDelegate.modelData[root.pageCounterRole] !== undefined ?
+                                                                                          parseInt(_pageRepeaterDelegate.modelData[root.pageCounterRole]) : -1)
+                        property string pageTitle: root.pageTitleRole === "" ? _pageRepeaterDelegate.modelData : _pageRepeaterDelegate.modelData[root.pageTitleRole]
+
                         Layout.fillWidth: true
                         Layout.preferredHeight: _pageLabel.height*1.25
 
@@ -109,24 +122,77 @@ Rectangle {
                             anchors.right: parent.right
                         }
 
-                        VclLabel {
-                            id: _pageLabel
-
+                        RowLayout {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.leftMargin: 5
                             anchors.rightMargin: 24
                             anchors.verticalCenter: parent.verticalCenter
 
-                            text: root.pageTitleRole === "" ? _pageRepeaterDelegate.modelData : _pageRepeaterDelegate.modelData[root.pageTitleRole]
-                            color: _pageList.currentIndex === _pageRepeaterDelegate.index ? Runtime.colors.primary.c50.text : Runtime.colors.accent.c600.text
-                            elide: Text.ElideMiddle
-                            horizontalAlignment: Text.AlignRight
-                            topPadding: 6
-                            bottomPadding: 6
+                            Item {
+                                Layout.fillWidth: true
 
-                            font.bold: _pageList.currentIndex === _pageRepeaterDelegate.index
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                                Rectangle {
+                                    id: _counterCircle
+
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.right: parent.right
+
+                                    width: Math.max(_pageCounter.width,_pageCounter.height)
+                                    height: width
+                                    radius: width/2
+
+                                    color: _pageList.currentIndex === _pageRepeaterDelegate.index ? Runtime.colors.primary.c50.text : Runtime.colors.accent.c600.text
+                                    visible: _pageRepeaterDelegate.pageCounter > 0
+
+                                    VclLabel {
+                                        id: _pageCounter
+
+                                        anchors.centerIn: parent
+
+                                        text: _pageRepeaterDelegate.pageCounter
+                                        color: Color.textColorFor(parent.color)
+                                        padding: 4
+                                    }
+
+                                    SequentialAnimation {
+                                        id: _counterHighlightAnimation
+
+                                        loops: 2
+
+                                        NumberAnimation { target: _counterCircle; property: "scale"; from: 1.0; to: 1.5; duration: 400; easing.type: Easing.OutQuad }
+                                        NumberAnimation { target: _counterCircle; property: "scale"; from: 1.5; to: 1.0; duration: 600; easing.type: Easing.InQuad }
+                                    }
+
+                                    Component.onCompleted: {
+                                        if(_pageRepeaterDelegate.pageCounter > 0 && root.highlightPageWithCounter)
+                                            _counterHighlightAnimation.start()
+                                    }
+
+                                    Connections {
+                                        target: Qt.application
+                                        function onStateChanged() {
+                                            if(Qt.application.state === Qt.ApplicationActive &&
+                                                    _pageRepeaterDelegate.pageCounter > 0 && root.highlightPageWithCounter)
+                                                _counterHighlightAnimation.restart()
+                                        }
+                                    }
+                                }
+                            }
+
+                            VclLabel {
+                                id: _pageLabel
+
+                                text: _pageRepeaterDelegate.pageTitle
+                                color: _pageList.currentIndex === _pageRepeaterDelegate.index ? Runtime.colors.primary.c50.text : Runtime.colors.accent.c600.text
+                                elide: Text.ElideMiddle
+                                horizontalAlignment: Text.AlignRight
+                                topPadding: 6
+                                bottomPadding: 6
+
+                                font.bold: _pageList.currentIndex === _pageRepeaterDelegate.index
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                            }
                         }
 
                         Image {
