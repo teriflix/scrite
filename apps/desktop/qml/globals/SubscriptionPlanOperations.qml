@@ -376,11 +376,16 @@ Item {
         id: _private
 
         property Component planActivationApi: SubscriptionPlanActivationRestApiCall {
+            property var plan // Should ideally be scriteUserSubscriptionPlanInfo
             property VclDialog waitDialog
+
             onJustIssuedCall: waitDialog = WaitDialog.launch("Activating plan ...")
+
             onFinished: {
                 waitDialog.close()
                 if(hasError) {
+                    if(plan.kind === "trial")
+                        Runtime.errorWhileActivatingTrial = true
                     MessageBox.information("Error", errorMessage)
                 } else {
                     UserAccountDialog.launch("Subscriptions")
@@ -391,6 +396,7 @@ Item {
         function subscribeTo(plan, callList) {
             if(plan.action.kind === "get") {
                 let api = planActivationApi.createObject(_private)
+                api.plan = plan
                 api.activationApi = plan.action.api
                 api.finished.connect(api.destroy)
                 if( !api.call() ) {

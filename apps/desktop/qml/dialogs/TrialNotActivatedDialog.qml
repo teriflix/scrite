@@ -33,7 +33,9 @@ DialogLauncher {
     id: root
 
     function launch() {
-        if(!Scrite.user.loggedIn || Scrite.user.info.hasTrialSubscription || Scrite.user.info.hasActiveSubscription || Runtime.requiresUserOnboarding())
+        if(!Scrite.user.loggedIn || Scrite.user.info.hasTrialSubscription ||
+            Scrite.user.info.hasActiveSubscription || Runtime.requiresUserOnboarding() ||
+            Runtime.errorWhileActivatingTrial === true)
             return null
 
         return doLaunch()

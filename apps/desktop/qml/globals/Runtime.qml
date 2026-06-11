@@ -56,6 +56,7 @@ Item {
     property bool allowAppUsage: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
     property bool canShowNotebookInStructure: width > minWindowWidthForShowingNotebookInStructure
     property bool currentUseSoftwareRenderer
+    property bool errorWhileActivatingTrial: false
     property bool loadMainUiContent: true
     property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
 
