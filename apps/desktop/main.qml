@@ -90,7 +90,33 @@ ApplicationWindow {
             // Raise window
             Scrite.window.raise()
 
-            // Show initial UI
+            // Check for legacy NSIS install (production Windows only).
+            // Scrite.prelaunchChecks() returns false if one is found; QML shows the error.
+            if (!Scrite.prelaunchChecks()) {
+                MessageBox.information(
+                    "Previous Version Detected",
+                    "A previous version of Scrite is installed on this computer.\n\n" +
+                    "Please uninstall it via \"Add or Remove Programs\" in Windows Settings " +
+                    "before running this version.",
+                    Qt.quit)
+                return
+            }
+
+            // Show the license dialog on first launch of each new version.
+            if (!Scrite.isLicenseAccepted()) {
+                var dlg = LicenseDialog.launch()
+                if (dlg)
+                    dlg.accepted.connect(_private.continueAfterLicense)
+                else
+                    _private.continueAfterLicense()
+                return
+            }
+
+            _private.continueAfterLicense()
+        }
+
+        function continueAfterLicense() {
+            // Show initial UI — user login check happens here
             if(Scrite.user.loggedIn) {
                 if(Runtime.allowAppUsage)
                     showHomeScreenOrOpenFile()

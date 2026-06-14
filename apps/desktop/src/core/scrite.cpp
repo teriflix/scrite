@@ -17,6 +17,8 @@
 
 #include "user.h"
 #include "quazip.h"
+#include <QFile>
+#include <QSettings>
 #include "appwindow.h"
 #include "quazipfile.h"
 #include "restapicall.h"
@@ -112,6 +114,47 @@ Locale Scrite::locale()
     ret.country.name = locale.nativeTerritoryName();
 
     return ret;
+}
+
+bool Scrite::prelaunchChecks()
+{
+#if defined(Q_OS_WIN) && defined(SCRITE_PRODUCTION_BUILD)
+    // Return false if a legacy NSIS-installed version of Scrite is present.
+    // The caller (QML) is responsible for showing an error dialog and quitting.
+    const char *const nsisRegPaths[] = {
+        "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Scrite",
+        "HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion"
+        "\\Uninstall\\Scrite",
+    };
+    for (const char *regPath : nsisRegPaths) {
+        const QSettings reg(QLatin1String(regPath), QSettings::NativeFormat);
+        if (!reg.value(QStringLiteral("UninstallString")).toString().isEmpty())
+            return false;
+    }
+#endif
+    return true;
+}
+
+bool Scrite::isLicenseAccepted()
+{
+    QSettings settings;
+    return settings.value(QStringLiteral("LicenseAccepted/") + QStringLiteral(SCRITE_VERSION),
+                          false)
+            .toBool();
+}
+
+void Scrite::acceptLicense()
+{
+    QSettings settings;
+    settings.setValue(QStringLiteral("LicenseAccepted/") + QStringLiteral(SCRITE_VERSION), true);
+}
+
+QString Scrite::licenseText()
+{
+    QFile file(QStringLiteral(":/LICENSE.txt"));
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return QString::fromUtf8(file.readAll());
+    return QString();
 }
 
 QString Scrite::currencySymbol(const QString &code)

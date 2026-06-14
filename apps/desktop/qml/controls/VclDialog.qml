@@ -233,17 +233,13 @@ Dialog {
         }
     }
 
+    background: Rectangle { color: Runtime.colors.primary.c100.background }
+
     // Private section
     Announcement.onIncoming: (type,data) => {
                                  if(root.closeOnDragDrop && type === Runtime.announcementIds.closeDialogBoxRequest)
                                     root.close()
                              }
-
-    Component.onCompleted: {
-        if(root.backdrop) {
-            background = _customBackground.createObject(root)
-        }
-    }
 
     QtObject {
         id: _private
@@ -278,22 +274,6 @@ Dialog {
 
                     onActivated: Runtime.language.setActiveCode(_languageDelegate.language.code)
                 }
-            }
-        }
-    }
-
-    Component {
-        id: _customBackground
-
-        Loader {
-            width: root.width
-            height: root.height
-
-            sourceComponent: root.backdrop
-            active: root.visible
-
-            BoxShadow {
-                anchors.fill: parent
             }
         }
     }

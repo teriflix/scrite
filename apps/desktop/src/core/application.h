@@ -48,7 +48,6 @@ class Application : public QApplication
 
 public:
     static QVersionNumber prepare();
-    static bool prelaunch(int argc, char **argv);
     static Application *instance();
 
     explicit Application(int &argc, char **argv, const QVersionNumber &version);
@@ -242,7 +241,7 @@ private:
 #endif
     QSettings *m_settings = nullptr;
     QUndoGroup *m_undoGroup = new QUndoGroup(this);
-    int m_idealFontPointSize = 12;
+    int m_idealFontPointSize = 10;
     int m_customFontPointSize = 0;
     QString m_baseWindowTitle;
     ErrorReport *m_errorReport = new ErrorReport(this);

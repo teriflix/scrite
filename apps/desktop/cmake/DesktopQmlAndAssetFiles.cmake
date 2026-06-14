@@ -289,6 +289,7 @@ set(SCRITE_DESKTOP_SINGLETON_QML_FILES
   "qml/dialogs/JoinDiscordCommunity.qml"
   "qml/dialogs/JumpToSceneNumberDialog.qml"
   "qml/dialogs/LanguageOptionsDialog.qml"
+  "qml/dialogs/LicenseDialog.qml"
   "qml/dialogs/MessageBox.qml"
   "qml/dialogs/PdfDialog.qml"
   "qml/dialogs/RenameCharacterDialog.qml"

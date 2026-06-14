@@ -19,7 +19,8 @@ This document contains three sections:
 2. Commercial Binary License — Governs official precompiled releases of
    Scrite distributed by IEDN Technologies Pvt. Ltd. (installers, app store
    builds). By installing or running an IEDN-distributed release, you agree
-   to the terms of this license.
+   to the terms of this license, along with our Terms of Use, Privacy Policy,
+   and Cancellation Policy available at https://www.scrite.io.
 
 3. Third-Party Licenses — Lists the open-source libraries and components
    bundled with Scrite, along with their respective license terms.
@@ -725,7 +726,9 @@ installer, or app store.
 You are granted a non-exclusive, non-transferable license to use this
 precompiled binary for evaluation during a 30-day trial period. After the
 30-day trial expires, continued use of the software requires a paid
-subscription. Use of this software implies acceptance of these terms.
+subscription. Use of this software implies acceptance of these terms, as
+well as our Terms of Use, Privacy Policy, and Cancellation Policy (see
+Section 6).
 
 2. TRIAL PERIOD
 
@@ -785,10 +788,17 @@ You may not:
 
 6. SUBSCRIPTION AND PAYMENT
 
-Subscription fees, billing cycles, and cancellation policies are governed
-by the Subscription Agreement available at https://scrite.io/terms-of-use or as
-provided during purchase. Payment information is processed securely by our
-payment partners.
+Subscription fees, billing cycles, and cancellation terms are governed by
+the following policies available on our website. By accepting this agreement,
+you also agree to the terms set out at each of these URLs:
+
+  Terms of Use:         https://www.scrite.io/terms-of-use/
+  Privacy Policy:       https://www.scrite.io/privacy-policy/
+  Cancellation Policy:  https://www.scrite.io/refund-and-cancellation-policy/
+
+Payment information is processed securely by our payment partners. These
+online policies may be updated from time to time; continued use of the
+software constitutes acceptance of the current versions.
 
 7. CLOUD SERVICES AND API ACCESS
 

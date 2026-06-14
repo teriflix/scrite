@@ -28,17 +28,6 @@
 #include "crashpadmodule.h"
 #endif
 
-// Needed for the pre-launch license dialog (all builds).
-#include <QFile>
-#include <QLabel>
-#include <QPixmap>
-#include <QDialog>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QFontMetrics>
-#include <QPlainTextEdit>
-#include <QDialogButtonBox>
-
 // Needed for MSIX AppData path translation (production Windows builds only).
 #if defined(Q_OS_WIN) && defined(SCRITE_PRODUCTION_BUILD)
 #include <appmodel.h>
@@ -395,154 +384,6 @@ QVersionNumber Application::prepare()
     Application::setPalette(palette);
 
     return applicationVersion;
-}
-
-bool Application::prelaunch(int argc, char **argv)
-{
-    // Set application metadata before constructing the temporary QApplication so
-    // QSettings resolves to the correct path. Application::prepare() re-applies
-    // these when it runs after this function returns (it detects qApp == nullptr).
-    QCoreApplication::setApplicationName(QStringLiteral("Scrite"));
-#ifdef SCRITE_PRODUCTION_BUILD
-    QCoreApplication::setOrganizationName(QStringLiteral("IEDN Technologies"));
-#else
-    QCoreApplication::setOrganizationName(QStringLiteral("Scrite"));
-#endif
-    QCoreApplication::setOrganizationDomain(QStringLiteral("scrite.io"));
-
-    // A live QApplication is required to show dialogs. Qt supports constructing a
-    // new QApplication after this one is destroyed, so main() can safely create
-    // the real Application instance once this function returns.
-    QApplication preApp(argc, argv);
-
-    QFontDatabase::addApplicationFont(QStringLiteral(":/fonts/Rubik/Rubik-Bold.ttf"));
-    QFontDatabase::addApplicationFont(QStringLiteral(":/fonts/Rubik/Rubik-Regular.ttf"));
-    QFontDatabase::addApplicationFont(
-            QStringLiteral(":/fonts/English/CourierPrime-Regular.ttf"));
-
-#if defined(Q_OS_WIN) && defined(SCRITE_PRODUCTION_BUILD)
-    // If a legacy NSIS-installed version of Scrite is present, insist the user
-    // uninstalls it first. Both the native 64-bit hive and the WOW64 hive are
-    // checked; a non-empty UninstallString in either one is sufficient.
-    const char *const nsisRegPaths[] = {
-        "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Scrite",
-        "HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion"
-        "\\Uninstall\\Scrite",
-    };
-    for (const char *regPath : nsisRegPaths) {
-        const QSettings reg(QLatin1String(regPath), QSettings::NativeFormat);
-        if (!reg.value(QStringLiteral("UninstallString")).toString().isEmpty()) {
-            QMessageBox::warning(
-                    nullptr, QStringLiteral("Previous Version Detected"),
-                    QStringLiteral("A previous version of Scrite was found on this computer.\n\n"
-                                   "Please uninstall it via \"Add or Remove Programs\" in Windows "
-                                   "Settings before running this version."));
-            return false;
-        }
-    }
-#endif // Q_OS_WIN && SCRITE_PRODUCTION_BUILD
-
-    // Show the license agreement once per application version. Acceptance is stored
-    // in platform-native QSettings (registry on Windows, plist on macOS) so it
-    // persists across launches without touching the AppDataLocation folder.
-    QSettings settings;
-    const QString licenseKey =
-            QStringLiteral("LicenseAccepted/") + QStringLiteral(SCRITE_VERSION);
-
-    if (!settings.value(licenseKey, false).toBool()) {
-        QFile licenseFile(QStringLiteral(":/LICENSE.txt"));
-        QString licenseText;
-        if (licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))
-            licenseText = QString::fromUtf8(licenseFile.readAll());
-
-        QString versionStr = QStringLiteral(SCRITE_VERSION);
-        const QString verType = QStringLiteral(SCRITE_VERSION_TYPE);
-        if (!verType.isEmpty())
-            versionStr += QStringLiteral("-") + verType;
-
-        QDialog dialog;
-        dialog.setWindowTitle(QStringLiteral("Scrite ") + versionStr);
-
-        QVBoxLayout *mainLayout = new QVBoxLayout(&dialog);
-        mainLayout->setContentsMargins(0, 0, 0, 0);
-        mainLayout->setSpacing(0);
-
-        // Blue header with app icon and welcome text.
-        QWidget *header = new QWidget(&dialog);
-        header->setObjectName(QStringLiteral("licenseHeader"));
-        header->setFixedHeight(100);
-        header->setStyleSheet(QStringLiteral(
-                "QWidget#licenseHeader { background-color: white; border-bottom: 1px solid gray; }"));
-
-        QHBoxLayout *headerLayout = new QHBoxLayout(header);
-        headerLayout->setContentsMargins(16, 16, 16, 16);
-        headerLayout->setSpacing(12);
-
-        QLabel *iconLabel = new QLabel(header);
-        const QPixmap appIcon(QStringLiteral(":/images/appicon.png"));
-        iconLabel->setPixmap(
-                appIcon.scaled(56, 56, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-        iconLabel->setFixedSize(56, 56);
-        headerLayout->addWidget(iconLabel);
-
-        QVBoxLayout *titleLayout = new QVBoxLayout;
-        titleLayout->setSpacing(2);
-
-        QLabel *welcomeLabel = new QLabel(QStringLiteral("Welcome to Scrite"), header);
-        welcomeLabel->setFont(QFont(QStringLiteral("Rubik"), 22, QFont::Bold));
-        welcomeLabel->setStyleSheet(QStringLiteral("color: black; background: transparent;"));
-        titleLayout->addWidget(welcomeLabel);
-
-        QLabel *versionLabel = new QLabel(QStringLiteral("Version ") + versionStr, header);
-        versionLabel->setFont(QFont(QStringLiteral("Rubik"), 11));
-        versionLabel->setStyleSheet(QStringLiteral("color: #5d208e; background: transparent;"));
-        titleLayout->addWidget(versionLabel);
-
-        headerLayout->addLayout(titleLayout);
-        headerLayout->addStretch();
-        mainLayout->addWidget(header);
-
-        // Body with license text and Accept/Decline buttons.
-        QWidget *body = new QWidget(&dialog);
-        QVBoxLayout *bodyLayout = new QVBoxLayout(body);
-        bodyLayout->setContentsMargins(16, 12, 16, 12);
-        bodyLayout->setSpacing(8);
-
-        QLabel *instrLabel = new QLabel(
-                QStringLiteral(
-                        "Please read and accept the following license agreement to use Scrite:"),
-                body);
-        instrLabel->setWordWrap(true);
-        bodyLayout->addWidget(instrLabel);
-
-        QFont monoFont(QStringLiteral("Courier Prime"), 10);
-        monoFont.setStyleHint(QFont::TypeWriter);
-
-        QPlainTextEdit *textEdit = new QPlainTextEdit(licenseText, body);
-        textEdit->setReadOnly(true);
-        textEdit->setWordWrapMode(QTextOption::NoWrap);
-        textEdit->setFont(monoFont);
-        textEdit->setMinimumWidth(QFontMetrics(monoFont).horizontalAdvance(QLatin1Char('M')) * 84);
-        textEdit->setMinimumHeight(400);
-        textEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        bodyLayout->addWidget(textEdit);
-
-        QDialogButtonBox *buttons = new QDialogButtonBox(body);
-        buttons->addButton(QStringLiteral("Accept"), QDialogButtonBox::AcceptRole);
-        buttons->addButton(QStringLiteral("Decline"), QDialogButtonBox::RejectRole);
-        QObject::connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
-        QObject::connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
-        bodyLayout->addWidget(buttons);
-
-        mainLayout->addWidget(body);
-
-        if (dialog.exec() != QDialog::Accepted)
-            return false;
-
-        settings.setValue(licenseKey, true);
-    }
-
-    return true;
 }
 
 Application::~Application()
@@ -979,7 +820,7 @@ void Application::computeIdealFontPointSize()
         fontPointSize = m_customFontPointSize;
     else {
 #ifndef Q_OS_MAC
-        fontPointSize = 12;
+        fontPointSize = 10;
 #else
         const qreal minInch = 0.12; // Font should occupy atleast 0.12 inches on the screen
         const qreal nrPointsPerInch =
@@ -1074,7 +915,9 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
 
     const QStringList geometry = geometryString.split(QStringLiteral(" "), Qt::SkipEmptyParts);
     if (geometry.length() != 4) {
-        window->setGeometry(screenGeo);
+        // No saved geometry — first launch. Use showMaximized() so the OS/window manager
+        // places the window correctly, including title bar within the available area.
+        QTimer::singleShot(100, window, &QWindow::showMaximized);
         return false;
     }
 

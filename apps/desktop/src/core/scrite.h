@@ -262,6 +262,11 @@ public:
     // clang-format on
     static Locale locale();
 
+    Q_INVOKABLE static bool prelaunchChecks();
+    Q_INVOKABLE static bool isLicenseAccepted();
+    Q_INVOKABLE static void acceptLicense();
+    Q_INVOKABLE static QString licenseText();
+
     Q_INVOKABLE static QString currencySymbol(const QString &code);
 
     Q_INVOKABLE static bool isFeatureEnabled(Scrite::AppFeature feature,
