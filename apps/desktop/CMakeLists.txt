@@ -58,12 +58,29 @@ target_sources(Scrite PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/src/crashpad/CrashRecoveryDialog.ui"
 )
 
+# Production-only startup checks: NSIS migration guard, license acceptance, and
+# IEDN Technologies org name. Pass -DSCRITE_PRODUCTION_BUILD=ON from the
+# production build system (which lives outside this repository). Open-source
+# builds leave this OFF and continue to use "Scrite" as the organization name.
+option(SCRITE_PRODUCTION_BUILD
+       "Enable production-only startup checks and IEDN org name"
+       OFF)
+
 target_compile_definitions(Scrite PRIVATE
   SCRITE_VERSION="${PROJECT_VERSION}"
   SCRITE_VERSION_TYPE="${SCRITE_VERSION_TYPE}"
   SCRITE_QML_URI="io.scrite.components"
   $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
+  $<$<BOOL:${SCRITE_PRODUCTION_BUILD}>:SCRITE_PRODUCTION_BUILD>
 )
+
+if(SCRITE_PRODUCTION_BUILD)
+  qt_add_resources(Scrite "production_resources"
+    PREFIX "/"
+    BASE "${CMAKE_SOURCE_DIR}"
+    FILES "${CMAKE_SOURCE_DIR}/LICENSE.txt"
+  )
+endif()
 
 target_include_directories(Scrite PRIVATE
   "${CMAKE_SOURCE_DIR}"
@@ -179,6 +196,18 @@ if(APPLE)
 endif()
 
 if(WIN32)
+  # version.rc.in is not part of this open-source repository. The production
+  # build system places it here before running CMake, at which point it is
+  # picked up automatically to embed PE version metadata in the executable.
+  # Open-source builds simply omit the version resource.
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in")
+    configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/version.rc"
+      @ONLY
+    )
+    target_sources(Scrite PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/version.rc")
+  endif()
   target_sources(Scrite PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/appicon.rc")
   target_link_libraries(Scrite PRIVATE User32)
   target_compile_options(Scrite PRIVATE

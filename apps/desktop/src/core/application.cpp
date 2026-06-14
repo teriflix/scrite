@@ -28,6 +28,16 @@
 #include "crashpadmodule.h"
 #endif
 
+#ifdef SCRITE_PRODUCTION_BUILD
+#include <QFile>
+#include <QLabel>
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QFontMetrics>
+#include <QPlainTextEdit>
+#include <QDialogButtonBox>
+#endif
+
 #include <QDir>
 #include <QUuid>
 #include <QtMath>
@@ -305,22 +315,57 @@ QVersionNumber Application::prepare()
     qInstallMessageHandler(ApplicationQtMessageHandler);
 
     Application::setApplicationName(QStringLiteral("Scrite"));
-    Application::setOrganizationName(QStringLiteral("IEDN Technologies Pvt. Ltd."));
+
+    // SCRITE_PRODUCTION_BUILD is set via -DSCRITE_PRODUCTION_BUILD=ON at CMake
+    // configure time by the production build system (external to this repo).
+    // Production builds use "IEDN Technologies" as the org name and
+    // migrate data from every prior org (oldest first so newest data wins).
+    // Open-source builds leave this flag unset and keep "Scrite" as the org name.
+    struct LegacyOrg {
+        const char *name;
+        const char *domain;
+    };
+#ifdef SCRITE_PRODUCTION_BUILD
+    // Org history: TERIFLIX → VCreate Logic Pvt. Ltd. → Scrite → IEDN Technologies
+    const LegacyOrg legacyOrgs[] = {
+        { "TERIFLIX", "teriflix.com" },
+        { "VCreate Logic Pvt. Ltd.", "vcreatelogic.com" },
+        { "Scrite", "scrite.io" },
+    };
+    Application::setOrganizationName(QStringLiteral("IEDN Technologies"));
     Application::setOrganizationDomain(QStringLiteral("scrite.io"));
-
-    const QDir oldAppDataFolder =
-            QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
-
+#else
+    // Org history: TERIFLIX → VCreate Logic Pvt. Ltd. → Scrite (current)
+    const LegacyOrg legacyOrgs[] = {
+        { "TERIFLIX", "teriflix.com" },
+        { "VCreate Logic Pvt. Ltd.", "vcreatelogic.com" },
+    };
     Application::setOrganizationName(QStringLiteral("Scrite"));
     Application::setOrganizationDomain(QStringLiteral("scrite.io"));
+#endif
 
-    if (oldAppDataFolder.exists()) {
-        const QString newAppDataPath =
-                QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-        QDir().mkpath(newAppDataPath);
-        copyFilesRecursively(oldAppDataFolder, QDir(newAppDataPath));
-        QDir(oldAppDataFolder).removeRecursively();
+    const QString targetAppDataPath =
+            QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
+    for (const LegacyOrg &legacy : legacyOrgs) {
+        Application::setOrganizationName(QLatin1String(legacy.name));
+        Application::setOrganizationDomain(QLatin1String(legacy.domain));
+        const QDir legacyDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+        if (legacyDir.exists()) {
+            QDir().mkpath(targetAppDataPath);
+            copyFilesRecursively(legacyDir, QDir(targetAppDataPath));
+            QDir(legacyDir).removeRecursively();
+        }
     }
+
+    // Restore the target org name after the migration loop changed it.
+#ifdef SCRITE_PRODUCTION_BUILD
+    Application::setOrganizationName(QStringLiteral("IEDN Technologies"));
+    Application::setOrganizationDomain(QStringLiteral("scrite.io"));
+#else
+    Application::setOrganizationName(QStringLiteral("Scrite"));
+    Application::setOrganizationDomain(QStringLiteral("scrite.io"));
+#endif
 
 #ifdef Q_OS_UNIX
     Application::setApplicationVersion(applicationVersionString + " (GNU Linux)");
@@ -343,6 +388,100 @@ QVersionNumber Application::prepare()
     Application::setPalette(palette);
 
     return applicationVersion;
+}
+
+bool Application::prelaunch(int argc, char **argv)
+{
+#ifndef SCRITE_PRODUCTION_BUILD
+    Q_UNUSED(argc)
+    Q_UNUSED(argv)
+    return true;
+#else
+    // Set application metadata before constructing the temporary QApplication so
+    // QSettings resolves to the correct path. Application::prepare() re-applies
+    // these when it runs after this function returns (it detects qApp == nullptr).
+    QCoreApplication::setApplicationName(QStringLiteral("Scrite"));
+    QCoreApplication::setOrganizationName(QStringLiteral("IEDN Technologies"));
+    QCoreApplication::setOrganizationDomain(QStringLiteral("scrite.io"));
+
+    // A live QApplication is required to show dialogs. Qt supports constructing a
+    // new QApplication after this one is destroyed, so main() can safely create
+    // the real Application instance once this function returns.
+    QApplication preApp(argc, argv);
+
+#ifdef Q_OS_WIN
+    // If a legacy NSIS-installed version of Scrite is present, insist the user
+    // uninstalls it first. Both the native 64-bit hive and the WOW64 hive are
+    // checked; a non-empty UninstallString in either one is sufficient.
+    const char *const nsisRegPaths[] = {
+        "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Scrite",
+        "HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion"
+        "\\Uninstall\\Scrite",
+    };
+    for (const char *regPath : nsisRegPaths) {
+        const QSettings reg(QLatin1String(regPath), QSettings::NativeFormat);
+        if (!reg.value(QStringLiteral("UninstallString")).toString().isEmpty()) {
+            QMessageBox::warning(
+                    nullptr, QStringLiteral("Previous Version Detected"),
+                    QStringLiteral("A previous version of Scrite was found on this computer.\n\n"
+                                   "Please uninstall it via \"Add or Remove Programs\" in Windows "
+                                   "Settings before running this version."));
+            return false;
+        }
+    }
+#endif // Q_OS_WIN
+
+    // Show the license agreement once per application version. Acceptance is stored
+    // in QSettings under the IEDN org so it persists across launches.
+    QSettings settings;
+    const QString licenseKey =
+            QStringLiteral("LicenseAccepted/") + QStringLiteral(SCRITE_VERSION);
+
+    if (!settings.value(licenseKey, false).toBool()) {
+        QFile licenseFile(QStringLiteral(":/LICENSE.txt"));
+        QString licenseText;
+        if (licenseFile.open(QIODevice::ReadOnly | QIODevice::Text))
+            licenseText = QString::fromUtf8(licenseFile.readAll());
+
+        QDialog dialog;
+        dialog.setWindowTitle(QStringLiteral("License Agreement — Scrite"));
+
+        QVBoxLayout *layout = new QVBoxLayout(&dialog);
+
+        QLabel *label = new QLabel(
+                QStringLiteral(
+                        "Please read and accept the following license agreement to use Scrite:"),
+                &dialog);
+        label->setWordWrap(true);
+        layout->addWidget(label);
+
+        QFont monoFont(QStringLiteral("Courier New"), 10);
+        monoFont.setStyleHint(QFont::TypeWriter);
+
+        QPlainTextEdit *textEdit = new QPlainTextEdit(licenseText, &dialog);
+        textEdit->setReadOnly(true);
+        textEdit->setWordWrapMode(QTextOption::NoWrap);
+        textEdit->setFont(monoFont);
+        // Size the widget wide enough to display 80 characters without horizontal scrolling.
+        textEdit->setMinimumWidth(QFontMetrics(monoFont).horizontalAdvance(QLatin1Char('M')) * 84);
+        textEdit->setMinimumHeight(400);
+        layout->addWidget(textEdit);
+
+        QDialogButtonBox *buttons = new QDialogButtonBox(&dialog);
+        buttons->addButton(QStringLiteral("Accept"), QDialogButtonBox::AcceptRole);
+        buttons->addButton(QStringLiteral("Decline"), QDialogButtonBox::RejectRole);
+        QObject::connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+        QObject::connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+        layout->addWidget(buttons);
+
+        if (dialog.exec() != QDialog::Accepted)
+            return false;
+
+        settings.setValue(licenseKey, true);
+    }
+
+    return true;
+#endif // SCRITE_PRODUCTION_BUILD
 }
 
 Application::~Application()

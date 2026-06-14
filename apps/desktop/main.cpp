@@ -42,6 +42,9 @@ int main(int argc, char **argv)
         }
     }
 
+    if (!Application::prelaunch(argc, argv))
+        return 0;
+
     Application scriteApp(argc, argv, Application::prepare());
 
     if (!SystemRequirements::checkAndReport())

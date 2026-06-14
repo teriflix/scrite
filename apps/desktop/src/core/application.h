@@ -48,6 +48,7 @@ class Application : public QApplication
 
 public:
     static QVersionNumber prepare();
+    static bool prelaunch(int argc, char **argv);
     static Application *instance();
 
     explicit Application(int &argc, char **argv, const QVersionNumber &version);
