@@ -36,6 +36,10 @@
 #include <QFontMetrics>
 #include <QPlainTextEdit>
 #include <QDialogButtonBox>
+#if defined(Q_OS_WIN)
+#include <appmodel.h>
+#include <ShlObj.h>
+#endif
 #endif
 
 #include <QDir>
@@ -628,6 +632,65 @@ QJsonObject Application::systemFontInfo()
     return ret;
 }
 
+#if defined(Q_OS_WIN) && defined(SCRITE_PRODUCTION_BUILD)
+// Translates a virtual AppData\Roaming path (as seen by the app inside the MSIX
+// container) to the physical package-specific path that Explorer, running outside
+// the container, can actually open. Returns the original path unchanged for paths
+// outside AppData\Roaming or when the app is not running as an MSIX package.
+static QString msixPhysicalPath(const QString &virtualPath)
+{
+    struct MsixPaths {
+        QString virtualRoaming;
+        QString physicalRoaming;
+    };
+    static const MsixPaths s = []() -> MsixPaths {
+        UINT32 len = 0;
+        if (GetPackageFamilyName(GetCurrentProcess(), &len, nullptr) != ERROR_INSUFFICIENT_BUFFER)
+            return {}; // not running as an MSIX package
+
+        QVector<wchar_t> familyName(len);
+        if (GetPackageFamilyName(GetCurrentProcess(), &len, familyName.data()) != ERROR_SUCCESS)
+            return {};
+
+        PWSTR pRoaming = nullptr;
+        PWSTR pLocal = nullptr;
+        SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_NO_PACKAGE_REDIRECTION,
+                             nullptr, &pRoaming);
+        SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_NO_PACKAGE_REDIRECTION,
+                             nullptr, &pLocal);
+
+        if (!pRoaming || !pLocal) {
+            if (pRoaming)
+                CoTaskMemFree(pRoaming);
+            if (pLocal)
+                CoTaskMemFree(pLocal);
+            return {};
+        }
+
+        MsixPaths result;
+        result.virtualRoaming =
+                QDir::fromNativeSeparators(QString::fromWCharArray(pRoaming));
+        result.physicalRoaming =
+                QDir::fromNativeSeparators(QString::fromWCharArray(pLocal))
+                + QLatin1String("/Packages/")
+                + QString::fromWCharArray(familyName.data())
+                + QLatin1String("/LocalCache/Roaming");
+        CoTaskMemFree(pRoaming);
+        CoTaskMemFree(pLocal);
+        return result;
+    }();
+
+    if (s.virtualRoaming.isEmpty())
+        return virtualPath;
+
+    const QString normalized = QDir::fromNativeSeparators(virtualPath);
+    if (normalized.startsWith(s.virtualRoaming, Qt::CaseInsensitive))
+        return s.physicalRoaming + normalized.mid(s.virtualRoaming.length());
+
+    return virtualPath;
+}
+#endif // Q_OS_WIN && SCRITE_PRODUCTION_BUILD
+
 void Application::revealFileOnDesktop(const QString &pathIn)
 {
     m_errorReport->clear();
@@ -648,7 +711,11 @@ void Application::revealFileOnDesktop(const QString &pathIn)
         QStringList param;
         if (!fileInfo.isDir())
             param += QLatin1String("/select,");
+#ifdef SCRITE_PRODUCTION_BUILD
+        param += QDir::toNativeSeparators(msixPhysicalPath(fileInfo.canonicalFilePath()));
+#else
         param += QDir::toNativeSeparators(fileInfo.canonicalFilePath());
+#endif
         QProcess::startDetached(explorer, param);
     } else if (Utils::Platform::isMacOSDesktop()) {
         QStringList scriptArgs;
@@ -687,11 +754,16 @@ void Application::revealFileOnDesktop(const QString &pathIn)
                                       .arg(fi.fileName(), fi.absolutePath()));
 #else
 #ifdef Q_OS_WIN
+#ifdef SCRITE_PRODUCTION_BUILD
+        const QString notificationPath = msixPhysicalPath(fi.absolutePath());
+#else
+        const QString notificationPath = fi.absolutePath();
+#endif
         notification->setText(
                 QStringLiteral("<b>%1</b> is available at '<i>%2</i>'. You can take a look at the "
                                "file by switching to the Explorer window which has been "
                                "opened in the background with this file selected.")
-                        .arg(fi.fileName(), fi.absolutePath()));
+                        .arg(fi.fileName(), notificationPath));
 #else
         notification->setText(
                 QStringLiteral("<b>%1</b> is available. Please launch your file manager app "
