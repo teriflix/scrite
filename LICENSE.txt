@@ -6,6 +6,27 @@ Scrite Copyright (C) 2020-2026 Prashanth N Udupa
 Copyright (C) 2026-present IEDN Technologies Pvt. Ltd.
 All rights reserved.
 
+--------------------------------------------------------------------------------
+ABOUT THIS DOCUMENT
+--------------------------------------------------------------------------------
+
+This document contains three sections:
+
+1. GNU General Public License v3 (GPLv3) — Governs the Scrite source code
+   available on GitHub. You are free to study, modify, and redistribute the
+   source under the terms of the GPLv3.
+
+2. Commercial Binary License — Governs official precompiled releases of
+   Scrite distributed by IEDN Technologies Pvt. Ltd. (installers, app store
+   builds). By installing or running an IEDN-distributed release, you agree
+   to the terms of this license.
+
+3. Third-Party Licenses — Lists the open-source libraries and components
+   bundled with Scrite, along with their respective license terms.
+
+Please scroll through the document to review all three sections before
+clicking Accept.
+
 ================================================================================
 SCRITE - GNU GENERAL PUBLIC LICENSE v3 (SOURCE CODE)
 ================================================================================

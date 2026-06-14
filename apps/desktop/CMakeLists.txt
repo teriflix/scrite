@@ -74,13 +74,12 @@ target_compile_definitions(Scrite PRIVATE
   $<$<BOOL:${SCRITE_PRODUCTION_BUILD}>:SCRITE_PRODUCTION_BUILD>
 )
 
-if(SCRITE_PRODUCTION_BUILD)
-  qt_add_resources(Scrite "production_resources"
-    PREFIX "/"
-    BASE "${CMAKE_SOURCE_DIR}"
-    FILES "${CMAKE_SOURCE_DIR}/LICENSE.txt"
-  )
-endif()
+# LICENSE.txt is embedded for the pre-launch license dialog in all builds.
+qt_add_resources(Scrite "prelaunch_resources"
+  PREFIX "/"
+  BASE "${CMAKE_SOURCE_DIR}"
+  FILES "${CMAKE_SOURCE_DIR}/LICENSE.txt"
+)
 
 target_include_directories(Scrite PRIVATE
   "${CMAKE_SOURCE_DIR}"
