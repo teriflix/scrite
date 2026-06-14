@@ -274,4 +274,4 @@ packaging/
 
 ## Contact
 
-For issues or questions, see: https://github.com/teriflix/scrite
+For issues or questions, see: https://www.scrite.io/source-code

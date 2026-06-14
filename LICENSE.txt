@@ -32,7 +32,8 @@ SCRITE - GNU GENERAL PUBLIC LICENSE v3 (SOURCE CODE)
 ================================================================================
 
 The source code of Scrite is licensed under the GNU General Public License
-version 3. This applies to all source code available on GitHub.
+version 3. This applies to all source code available at
+https://www.scrite.io/source-code.
 
 See the full GPLv3 license text below.
 
@@ -768,7 +769,7 @@ on GitHub. These proprietary components may not be:
 This binary includes software licensed under the GNU General Public License
 v3 and other open-source licenses (LGPL, MIT, BSD). The complete source code
 for GPL and LGPL components is available at:
-  https://github.com/teriflix/scrite
+  https://www.scrite.io/source-code
 
 Users retain the right to download, build, and use the open-source version
 for free at any time.

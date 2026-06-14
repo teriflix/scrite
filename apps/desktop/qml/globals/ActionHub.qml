@@ -674,7 +674,7 @@ Item {
             text: "Source Code"
 
             onTriggered: {
-                Qt.openUrlExternally("https://github.com/teriflix/scrite")
+                Qt.openUrlExternally("https://www.scrite.io/source-code")
             }
         }
     }
