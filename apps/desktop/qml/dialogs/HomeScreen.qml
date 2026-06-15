@@ -54,7 +54,12 @@ DialogLauncher {
             onCloseRequest: Qt.callLater(_dialog.close)
         }
 
-        onOpened: _private.launchCounter = _private.launchCounter+1
+        onOpened: {
+            if(Runtime.libraryService.screenplays.count === 0 || Runtime.libraryService.templates.count === 0)
+                Qt.callLater(Runtime.libraryService.reload)
+
+            _private.launchCounter = _private.launchCounter+1
+        }
 
         Announcement.onIncoming: (type, data) => {
             if(type === Runtime.announcementIds.closeHomeScreenRequest || type === Runtime.announcementIds.loginRequest)
