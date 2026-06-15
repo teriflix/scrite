@@ -291,7 +291,6 @@ add_custom_target(scrite_touch_build_timestamp ALL
 )
 add_dependencies(Scrite scrite_touch_build_timestamp)
 
-# CPack install rules
 if(APPLE)
   install(TARGETS Scrite BUNDLE DESTINATION .)
 elseif(WIN32)
