@@ -615,7 +615,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 // Layout.leftMargin: 20
-                Layout.rightMargin: 20
+                // Layout.rightMargin: 20
 
                 color: Qt.rgba(0,0,0,0)
                 border.width: _templatesView.interactive ? 1 : 0
