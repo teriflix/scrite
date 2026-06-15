@@ -47,7 +47,7 @@ DialogLauncher {
 
         width: Math.min(800, Scrite.window.width*0.9)
         height: Math.min(width*1.2, Scrite.window.height*0.9)
-        title: "scrite.io"
+        title: "Home"
 
         contentItem: HomeScreenImpl {
             mode: _dialog.mode

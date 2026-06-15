@@ -39,12 +39,12 @@ Settings {
     property bool useNativeTextRendering: false
     property bool useSoftwareRenderer: false
 
-    property string theme: "Material"
+    property string uiTheme: Scrite.app.availableThemes[0]
 
     Component.onCompleted: {
         colorIntensity = Runtime.bounded(0, colorIntensity, 1)
         Qt.callLater( () => {
-                         Runtime.currentTheme = theme
+                         Runtime.currentTheme = uiTheme
                          Runtime.currentUseSoftwareRenderer = useSoftwareRenderer
                      })
         updateColorScheme()

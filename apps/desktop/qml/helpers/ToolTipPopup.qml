@@ -76,7 +76,7 @@ ToolTip {
             font: Runtime.idealFontMetrics.font
             text: _content.fields[0]
             color: {
-                if(Runtime.applicationSettings.theme === "Material")
+                if(Runtime.applicationSettings.uiTheme === "Material")
                     return "white"
 
                 return root.palette.toolTipText

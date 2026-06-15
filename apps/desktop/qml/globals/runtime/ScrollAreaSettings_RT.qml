@@ -18,7 +18,7 @@ import QtCore
 import io.scrite.components
 
 Settings {
-    property real zoomFactor: 0.05
+    property real zoomFactor: 0.35
 
     category: "ScrollArea"
     location: Platform.settingsLocation

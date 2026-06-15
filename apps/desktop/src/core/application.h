@@ -146,14 +146,12 @@ public:
     // clang-format on
     static QStringList availableThemes();
 
-    static QString queryQtQuickStyleFor(const QString &theme);
-
     // clang-format off
-    Q_PROPERTY(bool usingMaterialTheme
-               READ usingMaterialTheme
+    Q_PROPERTY(bool usingGpuAcceleratedTheme
+               READ usingGpuAcceleratedTheme
                CONSTANT )
     // clang-format on
-    static bool usingMaterialTheme();
+    static bool usingGpuAcceleratedTheme();
 
     // clang-format off
     Q_PROPERTY(QString baseWindowTitle

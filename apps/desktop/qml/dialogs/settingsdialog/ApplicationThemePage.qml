@@ -56,24 +56,20 @@ Item {
             VclComboBox {
                 id: _themesComboBox
 
-                readonly property int materialStyleIndex: Scrite.app.availableThemes.indexOf("Material");
-
                 Layout.fillWidth: true
 
                 enabled: Runtime.currentUseSoftwareRenderer === false
                 model: Scrite.app.availableThemes
 
                 currentIndex: {
-                    const idx = Scrite.app.availableThemes.indexOf(Runtime.applicationSettings.theme)
-                    if(idx < 0)
-                    return materialStyleIndex
-                    return idx
+                    const idx = Scrite.app.availableThemes.indexOf(Runtime.applicationSettings.uiTheme)
+                    return idx < 0 ? 0 : idx
                 }
 
                 onCurrentTextChanged: {
-                    Runtime.applicationSettings.theme = currentText
+                    Runtime.applicationSettings.uiTheme = currentText
                     if(Runtime.currentTheme !== currentText)
-                    MessageBox.information("Requires Restart", "Scrite will use <b>" + currentText + "</b> theme upon restart.")
+                        MessageBox.information("Requires Restart", "Scrite will use <b>" + currentText + "</b> theme upon restart.")
                 }
 
                 ToolTipPopup {

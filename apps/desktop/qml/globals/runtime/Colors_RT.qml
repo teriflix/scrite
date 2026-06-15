@@ -45,6 +45,30 @@ Item {
 
     readonly property color transparent: "transparent"
 
+    // Complete palette for non-Material styles (e.g. Default/Basic, active under software rendering).
+    // Every role is set so ComboBox, Menu, Popup, ToolTip etc. get correct light/dark colours.
+    // Assigned on this Item so ApplicationWindow can bind role-by-role from Runtime.colors.palette.
+    palette.window:          primary.c100.background   // general surface
+    palette.windowText:      primary.c100.text         // general text on surface
+    palette.base:            primary.editor.background // text-input background (white / black)
+    palette.text:            primary.editor.text       // text-input foreground
+    palette.button:          primary.button.background // button fill
+    palette.buttonText:      primary.button.text       // button label
+    palette.highlight:       accent.highlight.background  // selection / focused-item fill
+    palette.highlightedText: accent.highlight.text        // text on selection
+    palette.light:           primary.c50.background    // lightest 3-D border edge
+    palette.midlight:        primary.c200.background   // between light and button
+    palette.mid:             primary.c400.background   // neutral divider / border
+    palette.dark:            primary.c600.background   // darker 3-D border edge
+    palette.shadow:          primary.c800.background   // deepest shadow
+    palette.alternateBase:   primary.c200.background   // alternate list-row tint
+    palette.toolTipBase:     primary.c100.background   // popup / tooltip fill
+    palette.toolTipText:     primary.c100.text         // popup / tooltip text
+    palette.placeholderText: primary.c500.background   // muted placeholder (Shade500 – not mirrored)
+    palette.brightText:      "white"                   // high-contrast text on dark surfaces
+    palette.link:            defaultLinkColor
+    palette.linkVisited:     hoveredLinkColor
+
     readonly property ColorTheme_RT primary: ColorTheme_RT {
         ObjectRegister.name: "primaryColors"
 

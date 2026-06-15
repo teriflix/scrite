@@ -232,10 +232,12 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
         return m_settings->value(QStringLiteral("Application/useSoftwareRenderer"), false).toBool();
     }();
     const QString style = [=]() -> QString {
-        const QString ret = m_settings->value(QStringLiteral("Application/theme")).toString();
-        if (useSoftwareRenderer && ret == QStringLiteral("Material"))
-            return QStringLiteral("Default");
-        return Application::queryQtQuickStyleFor(ret);
+        const QString ret = m_settings->value(QStringLiteral("Application/uiTheme")).toString();
+        const QStringList themes = Application::availableThemes();
+        const QString resolved = themes.contains(ret) ? ret : themes.first();
+        if (useSoftwareRenderer && resolved != themes.last())
+            return themes.last();
+        return resolved;
     }();
 
     if (useSoftwareRenderer)
@@ -317,7 +319,8 @@ QVersionNumber Application::prepare()
     // Production builds use "IEDN Technologies" as the org name and
     // migrate data from every prior org (oldest first so newest data wins).
     // Open-source builds leave this flag unset and keep "Scrite" as the org name.
-    struct LegacyOrg {
+    struct LegacyOrg
+    {
         const char *name;
         const char *domain;
     };
@@ -377,11 +380,11 @@ QVersionNumber Application::prepare()
     Application::setApplicationVersion(applicationVersionString + " (Windows 64-bit)");
 #endif
 
-    QPalette palette = Application::palette();
+    /*QPalette palette = Application::palette();
     palette.setColor(QPalette::Active, QPalette::Highlight, QColor::fromRgbF(0, 0.4, 1));
     palette.setColor(QPalette::Active, QPalette::HighlightedText, QColor(Qt::white));
     palette.setColor(QPalette::Active, QPalette::Text, QColor(Qt::black));
-    Application::setPalette(palette);
+    Application::setPalette(palette);*/
 
     return applicationVersion;
 }
@@ -466,30 +469,30 @@ const QString Application::versionType = QStringLiteral(SCRITE_VERSION_TYPE);
 
 QStringList Application::availableThemes()
 {
-    // return QQuickStyle::availableStyles();
-    static QStringList themes({ QStringLiteral("Basic"), QStringLiteral("Fusion"),
-                                QStringLiteral("Imagine"), QStringLiteral("Material"),
-                                QStringLiteral("Universal") });
+    // ORDERING RULE: first entry = best style for this platform (used as the default when no
+    // preference is stored); last entry = software-rendering fallback (must require no GPU).
+    // The Application constructor relies on first() and last() — never break this contract.
+    static QStringList themes;
+    if (themes.isEmpty()) {
+#ifdef Q_OS_WIN
+        if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows11)
+            themes << QStringLiteral("FluentWinUI3");
+        themes << QStringLiteral("Material");
+#elif defined(Q_OS_MACOS)
+        themes << QStringLiteral("MacOS") << QStringLiteral("Material");
+#else
+        themes << QStringLiteral("Material");
+#endif
+        themes << QStringLiteral("Basic");
+    }
+
     return themes;
 }
 
-QString Application::queryQtQuickStyleFor(const QString &theme)
+bool Application::usingGpuAcceleratedTheme()
 {
-    const QString defaultStyle = QStringLiteral("Material");
-    if (theme.isEmpty())
-        return defaultStyle;
-
-    const int idx = availableThemes().indexOf(theme);
-    if (idx < 0)
-        return defaultStyle;
-    if (idx == 0)
-        return QStringLiteral("Default");
-    return theme;
-}
-
-bool Application::usingMaterialTheme()
-{
-    return QQuickStyle::name() == QStringLiteral("Material");
+    const QString name = QQuickStyle::name();
+    return name == QStringLiteral("Material") || name == QStringLiteral("FluentWinUI3");
 }
 
 void Application::setBaseWindowTitle(const QString &val)
@@ -537,7 +540,8 @@ QJsonObject Application::systemFontInfo()
 // outside AppData\Roaming or when the app is not running as an MSIX package.
 static QString msixPhysicalPath(const QString &virtualPath)
 {
-    struct MsixPaths {
+    struct MsixPaths
+    {
         QString virtualRoaming;
         QString physicalRoaming;
     };
@@ -552,10 +556,10 @@ static QString msixPhysicalPath(const QString &virtualPath)
 
         PWSTR pRoaming = nullptr;
         PWSTR pLocal = nullptr;
-        SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_NO_PACKAGE_REDIRECTION,
-                             nullptr, &pRoaming);
-        SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_NO_PACKAGE_REDIRECTION,
-                             nullptr, &pLocal);
+        SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_NO_PACKAGE_REDIRECTION, nullptr,
+                             &pRoaming);
+        SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_NO_PACKAGE_REDIRECTION, nullptr,
+                             &pLocal);
 
         if (!pRoaming || !pLocal) {
             if (pRoaming)
@@ -566,12 +570,9 @@ static QString msixPhysicalPath(const QString &virtualPath)
         }
 
         MsixPaths result;
-        result.virtualRoaming =
-                QDir::fromNativeSeparators(QString::fromWCharArray(pRoaming));
-        result.physicalRoaming =
-                QDir::fromNativeSeparators(QString::fromWCharArray(pLocal))
-                + QLatin1String("/Packages/")
-                + QString::fromWCharArray(familyName.data())
+        result.virtualRoaming = QDir::fromNativeSeparators(QString::fromWCharArray(pRoaming));
+        result.physicalRoaming = QDir::fromNativeSeparators(QString::fromWCharArray(pLocal))
+                + QLatin1String("/Packages/") + QString::fromWCharArray(familyName.data())
                 + QLatin1String("/LocalCache/Roaming");
         CoTaskMemFree(pRoaming);
         CoTaskMemFree(pLocal);

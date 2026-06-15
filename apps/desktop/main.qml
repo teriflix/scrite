@@ -49,6 +49,27 @@ ApplicationWindow {
     Material.accent: Runtime.colors.accent.key
     Material.theme: Runtime.colors.theme
 
+    palette.window:          Runtime.colors.palette.window
+    palette.windowText:      Runtime.colors.palette.windowText
+    palette.base:            Runtime.colors.palette.base
+    palette.text:            Runtime.colors.palette.text
+    palette.button:          Runtime.colors.palette.button
+    palette.buttonText:      Runtime.colors.palette.buttonText
+    palette.highlight:       Runtime.colors.palette.highlight
+    palette.highlightedText: Runtime.colors.palette.highlightedText
+    palette.light:           Runtime.colors.palette.light
+    palette.midlight:        Runtime.colors.palette.midlight
+    palette.mid:             Runtime.colors.palette.mid
+    palette.dark:            Runtime.colors.palette.dark
+    palette.shadow:          Runtime.colors.palette.shadow
+    palette.alternateBase:   Runtime.colors.palette.alternateBase
+    palette.toolTipBase:     Runtime.colors.palette.toolTipBase
+    palette.toolTipText:     Runtime.colors.palette.toolTipText
+    palette.placeholderText: Runtime.colors.palette.placeholderText
+    palette.brightText:      Runtime.colors.palette.brightText
+    palette.link:            Runtime.colors.palette.link
+    palette.linkVisited:     Runtime.colors.palette.linkVisited
+
     Loader {
         id: _contentLoader
 
