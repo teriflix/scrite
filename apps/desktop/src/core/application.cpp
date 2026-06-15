@@ -145,8 +145,7 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
                              + Application::applicationVersion());
 
     const QString settingsFile =
-            QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
-                    .absoluteFilePath("settings.ini");
+            QDir(Application::appDataLocation()).absoluteFilePath("settings.ini");
     m_settings = new QSettings(settingsFile, QSettings::IniFormat, this);
     this->installationId();
     this->installationTimestamp();
@@ -351,13 +350,12 @@ QVersionNumber Application::prepare()
     Application::setOrganizationDomain(QStringLiteral("scrite.io"));
 #endif
 
-    const QString targetAppDataPath =
-            QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    const QString targetAppDataPath = Application::appDataLocation();
 
     for (const LegacyOrg &legacy : legacyOrgs) {
         Application::setOrganizationName(QLatin1String(legacy.name));
         Application::setOrganizationDomain(QLatin1String(legacy.domain));
-        const QDir legacyDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+        const QDir legacyDir(Application::appDataLocation());
         if (legacyDir.exists()) {
             QDir().mkpath(targetAppDataPath);
             copyFilesRecursively(legacyDir, QDir(targetAppDataPath));
@@ -395,6 +393,30 @@ QVersionNumber Application::prepare()
     Application::setPalette(palette);*/
 
     return applicationVersion;
+}
+
+QString Application::appDataLocation()
+{
+    // On Windows, production builds are distributed as MSIX packages. MSIX silently redirects
+    // all writes to AppData\Roaming into a package-private virtual store
+    // (%LOCALAPPDATA%\Packages\<id>\LocalCache\Roaming). That virtual store is wiped when the
+    // user uninstalls the package, taking settings, vault, recent files, and custom tags with it.
+    // KF_FLAG_NO_PACKAGE_REDIRECTION bypasses the redirect and returns the real AppData\Roaming
+    // path, so user data persists across uninstall/reinstall cycles.
+#if defined(Q_OS_WIN) && defined(SCRITE_PRODUCTION_BUILD)
+    PWSTR path = nullptr;
+    const HRESULT hr = SHGetKnownFolderPath(FOLDERID_RoamingAppData,
+                                             KF_FLAG_NO_PACKAGE_REDIRECTION, nullptr, &path);
+    if (SUCCEEDED(hr)) {
+        const QString base = QDir::fromNativeSeparators(QString::fromWCharArray(path));
+        CoTaskMemFree(path);
+        return base + QLatin1Char('/') + QCoreApplication::organizationName()
+               + QLatin1Char('/') + QCoreApplication::applicationName();
+    }
+    if (path)
+        CoTaskMemFree(path);
+#endif
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 }
 
 Application::~Application()

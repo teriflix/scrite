@@ -48,7 +48,7 @@ ScriteDocumentVault::ScriteDocumentVault(QObject *parent) : QAbstractListModel(p
             &ScriteDocumentVault::cleanup);
 
     const QString vault = QStringLiteral("vault");
-    QDir dir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    QDir dir(Application::appDataLocation());
     if (!dir.cd(vault)) {
         dir.mkdir(vault);
         dir.cd(vault);

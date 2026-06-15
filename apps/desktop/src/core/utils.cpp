@@ -632,8 +632,7 @@ bool Utils::Object::save(QObject *object)
     }
 
     const QString configFilePath =
-            QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
-                    .absoluteFilePath("objectconfig.json");
+            QDir(Application::appDataLocation()).absoluteFilePath("objectconfig.json");
 
     QJsonObject configObject;
 
@@ -670,8 +669,7 @@ bool Utils::Object::load(QObject *object)
         return false;
 
     const QString configFilePath =
-            QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
-                    .absoluteFilePath("objectconfig.json");
+            QDir(Application::appDataLocation()).absoluteFilePath("objectconfig.json");
 
     QJsonObject configObject;
 

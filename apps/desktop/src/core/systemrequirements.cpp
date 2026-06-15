@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 #include "systemrequirements.h"
+#include "application.h"
 #include "restapicall.h"
 #include "utils.h"
 
@@ -255,8 +256,7 @@ bool SystemRequirements::checkAndReport(const QList<Aspect> aspects)
 
         if (allowWithWarning) {
             const QString appSettingsFile =
-                    QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
-                            .absoluteFilePath("settings.ini");
+                    QDir(Application::appDataLocation()).absoluteFilePath("settings.ini");
             const QString minReqCheckedOn = QStringLiteral("Application/minReqCheckedOn");
             QSettings appSettings(appSettingsFile, QSettings::IniFormat);
             if (appSettings.contains(minReqCheckedOn)

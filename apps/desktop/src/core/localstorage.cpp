@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 #include "utils.h"
+#include "application.h"
 #include "simplecrypt.h"
 #include "localstorage.h"
 
@@ -38,7 +39,7 @@ public:
 
 EncryptedDataStore::EncryptedDataStore()
 {
-    const QString appDataFolder = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    const QString appDataFolder = Application::appDataLocation();
 
     QFile file(QDir(appDataFolder).absoluteFilePath("localstore.db"));
     if (!file.open(QFile::ReadOnly))
@@ -65,7 +66,7 @@ void EncryptedDataStore::save()
     if (this->data.isEmpty())
         return;
 
-    const QString appDataFolder = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    const QString appDataFolder = Application::appDataLocation();
 
     QFile file(QDir(appDataFolder).absoluteFilePath("localstore.db"));
     if (!file.open(QFile::WriteOnly))

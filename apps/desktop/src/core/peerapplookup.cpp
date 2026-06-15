@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 #include "peerapplookup.h"
+#include "application.h"
 #include "callgraph.h"
 
 #include <QDir>
@@ -35,8 +36,7 @@ static QString peerInfoFilePath()
 {
     static QString ret;
     if (ret.isEmpty()) {
-        const QString folderPath =
-                QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        const QString folderPath = Application::appDataLocation();
         const QDir folder(folderPath);
         if (!folder.exists())
             QDir().mkpath(folderPath);

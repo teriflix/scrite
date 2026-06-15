@@ -2278,7 +2278,7 @@ AnnotationMetaData::AnnotationMetaData()
 {
     const QString qrcFileName = QStringLiteral(":/misc/annotations_metadata.json");
     const QString revisionKey = QStringLiteral("#revision");
-    m_metaDataFile = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
+    m_metaDataFile = QDir(Application::appDataLocation())
                              .absoluteFilePath(QStringLiteral("annotations_metadata.json"));
 
     auto loadMetaData = [](const QString &fileName) {
@@ -4445,15 +4445,14 @@ void Structure::setDefaultIndexCardFields(const QJsonArray &val)
     emit defaultIndexCardFieldsChanged();
 
     const QByteArray bytes = QJsonDocument(val2).toJson();
-    Utils::File::write(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-                               + QStringLiteral("/index_card_fields.json"),
+    Utils::File::write(Application::appDataLocation() + QStringLiteral("/index_card_fields.json"),
                        bytes);
 }
 
 void Structure::loadDefaultIndexCardFields()
 {
     const QByteArray bytes =
-            Utils::File::read(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+            Utils::File::read(Application::appDataLocation()
                               + QStringLiteral("/index_card_fields.json"))
                     .toLatin1();
 
