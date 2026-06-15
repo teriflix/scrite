@@ -308,6 +308,7 @@ set(SCRITE_DESKTOP_SINGLETON_QML_FILES
   "qml/dialogs/TitlePageDialog.qml"
   "qml/dialogs/TrialNotActivatedDialog.qml"
   "qml/dialogs/UserAccountDialog.qml"
+  "qml/dialogs/ViewLicenseDialog.qml"
   "qml/dialogs/WaitDialog.qml"
   "qml/dialogs/homescreen/EditRecentFilesDialog.qml"
   "qml/floatingdockpanels/FloatingDockLayer.qml"

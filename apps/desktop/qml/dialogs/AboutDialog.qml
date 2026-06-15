@@ -19,7 +19,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import QtQuick.Controls.Material
 
 import io.scrite.components
 
@@ -129,7 +128,7 @@ DialogLauncher {
                     Link {
                         text: "License"
                         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                        onClicked: Qt.openUrlExternally("https://www.scrite.io/license/")
+                        onClicked: ViewLicenseDialog.launch()
                     }
 
                     VclText {
