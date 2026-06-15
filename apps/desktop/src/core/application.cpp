@@ -913,11 +913,7 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
     const QString geometryString =
             m_settings->value(group + QStringLiteral("/windowGeometry")).toString();
     if (geometryString == QStringLiteral("Maximized")) {
-#ifdef Q_OS_WIN
         QTimer::singleShot(100, window, &QWindow::showMaximized);
-#else
-        window->setGeometry(screenGeo);
-#endif
         return true;
     }
 
@@ -944,8 +940,8 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
     const int h = geometry.at(3).toInt() + geoDelta;
     QRect geo(x, y, w, h);
     if (!screenGeo.contains(geo)) {
-        if (w > screenGeo.width() || h > screenGeo.height()) {
-            window->setGeometry(screenGeo);
+        if (w >= screenGeo.width() || h >= screenGeo.height()) {
+            QTimer::singleShot(100, window, &QWindow::showMaximized);
             return false;
         }
 
