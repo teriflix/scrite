@@ -17,7 +17,7 @@ foreach(_scrite_include_before_var CMAKE_PROJECT_INCLUDE_BEFORE CMAKE_PROJECT_Sc
   endif()
 endforeach()
 
-project(Scrite VERSION 2.9.7 LANGUAGES C CXX)
+project(Scrite VERSION 2.9.8 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
