@@ -486,7 +486,7 @@ QStringList Application::availableThemes()
             themes << QStringLiteral("FluentWinUI3");
         themes << QStringLiteral("Material");
 #elif defined(Q_OS_MACOS)
-        themes << QStringLiteral("MacOS") << QStringLiteral("Material");
+        themes << QStringLiteral("Material") << QStringLiteral("macOS");
 #else
         themes << QStringLiteral("Material");
 #endif
