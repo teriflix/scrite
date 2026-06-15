@@ -120,20 +120,18 @@ ApplicationWindow {
                     "Please uninstall it via \"Add or Remove Programs\" in Windows Settings " +
                     "before running this version.",
                     Qt.quit)
-                return
-            }
-
-            // Show the license dialog on first launch of each new version.
-            if (!Scrite.isLicenseAccepted()) {
-                var dlg = LicenseDialog.launch()
-                if (dlg)
-                    dlg.accepted.connect(_private.continueAfterLicense)
-                else
+            } else {
+                // Show the license dialog on first launch of each new version.
+                if (!Scrite.isLicenseAccepted()) {
+                    let dlg = LicenseDialog.launch()
+                    if (dlg)
+                        dlg.accepted.connect(_private.continueAfterLicense)
+                    else
+                        _private.continueAfterLicense()
+                } else {
                     _private.continueAfterLicense()
-                return
+                }
             }
-
-            _private.continueAfterLicense()
         }
 
         function continueAfterLicense() {
