@@ -72,11 +72,6 @@ AppWindow::AppWindow(QQuickWindow *window) : QObject(window), m_window(window)
     QObject::connect(scriteDocument, &ScriteDocument::documentWindowTitleChanged, window,
                      &QQuickWindow::setTitle);
 
-    // Configure minimum size of the application window
-    const QScreen *screen = scriteApp.primaryScreen();
-    const QSize screenSize = screen->availableSize();
-    window->setMinimumSize(QSize(qMin(600, screenSize.width()), qMin(375, screenSize.height())));
-
     // If supplied in args, load the file-name
     this->initializeFileNameToOpen();
 
@@ -96,7 +91,7 @@ AppWindow::AppWindow(QQuickWindow *window) : QObject(window), m_window(window)
 
     m_defaultWindowFlags = window->flags();
 
-    window->setMinimumSize(QSize(1366, 700));
+    window->setMinimumSize(QSize(AppWindow::minimumWindowWidth, AppWindow::minimumWindowHeight));
 
     QTimer::singleShot(50, this, &AppWindow::init);
 }

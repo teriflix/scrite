@@ -19,6 +19,7 @@
 #include "undoredo.h"
 #include "hourglass.h"
 #include "autoupdate.h"
+#include "appwindow.h"
 #include "application.h"
 #include "notification.h"
 #include "localstorage.h"
@@ -934,10 +935,10 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
                            : 0,
                    100);
 
-    const int x = geometry.at(0).toInt() + geoDelta;
-    const int y = geometry.at(1).toInt() + geoDelta;
-    const int w = geometry.at(2).toInt() + geoDelta;
-    const int h = geometry.at(3).toInt() + geoDelta;
+    const int x = qMax(geometry.at(0).toInt() + geoDelta, 10);
+    const int y = qMax(geometry.at(1).toInt() + geoDelta, 50);
+    const int w = qMax(geometry.at(2).toInt() + geoDelta, AppWindow::minimumWindowWidth);
+    const int h = qMax(geometry.at(3).toInt() + geoDelta, AppWindow::minimumWindowHeight);
     QRect geo(x, y, w, h);
     if (!screenGeo.contains(geo)) {
         if (w >= screenGeo.width() || h >= screenGeo.height()) {

@@ -26,12 +26,26 @@ class AppWindow : public QObject
     QML_ATTACHED(AppWindow)
 
 public:
+    static constexpr int minimumWindowWidth = 1366;
+    static constexpr int minimumWindowHeight = 700;
+
     static QQuickWindow *instance();
     ~AppWindow();
 
     static AppWindow *qmlAttachedProperties(QObject *object);
 
     QQuickWindow *window() const { return m_window; }
+
+    // clang-format off
+    Q_PROPERTY(int minimumWindowWidth
+               READ getMinimumWindowWidth
+               CONSTANT)
+    Q_PROPERTY(int minimumWindowHeight
+               READ getMinimumWindowHeight
+               CONSTANT)
+    // clang-format on
+    int getMinimumWindowWidth() const { return minimumWindowWidth; }
+    int getMinimumWindowHeight() const { return minimumWindowHeight; }
 
     // clang-format off
     Q_PROPERTY(bool closeButtonVisible

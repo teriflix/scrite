@@ -38,8 +38,8 @@ ApplicationWindow {
     AppWindow.closeButtonVisible: closeButtonVisible
     AppWindow.onInitialize: _private.initialize()
 
-    width: 1366
-    height: 700
+    width: AppWindow.minimumWindowWidth
+    height: AppWindow.minimumWindowHeight
     visible: true
     visibility: ApplicationWindow.Windowed
 
