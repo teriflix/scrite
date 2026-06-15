@@ -41,7 +41,7 @@ DialogLauncher {
         titleBarCloseButtonVisible: false
 
         width: Math.min(560, Scrite.window.width * 0.85)
-        height: Math.min(360, Scrite.window.height * 0.85)
+        height: Math.min(400, Scrite.window.height * 0.85)
 
         content: Item {
             ColumnLayout {
