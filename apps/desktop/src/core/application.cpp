@@ -355,7 +355,7 @@ QVersionNumber Application::prepare()
     for (const LegacyOrg &legacy : legacyOrgs) {
         Application::setOrganizationName(QLatin1String(legacy.name));
         Application::setOrganizationDomain(QLatin1String(legacy.domain));
-        const QDir legacyDir(Application::appDataLocation());
+        const QDir legacyDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
         if (legacyDir.exists()) {
             QDir().mkpath(targetAppDataPath);
             copyFilesRecursively(legacyDir, QDir(targetAppDataPath));
@@ -397,10 +397,15 @@ QVersionNumber Application::prepare()
 
 QString Application::appDataLocation()
 {
-    // On Windows, production builds are distributed as MSIX packages. The MSIX manifest declares
-    // the unvirtualizedResources capability and disables FileSystemWriteVirtualization, so
-    // QStandardPaths returns the real AppData\Roaming path and writes land there directly —
-    // surviving uninstall/reinstall cycles without any special path construction here.
+    // On Windows, production builds are distributed as MSIX packages which virtualize writes to
+    // AppData\Roaming and AppData\Local, redirecting them into a package-private store that is
+    // deleted on uninstall. A dot-folder directly under the user's home directory sits outside
+    // MSIX's VFS redirect list entirely, so data written there survives uninstall/reinstall.
+#if defined(Q_OS_WIN) && defined(SCRITE_PRODUCTION_BUILD)
+    const QString location = QDir::homePath() + QLatin1String("/.scrite");
+    QDir().mkpath(location);
+    return location;
+#endif
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 }
 
