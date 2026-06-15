@@ -88,25 +88,9 @@ ApplicationWindow {
         function initialize() {
             // Initialize runtime
             Runtime.init(_contentLoader)
-            ActionHub.init(_contentLoader)
-            HelpCenter.init(_contentLoader)
-            CommandCenter.init(_contentLoader)
-            SubscriptionPlanOperations.init(_contentLoader)
 
             // Determine font size provided by QML
             determineDefaultFontSize()
-
-            // Show the main-window content
-            _contentLoader.active = true
-
-            // Initialize layers
-            BusyOverlay.init(_contentLoader)
-            SubscriptionDetailsDialog.init()
-            SubscriptionPlanComparisonDialog.init()
-            UserAccountDialog.init(_contentLoader)
-            FloatingDockLayer.init(_contentLoader)
-            OverlaysLayer.init(_contentLoader)
-            NotificationsLayer.init(_contentLoader)
 
             // Raise window
             Scrite.window.raise()
@@ -135,6 +119,24 @@ ApplicationWindow {
         }
 
         function continueAfterLicense() {
+            // Initialze modules
+            ActionHub.init(_contentLoader)
+            HelpCenter.init(_contentLoader)
+            CommandCenter.init(_contentLoader)
+            SubscriptionPlanOperations.init(_contentLoader)
+
+            // Show the main-window content
+            _contentLoader.active = true
+
+            // Initialize layers
+            BusyOverlay.init(_contentLoader)
+            SubscriptionDetailsDialog.init()
+            SubscriptionPlanComparisonDialog.init()
+            UserAccountDialog.init(_contentLoader)
+            FloatingDockLayer.init(_contentLoader)
+            OverlaysLayer.init(_contentLoader)
+            NotificationsLayer.init(_contentLoader)
+
             // Show initial UI — user login check happens here
             if(Scrite.user.loggedIn) {
                 if(Runtime.allowAppUsage)
