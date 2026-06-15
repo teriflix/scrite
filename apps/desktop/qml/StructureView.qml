@@ -37,7 +37,7 @@ Item {
     Rectangle {
         anchors.fill: _canvasScroll
 
-        color: Runtime.structureCanvasSettings.canvasColor
+        color: Runtime.colors.tx(Runtime.structureCanvasSettings.canvasColor)
         opacity: Runtime.applicationSettings.colorIntensity
         visible: Runtime.structureCanvasSettings.showGrid
     }
