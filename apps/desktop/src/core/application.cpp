@@ -640,7 +640,7 @@ void Application::revealFileOnDesktop(const QString &pathIn)
         QStringList param;
         if (!fileInfo.isDir())
             param += QLatin1String("/select,");
-#ifdef SCRITE_PRODUCTION_BUILD
+#if defined(Q_OS_WIN) && defined(SCRITE_PRODUCTION_BUILD)
         param += QDir::toNativeSeparators(msixPhysicalPath(fileInfo.canonicalFilePath()));
 #else
         param += QDir::toNativeSeparators(fileInfo.canonicalFilePath());
