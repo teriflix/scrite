@@ -87,7 +87,7 @@ bool QtApplicationEventNotificationCallback(void **cbdata);
 void ApplicationQtMessageHandler(QtMsgType type, const QMessageLogContext &context,
                                  const QString &message)
 {
-#if QT_NO_DEBUG_OUTPUT
+#if 0 // QT_NO_DEBUG_OUTPUT
     Q_UNUSED(type)
     Q_UNUSED(context)
     Q_UNUSED(message)
@@ -283,6 +283,8 @@ static void copyFilesRecursively(const QDir &from, const QDir &to)
     }
 }
 
+static const QString legacyDataMovedKey = QStringLiteral("Migration/legacyDataMoved");
+
 QVersionNumber Application::prepare()
 {
     const QVersionNumber applicationVersion =
@@ -351,6 +353,7 @@ QVersionNumber Application::prepare()
 #endif
 
     const QString targetAppDataPath = Application::appDataLocation();
+    bool legacyDataMigrated = false;
 
     for (const LegacyOrg &legacy : legacyOrgs) {
         Application::setOrganizationName(QLatin1String(legacy.name));
@@ -360,6 +363,7 @@ QVersionNumber Application::prepare()
             QDir().mkpath(targetAppDataPath);
             copyFilesRecursively(legacyDir, QDir(targetAppDataPath));
             QDir(legacyDir).removeRecursively();
+            legacyDataMigrated = true;
         }
     }
 
@@ -391,6 +395,12 @@ QVersionNumber Application::prepare()
     palette.setColor(QPalette::Active, QPalette::HighlightedText, QColor(Qt::white));
     palette.setColor(QPalette::Active, QPalette::Text, QColor(Qt::black));
     Application::setPalette(palette);*/
+
+    if (legacyDataMigrated) {
+        // Note, this doesnt go into settings.ini. And that's okay.
+        QSettings settings;
+        settings.setValue(legacyDataMovedKey, true);
+    }
 
     return applicationVersion;
 }
@@ -1034,6 +1044,18 @@ void Application::toggleFullscreen(QWindow *window)
         window->setProperty(propName, window->visibility() == QWindow::FullScreen);
         window->setVisibility(QWindow::FullScreen);
     }
+}
+
+bool Application::hasLegacyDataMovedRecently() const
+{
+    QSettings settings;
+    return settings.value(legacyDataMovedKey, false).toBool();
+}
+
+void Application::acknowledgeLegacyDataMigration()
+{
+    QSettings settings;
+    settings.remove(legacyDataMovedKey);
 }
 
 bool Application::hasActiveFocus(QQuickWindow *window, QQuickItem *item)

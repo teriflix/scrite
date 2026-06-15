@@ -119,6 +119,17 @@ ApplicationWindow {
         }
 
         function continueAfterLicense() {
+            if(Scrite.app.hasLegacyDataMovedRecently()) {
+                let dlg = LegacyDataMigrationDialog.launch()
+                if(dlg) {
+                    dlg.accepted.connect(_private.initApp)
+                    return
+                }
+            }
+            _private.initApp()
+        }
+
+        function initApp() {
             // Initialze modules
             ActionHub.init(_contentLoader)
             HelpCenter.init(_contentLoader)

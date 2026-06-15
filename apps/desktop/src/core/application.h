@@ -209,6 +209,9 @@ public:
     Q_INVOKABLE void startNewInstance(QWindow *window, const QString &filePath, bool anonymously);
     Q_INVOKABLE void toggleFullscreen(QWindow *window);
 
+    Q_INVOKABLE bool hasLegacyDataMovedRecently() const;
+    Q_INVOKABLE void acknowledgeLegacyDataMigration();
+
     // Must be called from main.cpp
     void initialize(QQmlEngine *engine);
 
