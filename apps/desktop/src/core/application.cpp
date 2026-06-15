@@ -397,25 +397,10 @@ QVersionNumber Application::prepare()
 
 QString Application::appDataLocation()
 {
-    // On Windows, production builds are distributed as MSIX packages. MSIX silently redirects
-    // all writes to AppData\Roaming into a package-private virtual store
-    // (%LOCALAPPDATA%\Packages\<id>\LocalCache\Roaming). That virtual store is wiped when the
-    // user uninstalls the package, taking settings, vault, recent files, and custom tags with it.
-    // KF_FLAG_NO_PACKAGE_REDIRECTION bypasses the redirect and returns the real AppData\Roaming
-    // path, so user data persists across uninstall/reinstall cycles.
-#if defined(Q_OS_WIN) && defined(SCRITE_PRODUCTION_BUILD)
-    PWSTR path = nullptr;
-    const HRESULT hr = SHGetKnownFolderPath(FOLDERID_RoamingAppData,
-                                             KF_FLAG_NO_PACKAGE_REDIRECTION, nullptr, &path);
-    if (SUCCEEDED(hr)) {
-        const QString base = QDir::fromNativeSeparators(QString::fromWCharArray(path));
-        CoTaskMemFree(path);
-        return base + QLatin1Char('/') + QCoreApplication::organizationName()
-               + QLatin1Char('/') + QCoreApplication::applicationName();
-    }
-    if (path)
-        CoTaskMemFree(path);
-#endif
+    // On Windows, production builds are distributed as MSIX packages. The MSIX manifest declares
+    // the unvirtualizedResources capability and disables FileSystemWriteVirtualization, so
+    // QStandardPaths returns the real AppData\Roaming path and writes land there directly —
+    // surviving uninstall/reinstall cycles without any special path construction here.
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 }
 
