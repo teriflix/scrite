@@ -192,6 +192,25 @@ Item {
 
                 onScaleChanged: _pageScaleSlider.value = activeScale
             }
+
+            MouseArea {
+                anchors.fill: parent
+
+                acceptedButtons: Qt.NoButton
+
+                onWheel: (wheel) => {
+                    if (wheel.modifiers & Qt.ControlModifier) {
+                        const notches = wheel.angleDelta.y / 120
+                        const factor  = 1 + notches * 0.1
+                        _pageScaleSlider.value = Math.max(
+                            _pageScaleSlider.from,
+                            Math.min(_pageScaleSlider.to, _pageScaleSlider.value * factor)
+                        )
+                    } else {
+                        wheel.accepted = false
+                    }
+                }
+            }
         }
 
         Rectangle {
