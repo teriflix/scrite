@@ -118,7 +118,7 @@ Item {
             // Height is set here rather than as a declarative binding because Popup.open() writes to height
             // internally, which would break any QML binding set before open() is called. By the time
             // onOpened fires, the layout has settled and contentItem.implicitHeight is stable.
-            onOpened: height = Math.min(Math.max(100, _dialog.contentItem.implicitHeight + _dialog.header.height + _dialog.footer.height), Scrite.window.height * 0.3)
+            onOpened: height = Math.min(Math.max(200, _dialog.contentItem.implicitHeight + _dialog.header.height + _dialog.footer.height), Scrite.window.height * 0.3)
         }
     }
 }
