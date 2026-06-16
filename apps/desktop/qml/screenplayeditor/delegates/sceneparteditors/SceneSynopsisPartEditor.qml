@@ -47,7 +47,7 @@ AbstractScenePartEditor {
         lod: LodLoader.LOD.Low
 
         lowDetailComponent: Item {
-            height: _synopsisView.contentHeight
+            height: _synopsisView.implicitHeight
 
             TextArea {
                 id: _synopsisView
