@@ -3353,8 +3353,13 @@ void ScreenplayTextObjectInterface::drawSceneNumber(QPainter *painter, const QRe
     QRectF rect = givenRect;
     rect.setLeft(rootFrameFormat.leftMargin() * 0.55);
 
+    const QFont oldFont = painter->font();
+    painter->setFont(doc->defaultFont());
+
     const QString sceneNumberText = sceneNumber + QStringLiteral(".");
     this->drawText(painter, rect, sceneNumberText);
+
+    painter->setFont(oldFont);
 }
 
 void ScreenplayTextObjectInterface::drawMoreMarker(QPainter *painter, const QRectF &givenRect,
