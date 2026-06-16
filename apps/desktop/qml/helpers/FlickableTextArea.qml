@@ -112,14 +112,22 @@ Flickable {
         LanguageTransliterator.option: Runtime.language.activeTransliterationOption
         LanguageTransliterator.enabled: !readOnly
 
-        ContextMenuEvent.mode: ContextMenuEvent.GlobalEventFilterMode
-        ContextMenuEvent.active: !_spellChecker.wordUnderCursorIsMisspelled
+        persistentSelection: _contextMenu.visible || _spellCheckMenu.active
+
         ContextMenuEvent.onPopup: (mouse) => {
-            if(!_textArea.activeFocus) {
+            if(!_textArea.activeFocus)
                 _textArea.forceActiveFocus()
+
+            if(_textArea.selectedText === "")
                 _textArea.cursorPosition = _textArea.positionAt(mouse.x, mouse.y)
+
+            if(_textArea.activeFocus) {
+                if(_textArea.selectedText === "" && _spellChecker.wordUnderCursorIsMisspelled) {
+                    _spellCheckMenu.spellingSuggestions = _spellChecker.spellingSuggestionsForWordUnderCursor
+                    _spellCheckMenu.popup()
+                } else
+                    _contextMenu.popup()
             }
-            _contextMenu.popup()
         }
 
         TabSequenceItem.manager: root.tabSequenceManager
@@ -151,8 +159,34 @@ Flickable {
             onTriggered: () => { _textArea.redo() }
         }
 
-        TextAreaSpellingSuggestionsMenu {
-            textArea: _textArea
+        SpellingSuggestionsMenu {
+            id: _spellCheckMenu
+
+            property int cursorPosition: -1
+
+            onMenuAboutToShow: () => {
+                                   cursorPosition = _spellChecker.cursorPosition
+                               }
+
+            onMenuAboutToHide: () => {
+                                   _textArea.forceActiveFocus()
+                                   _textArea.cursorPosition = cursorPosition
+                               }
+
+            onReplaceRequest: (suggestion) => {
+                                  if(cursorPosition >= 0) {
+                                      _spellChecker.replaceWordAt(cursorPosition, suggestion)
+                                      _textArea.cursorPosition = cursorPosition
+                                  }
+                              }
+
+            onAddToDictionaryRequest: () => {
+                                          _spellChecker.addWordAtPositionToDictionary(cursorPosition)
+                                      }
+
+            onAddToIgnoreListRequest: () => {
+                                          _spellChecker.addWordAtPositionToIgnoreList(cursorPosition)
+                                      }
         }
 
         onCursorRectangleChanged: {
@@ -176,14 +210,6 @@ Flickable {
 
     VclMenu {
         id: _contextMenu
-
-        property bool __persistentSelection: false
-
-        onAboutToShow: {
-            __persistentSelection = _textArea.persistentSelection
-            _textArea.persistentSelection = true
-        }
-        onAboutToHide: _textArea.persistentSelection = __persistentSelection
 
         VclMenuItem {
             text: "Cut\t" + ActionHub.editOptions.find("cut").shortcut

@@ -137,7 +137,6 @@ set(SCRITE_DESKTOP_QML_FILES
   "qml/helpers/SpellingSuggestionsMenu.qml"
   "qml/helpers/TagText.qml"
   "qml/helpers/TextAreaInput.qml"
-  "qml/helpers/TextAreaSpellingSuggestionsMenu.qml"
   "qml/helpers/TextEditCursorDelegate.qml"
   "qml/helpers/TextListInput.qml"
   "qml/helpers/TextTabBar.qml"

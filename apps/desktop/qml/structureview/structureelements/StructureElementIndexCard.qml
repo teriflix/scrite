@@ -406,6 +406,7 @@ AbstractStructureElementUI {
                                     },
 
                                     SpellCheckSyntaxHighlighterDelegate {
+                                        id: _spellChecker
                                         enabled: Runtime.screenplayEditorSettings.enableSpellCheck
                                         cursorPosition: _synopsisField.cursorPosition
                                     }
@@ -416,6 +417,24 @@ AbstractStructureElementUI {
                                 LanguageTransliterator.popup: LanguageTransliteratorPopup { }
                                 LanguageTransliterator.option: Runtime.language.activeTransliterationOption
                                 LanguageTransliterator.enabled: !readOnly
+
+                                persistentSelection: _contextMenu.visible || _spellCheckMenu.active
+
+                                ContextMenuEvent.onPopup: (mouse) => {
+                                    if(!_synopsisField.activeFocus)
+                                        _synopsisField.forceActiveFocus()
+
+                                    if(_synopsisField.selectedText === "")
+                                        _synopsisField.cursorPosition = _synopsisField.positionAt(mouse.x, mouse.y)
+
+                                    if(_synopsisField.activeFocus) {
+                                        if(_synopsisField.selectedText === "" && _spellChecker.wordUnderCursorIsMisspelled) {
+                                            _spellCheckMenu.spellingSuggestions = _spellChecker.spellingSuggestionsForWordUnderCursor
+                                            _spellCheckMenu.popup()
+                                        } else
+                                            _contextMenu.popup()
+                                    }
+                                }
 
                                 width: _synopsisFieldFlick.scrollBarVisible ? _synopsisFieldFlick.width-20 : _synopsisFieldFlick.width
                                 height: Math.max(250, contentHeight + 100)
@@ -461,8 +480,60 @@ AbstractStructureElementUI {
                                     enabled: !Scrite.document.readOnly
                                 }
 
-                                TextAreaSpellingSuggestionsMenu {
-                                    textArea: _synopsisField
+                                SpellingSuggestionsMenu {
+                                    id: _spellCheckMenu
+
+                                    property int cursorPosition: -1
+
+                                    onMenuAboutToShow: () => {
+                                                           cursorPosition = _spellChecker.cursorPosition
+                                                       }
+
+                                    onMenuAboutToHide: () => {
+                                                           _synopsisField.forceActiveFocus()
+                                                           _synopsisField.cursorPosition = cursorPosition
+                                                       }
+
+                                    onReplaceRequest: (suggestion) => {
+                                                          if(cursorPosition >= 0) {
+                                                              _spellChecker.replaceWordAt(cursorPosition, suggestion)
+                                                              _synopsisField.cursorPosition = cursorPosition
+                                                          }
+                                                      }
+
+                                    onAddToDictionaryRequest: () => {
+                                                                  _spellChecker.addWordAtPositionToDictionary(cursorPosition)
+                                                              }
+
+                                    onAddToIgnoreListRequest: () => {
+                                                                  _spellChecker.addWordAtPositionToIgnoreList(cursorPosition)
+                                                              }
+                                }
+
+                                VclMenu {
+                                    id: _contextMenu
+
+                                    focus: false
+
+                                    VclMenuItem {
+                                        text: "Cut\t" + ActionHub.editOptions.find("cut").shortcut
+                                        enabled: _synopsisField.selectedText !== ""
+                                        onClicked: _synopsisField.cut()
+                                        focusPolicy: Qt.NoFocus
+                                    }
+
+                                    VclMenuItem {
+                                        text: "Copy\t" + ActionHub.editOptions.find("copy").shortcut
+                                        enabled: _synopsisField.selectedText !== ""
+                                        onClicked: _synopsisField.copy()
+                                        focusPolicy: Qt.NoFocus
+                                    }
+
+                                    VclMenuItem {
+                                        text: "Paste\t" + ActionHub.editOptions.find("paste").shortcut
+                                        onClicked: _synopsisField.paste()
+                                        focusPolicy: Qt.NoFocus
+                                    }
                                 }
 
                                 cursorDelegate: TextEditCursorDelegate {

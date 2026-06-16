@@ -41,6 +41,8 @@ MenuLoader {
     menu: VclMenu {
         property int cursorPosition: -1
 
+        focus: false
+
         onAboutToShow: root.menuAboutToShow()
         onAboutToHide: root.menuAboutToHide()
 

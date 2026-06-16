@@ -59,19 +59,27 @@ TextArea {
     LanguageTransliterator.option: Runtime.language.activeTransliterationOption
     LanguageTransliterator.enabled: !readOnly
 
-    ContextMenuEvent.mode: ContextMenuEvent.GlobalEventFilterMode
-    ContextMenuEvent.active: !_spellChecker.wordUnderCursorIsMisspelled
     ContextMenuEvent.onPopup: (mouse) => {
-        if(!root.activeFocus) {
+        if(!root.activeFocus)
             root.forceActiveFocus()
+
+        if(root.selectedText === "")
             root.cursorPosition = root.positionAt(mouse.x, mouse.y)
+
+        if(root.activeFocus) {
+            if(root.selectedText === "" && _spellChecker.wordUnderCursorIsMisspelled) {
+                _spellCheckMenu.spellingSuggestions = _spellChecker.spellingSuggestionsForWordUnderCursor
+                _spellCheckMenu.popup()
+            } else
+                _contextMenu.popup()
         }
-        _contextMenu.popup()
     }
 
     // palette: Runtime.colors.palette
     selectByMouse: true
     selectByKeyboard: true
+
+    persistentSelection: _contextMenu.visible || _spellCheckMenu.active
 
     // renderType: Text.NativeRendering
     // selectionColor: Runtime.colors.accent.c700.background
@@ -97,8 +105,34 @@ TextArea {
         enabled: !Scrite.document.readOnly
     }
 
-    TextAreaSpellingSuggestionsMenu {
-        textArea: root
+    SpellingSuggestionsMenu {
+        id: _spellCheckMenu
+
+        property int cursorPosition: -1
+
+        onMenuAboutToShow: () => {
+                               cursorPosition = _spellChecker.cursorPosition
+                           }
+
+        onMenuAboutToHide: () => {
+                               root.forceActiveFocus()
+                               root.cursorPosition = cursorPosition
+                           }
+
+        onReplaceRequest: (suggestion) => {
+                              if(cursorPosition >= 0) {
+                                  _spellChecker.replaceWordAt(cursorPosition, suggestion)
+                                  root.cursorPosition = cursorPosition
+                              }
+                        }
+
+        onAddToDictionaryRequest: () => {
+                                      _spellChecker.addWordAtPositionToDictionary(cursorPosition)
+                                  }
+
+        onAddToIgnoreListRequest: () => {
+                                      _spellChecker.addWordAtPositionToIgnoreList(cursorPosition)
+                                  }
     }
 
     ActionHandler {
@@ -121,22 +155,10 @@ TextArea {
         }
     }
 
-    TextAreaSpellingSuggestionsMenu {
-        textArea: root
-    }
-
     VclMenu {
         id: _contextMenu
 
         focus: false
-
-        property bool __persistentSelection: false
-
-        onAboutToShow: {
-            __persistentSelection = root.persistentSelection
-            root.persistentSelection = true
-        }
-        onAboutToHide: root.persistentSelection = __persistentSelection
 
         VclMenuItem {
             text: "Cut\t" + ActionHub.editOptions.find("cut").shortcut

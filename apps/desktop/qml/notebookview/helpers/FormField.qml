@@ -207,6 +207,7 @@ Column {
                     },
 
                     SpellCheckSyntaxHighlighterDelegate {
+                        id: _spellChecker
                         enabled: Runtime.screenplayEditorSettings.enableSpellCheck
                         cursorPosition: _answerText.cursorPosition
                     }
@@ -221,6 +222,24 @@ Column {
                 }
                 LanguageTransliterator.option: Runtime.language.activeTransliterationOption
                 LanguageTransliterator.enabled: !readOnly
+
+                persistentSelection: _contextMenu.visible || _spellCheckMenu.active
+
+                ContextMenuEvent.onPopup: (mouse) => {
+                    if(!_answerText.activeFocus)
+                        _answerText.forceActiveFocus()
+
+                    if(_answerText.selectedText === "")
+                        _answerText.cursorPosition = _answerText.positionAt(mouse.x, mouse.y)
+
+                    if(_answerText.activeFocus) {
+                        if(_answerText.selectedText === "" && _spellChecker.wordUnderCursorIsMisspelled) {
+                            _spellCheckMenu.spellingSuggestions = _spellChecker.spellingSuggestionsForWordUnderCursor
+                            _spellCheckMenu.popup()
+                        } else
+                            _contextMenu.popup()
+                    }
+                }
 
                 text: root.answer
                 readOnly: Scrite.document.readOnly
@@ -259,8 +278,60 @@ Column {
                     onTriggered: () => { _answerText.redo() }
                 }
 
-                TextAreaSpellingSuggestionsMenu {
-                    textArea: _answerText
+                SpellingSuggestionsMenu {
+                    id: _spellCheckMenu
+
+                    property int cursorPosition: -1
+
+                    onMenuAboutToShow: () => {
+                                           cursorPosition = _spellChecker.cursorPosition
+                                       }
+
+                    onMenuAboutToHide: () => {
+                                           _answerText.forceActiveFocus()
+                                           _answerText.cursorPosition = cursorPosition
+                                       }
+
+                    onReplaceRequest: (suggestion) => {
+                                          if(cursorPosition >= 0) {
+                                              _spellChecker.replaceWordAt(cursorPosition, suggestion)
+                                              _answerText.cursorPosition = cursorPosition
+                                          }
+                                      }
+
+                    onAddToDictionaryRequest: () => {
+                                                  _spellChecker.addWordAtPositionToDictionary(cursorPosition)
+                                              }
+
+                    onAddToIgnoreListRequest: () => {
+                                                  _spellChecker.addWordAtPositionToIgnoreList(cursorPosition)
+                                              }
+                }
+
+                VclMenu {
+                    id: _contextMenu
+
+                    focus: false
+
+                    VclMenuItem {
+                        text: "Cut\t" + ActionHub.editOptions.find("cut").shortcut
+                        enabled: _answerText.selectedText !== ""
+                        onClicked: _answerText.cut()
+                        focusPolicy: Qt.NoFocus
+                    }
+
+                    VclMenuItem {
+                        text: "Copy\t" + ActionHub.editOptions.find("copy").shortcut
+                        enabled: _answerText.selectedText !== ""
+                        onClicked: _answerText.copy()
+                        focusPolicy: Qt.NoFocus
+                    }
+
+                    VclMenuItem {
+                        text: "Paste\t" + ActionHub.editOptions.find("paste").shortcut
+                        onClicked: _answerText.paste()
+                        focusPolicy: Qt.NoFocus
+                    }
                 }
 
                 onTextEdited: root.answer = text

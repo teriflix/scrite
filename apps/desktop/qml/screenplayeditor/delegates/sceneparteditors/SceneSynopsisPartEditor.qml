@@ -107,7 +107,7 @@ AbstractScenePartEditor {
             onActiveFocusChanged: {
                 if(activeFocus)
                     root.ensureVisible(_synopsisInput, Qt.rect(0, -10, cursorRectangle.width, cursorRectangle.height+20))
-                else
+                else if(!_synopsisInput.persistentSelection)
                     Qt.callLater(_synopsisLoader.lowLod)
             }
         }
