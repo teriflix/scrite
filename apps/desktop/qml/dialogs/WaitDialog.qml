@@ -61,8 +61,9 @@ Item {
             property ProgressReport progressReport
 
             width: Math.min(500, Scrite.window.width*0.5)
-            height: Math.min(200, Scrite.window.height*0.3)
+            height: 200 // placeholder; actual height is set in onOpened
 
+            clip: true
             title: "Please wait ..."
             closePolicy: Popup.NoAutoClose
             titleBarButtons: null
@@ -113,6 +114,11 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
+
+            // Height is set here rather than as a declarative binding because Popup.open() writes to height
+            // internally, which would break any QML binding set before open() is called. By the time
+            // onOpened fires, the layout has settled and contentItem.implicitHeight is stable.
+            onOpened: height = Math.min(Math.max(100, _dialog.contentItem.implicitHeight + _dialog.header.height + _dialog.footer.height), Scrite.window.height * 0.3)
         }
     }
 }
