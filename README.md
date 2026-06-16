@@ -63,6 +63,16 @@ These talks may help you find your way around the code.
 - [Nhân Trương reviews Scrite, in Vietnamese](https://www.youtube.com/watch?v=oY4kQrzIgvU)
 - [James K Martin reviews Scrite](https://www.youtube.com/watch?v=_JkTx75oVbE)
 
+## Special Thanks
+
+<a href="https://www.scrite.io/fossunited-grants/" target="_blank">
+<img src="./resources/sponsored-by-fugrants.png" alt="Sponsored by FOSSUnited" width="160"/>
+</a>
+
+[Grant Funding (2026)](https://www.scrite.io/fossunited-grants/): Covering essential expenses 
+related to server hosting, software licensing, code signing certificates, and legal document 
+reviews.
+
 ## Dependencies
 
 ### mkdocs
