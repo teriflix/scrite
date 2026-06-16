@@ -3166,6 +3166,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     QGraphicsTextItem *titleCardItem = new QGraphicsTextItem;
     scene.addItem(titleCardItem);
     titleCardItem->setFont(normalFont);
+    titleCardItem->setDefaultTextColor(Qt::black);
     titleCardItem->setTextWidth(sceneRect.width());
     QString titleHtml;
     {
@@ -3220,6 +3221,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
         scene.addItem(contactCardItem);
         contactCardItem->setTextWidth(sceneRect.width());
         contactCardItem->setFont(normalFont);
+        contactCardItem->setDefaultTextColor(Qt::black);
         contactCardItem->setHtml(contactHtml);
 
         QRectF contactCardRect = contactCardItem->boundingRect();
@@ -3252,6 +3254,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
 
         QGraphicsTextItem *loglineCard = new QGraphicsTextItem(loglineCardContainer);
         loglineCard->setFont(loglineFont);
+        loglineCard->setDefaultTextColor(Qt::black);
         loglineCard->setTextWidth(textWidth);
         loglineCardContainer->setPos(0, 0);
 
