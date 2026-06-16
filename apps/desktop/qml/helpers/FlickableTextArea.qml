@@ -74,6 +74,7 @@ Flickable {
         bottomPadding: 5
 
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+        verticalAlignment: Text.AlignTop
         selectByMouse: true
         selectByKeyboard: true
 

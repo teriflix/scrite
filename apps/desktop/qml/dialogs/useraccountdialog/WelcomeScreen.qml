@@ -69,6 +69,7 @@ Item {
                     width: _welcomeTextFlick.width - 20
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                     wrapMode: Text.WordWrap
+                    verticalAlignment: Text.AlignTop
                     readOnly: true
                     padding: _welcomeTextFlick.clip ? 10 : 0
 

@@ -107,6 +107,8 @@ AbstractScenePartEditor {
         LanguageTransliterator.option: Runtime.language.activeTransliterationOption
         LanguageTransliterator.enabled: !readOnly
 
+        verticalAlignment: Text.AlignTop
+
         width: parent.width
 
         clip: false

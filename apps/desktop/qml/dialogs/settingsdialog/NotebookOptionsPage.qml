@@ -52,6 +52,7 @@ Item {
                     Layout.fillWidth: true
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     wrapMode: Text.WordWrap
+                    verticalAlignment: Text.AlignTop
                     textFormat: TextArea.RichText
                     readOnly: true
                     background: Item { }
@@ -83,6 +84,7 @@ Item {
 
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     wrapMode: Text.WordWrap
+                    verticalAlignment: Text.AlignTop
                     textFormat: TextArea.RichText
                     readOnly: true
                     background: Item { }

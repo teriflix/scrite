@@ -53,6 +53,7 @@ DialogLauncher {
                     readOnly: true
                     selectByMouse: true
                     wrapMode: TextEdit.NoWrap
+                    verticalAlignment: Text.AlignTop
                     font.family: "Courier Prime"
                     font.pointSize: 10
                     background: Item { }

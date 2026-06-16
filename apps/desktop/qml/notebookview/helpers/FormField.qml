@@ -148,6 +148,7 @@ Column {
                 text: root.answer === "" ? root.placeholderText : root.answer
                 opacity: root.answer === "" ? 0.5 : 1
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                verticalAlignment: Text.AlignTop
 
                 topPadding: 5
                 leftPadding: 5
@@ -244,6 +245,7 @@ Column {
                 text: root.answer
                 readOnly: Scrite.document.readOnly
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                verticalAlignment: Text.AlignTop
                 selectByMouse: true
                 selectByKeyboard: true
 

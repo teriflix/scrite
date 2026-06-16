@@ -144,6 +144,7 @@ DialogLauncher {
                             width: _othersReasonView.width-17
 
                             wrapMode: Text.WordWrap
+                            verticalAlignment: Text.AlignTop
                             placeholderText: "Your input helps us improve. Any feedback will be appreciated!"
                             onEnabledChanged: {
                                 if(enabled)

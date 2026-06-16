@@ -418,6 +418,8 @@ AbstractStructureElementUI {
                                 LanguageTransliterator.option: Runtime.language.activeTransliterationOption
                                 LanguageTransliterator.enabled: !readOnly
 
+                                verticalAlignment: Text.AlignTop
+
                                 persistentSelection: _contextMenu.visible || _spellCheckMenu.active
 
                                 ContextMenuEvent.onPopup: (mouse) => {

@@ -31,6 +31,8 @@ TextArea {
     property bool undoRedoEnabled: false
     property bool spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
 
+    verticalAlignment: Text.AlignTop
+
     Component.onCompleted: {
         // For some reason, setting the text property causes it to get reset shortly later.
         Qt.callLater(() => { if(root.text !== root.initialText) root.text = root.initialText })

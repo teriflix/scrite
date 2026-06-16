@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
@@ -57,6 +59,7 @@ AbstractScenePartEditor {
                 text: root.scene && root.scene.hasSynopsis ? root.scene.synopsis : "Scene Synopsis"
                 opacity: root.scene && root.scene.hasSynopsis ? 1 : 0.5
                 readOnly: true
+                verticalAlignment: Text.AlignTop
                 background: Item { }
             }
 

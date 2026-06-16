@@ -330,6 +330,7 @@ Item {
             padding: 7.5
 
             wrapMode: Text.WordWrap
+            verticalAlignment: Text.AlignTop
             selectByMouse: true
             placeholderText: typeof propertyInfo.placeHolderText === "string" ? propertyInfo.placeHolderText : ""
             selectByKeyboard: true

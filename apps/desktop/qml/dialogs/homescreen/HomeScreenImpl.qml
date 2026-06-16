@@ -1093,6 +1093,7 @@ Item {
                                 text: record ? composeTextFromRecord(record) : defaultText
                                 textFormat: record ? TextArea.RichText : TextArea.MarkdownText
                                 wrapMode: Text.WordWrap
+                                verticalAlignment: Text.AlignTop
 
                                 background: Item { }
 

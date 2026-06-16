@@ -407,6 +407,7 @@ Item {
                 font: Scrite.document.printFormat.defaultFont
                 readOnly: true
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                verticalAlignment: Text.AlignTop
                 background: Item { }
 
                 SceneDocumentBinder {
