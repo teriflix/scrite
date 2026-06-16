@@ -39,11 +39,13 @@ Item {
     function close() { visible = false }
     function toggle() { visible = !visible }
     function adjustedX(xVal) {
-        const availableSpace = parent ? parent.width : Scrite.window.width
+        const fallback = Scrite.window ? Scrite.window.width : 0
+        const availableSpace = parent ? parent.width : fallback
         return Runtime.bounded(_private.margin, xVal, availableSpace-width-_private.margin)
     }
     function adjustedY(yVal) {
-        const availableSpace = parent ? parent.height : Scrite.window.height
+        const fallback = Scrite.window ? Scrite.window.height : 0
+        const availableSpace = parent ? parent.height : fallback
         return Runtime.bounded(_private.margin, yVal, availableSpace-height-_private.margin)
     }
 

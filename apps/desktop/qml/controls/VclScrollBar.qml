@@ -31,7 +31,7 @@ ScrollBar {
 
     Component.onCompleted: {
         if(flickable === null)
-            flickable = Object.firstParentByType(root, "QQuickFlickable")
+            flickable = Object.firstParentByType(root, "QQuickFlickable") as Flickable
     }
 
     policy: needed ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff

@@ -28,7 +28,7 @@ SpellingSuggestionsMenu {
     id: root
 
     // Just setting this property should be enough
-    property TextArea textArea
+    property var textArea
 
     anchors.bottom: parent.bottom
 
@@ -37,20 +37,20 @@ SpellingSuggestionsMenu {
     onTextAreaChanged: Qt.callLater(_private.update)
 
     onMenuAboutToShow: () => {
-                           _private.cursorPosition = textArea.cursorPosition
-                           textArea.persistentSelection = true
+                           _private.cursorPosition = _private.textArea.cursorPosition
+                           _private.textArea.persistentSelection = true
                        }
 
     onMenuAboutToHide: () => {
-                           textArea.persistentSelection = false
-                           textArea.forceActiveFocus()
-                           textArea.cursorPosition = _private.cursorPosition
+                           _private.textArea.persistentSelection = false
+                           _private.textArea.forceActiveFocus()
+                           _private.textArea.cursorPosition = _private.cursorPosition
                        }
 
     onReplaceRequest: (suggestion) => {
                           if(_private.cursorPosition >= 0) {
                               _private.spellCheck.replaceWordAt(_private.cursorPosition, suggestion)
-                              textArea.cursorPosition = _private.cursorPosition
+                              _private.textArea.cursorPosition = _private.cursorPosition
                           }
                     }
 
@@ -63,20 +63,20 @@ SpellingSuggestionsMenu {
                               }
 
     MouseArea {
-        parent: root.textArea ? root.textArea : root
+        parent: _private.textArea ? _private.textArea : root
 
         anchors.fill: parent
 
-        enabled: root.textArea && root.textArea.activeFocus && _private.spellCheck && _private.spellCheck.enabled
+        enabled: _private.textArea && _private.textArea.activeFocus && _private.spellCheck && _private.spellCheck.enabled
         cursorShape: Qt.IBeamCursor
         acceptedButtons: Qt.RightButton
 
         onClicked: (mouse) => {
                        mouse.accepted = false
 
-                       root.textArea.persistentSelection = true
-                       if(!root.textArea.hasSelection) {
-                           root.textArea.cursorPosition = root.textArea.positionAt(mouse.x, mouse.y)
+                       _private.textArea.persistentSelection = true
+                       if(_private.textArea.selectedText === "") {
+                           _private.textArea.cursorPosition = _private.textArea.positionAt(mouse.x, mouse.y)
                            if(_private.spellCheck.wordUnderCursorIsMisspelled) {
                                root.spellingSuggestions = _private.spellCheck.spellingSuggestionsForWordUnderCursor
                                root.popup()
@@ -85,7 +85,7 @@ SpellingSuggestionsMenu {
                            }
                        }
 
-                       root.textArea.persistentSelection = false
+                       _private.textArea.persistentSelection = false
                    }
     }
 
@@ -96,12 +96,13 @@ SpellingSuggestionsMenu {
         property var spellCheck    // of type SpellCheckSyntaxHighlighterDelegate
         property int cursorPosition: -1
         property var syntaxHighlighter // of type SyntaxHighlighter
+        property TextArea textArea: root.textArea as TextArea
 
         function update() {
-            if(root.textArea === null)
+            if(_private.textArea === null)
                 root.textArea = Object.firstParentByType(root, "QQuickTextArea")
 
-            syntaxHighlighter = Object.firstChildByType(root.textArea, "SyntaxHighlighter")
+            syntaxHighlighter = Object.firstChildByType(_private.textArea, "SyntaxHighlighter")
             if(syntaxHighlighter)
                 spellCheck = syntaxHighlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate")
 
