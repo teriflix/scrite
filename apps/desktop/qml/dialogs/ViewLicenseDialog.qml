@@ -55,7 +55,7 @@ DialogLauncher {
                     wrapMode: TextEdit.NoWrap
                     verticalAlignment: Text.AlignTop
                     font.family: "Courier Prime"
-                    font.pointSize: 10
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     background: Item { }
                 }
             }
