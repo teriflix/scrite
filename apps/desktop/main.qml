@@ -13,7 +13,6 @@
 **
 ****************************************************************************/
 
-import QtQml
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
@@ -22,13 +21,8 @@ import io.scrite.components
 
 import "./qml"
 import "./qml/globals"
-import "./qml/helpers"
-import "./qml/dialogs"
-import "./qml/controls"
-import "./qml/overlays"
-import "./qml/commandcenter"
+import "./qml/init"
 import "./qml/notifications"
-import "./qml/floatingdockpanels"
 
 ApplicationWindow {
     id: root
@@ -36,12 +30,12 @@ ApplicationWindow {
     property bool closeButtonVisible: true
 
     AppWindow.closeButtonVisible: closeButtonVisible
-    AppWindow.onInitialize: _private.initialize()
+    AppWindow.onInitialize: _initSM.start()
 
     width: AppWindow.minimumWindowWidth
     height: AppWindow.minimumWindowHeight
     visible: true
-    visibility: ApplicationWindow.Windowed
+    visibility: ApplicationWindow.Maximized
 
     color: Runtime.colors.primary.windowColor
 
@@ -81,126 +75,9 @@ ApplicationWindow {
         }
     }
 
-    // Private Section
-    QtObject {
-        id: _private
-
-        function initialize() {
-            // Initialize runtime
-            Runtime.init(_contentLoader)
-
-            // Determine font size provided by QML
-            determineDefaultFontSize()
-
-            // Raise window
-            Scrite.window.raise()
-
-            // Check for legacy NSIS install (production Windows only).
-            // Scrite.prelaunchChecks() returns false if one is found; QML shows the error.
-            if (!Scrite.prelaunchChecks()) {
-                MessageBox.information(
-                    "Previous Version Detected",
-                    "A previous version of Scrite is installed on this computer.\n\n" +
-                    "Please uninstall it via \"Add or Remove Programs\" in Windows Settings " +
-                    "before running this version.",
-                    Qt.quit)
-            } else {
-                // Show the license dialog on first launch of each new version.
-                if (!Scrite.isLicenseAccepted()) {
-                    let dlg = LicenseDialog.launch()
-                    if (dlg)
-                        dlg.accepted.connect(_private.continueAfterLicense)
-                    else
-                        _private.continueAfterLicense()
-                } else {
-                    _private.continueAfterLicense()
-                }
-            }
-        }
-
-        function continueAfterLicense() {
-            if(Scrite.app.hasLegacyDataMovedRecently()) {
-                let dlg = LegacyDataMigrationDialog.launch()
-                if(dlg) {
-                    dlg.accepted.connect(_private.initApp)
-                    return
-                }
-            }
-            _private.initApp()
-        }
-
-        function initApp() {
-            // Initialze modules
-            ActionHub.init(_contentLoader)
-            HelpCenter.init(_contentLoader)
-            CommandCenter.init(_contentLoader)
-            SubscriptionPlanOperations.init(_contentLoader)
-
-            // Show the main-window content
-            _contentLoader.active = true
-
-            // Initialize layers
-            BusyOverlay.init(_contentLoader)
-            SubscriptionDetailsDialog.init()
-            SubscriptionPlanComparisonDialog.init()
-            UserAccountDialog.init(_contentLoader)
-            FloatingDockLayer.init(_contentLoader)
-            OverlaysLayer.init(_contentLoader)
-            NotificationsLayer.init(_contentLoader)
-
-            // Show initial UI — user login check happens here
-            if(Scrite.user.loggedIn) {
-                if(Runtime.allowAppUsage)
-                    showHomeScreenOrOpenFile()
-                else
-                    UserAccountDialog.launch()
-            } else {
-                var splashScreen = SplashScreen.launch()
-                if(splashScreen)
-                    splashScreen.closed.connect(_private.splashScreenWasClosed)
-                else
-                    splashScreenWasClosed()
-            }
-        }
-
-        function determineDefaultFontSize() {
-            if( Scrite.app.customFontPointSize === 0) {
-                let textItemObj = Qt.createQmlObject("import QtQuick; Text { text: \"Welcome to Scrite\" }", _contentLoader)
-                let textItem = textItemObj as Text
-                if(textItem) {
-                    Scrite.app.customFontPointSize = textItem.font.pointSize
-                    textItem.destroy()
-                }
-            }
-        }
-
-        function splashScreenWasClosed() {
-            if(Platform.isWindowsDesktop && Platform.osMajorVersion < 10) {
-                MessageBox.information("",
-                    "The Windows version of Scrite works best on Windows 10 or higher. While it may work on earlier versions of Windows, we don't actively test on them. We recommend that you use Scrite on PCs with Windows 10 or higher.",
-                    _private.showHomeScreenOrOpenFile
-                )
-            } else if(Runtime.allowAppUsage)
-                showHomeScreenOrOpenFile()
-            else
-                UserAccountDialog.launch()
-        }
-
-        function showHomeScreenOrOpenFile() {
-            if(Scrite.fileNameToOpen === "") {
-                if(!Scrite.app.maybeOpenAnonymously())
-                    HomeScreen.launch()
-            } else
-                Scrite.document.open(Scrite.fileNameToOpen)
-
-            Runtime.execLater(_private, 2000, _private.maybeOnboardUserSurvey)
-        }
-
-        function maybeOnboardUserSurvey() {
-            if(Runtime.userAccountDialogSettings.userOnboardingStatus === "required") {
-                UserOnboardingDialog.launch()
-            }
-        }
+    AppInitStateMachine {
+        id: _initSM
+        contentLoader: _contentLoader
     }
 }
 

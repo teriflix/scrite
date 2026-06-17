@@ -147,7 +147,7 @@ DialogLauncher {
 
                     VclButton {
                         text: "Decline"
-                        onClicked: Qt.quit()
+                        onClicked: _dialog.reject()
                     }
 
                     VclButton {

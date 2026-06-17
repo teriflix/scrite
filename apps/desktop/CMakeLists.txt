@@ -21,6 +21,8 @@ find_package(Qt6 6.11 REQUIRED COMPONENTS
   Pdf
   WebEngineQuick
   Core5Compat
+  StateMachine
+  StateMachineQml
 )
 
 if(APPLE)
@@ -143,6 +145,8 @@ target_link_libraries(Scrite PRIVATE
   Qt6::Pdf
   Qt6::WebEngineQuick
   Qt6::Core5Compat
+  Qt6::StateMachine
+  Qt6::StateMachineQml
 
   QuaZip::QuaZip
   OpenXLSX

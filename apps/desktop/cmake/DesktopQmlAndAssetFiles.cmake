@@ -1,5 +1,6 @@
 set(SCRITE_DESKTOP_QML_FILES
   "main.qml"
+  "qml/init/AppInitStateMachine.qml"
   "qml/NotebookView.qml"
   "qml/ScreenplayEditor.qml"
   "qml/ScriteMainWindowContent.qml"
