@@ -295,16 +295,4 @@ add_custom_target(scrite_touch_build_timestamp ALL
 )
 add_dependencies(Scrite scrite_touch_build_timestamp)
 
-if(APPLE)
-  install(TARGETS Scrite BUNDLE DESTINATION .)
-elseif(WIN32)
-  install(TARGETS Scrite RUNTIME DESTINATION .)
-elseif(UNIX)
-  install(TARGETS Scrite RUNTIME DESTINATION bin)
-  install(FILES "${CMAKE_SOURCE_DIR}/packaging/assets/linux/Scrite.desktop"
-          DESTINATION share/applications)
-  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/images/appicon.png"
-          DESTINATION share/icons/hicolor/512x512/apps
-          RENAME Scrite.png)
-endif()
 
