@@ -420,7 +420,7 @@ DialogLauncher {
             }
 
             VclButton {
-                text: "Continue »"
+                text: "Buy Now »"
                 onClicked: _dialog.acceptAction.trigger()
             }
 
