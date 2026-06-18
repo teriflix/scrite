@@ -330,9 +330,7 @@ VclDialog {
                             Qt.callLater(root.close)
                         } else {
                             const reportErrors = Aggregation.errorReport(root.report)
-                            MessageBox.information(root.report.title, reportErrors.errorMessage, () => {
-                                                       Qt.callLater(root.close)
-                                                   } )
+                            MessageBox.information(root.report.title, reportErrors.errorMessage, root.close)
                         }
                     }
                 }
