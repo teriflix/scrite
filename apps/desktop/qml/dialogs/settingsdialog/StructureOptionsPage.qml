@@ -75,12 +75,12 @@ Item {
                         Layout.preferredHeight: 30
                         border.width: 1
                         border.color: Runtime.colors.primary.borderColor
-                        color: Runtime.structureCanvasSettings.canvasColor
+                        color: Runtime.structureCanvasSettings.canvasBackgroundColor
 
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: Runtime.structureCanvasSettings.canvasColor = Color.pick(Runtime.structureCanvasSettings.canvasColor)
+                            onClicked: Runtime.structureCanvasSettings.canvasBackgroundColor = Color.pick(Runtime.structureCanvasSettings.canvasBackgroundColor)
                         }
                     }
 
@@ -99,12 +99,12 @@ Item {
                         Layout.preferredHeight: 30
                         border.width: 1
                         border.color: Runtime.colors.primary.borderColor
-                        color: Runtime.structureCanvasSettings.gridColor
+                        color: Runtime.structureCanvasSettings.gridLineColor
 
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: Runtime.structureCanvasSettings.gridColor = Color.pick(Runtime.structureCanvasSettings.gridColor)
+                            onClicked: Runtime.structureCanvasSettings.gridLineColor = Color.pick(Runtime.structureCanvasSettings.gridLineColor)
                         }
                     }
 

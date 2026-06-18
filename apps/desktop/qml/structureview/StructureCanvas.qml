@@ -110,12 +110,12 @@ GridBackground {
     height: _private.heightBinder.get
 
     border.width: 2
-    border.color: Runtime.structureCanvasSettings.gridColor
+    border.color: Runtime.structureCanvasSettings.gridLineColor
 
     tickDistance: Scrite.document.structure.canvasGridSize
     gridIsVisible: Runtime.structureCanvasSettings.showGrid && root.canvasScrollInteractive
-    majorTickColor: Runtime.structureCanvasSettings.gridColor
-    minorTickColor: Color.translucent(Runtime.structureCanvasSettings.gridColor, 0.5)
+    majorTickColor: Runtime.structureCanvasSettings.gridLineColor
+    minorTickColor: Color.translucent(Runtime.structureCanvasSettings.gridLineColor, 0.5)
     backgroundColor: root.canvasScrollInteractive ? Runtime.colors.primary.c10.background : Color.translucent(Runtime.colors.primary.c300.background, 0.75)
 
     scale: root.canvasScrollSuggestedScale
