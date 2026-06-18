@@ -65,11 +65,11 @@ Item {
             return
         }
 
-        if(plan.kind !== "trial" && !Scrite.user.info.hasTrialSubscription && !Scrite.user.info.isEarlyAdopter) {
-            const buttons = [Runtime.toTitleCase(plan.action.kind) + " " + plan.title, "Go Back"]
+        if(plan.kind !== "trial" && !Scrite.user.info.hasTrialSubscription && !Scrite.user.info.isEarlyAdopter && !Runtime.errorWhileActivatingTrial) {
+            const buttons = ["Go Back", Runtime.toTitleCase(plan.action.kind) + " " + plan.title]
             MessageBox.question("Use Trial", "We recommend that you use the app on trial first before signing up for any other plan.",
                                 buttons, (option) => {
-                                    if(option === buttons[0])
+                                    if(option === buttons[1])
                                         _private.subscribeTo(plan, callList)
                                 })
         } else
@@ -407,8 +407,18 @@ Item {
                         callList.addCall(api)
                 }
             } else if(plan.action.kind === "buy" ) {
-                Qt.openUrlExternally(plan.action.url)
+                if (plan.kind === "paid" && _private.planHasExcludedFeatures(plan))
+                    SubscriptionPlanPurchaseDialog.launch(plan)
+                else
+                    Qt.openUrlExternally(plan.action.url)
             }
+        }
+
+        function planHasExcludedFeatures(plan) {
+            const f = plan.features
+            if (f.length === 0) return false
+            if (f.length === 1 && f[0] === "*") return false
+            return true
         }
 
         function loadTaxonomy() {

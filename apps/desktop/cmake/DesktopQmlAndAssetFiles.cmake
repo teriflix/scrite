@@ -306,6 +306,7 @@ set(SCRITE_DESKTOP_SINGLETON_QML_FILES
   "qml/dialogs/StructureStoryBeatsDialog.qml"
   "qml/dialogs/SubscriptionDetailsDialog.qml"
   "qml/dialogs/SubscriptionPlanComparisonDialog.qml"
+  "qml/dialogs/SubscriptionPlanPurchaseDialog.qml"
   "qml/dialogs/TitlePageDialog.qml"
   "qml/dialogs/TrialNotActivatedDialog.qml"
   "qml/dialogs/UserAccountDialog.qml"

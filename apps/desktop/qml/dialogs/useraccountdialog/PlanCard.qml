@@ -23,7 +23,7 @@ import "../../globals"
 import "../../controls"
 import "../../helpers"
 
-RowLayout {
+Item {
     id: root
 
     property url icon: exclusive ? "qrc:/images/exclprodicon.png" : "qrc:/images/prodicon.png"
@@ -31,94 +31,155 @@ RowLayout {
     property string duration
     property string durationNote
     property string price
+    property string actualPrice: ""
+    property string savingsLabel: ""
     property string priceNote
     property bool   exclusive: false
+    property bool   isBestValue: false
     property string actionLink
     property bool actionLinkVisible: true
     property bool actionLinkEnabled: true
 
     signal actionLinkClicked()
 
-    spacing: 10
+    implicitHeight: _row.implicitHeight
+    implicitWidth: _row.implicitWidth
 
     RowLayout {
-        Layout.fillWidth: true
-        Layout.preferredWidth: 25
-        z: 1
+        id: _row
+        anchors.fill: parent
+        spacing: 10
 
-        spacing: 5
+        // Column 1: icon + name + best value badge
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.preferredWidth: 25
+            z: 1
+            spacing: 5
 
-        Image {
-            Layout.alignment: Qt.AlignVCenter
-            Layout.preferredHeight: 32
-            Layout.preferredWidth: 32
+            Image {
+                Layout.alignment: Qt.AlignVCenter
+                Layout.preferredHeight: 32
+                Layout.preferredWidth: 32
 
-            source: Runtime.themedIcon(root.icon)
-            mipmap: true
-            smooth: true
-            fillMode: Image.PreserveAspectFit
+                source: Runtime.themedIcon(root.icon)
+                mipmap: true
+                smooth: true
+                fillMode: Image.PreserveAspectFit
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
+
+                LabelWithTooltip {
+                    Layout.fillWidth: true
+                    text: root.name
+                    padding: root.isBestValue ? 0 : 5
+                }
+
+                Rectangle {
+                    visible: root.isBestValue
+                    color: Runtime.colors.tx(Runtime.colors.accent.c600.background)
+                    radius: 4
+                    implicitWidth: _bvText.implicitWidth + 12
+                    implicitHeight: _bvText.implicitHeight + 4
+
+                    VclLabel {
+                        id: _bvText
+                        anchors.centerIn: parent
+                        text: "Best Value"
+                        color: Runtime.colors.accent.c600.text
+                        font.bold: true
+                        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                    }
+                }
+            }
         }
 
-        LabelWithTooltip {
+        // Column 2: duration + note
+        ColumnLayout {
             Layout.fillWidth: true
-            Layout.alignment: Qt.AlignVCenter
+            Layout.preferredWidth: 25
+            z: 1
 
-            text: root.name
-            padding: 5
+            LabelWithTooltip {
+                Layout.fillWidth: true
+                text: root.duration
+            }
+
+            LabelWithTooltip {
+                Layout.fillWidth: true
+                text: root.durationNote
+                visible: text !== ""
+                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+            }
         }
-    }
 
-    ColumnLayout {
-        Layout.fillWidth: true
-        Layout.preferredWidth: 30
-        z: 1
-
-        LabelWithTooltip {
+        // Column 3: actual price (struck through) + discount % + subtitle
+        ColumnLayout {
             Layout.fillWidth: true
+            Layout.preferredWidth: 20
+            z: 1
+            spacing: 2
 
-            text: root.duration
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 6
+                visible: root.actualPrice !== "" || root.savingsLabel !== ""
+
+                VclLabel {
+                    text: root.actualPrice
+                    font.family: Runtime.shortcutFontMetrics.font.family
+                    font.strikeout: true
+                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                    opacity: 0.5
+                    visible: root.actualPrice !== ""
+                }
+
+                VclLabel {
+                    text: root.savingsLabel
+                    font.bold: true
+                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                    visible: root.savingsLabel !== ""
+                }
+
+                Item { Layout.fillWidth: true }
+            }
+
+            LabelWithTooltip {
+                Layout.fillWidth: true
+                text: root.priceNote
+                visible: text !== ""
+                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+            }
         }
 
-        LabelWithTooltip {
+        // Column 4: price
+        VclLabel {
             Layout.fillWidth: true
-
-            text: root.durationNote
-            visible: text !== ""
-            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-        }
-    }
-
-    ColumnLayout {
-        Layout.fillWidth: true
-        Layout.preferredWidth: 30
-        z: 1
-
-        LabelWithTooltip {
-            Layout.fillWidth: true
-
+            Layout.preferredWidth: 15
             text: root.price
+            font.family: Runtime.shortcutFontMetrics.font.family
+            font.bold: root.savingsLabel !== ""
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+            horizontalAlignment: Text.AlignRight
+            rightPadding: 12
         }
 
-        LabelWithTooltip {
+        // Column 5: action link
+        Link {
             Layout.fillWidth: true
+            Layout.preferredWidth: 15
 
-            text: root.priceNote
-            visible: text !== ""
-            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+            text: root.actionLink
+            enabled: root.actionLinkEnabled
+            opacity: root.actionLinkVisible ? 1 : 0
+            font.bold: true
+            horizontalAlignment: Text.AlignRight
+
+            onClicked: root.actionLinkClicked()
         }
-    }
-
-    Link {
-        Layout.fillWidth: true
-        Layout.preferredWidth: 15
-
-        text: root.actionLink
-        enabled: root.actionLinkEnabled
-        opacity: root.actionLinkVisible ? 1 : 0
-        font.bold: true
-        horizontalAlignment: Text.AlignRight
-
-        onClicked: root.actionLinkClicked()
     }
 
     component LabelWithTooltip : VclLabel {

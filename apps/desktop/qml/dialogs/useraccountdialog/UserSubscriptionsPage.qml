@@ -125,8 +125,27 @@ Item {
                     title: "Available Plans"
 
                     ColumnLayout {
+                        id: _plansColumn
                         width: parent.width
                         spacing: 20
+
+                        property int bestValueIndex: -1
+
+                        Component.onCompleted: {
+                            const plans = Scrite.user.asSubscriptionPlanInfoList(_queryUserSubsCall.availablePlans)
+                            let bestIdx = -1
+                            let bestPct = 0
+                            for (let i = 0; i < plans.length; i++) {
+                                if (plans[i].exclusive)
+                                    continue
+                                const p = plans[i].pricing
+                                if (p.actual > 0 && p.actual > p.price) {
+                                    const pct = (p.actual - p.price) / p.actual
+                                    if (pct > bestPct) { bestPct = pct; bestIdx = i }
+                                }
+                            }
+                            bestValueIndex = bestIdx
+                        }
 
                         Repeater {
                             model: Scrite.user.asSubscriptionPlanInfoList(_queryUserSubsCall.availablePlans)
@@ -143,12 +162,24 @@ Item {
                                 exclusive: _delegate2.modelData.exclusive
                                 durationNote: _delegate2.modelData.featureNote
                                 price: {
-                                    if(_delegate2.modelData.price === 0)
+                                    const p = _delegate2.modelData.pricing
+                                    if (p.price === 0)
                                         return "FREE"
-
-                                    const currencySymbol = Scrite.currencySymbol(_delegate2.modelData.currency)
-                                    return currencySymbol + _delegate2.modelData.price + " *"
+                                    return Scrite.currencySymbol(p.currency) + p.price
                                 }
+                                actualPrice: {
+                                    const p = _delegate2.modelData.pricing
+                                    if (p.actual > 0 && p.actual > p.price)
+                                        return Scrite.currencySymbol(p.currency) + p.actual
+                                    return ""
+                                }
+                                savingsLabel: {
+                                    const p = _delegate2.modelData.pricing
+                                    if (p.actual > 0 && p.actual > p.price)
+                                        return Math.round((1 - p.price / p.actual) * 100) + "% discount"
+                                    return ""
+                                }
+                                isBestValue: _delegate2.index === _plansColumn.bestValueIndex
                                 priceNote: _delegate2.modelData.subtitle
                                 actionLink: SubscriptionPlanOperations.planActionLinkText(_delegate2.modelData)
                                 onActionLinkClicked: SubscriptionPlanOperations.subscribeTo(_delegate2.modelData)
@@ -246,7 +277,7 @@ Item {
                 VclLabel {
                     Layout.fillWidth: true
 
-                    text: "* All prices are subject to change without notice."
+                    text: "All prices are subject to change without notice."
                     wrapMode: Text.WordWrap
                 }
 
