@@ -116,42 +116,6 @@ QString SceneMetadataReport::personalizedFileName(const QString &fileName) const
     return buildPersonalizedFileName(fileName, appendix);
 }
 
-void SceneMetadataReport::setEpisodeNumbers(const QList<int> &val)
-{
-    if (m_episodeNumbers == val)
-        return;
-
-    m_episodeNumbers = val;
-    emit episodeNumbersChanged();
-}
-
-void SceneMetadataReport::setSceneNumbers(const QList<int> &val)
-{
-    if (m_sceneNumbers == val)
-        return;
-
-    m_sceneNumbers = val;
-    emit sceneNumbersChanged();
-}
-
-void SceneMetadataReport::setTags(const QStringList &val)
-{
-    if (m_tags == val)
-        return;
-
-    m_tags = val;
-    emit tagsChanged();
-}
-
-void SceneMetadataReport::setKeywords(const QString &val)
-{
-    if (m_keywords == val)
-        return;
-
-    m_keywords = val;
-    emit keywordsChanged();
-}
-
 void SceneMetadataReport::setShowSynopsisColumn(bool val)
 {
     if (m_showSynopsisColumn == val)
@@ -573,7 +537,7 @@ bool SceneMetadataReport::doGenerate(QTextDocument *document)
 }
 
 void SceneMetadataReport::configureWriter(QPdfWriter *pdfWriter,
-                                           const QTextDocument *document) const
+                                          const QTextDocument *document) const
 {
     this->configureWriterImpl(pdfWriter, document);
 }
@@ -870,7 +834,7 @@ bool SceneMetadataReport::directExportToOdf(QIODevice *device)
 }
 
 void SceneMetadataReport::configureWriterImpl(QPagedPaintDevice *ppd,
-                                               const QTextDocument *document) const
+                                              const QTextDocument *document) const
 {
     // Use A3 landscape page size for scene metadata report
     ppd->setPageSize(QPageSize::A3);

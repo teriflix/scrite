@@ -38,66 +38,6 @@ public:
     bool isSinglePageReport() const { return false; }
 
     // clang-format off
-    Q_CLASSINFO("episodeNumbers_FieldGroup", "Episodes")
-    Q_CLASSINFO("episodeNumbers_FieldLabel", "Episodes to include in the report")
-    Q_CLASSINFO("episodeNumbers_FieldEditor", "MultipleEpisodeSelector")
-    Q_CLASSINFO("episodeNumbers_FieldNote", "If no episodes are selected, then the report is generated for all episodes in the screenplay.")
-    Q_CLASSINFO("episodeNumbers_IsPersistent", "false")
-    Q_PROPERTY(QList<int> episodeNumbers
-               READ episodeNumbers
-               WRITE setEpisodeNumbers
-               NOTIFY episodeNumbersChanged)
-    // clang-format on
-    void setEpisodeNumbers(const QList<int> &val);
-    QList<int> episodeNumbers() const { return m_episodeNumbers; }
-    Q_SIGNAL void episodeNumbersChanged();
-
-    // clang-format off
-    Q_CLASSINFO("sceneNumbers_FieldGroup", "Scenes")
-    Q_CLASSINFO("sceneNumbers_FieldLabel", "Scenes to include in the report")
-    Q_CLASSINFO("sceneNumbers_FieldEditor", "MultipleSceneSelector")
-    Q_CLASSINFO("sceneNumbers_FieldNote", "If no scenes are selected, then the report is generated for all scenes in the screenplay.")
-    Q_CLASSINFO("sceneNumbers_IsPersistent", "false")
-    Q_PROPERTY(QList<int> sceneNumbers
-               READ sceneNumbers
-               WRITE setSceneNumbers
-               NOTIFY sceneNumbersChanged)
-    // clang-format on
-    void setSceneNumbers(const QList<int> &val);
-    QList<int> sceneNumbers() const { return m_sceneNumbers; }
-    Q_SIGNAL void sceneNumbersChanged();
-
-    // clang-format off
-    Q_CLASSINFO("tags_FieldGroup", "Tags")
-    Q_CLASSINFO("tags_FieldLabel", "Groups/Tags to include in the report")
-    Q_CLASSINFO("tags_FieldEditor", "MultipleTagGroupSelector")
-    Q_CLASSINFO("tags_FieldNote", "If no tags are selected, then the report is generated for all tags in the screenplay.")
-    Q_CLASSINFO("tags_IsPersistent", "false")
-    Q_PROPERTY(QStringList tags
-               READ tags
-               WRITE setTags
-               NOTIFY tagsChanged)
-    // clang-format on
-    void setTags(const QStringList &val);
-    QStringList tags() const { return m_tags; }
-    Q_SIGNAL void tagsChanged();
-
-    // clang-format off
-    Q_CLASSINFO("keywords_FieldGroup", "Keywords")
-    Q_CLASSINFO("keywords_FieldLabel", "Keywords to filter scenes")
-    Q_CLASSINFO("keywords_FieldEditor", "MultipleKeywordsSelector")
-    Q_CLASSINFO("keywords_FieldNote", "Comma-separated keywords to search in scene text.")
-    Q_CLASSINFO("keywords_IsPersistent", "false")
-    Q_PROPERTY(QString keywords
-               READ keywords
-               WRITE setKeywords
-               NOTIFY keywordsChanged)
-    // clang-format on
-    void setKeywords(const QString &val);
-    QString keywords() const { return m_keywords; }
-    Q_SIGNAL void keywordsChanged();
-
-    // clang-format off
     Q_CLASSINFO("showSynopsisColumn_FieldGroup", "Columns")
     Q_CLASSINFO("showSynopsisColumn_FieldLabel", "Include 'Synopsis' column in the report")
     Q_CLASSINFO("showSynopsisColumn_FieldEditor", "CheckBox")
