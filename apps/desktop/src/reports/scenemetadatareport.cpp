@@ -83,6 +83,22 @@ SceneMetadataReport::SceneMetadataReport(QObject *parent) : AbstractReportGenera
 
 SceneMetadataReport::~SceneMetadataReport() { }
 
+QString SceneMetadataReport::formatDescription(Format format) const
+{
+    if (format == OpenDocumentFormat)
+        return QStringLiteral("Spreadsheet");
+
+    return QStringLiteral("PDF");
+}
+
+QString SceneMetadataReport::formatFileExtension(Format format) const
+{
+    if (format == OpenDocumentFormat)
+        return QStringLiteral("xlsx");
+
+    return AbstractReportGenerator::formatFileExtension(format);
+}
+
 QString SceneMetadataReport::personalizedFileName(const QString &fileName) const
 {
     QString appendix;

@@ -52,6 +52,9 @@ public:
     Format format() const { return m_format; }
     Q_SIGNAL void formatChanged();
 
+    Q_INVOKABLE virtual QString formatDescription(Format format) const;
+    Q_INVOKABLE virtual QString formatFileExtension(Format format) const;
+
     // clang-format off
     Q_PROPERTY(QString title
                READ title

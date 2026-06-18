@@ -44,6 +44,22 @@ SceneCharacterMatrixReport::SceneCharacterMatrixReport(QObject *parent)
 
 SceneCharacterMatrixReport::~SceneCharacterMatrixReport() { }
 
+QString SceneCharacterMatrixReport::formatDescription(Format format) const
+{
+    if (format == OpenDocumentFormat)
+        return QStringLiteral("Spreadsheet");
+
+    return QStringLiteral("PDF");
+}
+
+QString SceneCharacterMatrixReport::formatFileExtension(Format format) const
+{
+    if (format == OpenDocumentFormat)
+        return QStringLiteral("xlsx");
+
+    return AbstractReportGenerator::formatFileExtension(format);
+}
+
 QString SceneCharacterMatrixReport::personalizedFileName(const QString &fileName) const
 {
     const QStringList allCharacters =

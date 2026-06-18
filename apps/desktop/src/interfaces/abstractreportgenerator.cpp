@@ -76,6 +76,22 @@ void AbstractReportGenerator::setFormat(AbstractReportGenerator::Format val)
     }
 }
 
+QString AbstractReportGenerator::formatDescription(Format format) const
+{
+    if (format == OpenDocumentFormat)
+        return QStringLiteral("Open Document Format");
+
+    return QStringLiteral("PDF Format");
+}
+
+QString AbstractReportGenerator::formatFileExtension(Format format) const
+{
+    if (format == OpenDocumentFormat)
+        return QStringLiteral("odt");
+
+    return QStringLiteral("pdf");
+}
+
 QString AbstractReportGenerator::title() const
 {
     const int cii = this->metaObject()->indexOfClassInfo("Title");

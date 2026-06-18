@@ -33,6 +33,9 @@ public:
     Q_INVOKABLE explicit SceneCharacterMatrixReport(QObject *parent = nullptr);
     ~SceneCharacterMatrixReport();
 
+    virtual QString formatDescription(Format format) const;
+    virtual QString formatFileExtension(Format format) const;
+
     bool requiresConfiguration() const { return true; }
     bool isSinglePageReport() const { return true; }
 

@@ -154,22 +154,23 @@ VclDialog {
                 enabled: _private.reportSaveFeature.enabled
                 allowedExtensions: [
                     {
-                        "label": "PDF Format",
-                        "suffix": "pdf",
+                        "label": root.report.formatDescription(AbstractReportGenerator.PdfFormat),
+                        "suffix": root.report.formatFileExtension(AbstractReportGenerator.PdfFormat),
                         "value": AbstractReportGenerator.PdfFormat,
                         "enabled": root.report.supportsFormat(AbstractReportGenerator.PdfFormat)
                     },
                     {
-                        "label": "Open Document Format",
-                        "suffix": "odt",
+                        "label": root.report.formatDescription(AbstractReportGenerator.OpenDocumentFormat),
+                        "suffix": root.report.formatFileExtension(AbstractReportGenerator.OpenDocumentFormat),
                         "value": AbstractReportGenerator.OpenDocumentFormat,
                         "enabled": root.report.supportsFormat(AbstractReportGenerator.OpenDocumentFormat) && _private.reportSaveFeature.enabled
                     }
                 ]
                 nameFilters: {
+                    const ae = allowedExtensions
                     if(root.report.format === AbstractReportGenerator.PdfFormat)
-                        return "PDF (*.pdf)"
-                    return "Open Document Format (*.odt)"
+                        return ae[0].label + " (*." + ae[0].suffix + ")"
+                    return ae[1].label + " (*." + ae[1].suffix + ")"
                 }
 
                 onSelectedExtensionChanged: root.report.format = _fileSelector.selectedExtension.value
