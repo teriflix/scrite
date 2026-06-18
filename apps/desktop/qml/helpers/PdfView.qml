@@ -26,6 +26,7 @@ import QtQuick.Controls.Material
 import io.scrite.components
 
 import "../globals"
+import "../dialogs"
 import "../controls"
 
 Item {
@@ -276,6 +277,8 @@ Item {
             }
 
             VclToolButton {
+                id: _savePdfButton
+
                 text: "Save PDF"
                 down: _saveMenu.visible
                 visible: (root.allowFileSave || root.saveFeatureDisabled)
@@ -324,6 +327,32 @@ Item {
 
                             onClicked: _saveFileDialog.open()
                         }
+                    }
+                }
+            }
+
+            RowLayout {
+                visible: !_savePdfButton.visible
+
+                VclLabel {
+                    text: "Save PDF is disabled."
+                }
+
+                Link {
+                    Layout.alignment: Qt.AlignRight
+
+                    text: "More Info »"
+                    enabled: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
+                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+
+                    onClicked: {
+                        MessageBox.question("Feature Not Available",
+                                            "Your current subscription plan does not include this feature. " +
+                                            "Click the Details button to view information about your current subscription.",
+                                            ["Details", "Ok"], (answer) => {
+                                                if(answer === "Details")
+                                                    UserAccountDialog.launch("Subscriptions")
+                                            })
                     }
                 }
             }
