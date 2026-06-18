@@ -72,6 +72,7 @@ Item {
                                  ]
                     return "<p>Scene Selection:</p>" + SMath.formatAsBulletPoints(fields)
                 }
+                textColor: Runtime.colors.accent.c500.text
                 visible: _sceneGroup.evaluateLengths && _sceneGroup.sceneCount >= 2
                 parseShortcutInText: false
             }

@@ -166,6 +166,7 @@ Item {
                                      ]
                         return "<p>Scene Selection:</p>" + SMath.formatAsBulletPoints(fields)
                     }
+                    textColor: Runtime.colors.accent.c500.text
                     visible: Runtime.sceneListPanelSettings.showTooltip && _sceneListView.sceneGroup.evaluateLengths && _sceneListView.sceneGroup.sceneCount >= 2
                     parseShortcutInText: false
                 }

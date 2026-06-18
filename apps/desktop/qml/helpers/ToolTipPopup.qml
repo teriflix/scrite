@@ -26,6 +26,7 @@ ToolTip {
 
     readonly property real maximumContentWidth: 350
     property bool parseShortcutInText: true
+    property color textColor: Runtime.colors.primary.c100.text
 
     property Item container: parent
 
@@ -37,6 +38,11 @@ ToolTip {
 
     delay: DelayedProperty.value > 0 ? 0 : Scrite.app.styleHints.mousePressAndHoldInterval
     contentWidth: Math.min(_content.implicitWidth, maximumContentWidth)
+
+    background: Rectangle {
+        color: Runtime.colors.primary.c100.background
+        opacity: 0.9
+    }
 
     contentItem: RowLayout {
         id: _content
@@ -75,12 +81,7 @@ ToolTip {
 
             font: Runtime.idealFontMetrics.font
             text: _content.fields[0]
-            color: {
-                if(Runtime.applicationSettings.uiTheme === "Material")
-                    return "white"
-
-                return root.palette.toolTipText
-            }
+            color: root.textColor
             wrapMode: Text.WordWrap
         }
 
