@@ -35,6 +35,35 @@ UserGuideSearchIndex::UserGuideSearchIndex(QObject *parent) : QAbstractListModel
 
 UserGuideSearchIndex::~UserGuideSearchIndex() { }
 
+QUrl UserGuideSearchIndex::find(const QString &searchTerm) const
+{
+    const QString term = searchTerm.trimmed();
+    if (term.isEmpty() || m_items.isEmpty())
+        return QUrl();
+
+    const Item *titleMatch = nullptr;
+    const Item *textMatch = nullptr;
+
+    for (const Item &item : m_items) {
+        if (item.title.compare(term, Qt::CaseInsensitive) == 0)
+            return item.location;
+
+        if (!titleMatch && item.title.contains(term, Qt::CaseInsensitive))
+            titleMatch = &item;
+
+        if (!textMatch && item.plainText.contains(term, Qt::CaseInsensitive))
+            textMatch = &item;
+    }
+
+    if (titleMatch)
+        return titleMatch->location;
+
+    if (textMatch)
+        return textMatch->location;
+
+    return QUrl();
+}
+
 int UserGuideSearchIndex::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : m_items.size();
@@ -231,6 +260,15 @@ void UserGuideSearchIndexFilter::setFilter(const QString &val)
     emit filterChanged();
 
     this->invalidate();
+}
+
+QUrl UserGuideSearchIndexFilter::find(const QString &searchTerm) const
+{
+    UserGuideSearchIndex *src = qobject_cast<UserGuideSearchIndex *>(this->sourceModel());
+    if (src == nullptr)
+        return QUrl();
+
+    return src->find(searchTerm);
 }
 
 QString UserGuideSearchIndexFilter::highlightFilter(const QString &text, const QString &filter,

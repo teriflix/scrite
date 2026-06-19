@@ -117,7 +117,7 @@ DialogLauncher {
                     Layout.alignment: Qt.AlignHCenter
 
                     visible: !_emailSupport.enabled
-                    text: "Please note: There is <b>no phone or email support</b> available for Scrite."
+                    text: "Please note: Email support is limited to premium plan subscribers only."
                     color: Runtime.colors.primary.c600.background
                     wrapMode: Text.WordWrap
                     font.pointSize: Runtime.minimumFontMetrics.font.pointSize

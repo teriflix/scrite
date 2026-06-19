@@ -41,6 +41,8 @@ ToolTip {
 
     background: Rectangle {
         color: Runtime.colors.primary.c100.background
+        border.width: 1
+        border.color: Runtime.colors.primary.borderColor
         opacity: 0.9
     }
 

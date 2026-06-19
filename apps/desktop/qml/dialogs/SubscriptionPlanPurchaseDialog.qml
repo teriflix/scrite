@@ -25,6 +25,7 @@ import io.scrite.components
 import "../globals"
 import "../controls"
 import "../helpers"
+import "../commandcenter"
 
 DialogLauncher {
     id: root
@@ -107,10 +108,63 @@ DialogLauncher {
                             wrapMode: Text.WordWrap
                         }
 
-                        VclLabel {
+                        RowLayout {
                             Layout.fillWidth: true
-                            text: Runtime.daysSpanAsString(_dialog.plan.duration) + "  ·  " + _dialog.plan.devices + " device(s)"
-                            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                            spacing: 6
+
+                            VclLabel {
+                                text: Runtime.daysSpanAsString(_dialog.plan.duration) + "  ·  " +
+                                      "Device Count: " + _dialog.plan.devices
+                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                            }
+
+                            VclLabel {
+                                text: "ⓘ"
+                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        const n = _dialog.plan.devices
+                                        const opening = n === 1
+                                            ? "This plan allows Scrite to be activated on 1 device at a time."
+                                            : "This plan allows Scrite to be activated on up to " + n + " devices at a time."
+                                        MessageBox.question(
+                                            "About Device Activations",
+                                            opening + "\n\nEach activation is tied to the specific OS installation and user account used at sign-in. This means reinstalling your OS, or signing in from a different user account on the same machine, counts as a separate activation.\n\nTo activate on a new device once the limit is reached, sign out from one of your existing activated devices first. Exceeding the limit without doing so will result in an activation error.",
+                                            ["More Info", "Ok"],
+                                            (btn) => {
+                                                if (btn === "More Info") {
+                                                    const url = HelpCenter.lookup("device limits")
+                                                    if (url.toString() !== "")
+                                                        Qt.openUrlExternally(url)
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
+                            VclLabel {
+                                text: "  ·  Discord community support only."
+                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                                visible: !Scrite.isFeatureNameEnabled("support/email", _dialog.plan.features)
+                            }
+
+                            VclLabel {
+                                text: "ⓘ"
+                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                                visible: !Scrite.isFeatureNameEnabled("support/email", _dialog.plan.features)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: JoinDiscordCommunity.launch()
+                                }
+                            }
+
+                            Item { Layout.fillWidth: true }
                         }
 
                         VclLabel {
@@ -132,7 +186,7 @@ DialogLauncher {
                             text: Scrite.currencySymbol(_dialog.plan.pricing.currency) + _dialog.plan.pricing.actual
                             font.family: Runtime.shortcutFontMetrics.font.family
                             font.strikeout: true
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                             opacity: 0.5
                             visible: _dialog.plan.pricing.actual > 0 && _dialog.plan.pricing.actual > _dialog.plan.pricing.price
                         }
@@ -153,7 +207,7 @@ DialogLauncher {
                                 const p = _dialog.plan.pricing
                                 const pct = Math.round((1 - p.price / p.actual) * 100)
                                 const saved = Math.round(p.actual - p.price)
-                                return "Save " + pct + "%  (" + Scrite.currencySymbol(p.currency) + saved + " off!)"
+                                return Scrite.currencySymbol(p.currency) + saved + " off - " + pct  + "% discount"
                             }
                             font.family: Runtime.shortcutFontMetrics.font.family
                             font.bold: true
@@ -415,12 +469,7 @@ DialogLauncher {
             }
 
             VclButton {
-                text: "Go Back"
-                onClicked: _dialog.close()
-            }
-
-            VclButton {
-                text: "Buy Now »"
+                text: "Buy »"
                 onClicked: _dialog.acceptAction.trigger()
             }
 

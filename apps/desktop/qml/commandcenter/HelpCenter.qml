@@ -39,6 +39,10 @@ Popup {
         visible = false
     }
 
+    function lookup(searchTerm) {
+        return _private.searchIndex.find(searchTerm)
+    }
+
     Material.elevation: 6
     Material.containerStyle: Material.Filled
     Material.roundedScale: Material.NotRounded

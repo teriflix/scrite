@@ -32,6 +32,8 @@ public:
     bool isBusy() const { return m_busy; }
     Q_SIGNAL void busyChanged();
 
+    Q_INVOKABLE QUrl find(const QString &searchTerm) const;
+
     enum { LocationRole = Qt::UserRole, TitleRole, FullTitleRole, RichTextRole, PlainTextRole };
 
     // QAbstractItemModel interface
@@ -84,6 +86,8 @@ public:
     void setFilter(const QString &val);
     QString filter() const { return m_filter; }
     Q_SIGNAL void filterChanged();
+
+    Q_INVOKABLE QUrl find(const QString &searchTerm) const;
 
     Q_INVOKABLE static QString highlightFilter(const QString &text, const QString &filter,
                                                int maxChars = 120);

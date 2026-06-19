@@ -50,7 +50,10 @@ Item {
             for(let i=0; i<planKinds.length; i++) {
                 const planKind = planKinds[i]
                 if(planKind.name === plan.kind) {
-                    ret = planKind.label + " »"
+                    if (plan.kind === "paid" && _private.planHasExcludedFeatures(plan))
+                        ret = "Review »"
+                    else
+                        ret = planKind.label + " »"
                     break
                 }
             }

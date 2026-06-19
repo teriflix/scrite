@@ -102,6 +102,7 @@ Item {
             Layout.fillWidth: true
             Layout.preferredWidth: 25
             z: 1
+            spacing: 2
 
             LabelWithTooltip {
                 Layout.fillWidth: true
