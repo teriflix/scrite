@@ -332,21 +332,22 @@ QVersionNumber Application::prepare()
     {
         const char *name;
         const char *domain;
+        bool remove = false;
     };
 #ifdef SCRITE_PRODUCTION_BUILD
     // Org history: TERIFLIX → VCreate Logic Pvt. Ltd. → Scrite → IEDN Technologies
     const LegacyOrg legacyOrgs[] = {
-        { "TERIFLIX", "teriflix.com" },
-        { "VCreate Logic Pvt. Ltd.", "vcreatelogic.com" },
-        { "Scrite", "scrite.io" },
+        { "TERIFLIX", "teriflix.com", true },
+        { "VCreate Logic Pvt. Ltd.", "vcreatelogic.com", true },
+        { "Scrite", "scrite.io", false },
     };
     Application::setOrganizationName(QStringLiteral("IEDN Technologies"));
     Application::setOrganizationDomain(QStringLiteral("scrite.io"));
 #else
     // Org history: TERIFLIX → VCreate Logic Pvt. Ltd. → Scrite (current)
     const LegacyOrg legacyOrgs[] = {
-        { "TERIFLIX", "teriflix.com" },
-        { "VCreate Logic Pvt. Ltd.", "vcreatelogic.com" },
+        { "TERIFLIX", "teriflix.com", true },
+        { "VCreate Logic Pvt. Ltd.", "vcreatelogic.com", true },
     };
     Application::setOrganizationName(QStringLiteral("Scrite"));
     Application::setOrganizationDomain(QStringLiteral("scrite.io"));
@@ -355,15 +356,19 @@ QVersionNumber Application::prepare()
     const QString targetAppDataPath = Application::appDataLocation();
     bool legacyDataMigrated = false;
 
-    for (const LegacyOrg &legacy : legacyOrgs) {
-        Application::setOrganizationName(QLatin1String(legacy.name));
-        Application::setOrganizationDomain(QLatin1String(legacy.domain));
-        const QDir legacyDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
-        if (legacyDir.exists()) {
-            QDir().mkpath(targetAppDataPath);
-            copyFilesRecursively(legacyDir, QDir(targetAppDataPath));
-            QDir(legacyDir).removeRecursively();
-            legacyDataMigrated = true;
+    if (!QDir(targetAppDataPath).exists("settings.ini")) {
+
+        for (const LegacyOrg &legacy : legacyOrgs) {
+            Application::setOrganizationName(QLatin1String(legacy.name));
+            Application::setOrganizationDomain(QLatin1String(legacy.domain));
+            const QDir legacyDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+            if (legacyDir.exists()) {
+                QDir().mkpath(targetAppDataPath);
+                copyFilesRecursively(legacyDir, QDir(targetAppDataPath));
+                if (legacy.remove)
+                    QDir(legacyDir).removeRecursively();
+                legacyDataMigrated = true;
+            }
         }
     }
 

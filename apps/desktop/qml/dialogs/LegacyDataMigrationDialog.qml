@@ -58,7 +58,7 @@ DialogLauncher {
                 VclLabel {
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
-                    text: "Please note: if you downgrade to an older version of Scrite, it will no longer have access to your settings, recent files, or vault — they now reside exclusively in the new location."
+                    text: "Please note: if you downgrade to an older version of Scrite, it will not have access to updated settings, recent files, or vault — they now reside exclusively in the new location."
                     font.bold: true
                 }
 
