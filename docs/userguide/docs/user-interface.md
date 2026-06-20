@@ -191,8 +191,10 @@ dark modes.
 <img src="../images/ui/014-dark-mode.jpg" width="85%"/>
 
 You can even assign a shortcut to the command to quickly trigger the switch between light and dark
-modes. Our preferred shortcut is `Meta+Shift+D`, but you can choose any other combination you like.
-By default the command has no shortcut assigned to it.
+modes. Our preferred shortcut is `Meta+Shift+D` for Windows & Linux and `Cmd+Shift+D` on macOS, but
+you can choose any other combination you like.
+
+> Meta = Windows key
 
 <img src="../images/ui/015-dark-mode.jpg" width="85%"/>
 

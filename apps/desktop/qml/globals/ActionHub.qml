@@ -536,13 +536,13 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property bool allowShortcut: true
+            readonly property string defaultShortcut: "Meta+Shift+D"
 
             text: "Toggle Color Theme (Light \u21D4 Dark)"
             objectName: "toggleColorTheme"
 
             onTriggered: {
-                if(Runtime.applicationSettings.colorMode === "Dark") {
+                if(Runtime.applicationSettings.colorMode === "Dark" || Runtime.colors.scheme === Qt.ColorScheme.Dark) {
                     Runtime.applicationSettings.colorMode = "Light"
                 } else {
                     Runtime.applicationSettings.colorMode = "Dark"
