@@ -63,6 +63,7 @@ set(SCRITE_DESKTOP_QML_FILES
   "qml/dialogs/settingsdialog/impl_SettingsDialog.qml"
   "qml/dialogs/useraccountdialog/AccountEmailScreen.qml"
   "qml/dialogs/useraccountdialog/ActivationCodeScreen.qml"
+  "qml/dialogs/useraccountdialog/FeatureListPanel.qml"
   "qml/dialogs/useraccountdialog/JunctionScreen.qml"
   "qml/dialogs/useraccountdialog/PlanCard.qml"
   "qml/dialogs/useraccountdialog/ReloadUserScreen.qml"

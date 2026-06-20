@@ -220,7 +220,7 @@ DialogLauncher {
                         padding: 12
                         color: Runtime.colors.accent.c600.text
                         horizontalAlignment: Text.AlignHCenter
-                        text: "* All prices are subject to change without notice."
+                        text: "* Plans & prices are subject to change without notice."
                     }
                 }
             }

@@ -2,7 +2,8 @@
 **
 ** Copyright (C) 2020 Prashanth N Udupa
 ** Author: Prashanth N Udupa (prashanth@scrite.io,
-**                            prashanth.udupa@gmail.com)
+**                            prashanth.udupa@gmail.com,
+**                            prashanth@vcreatelogic.com)
 **
 ** This code is distributed under GPL v3. Complete text of the license
 ** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
@@ -26,6 +27,8 @@ import "../globals"
 import "../controls"
 import "../helpers"
 import "../commandcenter"
+
+import "./useraccountdialog"
 
 DialogLauncher {
     id: root
@@ -229,225 +232,27 @@ DialogLauncher {
                     Layout.fillHeight: true
                     spacing: 10
 
-                    // Included column
-                    Rectangle {
+                    FeatureListPanel {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        color: Runtime.colors.primary.c100.background
-                        border.color: Runtime.colors.primary.c400.background
-                        border.width: 1
-                        clip: true
-
-                        ColumnLayout {
-                            anchors.fill: parent
-                            spacing: 0
-
-                            Rectangle {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: _includedHeader.implicitHeight
-                                color: Runtime.colors.tx(Runtime.colors.accent.c600.background)
-                                border.color: Runtime.colors.primary.c400.background
-                                border.width: 1
-
-                                VclLabel {
-                                    id: _includedHeader
-                                    width: parent.width
-                                    text: "✓   Included"
-                                    color: Runtime.colors.accent.c600.text
-                                    font.bold: true
-                                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                                    padding: 8
-                                }
-                            }
-
-                            Item {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-
-                                ListView {
-                                    id: _includedList
-
-                                    anchors.fill: parent
-                                    anchors.margins: 1
-                                    anchors.topMargin: 0
-
-                                    model: _includedModel
-                                    clip: true
-                                    keyNavigationEnabled: true
-
-                                    ScrollBar.vertical: VclScrollBar { }
-
-                                    delegate: Item {
-                                        id: _includedDelegate
-                                        required property int index
-                                        required property string featureTitle
-                                        required property string featureDescription
-
-                                        readonly property bool isCurrent: ListView.isCurrentItem
-
-                                        width: _includedList.width
-                                        height: _includedDelegateLayout.implicitHeight
-
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            color: _includedDelegate.isCurrent
-                                                   ? Runtime.colors.accent.c200.background
-                                                   : (_includedDelegate.index % 2 === 0) ? Runtime.colors.primary.c50.background
-                                                                                         : Runtime.colors.primary.c100.background
-                                        }
-
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            onClicked: {
-                                                _includedList.forceActiveFocus()
-                                                _includedList.currentIndex = _includedDelegate.isCurrent ? -1 : _includedDelegate.index
-                                            }
-                                        }
-
-                                        ColumnLayout {
-                                            id: _includedDelegateLayout
-                                            width: parent.width
-                                            spacing: 0
-
-                                            VclLabel {
-                                                Layout.fillWidth: true
-                                                text: _includedDelegate.featureTitle
-                                                font.bold: _includedDelegate.isCurrent
-                                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                                                topPadding: 8
-                                                bottomPadding: _includedDelegate.isCurrent ? 2 : 8
-                                                leftPadding: 8
-                                                rightPadding: 8
-                                                wrapMode: Text.WordWrap
-                                            }
-
-                                            VclLabel {
-                                                Layout.fillWidth: true
-                                                text: _includedDelegate.featureDescription
-                                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                                                font.italic: true
-                                                topPadding: 0
-                                                bottomPadding: 8
-                                                leftPadding: 8
-                                                rightPadding: 8
-                                                wrapMode: Text.WordWrap
-                                                visible: _includedDelegate.isCurrent && text !== ""
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        headerText: "✓   Included"
+                        headerBgColor: Runtime.colors.tx(Runtime.colors.accent.c600.background)
+                        headerTextColor: Runtime.colors.accent.c600.text
+                        headerBorderWidth: 1
+                        listModel: _includedModel
+                        highlightColor: Runtime.colors.accent.c200.background
                     }
 
-                    // Not included column
-                    Rectangle {
+                    FeatureListPanel {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        color: Runtime.colors.primary.c100.background
-                        border.color: Runtime.colors.primary.c400.background
-                        border.width: 1
-                        clip: true
+                        headerText: "✗   Not Included"
+                        headerBgColor: Runtime.colors.primary.c600.background
+                        headerTextColor: Runtime.colors.primary.c600.text
+                        listModel: _excludedModel
+                        highlightColor: Runtime.colors.primary.c300.background
+                        titlePrefix: "✗  "
                         visible: _excludedModel.count > 0
-
-                        ColumnLayout {
-                            anchors.fill: parent
-                            spacing: 0
-
-                            Rectangle {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: _excludedHeader.implicitHeight
-                                color: Runtime.colors.primary.c600.background
-
-                                VclLabel {
-                                    id: _excludedHeader
-                                    width: parent.width
-                                    text: "✗   Not Included"
-                                    color: Runtime.colors.primary.c600.text
-                                    font.bold: true
-                                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                                    padding: 8
-                                }
-                            }
-
-                            Item {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-
-                                ListView {
-                                    id: _excludedList
-
-                                    anchors.fill: parent
-                                    anchors.margins: 1
-                                    anchors.topMargin: 0
-
-                                    model: _excludedModel
-                                    clip: true
-                                    keyNavigationEnabled: true
-
-                                    ScrollBar.vertical: VclScrollBar { }
-
-                                    delegate: Item {
-                                        id: _excludedDelegate
-                                        required property int index
-                                        required property string featureTitle
-                                        required property string featureDescription
-
-                                        readonly property bool isCurrent: ListView.isCurrentItem
-
-                                        width: _excludedList.width
-                                        height: _excludedDelegateLayout.implicitHeight
-
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            color: _excludedDelegate.isCurrent
-                                                   ? Runtime.colors.primary.c300.background
-                                                   : (_excludedDelegate.index % 2 === 0) ? Runtime.colors.primary.c50.background
-                                                                                         : Runtime.colors.primary.c100.background
-                                        }
-
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            onClicked: {
-                                                _excludedList.forceActiveFocus()
-                                                _excludedList.currentIndex = _excludedDelegate.isCurrent ? -1 : _excludedDelegate.index
-                                            }
-                                        }
-
-                                        ColumnLayout {
-                                            id: _excludedDelegateLayout
-                                            width: parent.width
-                                            spacing: 0
-
-                                            VclLabel {
-                                                Layout.fillWidth: true
-                                                text: "✗  " + _excludedDelegate.featureTitle
-                                                font.bold: _excludedDelegate.isCurrent
-                                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                                                topPadding: 8
-                                                bottomPadding: _excludedDelegate.isCurrent ? 2 : 8
-                                                leftPadding: 8
-                                                rightPadding: 8
-                                                wrapMode: Text.WordWrap
-                                            }
-
-                                            VclLabel {
-                                                Layout.fillWidth: true
-                                                text: _excludedDelegate.featureDescription
-                                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                                                font.italic: true
-                                                topPadding: 0
-                                                bottomPadding: 8
-                                                leftPadding: 8
-                                                rightPadding: 8
-                                                wrapMode: Text.WordWrap
-                                                visible: _excludedDelegate.isCurrent && text !== ""
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
             }

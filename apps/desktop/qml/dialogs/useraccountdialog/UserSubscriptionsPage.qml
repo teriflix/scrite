@@ -195,7 +195,7 @@ Item {
 
                 VclLabel {
                     Layout.fillWidth: true
-                    text: "All prices are subject to change without notice."
+                    text: "Plans & prices are subject to change without notice."
                     wrapMode: Text.WordWrap
                 }
 
@@ -438,6 +438,7 @@ Item {
 
                                 // Included
                                 FeatureListPanel {
+                                    id: _includedPanel
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     headerText: "✓   Included"
@@ -446,10 +447,12 @@ Item {
                                     headerBorderWidth: 1
                                     listModel: _includedModel
                                     highlightColor: Runtime.colors.accent.c200.background
+                                    listInteractive: false
                                 }
 
                                 // Not Included
                                 FeatureListPanel {
+                                    id: _excludedPanel
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     headerText: "✗   Not Included"
@@ -459,6 +462,7 @@ Item {
                                     highlightColor: Runtime.colors.primary.c300.background
                                     titlePrefix: "✗  "
                                     visible: _excludedModel.count > 0
+                                    listInteractive: false
                                 }
                             }
                         }
@@ -496,6 +500,7 @@ Item {
                                 price: Runtime.toTitleCase(_histDelegate.modelData.kind)
                                 priceNote: _histDelegate.modelData.plan.featureNote
                                 actionLink: "Details »"
+                                useFixedFontForPrice: false
                                 actionLinkEnabled: SubscriptionPlanOperations.taxonomy !== undefined
                                 onActionLinkClicked: SubscriptionDetailsDialog.launch(_histDelegate.modelData)
                             }
@@ -659,137 +664,4 @@ Item {
         }
     }
 
-    component FeatureListPanel: Rectangle {
-        id: _panel
-
-        property string headerText
-        property color headerBgColor
-        property color headerTextColor
-        property int headerBorderWidth: 0
-        property ListModel listModel
-        property color highlightColor
-        property string titlePrefix: ""
-
-        color: Runtime.colors.primary.c100.background
-        border.color: Runtime.colors.primary.c400.background
-        border.width: 1
-        clip: true
-
-        ColumnLayout {
-            anchors.fill: parent
-            spacing: 0
-
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: _panelHeader.implicitHeight
-
-                color: _panel.headerBgColor
-
-                border.color: Runtime.colors.primary.c400.background
-                border.width: _panel.headerBorderWidth
-
-                VclLabel {
-                    id: _panelHeader
-
-                    width: parent.width
-                    text: _panel.headerText
-                    color: _panel.headerTextColor
-                    padding: 8
-
-                    font.bold: true
-                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                }
-            }
-
-            Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                ListView {
-                    property color highlightColor: _panel.highlightColor
-                    property string titlePrefix: _panel.titlePrefix
-
-                    ScrollBar.vertical: VclScrollBar { }
-
-                    anchors.fill: parent
-                    anchors.margins: 1
-                    anchors.topMargin: 0
-
-                    model: _panel.listModel
-
-                    clip: true
-                    keyNavigationEnabled: true
-
-                    delegate: Item {
-                        id: _delegate
-                        required property int index
-                        required property string featureTitle
-                        required property string featureDescription
-                        readonly property bool isCurrent: ListView.isCurrentItem
-                        readonly property var listView: ListView.view
-
-                        width: listView ? listView.width : 0
-                        height: _delegateLayout.implicitHeight
-
-                        Rectangle {
-                            anchors.fill: parent
-
-                            color: _delegate.isCurrent
-                                   ? _delegate.listView.highlightColor
-                                   : (_delegate.index % 2 === 0)
-                                     ? Runtime.colors.primary.c50.background
-                                     : Runtime.colors.primary.c100.background
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-
-                            onClicked: {
-                                _delegate.listView.forceActiveFocus()
-                                _delegate.listView.currentIndex = _delegate.isCurrent ? -1 : _delegate.index
-                            }
-                        }
-
-                        ColumnLayout {
-                            id: _delegateLayout
-
-                            width: parent.width
-                            spacing: 0
-
-                            VclLabel {
-                                Layout.fillWidth: true
-
-                                text: _delegate.listView.titlePrefix + _delegate.featureTitle
-                                wrapMode: Text.WordWrap
-
-                                topPadding: 8
-                                bottomPadding: _delegate.isCurrent ? 2 : 8
-                                leftPadding: 8
-                                rightPadding: 8
-
-                                font.bold: _delegate.isCurrent
-                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                            }
-
-                            VclLabel {
-                                Layout.fillWidth: true
-
-                                text: _delegate.featureDescription
-                                visible: _delegate.isCurrent && text !== ""
-                                wrapMode: Text.WordWrap
-
-                                topPadding: 0
-                                bottomPadding: 8
-                                leftPadding: 8
-                                rightPadding: 8
-
-                                font.italic: true
-                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 }

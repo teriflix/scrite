@@ -27,6 +27,13 @@ Item {
     id: root
 
     property url icon: exclusive ? "qrc:/images/exclprodicon.png" : "qrc:/images/prodicon.png"
+
+    property bool   exclusive: false
+    property bool   isBestValue: false
+    property bool   actionLinkVisible: true
+    property bool   actionLinkEnabled: true
+    property bool   useFixedFontForPrice: true
+
     property string name
     property string duration
     property string durationNote
@@ -34,11 +41,7 @@ Item {
     property string actualPrice: ""
     property string savingsLabel: ""
     property string priceNote
-    property bool   exclusive: false
-    property bool   isBestValue: false
     property string actionLink
-    property bool actionLinkVisible: true
-    property bool actionLinkEnabled: true
 
     signal actionLinkClicked()
 
@@ -131,7 +134,7 @@ Item {
 
                 VclLabel {
                     text: root.actualPrice
-                    font.family: Runtime.shortcutFontMetrics.font.family
+                    font.family: root.useFixedFontForPrice ? Runtime.shortcutFontMetrics.font.family : Runtime.idealFontMetrics.font.family
                     font.strikeout: true
                     font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                     opacity: 0.5
@@ -161,9 +164,9 @@ Item {
             Layout.fillWidth: true
             Layout.preferredWidth: 15
             text: root.price
-            font.family: Runtime.shortcutFontMetrics.font.family
+            font.family: root.useFixedFontForPrice ? Runtime.shortcutFontMetrics.font.family : Runtime.idealFontMetrics.font.family
             font.bold: root.savingsLabel !== ""
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize + (root.useFixedFontForPrice ? 2 : -2)
             horizontalAlignment: Text.AlignRight
             rightPadding: 12
         }
