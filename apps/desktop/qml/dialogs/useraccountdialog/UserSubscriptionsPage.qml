@@ -38,102 +38,6 @@ Item {
         calls: [_queryUserSubsCall]
     }
 
-    component SubCard: Rectangle {
-        id: _subCard
-
-        property scriteUserSubscriptionInfo subscription
-        property string badgeText
-        property color badgeColor
-        property string statusLine
-
-        implicitHeight: _subCardContent.implicitHeight + 24
-        radius: 4
-        border.width: 1
-
-        ColumnLayout {
-            id: _subCardContent
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 12 }
-            spacing: 4
-
-            VclLabel {
-                Layout.fillWidth: true
-                text: _subCard.badgeText
-                font.bold: true
-                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                color: _subCard.badgeColor
-            }
-
-            VclLabel {
-                Layout.fillWidth: true
-                text: _subCard.subscription.plan.title
-                font.bold: true
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
-                wrapMode: Text.WordWrap
-            }
-
-            VclLabel {
-                Layout.fillWidth: true
-                text: _subCard.subscription.plan.subtitle
-                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                font.italic: true
-                wrapMode: Text.WordWrap
-                visible: text !== ""
-            }
-
-            Row {
-                spacing: 4
-
-                VclLabel {
-                    text: Runtime.daysSpanAsString(_subCard.subscription.plan.duration) +
-                          "  ·  Device Count: " + _subCard.subscription.plan.devices
-                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                }
-
-                VclLabel {
-                    text: "ⓘ"
-                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            const n = _subCard.subscription.plan.devices
-                            const opening = n === 1
-                                ? "This plan allows Scrite to be activated on 1 device at a time."
-                                : "This plan allows Scrite to be activated on up to " + n + " devices at a time."
-                            MessageBox.question(
-                                "About Device Activations",
-                                opening + "\n\nEach activation is tied to the specific OS installation and user account used at sign-in. This means reinstalling your OS, or signing in from a different user account on the same machine, counts as a separate activation.\n\nTo activate on a new device once the limit is reached, sign out from one of your existing activated devices first. Exceeding the limit without doing so will result in an activation error.",
-                                ["More Info", "Ok"],
-                                (btn) => {
-                                    if (btn === "More Info") {
-                                        const url = HelpCenter.lookup("device limits")
-                                        if (url.toString() !== "") Qt.openUrlExternally(url)
-                                    }
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-
-            VclLabel {
-                Layout.fillWidth: true
-                text: _subCard.statusLine
-                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                wrapMode: Text.WordWrap
-            }
-
-            Link {
-                text: "Order #" + _subCard.subscription.wc_order_id + " »"
-                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                visible: _subCard.subscription.wc_order_id !== undefined &&
-                         _subCard.subscription.wc_order_id !== ""
-                onClicked: Qt.openUrlExternally(_subCard.subscription.detailsUrl)
-            }
-        }
-    }
-
     Item {
         id: _userSubsView
         width: parent.width
@@ -533,216 +437,28 @@ Item {
                                 spacing: 10
 
                                 // Included
-                                Rectangle {
+                                FeatureListPanel {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    color: Runtime.colors.primary.c100.background
-                                    border.color: Runtime.colors.primary.c400.background
-                                    border.width: 1
-                                    clip: true
-
-                                    ColumnLayout {
-                                        anchors.fill: parent
-                                        spacing: 0
-
-                                        Rectangle {
-                                            Layout.fillWidth: true
-                                            Layout.preferredHeight: _includedHeader.implicitHeight
-                                            color: Runtime.colors.tx(Runtime.colors.accent.c600.background)
-                                            border.color: Runtime.colors.primary.c400.background
-                                            border.width: 1
-
-                                            VclLabel {
-                                                id: _includedHeader
-                                                width: parent.width
-                                                text: "✓   Included"
-                                                color: Runtime.colors.accent.c600.text
-                                                font.bold: true
-                                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                                                padding: 8
-                                            }
-                                        }
-
-                                        Item {
-                                            Layout.fillWidth: true
-                                            Layout.fillHeight: true
-
-                                            ListView {
-                                                anchors.fill: parent
-                                                anchors.margins: 1
-                                                anchors.topMargin: 0
-                                                model: _includedModel
-                                                clip: true
-                                                keyNavigationEnabled: true
-                                                ScrollBar.vertical: VclScrollBar { }
-
-                                                delegate: Item {
-                                                    id: _iDelegate
-                                                    required property int index
-                                                    required property string featureTitle
-                                                    required property string featureDescription
-                                                    readonly property bool isCurrent: ListView.isCurrentItem
-                                                    readonly property var listView: ListView.view
-                                                    width: listView ? listView.width : 0
-                                                    height: _iLayout.implicitHeight
-
-                                                    Rectangle {
-                                                        anchors.fill: parent
-                                                        color: _iDelegate.isCurrent
-                                                               ? Runtime.colors.accent.c200.background
-                                                               : (_iDelegate.index % 2 === 0)
-                                                                 ? Runtime.colors.primary.c50.background
-                                                                 : Runtime.colors.primary.c100.background
-                                                    }
-
-                                                    MouseArea {
-                                                        anchors.fill: parent
-                                                        onClicked: {
-                                                            _iDelegate.listView.forceActiveFocus()
-                                                            _iDelegate.listView.currentIndex = _iDelegate.isCurrent ? -1 : _iDelegate.index
-                                                        }
-                                                    }
-
-                                                    ColumnLayout {
-                                                        id: _iLayout
-                                                        width: parent.width
-                                                        spacing: 0
-
-                                                        VclLabel {
-                                                            Layout.fillWidth: true
-                                                            text: _iDelegate.featureTitle
-                                                            font.bold: _iDelegate.isCurrent
-                                                            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                                                            topPadding: 8
-                                                            bottomPadding: _iDelegate.isCurrent ? 2 : 8
-                                                            leftPadding: 8
-                                                            rightPadding: 8
-                                                            wrapMode: Text.WordWrap
-                                                        }
-
-                                                        VclLabel {
-                                                            Layout.fillWidth: true
-                                                            text: _iDelegate.featureDescription
-                                                            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                                                            font.italic: true
-                                                            topPadding: 0
-                                                            bottomPadding: 8
-                                                            leftPadding: 8
-                                                            rightPadding: 8
-                                                            wrapMode: Text.WordWrap
-                                                            visible: _iDelegate.isCurrent && text !== ""
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                    headerText: "✓   Included"
+                                    headerBgColor: Runtime.colors.tx(Runtime.colors.accent.c600.background)
+                                    headerTextColor: Runtime.colors.accent.c600.text
+                                    headerBorderWidth: 1
+                                    listModel: _includedModel
+                                    highlightColor: Runtime.colors.accent.c200.background
                                 }
 
                                 // Not Included
-                                Rectangle {
+                                FeatureListPanel {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    color: Runtime.colors.primary.c100.background
-                                    border.color: Runtime.colors.primary.c400.background
-                                    border.width: 1
-                                    clip: true
+                                    headerText: "✗   Not Included"
+                                    headerBgColor: Runtime.colors.primary.c600.background
+                                    headerTextColor: Runtime.colors.primary.c600.text
+                                    listModel: _excludedModel
+                                    highlightColor: Runtime.colors.primary.c300.background
+                                    titlePrefix: "✗  "
                                     visible: _excludedModel.count > 0
-
-                                    ColumnLayout {
-                                        anchors.fill: parent
-                                        spacing: 0
-
-                                        Rectangle {
-                                            Layout.fillWidth: true
-                                            Layout.preferredHeight: _excludedHeader.implicitHeight
-                                            color: Runtime.colors.primary.c600.background
-
-                                            VclLabel {
-                                                id: _excludedHeader
-                                                width: parent.width
-                                                text: "✗   Not Included"
-                                                color: Runtime.colors.primary.c600.text
-                                                font.bold: true
-                                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                                                padding: 8
-                                            }
-                                        }
-
-                                        Item {
-                                            Layout.fillWidth: true
-                                            Layout.fillHeight: true
-
-                                            ListView {
-                                                anchors.fill: parent
-                                                anchors.margins: 1
-                                                anchors.topMargin: 0
-                                                model: _excludedModel
-                                                clip: true
-                                                keyNavigationEnabled: true
-                                                ScrollBar.vertical: VclScrollBar { }
-
-                                                delegate: Item {
-                                                    id: _eDelegate
-                                                    required property int index
-                                                    required property string featureTitle
-                                                    required property string featureDescription
-                                                    readonly property bool isCurrent: ListView.isCurrentItem
-                                                    readonly property var listView: ListView.view
-                                                    width: listView ? listView.width : 0
-                                                    height: _eLayout.implicitHeight
-
-                                                    Rectangle {
-                                                        anchors.fill: parent
-                                                        color: _eDelegate.isCurrent
-                                                               ? Runtime.colors.primary.c300.background
-                                                               : (_eDelegate.index % 2 === 0)
-                                                                 ? Runtime.colors.primary.c50.background
-                                                                 : Runtime.colors.primary.c100.background
-                                                    }
-
-                                                    MouseArea {
-                                                        anchors.fill: parent
-                                                        onClicked: {
-                                                            _eDelegate.listView.forceActiveFocus()
-                                                            _eDelegate.listView.currentIndex = _eDelegate.isCurrent ? -1 : _eDelegate.index
-                                                        }
-                                                    }
-
-                                                    ColumnLayout {
-                                                        id: _eLayout
-                                                        width: parent.width
-                                                        spacing: 0
-
-                                                        VclLabel {
-                                                            Layout.fillWidth: true
-                                                            text: "✗  " + _eDelegate.featureTitle
-                                                            font.bold: _eDelegate.isCurrent
-                                                            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                                                            topPadding: 8
-                                                            bottomPadding: _eDelegate.isCurrent ? 2 : 8
-                                                            leftPadding: 8
-                                                            rightPadding: 8
-                                                            wrapMode: Text.WordWrap
-                                                        }
-
-                                                        VclLabel {
-                                                            Layout.fillWidth: true
-                                                            text: _eDelegate.featureDescription
-                                                            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                                                            font.italic: true
-                                                            topPadding: 0
-                                                            bottomPadding: 8
-                                                            leftPadding: 8
-                                                            rightPadding: 8
-                                                            wrapMode: Text.WordWrap
-                                                            visible: _eDelegate.isCurrent && text !== ""
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -845,5 +561,235 @@ Item {
         }
 
         Component.onCompleted: go()
+    }
+
+    component SubCard: Rectangle {
+        id: _subCard
+
+        property scriteUserSubscriptionInfo subscription
+        property string badgeText
+        property color badgeColor
+        property string statusLine
+
+        implicitHeight: _subCardContent.implicitHeight + 24
+        radius: 4
+        border.width: 1
+
+        ColumnLayout {
+            id: _subCardContent
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 12 }
+            spacing: 4
+
+            VclLabel {
+                Layout.fillWidth: true
+                text: _subCard.badgeText
+                font.bold: true
+                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                color: _subCard.badgeColor
+            }
+
+            VclLabel {
+                Layout.fillWidth: true
+                text: _subCard.subscription.plan.title
+                font.bold: true
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+                wrapMode: Text.WordWrap
+            }
+
+            VclLabel {
+                Layout.fillWidth: true
+                text: _subCard.subscription.plan.subtitle
+                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                font.italic: true
+                wrapMode: Text.WordWrap
+                visible: text !== ""
+            }
+
+            Row {
+                spacing: 4
+
+                VclLabel {
+                    text: Runtime.daysSpanAsString(_subCard.subscription.plan.duration) +
+                          "  ·  Device Count: " + _subCard.subscription.plan.devices
+                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                }
+
+                VclLabel {
+                    text: "ⓘ"
+                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            const n = _subCard.subscription.plan.devices
+                            const opening = n === 1
+                                ? "This plan allows Scrite to be activated on 1 device at a time."
+                                : "This plan allows Scrite to be activated on up to " + n + " devices at a time."
+                            MessageBox.question(
+                                "About Device Activations",
+                                opening + "\n\nEach activation is tied to the specific OS installation and user account used at sign-in. This means reinstalling your OS, or signing in from a different user account on the same machine, counts as a separate activation.\n\nTo activate on a new device once the limit is reached, sign out from one of your existing activated devices first. Exceeding the limit without doing so will result in an activation error.",
+                                ["More Info", "Ok"],
+                                (btn) => {
+                                    if (btn === "More Info") {
+                                        const url = HelpCenter.lookup("device limits")
+                                        if (url.toString() !== "") Qt.openUrlExternally(url)
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            VclLabel {
+                Layout.fillWidth: true
+                text: _subCard.statusLine
+                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                wrapMode: Text.WordWrap
+            }
+
+            Link {
+                text: "Order #" + _subCard.subscription.wc_order_id + " »"
+                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                visible: _subCard.subscription.wc_order_id !== undefined &&
+                         _subCard.subscription.wc_order_id !== ""
+                onClicked: Qt.openUrlExternally(_subCard.subscription.detailsUrl)
+            }
+        }
+    }
+
+    component FeatureListPanel: Rectangle {
+        id: _panel
+
+        property string headerText
+        property color headerBgColor
+        property color headerTextColor
+        property int headerBorderWidth: 0
+        property ListModel listModel
+        property color highlightColor
+        property string titlePrefix: ""
+
+        color: Runtime.colors.primary.c100.background
+        border.color: Runtime.colors.primary.c400.background
+        border.width: 1
+        clip: true
+
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 0
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: _panelHeader.implicitHeight
+
+                color: _panel.headerBgColor
+
+                border.color: Runtime.colors.primary.c400.background
+                border.width: _panel.headerBorderWidth
+
+                VclLabel {
+                    id: _panelHeader
+
+                    width: parent.width
+                    text: _panel.headerText
+                    color: _panel.headerTextColor
+                    padding: 8
+
+                    font.bold: true
+                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                }
+            }
+
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                ListView {
+                    property color highlightColor: _panel.highlightColor
+                    property string titlePrefix: _panel.titlePrefix
+
+                    ScrollBar.vertical: VclScrollBar { }
+
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    anchors.topMargin: 0
+
+                    model: _panel.listModel
+
+                    clip: true
+                    keyNavigationEnabled: true
+
+                    delegate: Item {
+                        id: _delegate
+                        required property int index
+                        required property string featureTitle
+                        required property string featureDescription
+                        readonly property bool isCurrent: ListView.isCurrentItem
+                        readonly property var listView: ListView.view
+
+                        width: listView ? listView.width : 0
+                        height: _delegateLayout.implicitHeight
+
+                        Rectangle {
+                            anchors.fill: parent
+
+                            color: _delegate.isCurrent
+                                   ? _delegate.listView.highlightColor
+                                   : (_delegate.index % 2 === 0)
+                                     ? Runtime.colors.primary.c50.background
+                                     : Runtime.colors.primary.c100.background
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+
+                            onClicked: {
+                                _delegate.listView.forceActiveFocus()
+                                _delegate.listView.currentIndex = _delegate.isCurrent ? -1 : _delegate.index
+                            }
+                        }
+
+                        ColumnLayout {
+                            id: _delegateLayout
+
+                            width: parent.width
+                            spacing: 0
+
+                            VclLabel {
+                                Layout.fillWidth: true
+
+                                text: _delegate.listView.titlePrefix + _delegate.featureTitle
+                                wrapMode: Text.WordWrap
+
+                                topPadding: 8
+                                bottomPadding: _delegate.isCurrent ? 2 : 8
+                                leftPadding: 8
+                                rightPadding: 8
+
+                                font.bold: _delegate.isCurrent
+                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                            }
+
+                            VclLabel {
+                                Layout.fillWidth: true
+
+                                text: _delegate.featureDescription
+                                visible: _delegate.isCurrent && text !== ""
+                                wrapMode: Text.WordWrap
+
+                                topPadding: 0
+                                bottomPadding: 8
+                                leftPadding: 8
+                                rightPadding: 8
+
+                                font.italic: true
+                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
