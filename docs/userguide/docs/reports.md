@@ -189,20 +189,6 @@ section of the report configuration dialog:
 | **Scene Time** | The estimated screen time for the scene |
 | **Characters** | Comma‑separated list of characters who appear in the scene |
 
-### Filtering scenes
-
-Before generating the report you can narrow down which scenes are included:
-
-- **Episodes** – select one or more episode numbers; leave empty to include all episodes.
-- **Scenes** – pick individual scene numbers; leave empty to include all scenes.
-- **Groups / Tags** – select one or more structural tag groups; only scenes that carry at least one
-  of the chosen tags are included.
-- **Keywords** – enter comma‑separated keywords; only scenes whose heading or synopsis contains at
-  least one keyword are included.
-
-The active filters are summarised in the report header so recipients can see at a glance what was
-included.
-
 ### Output format
 
 By default the report is saved as an **XLSX** spreadsheet. Columns are auto‑sized to fit their
