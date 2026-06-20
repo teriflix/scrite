@@ -536,10 +536,13 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: "Meta+Shift+D"
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ?
+                                                          Gui.shortcut(Qt.ControlModifier+Qt.ShiftModifier+Qt.Key_D) :
+                                                          Gui.shortcut(Qt.MetaModifier+Qt.ShiftModifier+Qt.Key_D)
 
             text: "Toggle Color Theme (Light \u21D4 Dark)"
             objectName: "toggleColorTheme"
+            shortcut: defaultShortcut
 
             onTriggered: {
                 if(Runtime.applicationSettings.colorMode === "Dark" || Runtime.colors.scheme === Qt.ColorScheme.Dark) {
