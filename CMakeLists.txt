@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.27)
 # Build all macOS targets as universal binaries.
 if(APPLE)
   set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "macOS universal architectures" FORCE)
+  set(CMAKE_OSX_DEPLOYMENT_TARGET 13.0 CACHE STRING "macOS deployment target" FORCE)
 endif()
 
 # Qt Creator can inject CMAKE_PROJECT_*_INCLUDE_BEFORE entries that point into a
