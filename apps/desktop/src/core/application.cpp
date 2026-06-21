@@ -976,6 +976,7 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
         geo.moveCenter(screenGeo.center());
     }
 
+    window->showNormal();
     window->setGeometry(geo);
     return true;
 }
