@@ -986,7 +986,7 @@ void UserMeRestApiCall::setResponse(const QJsonObject &val)
     LocalStorage::store(LocalStorage::user, QJsonDocument(data).toJson());
     LocalStorage::store(LocalStorage::userId, data.value("_id").toString());
 
-    QTimer::singleShot(100, User::instance(), &User::checkForMessagesNow);
+    QTimer::singleShot(100, User::instance(), &User::checkForMessages);
     QTimer::singleShot(0, User::instance(), &User::loadInfoFromStorage);
     QTimer::singleShot(0, RestApi::instance(), &RestApi::sessionTokenAvailable);
     QTimer::singleShot(100, User::instance(), &User::checkIfVersionTypeUseIsAllowed);
@@ -1359,9 +1359,7 @@ void SessionNewRestApiCall::setResponse(const QJsonObject &val)
     for (const QString &key : keys)
         LocalStorage::store(key, data.value(key).toString().toUtf8());
 
-    QTimer::singleShot(100, User::instance(), &User::checkForMessages);
     QTimer::singleShot(0, User::instance(), &User::loadInfoUsingRestApiCall);
-    QTimer::singleShot(0, RestApi::instance(), &RestApi::sessionTokenAvailable);
 
     RestApiCall::setResponse(val);
 }

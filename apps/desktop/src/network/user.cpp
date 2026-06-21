@@ -666,6 +666,7 @@ void User::checkForMessages()
         m_checkForMessagesTimer->setInterval(30000);
         connect(m_checkForMessagesTimer, &QTimer::timeout, this, &User::checkForMessagesNow);
         this->checkForMessagesNow();
+        m_checkForMessagesTimer->start();
     } else if (!m_checkForMessagesTimer->isActive()) {
         m_checkForMessagesTimer->start();
     }
