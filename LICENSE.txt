@@ -869,7 +869,7 @@ license terms to ensure compliance.
 COMPONENT SOURCES:
 
   • Git Submodules: Source code fetched from external repositories as git submodules
-    (KDE Sonnet, OpenXLSX, QuaZip, Extra CMake Modules)
+    (KDE Sonnet, OpenXLSX, QuaZip, Extra CMake Modules, Sanscript)
 
   • Included in Repository: Source code included in thirdparty/ directory
     (poly2tri, SimpleCrypt, phtranslator, OpenSSL, Quill, Curved-Arrows)
@@ -878,7 +878,7 @@ COMPONENT SOURCES:
     (Qt Framework)
 
   • Baked into Executable: JavaScript/resources compiled into the binary
-    (Quill, Curved-Arrows)
+    (Quill, Curved-Arrows, Sanscript)
 
 DYNAMICALLY LINKED LIBRARIES:
 (License terms require dynamic linking to allow users to relink with modified versions)
@@ -947,6 +947,12 @@ JAVASCRIPT PACKAGES:
     License: MIT
     Source: Baked into executable as resources (thirdparty/source/dragonman225-curved-arrows)
     https://github.com/dragonman225/curved-arrows
+
+  • Sanscript (Transliteration Library)
+    License: MIT
+    Source: Baked into executable as resources (thirdparty/source/sanscript.js)
+            Built from commit 24e1510 of the upstream repository
+    https://github.com/indic-transliteration/sanscript.js
 
 BUILD TOOLS:
 (Used during build process; not included in final binaries)

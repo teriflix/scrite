@@ -10,3 +10,6 @@
 [submodule "thirdparty/static/openxlsx/openxlsx"]
 	path = thirdparty/static/openxlsx/openxlsx
 	url = https://github.com/troldal/OpenXLSX.git
+[submodule "thirdparty/source/sanscript.js/sanscript.js"]
+	path = thirdparty/source/sanscript.js/sanscript.js
+	url = https://github.com/indic-transliteration/sanscript.js

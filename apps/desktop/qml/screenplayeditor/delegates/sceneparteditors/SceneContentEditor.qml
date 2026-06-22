@@ -539,8 +539,10 @@ AbstractScenePartEditor {
                                  const pos = _sceneTextEditor.selectionStart
                                  const txText = option.transliterateParagraph(_sceneTextEditor.selectedText)
                                  if(txText !== "" && txText !== _sceneTextEditor.selectedText) {
-                                     _sceneTextEditor.remove(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
-                                     _sceneTextEditor.insert(pos, txText)
+                                    Runtime.undoMacro(text, () => {
+                                                          _sceneTextEditor.remove(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
+                                                          _sceneTextEditor.insert(pos, txText)
+                                                      })
                                  } else {
                                      MessageBox.information("Translation Error", "Couldn't translate the selected text to " + Runtime.language.active.name + ".")
                                  }

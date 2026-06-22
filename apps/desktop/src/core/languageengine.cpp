@@ -29,6 +29,7 @@
 #include <QTextBlock>
 #include <QScopeGuard>
 #include <QApplication>
+#include <QJSEngine>
 #include <QNetworkReply>
 #include <QFontDatabase>
 #include <QJsonDocument>
@@ -1435,6 +1436,138 @@ QString StaticTransliterationEngine::transliterateWord(const QString &word,
 
 ///////////////////////////////////////////////////////////////////////////////
 
+SanscriptjsTransliterationEngine::SanscriptjsTransliterationEngine(QObject *parent)
+    : AbstractTransliterationEngine(parent)
+{
+}
+
+SanscriptjsTransliterationEngine::~SanscriptjsTransliterationEngine()
+{
+    delete m_jsEngine;
+}
+
+QString SanscriptjsTransliterationEngine::name() const
+{
+    return QStringLiteral("Sanscript");
+}
+
+QList<int> SanscriptjsTransliterationEngine::supportedLanguageCodes()
+{
+    return { QLocale::Hindi,    QLocale::Marathi, QLocale::Sanskrit, QLocale::Bengali,
+             QLocale::Gujarati, QLocale::Punjabi, QLocale::Oriya,    QLocale::Tamil,
+             QLocale::Telugu,   QLocale::Kannada, QLocale::Malayalam };
+}
+
+QString SanscriptjsTransliterationEngine::schemeForLanguage(int lang)
+{
+    switch (lang) {
+    case QLocale::Hindi:
+    case QLocale::Marathi:
+    case QLocale::Sanskrit:
+        return QStringLiteral("devanagari");
+    case QLocale::Bengali:
+        return QStringLiteral("bengali");
+    case QLocale::Gujarati:
+        return QStringLiteral("gujarati");
+    case QLocale::Punjabi:
+        return QStringLiteral("gurmukhi");
+    case QLocale::Oriya:
+        return QStringLiteral("oriya");
+    case QLocale::Tamil:
+        return QStringLiteral("tamil");
+    case QLocale::Telugu:
+        return QStringLiteral("telugu");
+    case QLocale::Kannada:
+        return QStringLiteral("kannada");
+    case QLocale::Malayalam:
+        return QStringLiteral("malayalam");
+    default:
+        break;
+    }
+    return QString();
+}
+
+QList<TransliterationOption> SanscriptjsTransliterationEngine::options(int lang) const
+{
+    if (supportedLanguageCodes().contains(lang))
+        return { { (QObject *)this, lang,
+                   QStringLiteral("Sanscript.js - ") + schemeForLanguage(lang), this->name(),
+                   true } };
+    return {};
+}
+
+bool SanscriptjsTransliterationEngine::canActivate(const TransliterationOption &option)
+{
+    return option.transliteratorObject == this
+            && supportedLanguageCodes().contains(option.languageCode);
+}
+
+bool SanscriptjsTransliterationEngine::activate(const TransliterationOption &option)
+{
+    Q_UNUSED(option)
+    return true;
+}
+
+QString
+SanscriptjsTransliterationEngine::transliterateWord(const QString &word,
+                                                    const TransliterationOption &option) const
+{
+    if (word.isEmpty())
+        return word;
+
+    const QString toScheme = schemeForLanguage(option.languageCode);
+    if (toScheme.isEmpty())
+        return word;
+
+    if (!ensureEngine())
+        return word;
+
+    m_jsEngine->globalObject().setProperty(QStringLiteral("_input"), word);
+    m_jsEngine->globalObject().setProperty(QStringLiteral("_from"), QStringLiteral("itrans"));
+    m_jsEngine->globalObject().setProperty(QStringLiteral("_to"), toScheme);
+
+    const QJSValue result = m_jsEngine->evaluate(QStringLiteral("Sanscript.t(_input, _from, _to)"));
+    if (result.isError())
+        return word;
+
+    return result.toString();
+}
+
+bool SanscriptjsTransliterationEngine::ensureEngine() const
+{
+    if (m_jsEngine != nullptr)
+        return true;
+
+    QFile f(QStringLiteral(":/sanscript.js/sanscript.js"));
+    if (!f.open(QIODevice::ReadOnly))
+        return false;
+
+    QString src = QString::fromUtf8(f.readAll());
+
+    // QJSEngine does not support ES module syntax. Rewrite "export default " as
+    // "var Sanscript = " so the object lands on the global scope.
+    src.replace(QRegularExpression(QStringLiteral(R"(^\s*export\s+default\s+)"),
+                                   QRegularExpression::MultilineOption),
+                QStringLiteral("var Sanscript = "));
+
+    // Strip bare named-export statements: export { foo, bar };
+    src.replace(QRegularExpression(QStringLiteral(R"(^\s*export\s+\{[^}]*\}\s*;?\s*$)"),
+                                   QRegularExpression::MultilineOption),
+                QString());
+
+    m_jsEngine = new QJSEngine();
+    const QJSValue evalResult = m_jsEngine->evaluate(src);
+    if (evalResult.isError()) {
+        delete m_jsEngine;
+        m_jsEngine = nullptr;
+        return false;
+    }
+
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 DictpressTransliterationEngine::DictpressTransliterationEngine(int language, QObject *parent)
     : AbstractTransliterationEngine(parent)
 {
@@ -2037,6 +2170,7 @@ LanguageEngine::LanguageEngine(QObject *parent) : QObject(parent)
     // default. So, that should go first in the list.
     m_transliterators << new PlatformTransliterationEngine(this);
     m_transliterators << new StaticTransliterationEngine(this);
+    m_transliterators << new SanscriptjsTransliterationEngine(this);
     m_transliterators << new DictpressTransliterationEngine(QLocale::Kannada, this); // For Alar
     m_transliterators << new DictpressTransliterationEngine(QLocale::Malayalam, this); // For Olam
     m_transliterators << new FallbackTransliterationEngine(m_transliterators.first(), this);

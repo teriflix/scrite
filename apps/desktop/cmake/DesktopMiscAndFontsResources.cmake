@@ -25,6 +25,16 @@ set_source_files_properties("misc/../../../LICENSE.txt"
   PROPERTIES QT_RESOURCE_ALIAS "LICENSE.txt"
 )
 
+set_source_files_properties("misc/../../../thirdparty/source/sanscript.js/sanscript-24e1510.js"
+  PROPERTIES QT_RESOURCE_ALIAS "sanscript.js"
+)
+
+qt_add_resources(Scrite SCRITE_SANSCRIPT_RESOURCES
+  PREFIX "/sanscript.js"
+  FILES
+    "misc/../../../thirdparty/source/sanscript.js/sanscript-24e1510.js"
+)
+
 set_source_files_properties("misc/../../../thirdparty/source/quill/quill.min.js"
   PROPERTIES QT_RESOURCE_ALIAS "quill/quill.min.js"
 )

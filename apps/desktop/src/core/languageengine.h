@@ -580,6 +580,36 @@ public:
     QString transliterateWord(const QString &word, const TransliterationOption &option) const;
 };
 
+class QJSEngine;
+
+/*
+ * This engine uses the sanscript.js library (MIT) evaluated via QJSEngine to offer
+ * static in-app transliteration from English phonetic (ITRANS) to Indian scripts.
+ * The JS source is embedded as a QRC resource at qrc:/sanscript.js/sanscript.js.
+ */
+class SanscriptjsTransliterationEngine : public AbstractTransliterationEngine
+{
+    Q_OBJECT
+
+public:
+    explicit SanscriptjsTransliterationEngine(QObject *parent = nullptr);
+    ~SanscriptjsTransliterationEngine();
+
+    // AbstractTransliterationEngine interface
+    QString name() const;
+    QList<TransliterationOption> options(int lang) const;
+    bool canActivate(const TransliterationOption &option);
+    bool activate(const TransliterationOption &option);
+    QString transliterateWord(const QString &word, const TransliterationOption &option) const;
+
+private:
+    bool ensureEngine() const;
+    static QList<int> supportedLanguageCodes();
+    static QString schemeForLanguage(int lang);
+
+    mutable QJSEngine *m_jsEngine = nullptr;
+};
+
 class QNetworkReply;
 
 /*

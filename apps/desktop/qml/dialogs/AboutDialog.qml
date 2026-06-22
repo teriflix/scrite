@@ -179,6 +179,11 @@ DialogLauncher {
                             }
 
                             ListElement {
+                                credits: "<strong>Sanscript</strong> for transliteration across Indian scripts and romanization schemes."
+                                url: "https://github.com/indic-transliteration/sanscript.js"
+                            }
+
+                            ListElement {
                                 credits: "<strong>Sonnet</strong> from KDE Frameworks for powering spell check."
                                 url: "https://api.kde.org/sonnet-index.html"
                             }
