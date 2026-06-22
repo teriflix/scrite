@@ -26,6 +26,8 @@ import "../globals"
 ToolButton {
     id: root
 
+    property alias tooltip: _tooltip.text
+
     Material.background: "transparent"
 
     flat: true
@@ -40,6 +42,8 @@ ToolButton {
     icon.color: down ? Runtime.colors.buttonDownIconColor : action.icon.color
 
     ToolTipPopup {
+        id: _tooltip
+
         container: root
 
         text: {

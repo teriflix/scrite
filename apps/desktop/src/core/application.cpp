@@ -80,8 +80,6 @@
 #include <QtConcurrentRun>
 #include <QOperatingSystemVersion>
 
-// #define ENABLE_SCRIPT_HOTKEY
-
 bool QtApplicationEventNotificationCallback(void **cbdata);
 
 void ApplicationQtMessageHandler(QtMsgType type, const QMessageLogContext &context,

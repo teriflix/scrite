@@ -135,6 +135,12 @@ Rectangle {
                 actionManager: ActionHub.appOptions
             }
 
+            ActionToolButton {
+                action: ActionHub.appOptions.find("toggleColorTheme")
+                visible: true
+                tooltip: (action.isDarkMode ? "Light" : "Dark") + " Mode (" + Gui.portableShortcut(action.shortcut) + ")"
+            }
+
             Rectangle {
                 Layout.fillHeight: true
                 Layout.preferredWidth: 1

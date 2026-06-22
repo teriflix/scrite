@@ -540,17 +540,15 @@ Item {
                                                           Gui.shortcut(Qt.ControlModifier+Qt.ShiftModifier+Qt.Key_D) :
                                                           Gui.shortcut(Qt.MetaModifier+Qt.ShiftModifier+Qt.Key_D)
 
+            property bool isDarkMode: Runtime.applicationSettings.colorMode === "Dark" || Runtime.colors.scheme === Qt.ColorScheme.Dark
+
             text: "Toggle Color Theme (Light \u21D4 Dark)"
             objectName: "toggleColorTheme"
             shortcut: defaultShortcut
 
-            onTriggered: {
-                if(Runtime.applicationSettings.colorMode === "Dark" || Runtime.colors.scheme === Qt.ColorScheme.Dark) {
-                    Runtime.applicationSettings.colorMode = "Light"
-                } else {
-                    Runtime.applicationSettings.colorMode = "Dark"
-                }
-            }
+            icon.source: "qrc:/icons/action/" + (isDarkMode ? "light" : "dark") + "_mode.png"
+
+            onTriggered: Runtime.applicationSettings.colorMode = isDarkMode ? "Light" : "Dark"
         }
 
         Action {
