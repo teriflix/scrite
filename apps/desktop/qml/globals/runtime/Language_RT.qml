@@ -28,6 +28,7 @@ QtObject {
     property var activeTransliterationOption: active.valid ? active.preferredTransliterationOption() : undefined
 
     property bool activeTransliterationIsInApp: activeTransliterationOption && activeTransliterationOption.valid ? activeTransliterationOption.inApp : false
+    property bool textSelectionTransliterationEnabled: activeTransliterationIsInApp && Runtime.screenplayEditorSettings.allowSelectedTextTranslation
 
     property AbstractTransliterationEngine activeTransliterator: activeTransliterationOption && activeTransliterationOption.valid ? activeTransliterationOption.transliterator : null
 

@@ -63,9 +63,12 @@ MenuItem {
 
         spacing: 20
 
+
         RowLayout {
             Layout.leftMargin: !root.mirrored ? _content.indicatorPadding : _content.arrowPadding
             Layout.fillWidth: true
+
+            opacity: root.enabled ? 1 : 0.5
 
             Image {
                 Layout.preferredWidth: _label.height

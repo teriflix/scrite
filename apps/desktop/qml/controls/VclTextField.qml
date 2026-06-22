@@ -61,6 +61,7 @@ TextField {
 
     property alias label: _label.text
     property alias labelColor: _label.color
+    property alias contextMenu: _contextMenu
     property alias labelTextAlign: _label.horizontalAlignment
     property alias showingSymbols: _specialSymbolSupport.showingSymbols
     property alias completionRow: _completionModel.currentRow

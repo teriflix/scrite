@@ -1121,7 +1121,7 @@ bool DefaultTransliteration::supportsLanguageCode(int code) const
 
 QString DefaultTransliteration::onWord(const QString &word, int code)
 {
-    if (word.isEmpty())
+    if (word.isEmpty() || LanguageEngine::determineScript(word) != QChar::Script_Latin)
         return word;
 
     void *translator = [code]() -> void * {
@@ -1368,8 +1368,9 @@ QString TransliterationOption::transliterateParagraph(const QString &paragraph) 
     AbstractTransliterationEngine *t = this->transliterator();
     if (t) {
         const QList<ScriptBoundary> boundaries = LanguageEngine::determineBoundaries(paragraph);
-        for (const ScriptBoundary &boundary : boundaries) {
-            ret.replace(boundary.start, boundary.end - boundary.start + 1,
+        for (int b = boundaries.size() - 1; b >= 0; b--) {
+            const ScriptBoundary &boundary = boundaries[b];
+            ret.replace(boundary.start, boundary.end - boundary.start,
                         t->transliterateWord(boundary.text, *this));
         }
     }
@@ -1453,9 +1454,9 @@ QString SanscriptjsTransliterationEngine::name() const
 
 QList<int> SanscriptjsTransliterationEngine::supportedLanguageCodes()
 {
-    return { QLocale::Hindi,    QLocale::Marathi, QLocale::Sanskrit, QLocale::Bengali,
-             QLocale::Gujarati, QLocale::Punjabi, QLocale::Oriya,    QLocale::Tamil,
-             QLocale::Telugu,   QLocale::Kannada, QLocale::Malayalam };
+    return { QLocale::Hindi,    QLocale::Marathi, QLocale::Sanskrit,  QLocale::Bengali,
+             QLocale::Gujarati, QLocale::Punjabi, QLocale::Oriya,     QLocale::Tamil,
+             QLocale::Telugu,   QLocale::Kannada, QLocale::Malayalam, QLocale::English };
 }
 
 QString SanscriptjsTransliterationEngine::schemeForLanguage(int lang)
@@ -1481,6 +1482,37 @@ QString SanscriptjsTransliterationEngine::schemeForLanguage(int lang)
         return QStringLiteral("kannada");
     case QLocale::Malayalam:
         return QStringLiteral("malayalam");
+    case QLocale::English:
+        return QStringLiteral("itrans");
+    default:
+        break;
+    }
+    return QString();
+}
+
+QString SanscriptjsTransliterationEngine::schemeForScript(QChar::Script script)
+{
+    switch (script) {
+    case QChar::Script_Devanagari:
+        return QStringLiteral("devanagari");
+    case QChar::Script_Bengali:
+        return QStringLiteral("bengali");
+    case QChar::Script_Gujarati:
+        return QStringLiteral("gujarati");
+    case QChar::Script_Gurmukhi:
+        return QStringLiteral("gurmukhi");
+    case QChar::Script_Oriya:
+        return QStringLiteral("oriya");
+    case QChar::Script_Tamil:
+        return QStringLiteral("tamil");
+    case QChar::Script_Telugu:
+        return QStringLiteral("telugu");
+    case QChar::Script_Kannada:
+        return QStringLiteral("kannada");
+    case QChar::Script_Malayalam:
+        return QStringLiteral("malayalam");
+    case QChar::Script_Latin:
+        return QStringLiteral("itrans");
     default:
         break;
     }
@@ -1519,11 +1551,15 @@ SanscriptjsTransliterationEngine::transliterateWord(const QString &word,
     if (toScheme.isEmpty())
         return word;
 
+    const QString fromScheme = schemeForScript(LanguageEngine::determineScript(word));
+    if (fromScheme.isEmpty() || fromScheme == toScheme)
+        return word;
+
     if (!ensureEngine())
         return word;
 
     m_jsEngine->globalObject().setProperty(QStringLiteral("_input"), word);
-    m_jsEngine->globalObject().setProperty(QStringLiteral("_from"), QStringLiteral("itrans"));
+    m_jsEngine->globalObject().setProperty(QStringLiteral("_from"), fromScheme);
     m_jsEngine->globalObject().setProperty(QStringLiteral("_to"), toScheme);
 
     const QJSValue result = m_jsEngine->evaluate(QStringLiteral("Sanscript.t(_input, _from, _to)"));

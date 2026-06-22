@@ -606,6 +606,7 @@ private:
     bool ensureEngine() const;
     static QList<int> supportedLanguageCodes();
     static QString schemeForLanguage(int lang);
+    static QString schemeForScript(QChar::Script script);
 
     mutable QJSEngine *m_jsEngine = nullptr;
 };

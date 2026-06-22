@@ -13,7 +13,10 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
+import QtQuick.Controls
 
 import io.scrite.components
 
@@ -150,6 +153,63 @@ VclTextField {
             }
 
             return suggestion
+        }
+    }
+
+    ActionHandler {
+        id: _transliterateActionHandler
+
+        property string text: "Transliterate to " + Runtime.language.active.name
+
+        action: ActionHub.editOptions.find("translateToActiveLanguage") as Action
+        enabled: !root.readOnly && root.activeFocus && root.selectedText !== "" &&
+                 Runtime.language.textSelectionTransliterationEnabled
+
+        onTriggered: () => {
+            if(!enabled) return
+
+            root.forceActiveFocus()
+            const option = Runtime.language.active.preferredTransliterationOption()
+            if(option && option.inApp) {
+                const pos = root.selectionStart
+                const txText = option.transliterateParagraph(root.selectedText)
+                if(txText !== "" && txText !== root.selectedText) {
+                    root.remove(root.selectionStart, root.selectionEnd)
+                    root.insert(pos, txText)
+                }
+            }
+        }
+    }
+
+    Component.onCompleted: {
+        contextMenu.addItem(_menuSeparator.createObject(contextMenu))
+        contextMenu.addItem(_transliterateMenuItem.createObject(contextMenu))
+    }
+
+    Component {
+        id: _menuSeparator
+
+        MenuSeparator { }
+    }
+
+    Component {
+        id: _transliterateMenuItem
+
+        // We don't set action: here because MenuItem binds its enabled to action.enabled,
+        // which is ActionHandler.canHandle. When the context menu opens the field loses
+        // focus, disabling the ActionHandler and graying out the item before it can be
+        // clicked. Instead we manage enabled independently and call forceActiveFocus()
+        // before triggering, so the ActionHandler is active when the action fires.
+        VclMenuItem {
+            focusPolicy: Qt.NoFocus
+            text: "Transliterate to " + Runtime.language.active.name + "\t" + _transliterateActionHandler.action.shortcut
+            enabled: !root.readOnly && root.selectedText !== "" &&
+                     Runtime.language.textSelectionTransliterationEnabled
+
+            onTriggered: () => {
+                             root.forceActiveFocus()
+                             _transliterateActionHandler.action.trigger()
+                         }
         }
     }
 }

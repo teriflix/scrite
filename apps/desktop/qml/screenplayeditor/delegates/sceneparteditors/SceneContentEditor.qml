@@ -522,10 +522,10 @@ AbstractScenePartEditor {
     }
 
     ActionHandler {
-        property string text: "Translate to " + Runtime.language.active.name
+        property string text: "Transliterate to " + Runtime.language.active.name
 
         action: _private.translateToActiveLanguage
-        enabled: Runtime.screenplayEditorSettings.allowSelectedTextTranslation && _sceneTextEditor.activeFocus &&
+        enabled: Runtime.language.textSelectionTransliterationEnabled && _sceneTextEditor.activeFocus &&
                  _sceneTextEditor.selectionEnd > _sceneTextEditor.selectionStart && _sceneTextEditor.selectionStart >= 0
 
         onTriggered: () => {
