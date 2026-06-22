@@ -670,6 +670,10 @@ StructureIndexCardStack::StructureIndexCardStack(const StructureElementStack *st
     this->setPos(geometry1.topLeft());
     geometry1.moveTopLeft(QPointF(0, 0));
 
+    const StructureElement *stackLeader = stack->stackLeader();
+    if (stackLeader != nullptr)
+        geometry1.setHeight(qMin(stackLeader->geometry().height(), geometry1.height()));
+
     const int nrCards = qMin(5, stack->objectCount());
     for (int i = nrCards - 1; i >= 0; i--) {
         int idx = i;

@@ -664,7 +664,7 @@ void StructureElementStack::initialize()
     else
         screenplay = ScriteDocument::instance()->screenplay();
 
-    qreal x = 0, y = 0, w = 350, h = 375;
+    qreal x = 0, y = 0, w = 350, h = 200;
 
     for (int i = list.size() - 1; i >= 0; i--) {
         StructureElement *element = list.at(i);
@@ -4451,10 +4451,9 @@ void Structure::setDefaultIndexCardFields(const QJsonArray &val)
 
 void Structure::loadDefaultIndexCardFields()
 {
-    const QByteArray bytes =
-            Utils::File::read(Application::appDataLocation()
-                              + QStringLiteral("/index_card_fields.json"))
-                    .toLatin1();
+    const QByteArray bytes = Utils::File::read(Application::appDataLocation()
+                                               + QStringLiteral("/index_card_fields.json"))
+                                     .toLatin1();
 
     m_defaultIndexCardFields = QJsonDocument::fromJson(bytes).array();
     emit defaultIndexCardFieldsChanged();
