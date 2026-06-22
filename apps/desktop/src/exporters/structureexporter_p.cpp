@@ -230,6 +230,7 @@ StructureIndexCard::StructureIndexCard(const StructureExporter *exporter,
         headingTextItem->setPlainText(QStringLiteral("NO SCENE HEADING"));
     headingTextItem->setFont(element->hasNativeTitle() ? boldFont(normalFont)
                                                        : boldFont(fixedWidthFont));
+    headingTextItem->setDefaultTextColor(Qt::black);
 
     headingTextItem->setX(contentRect.x());
     headingTextItem->setY(contentRect.y());
@@ -241,6 +242,7 @@ StructureIndexCard::StructureIndexCard(const StructureExporter *exporter,
     tagsTextItem->setTextWidth(contentRect.width());
     tagsTextItem->setHtml(tagsText);
     tagsTextItem->setFont(smallFont(normalFont));
+    tagsTextItem->setDefaultTextColor(Qt::black);
 
     tagsTextItem->setX(contentRect.x());
     tagsTextItem->setY(contentRect.bottom() - tagsTextItem->boundingRect().height());
@@ -304,6 +306,7 @@ StructureIndexCard::StructureIndexCard(const StructureExporter *exporter,
         synopsisTextItem->setTextWidth(contentRect.width());
         synopsisTextItem->setPlainText(element->scene()->synopsis());
         synopsisTextItem->setFont(normalFont);
+        synopsisTextItem->setDefaultTextColor(Qt::black);
 
         if (synopsisTextItem->boundingRect().height() > cardContentRectItem->rect().height())
             cardContentRectItem->setPen(QPen(QColor::fromRgbF(0, 0, 0, 0.5), 1));
@@ -340,6 +343,7 @@ StructureIndexCardFields::StructureIndexCardFields(const StructureElement *eleme
         QGraphicsTextItem *keyItem = new QGraphicsTextItem;
         keyItem->setPlainText(key);
         keyItem->setFont(normalFont);
+        keyItem->setDefaultTextColor(Qt::black);
         keyItems.append(keyItem);
 
         QGraphicsTextItem *valueItem = new QGraphicsTextItem;
@@ -351,6 +355,7 @@ StructureIndexCardFields::StructureIndexCardFields(const StructureElement *eleme
             valueItem->setPlainText(value);
             valueItem->setFont(normalFont);
         }
+        valueItem->setDefaultTextColor(Qt::black);
         valueItems.append(valueItem);
     }
 
@@ -435,6 +440,7 @@ StructureIndexCardFieldsLegend::StructureIndexCardFieldsLegend(const Structure *
     QGraphicsSimpleTextItem *headingItem = new QGraphicsSimpleTextItem(this);
     headingItem->setFont(bigNormalBoldFont);
     headingItem->setText(QStringLiteral("Index Card Fields"));
+    headingItem->setBrush(Qt::black);
     headingItem->setPos(spacing, spacing);
 
     QRectF headingItemRect = headingItem->mapRectToParent(headingItem->boundingRect());
@@ -448,11 +454,13 @@ StructureIndexCardFieldsLegend::StructureIndexCardFieldsLegend(const Structure *
         QGraphicsSimpleTextItem *keyItem = new QGraphicsSimpleTextItem(this);
         keyItem->setText(key);
         keyItem->setFont(normalBoldFont);
+        keyItem->setBrush(Qt::black);
         keyItems.append(keyItem);
 
         QGraphicsSimpleTextItem *descItem = new QGraphicsSimpleTextItem(this);
         descItem->setText(desc);
         descItem->setFont(normalFont);
+        descItem->setBrush(Qt::black);
         descItems.append(descItem);
     }
 
@@ -1119,6 +1127,7 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
     titleItem->setPlainText(title);
     titleItem->setFont(titleFont);
     titleItem->setTextWidth(maxCoverPhotoSize.width());
+    titleItem->setDefaultTextColor(Qt::black);
     centerTextInDocument(titleItem->document());
 
     if (!screenplay->subtitle().isEmpty()) {
@@ -1129,6 +1138,7 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
         subtitleFont.setPointSize(subtitleFont.pointSize() + 5);
         subtitleItem->setFont(subtitleFont);
         subtitleItem->setTextWidth(maxCoverPhotoSize.width());
+        subtitleItem->setDefaultTextColor(Qt::black);
         centerTextInDocument(subtitleItem->document());
     }
 
@@ -1140,6 +1150,7 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
         basedOnFont.setPointSize(basedOnFont.pointSize() + 5);
         basedOnItem->setFont(basedOnFont);
         basedOnItem->setTextWidth(maxCoverPhotoSize.width());
+        basedOnItem->setDefaultTextColor(Qt::black);
         centerTextInDocument(basedOnItem->document());
     }
 
@@ -1151,6 +1162,7 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
         authorFont.setPointSize(authorFont.pointSize() + 5);
         authorItem->setFont(authorFont);
         authorItem->setTextWidth(maxCoverPhotoSize.width());
+        authorItem->setDefaultTextColor(Qt::black);
         centerTextInDocument(authorItem->document());
     }
 
@@ -1162,6 +1174,7 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
         versionFont.setPointSize(versionFont.pointSize() + 2);
         versionItem->setFont(versionFont);
         versionItem->setTextWidth(maxCoverPhotoSize.width());
+        versionItem->setDefaultTextColor(Qt::black);
         centerTextInDocument(versionItem->document());
     }
 
@@ -1205,6 +1218,7 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
         cursor.mergeBlockFormat(format);
 
         QGraphicsTextItem *contactInfoItem = new QGraphicsTextItem(this);
+        contactInfoItem->setDefaultTextColor(Qt::black);
         contactInfoItem->setDocument(contactInfoDoc);
         contactInfoDoc->setParent(contactInfoItem);
     }
@@ -1212,6 +1226,7 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
     if (!screenplay->logline().isEmpty()) {
         QGraphicsTextItem *loglineItem = new QGraphicsTextItem(this);
         loglineItem->setFont(::applicationFont());
+        loglineItem->setDefaultTextColor(Qt::black);
 
         const QString html = QStringLiteral("<strong>Logline:</strong> ") + screenplay->logline();
         loglineItem->setHtml(html);
@@ -1221,6 +1236,7 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
     if (!comment.isEmpty()) {
         QGraphicsTextItem *commentItem = new QGraphicsTextItem(this);
         commentItem->setFont(::applicationFont());
+        commentItem->setDefaultTextColor(Qt::black);
 
         const QString html = QStringLiteral("<strong>Comment:</strong> ") + comment;
         commentItem->setHtml(html);
@@ -1229,6 +1245,7 @@ StructureTitleCard::StructureTitleCard(const Structure *structure, const QString
 
     QGraphicsSimpleTextItem *groupingInfoItem = new QGraphicsSimpleTextItem(this);
     groupingInfoItem->setFont(::applicationFont());
+    groupingInfoItem->setBrush(Qt::black);
     if (structure->preferredGroupCategory().isEmpty())
         groupingInfoItem->setText(QStringLiteral("Grouping: Act Wise"));
     else
