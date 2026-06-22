@@ -16,9 +16,8 @@
 #include "scrite.h"
 
 #include "user.h"
+#include "utils.h"
 #include "quazip.h"
-#include <QFile>
-#include <QSettings>
 #include "appwindow.h"
 #include "quazipfile.h"
 #include "restapicall.h"
@@ -26,6 +25,9 @@
 #include "scritedocument.h"
 #include "notificationmanager.h"
 #include "scritedocumentvault.h"
+
+#include <QFile>
+#include <QSettings>
 
 Scrite::Scrite(QObject *parent) : QObject(parent)
 {
@@ -138,8 +140,8 @@ bool Scrite::prelaunchChecks()
 bool Scrite::isLicenseAccepted()
 {
     QSettings settings;
-    return settings.value(QStringLiteral("LicenseAccepted/") + QStringLiteral(SCRITE_VERSION),
-                          false)
+    return settings
+            .value(QStringLiteral("LicenseAccepted/") + QStringLiteral(SCRITE_VERSION), false)
             .toBool();
 }
 

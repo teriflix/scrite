@@ -82,73 +82,20 @@ QSM.StateMachine {
             }
         }
 
-        QSM.SignalTransition { signal: s2Prelaunch.passed; targetState: s3aLicense }
+        QSM.SignalTransition { signal: s2Prelaunch.passed; targetState: s3AppInit }
         QSM.SignalTransition { signal: s2Prelaunch.failed; targetState: sQuit }
-    }
-
-    /*
-     * Shows the license dialog the first time each new version is launched.
-     * Skipped silently if the license for this version is already on record.
-     * Accepting advances to s3bLegacyMigration; declining exits the app.
-     */
-    QSM.State {
-        id: s3aLicense
-
-        signal accepted()
-        signal declined()
-
-        onEntered: {
-            if (!Scrite.isLicenseAccepted()) {
-                let dlg = LicenseDialog.launch()
-                if (dlg) {
-                    dlg.accepted.connect(() => s3aLicense.accepted())
-                    dlg.rejected.connect(() => s3aLicense.declined())
-                } else {
-                    Qt.callLater(() => s3aLicense.accepted())
-                }
-            } else {
-                Qt.callLater(() => s3aLicense.accepted())
-            }
-        }
-
-        QSM.SignalTransition { signal: s3aLicense.accepted; targetState: s3bLegacyMigration }
-        QSM.SignalTransition { signal: s3aLicense.declined; targetState: sQuit }
-    }
-
-    /*
-     * If Scrite recently moved the user's settings, recent files, and vault to
-     * a new location on disk, this state shows a one-time notice explaining the
-     * change. The dialog is purely informational — there is no decline path.
-     */
-    QSM.State {
-        id: s3bLegacyMigration
-
-        signal done()
-
-        onEntered: {
-            if (Scrite.app.hasLegacyDataMovedRecently()) {
-                let dlg = LegacyDataMigrationDialog.launch()
-                if (dlg)
-                    dlg.accepted.connect(() => s3bLegacyMigration.done())
-                else
-                    Qt.callLater(() => s3bLegacyMigration.done())
-            } else {
-                Qt.callLater(() => s3bLegacyMigration.done())
-            }
-        }
-
-        QSM.SignalTransition { signal: s3bLegacyMigration.done; targetState: s4AppInit }
     }
 
     /*
      * Initialises all application modules (ActionHub, HelpCenter, CommandCenter,
      * SubscriptionPlanOperations), activates the main content loader, then wires
      * up the UI layers (BusyOverlay, dialogs, dock panels, notifications).
-     * Branches to s5Splash, s6HomeOrFile, or s7LoginRequired based on login
-     * state and subscription entitlement.
+     * This runs before the license and legacy migration dialogs to ensure that
+     * ActionHub initialization happens with the user's cached login (if available),
+     * allowing LibraryService to fetch data correctly on first launch after update.
      */
     QSM.State {
-        id: s4AppInit
+        id: s3AppInit
 
         signal done()
 
@@ -168,19 +115,74 @@ QSM.StateMachine {
             OverlaysLayer.init(root.contentLoader)
             NotificationsLayer.init(root.contentLoader)
 
-            Qt.callLater(() => s4AppInit.done())
+            Qt.callLater(() => s3AppInit.done())
+        }
+
+        QSM.SignalTransition { signal: s3AppInit.done; targetState: s4License }
+    }
+
+    /*
+     * Shows the license dialog the first time each new version is launched.
+     * Skipped silently if the license for this version is already on record.
+     * Accepting advances to s5LegacyMigration; declining exits the app.
+     */
+    QSM.State {
+        id: s4License
+
+        signal accepted()
+        signal declined()
+
+        onEntered: {
+            if (!Scrite.isLicenseAccepted()) {
+                let dlg = LicenseDialog.launch()
+                if (dlg) {
+                    dlg.accepted.connect(() => s4License.accepted())
+                    dlg.rejected.connect(() => s4License.declined())
+                } else {
+                    Qt.callLater(() => s4License.accepted())
+                }
+            } else {
+                Qt.callLater(() => s4License.accepted())
+            }
+        }
+
+        QSM.SignalTransition { signal: s4License.accepted; targetState: s5LegacyMigration }
+        QSM.SignalTransition { signal: s4License.declined; targetState: sQuit }
+    }
+
+    /*
+     * If Scrite recently moved the user's settings, recent files, and vault to
+     * a new location on disk, this state shows a one-time notice explaining the
+     * change. The dialog is purely informational — there is no decline path.
+     * After this, the state machine branches based on login and subscription status.
+     */
+    QSM.State {
+        id: s5LegacyMigration
+
+        signal done()
+
+        onEntered: {
+            if (Scrite.app.hasLegacyDataMovedRecently()) {
+                let dlg = LegacyDataMigrationDialog.launch()
+                if (dlg)
+                    dlg.accepted.connect(() => s5LegacyMigration.done())
+                else
+                    Qt.callLater(() => s5LegacyMigration.done())
+            } else {
+                Qt.callLater(() => s5LegacyMigration.done())
+            }
         }
 
         QSM.SignalTransition {
-            signal: s4AppInit.done; targetState: s5Splash
+            signal: s5LegacyMigration.done; targetState: s6Splash
             guard: !Scrite.user.loggedIn
         }
         QSM.SignalTransition {
-            signal: s4AppInit.done; targetState: s6HomeOrFile
+            signal: s5LegacyMigration.done; targetState: s7HomeOrFile
             guard: Scrite.user.loggedIn && Runtime.allowAppUsage
         }
         QSM.SignalTransition {
-            signal: s4AppInit.done; targetState: s7LoginRequired
+            signal: s5LegacyMigration.done; targetState: s8LoginRequired
             guard: Scrite.user.loggedIn && !Runtime.allowAppUsage
         }
     }
@@ -189,11 +191,11 @@ QSM.StateMachine {
      * Entered when the user is not logged in. Shows the splash screen and waits
      * for it to close (either by user interaction or the 5-second auto-dismiss
      * timer). On Windows versions older than 10, an additional compatibility
-     * warning is shown before proceeding. Exits to s6HomeOrFile or s7LoginRequired
+     * warning is shown before proceeding. Exits to s7HomeOrFile or s8LoginRequired
      * depending on subscription entitlement at that point.
      */
     QSM.State {
-        id: s5Splash
+        id: s6Splash
 
         signal closed()
 
@@ -206,23 +208,23 @@ QSM.StateMachine {
                             "The Windows version of Scrite works best on Windows 10 or higher. " +
                             "While it may work on earlier versions of Windows, we don't actively " +
                             "test on them. We recommend that you use Scrite on PCs with Windows 10 or higher.",
-                            () => s5Splash.closed()
+                            () => s6Splash.closed()
                         )
                     } else {
-                        s5Splash.closed()
+                        s6Splash.closed()
                     }
                 })
             } else {
-                Qt.callLater(() => s5Splash.closed())
+                Qt.callLater(() => s6Splash.closed())
             }
         }
 
         QSM.SignalTransition {
-            signal: s5Splash.closed; targetState: s6HomeOrFile
+            signal: s6Splash.closed; targetState: s7HomeOrFile
             guard: Runtime.allowAppUsage
         }
         QSM.SignalTransition {
-            signal: s5Splash.closed; targetState: s7LoginRequired
+            signal: s6Splash.closed; targetState: s8LoginRequired
             guard: !Runtime.allowAppUsage
         }
     }
@@ -234,7 +236,7 @@ QSM.StateMachine {
      * to run 2 seconds later.
      */
     QSM.State {
-        id: s6HomeOrFile
+        id: s7HomeOrFile
 
         signal done()
 
@@ -246,10 +248,10 @@ QSM.StateMachine {
                 Scrite.document.open(Scrite.fileNameToOpen)
             }
             Runtime.execLater(root, 2000, root._maybeOnboardUserSurvey)
-            Qt.callLater(() => s6HomeOrFile.done())
+            Qt.callLater(() => s7HomeOrFile.done())
         }
 
-        QSM.SignalTransition { signal: s6HomeOrFile.done; targetState: sDone }
+        QSM.SignalTransition { signal: s7HomeOrFile.done; targetState: sDone }
     }
 
     /*
@@ -258,16 +260,16 @@ QSM.StateMachine {
      * can resolve their account status.
      */
     QSM.State {
-        id: s7LoginRequired
+        id: s8LoginRequired
 
         signal done()
 
         onEntered: {
             UserAccountDialog.launch()
-            Qt.callLater(() => s7LoginRequired.done())
+            Qt.callLater(() => s8LoginRequired.done())
         }
 
-        QSM.SignalTransition { signal: s7LoginRequired.done; targetState: sDone }
+        QSM.SignalTransition { signal: s8LoginRequired.done; targetState: sDone }
     }
 
     /*
@@ -280,7 +282,7 @@ QSM.StateMachine {
     }
 
     /*
-     * Terminal success state. Entered after s6HomeOrFile or s7LoginRequired
+     * Terminal success state. Entered after s7HomeOrFile or s8LoginRequired
      * completes, signalling that the init sequence finished normally.
      */
     QSM.FinalState {

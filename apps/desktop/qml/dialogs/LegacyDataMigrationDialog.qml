@@ -37,7 +37,7 @@ DialogLauncher {
     dialogComponent: VclDialog {
         id: _dialog
 
-        title: "Your Scrite Data Has Been Moved"
+        title: "Scrite Settings Migration"
         titleBarCloseButtonVisible: false
 
         width: Math.min(560, Scrite.window.width * 0.85)
@@ -52,13 +52,13 @@ DialogLauncher {
                 VclLabel {
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
-                    text: "Your Scrite settings, recent files, and vault have been automatically moved to a new location on this computer. This is a one-time migration. You can look up the exact location by searching for \"Settings Folder\" in the Command Center."
+                    text: "Your Scrite settings, recent files, and vault have been copied to a new location on this computer. You can look up the exact location by searching for \"Settings Folder\" in the Command Center."
                 }
 
                 VclLabel {
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
-                    text: "Please note: if you downgrade to an older version of Scrite, it will not have access to updated settings, recent files, or vault — they now reside exclusively in the new location."
+                    text: "Please note: if you downgrade to an older version of Scrite, they will continue to use settings, vault and recent files from the old location."
                     font.bold: true
                 }
 
