@@ -81,7 +81,6 @@ Popup {
 
             highlight: Rectangle {
                 color: "lightsteelblue"
-                visible: _suggestionsList.count > 1
             }
             highlightMoveDuration: 0
             highlightResizeDuration: 0

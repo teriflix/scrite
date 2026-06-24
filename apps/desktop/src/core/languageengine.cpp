@@ -1919,13 +1919,20 @@ bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
             }
 
             if (keyEvent->key() == Qt::Key_Up) {
-                this->setCurrentSuggestionIndex(qMax(0, m_currentWord.currentSuggestionIndex - 1));
+                if (!m_currentWord.suggestions.isEmpty()) {
+                    this->setCurrentSuggestionIndex(
+                            qMax(0, m_currentWord.currentSuggestionIndex - 1));
+                    return true;
+                }
                 return false;
             }
 
             if (keyEvent->key() == Qt::Key_Down) {
-                this->setCurrentSuggestionIndex(qMin(m_currentWord.suggestions.size() - 1,
-                                                     m_currentWord.currentSuggestionIndex + 1));
+                if (!m_currentWord.suggestions.isEmpty()) {
+                    this->setCurrentSuggestionIndex(qMin(m_currentWord.suggestions.size() - 1,
+                                                         m_currentWord.currentSuggestionIndex + 1));
+                    return true;
+                }
                 return false;
             }
 
