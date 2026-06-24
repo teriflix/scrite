@@ -18,6 +18,7 @@ pragma ComponentBehavior: Bound
 
 import QtQml
 import QtQuick
+import QtQuick.Window
 
 import io.scrite.components
 
@@ -51,32 +52,66 @@ QtObject {
         id: _d
 
         BoundingBoxItem.livePreview: false
-        BoundingBoxItem.previewImageSource: _image.source
+        BoundingBoxItem.previewImageSource: _d.annotation.imageUrl(_image.imageName)
 
         clip: true
         color: _image.isSet ? (_d.annotation.attributes.fillBackground ? _d.annotation.attributes.backgroundColor : Qt.rgba(0,0,0,0)) : Runtime.colors.primary.c100.background
 
+        Rectangle {
+            anchors.fill: _image
+            visible: _image.isSet && _image.status === Image.Loading
+            color: Runtime.colors.primary.editor.background
+
+            BusyIcon {
+                anchors.centerIn: parent
+                running: parent.visible
+            }
+        }
+
         Image {
             id: _image
 
-            property bool isSet: _d.annotation.attributes.image !== "" && status === Image.Ready
+            property bool isSet: imageName !== "" && naturalSize !== Qt.size(0,0)
+            property size naturalSize: imageName !== ""
+                ? _d.annotation.estimateImageSize(imageName)
+                : Qt.size(0, 0)
+            property real desiredWidth: naturalSize.width > 0
+                ? Math.min((_d.width - 10) * _d.canvasScale * Screen.devicePixelRatio, naturalSize.width)
+                : 0
+            property real lastCommittedWidth: 0
+            property string imageName: _d.annotation.attributes.image
+
+            onNaturalSizeChanged: {
+                lastCommittedWidth = naturalSize.width > 0 ? desiredWidth : 0
+            }
+
+            Connections {
+                target: _d
+                function onCanvasScaleSettled() {
+                    if (_image.desiredWidth <= 0) {
+                        _image.lastCommittedWidth = 0
+                    } else if (_image.lastCommittedWidth <= 0 ||
+                               Math.abs(_image.desiredWidth - _image.lastCommittedWidth) / _image.lastCommittedWidth > 0.25) {
+                        _image.lastCommittedWidth = _image.desiredWidth
+                    }
+                }
+            }
 
             width: _d.width - 10
-            height: sourceSize.height / sourceSize.width * width
+            height: naturalSize.width > 0 ? naturalSize.height / naturalSize.width * width : 0
             anchors.top: _d.top
             anchors.topMargin: 5
             anchors.horizontalCenter: _d.horizontalCenter
 
             smooth: _d.canvasScrollMoving || _d.canvasScrollFlicking ? false : true
             mipmap: smooth
-            source: _d.annotation.imageUrl(_d.annotation.attributes.image)
+            source: lastCommittedWidth > 0
+                ? "image://annotation-image/" + imageName + "/" + Math.round(lastCommittedWidth)
+                : ""
             fillMode: Image.Stretch
             asynchronous: true
 
-            onStatusChanged: {
-                if(status === Image.Ready)
-                    _d.BoundingBoxItem.markPreviewDirty()
-            }
+            onStatusChanged: _d.BoundingBoxItem.livePreview = false
         }
 
         VclLabel {
@@ -88,7 +123,7 @@ QtObject {
             height: Math.max(_d.height - _image.height - 10, 0)
 
             text: _image.isSet ? _d.annotation.attributes.caption : (_d.currentAnnotationItem === _d ? "Set an image" : "Click to set an image")
-            color: _d.annotation.attributes.captionColor
+            color: Runtime.colors.tx(_d.annotation.attributes.captionColor)
             elide: Text.ElideRight
             visible: height > 0
             wrapMode: Text.WordWrap

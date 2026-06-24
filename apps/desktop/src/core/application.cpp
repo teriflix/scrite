@@ -1122,6 +1122,7 @@ bool Application::registerFileTypes()
 }
 
 #include "qimageitem.h"
+#include "structure.h"
 #include "languageengine.h"
 #include "colorimageprovider.h"
 #include "themediconprovider.h"
@@ -1145,4 +1146,5 @@ void Application::initialize(QQmlEngine *engine)
     engine->addImageProvider(ColorImageProvider::name(), new ColorImageProvider);
     engine->addImageProvider(ThemedIconProvider::name(), new ThemedIconProvider);
     engine->addImageProvider(BasicFileIconProvider::name(), new BasicFileIconProvider);
+    engine->addImageProvider(AnnotationImageProvider::name(), new AnnotationImageProvider);
 }

@@ -28,6 +28,7 @@
 #include <QColor>
 #include <QPointer>
 #include <QJsonArray>
+#include <QQuickImageProvider>
 #include <QJsonObject>
 #include <QUndoCommand>
 #include <QStringListModel>
@@ -1091,6 +1092,7 @@ public:
     Q_INVOKABLE QString addImage(const QString &path) const;
     Q_INVOKABLE QString addImage(const QVariant &image) const;
     Q_INVOKABLE QUrl imageUrl(const QString &name) const;
+    Q_INVOKABLE QSizeF estimateImageSize(const QString &name) const;
 
     void createCopyOfFileAttributes();
 
@@ -1909,6 +1911,18 @@ private:
     FilterStrategy m_filterStrategy = IntersectsStrategy;
     ComputeStrategy m_computeStrategy = OnDemandComputeStrategy;
     QList<QPair<const QObject *, bool>> m_visibleSourceRows;
+};
+
+class AnnotationImageProvider : public QQuickImageProvider
+{
+public:
+    static QString name();
+
+    explicit AnnotationImageProvider();
+    ~AnnotationImageProvider();
+
+    // QQuickImageProvider interface
+    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
 };
 
 #endif // STRUCTURE_H

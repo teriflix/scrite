@@ -46,6 +46,16 @@ Item {
 
     signal canvasActiveFocusRequest()
     signal ensureAreaVisibleRequest(rect area)
+    signal canvasScaleSettled()
+
+    onCanvasScaleChanged: zoomSettleTimer.restart()
+
+    Timer {
+        id: zoomSettleTimer
+        interval: 300
+        repeat: false
+        onTriggered: root.canvasScaleSettled()
+    }
 
     property AnnotationGrip grip: _gripLoader.item as AnnotationGrip
 
@@ -225,9 +235,12 @@ Item {
                 delegate.currentAnnotationItem = Qt.binding( () => { return _gripLoader.annotationItem } )
                 delegate.canvasScrollMoving = Qt.binding( () => { return root.canvasScrollMoving } )
                 delegate.canvasScrollFlicking = Qt.binding( () => { return root.canvasScrollFlicking } )
+                delegate.canvasScale = Qt.binding( () => { return root.canvasScale } )
                 delegate.BoundingBoxItem.evaluator = root.canvasItemsBoundingBox
                 delegate.BoundingBoxItem.livePreview = true
                 delegate.gripRequest.connect(_private.gripDelegate)
+
+                root.canvasScaleSettled.connect(delegate.canvasScaleSettled)
             }
             return delegate
         }

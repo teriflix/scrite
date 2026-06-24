@@ -43,6 +43,7 @@
 #include <QClipboard>
 #include <QStyleHints>
 #include <QScopeGuard>
+#include <QImageReader>
 #include <QQuickWindow>
 #include <QJsonDocument>
 #include <QStandardPaths>
@@ -2508,6 +2509,13 @@ QUrl Annotation::imageUrl(const QString &name) const
 {
     DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
     return QUrl::fromLocalFile(dfs->absolutePath(name));
+}
+
+QSizeF Annotation::estimateImageSize(const QString &name) const
+{
+    DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+    QImageReader reader(dfs->absolutePath(name));
+    return QSizeF(reader.size());
 }
 
 void Annotation::createCopyOfFileAttributes()
@@ -5895,4 +5903,55 @@ void StructureCanvasViewportFilterModel::invalidateSelfLater()
         m_invalidateTimer.start(0, this);
     else
         m_invalidateTimer.stop();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+QString AnnotationImageProvider::name()
+{
+    return QStringLiteral("annotation-image");
+}
+
+AnnotationImageProvider::AnnotationImageProvider()
+    : QQuickImageProvider(QQuickImageProvider::Image,
+                          QQuickImageProvider::ForceAsynchronousImageLoading)
+{
+}
+
+AnnotationImageProvider::~AnnotationImageProvider() { }
+
+QImage AnnotationImageProvider::requestImage(const QString &id, QSize *size,
+                                             const QSize &requestedSize)
+{
+    Q_UNUSED(requestedSize)
+
+    const QStringList parts = id.split(QLatin1Char('/'), Qt::SkipEmptyParts);
+    if (parts.size() != 3 || parts[0] != QLatin1String("annotation"))
+        return QImage();
+
+    const QString imageName = parts[0] + QLatin1Char('/') + parts[1];
+    const int targetWidth = parts[2].toInt();
+    if (targetWidth <= 0)
+        return QImage();
+
+    DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+    const QString path = dfs->absolutePath(imageName);
+
+    QImageReader reader(path);
+    if (!reader.canRead())
+        return QImage();
+
+    const QSize naturalSize = reader.size();
+    if (naturalSize.isEmpty())
+        return QImage();
+
+    if (targetWidth > 0 && targetWidth < naturalSize.width()) {
+        const int targetHeight = naturalSize.height() * targetWidth / naturalSize.width();
+        reader.setScaledSize(QSize(targetWidth, targetHeight));
+    }
+
+    const QImage image = reader.read();
+    if (size)
+        *size = image.size();
+    return image;
 }

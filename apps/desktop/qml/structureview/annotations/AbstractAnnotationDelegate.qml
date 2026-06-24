@@ -28,8 +28,10 @@ Rectangle {
     property Item currentAnnotationItem
     property bool canvasScrollMoving
     property bool canvasScrollFlicking
+    property real canvasScale: 1
 
     signal gripRequest(Item delegate, Annotation annotation)
+    signal canvasScaleSettled()
 
     /**
       BoundingBoxItem is attached to annotations within AnnotationLayer._private.createAnnotationDelegate()
