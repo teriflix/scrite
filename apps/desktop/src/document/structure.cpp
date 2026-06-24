@@ -5945,9 +5945,10 @@ QImage AnnotationImageProvider::requestImage(const QString &id, QSize *size,
     if (naturalSize.isEmpty())
         return QImage();
 
-    if (targetWidth > 0 && targetWidth < naturalSize.width()) {
-        const int targetHeight = naturalSize.height() * targetWidth / naturalSize.width();
-        reader.setScaledSize(QSize(targetWidth, targetHeight));
+    if (targetWidth < naturalSize.width()) {
+        const QSizeF targetSize =
+                QSizeF(naturalSize) * qreal(targetWidth) / qreal(naturalSize.width());
+        reader.setScaledSize(targetSize.toSize());
     }
 
     const QImage image = reader.read();

@@ -19,6 +19,7 @@ pragma ComponentBehavior: Bound
 import QtQml
 import QtQuick
 import QtQuick.Window
+import QtQuick.Controls
 
 import io.scrite.components
 
@@ -62,8 +63,9 @@ QtObject {
             visible: _image.isSet && _image.status === Image.Loading
             color: Runtime.colors.primary.editor.background
 
-            BusyIcon {
+            BusyIndicator {
                 anchors.centerIn: parent
+                scale: _d.canvasScale > 1 ? (1/_d.canvasScale) : 1
                 running: parent.visible
             }
         }
