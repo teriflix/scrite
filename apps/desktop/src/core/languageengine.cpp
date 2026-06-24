@@ -1841,6 +1841,9 @@ void LanguageTransliterator::setEnabled(bool val)
     if (m_enabled == val)
         return;
 
+    if (!val)
+        this->commitWordToEditor();
+
     m_enabled = val;
     emit enabledChanged();
 }
@@ -1849,6 +1852,8 @@ void LanguageTransliterator::setOption(const TransliterationOption &val)
 {
     if (m_option == val)
         return;
+
+    this->commitWordToEditor();
 
     AbstractTransliterationEngine *oldTxEngine = m_option.transliterator();
     if (oldTxEngine)
@@ -1888,7 +1893,8 @@ bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
 
     if (m_editor != nullptr && object == m_editor && m_enabled && m_option.isValid()
         && m_option.inApp) {
-        if (event->type() == QEvent::FocusOut) {
+        if (event->type() == QEvent::FocusOut
+            || event->type() == QEvent::MouseButtonPress) {
             this->commitWordToEditor();
             return false;
         }
@@ -1897,7 +1903,8 @@ bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
                 qobject_cast<AbstractTransliterationEngine *>(m_option.transliteratorObject);
 
         if (event->type() == QEvent::FocusIn) {
-            transliterationEngine->doActivate(m_option);
+            if (transliterationEngine)
+                transliterationEngine->doActivate(m_option);
             return false;
         }
 
@@ -2165,8 +2172,10 @@ void LanguageTransliterator::resetCurrentWord()
     emit currentSuggestionIndexChanged();
 
     QTimer::singleShot(100, this, [=]() {
-        m_currentWord.textRect = QRect();
-        emit textRectChanged();
+        if (m_currentWord.originalString.isEmpty()) {
+            m_currentWord.textRect = QRect();
+            emit textRectChanged();
+        }
     });
 }
 
