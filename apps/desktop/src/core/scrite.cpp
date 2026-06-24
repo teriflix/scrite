@@ -223,6 +223,11 @@ bool Scrite::isFeatureNameEnabled(const QString &featureName, const QStringList 
     return (allFeaturesEnabled || featureEnabled) && !featureDisabled;
 }
 
+void Scrite::scheduleFreshSpellCheck()
+{
+    SpellCheckService::scheduleUpdateAll();
+}
+
 void doZipRecursively(const QDir &dir, const QDir &rootDir, QuaZip &qzip)
 {
     const QFileInfoList entries = dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs,

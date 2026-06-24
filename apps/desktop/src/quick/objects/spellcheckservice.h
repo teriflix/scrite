@@ -90,6 +90,9 @@ class SpellCheckService : public QObject, public Modifiable, public QQmlParserSt
     QML_ELEMENT
 
 public:
+    static QStringList &globalIgnoreList();
+    static void scheduleUpdateAll();
+
     SpellCheckService(QObject *parent = nullptr);
     ~SpellCheckService();
 

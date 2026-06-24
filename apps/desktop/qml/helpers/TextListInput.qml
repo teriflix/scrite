@@ -54,6 +54,7 @@ Flow {
 
     readonly property alias label: _label
     readonly property alias acceptingNewText: _newInputLoader.active
+    readonly property real headerImplicitHeight: _headerLoader.item ? _headerLoader.item.implicitHeight : 0
 
     signal ensureVisible(Item item, rect area)
     signal textClicked(string text, Item source)
@@ -156,69 +157,81 @@ Flow {
         }
     }
 
-    Loader {
-        id: _newInputLoader
+    Item {
+        height: Math.max(_tagTexts.count > 0 ? (_tagTexts.itemAt(_tagTexts.count-1)?.height ?? root.headerImplicitHeight) : root.headerImplicitHeight, _label.height)
+        width: (_newInputLoader.active ? _newInputLoader.width : 0) + _addBoxImage.width
 
-        active: false
-        visible: active
+        Loader {
+            id: _newInputLoader
 
-        sourceComponent: VclTextField {
-            Component.onCompleted: {
-                forceActiveFocus()
-                root.ensureVisible(_newInputLoader, Qt.rect(0,0,width,height))
-            }
+            anchors.verticalCenter: parent.verticalCenter
 
-            Keys.onEscapePressed: {
-                text = ""
-                root.newTextCancelled()
-                _newInputLoader.active = false
-            }
+            active: false
+            visible: active
 
-            width: Math.max(contentWidth + leftPadding + rightPadding, Runtime.idealFontMetrics.averageCharacterWidth * 20)
-
-            readOnly: false
-            maximumLength: root.maxTextLength
-            completionStrings: root.completionStrings
-
-            font.family: root.font.family
-            font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
-            font.capitalization: root.font.capitalization
-
-            onEditingComplete: {
-                if(text.length > 0) {
-                    root.newTextRequest(text)
+            sourceComponent: VclTextField {
+                Component.onCompleted: {
+                    forceActiveFocus()
+                    root.ensureVisible(_newInputLoader, Qt.rect(0,0,width,height))
                 }
-                _newInputLoader.active = false
+
+                Keys.onEscapePressed: {
+                    text = ""
+                    root.newTextCancelled()
+                    _newInputLoader.active = false
+                }
+
+                width: Math.max(contentWidth + leftPadding + rightPadding, Runtime.idealFontMetrics.averageCharacterWidth * 20)
+
+                readOnly: false
+                maximumLength: root.maxTextLength
+                completionStrings: root.completionStrings
+
+                font.family: root.font.family
+                font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
+                font.capitalization: root.font.capitalization
+
+                onEditingComplete: {
+                    if(text.length > 0) {
+                        root.newTextRequest(text)
+                    }
+                    _newInputLoader.active = false
+                }
+            }
+
+            onStatusChanged: {
+                if(status === Loader.Null) {
+                    Object.resetProperty(_newInputLoader, "width")
+                    Object.resetProperty(_newInputLoader, "height")
+                }
             }
         }
 
-        onStatusChanged: {
-            if(status === Loader.Null) {
-                Object.resetProperty(_newInputLoader, "width")
-                Object.resetProperty(_newInputLoader, "height")
+        Image {
+            id: _addBoxImage
+
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+
+            source: Runtime.themedIcon("qrc:/icons/content/add_box.png")
+
+            width: _label.height
+            height: width
+
+            opacity: enabled ? 1 : 0.5
+            visible: enabled
+            enabled: !root.readOnly
+
+            MouseArea {
+                anchors.fill: parent
+
+                ToolTipPopup {
+                    text: root.addTextButtonTooltip + " (Max " + root.maxTextLength + " letters)"
+                    visible: container.containsMouse
+                }
+
+                onClicked: _newInputLoader.active = true
             }
-        }
-    }
-
-    Image {
-        source: Runtime.themedIcon("qrc:/icons/content/add_box.png")
-
-        width: _label.height
-        height: width
-
-        opacity: enabled ? 1 : 0.5
-        visible: enabled
-        enabled: !root.readOnly
-
-        MouseArea {
-            anchors.fill: parent
-
-            ToolTipPopup {
-                text: root.addTextButtonTooltip + " (Max " + root.maxTextLength + " letters)"
-                visible: container.containsMouse
-            }
-
-            onClicked: _newInputLoader.active = true
         }
     }
 }

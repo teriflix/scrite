@@ -274,6 +274,8 @@ public:
     Q_INVOKABLE static bool isFeatureNameEnabled(const QString &feature,
                                                  const QStringList &features);
 
+    Q_INVOKABLE static void scheduleFreshSpellCheck();
+
     static bool doZip(const QFileInfo &zipFileInfo, const QDir &sourceDir,
                       const QList<QPair<QString, int>> &files);
     static bool doZip(const QFileInfo &zipFileInfo, const QDir &rootDir);

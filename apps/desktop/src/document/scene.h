@@ -267,7 +267,10 @@ public:
     bool polishText(Scene *previousScene = nullptr);
     bool capitalizeSentences();
     QList<int> autoCapitalizePositions() const;
-    static QList<int> autoCapitalizePositions(const QString &text);
+    QList<int> autoCapitalizePositions(const QStringList &exceptions) const;
+    static QList<int> autoCapitalizePositions(const QString &text,
+                                              const QStringList &exceptions = {});
+    static QStringList &autoCapitalizeExceptionsList();
 
     // clang-format off
     Q_PROPERTY(int wordCount

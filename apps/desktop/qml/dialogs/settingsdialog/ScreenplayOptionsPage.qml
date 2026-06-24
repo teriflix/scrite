@@ -48,6 +48,58 @@ Item {
                 columns: 2
                 columnSpacing: 10
 
+                TextListInput {
+                    id: _exceptionsInput
+
+                    Layout.columnSpan: 2
+                    Layout.fillWidth: true
+
+                    header: VclCheckBox {
+                        id: _enableAutoCapitalizeSentences
+
+                        text: "Capitalize Sentences, with the exception of:"
+                        checked: Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
+                        onToggled: Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences = checked
+                        hoverEnabled: true
+
+                        ToolTipPopup {
+                            visible: _enableAutoCapitalizeSentences.hovered
+                            text: "If checked, it automatically capitalizes first letter of every sentence while typing."
+                        }
+                    }
+
+                    readOnly: !Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
+
+                    Component.onCompleted: label.visible = false
+
+                    textList: Runtime.screenplayEditorSettings.autoCapitalizeExceptions
+                    completionStrings: {
+                        const defaults = ["e.g.", "i.e.", "etc.", "vs.", "approx.", "dept.", "est.", "fig.", "misc."]
+                        const current = Runtime.screenplayEditorSettings.autoCapitalizeExceptions
+                        return defaults.filter(d => !current.includes(d))
+                    }
+                    labelText: ""
+                    labelIconSource: ""
+                    labelIconVisible: false
+                    addTextButtonTooltip: "Add an abbreviation that should not trigger auto-capitalization"
+
+                    onConfigureTextRequest: (text, tag) => {
+                        tag.closable = true
+                        tag.height = Qt.binding(() => _exceptionsInput.headerImplicitHeight)
+                        tag.opacity = Qt.binding(() => Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences ? 1.0 : 0.5)
+                    }
+                    onTextCloseRequest: (text) => {
+                        const updated = Runtime.screenplayEditorSettings.autoCapitalizeExceptions.filter(e => e !== text)
+                        Runtime.screenplayEditorSettings.autoCapitalizeExceptions = updated
+                        Scrite.scheduleFreshSpellCheck()
+                    }
+                    onNewTextRequest: (text) => {
+                        const updated = Runtime.screenplayEditorSettings.autoCapitalizeExceptions.concat([text])
+                        Runtime.screenplayEditorSettings.autoCapitalizeExceptions = updated
+                        Scrite.scheduleFreshSpellCheck()
+                    }
+                }
+
                 VclCheckBox {
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
@@ -71,22 +123,6 @@ Item {
                         visible: _singleClickAutoComplete.hovered
                     }
 
-                }
-
-                VclCheckBox {
-                    id: _enableAutoCapitalizeSentences
-
-                    Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
-
-                    text: "Capitalize Sentences"
-                    checked: Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
-                    onToggled: Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences = checked
-                    hoverEnabled: true
-
-                    ToolTipPopup {
-                        visible: _enableAutoCapitalizeSentences.hovered
-                        text: "If checked, it automatically capitalizes first letter of every sentence while typing."
-                    }
                 }
 
                 VclCheckBox {

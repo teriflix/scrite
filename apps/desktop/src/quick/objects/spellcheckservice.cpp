@@ -308,13 +308,33 @@ private:
 };
 
 Q_GLOBAL_STATIC(SpellCheckThreadPool, SpellCheckServiceThreadPool)
+Q_GLOBAL_STATIC(QList<SpellCheckService *>, AllSpellCheckServices)
+
+QStringList &SpellCheckService::globalIgnoreList()
+{
+    static QStringList ret;
+    return ret;
+}
 
 SpellCheckService::SpellCheckService(QObject *parent)
     : QObject(parent), m_textTracker(&m_textModifiable)
 {
+    if (auto *all = AllSpellCheckServices())
+        all->append(this);
 }
 
-SpellCheckService::~SpellCheckService() { }
+SpellCheckService::~SpellCheckService()
+{
+    if (auto *all = AllSpellCheckServices())
+        all->removeOne(this);
+}
+
+void SpellCheckService::scheduleUpdateAll()
+{
+    if (auto *all = AllSpellCheckServices())
+        for (SpellCheckService *svc : *all)
+            svc->scheduleUpdate();
+}
 
 void SpellCheckService::setText(const QString &val)
 {
@@ -390,6 +410,7 @@ void SpellCheckService::update()
     request.timestamp = m_textModifiable.modificationTime();
     request.characterNames = ScriteDocument::instance()->structure()->characterNames();
     request.ignoreList = ScriteDocument::instance()->spellCheckIgnoreList();
+    request.ignoreList += SpellCheckService::globalIgnoreList();
 
     request.characterNames << QStringLiteral("Rajkumar");
 

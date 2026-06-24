@@ -23,7 +23,7 @@ import io.scrite.components
 import "../globals"
 import "../controls"
 
-Rectangle {
+Item {
     id: root
 
     property alias topPadding: _text.topPadding
@@ -33,6 +33,8 @@ Rectangle {
 
     property alias text: _text.text
     property alias font: _text.font
+    property alias color: _background.color
+    property alias border: _background.border
     property alias closable: _closeButtonLoader.active
     property alias textColor: _text.color
     property alias hoverEnabled: _mouseArea.hoverEnabled
@@ -44,14 +46,22 @@ Rectangle {
     implicitWidth: _layout.width
     implicitHeight: _layout.height
 
-    color: Runtime.colors.primary.c10.background
-    radius: height/2
+    Rectangle {
+        id: _background
 
-    border.width: 1
-    border.color: _text.color
+        anchors.fill: _layout
+
+        color: Runtime.colors.primary.c10.background
+        radius: height/2
+
+        border.width: 1
+        border.color: _text.color
+    }
 
     Row {
         id: _layout
+
+        anchors.verticalCenter: parent.verticalCenter
 
         Text {
             id: _text

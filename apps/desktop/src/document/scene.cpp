@@ -522,6 +522,12 @@ bool SceneElement::capitalizeSentences()
     return true;
 }
 
+QStringList &SceneElement::autoCapitalizeExceptionsList()
+{
+    static QStringList ret;
+    return ret;
+}
+
 QList<int> SceneElement::autoCapitalizePositions() const
 {
     // Auto-capitalize needs to be done only on action and dialogue paragraphs.
@@ -529,10 +535,19 @@ QList<int> SceneElement::autoCapitalizePositions() const
                  .contains(m_type))
         return QList<int>();
 
-    return SceneElement::autoCapitalizePositions(m_text);
+    return SceneElement::autoCapitalizePositions(m_text, SceneElement::autoCapitalizeExceptionsList());
 }
 
-QList<int> SceneElement::autoCapitalizePositions(const QString &text)
+QList<int> SceneElement::autoCapitalizePositions(const QStringList &exceptions) const
+{
+    if (!QList<SceneElement::Type>({ SceneElement::Action, SceneElement::Dialogue })
+                 .contains(m_type))
+        return QList<int>();
+
+    return SceneElement::autoCapitalizePositions(m_text, exceptions);
+}
+
+QList<int> SceneElement::autoCapitalizePositions(const QString &text, const QStringList &exceptions)
 {
     QList<int> ret;
 
@@ -541,6 +556,7 @@ QList<int> SceneElement::autoCapitalizePositions(const QString &text)
                                 // returns true for non-sentence breaking
                                 // punctuations also, which we don't want.
     bool needsCapping = true;
+    bool prevNonSpaceWasSentenceBreak = false;
     for (int i = 0; i < text.length(); i++) {
         const QChar ch = text.at(i);
         if (ch.isSpace())
@@ -553,8 +569,46 @@ QList<int> SceneElement::autoCapitalizePositions(const QString &text)
                 ret.append(i);
         }
 
-        if (sentenceBreaks.contains(ch))
-            needsCapping = true;
+        if (sentenceBreaks.contains(ch)) {
+            if (ch != '.') {
+                // '!' and '?' always end a sentence regardless of what preceded them.
+                needsCapping = true;
+            } else if (!prevNonSpaceWasSentenceBreak) {
+                // '.' only triggers when the previous non-space character was not also
+                // a sentence break — prevents '..' and '...' from capitalizing the
+                // following word.
+                bool isException = false;
+                if (!exceptions.isEmpty()) {
+                    // Collect the token from the previous whitespace up to and
+                    // including the current '.' to match against abbreviations.
+                    int wordStart = i;
+                    while (wordStart > 0 && !text.at(wordStart - 1).isSpace())
+                        wordStart--;
+                    const QString token = text.mid(wordStart, i - wordStart + 1);
+
+                    // If the next character is not a space the '.' is mid-abbreviation
+                    // (e.g. the first '.' in "e.g."), so a prefix match is enough.
+                    // At the end of the token (next char is space or end of string)
+                    // we require an exact match.
+                    const bool nextIsSpace =
+                            (i + 1 >= text.length()) || text.at(i + 1).isSpace();
+                    for (const QString &exc : exceptions) {
+                        const bool matched = nextIsSpace
+                                ? exc.compare(token, Qt::CaseInsensitive) == 0
+                                : exc.startsWith(token, Qt::CaseInsensitive);
+                        if (matched) {
+                            isException = true;
+                            break;
+                        }
+                    }
+                }
+                if (!isException)
+                    needsCapping = true;
+            }
+            prevNonSpaceWasSentenceBreak = true;
+        } else {
+            prevNonSpaceWasSentenceBreak = false;
+        }
     }
 
     // Capitalize I if found anywhere in the text, except at the very end.

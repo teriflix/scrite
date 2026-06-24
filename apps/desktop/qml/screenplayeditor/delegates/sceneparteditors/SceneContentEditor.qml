@@ -337,6 +337,7 @@ AbstractScenePartEditor {
         autoCapitalizeSentences: !root.readOnly &&
                                  Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences &&
                                  (Runtime.language.activeTransliterationOption ? !Runtime.language.activeTransliterationOption.inApp : true)
+        autoCapitalizeExceptions: Runtime.screenplayEditorSettings.autoCapitalizeExceptions
 
         onDocumentInitialized: () => {
                                    if(!_private.firstInitializationDone && !_private.scrollingBetweenScenes) {

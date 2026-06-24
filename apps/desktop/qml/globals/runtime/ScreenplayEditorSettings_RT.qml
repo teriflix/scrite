@@ -52,6 +52,7 @@ Settings {
     property bool displaySceneComments: false
     property bool displaySceneSynopsis: false
     property bool enableAutoCapitalizeSentences: true
+    property var autoCapitalizeExceptions: ["e.g.", "i.e.", "etc.", "vs.", "approx.", "dept.", "est.", "fig.", "misc."]
     property bool enableAutoPolishParagraphs: true // for automatically adding/removing CONT'D where appropriate
     property bool enableSpellCheck: true // Since this is now fixed: https://github.com/teriflix/scrite/issues/138
     property bool focusCursorOnSceneHeadingInNewScenes: false

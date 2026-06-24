@@ -246,6 +246,16 @@ public:
     bool isAutoCapitalizeSentences() const { return m_autoCapitalizeSentences; }
     Q_SIGNAL void autoCapitalizeSentencesChanged();
 
+    // clang-format off
+    Q_PROPERTY(QStringList autoCapitalizeExceptions
+               READ autoCapitalizeExceptions
+               WRITE setAutoCapitalizeExceptions
+               NOTIFY autoCapitalizeExceptionsChanged)
+    // clang-format on
+    void setAutoCapitalizeExceptions(const QStringList &val);
+    QStringList autoCapitalizeExceptions() const { return m_autoCapitalizeExceptions; }
+    Q_SIGNAL void autoCapitalizeExceptionsChanged();
+
     // Adds : at end of shots & transitions, CONT'D for characters where applicable.
     // clang-format off
     Q_PROPERTY(bool autoPolishParagraphs
@@ -697,6 +707,7 @@ private:
     bool m_applyNextCharFormat = false;
     bool m_applyTextFormat = false;
     bool m_autoCapitalizeSentences = true;
+    QStringList m_autoCapitalizeExceptions;
     bool m_autoPolishParagraphs = true;
     bool m_forceSyncDocument = false;
     bool m_initializingDocument = false;

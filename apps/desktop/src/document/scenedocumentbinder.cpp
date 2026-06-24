@@ -23,6 +23,7 @@
 #include "garbagecollector.h"
 #include "qobjectserializer.h"
 #include "scenedocumentbinder.h"
+#include "spellcheckservice.h"
 
 #include <QPointer>
 #include <QMarginsF>
@@ -495,7 +496,8 @@ void SceneDocumentBlockUserData::autoCapitalizeNow()
         return;
 
     // Auto-capitalize needs to be done only on action and dialogue paragraphs.
-    const QList<int> capitalizePositions = m_sceneElement->autoCapitalizePositions();
+    const QList<int> capitalizePositions =
+            m_sceneElement->autoCapitalizePositions(m_binder->m_autoCapitalizeExceptions);
     if (capitalizePositions.isEmpty())
         return;
 
@@ -849,6 +851,27 @@ void SceneDocumentBinder::setAutoCapitalizeSentences(bool val)
 
     m_autoCapitalizeSentences = val;
     emit autoCapitalizeSentencesChanged();
+}
+
+void SceneDocumentBinder::setAutoCapitalizeExceptions(const QStringList &val)
+{
+    if (m_autoCapitalizeExceptions == val)
+        return;
+
+    m_autoCapitalizeExceptions = val;
+    emit autoCapitalizeExceptionsChanged();
+
+    SceneElement::autoCapitalizeExceptionsList() = val;
+
+    QStringList &gil = SpellCheckService::globalIgnoreList();
+    gil.clear();
+    for (const QString &exc : val) {
+        const QStringList parts = exc.split(QLatin1Char('.'), Qt::SkipEmptyParts);
+        for (const QString &part : parts)
+            if (part.length() > 1)
+                gil.append(part.toLower());
+    }
+    gil.removeDuplicates();
 }
 
 void SceneDocumentBinder::setAutoPolishParagraphs(bool val)
