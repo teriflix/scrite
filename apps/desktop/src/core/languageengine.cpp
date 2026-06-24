@@ -1973,14 +1973,16 @@ bool LanguageTransliterator::updateWordFromInput(const QKeyEvent *keyEvent)
     if (inputText.isEmpty() || (inputText.length() == 1 && inputText[0].isPunct()))
         return false;
 
-    QInputMethodQueryEvent query(Qt::ImCursorPosition | Qt::ImCursorRectangle);
+    QInputMethodQueryEvent query(Qt::ImCursorPosition | Qt::ImAnchorPosition | Qt::ImCursorRectangle);
     qApp->sendEvent(m_editor, &query);
 
     const int cursorPosition = query.value(Qt::ImCursorPosition).toInt();
     const QRect cursorRect = query.value(Qt::ImCursorRectangle).toRect();
 
-    if (m_currentWord.start < 0 || m_currentWord.originalString.isEmpty())
-        m_currentWord.start = cursorPosition;
+    if (m_currentWord.start < 0 || m_currentWord.originalString.isEmpty()) {
+        const int anchorPosition = query.value(Qt::ImAnchorPosition).toInt();
+        m_currentWord.start = qMin(cursorPosition, anchorPosition);
+    }
     m_currentWord.end = cursorPosition;
 
     const int cursorPosInWord = cursorPosition - m_currentWord.start;
