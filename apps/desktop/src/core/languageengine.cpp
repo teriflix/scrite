@@ -1936,10 +1936,15 @@ bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
                 return false;
             }
 
+            if (keyEvent->key() == Qt::Key_Backspace)
+                return this->handleBackspace(keyEvent);
+
+            if (keyEvent->key() == Qt::Key_Delete)
+                return this->handleDelete(keyEvent);
+
             if (!this->updateWordFromInput(keyEvent)) {
-                const QList<int> exceptions = { Qt::Key_Backspace, Qt::Key_Delete, Qt::Key_Shift,
-                                                Qt::Key_Control,   Qt::Key_Alt,    Qt::Key_Meta,
-                                                Qt::Key_CapsLock,  Qt::Key_NumLock };
+                const QList<int> exceptions = { Qt::Key_Shift,   Qt::Key_Control, Qt::Key_Alt,
+                                                Qt::Key_Meta,    Qt::Key_CapsLock, Qt::Key_NumLock };
                 if ((m_currentWord.originalString.isEmpty() && m_currentWord.suggestions.isEmpty())
                     || exceptions.contains(keyEvent->key()))
                     return false;
@@ -1965,7 +1970,7 @@ bool LanguageTransliterator::updateWordFromInput(const QKeyEvent *keyEvent)
         return false;
 
     const QString inputText = keyEvent->text();
-    if (inputText.length() == 1 && inputText[0].isPunct())
+    if (inputText.isEmpty() || (inputText.length() == 1 && inputText[0].isPunct()))
         return false;
 
     QInputMethodQueryEvent query(Qt::ImCursorPosition | Qt::ImCursorRectangle);
@@ -1978,10 +1983,10 @@ bool LanguageTransliterator::updateWordFromInput(const QKeyEvent *keyEvent)
         m_currentWord.start = cursorPosition;
     m_currentWord.end = cursorPosition;
 
-    if (keyEvent->key() == Qt::Key_Backspace) {
-        if (!m_currentWord.originalString.isEmpty())
-            m_currentWord.originalString.remove(m_currentWord.originalString.length() - 1, 1);
-    } else
+    const int cursorPosInWord = cursorPosition - m_currentWord.start;
+    if (cursorPosInWord >= 0 && cursorPosInWord <= m_currentWord.originalString.length())
+        m_currentWord.originalString.insert(cursorPosInWord, inputText);
+    else
         m_currentWord.originalString += inputText;
     emit currentWordChanged();
 
@@ -1998,6 +2003,123 @@ bool LanguageTransliterator::updateWordFromInput(const QKeyEvent *keyEvent)
     emit textRectChanged();
 
     return true;
+}
+
+bool LanguageTransliterator::handleBackspace(const QKeyEvent *keyEvent)
+{
+    if (m_currentWord.originalString.isEmpty())
+        return false;
+
+    QInputMethodQueryEvent query(Qt::ImCursorPosition | Qt::ImCursorRectangle);
+    qApp->sendEvent(m_editor, &query);
+    const int cursorPosition = query.value(Qt::ImCursorPosition).toInt();
+    const QRect cursorRect = query.value(Qt::ImCursorRectangle).toRect();
+
+    const int cursorPosInWord = cursorPosition - m_currentWord.start;
+
+    if (cursorPosInWord <= 0 || cursorPosInWord > m_currentWord.originalString.length()) {
+        this->resetCurrentWord();
+        return false;
+    }
+
+    AbstractTransliterationEngine *engine =
+            qobject_cast<AbstractTransliterationEngine *>(m_option.transliteratorObject);
+
+    if (keyEvent->modifiers() & Qt::ControlModifier) {
+        // Delete from word start to cursor: done via QInputMethodEvent so we control the range.
+        const int charsToDelete = cursorPosInWord;
+        m_currentWord.originalString.remove(0, charsToDelete);
+
+        QInputMethodEvent deleteEvent;
+        deleteEvent.setCommitString(QString(), -charsToDelete, charsToDelete);
+        qApp->sendEvent(m_editor, &deleteEvent);
+
+        if (m_currentWord.originalString.isEmpty()) {
+            this->resetCurrentWord();
+        } else {
+            this->setCurrentSuggestions(
+                    { engine->transliterateWord(m_currentWord.originalString, m_option) });
+            emit currentWordChanged();
+            if (!m_currentWord.textRect.isValid() || m_currentWord.textRect.isEmpty())
+                m_currentWord.textRect = cursorRect;
+            emit textRectChanged();
+        }
+        return true; // event consumed; QInputMethodEvent already performed the deletion
+    } else {
+        // Delete the single char just before cursor; let the editor process the key.
+        m_currentWord.originalString.remove(cursorPosInWord - 1, 1);
+
+        if (m_currentWord.originalString.isEmpty()) {
+            this->resetCurrentWord();
+        } else {
+            this->setCurrentSuggestions(
+                    { engine->transliterateWord(m_currentWord.originalString, m_option) });
+            emit currentWordChanged();
+            if (!m_currentWord.textRect.isValid() || m_currentWord.textRect.isEmpty())
+                m_currentWord.textRect = cursorRect;
+            emit textRectChanged();
+        }
+        return false; // let editor move the cursor and delete the character
+    }
+}
+
+bool LanguageTransliterator::handleDelete(const QKeyEvent *keyEvent)
+{
+    if (m_currentWord.originalString.isEmpty())
+        return false;
+
+    QInputMethodQueryEvent query(Qt::ImCursorPosition | Qt::ImCursorRectangle);
+    qApp->sendEvent(m_editor, &query);
+    const int cursorPosition = query.value(Qt::ImCursorPosition).toInt();
+    const QRect cursorRect = query.value(Qt::ImCursorRectangle).toRect();
+
+    const int cursorPosInWord = cursorPosition - m_currentWord.start;
+
+    if (cursorPosInWord < 0 || cursorPosInWord >= m_currentWord.originalString.length()) {
+        this->resetCurrentWord();
+        return false;
+    }
+
+    AbstractTransliterationEngine *engine =
+            qobject_cast<AbstractTransliterationEngine *>(m_option.transliteratorObject);
+
+    if (keyEvent->modifiers() & Qt::ControlModifier) {
+        // Delete from cursor to word end: done via QInputMethodEvent so we control the range.
+        const int charsToDelete = m_currentWord.originalString.length() - cursorPosInWord;
+        m_currentWord.originalString.remove(cursorPosInWord, charsToDelete);
+
+        QInputMethodEvent deleteEvent;
+        deleteEvent.setCommitString(QString(), 0, charsToDelete);
+        qApp->sendEvent(m_editor, &deleteEvent);
+
+        if (m_currentWord.originalString.isEmpty()) {
+            this->resetCurrentWord();
+        } else {
+            m_currentWord.end = cursorPosition;
+            this->setCurrentSuggestions(
+                    { engine->transliterateWord(m_currentWord.originalString, m_option) });
+            emit currentWordChanged();
+            if (!m_currentWord.textRect.isValid() || m_currentWord.textRect.isEmpty())
+                m_currentWord.textRect = cursorRect;
+            emit textRectChanged();
+        }
+        return true; // event consumed; QInputMethodEvent already performed the deletion
+    } else {
+        // Delete the single char just after cursor; let the editor process the key.
+        m_currentWord.originalString.remove(cursorPosInWord, 1);
+
+        if (m_currentWord.originalString.isEmpty()) {
+            this->resetCurrentWord();
+        } else {
+            this->setCurrentSuggestions(
+                    { engine->transliterateWord(m_currentWord.originalString, m_option) });
+            emit currentWordChanged();
+            if (!m_currentWord.textRect.isValid() || m_currentWord.textRect.isEmpty())
+                m_currentWord.textRect = cursorRect;
+            emit textRectChanged();
+        }
+        return false; // let editor delete the character
+    }
 }
 
 bool LanguageTransliterator::commitWordToEditor()

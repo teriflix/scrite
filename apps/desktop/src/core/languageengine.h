@@ -795,6 +795,8 @@ protected:
 private:
     LanguageTransliterator(QObject *parent = nullptr);
     bool updateWordFromInput(const QKeyEvent *keyEvent);
+    bool handleBackspace(const QKeyEvent *keyEvent);
+    bool handleDelete(const QKeyEvent *keyEvent);
     bool commitWordToEditor();
     void resetCurrentWord();
     void useSuggestions(const QString &word, const QStringList &suggestions);
