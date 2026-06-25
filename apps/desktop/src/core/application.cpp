@@ -281,7 +281,6 @@ static void copyFilesRecursively(const QDir &from, const QDir &to)
     }
 }
 
-static const QString legacyDataMovedKey = QStringLiteral("Migration/legacyDataMoved");
 
 QVersionNumber Application::prepare()
 {
@@ -355,7 +354,6 @@ QVersionNumber Application::prepare()
     bool legacyDataMigrated = false;
 
     if (!QDir(targetAppDataPath).exists("settings.ini")) {
-
         for (const LegacyOrg &legacy : legacyOrgs) {
             Application::setOrganizationName(QLatin1String(legacy.name));
             Application::setOrganizationDomain(QLatin1String(legacy.domain));
@@ -399,11 +397,8 @@ QVersionNumber Application::prepare()
     palette.setColor(QPalette::Active, QPalette::Text, QColor(Qt::black));
     Application::setPalette(palette);*/
 
-    if (legacyDataMigrated) {
-        // Note, this doesnt go into settings.ini. And that's okay.
-        QSettings settings;
-        settings.setValue(legacyDataMovedKey, true);
-    }
+    if (legacyDataMigrated)
+        QFile(targetAppDataPath + QLatin1String("/migration_acknowledgement_pending")).open(QFile::WriteOnly);
 
     return applicationVersion;
 }
@@ -1052,14 +1047,14 @@ void Application::toggleFullscreen(QWindow *window)
 
 bool Application::hasLegacyDataMovedRecently() const
 {
-    QSettings settings;
-    return settings.value(legacyDataMovedKey, false).toBool();
+    return QFile::exists(Application::appDataLocation()
+                         + QLatin1String("/migration_acknowledgement_pending"));
 }
 
 void Application::acknowledgeLegacyDataMigration()
 {
-    QSettings settings;
-    settings.remove(legacyDataMovedKey);
+    QFile::remove(Application::appDataLocation()
+                  + QLatin1String("/migration_acknowledgement_pending"));
 }
 
 bool Application::hasActiveFocus(QQuickWindow *window, QQuickItem *item)
