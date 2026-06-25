@@ -1337,6 +1337,16 @@ bool TransliterationOption::isValid() const
     return t != nullptr && languageCode >= 0 && t->canActivate(*this);
 }
 
+bool TransliterationOption::hasAlphabetMappings() const
+{
+    if (this->inApp) {
+        AbstractTransliterationEngine *t = this->transliterator();
+        const AlphabetMappings mappings = t->alphabetMappings(this->languageCode);
+        return mappings.isValid();
+    }
+    return false;
+}
+
 bool TransliterationOption::activate()
 {
     AbstractTransliterationEngine *t = this->transliterator();
@@ -1392,6 +1402,11 @@ bool AbstractTransliterationEngine::doActivate(const TransliterationOption &opti
     return false;
 }
 
+AlphabetMappings AbstractTransliterationEngine::alphabetMappings(int langCode) const
+{
+    return AlphabetMappings();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 StaticTransliterationEngine::StaticTransliterationEngine(QObject *parent)
@@ -1433,6 +1448,11 @@ QString StaticTransliterationEngine::transliterateWord(const QString &word,
                                                        const TransliterationOption &option) const
 {
     return DefaultTransliteration::onWord(word, option.languageCode);
+}
+
+AlphabetMappings StaticTransliterationEngine::alphabetMappings(int langCode) const
+{
+    return DefaultTransliteration::alphabetMappingsFor(langCode);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1893,8 +1913,7 @@ bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
 
     if (m_editor != nullptr && object == m_editor && m_enabled && m_option.isValid()
         && m_option.inApp) {
-        if (event->type() == QEvent::FocusOut
-            || event->type() == QEvent::MouseButtonPress) {
+        if (event->type() == QEvent::FocusOut || event->type() == QEvent::MouseButtonPress) {
             this->commitWordToEditor();
             return false;
         }
@@ -1950,8 +1969,8 @@ bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
                 return this->handleDelete(keyEvent);
 
             if (!this->updateWordFromInput(keyEvent)) {
-                const QList<int> exceptions = { Qt::Key_Shift,   Qt::Key_Control, Qt::Key_Alt,
-                                                Qt::Key_Meta,    Qt::Key_CapsLock, Qt::Key_NumLock };
+                const QList<int> exceptions = { Qt::Key_Shift, Qt::Key_Control,  Qt::Key_Alt,
+                                                Qt::Key_Meta,  Qt::Key_CapsLock, Qt::Key_NumLock };
                 if ((m_currentWord.originalString.isEmpty() && m_currentWord.suggestions.isEmpty())
                     || exceptions.contains(keyEvent->key()))
                     return false;
@@ -1980,7 +1999,8 @@ bool LanguageTransliterator::updateWordFromInput(const QKeyEvent *keyEvent)
     if (inputText.isEmpty() || (inputText.length() == 1 && inputText[0].isPunct()))
         return false;
 
-    QInputMethodQueryEvent query(Qt::ImCursorPosition | Qt::ImAnchorPosition | Qt::ImCursorRectangle);
+    QInputMethodQueryEvent query(Qt::ImCursorPosition | Qt::ImAnchorPosition
+                                 | Qt::ImCursorRectangle);
     qApp->sendEvent(m_editor, &query);
 
     const int cursorPosition = query.value(Qt::ImCursorPosition).toInt();

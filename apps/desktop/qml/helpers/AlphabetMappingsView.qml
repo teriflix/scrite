@@ -26,7 +26,7 @@ import "../controls"
 Rectangle {
     id: root
 
-    required property scriteLanguage language
+    required property scriteTransliterationOption option
 
     width: _layout.width + 20
     height: _layout.height + 20
@@ -121,7 +121,7 @@ Rectangle {
     FontMetrics {
         id: _languageFontMetrics
 
-        font.family: root.language.font()
+        font.family: _private.alphabetMappings ? _private.alphabetMappings.language.font() : ""
         font.pointSize: Runtime.idealFontMetrics.font.pointSize
     }
 
@@ -136,13 +136,13 @@ Rectangle {
 
         readonly property real textCellWidth: 50
 
-        readonly property var alphabetMappings: DefaultTransliteration.alphabetMappingsFor(root.language.code)
+        readonly property var alphabetMappings: root.option.transliterator ? root.option.transliterator.alphabetMappings(root.option.languageCode) : undefined
 
-        readonly property var mappingModels: [
+        readonly property var mappingModels: alphabetMappings ? [
             { "heading": "Vowels", "array": alphabetMappings.vowels },
             { "heading": "Consonants", "array": alphabetMappings.consonants },
             { "heading": "Digits", "array": alphabetMappings.digits },
             { "heading": "Symbols", "array": alphabetMappings.symbols }
-        ]
+        ] : []
     }
 }

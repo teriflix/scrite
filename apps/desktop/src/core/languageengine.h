@@ -79,6 +79,12 @@ public:
     // clang-format on
     bool isValid() const;
 
+    // clang-format off
+    Q_PROPERTY(bool hasAlphabetMappings
+               READ hasAlphabetMappings)
+    // clang-format on
+    bool hasAlphabetMappings() const;
+
     Q_INVOKABLE bool activate();
     Q_INVOKABLE QString transliterateWord(const QString &word) const;
     Q_INVOKABLE QString transliterateParagraph(const QString &paragraph) const;
@@ -543,9 +549,12 @@ public:
     /** called to verify if an option is still available */
     virtual bool canActivate(const TransliterationOption &option) = 0;
 
-    /** caled to fetch the transliterated word for the said language **/
+    /** called to fetch the transliterated word for the said language **/
     virtual QString transliterateWord(const QString &word,
                                       const TransliterationOption &lang) const = 0;
+
+    /** called to fetch alphabet mappings for a lanugage **/
+    Q_INVOKABLE virtual AlphabetMappings alphabetMappings(int langCode) const;
 
 protected:
     /** called as soon as editor receives focus **/
@@ -578,6 +587,7 @@ public:
     bool canActivate(const TransliterationOption &option);
     bool activate(const TransliterationOption &option);
     QString transliterateWord(const QString &word, const TransliterationOption &option) const;
+    AlphabetMappings alphabetMappings(int langCode) const;
 };
 
 class QJSEngine;

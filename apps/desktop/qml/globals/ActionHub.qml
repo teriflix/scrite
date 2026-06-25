@@ -792,9 +792,9 @@ Item {
 
             property string tooltip: "Show English to " + Runtime.language.active.name + " alphabet mappings."
 
-            enabled: Runtime.language.activeCode !== QtLocale.English &&
-                     Runtime.language.activeTransliterator.name === DefaultTransliteration.driver &&
-                     DefaultTransliteration.supportsLanguageCode(Runtime.language.activeCode)
+            enabled: Runtime.language.activeTransliterationOption !== undefined &&
+                     Runtime.language.activeTransliterationOption.valid &&
+                     Runtime.language.activeTransliterationOption.hasAlphabetMappings
             shortcut: defaultShortcut
             text: "Alphabet Mappings"
             objectName: "alphabetMappings"

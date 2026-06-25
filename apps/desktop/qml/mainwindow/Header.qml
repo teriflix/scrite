@@ -365,7 +365,7 @@ Rectangle {
                 active: parent.visible
 
                 sourceComponent: AlphabetMappingsView {
-                    language: Runtime.language.active
+                    option: Runtime.language.activeTransliterationOption
 
                     EventFilter.target: Scrite.app
                     EventFilter.events: [EventFilter.KeyPress]
