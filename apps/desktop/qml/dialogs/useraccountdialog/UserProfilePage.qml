@@ -204,17 +204,32 @@ Item {
 
             spacing: 25
 
-            VclCheckBox {
-                id: _chkAnalyticsConsent
+            RowLayout {
+                spacing: 4
 
-                TabSequenceItem.manager: _userInfoFields
-                TabSequenceItem.sequence: 5
+                VclCheckBox {
+                    id: _chkAnalyticsConsent
 
-                text: "Send analytics data."
-                checked: root.userInfo.consentToActivityLog
-                padding: 0
+                    TabSequenceItem.manager: _userInfoFields
+                    TabSequenceItem.sequence: 5
 
-                onToggled: _userInfoFields.needsSaving = true
+                    text: "Send usage analytics."
+                    checked: root.userInfo.consentToActivityLog
+                    padding: 0
+
+                    onToggled: _userInfoFields.needsSaving = true
+                }
+
+                Link {
+                    text: "More Info"
+                    onClicked: {
+                        const url = HelpCenter.lookup("Usage Analytics")
+                        if(url !== "")
+                            Qt.openUrlExternally(url);
+                        else
+                            Qt.openUrlExternally("https://www.scrite.io/privacy-policy/")
+                    }
+                }
             }
 
             VclCheckBox {

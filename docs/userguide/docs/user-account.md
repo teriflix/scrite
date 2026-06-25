@@ -36,6 +36,28 @@ After changing any field or toggle, click Save to apply the updates.
 
 <img src="../images/user-account/002-profile-page.jpg" width="85%"/>
 
+### Usage Analytics
+
+The **Send usage analytics** (formerly Send analytics data) checkbox controls whether Scrite sends 
+activity logs to the Scrite servers. 
+
+**What is collected:** When enabled, Scrite periodically sends logs that record which features you
+use and how often. Each log includes enough information to identify your account and device so the
+team can attribute activity to a subscription tier and platform.
+
+**How this helps:** Telemetry data lets the team see which features are actually used and which are
+not. That informs decisions about where to invest development effort, what to improve in the product,
+and how to shape subscription offerings so they reflect how writers genuinely use Scrite.
+
+**What is never collected:** The logs contain no content from your screenplays or documents. Your
+creative work stays entirely on your device and is never transmitted to the Scrite servers.
+
+**When disabled:** Scrite still records the bare minimum needed to maintain your account and
+license — specifically, that the app was launched. All other in-app activity logging stops.
+
+You can change this preference at any time. Click **Save** after toggling the checkbox for the
+change to take effect.
+
 ### Logout
 
 You can click on the `Logout` button to volutarily relinquiesh the activation of your subscription
