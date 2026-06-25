@@ -168,9 +168,8 @@ language.
 
 <img src="../images/language-support/013-input-methods.jpg" width="60%"/>
 
-Whenever the built-in PhTranslator is assigned to any of the Indian languages,
-Scrite also displays an icon on the toolbar for reviewing the alphabet mapping
-table.
+Whenever the active transliteration option provides an alphabet mapping table,
+Scrite displays an icon on the toolbar for reviewing it.
 
 <img src="../images/language-support/014-input-methods.jpg" width="100%"/>
 
@@ -180,6 +179,137 @@ to use.
 > NOTE: By default Scrite insists on handling language input switch all by
 > itself, unless you configure the app to [delegate it entirely to the
 > OS](#letting-os-manage-input-method-switching).
+
+### Built In Transliteration Engines
+
+For the 11 Indian languages Scrite supports natively, you have a choice of two
+built-in phonetic transliteration engines: PhTranslator and Sanscript. Both
+accept English keystrokes and convert them to the target Indian script as you
+type, entirely within the app and without any network access. You can select
+either one in the `Language Settings` dialog by unchecking `Auto Select` and
+picking from the input method list.
+
+#### PhTranslator
+
+[PhTranslator](https://phtranslator.sourceforge.net) is a static transliteration
+library originally developed as an open-source project on SourceForge. It covers
+all 11 Indian languages: Bengali, Gujarati, Hindi, Kannada, Malayalam, Marathi,
+Oriya, Punjabi, Sanskrit, Tamil, and Telugu. The engine applies a fixed,
+deterministic mapping from English letter sequences to the corresponding native
+script characters. There are no fuzzy matches, no suggestions to scroll through,
+and no external dependencies. Every keystroke is converted instantly.
+
+In the input method list it appears as `Built-In (PhTranslator)`.
+
+<img src="../images/language-support/020-phtranslator-option.jpg" width="85%"/>
+
+When PhTranslator is the active transliteration option, Scrite shows the alphabet
+mapping icon on the toolbar. Clicking it opens a reference table that lists the
+exact English key combinations for every vowel, consonant, digit, and symbol in
+the current language -- the same table shown above in the Input Method Mapping
+section.
+
+What PhTranslator can and cannot transliterate is determined entirely by the
+library itself. Scrite simply passes your keystrokes through it and displays
+whatever it produces.
+
+#### Sanscript
+
+> NOTE: Sanscript is available from Scrite version 3 onwards.
+
+[Sanscript](https://github.com/indic-transliteration/sanscript.js) (`sanscript.js`)
+is an open-source transliteration library for Indian languages authored by Arun
+Prasad and the Sanskrit Coders community, released under the MIT licence. Scrite
+bundles a pre-built copy of the library inside the application and evaluates it
+at runtime, so no network access or external installation is required.
+
+Sanscript covers the same 11 Indian languages as PhTranslator. It uses the
+[ITRANS](https://en.wikipedia.org/wiki/ITRANS) romanization scheme to map English
+phonetics to the target script. In the input method list it appears as
+`Sanscript.js - <script-name> (Sanscript)`, for example
+`Sanscript.js - devanagari (Sanscript)` for Hindi, Marathi, and Sanskrit,
+`Sanscript.js - kannada (Sanscript)` for Kannada, and so on.
+
+<img src="../images/language-support/021-sanscript-option.jpg" width="85%"/>
+
+Sanscript does not currently provide an alphabet mapping table, so the toolbar
+icon will not appear when it is the active engine. Users who need a keystroke
+reference while using Sanscript can consult the
+[ITRANS specification](https://en.wikipedia.org/wiki/ITRANS) directly.
+
+What Sanscript can and cannot transliterate is determined entirely by the
+library itself. Scrite simply passes your keystrokes through it and displays
+whatever it produces.
+
+#### Choosing between PhTranslator and Sanscript
+
+The two engines differ only in the keystroke conventions they follow, not in the
+correctness or completeness of the output. Both produce standard Unicode text
+that is identical for most common words.
+
+If you are already familiar with ITRANS conventions -- for example, typing `aa`
+for the long-A vowel, `sh` for the sibilant श, or `N^` for the anusvara ं --
+Sanscript will feel natural from the start.
+
+If you prefer a more relaxed, phonetic-English style of input, or if you are
+switching from an older version of Scrite where PhTranslator was the only option,
+stay with PhTranslator. The alphabet mapping table on the toolbar is available to
+help you learn its key combinations.
+
+### Cross-Transliteration
+
+> NOTE: Cross-transliteration is available from Scrite version 3 onwards.
+
+Cross-transliteration lets you convert a selected passage of text from its
+current script to the active language's script, all within the screenplay
+editor. For example, you can write a line of dialogue in English phonetics and
+convert it to Kannada in one step. Or, if you already have a passage in Kannada
+and want the same sounds rendered in Telugu, you can do that too.
+
+> At the moment this feature works only for the 11 Indian languages supported by
+> Scrite. Converting from English phonetics to an Indian language works with
+> both PhTranslator and Sanscript as the target language's input method.
+> Converting from an Indian language back to English, or from one Indian language
+> to another, requires the target language's input method to be set to Sanscript.
+
+This is an experimental feature and is turned off by default. To enable it,
+click the `Screenplay Editor Options` button on the toolbar and check `Allow
+Translation of Selected Text`.
+
+<img src="../images/language-support/022-enable-cross-transliteration.jpg" width="85%"/>
+
+**Using it**
+
+1. Set your target language using the language menu on the toolbar.
+2. Ensure that language's input method is set to Sanscript, or to PhTranslator
+   if you are converting from English phonetics to an Indian language.
+3. Select the text you want to convert.
+4. Right-click and choose `Transliterate to [Language]`, or press
+   `Shift+Alt+V`.
+
+Scrite replaces the selected text with the transliterated result in a single
+undoable step. For example, selecting a passage in Kannada and running the
+command with English as the active language converts it to its ITRANS phonetic
+equivalent.
+
+<img src="../images/language-support/023-cross-transliterate-to-english.jpg" width="100%"/>
+
+Sanscript routes everything through the ITRANS romanization scheme internally,
+which allows it to detect the script of the selected text and convert it to any
+other supported Indian script. This makes it possible to transliterate a passage
+from Kannada (ಸಮುದ್ರದಲ್ಲಿ ನೀರು ಹೊಳೆಯುತ್ತಿದೆ) to Telugu
+(సముద్రదల్లి నీరు హొళెయుత్తిదె) simply by switching the active language to
+Telugu with Sanscript as its input method, selecting the Kannada text, and
+running the command.
+
+<img src="../images/language-support/024-cross-transliterate-to-telugu.jpg" width="100%"/>
+
+> NOTE: What Sanscript can and cannot cross-transliterate is determined
+> entirely by the library itself. Scrite passes the selected text through it
+> and replaces it with whatever the library produces. The result is a phonetic
+> equivalent in the target script -- it does not account for grammar,
+> inflection, or vocabulary differences between languages, and is not a
+> translation.
 
 ### Dictpress: Alar and Olam
 
