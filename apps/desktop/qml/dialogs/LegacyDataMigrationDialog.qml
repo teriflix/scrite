@@ -61,14 +61,6 @@ DialogLauncher {
                     text: "Please note: if you downgrade to an older version of Scrite, they will continue to use settings, vault and recent files from the old location."
                     font.bold: true
                 }
-
-                Item { Layout.fillHeight: true }
-
-                VclCheckBox {
-                    id: _iUnderstandCheckBox
-                    Layout.fillWidth: true
-                    text: "I understand"
-                }
             }
         }
 
@@ -90,12 +82,12 @@ DialogLauncher {
 
                 VclButton {
                     id: _okButton
+
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     anchors.rightMargin: 16
 
-                    text: "Ok"
-                    enabled: _iUnderstandCheckBox.checked
+                    text: "OK"
 
                     onClicked: {
                         Scrite.app.acknowledgeLegacyDataMigration()
