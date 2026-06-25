@@ -111,7 +111,7 @@ width="85%"/>
 
 ### Empty Scene Icon
 
-The Scene List panel shows an “empty‑scene” icon for scenes with only a
+The Scene List panel shows an "empty‑scene" icon for scenes with only a
 scene‑heading but no content. This icon disappears as soon as some content is
 typed or pasted into the scene.
 
@@ -184,7 +184,7 @@ bubble to the left of the editing area.
 > CONT’D usage.
 
 Time values are approximate (1 page ≈ 1 minute). You can adjust 'Time Per Page'
-in Settings → Screenplay → Page Setup.
+in Settings > Screenplay > Page Setup.
 
 <img src="../images/screenplay/018-time-per-page.jpg" width="85%"/>
 
@@ -202,7 +202,7 @@ and Linux vary as well.
 ## Formatting Paragraphs
 
 You can format paragraph types and have that format applied to all paragraphs of
-those types. Go to Settings → Screenplay → Formatting Rules to view and edit the
+those types. Go to Settings > Screenplay > Formatting Rules to view and edit the
 currently applied rules. 
 
 <img src="../images/screenplay/019-formatting.png" width="100%"/>
@@ -228,8 +228,8 @@ formatting options:
 1. Default formatting options used for new files.
 2. Document‑specific options used for the current file.
 
-Click “Factory Reset” to discard document‑specific options and use defaults.
-Click “Make Default” to set current options as your defaults.
+Click "Factory Reset" to discard document‑specific options and use defaults.
+Click "Make Default" to set current options as your defaults.
 
 <img src="../images/screenplay/022-formatting.png" width="100%"/>
 
@@ -388,7 +388,7 @@ scrolls with the scene and shows a title bar for clarity.
 ### Featured Image
 
 The comment box has multiple tabs. Click the Featured Image tab to assign a
-photo per scene. Drag and drop or click “Select Photo”. Typically this is a
+photo per scene. Drag and drop or click "Select Photo". Typically this is a
 storyboard sketch or location photo, but you can choose any image.
 
 <img src="../images/screenplay/029-featured-image.jpg" width="100%"/>
@@ -486,9 +486,9 @@ width="85%"/>
 
 ### Alter Character Name
 
-If you have “Show Scene Characters and Tags” turned on in Screenplay Editor
+If you have "Show Scene Characters and Tags" turned on in Screenplay Editor
 options, then you can click on a character name in the character list shown
-under scene heading and select “Rename/Merge Character” option ….
+under scene heading and select "Rename/Merge Character" option ….
 
 <img src="../images/screenplay/038-rename-characters.jpg" width="66%"/>
 
@@ -521,7 +521,7 @@ names for the same character. In this case, Maya and Mayavi.
 
 You may want to merge Mayavi into Maya across the entire screenplay, even if the
 name is used in action or dialogue paragraphs. Just like you would rename
-characters, you can click on Mayavi and select the “Rename/Merge Character”
+characters, you can click on Mayavi and select the "Rename/Merge Character"
 option.
 
 <img src="../images/screenplay/041-merge-characters.png" width="66%"/>
@@ -531,12 +531,12 @@ dialog box, write the name of the character you want to merge this one with.
 
 <img src="../images/screenplay/042-merge-characters.png" width="66%"/>
 
-Now, upon clicking the “Rename” button, you will notice that Scrite recognizes
+Now, upon clicking the "Rename" button, you will notice that Scrite recognizes
 it as a merge workflow and will ask you to confirm it.
 
 <img src="../images/screenplay/043-merge-characters.png" width="66%"/>
 
-Upon clicking “Yes” in this dialog box, Scrite not only changes Mayavi to Maya
+Upon clicking "Yes" in this dialog box, Scrite not only changes Mayavi to Maya
 everywhere in the screenplay, but it will also move notes, attachments, and
 photos associated with Mayavi with the notes, attachments, and photos of Maya.
 
@@ -630,7 +630,7 @@ Settings > Screenplay > Options page.
 ### Scenes Without Heading
 
 You can turn off scene headings for specific scenes. Pull out the scene menu and
-uncheck “Scene Heading”. The editor shows “NO SCENE HEADING”. Such scenes are
+uncheck "Scene Heading". The editor shows "NO SCENE HEADING". Such scenes are
 shown as is in preview and exported as such in PDF and reports.
 
 <img src="../images/screenplay/044-no-scene-heading.png" width="100%"/>
@@ -665,7 +665,7 @@ accessible from the [command center](user-interface.md#command-center).
 ### Removing Scenes
 
 Removing a scene is as simple as pulling out the scene menu and selecting the
-“Remove” option.
+"Remove" option.
 
 <img src="../images/screenplay/048-remove-scene.jpg" width="50%"/>
 
@@ -693,7 +693,7 @@ scene.
 ### Splitting Scenes
 
 Place the cursor before the first character of the paragraph where you want to
-split, then right‑click and select “Split Scene” or use `Ctrl+Shift+Enter`
+split, then right‑click and select "Split Scene" or use `Ctrl+Shift+Enter`
 (Windows/Linux) or `⌘+Shift+Return` (macOS). Dialogue character lists are split
 accurately; mute characters remain in the original scene.
 
@@ -702,7 +702,7 @@ accurately; mute characters remain in the original scene.
 ### Merging Scenes
 
 Place the cursor at the first line of the scene to merge into the previous one,
-then right‑click “Join Previous Scene” or use `Ctrl+Shift+Backspace`
+then right‑click "Join Previous Scene" or use `Ctrl+Shift+Backspace`
 (Windows/Linux) or `⌘+Shift+Backspace` (macOS). Scrite inserts a separator
 paragraph; you can delete it.
 
@@ -858,7 +858,7 @@ Misspelled words are highlighted in red; right‑click for corrections.
 
 <img src="../images/screenplay/068-spell-check.jpg" width="40%"/>
 
-Choose “Add to dictionary” (system‑wide) or “Ignore” (current document only).
+Choose "Add to dictionary" (system‑wide) or "Ignore" (current document only).
 Scrite recognizes character names as correct by default. 
 
 > NOTE: Grammar check is not yet available.
@@ -866,5 +866,57 @@ Scrite recognizes character names as correct by default.
 You can enable/disable spell-check in Settings > Screenplay > Options page.
 
 <img src="../images/screenplay/069-spell-check.jpg" width="100%"/>
+
+## Auto-Capitalization
+
+Scrite automatically capitalizes the first letter of each sentence in action and dialogue
+paragraphs as you type. This is enabled by default and can be toggled in Settings >
+Screenplay > Options.
+
+<img src="../images/screenplay/081-auto-capitalize-settings.jpg" width="65%"/>
+
+### Exception List
+
+Some abbreviations end with a period but do not end a sentence - `etc.`, `vs.`, `e.g.` and
+similar. Without exceptions, Scrite would incorrectly capitalize the word that follows such
+abbreviations.
+
+The exception list tells Scrite which abbreviations should not trigger capitalization after
+their period. The default list includes: `e.g.`, `i.e.`, `etc.`, `vs.`, `approx.`, `dept.`,
+`est.`, `fig.`, and `misc.`
+
+Each exception is shown as a tag alongside the checkbox. To add your own abbreviation, click
+the `+` button, type the abbreviation, and press Enter. To remove one, click its × icon. A
+dropdown suggests default abbreviations not yet in your list.
+
+When "Capitalize Sentences" is unchecked, the exception list is shown at reduced opacity and
+cannot be edited.
+
+### Ellipsis Handling
+
+Previously, `..` or `...` would falsely trigger capitalization of the word that followed. This
+is now fixed - consecutive periods no longer count as a sentence break.
+
+### Spell Check Integration
+
+Abbreviations in the exception list are also automatically excluded from spell check. If
+`etc.` is in your list, for example, `etc` will not be flagged as misspelled. There is no
+need to add these to your system dictionary manually.
+
+## Add/Remove CONT'D
+
+When a character's dialogue is interrupted by an action paragraph within the same scene and
+then continues, professional screenwriting convention calls for `CONT'D` next to the character
+name on the resumed block. Scrite can add and remove this automatically.
+
+Enable or disable this in Settings > Screenplay > Options by checking "Add/Remove CONT'D".
+
+<img src="../images/screenplay/082-contd-settings.jpg" width="85%"/>
+
+When enabled, Scrite adds `CONT'D` whenever a character's dialogue resumes after an
+interrupting action paragraph, and removes it automatically if that action paragraph is
+deleted.
+
+<img src="../images/screenplay/083-contd-example.jpg" width="65%"/>
 
 
