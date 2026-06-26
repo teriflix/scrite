@@ -27,6 +27,9 @@
 #include "scritedocumentvault.h"
 
 #include <QFile>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QProcess>
 #include <QSettings>
 
 Scrite::Scrite(QObject *parent) : QObject(parent)
@@ -118,11 +121,13 @@ Locale Scrite::locale()
     return ret;
 }
 
-bool Scrite::prelaunchChecks()
+QJsonValue Scrite::prelaunchChecks()
 {
 #if defined(Q_OS_WIN) && defined(SCRITE_PRODUCTION_BUILD)
-    // Return false if a legacy NSIS-installed version of Scrite is present.
-    // The caller (QML) is responsible for showing an error dialog and quitting.
+    // Returns a QJsonObject with "uninstaller" and "version" keys if a legacy NSIS-installed
+    // version of Scrite is present. "uninstaller" is the path from UninstallString (or "YES"
+    // if the key exists but is empty). Returns QJsonValue() (undefined) when no legacy install
+    // is found, including on non-Windows platforms.
     const char *const nsisRegPaths[] = {
         "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Scrite",
         "HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion"
@@ -130,11 +135,42 @@ bool Scrite::prelaunchChecks()
     };
     for (const char *regPath : nsisRegPaths) {
         const QSettings reg(QLatin1String(regPath), QSettings::NativeFormat);
-        if (!reg.value(QStringLiteral("UninstallString")).toString().isEmpty())
-            return false;
+        if (!reg.contains(QStringLiteral("UninstallString")))
+            continue;
+        const QString uninstaller = reg.value(QStringLiteral("UninstallString")).toString();
+        const QString version = reg.value(QStringLiteral("DisplayVersion")).toString();
+        return QJsonObject { { QStringLiteral("uninstaller"),
+                               uninstaller.isEmpty() ? QStringLiteral("YES") : uninstaller },
+                             { QStringLiteral("version"), version } };
     }
 #endif
-    return true;
+    return QJsonValue();
+}
+
+void Scrite::launchLegacyUninstaller(const QString &path)
+{
+#if defined(Q_OS_WIN)
+    if (path.isEmpty() || path == QStringLiteral("YES"))
+        return;
+    // NSIS UninstallString may be unquoted ("C:\Prog Files\uninst.exe") or quoted with
+    // args ("C:\Prog Files\uninst.exe" /S). splitCommand splits on spaces, so only use
+    // it when the string starts with a quote; otherwise the whole string is the program.
+    QString program;
+    QStringList arguments;
+    if (path.startsWith(QLatin1Char('"'))) {
+        const QStringList parts = QProcess::splitCommand(path);
+        if (!parts.isEmpty()) {
+            program = parts.first();
+            arguments = parts.mid(1);
+        }
+    } else {
+        program = path;
+    }
+    if (!program.isEmpty())
+        QProcess::startDetached(program, arguments);
+#else
+    Q_UNUSED(path)
+#endif
 }
 
 bool Scrite::isLicenseAccepted()

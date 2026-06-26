@@ -60,7 +60,8 @@ QSM.StateMachine {
     /*
      * Runs platform-specific pre-launch checks. On production Windows builds
      * this guards against running alongside a legacy NSIS installation. If the
-     * check fails the user is informed and the app exits; otherwise init continues.
+     * check fails the user is informed, the legacy uninstaller is launched, and
+     * the app exits; otherwise init continues.
      */
     QSM.State {
         id: s2Prelaunch
@@ -69,14 +70,30 @@ QSM.StateMachine {
         signal failed()
 
         onEntered: {
-            if (!Scrite.prelaunchChecks()) {
-                MessageBox.information(
-                    "Previous Version Detected",
-                    "A previous version of Scrite is installed on this computer.\n\n" +
-                    "Please uninstall it via \"Add or Remove Programs\" in Windows Settings " +
-                    "before running this version.",
-                    () => s2Prelaunch.failed()
-                )
+            const info = Scrite.prelaunchChecks()
+            if (info) {
+                if (info.uninstaller !== "YES") {
+                    const versionLabel = info.version ? ("v" + info.version + " ") : ""
+                    const launchButton = "Launch " + versionLabel + "Uninstaller"
+                    MessageBox.question(
+                        "Previous Version Detected",
+                        "A previous version of Scrite is installed on this computer.\n\n" +
+                        "Please uninstall it before running this version. Would you like to launch the uninstaller now?",
+                        [launchButton, "No, I Will Uninstall Myself"],
+                        (button) => {
+                            if (button === launchButton)
+                                Scrite.launchLegacyUninstaller(info.uninstaller)
+                            s2Prelaunch.failed()
+                        }
+                    )
+                } else {
+                    MessageBox.information(
+                        "Previous Version Detected",
+                        "A previous version of Scrite is installed on this computer.\n\n" +
+                        "Please uninstall it via \"Add or Remove Programs\" in Windows Settings before running this version.",
+                        () => s2Prelaunch.failed()
+                    )
+                }
             } else {
                 Qt.callLater(() => s2Prelaunch.passed())
             }
