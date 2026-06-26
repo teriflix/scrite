@@ -1469,6 +1469,7 @@ public:
     QString defaultGroupsDataFile() const;
 
     Q_INVOKABLE void loadDefaultGroupsData();
+    Q_INVOKABLE static bool isBuiltInGroup(const QString &name);
 
     // clang-format off
     Q_PROPERTY(QString groupsData

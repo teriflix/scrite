@@ -242,7 +242,9 @@ VclMenu {
                                                           root.sceneGroup.toggle(_groupsViewDelegate.index)
                                                           root.toggled(_groupsViewDelegate.index, _groupsViewDelegate.arrayItem.name)
                                                       })
-                                    Scrite.user.logActivity2("structure", "tag: " + _groupsViewDelegate.arrayItem.name)
+                                    const data = Scrite.document.structure.isBuiltInGroup(_groupsViewDelegate.arrayItem.name) ?
+                                                   "tag: " + _groupsViewDelegate.arrayItem.name : "tag: custom-story-beat"
+                                    Scrite.user.logActivity2("structure", data)
                                 }
                             }
                         }

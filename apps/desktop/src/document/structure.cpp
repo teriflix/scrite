@@ -4088,6 +4088,144 @@ void Structure::clearAnnotations()
         this->removeAnnotation(m_annotations.first());
 }
 
+namespace {
+
+struct CategoryOrGroup
+{
+    QString name;
+    QString label;
+    QString desc;
+    QString act;
+    int type = -1; // -1 = category, 0 = visual group, 1 = sub-group
+
+    CategoryOrGroup() { }
+    CategoryOrGroup(const QString &name, const QString &desc = QString())
+    {
+        this->label = name.simplified();
+        this->name = this->label.toUpper();
+        this->desc = desc.simplified();
+    }
+
+    bool isValid() const { return !name.isEmpty(); }
+
+    bool operator<(const CategoryOrGroup &other) const { return name < other.name; }
+
+    bool operator==(const CategoryOrGroup &other) const { return name == other.name; }
+
+    QJsonObject toJson(const QString &namePrefix = QString()) const
+    {
+        QJsonObject ret;
+        ret.insert(QStringLiteral("name"),
+                   namePrefix.isEmpty() ? this->name
+                                        : (namePrefix + QStringLiteral("/") + this->name));
+        ret.insert(QStringLiteral("label"), this->label);
+        ret.insert(QStringLiteral("desc"), this->desc);
+        if (this->type >= 0) {
+            ret.insert(QStringLiteral("type"), this->type);
+            ret.insert(QStringLiteral("act"), this->act);
+        }
+        return ret;
+    }
+
+    QString toString() const
+    {
+        QString ret;
+        QTextStream ts(&ret, QIODevice::WriteOnly);
+        if (type < 0)
+            ts << QStringLiteral("[") << this->label << QStringLiteral("]");
+        else {
+            if (!act.isEmpty())
+                ts << QStringLiteral("<") + this->act << QStringLiteral(">");
+            if (type > 0)
+                ts << QStringLiteral("- ") << this->label;
+            else
+                ts << this->label;
+        }
+        if (!this->desc.isEmpty())
+            ts << QStringLiteral(": ") << this->desc;
+        ts.flush();
+        return ret;
+    }
+};
+
+typedef CategoryOrGroup Category;
+typedef CategoryOrGroup Group;
+
+QMap<Category, QList<Group>> parseGroupsData(const QString &text)
+{
+    const QString sqbo = QStringLiteral("[");
+    const QString sqbc = QStringLiteral("]");
+    const QString dash = QStringLiteral("- ");
+    const QString colon = QStringLiteral(":");
+    const QString abc = QStringLiteral(">");
+
+    auto fromCategoryLine = [&](const QString &line) -> Category {
+        Category ret;
+
+        if (line.isEmpty())
+            return ret;
+
+        if (!line.startsWith(sqbo))
+            return ret;
+
+        const int closingBraceIndex = line.indexOf(sqbc);
+        if (closingBraceIndex < 0)
+            return ret;
+
+        const QString name = line.mid(1, closingBraceIndex - 1);
+        const QString desc = line.section(colon, 1);
+        ret = CategoryOrGroup(name, desc);
+
+        return ret;
+    };
+
+    auto fromGroupLine = [&](const QString &line) -> Group {
+        Group ret;
+
+        if (line.isEmpty())
+            return ret;
+
+        QString line2 = line;
+        const int type = line.startsWith(dash) ? 1 : 0;
+        if (type == 1)
+            line2 = line.mid(2).trimmed();
+
+        const QString field1 = line2.section(colon, 0, 0);
+        const QString act =
+                field1.startsWith("<") ? field1.mid(1).section(abc, 0, 0).trimmed() : QString();
+        const QString name = act.isEmpty() ? field1 : field1.section(abc, 1);
+        const QString desc = line2.section(colon, 1);
+        ret = CategoryOrGroup(name, desc);
+        ret.type = type;
+        ret.act = act.toUpper();
+
+        return ret;
+    };
+
+    QMap<Category, QList<Group>> categoryGroupsMap;
+
+    QString text2 = text;
+    QTextStream ts(&text2, QIODevice::ReadOnly);
+    Category activeCategory(QStringLiteral("Default Category"));
+
+    while (!ts.atEnd()) {
+        const QString line = ts.readLine().trimmed();
+        if (line.isEmpty())
+            continue;
+
+        if (line.startsWith(sqbo))
+            activeCategory = fromCategoryLine(line);
+        else {
+            const Group group = fromGroupLine(line);
+            categoryGroupsMap[activeCategory].append(group);
+        }
+    }
+
+    return categoryGroupsMap;
+}
+
+} // namespace
+
 QString Structure::defaultGroupsDataFile() const
 {
     static const QString ret = Utils::Platform::configPath(QStringLiteral("storybeats.lst"));
@@ -4178,139 +4316,9 @@ void Structure::setGroupsData(const QString &val)
     if (m_groupsData == val)
         return;
 
-    struct CategoryOrGroup
-    {
-        QString name;
-        QString label;
-        QString desc;
-        QString act;
-        int type = -1; // -1 = category, 0 = visual group, 1 = sub-group
+    QMap<Category, QList<Group>> categoryGroupsMap = parseGroupsData(val);
 
-        CategoryOrGroup() { }
-        CategoryOrGroup(const QString &name, const QString &desc = QString())
-        {
-            this->label = name.simplified();
-            this->name = this->label.toUpper();
-            this->desc = desc.simplified();
-        }
-
-        bool isValid() const { return !name.isEmpty(); }
-
-        bool operator<(const CategoryOrGroup &other) const { return name < other.name; }
-
-        bool operator==(const CategoryOrGroup &other) const { return name == other.name; }
-
-        QJsonObject toJson(const QString &namePrefix = QString()) const
-        {
-            QJsonObject ret;
-            ret.insert(QStringLiteral("name"),
-                       namePrefix.isEmpty() ? this->name
-                                            : (namePrefix + QStringLiteral("/") + this->name));
-            ret.insert(QStringLiteral("label"), this->label);
-            ret.insert(QStringLiteral("desc"), this->desc);
-            if (this->type >= 0) {
-                ret.insert(QStringLiteral("type"), this->type);
-                ret.insert("act", this->act);
-            }
-            return ret;
-        }
-
-        QString toString() const
-        {
-            QString ret;
-            QTextStream ts(&ret, QIODevice::WriteOnly);
-            if (type < 0)
-                ts << QStringLiteral("[") << this->label << QStringLiteral("]");
-            else {
-                if (!act.isEmpty())
-                    ts << QStringLiteral("<") + this->act << QStringLiteral(">");
-                if (type > 0)
-                    ts << QStringLiteral("- ") << this->label;
-                else
-                    ts << this->label;
-            }
-            if (!this->desc.isEmpty())
-                ts << QStringLiteral(": ") << this->desc;
-            ts.flush();
-            return ret;
-        }
-    };
-    typedef CategoryOrGroup Category;
-    typedef CategoryOrGroup Group;
-
-    const QString sqbo = QStringLiteral("[");
-    const QString sqbc = QStringLiteral("]");
-    const QString dash = QStringLiteral("- ");
-    const QString colon = QStringLiteral(":");
     const QString newl = QStringLiteral("\n");
-    const QString abo = QStringLiteral("<");
-    const QString abc = QStringLiteral(">");
-
-    auto fromCategoryLine = [=](const QString &line) -> Category {
-        Category ret;
-
-        if (line.isEmpty())
-            return ret;
-
-        if (!line.startsWith(sqbo))
-            return ret;
-
-        const int closingBraceIndex = line.indexOf(sqbc);
-        if (closingBraceIndex < 0)
-            return ret;
-
-        const QString name = line.mid(1, closingBraceIndex - 1);
-        const QString desc = line.section(colon, 1);
-        ret = CategoryOrGroup(name, desc);
-
-        return ret;
-    };
-
-    auto fromGroupLine = [=](const QString &line) -> Group {
-        Group ret;
-
-        if (line.isEmpty())
-            return ret;
-
-        QString line2 = line;
-        const int type = line.startsWith(dash) ? 1 : 0;
-        if (type == 1)
-            line2 = line.mid(2).trimmed();
-
-        const QString field1 = line2.section(colon, 0, 0);
-        const QString act =
-                field1.startsWith("<") ? field1.mid(1).section(abc, 0, 0).trimmed() : QString();
-        const QString name = act.isEmpty() ? field1 : field1.section(abc, 1);
-        const QString desc = line2.section(colon, 1);
-        ret = CategoryOrGroup(name, desc);
-        ret.type = type;
-        ret.act = act.toUpper();
-
-        return ret;
-    };
-
-    QMap<Category, QList<Group>> categoryGroupsMap;
-
-    // Parse the text and evaluate groups in it
-    {
-        QString val2 = val;
-        QTextStream ts(&val2, QIODevice::ReadOnly);
-
-        Category activeCategory(QStringLiteral("Default Category"));
-
-        while (!ts.atEnd()) {
-            const QString line = ts.readLine().trimmed();
-            if (line.isEmpty())
-                continue;
-
-            if (line.startsWith(sqbo))
-                activeCategory = fromCategoryLine(line);
-            else {
-                const Group group = fromGroupLine(line);
-                categoryGroupsMap[activeCategory].append(group);
-            }
-        }
-    }
 
     // Polish the text and write properly
     m_groupsModel = QJsonArray();
@@ -4378,6 +4386,24 @@ void Structure::setGroupsData(const QString &val)
     outFile2.open( QFile::WriteOnly );
     outFile2.write( m_groupsData.toLatin1() );
 #endif
+}
+
+bool Structure::isBuiltInGroup(const QString &name)
+{
+    static const QSet<QString> builtInNames = []() -> QSet<QString> {
+        QFile f(QStringLiteral(":/misc/storybeats.lst"));
+        if (!f.open(QFile::ReadOnly))
+            return QSet<QString>();
+        const QMap<Category, QList<Group>> map = parseGroupsData(QString::fromUtf8(f.readAll()));
+        QSet<QString> names;
+        for (auto it = map.cbegin(); it != map.cend(); ++it) {
+            const QString catName = it.key().name;
+            for (const Group &g : it.value())
+                names.insert(catName + QStringLiteral("/") + g.name);
+        }
+        return names;
+    }();
+    return builtInNames.contains(name);
 }
 
 void Structure::setPreferredGroupCategory(const QString &val)
