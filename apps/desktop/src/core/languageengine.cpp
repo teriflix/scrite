@@ -2213,6 +2213,10 @@ void LanguageTransliterator::setCurrentSuggestions(const QStringList &suggestion
         suggestions2.clear();
     }
 
+    if (!suggestions2.isEmpty()) {
+        suggestions2.removeOne(m_currentWord.originalString);
+    }
+
     if (m_currentWord.suggestions == suggestions2)
         return;
 
