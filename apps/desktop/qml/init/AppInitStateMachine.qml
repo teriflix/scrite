@@ -99,20 +99,48 @@ QSM.StateMachine {
             }
         }
 
-        QSM.SignalTransition { signal: s2Prelaunch.passed; targetState: s3AppInit }
+        QSM.SignalTransition { signal: s2Prelaunch.passed; targetState: s3License }
         QSM.SignalTransition { signal: s2Prelaunch.failed; targetState: sQuit }
+    }
+
+    /*
+     * Shows the license dialog the first time each new version is launched.
+     * Skipped silently if the license for this version is already on record.
+     * Accepting advances to s4AppInit; declining exits the app.
+     */
+    QSM.State {
+        id: s3License
+
+        signal accepted()
+        signal declined()
+
+        onEntered: {
+            if (!Scrite.isLicenseAccepted()) {
+                let dlg = LicenseDialog.launch()
+                if (dlg) {
+                    dlg.accepted.connect(() => s3License.accepted())
+                    dlg.rejected.connect(() => s3License.declined())
+                } else {
+                    Qt.callLater(() => s3License.accepted())
+                }
+            } else {
+                Qt.callLater(() => s3License.accepted())
+            }
+        }
+
+        QSM.SignalTransition { signal: s3License.accepted; targetState: s4AppInit }
+        QSM.SignalTransition { signal: s3License.declined; targetState: sQuit }
     }
 
     /*
      * Initialises all application modules (ActionHub, HelpCenter, CommandCenter,
      * SubscriptionPlanOperations), activates the main content loader, then wires
      * up the UI layers (BusyOverlay, dialogs, dock panels, notifications).
-     * This runs before the license and legacy migration dialogs to ensure that
-     * ActionHub initialization happens with the user's cached login (if available),
-     * allowing LibraryService to fetch data correctly on first launch after update.
+     * This runs after the license dialog to ensure the user sees the license
+     * before any potential initialization delays from loading ScriteMainWindowContent.
      */
     QSM.State {
-        id: s3AppInit
+        id: s4AppInit
 
         signal done()
 
@@ -132,39 +160,10 @@ QSM.StateMachine {
             OverlaysLayer.init(root.contentLoader)
             NotificationsLayer.init(root.contentLoader)
 
-            Qt.callLater(() => s3AppInit.done())
+            Qt.callLater(() => s4AppInit.done())
         }
 
-        QSM.SignalTransition { signal: s3AppInit.done; targetState: s4License }
-    }
-
-    /*
-     * Shows the license dialog the first time each new version is launched.
-     * Skipped silently if the license for this version is already on record.
-     * Accepting advances to s5LegacyMigration; declining exits the app.
-     */
-    QSM.State {
-        id: s4License
-
-        signal accepted()
-        signal declined()
-
-        onEntered: {
-            if (!Scrite.isLicenseAccepted()) {
-                let dlg = LicenseDialog.launch()
-                if (dlg) {
-                    dlg.accepted.connect(() => s4License.accepted())
-                    dlg.rejected.connect(() => s4License.declined())
-                } else {
-                    Qt.callLater(() => s4License.accepted())
-                }
-            } else {
-                Qt.callLater(() => s4License.accepted())
-            }
-        }
-
-        QSM.SignalTransition { signal: s4License.accepted; targetState: s5LegacyMigration }
-        QSM.SignalTransition { signal: s4License.declined; targetState: sQuit }
+        QSM.SignalTransition { signal: s4AppInit.done; targetState: s5LegacyMigration }
     }
 
     /*
