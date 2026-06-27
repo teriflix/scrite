@@ -680,6 +680,7 @@ public:
 
     // Activates the default language and returns its code
     int activateDefaultLanguage();
+    QList<int> supportedLanguageCodes() const;
 
     // AbstractTransliterator interface
     QString name() const;

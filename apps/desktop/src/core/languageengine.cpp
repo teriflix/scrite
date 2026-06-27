@@ -984,7 +984,15 @@ void SupportedLanguages::fromJson(const QJsonValue &value)
     for (const QJsonValue &arrayItem : array) {
         const QJsonObject item = arrayItem.toObject();
 
-        int languageCode = item.value("code").toInt();
+        QString languageName = item.value("name").toString();
+        if (languageName.isEmpty())
+            continue;
+
+        const QMetaEnum localeLanguageEnum = QMetaEnum::fromType<QLocale::Language>();
+        int languageCode = localeLanguageEnum.keyToValue(languageName.toLatin1().constData());
+
+        if (languageCode < 0)
+            continue;
 
         Language language = this->hasLanguage(languageCode)
                 ? this->findLanguage(languageCode)
@@ -2552,14 +2560,7 @@ QList<int> LanguageEngine::platformLanguages() const
     if (platformEngine == nullptr)
         return {};
 
-    QList<int> ret;
-    for (int i = 0; i < m_availableLanguages->count(); i++) {
-        const Language language = m_availableLanguages->languageAt(i);
-        if (platformEngine->canTransliterate(language.code))
-            ret.append(language.code);
-    }
-
-    return ret;
+    return platformEngine->supportedLanguageCodes();
 }
 
 QList<TransliterationOption> LanguageEngine::queryTransliterationOptions(int language) const

@@ -161,6 +161,16 @@ int MacOSBackend::activeLanguage() const
     return -1;
 }
 
+QList<int> MacOSBackend::supportedLanguageCodes() const
+{
+    QSet<int> languages;
+    for (const TextInputSource &tis : std::as_const(d->textInputSources)) {
+        if (tis.isValid())
+            languages.insert(tis.languageCode);
+    }
+    return languages.values();
+}
+
 QList<TransliterationOption>
 MacOSBackend::options(int lang, const PlatformTransliterationEngine *transliterator) const
 {
@@ -253,7 +263,6 @@ bool MacOSBackend::reload()
                             .left(2);
             const QLocale keyboardLocale(primaryLanguage);
             tis.languageCode = keyboardLocale.language();
-
             textInputSources << tis;
         }
     }
@@ -286,6 +295,11 @@ PlatformTransliterationEngine::~PlatformTransliterationEngine() { }
 QString PlatformTransliterationEngine::name() const
 {
     return QStringLiteral("macOS");
+}
+
+QList<int> PlatformTransliterationEngine::supportedLanguageCodes() const
+{
+    return ::Backend->supportedLanguageCodes();
 }
 
 int PlatformTransliterationEngine::defaultLanguage() const

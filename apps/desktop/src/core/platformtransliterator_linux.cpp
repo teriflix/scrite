@@ -48,6 +48,11 @@ QString PlatformTransliterationEngine::name() const
     return QStringLiteral("Linux IBus");
 }
 
+QList<int> PlatformTransliterationEngine::supportedLanguageCodes() const
+{
+    return ::Backend->supportedLanguageCodes();
+}
+
 int PlatformTransliterationEngine::activateDefaultLanguage()
 {
     int code = ::Backend->activateDefaultLanguage();
@@ -218,6 +223,15 @@ int LinuxIBusBackend::activeLanguage() const
     }
 
     return -1;
+}
+
+QList<int> LinuxIBusBackend::supportedLanguageCodes() const
+{
+    QSet<int> languages;
+    for (IBusEngineDesc *engine : std::as_const(d->engines)) {
+        languages.insert(engine_language(engine));
+    }
+    return languages.values();
 }
 
 QList<TransliterationOption>

@@ -35,6 +35,8 @@ public:
 
     int activeLanguage() const;
 
+    QList<int> supportedLanguageCodes() const;
+
     QList<TransliterationOption> options(int lang,
                                          const PlatformTransliterationEngine *transliterator) const;
     bool canActivate(const TransliterationOption &option,

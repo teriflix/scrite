@@ -39,6 +39,11 @@ QString PlatformTransliterationEngine::name() const
     return QStringLiteral("Windows");
 }
 
+QList<int> PlatformTransliterationEngine::supportedLanguageCodes() const
+{
+    return ::Backend->supportedLanguageCodes();
+}
+
 int PlatformTransliterationEngine::defaultLanguage() const
 {
     return ::Backend->defaultLanguage();
@@ -166,6 +171,15 @@ int WindowsBackend::activeLanguage() const
         return it->languageCode;
 
     return -1;
+}
+
+QList<int> WindowsBackend::supportedLanguageCodes() const
+{
+    QSet<int> languages;
+    for (const TextInputSource &tis : std::as_const(d->textInputSources)) {
+        languages.insert(tis.languageCode);
+    }
+    return languages.values();
 }
 
 QList<TransliterationOption>
