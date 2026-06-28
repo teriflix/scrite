@@ -175,16 +175,15 @@ void Scrite::launchLegacyUninstaller(const QString &path)
 
 bool Scrite::isLicenseAccepted()
 {
-    QSettings settings;
-    return settings
-            .value(QStringLiteral("LicenseAccepted/") + QStringLiteral(SCRITE_VERSION), false)
+    return Application::instance()->settings()
+            ->value(QStringLiteral("LicenseAccepted/") + QStringLiteral(SCRITE_VERSION), false)
             .toBool();
 }
 
 void Scrite::acceptLicense()
 {
-    QSettings settings;
-    settings.setValue(QStringLiteral("LicenseAccepted/") + QStringLiteral(SCRITE_VERSION), true);
+    Application::instance()->settings()
+            ->setValue(QStringLiteral("LicenseAccepted/") + QStringLiteral(SCRITE_VERSION), true);
 }
 
 QString Scrite::licenseText()
