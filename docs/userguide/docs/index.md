@@ -123,7 +123,9 @@ would like to support them at some point in the future.
         - Scrite may run on Windows 7/8.1, but it’s not actively tested. 
         - If installation fails or the app won’t start (DLL errors), install
           Windows Updates and then reinstall Scrite.
-    - macOS High Sierra 10.13 or later
+    - macOS
+        - Version 2.x: macOS Catalina (10.15) or later
+        - Version 3.x: macOS Monterey (12.0) or later
         - Universal builds with native support for both x86_64 and Apple Silicon 
     - GNU/Linux
         - Ubuntu 22.04 or later
