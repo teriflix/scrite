@@ -122,10 +122,10 @@ QString SystemRequirements::describe(const QList<Aspect> aspects)
 #if defined(Q_OS_WIN)
             descriptions << QObject::tr("Windows 10 or later");
 #elif defined(Q_OS_MACOS)
-            descriptions << QObject::tr("macOS 10.15 (Catalina) or later");
+            descriptions << QObject::tr("macOS 12.0 (Monterey) or later");
 #elif defined(Q_OS_LINUX)
             descriptions << QObject::tr(
-                    "A modern Linux distribution (like Ubuntu 20.04+, CentOS/RHEL 8+, Fedora 30+, "
+                    "A modern Linux distribution (like Ubuntu 22.04+, CentOS/RHEL 8+, Fedora 30+, "
                     "Mint 20+, openSuSE 15.2+)");
 #else
             descriptions << QObject::tr("A supported operating system");
@@ -376,9 +376,8 @@ bool SystemRequirements::hasMinimumOSVersion()
     // but we recommend Windows 10 or later.
     return QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10;
 #elif defined(Q_OS_MACOS)
-    // Qt 5.15 requires macOS 10.13 (High Sierra) or later.
-    // But we recommend macOS 10.15 (Catalina) or later.
-    return QOperatingSystemVersion::current() >= QOperatingSystemVersion::MacOSCatalina;
+    // Qt 6.11 requires macOS 12.0 (Monterey) or later.
+    return QOperatingSystemVersion::current() >= QOperatingSystemVersion::MacOSMonterey;
 #elif defined(Q_OS_LINUX)
     // For Linux, dependency versions (like glibc) are more critical than the
     // kernel or distribution version. If the application is running, it's
