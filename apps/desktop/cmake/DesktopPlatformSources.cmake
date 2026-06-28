@@ -8,6 +8,7 @@ set(SCRITE_DESKTOP_WIN_PLATFORM_SOURCES
 set(SCRITE_DESKTOP_MAC_PLATFORM_SOURCES
   "src/core/platformtransliterator_macos.h"
   "src/core/platformtransliterator_macos.mm"
+  "src/quick/objects/spellcheckservice_macos.mm"
 )
 
 set(SCRITE_DESKTOP_LINUX_PLATFORM_SOURCES

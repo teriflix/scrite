@@ -248,7 +248,13 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     if (useSoftwareRenderer)
         QQuickWindow::setGraphicsApi(QSGRendererInterface::Software);
 
-#ifndef Q_OS_MAC
+#ifdef Q_OS_MAC
+    const QString pluginsPath = Application::applicationDirPath() + "/../PlugIns";
+    Application::addLibraryPath(pluginsPath);
+
+    const QString frameworksPath = Application::applicationDirPath() + "/../Frameworks";
+    Application::addLibraryPath(frameworksPath);
+#else
 #ifdef Q_OS_UNIX
     const QString libPath = Application::applicationDirPath() + "/../lib";
     Application::addLibraryPath(libPath);
@@ -280,7 +286,6 @@ static void copyFilesRecursively(const QDir &from, const QDir &to)
         }
     }
 }
-
 
 QVersionNumber Application::prepare()
 {
@@ -398,7 +403,8 @@ QVersionNumber Application::prepare()
     Application::setPalette(palette);*/
 
     if (legacyDataMigrated)
-        QFile(targetAppDataPath + QLatin1String("/migration_acknowledgement_pending")).open(QFile::WriteOnly);
+        QFile(targetAppDataPath + QLatin1String("/migration_acknowledgement_pending"))
+                .open(QFile::WriteOnly);
 
     return applicationVersion;
 }

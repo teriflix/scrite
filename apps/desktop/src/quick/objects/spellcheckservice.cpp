@@ -28,6 +28,10 @@
 #include <QRandomGenerator>
 #include <QCoreApplication>
 
+#ifdef Q_OS_MAC
+void ensureNSSpellCheckerInitialized();
+#endif
+
 #include "sonnet/src/core/speller.h"
 #include "sonnet/src/core/loader_p.h"
 #include "sonnet/src/core/textbreaks_p.h"
@@ -286,6 +290,10 @@ class SpellCheckThreadPool : public QThreadPool
 public:
     SpellCheckThreadPool()
     {
+#ifdef Q_OS_MAC
+        ensureNSSpellCheckerInitialized();
+#endif
+
         // Load platform specific spell check plugins
         const QList<int> supportedLanguageCodes =
                 LanguageEngine::instance()->supportedLanguages()->languageCodes();
