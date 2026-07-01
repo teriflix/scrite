@@ -140,7 +140,7 @@ Item {
                             case "fontStyle": return _fontStyleEditorComponent
                             case "hAlign": return _hAlignEditorComponent
                             case "vAlign": return _vAlignEditorComponent
-                            case "_imageEditorImage": return _imageEditorComponent
+                            case "image": return _imageEditorComponent
                             }
                             return _unknownEditorComponent
                         }

@@ -83,7 +83,7 @@ QtObject {
             property real lastCommittedWidth: 0
             property string imageName: _d.annotation.attributes.image
 
-            onNaturalSizeChanged: {
+            onDesiredWidthChanged: {
                 lastCommittedWidth = naturalSize.width > 0 ? desiredWidth : 0
             }
 
