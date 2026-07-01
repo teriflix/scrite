@@ -89,15 +89,13 @@ Item {
                 color: index === _completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.editor.text
 
                 MouseArea {
-                    property bool singleClickAutoComplete: Runtime.screenplayEditorSettings.singleClickAutoComplete
-
                     anchors.fill: parent
 
-                    cursorShape: singleClickAutoComplete ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    hoverEnabled: singleClickAutoComplete
+                    cursorShape: Qt.PointingHandCursor
+                    hoverEnabled: true
 
                     onClicked: {
-                        if(singleClickAutoComplete || _private.completionModel.currentRow === _completionDelegate.index)
+                        if(_private.completionModel.currentRow === _completionDelegate.index)
                             _private.completionModel.requestCompletion( _private.completionModel.currentCompletion )
                         else
                             _private.completionModel.currentRow = _completionDelegate.index
@@ -105,7 +103,10 @@ Item {
 
                     onDoubleClicked: _private.completionModel.requestCompletion( _private.completionModel.currentCompletion )
 
-                    onContainsMouseChanged: if(singleClickAutoComplete) _private.completionModel.currentRow = _completionDelegate.index
+                    onContainsMouseChanged: {
+                        if(containsMouse)
+                            _private.completionModel.currentRow = _completionDelegate.index
+                    }
                 }
             }
         }
@@ -126,6 +127,7 @@ Item {
             property bool hasSuggestion: count > 0
 
             property string suggestion: currentCompletion
+
 
             enabled: root.sceneTextEditor.activeFocus && _private.completionModelEnable.value && completable
             sortStrings: false

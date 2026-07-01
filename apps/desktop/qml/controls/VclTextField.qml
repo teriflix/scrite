@@ -57,7 +57,6 @@ TextField {
     property bool labelAlwaysVisible: false
     property bool includeEmojiSymbols: true
     property bool enableTransliteration: false
-    property bool singleClickAutoComplete: true
 
     property alias label: _label.text
     property alias labelColor: _label.color
@@ -265,11 +264,11 @@ TextField {
 
                     anchors.fill: parent
 
-                    hoverEnabled: root.singleClickAutoComplete
-                    cursorShape: root.singleClickAutoComplete ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
 
                     onClicked: {
-                        if(root.singleClickAutoComplete || _completionModel.currentRow === _completionDelegate.index)
+                        if(_completionModel.currentRow === _completionDelegate.index)
                             _completionModel.requestCompletion(parent.text)
                         else
                             _completionModel.currentRow = _completionDelegate.index
@@ -280,7 +279,7 @@ TextField {
                     }
 
                     onContainsMouseChanged: {
-                        if(root.singleClickAutoComplete)
+                        if(containsMouse)
                             _completionModel.currentRow = _completionDelegate.index
                     }
                 }

@@ -109,23 +109,6 @@ Item {
                 }
 
                 VclCheckBox {
-                    id: _singleClickAutoComplete
-
-                    Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
-
-                    text: "Auto Complete on Single Click"
-                    checked: Runtime.screenplayEditorSettings.singleClickAutoComplete
-                    onToggled: Runtime.screenplayEditorSettings.singleClickAutoComplete = checked
-                    hoverEnabled: true
-
-                    ToolTipPopup {
-                        text: "If checked, single click on an option in auto-complete popup will apply it in the screenplay editor."
-                        visible: _singleClickAutoComplete.hovered
-                    }
-
-                }
-
-                VclCheckBox {
                     id: _enableAutoPolishParagraphs
 
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns

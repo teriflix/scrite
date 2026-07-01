@@ -73,7 +73,6 @@ Settings {
     property bool showLanguageRefreshNoticeBox: true
     property bool showLoglineEditor: false
     property bool showSpellCheckRefreshNoticeBox: true
-    property bool singleClickAutoComplete: true
 
     property real sidePanelWidth: 400
     property real spaceBetweenScenes: 0

@@ -101,6 +101,7 @@ Item {
             width: Math.min(500, Scrite.window.width * 0.5)
             height: _layout.implicitHeight + 40 + header.height
 
+            focus: true
             titleBarButtons: null
             titleBarCloseButtonVisible: false
 

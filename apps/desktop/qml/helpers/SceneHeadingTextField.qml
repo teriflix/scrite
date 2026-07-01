@@ -43,7 +43,6 @@ VclTextField {
     completionPrefix: _private.completionPrefix
     completionStrings: _private.completionStrings
     enableTransliteration: true
-    singleClickAutoComplete: Runtime.screenplayEditorSettings.singleClickAutoComplete
 
     font.bold: _private.font.bold
     font.family: _private.font.family
