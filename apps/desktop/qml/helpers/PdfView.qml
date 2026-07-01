@@ -314,18 +314,46 @@ Item {
                         }
 
                         VclMenuItem {
+                            id: _aptFolderItem
+
                             text: Scrite.document.fileName === "" ?
                                       "To 'Desktop' folder" :
                                       "To the Scrite document folder"
                             property string targetFolder: Scrite.document.fileName === "" ? StandardPaths.writableLocation(StandardPaths.DesktopLocation) : File.path(Scrite.document.fileName)
 
                             onClicked: _private.savePdf(targetFolder)
+
+                            ToolTipPopup {
+                                container: _aptFolderItem
+                                text: _aptFolderItem.targetFolder
+                                visible: _aptFolderItem.hovered
+                            }
+                        }
+
+                        VclMenuItem {
+                            id: _lastUsedFolderItem
+
+                            text: 'Last used folder'
+                            property string targetFolder: Url.toPath(_saveFileDialog.currentFolder)
+
+                            onClicked: _private.savePdf(targetFolder)
+
+                            ToolTipPopup {
+                                container: _lastUsedFolderItem
+                                text: _lastUsedFolderItem.targetFolder
+                                visible: _lastUsedFolderItem.hovered
+                            }
                         }
 
                         VclMenuItem {
                             text: "Other ..."
 
-                            onClicked: _saveFileDialog.open()
+                            onClicked: {
+                                _saveFileDialog.selectedFile = Url.fromPath(
+                                    Url.toPath(_saveFileDialog.currentFolder) + "/" + File.completeBaseName(root.saveFilePath) + ".pdf"
+                                )
+                                _saveFileDialog.open()
+                            }
                         }
                     }
                 }
@@ -419,7 +447,16 @@ Item {
 
         fileMode: FileDialog.SaveFile
         nameFilters: ["PDF Files (*.pdf)"]
-        currentFolder: Url.fromPath(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
+        currentFolder: {
+            const folderUrl = Runtime.workspaceSettings.lastPdfSaveFolderUrl
+            if (folderUrl !== "") {
+                const folderPath = Url.toPath(folderUrl)
+                if (folderPath !== "" && folderPath) {
+                    return folderUrl
+                }
+            }
+            return Url.fromPath(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
+        }
 
          // The default Ctrl+U interfers with underline
         onAccepted: {
@@ -427,6 +464,8 @@ Item {
             const downloadedFilePath = File.copyToFolder( Url.toPath(_pdfDoc.source), targetFilePath )
             if(downloadedFilePath !== "")
                 File.revealOnDesktop(downloadedFilePath)
+
+            Runtime.workspaceSettings.lastPdfSaveFolderUrl = Url.fromPath(File.path(downloadedFilePath))
         }
     }
 

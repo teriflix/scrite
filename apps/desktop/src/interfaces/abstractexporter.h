@@ -73,6 +73,13 @@ public:
     // clang-format on
     virtual bool requiresConfiguration() const { return false; }
 
+    // clang-format off
+    Q_PROPERTY(bool pdfFormat
+               READ isPdfFormat
+               CONSTANT )
+    // clang-format on
+    bool isPdfFormat() const { return this->fileNameExtension() == QStringLiteral("pdf"); }
+
     Q_INVOKABLE bool setConfigurationValue(const QString &name, const QVariant &value);
     Q_INVOKABLE QVariant getConfigurationValue(const QString &name) const;
 

@@ -63,8 +63,10 @@ Item {
 
     Column {
         id: _layout
-        spacing: 10
+
         width: parent.width
+
+        spacing: 10
 
         VclLabel {
             id: _labelText
@@ -72,12 +74,13 @@ Item {
             width: parent.width
 
             enabled: visible
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
             lineHeight: 1.2
             lineHeightMode: Text.ProportionalHeight
             text: "<b>" + root.label + ":</b><br/>(" + root.filePathPrefix + "<u>" + _fileInfo.absoluteFilePath + "</u>. <a href=\"change\">Change path</a>.)</font>"
             visible: root.selectedExtension !== undefined && root.selectedExtension.value !== AbstractReportGenerator.PdfFormat
             wrapMode: Text.WordWrap
+
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
             MouseArea {
                 anchors.fill: parent
@@ -100,7 +103,7 @@ Item {
             enabled: visible
             placeholderText: "File Name"
             text: _fileInfo.baseName
-            visible: root.selectedExtension !== undefined && root.selectedExtension.value !== AbstractReportGenerator.PdfFormat
+            visible: _labelText.visible
 
             onTextEdited: _fileInfo.baseName = text
         }

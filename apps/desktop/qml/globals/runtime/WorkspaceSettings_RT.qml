@@ -38,6 +38,7 @@ Settings {
     property real screenplayEditorWidth: -1
     property real workspaceHeight
 
+    property string lastPdfSaveFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DownloadLocation)
     property string lastOpenExportFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
     property string lastOpenFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
     property string lastOpenImportFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)

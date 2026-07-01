@@ -72,14 +72,29 @@ VclDialog {
                 FileSelector {
                     Layout.fillWidth: true
 
-                    label: "Select a file to export into"
                     absoluteFilePath: root.exporter.fileName
-                    onAbsoluteFilePathChanged: root.exporter.fileName = absoluteFilePath
+                    enabled: visible && _private.exportSaveFeature.enabled
+                    label: "Select a file to export into"
                     nameFilters: root.exporter.nameFilters
+                    opacity: enabled ? 1 : 0.5
                     tabSequenceManager: _tabSequence
                     visible: !_private.isPdfExport
-                    enabled: visible && _private.exportSaveFeature.enabled
-                    opacity: enabled ? 1 : 0.5
+
+                    allowedExtensions: {
+                        let suffix = root.exporter.nameFilters.match(/\*\.(\w+)/)?.[1] ?? ""
+                        return [{
+                            label: root.exporter.formatName,
+                            suffix: suffix,
+                            value: -1,
+                            enabled: true
+                        }]
+                    }
+                    selectedExtension: allowedExtensions[0]
+
+                    onAbsoluteFilePathChanged: {
+                        root.exporter.fileName = absoluteFilePath
+                        Runtime.workspaceSettings.lastOpenExportFolderUrl = Url.fromPath(File.path(absoluteFilePath))
+                    }
                 }
 
                 VclLabel {
@@ -167,11 +182,24 @@ VclDialog {
 
             RowLayout {
                 id: _footerLayout
+
                 anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.rightMargin: 16
+                anchors.margins: 16
 
                 spacing: 20
+
+                VclLabel {
+                    Layout.fillWidth: true
+
+                    wrapMode: Text.WordWrap
+                    text: {
+                        if(_private.isPdfExport)
+                            return "Click '" + _exportButton.text + "' to see a preview of the PDF. You can save to disk from the preview dialog."
+                        return "Click '" + _exportButton.text + "' to save the exported file to disk."
+                    }
+                }
 
                 VclButton {
                     enabled: root.exporter.canCopyToClipboard

@@ -2125,38 +2125,23 @@ void ScriteDocument::setupExporter(AbstractExporter *exporter)
         // Insert a dummy extension, so that exporters can correct it.
         suggestedName += QStringLiteral(".ext");
 
-#if 0
-        QFileInfo fi(m_fileName);
-        if (fi.exists())
-            exporter->setFileName(fi.absoluteDir().absoluteFilePath(suggestedName));
-        else {
+        QString path = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+        if (!exporter->isPdfFormat()) {
             const QUrl folderUrl(
                     Application::instance()
                             ->settings()
                             ->value(QStringLiteral("Workspace/lastOpenExportFolderUrl"))
                             .toString());
-            const QString path = folderUrl.isEmpty()
-                    ? QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
-                    : folderUrl.toLocalFile();
+            if (!folderUrl.isEmpty()) {
+                const QString folder = folderUrl.toLocalFile();
+                if (QDir(folder).exists()) {
+                    path = folder;
+                }
+            }
         }
-#else
-        const QString path = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
-#endif
+
         exporter->setFileName(path + QStringLiteral("/") + suggestedName);
     }
-
-#if 0
-    ProgressReport *progressReport = exporter->findChild<ProgressReport *>();
-    if (progressReport) {
-        connect(progressReport, &ProgressReport::statusChanged, this,
-                [progressReport, this, exporter]() {
-                    if (progressReport->status() == ProgressReport::Started)
-                        this->setBusyMessage("Exporting into \"" + exporter->fileName() + "\" ...");
-                    else if (progressReport->status() == ProgressReport::Finished)
-                        this->clearBusyMessage();
-                });
-    }
-#endif
 }
 
 void ScriteDocument::setupReportGenerator(AbstractReportGenerator *reportGenerator)
@@ -2180,39 +2165,20 @@ void ScriteDocument::setupReportGenerator(AbstractReportGenerator *reportGenerat
         suggestedName = suggestedName + QStringLiteral(" - ") + reportName + QStringLiteral(" - ")
                 + createTimestampString() + suffix;
 
-#if 0
-        QFileInfo fi(m_fileName);
-        if (fi.exists())
-            reportGenerator->setFileName(fi.absoluteDir().absoluteFilePath(suggestedName));
-        else {
-            const QUrl folderUrl(
-                    Application::instance()
-                            ->settings()
-                            ->value(QStringLiteral("Workspace/lastOpenReportsFolderUrl"))
-                            .toString());
-            const QString path = folderUrl.isEmpty()
-                    ? QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
-                    : folderUrl.toLocalFile();
+        QString path = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+        const QUrl folderUrl(Application::instance()
+                                     ->settings()
+                                     ->value(QStringLiteral("Workspace/lastOpenReportsFolderUrl"))
+                                     .toString());
+        if (!folderUrl.isEmpty()) {
+            const QString folder = folderUrl.toLocalFile();
+            if (QDir(folder).exists()) {
+                path = folder;
+            }
         }
-#else
-        const QString path = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
-#endif
+
         reportGenerator->setFileName(path + QStringLiteral("/") + suggestedName);
     }
-
-#if 0
-    ProgressReport *progressReport = reportGenerator->findChild<ProgressReport *>();
-    if (progressReport) {
-        connect(progressReport, &ProgressReport::statusChanged, this,
-                [progressReport, this, reportGenerator]() {
-                    if (progressReport->status() == ProgressReport::Started)
-                        this->setBusyMessage("Generating \"" + reportGenerator->fileName()
-                                             + "\" ...");
-                    else if (progressReport->status() == ProgressReport::Finished)
-                        this->clearBusyMessage();
-                });
-    }
-#endif
 }
 
 QAbstractListModel *ScriteDocument::structureElementConnectors() const

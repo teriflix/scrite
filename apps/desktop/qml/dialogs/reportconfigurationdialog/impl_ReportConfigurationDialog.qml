@@ -174,7 +174,10 @@ VclDialog {
                 }
 
                 onSelectedExtensionChanged: root.report.format = _fileSelector.selectedExtension.value
-                onAbsoluteFilePathChanged: root.report.fileName = _fileSelector.absoluteFilePath
+                onAbsoluteFilePathChanged: {
+                    root.report.fileName = _fileSelector.absoluteFilePath
+                    Runtime.workspaceSettings.lastOpenReportsFolderUrl = Url.fromPath(File.path(absoluteFilePath))
+                }
 
                 Component.onCompleted: {
                     const aes = _fileSelector.allowedExtensions
@@ -274,8 +277,18 @@ VclDialog {
                 width: parent.width-32
                 anchors.centerIn: parent
 
+                VclLabel {
+                    Layout.fillWidth: true
+
+                    wrapMode: Text.WordWrap
+                    text: {
+                        if(_private.isPdfExport)
+                            return "Click 'Generate' to see a preview of the PDF. You can save to disk from the preview dialog."
+                        return "Click 'Generate' to save the report to disk."
+                    }
+                }
+
                 VclButton {
-                    Layout.alignment: Qt.AlignRight
                     enabled: root.report.fileName !== "" && _private.reportEnabled
                     text: "Generate"
                     onClicked: _generateReportJob.start()
