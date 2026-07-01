@@ -181,8 +181,10 @@ VclTextField {
     }
 
     Component.onCompleted: {
-        contextMenu.addItem(_menuSeparator.createObject(contextMenu))
-        contextMenu.addItem(_transliterateMenuItem.createObject(contextMenu))
+        if(contextMenu) {
+            contextMenu.addItem(_menuSeparator.createObject(contextMenu))
+            contextMenu.addItem(_transliterateMenuItem.createObject(contextMenu))
+        }
     }
 
     Component {
@@ -202,7 +204,7 @@ VclTextField {
         VclMenuItem {
             focusPolicy: Qt.NoFocus
             text: "Transliterate to " + Runtime.language.active.name + "\t" + _transliterateActionHandler.action.shortcut
-            enabled: !root.readOnly && root.selectedText !== "" &&
+            enabled: !root.readOnly && root.selectedText !== "" && Runtime.language.activeCode === QtLocale.English &&
                      Runtime.language.textSelectionTransliterationEnabled
 
             onTriggered: () => {
