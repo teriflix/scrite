@@ -304,7 +304,10 @@ void StructureElement::setScene(Scene *val)
     m_scene = val;
     m_scene->setStructureElement(this);
     connect(m_scene, &Scene::sceneChanged, this, &StructureElement::elementChanged);
-    connect(m_scene, &Scene::aboutToDelete, this, &StructureElement::deleteLater);
+    connect(m_scene, &Scene::aboutToDelete, this, [this]() {
+        m_scene = nullptr;
+        deleteLater();
+    });
 
     connect(m_scene->heading(), &SceneHeading::enabledChanged, this,
             &StructureElement::sceneHeadingChanged);
@@ -3156,8 +3159,12 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     }
 
     auto lessThan = [screenplay](StructureElement *e1, StructureElement *e2) -> bool {
-        const int pos1 = screenplay->firstIndexOfScene(e1->scene());
-        const int pos2 = screenplay->firstIndexOfScene(e2->scene());
+        Scene *scene1 = e1->scene();
+        Scene *scene2 = e2->scene();
+        if (scene1 == nullptr || scene2 == nullptr)
+            return scene1 != nullptr;
+        const int pos1 = screenplay->firstIndexOfScene(scene1);
+        const int pos2 = screenplay->firstIndexOfScene(scene2);
         if (pos1 >= 0 && pos2 >= 0)
             return pos1 < pos2;
         if (pos2 < 0)
