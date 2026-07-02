@@ -2068,22 +2068,22 @@ Item {
         }
 
         Action {
-            property Action editCopy: editOptions.find("copy")
+            readonly property string defaultShortcut: "Alt+C"
 
             enabled: ActionHandler.canHandle
             objectName: "copy"
-            shortcut: editCopy.shortcut
+            shortcut: defaultShortcut
             text: "Copy"
 
             icon.source: "qrc:/icons/content/content_copy.png"
         }
 
         Action {
-            property Action editPaste: editOptions.find("paste")
+            readonly property string defaultShortcut: "Alt+V"
 
             enabled: ActionHandler.canHandle
             objectName: "paste"
-            shortcut: editPaste.shortcut
+            shortcut: defaultShortcut
             text: "Paste"
 
             icon.source: "qrc:/icons/content/content_paste.png"
@@ -2535,7 +2535,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_Greater)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.ShiftModifier+Qt.Key_Greater)
 
             enabled: ActionHandler.canHandle
             objectName: "noteOffset"
