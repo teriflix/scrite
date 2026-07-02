@@ -87,7 +87,7 @@ Item {
                     pageMargins: root.sceneDelegate.pageMargins
                     screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
-                    onEnsureVisible: (item, area) => { root.sceneDelegate.ensureVisible(item, area) }
+                    onEnsureVisible: (item, area) => { _ensureTimer.ensureVisible(item, area) }
 
                     onHasFocusChanged: {
                         if(hasFocus)
@@ -115,7 +115,7 @@ Item {
                         pageMargins: root.sceneDelegate.pageMargins
                         screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
-                        onEnsureVisible: (item, area) => { root.sceneDelegate.ensureVisible(item, area) }
+                        onEnsureVisible: (item, area) => { _ensureTimer.ensureVisible(item, area) }
 
                         // TODO
                         onSceneTagAdded: (tagName) => { }
@@ -143,7 +143,7 @@ Item {
                         pageMargins: root.sceneDelegate.pageMargins
                         screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
-                        onEnsureVisible: (item, area) => { root.sceneDelegate.ensureVisible(item, area) }
+                        onEnsureVisible: (item, area) => { _ensureTimer.ensureVisible(item, area) }
 
                         onNewCharacterAdded: (characterName) => { }
                     }
@@ -169,7 +169,7 @@ Item {
                         pageMargins: root.sceneDelegate.pageMargins
                         screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
-                        onEnsureVisible: (item, area) => { root.sceneDelegate.ensureVisible(item, area) }
+                        onEnsureVisible: (item, area) => { _ensureTimer.ensureVisible(item, area) }
 
                         FontMetrics {
                             id: _synopsisFontMetrics
@@ -221,11 +221,11 @@ Item {
 
                 onEnsureVisible: (item, area) => {
                                      if(cursorPosition === 0) {
-                                        root.sceneDelegate.ensureVisible(_sceneHeadingEditor, Qt.rect(0, 0, area.width, area.height))
+                                        _ensureTimer.ensureVisible(_sceneHeadingEditor, Qt.rect(0, 0, area.width, area.height))
                                      } else
-                                        root.sceneDelegate.ensureVisible(item, area)
+                                        _ensureTimer.ensureVisible(item, area)
                                  }
-                onEnsureCentered: (item, area) => { root.sceneDelegate.ensureCentered(item, area) }
+                onEnsureCentered: (item, area) => { _ensureTimer.ensureCentered(item, area) }
 
                 onSplitSceneRequest: (paragraph, cursorPosition) => { root.sceneDelegate.splitSceneRequest(paragraph, cursorPosition) }
                 onMergeWithPreviousSceneRequest: () => { root.sceneDelegate.mergeWithPreviousSceneRequest() }
@@ -291,7 +291,7 @@ Item {
             listView: root.sceneDelegate.listView
             maxPanelWidth: Math.min(root.sceneDelegate.spaceAvailableForScenePanel, Runtime.maxSceneSidePanelWidth)
 
-            onEnsureVisible: (item, area) => { root.sceneDelegate.ensureVisible(item, area) }
+            onEnsureVisible: (item, area) => { _ensureTimer.ensureVisible(item, area) }
 
             function evaluateLabel() {
                 let rsn = root.sceneDelegate.screenplayElement.resolvedSceneNumber
@@ -314,6 +314,63 @@ Item {
 
         function __evaluateScreenY() {
             return root.sceneDelegate.listView.mapFromItem(root.sceneDelegate, 0, 0).y
+        }
+    }
+
+    Connections {
+        target: root.sceneDelegate.scene
+
+        function onSceneAboutToReset() {
+            _ensureTimer.stop()
+            _ensureTimer.interval = 20000 // Set to a large value just to make sure that we keep batching all ensureXYZ() calls
+        }
+
+        function onSceneReset() {
+            _ensureTimer.stop()
+            _ensureTimer.interval = Runtime.stdAnimationDuration/2 // Set to a reasonable value, so that they get processed soon.
+            _ensureTimer.start()
+        }
+    }
+
+    Timer {
+        id: _ensureTimer
+
+        property int kind: 0 // 0=UnknownKind, 1=EnsureVisibleKind, 2=EnsureCenteredKind
+        property Item item
+        property rect area: Qt.rect(0,0,0,0)
+
+        function ensureVisible(item_, area_) {
+            kind = 1
+            item = item_
+            area = area_
+            start()
+        }
+
+        function ensureCentered(item_, area_) {
+            kind = 2
+            item = item_
+            area = area_
+            start()
+        }
+
+        repeat: false
+        interval: 50
+
+        onTriggered: {
+            if(item === null || kind < 1 || kind > 2 || area === Qt.rect(0,0,0,0)) {
+                interval = 50
+                return
+            }
+
+            if(kind == 1) {
+                root.sceneDelegate.ensureVisible(item, area)
+            } else {
+                root.sceneDelegate.ensureCentered(item, area)
+            }
+
+            item = null
+            area = Qt.rect(0,0,0,0)
+            interval = 50
         }
     }
 

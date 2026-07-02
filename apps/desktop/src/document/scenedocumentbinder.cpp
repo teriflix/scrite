@@ -2202,7 +2202,7 @@ void SceneDocumentBinder::initializeDocument()
 
     QTextDocument *document = m_textDocument->textDocument();
     QSignalBlocker documentSignalBlocker(document);
-    if (m_documentLoadCount > 0)
+    if (m_documentLoadCount > 0 && !m_sceneIsBeingReset)
         documentSignalBlocker.unblock();
     document->setDefaultFont(defaultFont);
     document->setUseDesignMetrics(true);
@@ -2268,6 +2268,9 @@ void SceneDocumentBinder::initializeDocument()
     }
 
     documentSignalBlocker.unblock();
+
+    if (m_sceneIsBeingReset)
+        document->markContentsDirty(0, document->characterCount());
 
     if (m_cursorPosition <= 0 && m_currentElement == nullptr && nrElements == 1)
         this->setCurrentElement(m_scene->elementAt(0));

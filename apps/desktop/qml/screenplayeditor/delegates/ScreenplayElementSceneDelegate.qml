@@ -70,7 +70,29 @@ AbstractScreenplayElementSceneDelegate {
       responsive.
       */
     content: Item {
-        height: _highResLoader.active ? _highResLoader.height : _lowResLoader.height
+        id: _contentItem
+
+        property bool heightFrozen: false
+        property real frozenHeight: 0
+
+        height: heightFrozen ? frozenHeight : (_highResLoader.active ? _highResLoader.height : _lowResLoader.height)
+
+        clip: heightFrozen
+
+        Connections {
+            target: root.scene
+
+            function onSceneAboutToReset() {
+                _contentItem.frozenHeight = _contentItem.height
+                _contentItem.heightFrozen = true
+            }
+
+            function onSceneReset() {
+                Qt.callLater(() => {
+                    _contentItem.heightFrozen = false
+                })
+            }
+        }
 
         Loader {
             id: _lowResLoader
