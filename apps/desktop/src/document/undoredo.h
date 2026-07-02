@@ -126,7 +126,10 @@ signals:
 private:
     void onActiveInGroupChanged(QUndoStack *stack);
 
+    void onIndexChanged(int index);
+
 private:
+    int m_lastIndex = 0;
     bool m_active = false;
 };
 

@@ -203,44 +203,45 @@ AbstractScenePartEditor {
             acceptedButtons: Qt.RightButton
 
             onClicked: (mouse) => {
-                           mouse.accepted = true
+                mouse.accepted = true
 
-                           _sceneTextEditor.persistentSelection = true
-                           if(!_sceneTextEditor.hasSelection && _sceneDocumentBinder.spellCheckEnabled) {
-                               _sceneTextEditor.cursorPosition = _sceneTextEditor.positionAt(mouse.x, mouse.y)
-                               if(_sceneDocumentBinder.wordUnderCursorIsMisspelled) {
-                                   _spellingSuggestionsMenu.popup()
-                                   return
-                               }
-                           }
+                _sceneTextEditor.persistentSelection = true
+                if(!_sceneTextEditor.hasSelection && _sceneDocumentBinder.spellCheckEnabled) {
+                    _sceneTextEditor.cursorPosition = _sceneTextEditor.positionAt(mouse.x, mouse.y)
+                    if(_sceneDocumentBinder.wordUnderCursorIsMisspelled) {
+                        _spellingSuggestionsMenu.popup()
+                        return
+                    }
+                }
 
-                           _sceneTextEditor.persistentSelection = false
-                           _contextMenu.popup()
-                       }
+                _sceneTextEditor.persistentSelection = false
+                _contextMenu.popup()
+            }
         }
 
         onLinkActivated: (link) => {
-                             if(activeFocus && controlModifierPressed) {
-                                 controlModifierPressed = false
-                                 const maxWidth = Math.min(500, Scrite.window.width * 0.5) - 40
-                                 const elidedLink = Runtime.idealFontMetrics.elidedText(link, Text.ElideMiddle, maxWidth)
-                                 MessageBox.question("Link clicked",
-                                                     "The following link was activated. Do you want to open it?\n\n" +
-                                                     elidedLink, ["Yes", "No"], (answer) => {
-                                                         if(answer === "Yes") {
-                                                             Qt.openUrlExternally(link);
-                                                         }
-                                                     })
-                             }
-                         }
+            if(activeFocus && controlModifierPressed) {
+                controlModifierPressed = false
+                const maxWidth = Math.min(500, Scrite.window.width * 0.5) - 40
+                const elidedLink = Runtime.idealFontMetrics.elidedText(link, Text.ElideMiddle, maxWidth)
+                MessageBox.question("Link clicked",
+                                    "The following link was activated. Do you want to open it?\n\n" +
+                                    elidedLink, ["Yes", "No"], (answer) => {
+                                        if(answer === "Yes") {
+                                            Qt.openUrlExternally(link);
+                                        }
+                                    })
+            }
+        }
 
         onActiveFocusChanged: () => {
-                                  Qt.callLater(_private.handleSceneTextEditorFocusChange)
-                              }
+            if(activeFocus) root.scene.undoRedoEnabled = !root.readOnly
+            Qt.callLater(_private.handleSceneTextEditorFocusChange)
+        }
 
         onCursorRectangleChanged: () => {
-                                      Qt.callLater(_private.ensureSceneTextEditorCursorIsVisible)
-                                  }
+            Qt.callLater(_private.ensureSceneTextEditorCursorIsVisible)
+        }
     }
 
     SceneTextEditorSpellingSuggestionsMenu {
@@ -793,14 +794,14 @@ AbstractScenePartEditor {
             if(_sceneTextEditor.canPaste && _sceneTextEditor.activeFocus) {
                 captureCursorOffset()
 
-                Runtime.undoMacro("Paste Paragraphs", () => {
+                Runtime.undoMacro("Paste Paragraphs Macro", () => {
                     // Fix for https://github.com/teriflix/scrite/issues/195
                     // [0.5.2 All] Pasting doesnt replace the selected text #195
                     if(_sceneTextEditor.hasSelection)
                         _sceneTextEditor.remove(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
 
-                    const cursorPositionBeforePaste = _sceneTextEditor.cursorPosition
                     const cursorPositionAfterPaste = _sceneDocumentBinder.paste(_sceneTextEditor.cursorPosition)
+
                     if(cursorPositionAfterPaste < 0) {
                         _sceneTextEditor.paste()
                         discardCursorOffset()

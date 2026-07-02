@@ -89,6 +89,9 @@ void UndoHub::setMergeTimeGap(int val)
 UndoStack::UndoStack(QObject *parent) : QUndoStack(parent)
 {
     UndoHub::instance()->addStack(this);
+#if 0
+    connect(this, &QUndoStack::indexChanged, this, &UndoStack::onIndexChanged);
+#endif
 }
 
 UndoStack::~UndoStack()
@@ -104,6 +107,39 @@ void UndoStack::onActiveInGroupChanged(QUndoStack *stack)
         m_active = a;
         emit activeChanged();
     }
+}
+
+void UndoStack::onIndexChanged(int index)
+{
+#if 0
+    auto guard = qScopeGuard([=]() { m_lastIndex = index; });
+
+    if (index > m_lastIndex) {
+        // Redo/Push - the executed command is at index - 1
+        const QUndoCommand *cmd = this->command(index - 1);
+        if (cmd) {
+            Utils::Gui::log(
+                    QStringLiteral("%1: Executed [%2] = %3")
+                            .arg(this->objectName(), QString::number(index - 1), cmd->text()));
+            return;
+        }
+    }
+
+    if (index < m_lastIndex) {
+        // Undo - the undone command is at the new index
+        const QUndoCommand *cmd = this->command(index);
+        if (cmd) {
+            Utils::Gui::log(QStringLiteral("%1: Undone [%2] = %3")
+                                    .arg(this->objectName(), QString::number(index), cmd->text()));
+            return;
+        }
+    }
+
+    Utils::Gui::log(QStringLiteral("%1: Index Changed to [%2]")
+                            .arg(this->objectName(), QString::number(index)));
+#else
+    Q_UNUSED(index)
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -150,8 +150,10 @@ void AbstractSceneUndoCommand::setSceneId(const QString &id)
 SceneHeadingUndoCommand::SceneHeadingUndoCommand(SceneHeading *sceneHeading)
     : AbstractSceneUndoCommand(sceneHeading ? sceneHeading->scene() : nullptr)
 {
-    if (sceneHeading)
+    if (sceneHeading) {
         m_before.save(sceneHeading);
+        this->setText(QStringLiteral("Scene Heading"));
+    }
 }
 
 void SceneHeadingUndoCommand::undo()
@@ -262,8 +264,10 @@ SceneElement *AbstractSceneElementLifetimeUndoCommand::reconstructElement(const 
 SceneElementTypeUndoCommand::SceneElementTypeUndoCommand(SceneElement *sceneElement)
     : AbstractSceneElementUndoCommand(sceneElement)
 {
-    if (sceneElement)
+    if (sceneElement) {
         m_before = sceneElement->type();
+        this->setText(QStringLiteral("Element Type"));
+    }
 }
 
 void SceneElementTypeUndoCommand::undo()
@@ -319,8 +323,10 @@ bool SceneElementTypeUndoCommand::mergeWith(const QUndoCommand *other)
 SceneElementAlignmentUndoCommand::SceneElementAlignmentUndoCommand(SceneElement *sceneElement)
     : AbstractSceneElementUndoCommand(sceneElement)
 {
-    if (sceneElement)
+    if (sceneElement) {
         m_before = sceneElement->alignment();
+        this->setText(QStringLiteral("Element Alignment"));
+    }
 }
 
 void SceneElementAlignmentUndoCommand::undo()
@@ -376,8 +382,10 @@ bool SceneElementAlignmentUndoCommand::mergeWith(const QUndoCommand *other)
 SceneElementTextFormatsUndoCommand::SceneElementTextFormatsUndoCommand(SceneElement *sceneElement)
     : AbstractSceneElementUndoCommand(sceneElement)
 {
-    if (sceneElement)
+    if (sceneElement) {
         m_before = sceneElement->textFormats();
+        this->setText(QStringLiteral("Element Text Formats"));
+    }
 }
 
 void SceneElementTextFormatsUndoCommand::undo()
@@ -437,6 +445,7 @@ SceneInsertElementUndoCommand::SceneInsertElementUndoCommand(Scene *scene, Scene
     if (element) {
         m_elementData.capture(element);
         m_sceneElementId = m_elementData.id;
+        this->setText(QStringLiteral("Insert Element"));
     }
 }
 
@@ -489,6 +498,7 @@ SceneRemoveElementUndoCommand::SceneRemoveElementUndoCommand(Scene *scene, Scene
     if (element) {
         m_elementData.capture(element);
         m_sceneElementId = m_elementData.id;
+        this->setText(QStringLiteral("Remove Element"));
     }
 }
 
@@ -548,6 +558,7 @@ SceneElementTextUndoCommand::SceneElementTextUndoCommand(SceneElement *sceneElem
     m_oldCursorPosition = sceneElement->scene()->cursorPosition();
     m_oldText = sceneElement->text();
     m_timestamp = QDateTime::currentMSecsSinceEpoch();
+    this->setText(QStringLiteral("Element Text"));
 }
 
 SceneElementTextUndoCommand::~SceneElementTextUndoCommand() { }

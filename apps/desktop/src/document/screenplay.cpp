@@ -1677,7 +1677,7 @@ private:
 
 UndoClearScreenplayCommand::UndoClearScreenplayCommand(Screenplay *screenplay,
                                                        const QStringList &sceneIds)
-    : QUndoCommand(), m_sceneIds(sceneIds), m_screenplay(screenplay)
+    : QUndoCommand(QStringLiteral("Clear Screenplay")), m_sceneIds(sceneIds), m_screenplay(screenplay)
 {
     m_connection = QObject::connect(m_screenplay, &Screenplay::destroyed,
                                     [this]() { this->setObsolete(true); });
@@ -1813,7 +1813,7 @@ private:
 };
 
 SplitElementUndoCommand::SplitElementUndoCommand(ScreenplayElement *ptr)
-    : QUndoCommand(), m_screenplayElement(ptr)
+    : QUndoCommand(QStringLiteral("Split Element")), m_screenplayElement(ptr)
 {
 }
 
@@ -2886,7 +2886,8 @@ private:
 ScreenplayPasteUndoCommand::ScreenplayPasteUndoCommand(Screenplay *screenplay, Structure *structure,
                                                        const QJsonArray &elements,
                                                        const QJsonObject &scenes, int pasteAfter)
-    : m_structure(structure),
+    : QUndoCommand(QStringLiteral("Paste Paragraphs")),
+      m_structure(structure),
       m_screenplay(screenplay),
       m_pasteAfter(pasteAfter),
       m_scenesData(scenes),
@@ -2986,7 +2987,8 @@ private:
 
 ScreenplayPasteFromFountainUndoCommand::ScreenplayPasteFromFountainUndoCommand(
         Screenplay *screenplay, Structure *structure, const Fountain::Body &body, int pasteAfter)
-    : m_structure(structure), m_screenplay(screenplay), m_pasteAfter(pasteAfter), m_body(body)
+    : QUndoCommand(QStringLiteral("Paste Fountain")),
+      m_structure(structure), m_screenplay(screenplay), m_pasteAfter(pasteAfter), m_body(body)
 {
 }
 

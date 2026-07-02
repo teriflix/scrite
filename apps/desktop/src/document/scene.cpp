@@ -1841,7 +1841,11 @@ void Scene::beginUndoCapture(bool allowMerging)
     if (m_pushUndoCommand != nullptr)
         return;
 
-    if (!AbstractSceneUndoCommand::hasCurrent() && UndoHub::active() && this->isUndoRedoEnabled())
+    const bool hasCurrent = AbstractSceneUndoCommand::hasCurrent();
+    const bool hasActive = UndoHub::active() != nullptr;
+    const bool undoEnabled = this->isUndoRedoEnabled();
+
+    if (!hasCurrent && hasActive && undoEnabled)
         m_pushUndoCommand = new SceneUndoCommand(this, allowMerging);
     emit inUndoCaptureChanged();
 }
