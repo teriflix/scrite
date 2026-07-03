@@ -337,7 +337,7 @@ AbstractScenePartEditor {
         selectionStartPosition: _sceneTextEditor.activeFocus ? _sceneTextEditor.selectionStart : -1
         autoCapitalizeSentences: !root.readOnly &&
                                  Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences &&
-                                 (Runtime.language.activeTransliterationOption ? !Runtime.language.activeTransliterationOption.inApp : true)
+                                 Runtime.language.active.charScript() === QtChar.Script_Latin
         autoCapitalizeExceptions: Runtime.screenplayEditorSettings.autoCapitalizeExceptions
 
         onDocumentInitialized: () => {
