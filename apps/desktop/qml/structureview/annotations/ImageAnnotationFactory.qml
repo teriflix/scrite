@@ -63,7 +63,7 @@ QtObject {
             visible: _image.isSet && _image.status === Image.Loading
             color: Runtime.colors.primary.editor.background
 
-            BusyIndicator {
+            BusyIcon {
                 anchors.centerIn: parent
                 scale: _d.canvasScale > 1 ? (1/_d.canvasScale) : 1
                 running: parent.visible
@@ -89,6 +89,7 @@ QtObject {
 
             Connections {
                 target: _d
+
                 function onCanvasScaleSettled() {
                     if (_image.desiredWidth <= 0) {
                         _image.lastCommittedWidth = 0

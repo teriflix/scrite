@@ -1611,6 +1611,7 @@ private:
 
     bool removeElementInternal(StructureElement *ptr);
     bool renameCharacter(const QString &from, const QString &to, QString *errMsg);
+    QRectF calculatePerimeterAnnotationPosition(const QRectF &newAnnotationGeometry);
 
 private:
     friend class StructureLayout;

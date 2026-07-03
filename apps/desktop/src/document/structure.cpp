@@ -4722,6 +4722,139 @@ static inline QJsonObject fetchPasteDataFromClipboard(QString *className = nullp
     return data;
 }
 
+QRectF Structure::calculatePerimeterAnnotationPosition(const QRectF &newAnnotationGeometry)
+{
+    const qreal offsetDistance = 50.0;
+    const qreal gapBetweenAnnotations = 10.0;
+
+    QRectF elementsBBox = this->elementsBoundingBox();
+    if (!elementsBBox.isValid()) {
+        elementsBBox = QRectF(5000, 5000, 400, 400);
+    }
+
+    if (m_annotations.isEmpty()) {
+        QRectF geometry = newAnnotationGeometry;
+        geometry.moveLeft(elementsBBox.left() - offsetDistance - geometry.width());
+        geometry.moveTop(elementsBBox.top());
+        return geometry;
+    }
+    const qreal newAnnotationWidth = newAnnotationGeometry.width();
+    const qreal newAnnotationHeight = newAnnotationGeometry.height();
+
+    auto checkOverlapWithExisting = [this](const QRectF &rect) {
+        for (int i = 0; i < m_annotations.size(); ++i) {
+            Annotation *annotation = m_annotations.at(i);
+            if (annotation && annotation->geometry().intersects(rect))
+                return true;
+        }
+        return false;
+    };
+
+    auto tryPlaceOnEdge = [&](const QString &edge) -> QRectF {
+        QRectF result;
+
+        if (edge == "left") {
+            qreal x = elementsBBox.left() - offsetDistance - newAnnotationWidth;
+            qreal y = elementsBBox.top();
+
+            for (int i = 0; i < m_annotations.size(); ++i) {
+                Annotation *annotation = m_annotations.at(i);
+                if (!annotation)
+                    continue;
+
+                const QRectF annGeom = annotation->geometry();
+                if (annGeom.left() <= elementsBBox.left() - offsetDistance) {
+                    qreal bottomY = annGeom.bottom() + gapBetweenAnnotations;
+                    if (bottomY > y)
+                        y = bottomY;
+                }
+            }
+
+            if (y + newAnnotationHeight <= elementsBBox.bottom()) {
+                result = QRectF(x, y, newAnnotationWidth, newAnnotationHeight);
+                if (!checkOverlapWithExisting(result))
+                    return result;
+            }
+        } else if (edge == "bottom") {
+            qreal x = elementsBBox.left();
+            qreal y = elementsBBox.bottom() + offsetDistance;
+
+            for (int i = 0; i < m_annotations.size(); ++i) {
+                Annotation *annotation = m_annotations.at(i);
+                if (!annotation)
+                    continue;
+
+                const QRectF annGeom = annotation->geometry();
+                if (annGeom.top() >= elementsBBox.bottom() + offsetDistance) {
+                    qreal rightX = annGeom.right() + gapBetweenAnnotations;
+                    if (rightX > x)
+                        x = rightX;
+                }
+            }
+
+            if (x + newAnnotationWidth <= elementsBBox.right()) {
+                result = QRectF(x, y, newAnnotationWidth, newAnnotationHeight);
+                if (!checkOverlapWithExisting(result))
+                    return result;
+            }
+        } else if (edge == "right") {
+            qreal x = elementsBBox.right() + offsetDistance;
+            qreal y = elementsBBox.top();
+
+            for (int i = 0; i < m_annotations.size(); ++i) {
+                Annotation *annotation = m_annotations.at(i);
+                if (!annotation)
+                    continue;
+
+                const QRectF annGeom = annotation->geometry();
+                if (annGeom.left() >= elementsBBox.right() + offsetDistance) {
+                    qreal bottomY = annGeom.bottom() + gapBetweenAnnotations;
+                    if (bottomY > y)
+                        y = bottomY;
+                }
+            }
+
+            result = QRectF(x, y, newAnnotationWidth, newAnnotationHeight);
+            if (!checkOverlapWithExisting(result))
+                return result;
+        } else if (edge == "top") {
+            qreal x = elementsBBox.left();
+            qreal y = elementsBBox.top() - offsetDistance - newAnnotationHeight;
+
+            for (int i = 0; i < m_annotations.size(); ++i) {
+                Annotation *annotation = m_annotations.at(i);
+                if (!annotation)
+                    continue;
+
+                const QRectF annGeom = annotation->geometry();
+                if (annGeom.bottom() <= elementsBBox.top() - offsetDistance) {
+                    qreal rightX = annGeom.right() + gapBetweenAnnotations;
+                    if (rightX > x)
+                        x = rightX;
+                }
+            }
+
+            result = QRectF(x, y, newAnnotationWidth, newAnnotationHeight);
+            if (!checkOverlapWithExisting(result))
+                return result;
+        }
+
+        return QRectF();
+    };
+
+    QStringList edges = { "left", "bottom", "right", "top" };
+    for (const QString &edge : edges) {
+        QRectF result = tryPlaceOnEdge(edge);
+        if (result.isValid())
+            return result;
+    }
+
+    QRectF geometry = newAnnotationGeometry;
+    geometry.moveLeft(elementsBBox.left() - offsetDistance - geometry.width());
+    geometry.moveTop(elementsBBox.top());
+    return geometry;
+}
+
 void Structure::paste(const QPointF &pos)
 {
     QString className;
@@ -4751,7 +4884,7 @@ void Structure::paste(const QPointF &pos)
         QRectF geometry = annotation->geometry();
 
         if (pos.isNull())
-            geometry.moveTopLeft(geometry.topLeft() + QPointF(50, 50));
+            geometry = this->calculatePerimeterAnnotationPosition(geometry);
         else
             geometry.moveCenter(pos);
 

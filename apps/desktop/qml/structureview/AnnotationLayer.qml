@@ -241,6 +241,8 @@ Item {
                 delegate.gripRequest.connect(_private.gripDelegate)
 
                 root.canvasScaleSettled.connect(delegate.canvasScaleSettled)
+                Qt.callLater(delegate.canvasScaleSettled) // First call
+                root.canvasItemsBoundingBox.recomputeBoundingBox()
             }
             return delegate
         }
