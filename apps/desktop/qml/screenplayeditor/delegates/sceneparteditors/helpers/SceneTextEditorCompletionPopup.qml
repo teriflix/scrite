@@ -96,12 +96,12 @@ Item {
 
                     onClicked: {
                         if(_private.completionModel.currentRow === _completionDelegate.index)
-                            _private.completionModel.requestCompletion( _private.completionModel.currentCompletion )
+                            _private.completionModel.complete( _private.completionModel.currentCompletion )
                         else
                             _private.completionModel.currentRow = _completionDelegate.index
                     }
 
-                    onDoubleClicked: _private.completionModel.requestCompletion( _private.completionModel.currentCompletion )
+                    onDoubleClicked: _private.completionModel.complete( _private.completionModel.currentCompletion )
 
                     onContainsMouseChanged: {
                         if(containsMouse)

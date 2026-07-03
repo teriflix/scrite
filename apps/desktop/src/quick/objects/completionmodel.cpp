@@ -16,6 +16,7 @@
 #include "completionmodel.h"
 #include "timeprofiler.h"
 #include "application.h"
+#include "utils.h"
 
 #include <QTimer>
 #include <QKeyEvent>
@@ -188,6 +189,17 @@ void CompletionModel::setFilterKeyStrokes(bool val)
         qApp->installEventFilter(this);
     else
         qApp->removeEventFilter(this);
+}
+
+bool CompletionModel::complete(const QString &string)
+{
+    if (m_filteredStrings.indexOf(string) >= 0) {
+        emit requestCompletion(string);
+        QTimer::singleShot(0, this, &CompletionModel::clearFilterStrings);
+        return true;
+    }
+
+    return false;
 }
 
 int CompletionModel::rowCount(const QModelIndex &parent) const

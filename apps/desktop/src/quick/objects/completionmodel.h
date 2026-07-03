@@ -180,6 +180,8 @@ public:
     bool isFilterKeyStrokes() const { return m_filterKeyStrokes; }
     Q_SIGNAL void filterKeyStrokesChanged();
 
+    Q_INVOKABLE bool complete(const QString &string);
+
     Q_SIGNAL void requestCompletion(const QString &string);
 
     // QAbstractItemModel interface
