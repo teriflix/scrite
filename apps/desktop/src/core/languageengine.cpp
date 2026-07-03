@@ -1983,8 +1983,8 @@ bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
                     || exceptions.contains(keyEvent->key()))
                     return false;
 
-                this->commitWordToEditor();
-                return (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter);
+                return this->commitWordToEditor()
+                        && (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter);
             }
         }
 
