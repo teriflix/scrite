@@ -1955,7 +1955,7 @@ void Character::write(QTextCursor &cursor, const WriteOptions &options) const
     }
 }
 
-bool Character::LessThan(Character *a, Character *b)
+bool Character::LessThan(const Character *a, const Character *b)
 {
     return a->name().localeAwareCompare(b->name()) < 0;
 }

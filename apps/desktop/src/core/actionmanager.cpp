@@ -125,7 +125,7 @@ typedef QObjectListModel<ActionManager *> ActionManagers;
 
 Q_GLOBAL_STATIC(ActionManagers, ActionManagerModel)
 
-static bool ActionManagerModelSortFunction(ActionManager *a, ActionManager *b)
+static bool ActionManagerModelSortFunction(const ActionManager *a, const ActionManager *b)
 {
     if (a->sortOrder() == b->sortOrder())
         return QString::localeAwareCompare(a->objectName(), b->objectName()) < 0;
@@ -1303,16 +1303,18 @@ void ActionsModel::reload()
 
     for (ActionManager *actionManager : sortedManagers) {
         connect(actionManager, &ActionManager::objectNameChanged, this,
-                &ActionsModel::onActionManagerNameChanged);
+                &ActionsModel::onActionManagerNameChanged, Qt::UniqueConnection);
         connect(actionManager, &ActionManager::titleChanged, this,
-                &ActionsModel::onActionManagerNameChanged);
+                &ActionsModel::onActionManagerNameChanged, Qt::UniqueConnection);
         connect(actionManager, &ActionManager::dataChanged, this,
-                &ActionsModel::onActionManagerDataChanged);
+                &ActionsModel::onActionManagerDataChanged, Qt::UniqueConnection);
 
-        connect(actionManager, &ActionManager::modelReset, this, &ActionsModel::reloadLater);
+        connect(actionManager, &ActionManager::modelReset, this, &ActionsModel::reloadLater,
+                Qt::UniqueConnection);
         connect(actionManager, &ActionManager::rowsAboutToBeRemoved, this,
-                &ActionsModel::reloadLater);
-        connect(actionManager, &ActionManager::rowsInserted, this, &ActionsModel::reloadLater);
+                &ActionsModel::reloadLater, Qt::UniqueConnection);
+        connect(actionManager, &ActionManager::rowsInserted, this, &ActionsModel::reloadLater,
+                Qt::UniqueConnection);
 
         const QList<QObject *> actions = actionManager->actions();
         for (QObject *action : actions) {
