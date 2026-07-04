@@ -182,8 +182,8 @@ VclTextField {
 
     Component.onCompleted: {
         if(contextMenu) {
-            contextMenu.addItem(_menuSeparator.createObject(contextMenu))
-            contextMenu.addItem(_transliterateMenuItem.createObject(contextMenu))
+            contextMenu.addItem(_menuSeparator.createObject(root))
+            contextMenu.addItem(_transliterateMenuItem.createObject(root))
         }
     }
 
