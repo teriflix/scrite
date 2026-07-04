@@ -535,13 +535,13 @@ void StructureElementStack::sortByScreenplayOccurance(Screenplay *screenplay)
 {
     QList<StructureElement *> &list = this->list();
 
+    std::for_each(list.begin(), list.end(), [](StructureElement *e) { e->setStackLeader(false); });
+
     bool shifted = false;
     std::sort(list.begin(), list.end(),
-              [screenplay, &shifted](StructureElement *e1, StructureElement *e2) {
+              [screenplay, &shifted](const StructureElement *e1, const StructureElement *e2) {
                   const int i1 = screenplay->firstIndexOfScene(e1->scene());
                   const int i2 = screenplay->firstIndexOfScene(e2->scene());
-                  e1->setStackLeader(false);
-                  e2->setStackLeader(false);
                   if (i1 > i2)
                       shifted = true;
                   return i1 < i2;
@@ -3159,7 +3159,7 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
             stackIds.append(element->stackId());
     }
 
-    auto lessThan = [screenplay](StructureElement *e1, StructureElement *e2) -> bool {
+    auto lessThan = [screenplay](const StructureElement *e1, const StructureElement *e2) -> bool {
         if (!e1 || !e2)
             return e1 != nullptr;
         Scene *scene1 = e1->scene();
@@ -3666,7 +3666,7 @@ Structure::evaluateGroupsImpl(Screenplay *screenplay, const QString &category) c
         while (it != end) {
             QList<StructureElement *> selements = it.value();
             std::sort(selements.begin(), selements.end(),
-                      [sceneIndexMap](StructureElement *a, StructureElement *b) {
+                      [sceneIndexMap](const StructureElement *a, const StructureElement *b) {
                           return sceneIndexMap.value(a->scene()) < sceneIndexMap.value(b->scene());
                       });
 

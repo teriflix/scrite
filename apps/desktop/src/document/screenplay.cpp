@@ -1092,7 +1092,7 @@ void Screenplay::removeElements(const QList<ScreenplayElement *> &givenElements)
     QList<Batch> batches = QList<Batch>() << Batch();
     int leastIndex = INT_MAX;
 
-    std::sort(elements.begin(), elements.end(), [=](ScreenplayElement *e1, ScreenplayElement *e2) {
+    std::sort(elements.begin(), elements.end(), [=](const ScreenplayElement *e1, const ScreenplayElement *e2) {
         return m_elements.indexOf(e1) < m_elements.indexOf(e2);
     });
     for (ScreenplayElement *element : std::as_const(elements)) {
