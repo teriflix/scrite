@@ -3131,13 +3131,14 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
 
     QScopedValueRollback<bool> _ure(m_undoRedoEnabled, false);
 
-    QList<StructureElement *> elementsToLayout;
+    QList<QPointer<StructureElement>> elementsToLayout;
     for (StructureElement *element : m_elements.constList())
         if (element->isSelected())
-            elementsToLayout << element;
+            elementsToLayout << QPointer<StructureElement>(element);
 
     if (elementsToLayout.isEmpty())
-        elementsToLayout = m_elements;
+        for (StructureElement *element : m_elements.constList())
+            elementsToLayout << QPointer<StructureElement>(element);
 
     if (elementsToLayout.size() < 2)
         return newBoundingRect;
@@ -3148,8 +3149,8 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
 
     QStringList stackIds;
     for (int i = elementsToLayout.size() - 1; i >= 0; i--) {
-        StructureElement *element = elementsToLayout.at(i);
-        if (element->stackId().isEmpty())
+        StructureElement *element = elementsToLayout.at(i).data();
+        if (!element || element->stackId().isEmpty())
             continue;
 
         if (stackIds.contains(element->stackId()))
@@ -3158,7 +3159,12 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
             stackIds.append(element->stackId());
     }
 
-    auto lessThan = [screenplay](StructureElement *e1, StructureElement *e2) -> bool {
+    auto lessThan = [screenplay](const QPointer<StructureElement> &e1Ptr,
+                                  const QPointer<StructureElement> &e2Ptr) -> bool {
+        StructureElement *e1 = e1Ptr.data();
+        StructureElement *e2 = e2Ptr.data();
+        if (!e1 || !e2)
+            return e1 != nullptr;
         Scene *scene1 = e1->scene();
         Scene *scene2 = e2->scene();
         if (scene1 == nullptr || scene2 == nullptr)
@@ -3174,8 +3180,12 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     std::sort(elementsToLayout.begin(), elementsToLayout.end(), lessThan);
 
     QRectF oldBoundingRect;
-    for (StructureElement *element : std::as_const(elementsToLayout))
+    for (const QPointer<StructureElement> &elementPtr : std::as_const(elementsToLayout)) {
+        StructureElement *element = elementPtr.data();
+        if (!element)
+            continue;
         oldBoundingRect |= QRectF(element->x(), element->y(), element->width(), element->height());
+    }
 
     const qreal verticalLayoutSpacing = m_canvasUIMode == IndexCardUI ? 100 : 50;
     const qreal horizontalLayoutSpacing = verticalLayoutSpacing;
@@ -3185,7 +3195,10 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     int direction = 1;
     QRectF elementRect;
     for (int i = 0; i < elementsToLayout.size(); i++) {
-        StructureElement *element = elementsToLayout.at(i);
+        StructureElement *element = elementsToLayout.at(i).data();
+        if (!element)
+            continue;
+
         if (i == 0) {
             elementRect = QRectF(element->position(), QSize(element->width(), element->height()));
             newBoundingRect = elementRect;
