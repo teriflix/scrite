@@ -340,6 +340,11 @@ Item {
         property rect area: Qt.rect(0,0,0,0)
 
         function ensureVisible(item_, area_) {
+            if(interval === 0 && !running) {
+                root.sceneDelegate.ensureVisible(item_, area_)
+                return
+            }
+
             kind = 1
             item = item_
             area = area_
@@ -347,6 +352,9 @@ Item {
         }
 
         function ensureCentered(item_, area_) {
+            if(running && kind == 1)
+                return // There is already a ensureVisible queued.
+
             kind = 2
             item = item_
             area = area_
@@ -354,11 +362,11 @@ Item {
         }
 
         repeat: false
-        interval: 50
+        interval: 0
 
         onTriggered: {
             if(item === null || kind < 1 || kind > 2 || area === Qt.rect(0,0,0,0)) {
-                interval = 50
+                interval = 0
                 return
             }
 
@@ -370,7 +378,8 @@ Item {
 
             item = null
             area = Qt.rect(0,0,0,0)
-            interval = 50
+            kind = 0
+            interval = 0
         }
     }
 

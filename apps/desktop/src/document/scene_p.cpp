@@ -51,6 +51,7 @@ void SceneUndoCommand::undo()
     if (this->fromByteArray(m_before) == nullptr)
         this->setObsolete(true);
     m_allowMerging = false;
+    this->makeSceneActive();
 }
 
 void SceneUndoCommand::redo()
@@ -74,6 +75,7 @@ void SceneUndoCommand::redo()
     if (this->fromByteArray(m_after) == nullptr)
         this->setObsolete(true);
     m_allowMerging = false;
+    this->makeSceneActive();
 }
 
 bool SceneUndoCommand::mergeWith(const QUndoCommand *other)
@@ -143,6 +145,27 @@ void AbstractSceneUndoCommand::setSceneId(const QString &id)
         m_sceneId = id;
 }
 
+void AbstractSceneUndoCommand::makeSceneActive()
+{
+    Scene *scene = this->scene();
+    if (scene == nullptr)
+        return;
+
+    StructureElement *structureElement = scene->structureElement();
+    if (structureElement == nullptr)
+        return;
+
+    Structure *structure = structureElement->structure();
+    if (structure == nullptr)
+        return;
+
+    int idx = structure->indexOfElement(structureElement);
+    if (idx < 0)
+        return;
+
+    structure->setCurrentElementIndex(idx);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // SceneHeadingUndoCommand
 ///////////////////////////////////////////////////////////////////////////////
@@ -169,6 +192,7 @@ void SceneHeadingUndoCommand::undo()
 
     QScopedValueRollback<AbstractSceneUndoCommand *> __crb(AbstractSceneUndoCommand::current, this);
     m_before.load(scene->heading());
+    this->makeSceneActive();
 }
 
 void SceneHeadingUndoCommand::redo()
@@ -181,6 +205,7 @@ void SceneHeadingUndoCommand::redo()
         QScopedValueRollback<AbstractSceneUndoCommand *> __crb(AbstractSceneUndoCommand::current,
                                                                this);
         m_after.load(scene->heading());
+        this->makeSceneActive();
     } else {
         m_after.save(scene->heading());
         m_inited = true;
@@ -283,6 +308,7 @@ void SceneElementTypeUndoCommand::undo()
 
     QScopedValueRollback<AbstractSceneUndoCommand *> __crb(AbstractSceneUndoCommand::current, this);
     element->setType(m_before);
+    this->makeSceneActive();
 }
 
 void SceneElementTypeUndoCommand::redo()
@@ -295,6 +321,7 @@ void SceneElementTypeUndoCommand::redo()
         QScopedValueRollback<AbstractSceneUndoCommand *> __crb(AbstractSceneUndoCommand::current,
                                                                this);
         element->setType(m_after);
+        this->makeSceneActive();
     } else {
         m_sceneElementId = element->id();
         m_after = element->type();
@@ -342,6 +369,7 @@ void SceneElementAlignmentUndoCommand::undo()
 
     QScopedValueRollback<AbstractSceneUndoCommand *> __crb(AbstractSceneUndoCommand::current, this);
     element->setAlignment(m_before);
+    this->makeSceneActive();
 }
 
 void SceneElementAlignmentUndoCommand::redo()
@@ -354,6 +382,7 @@ void SceneElementAlignmentUndoCommand::redo()
         QScopedValueRollback<AbstractSceneUndoCommand *> __crb(AbstractSceneUndoCommand::current,
                                                                this);
         element->setAlignment(m_after);
+        this->makeSceneActive();
     } else {
         m_sceneElementId = element->id();
         m_after = element->alignment();
@@ -401,6 +430,7 @@ void SceneElementTextFormatsUndoCommand::undo()
 
     QScopedValueRollback<AbstractSceneUndoCommand *> __crb(AbstractSceneUndoCommand::current, this);
     element->setTextFormats(m_before);
+    this->makeSceneActive();
 }
 
 void SceneElementTextFormatsUndoCommand::redo()
@@ -413,6 +443,7 @@ void SceneElementTextFormatsUndoCommand::redo()
         QScopedValueRollback<AbstractSceneUndoCommand *> __crb(AbstractSceneUndoCommand::current,
                                                                this);
         element->setTextFormats(m_after);
+        this->makeSceneActive();
     } else {
         m_sceneElementId = element->id();
         m_after = element->textFormats();
@@ -463,6 +494,7 @@ void SceneInsertElementUndoCommand::undo()
     QScopedValueRollback<AbstractSceneUndoCommand *> __crb(AbstractSceneUndoCommand::current, this);
     this->scene()->removeElement(element);
     m_sceneElement = nullptr; // element is now GC'd; future redo() recreates from m_elementData
+    this->makeSceneActive();
 }
 
 void SceneInsertElementUndoCommand::redo()
@@ -484,6 +516,7 @@ void SceneInsertElementUndoCommand::redo()
     SceneElement *newElement = reconstructElement(m_elementData);
     s->insertElementAt(newElement, m_index);
     m_sceneElement = newElement; // re-arm lookupSceneElement for a future undo()
+    this->makeSceneActive();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -520,6 +553,7 @@ void SceneRemoveElementUndoCommand::undo()
     SceneElement *newElement = reconstructElement(m_elementData);
     s->insertElementAt(newElement, m_index);
     m_sceneElement = newElement; // arm lookupSceneElement for subsequent redo()
+    this->makeSceneActive();
 }
 
 void SceneRemoveElementUndoCommand::redo()
@@ -539,6 +573,7 @@ void SceneRemoveElementUndoCommand::redo()
     QScopedValueRollback<AbstractSceneUndoCommand *> __crb(AbstractSceneUndoCommand::current, this);
     this->scene()->removeElement(element);
     m_sceneElement = nullptr; // element is now GC'd; future undo() recreates from m_elementData
+    this->makeSceneActive();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -578,12 +613,11 @@ void SceneElementTextUndoCommand::undo()
 
     element->setText(m_oldText);
     element->scene()->sceneReset(m_oldCursorPosition);
+    this->makeSceneActive();
 }
 
 void SceneElementTextUndoCommand::redo()
 {
-    QScopedValueRollback<AbstractSceneUndoCommand *> __crb(AbstractSceneUndoCommand::current, this);
-
     SceneElement *element = this->lookupSceneElement();
     if (element == nullptr)
         return;
@@ -602,9 +636,11 @@ void SceneElementTextUndoCommand::redo()
         this->setText("[" + this->sceneId() + "]: " + m_oldText + " -> " + m_newText);
         m_inited = true;
     } else {
+        QScopedValueRollback<AbstractSceneUndoCommand *> __crb(AbstractSceneUndoCommand::current, this);
         Scene *scene = element->scene();
         element->setText(m_newText);
         emit scene->sceneReset(m_newCursorPosition);
+        this->makeSceneActive();
     }
 }
 

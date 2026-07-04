@@ -44,6 +44,8 @@ protected:
     void setSceneId(const QString &id);
     QString sceneId() const { return m_sceneId; }
 
+    void makeSceneActive();
+
 private:
     friend class PushSceneUndoCommand;
 
