@@ -52,8 +52,7 @@ AbstractSelection {
         if(!canLayout)
             return
 
-        _private.layoutAnimation.layoutType = type
-        _private.layoutAnimation.start()
+        _private.layoutAnimation.run(items, type)
     }
 
     function confirmDelete() {

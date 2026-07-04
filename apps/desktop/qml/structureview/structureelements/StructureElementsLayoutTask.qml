@@ -83,6 +83,8 @@ SequentialAnimation {
                 "bottom": __layoutItemBounds.top + __layoutItemBounds.height-1
             };
             __layoutItemBounds = undefined
+            __layoutItems = []
+            __layoutType = -1
             root.selectItemsInBoundaryRequest(boundary)
             root.allowCanvasPreviewRequest()
         }
