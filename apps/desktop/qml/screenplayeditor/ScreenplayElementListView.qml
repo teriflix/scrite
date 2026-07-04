@@ -565,8 +565,7 @@ ListView {
             if(!Runtime.screenplayEditorSettings.autoSelectSceneUnderMouse)
                 return
 
-            const globalCursorPos = MouseCursor.position()
-            let localCursorPos = MouseCursor.itemPosition(root, globalCursorPos)
+            let localCursorPos = MouseCursor.itemPosition(root)
             localCursorPos.x = root.width/2
             if(localCursorPos.y >= 0 && localCursorPos.y < root.height) {
                 localCursorPos = root.contentItem.mapFromItem(root, localCursorPos.x, localCursorPos.y)
