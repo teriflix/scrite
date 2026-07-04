@@ -3131,14 +3131,14 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
 
     QScopedValueRollback<bool> _ure(m_undoRedoEnabled, false);
 
-    QList<QPointer<StructureElement>> elementsToLayout;
+    QList<StructureElement *> elementsToLayout;
     for (StructureElement *element : m_elements.constList())
         if (element->isSelected())
-            elementsToLayout << QPointer<StructureElement>(element);
+            elementsToLayout << element;
 
     if (elementsToLayout.isEmpty())
         for (StructureElement *element : m_elements.constList())
-            elementsToLayout << QPointer<StructureElement>(element);
+            elementsToLayout << element;
 
     if (elementsToLayout.size() < 2)
         return newBoundingRect;
@@ -3149,7 +3149,7 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
 
     QStringList stackIds;
     for (int i = elementsToLayout.size() - 1; i >= 0; i--) {
-        StructureElement *element = elementsToLayout.at(i).data();
+        StructureElement *element = elementsToLayout.at(i);
         if (!element || element->stackId().isEmpty())
             continue;
 
@@ -3159,10 +3159,7 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
             stackIds.append(element->stackId());
     }
 
-    auto lessThan = [screenplay](const QPointer<StructureElement> &e1Ptr,
-                                  const QPointer<StructureElement> &e2Ptr) -> bool {
-        StructureElement *e1 = e1Ptr.data();
-        StructureElement *e2 = e2Ptr.data();
+    auto lessThan = [screenplay](StructureElement *e1, StructureElement *e2) -> bool {
         if (!e1 || !e2)
             return e1 != nullptr;
         Scene *scene1 = e1->scene();
@@ -3173,6 +3170,8 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
         const int pos2 = screenplay->firstIndexOfScene(scene2);
         if (pos1 >= 0 && pos2 >= 0)
             return pos1 < pos2;
+        if (pos1 < 0 && pos2 < 0)
+            return false;
         if (pos2 < 0)
             return true;
         return false;
@@ -3180,8 +3179,7 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     std::sort(elementsToLayout.begin(), elementsToLayout.end(), lessThan);
 
     QRectF oldBoundingRect;
-    for (const QPointer<StructureElement> &elementPtr : std::as_const(elementsToLayout)) {
-        StructureElement *element = elementPtr.data();
+    for (StructureElement *element : std::as_const(elementsToLayout)) {
         if (!element)
             continue;
         oldBoundingRect |= QRectF(element->x(), element->y(), element->width(), element->height());
@@ -3195,7 +3193,7 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     int direction = 1;
     QRectF elementRect;
     for (int i = 0; i < elementsToLayout.size(); i++) {
-        StructureElement *element = elementsToLayout.at(i).data();
+        StructureElement *element = elementsToLayout.at(i);
         if (!element)
             continue;
 
