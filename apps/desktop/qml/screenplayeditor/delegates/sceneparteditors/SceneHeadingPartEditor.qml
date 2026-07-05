@@ -175,7 +175,7 @@ AbstractScenePartEditor {
                 action: ActionHub.paragraphFormats.find("headingParagraph")
                 enabled: root.isCurrent && !root.readOnly && !_sceneHeading.activeFocus
 
-                onTriggered: () => {
+                onToggled: () => {
                                  _sceneHeading.selectAll()
                                  _sceneHeading.forceActiveFocus()
                              }

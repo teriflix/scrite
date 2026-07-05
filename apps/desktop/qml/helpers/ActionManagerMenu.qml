@@ -53,7 +53,6 @@ VclMenu {
 
             property var qmlAction: modelData
 
-
             action: qmlAction
             focusPolicy: Qt.NoFocus
             opacity: enabled ? 1 : 0.5

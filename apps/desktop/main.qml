@@ -23,6 +23,7 @@ import "./qml"
 import "./qml/globals"
 import "./qml/init"
 import "./qml/notifications"
+import "./qml/native"
 
 ApplicationWindow {
     id: root
@@ -78,6 +79,11 @@ ApplicationWindow {
     AppInitStateMachine {
         id: _initSM
         contentLoader: _contentLoader
+    }
+
+    Component.onCompleted: {
+        if(Platform.isMacOSDesktop)
+            Qt.createQmlObject("import \"./qml/native\"; NativeMenuBar { }", root)
     }
 }
 

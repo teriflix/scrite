@@ -536,6 +536,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: Platform.isMacOSDesktop ?
                                                           Gui.shortcut(Qt.ControlModifier+Qt.ShiftModifier+Qt.Key_D) :
                                                           Gui.shortcut(Qt.MetaModifier+Qt.ShiftModifier+Qt.Key_D)
@@ -627,7 +628,7 @@ Item {
             text: "User Guides"
             objectName: "userGuides"
 
-            icon.source: "qrc:/icons/action/help.png"
+            icon.source: "qrc:/icons/action/userguide.png"
 
             onTriggered: Qt.openUrlExternally(Runtime.userGuidesUrl)
         }
@@ -687,6 +688,8 @@ Item {
         objectName: "languageOptions"
 
         Action {
+            id: _languageSettingsAction
+
             readonly property var keywords: ["add language", "input methods", "input tools", "baraha", "nudi", "ism", "font", "more languages"]
             property int sortOrder: LanguageEngine.supportedLanguages.count + 1
 
@@ -696,7 +699,9 @@ Item {
         }
 
         Action {
+            property int sortOrder: _languageSettingsAction.sortOrder + 1
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string tooltip: "Cycles through languages added in the language menu."
             readonly property string defaultShortcut: "F6"
 
@@ -717,7 +722,9 @@ Item {
         }
 
         Action {
+            property int sortOrder: _languageSettingsAction.sortOrder + 2
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property bool allowShortcut: true
             readonly property string tooltip: "When checked, Scrite handles all language switches ignoring any language switch initiated by the operating system."
 
@@ -778,7 +785,7 @@ Item {
 
             icon.source: language.iconSource
 
-            onTriggered: Runtime.language.setActiveCode(language.code)
+            onTriggered: if(checked) Runtime.language.setActiveCode(language.code)
         }
     }
 
@@ -807,7 +814,7 @@ Item {
         function setBinder(binder) { root.setBinder(binder) }
         function resetBinder(binder) { root.resetBinder(binder) }
 
-        title: "Paragraph Format"
+        title: "Format"
         objectName: "paragraphFormats"
 
         Action {
@@ -866,48 +873,20 @@ Item {
         objectName: "editOptions"
 
         Action {
-            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Find)
-
-            enabled: ActionHandler.canHandle
-            objectName: "find"
-            shortcut: defaultShortcut
-            text: "Find"
-
-            icon.source: "qrc:/icons/action/search.png"
-        }
-
-        Action {
-            readonly property string defaultShortcut: Platform.MacOSDesktop ? "Ctrl+Shift+F" : Gui.standardShortcut(StandardKey.Replace)
-            readonly property bool visible: false
-
-            enabled: ActionHandler.canHandle
-            objectName: "replace"
-            shortcut: defaultShortcut
-            text: "Replace"
-
-            icon.source: "qrc:/icons/action/find_replace.png"
-        }
-
-        Action {
-            readonly property bool visible: false
-
-            enabled: ActionHandler.canHandle
-            objectName: "selectAll"
-            shortcut: Gui.standardShortcut(StandardKey.SelectAll)
-            text: "Select All"
-        }
-
-        Action {
-            readonly property bool visible: false
+            property bool visible: ActionHandler.canHandle
+            readonly property bool nativeVisible: true
 
             enabled: ActionHandler.canHandle
             objectName: "cut"
             shortcut: Gui.standardShortcut(StandardKey.Cut)
             text: "Cut"
+
+            icon.source: "qrc:/icons/content/content_cut.png"
         }
 
         Action {
             property bool visible: ActionHandler.canHandle
+            readonly property bool nativeVisible: true
 
             enabled: ActionHandler.canHandle
             objectName: "copy"
@@ -919,6 +898,7 @@ Item {
 
         Action {
             property bool visible: ActionHandler.canHandle
+            readonly property bool nativeVisible: true
 
             enabled: ActionHandler.canHandle
             objectName: "paste"
@@ -930,6 +910,7 @@ Item {
 
         Action {
             property bool visible: ActionHandler.canHandle
+            readonly property bool nativeVisible: true
 
             enabled: Runtime.dialogs.objectCount === 0
             objectName: "undo"
@@ -947,6 +928,7 @@ Item {
 
         Action {
             property bool visible: ActionHandler.canHandle
+            readonly property bool nativeVisible: true
 
             enabled: Runtime.dialogs.objectCount === 0
             objectName: "redo"
@@ -963,6 +945,18 @@ Item {
         }
 
         Action {
+            readonly property bool visible: false
+            readonly property bool nativeVisible: true
+
+            enabled: ActionHandler.canHandle
+            objectName: "selectAll"
+            shortcut: Gui.standardShortcut(StandardKey.SelectAll)
+            text: "Select All"
+
+            icon.source: "qrc:/icons/content/select_all.png"
+        }
+
+        Action {
             readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Refresh)
 
             enabled: ActionHandler.canHandle
@@ -974,6 +968,30 @@ Item {
         }
 
         Action {
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Find)
+
+            enabled: ActionHandler.canHandle
+            objectName: "find"
+            shortcut: defaultShortcut
+            text: "Find"
+
+            icon.source: "qrc:/icons/action/search.png"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool nativeVisible: true
+            readonly property string defaultShortcut: Platform.MacOSDesktop ? "Ctrl+Shift+F" : Gui.standardShortcut(StandardKey.Replace)
+
+            enabled: ActionHandler.canHandle
+            objectName: "replace"
+            shortcut: defaultShortcut
+            text: "Replace"
+
+            icon.source: "qrc:/icons/action/find_replace.png"
+        }
+
+        Action {
             readonly property bool allowShortcut: true
 
             enabled: ActionHandler.canHandle
@@ -982,6 +1000,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: "F3"
 
             enabled: ActionHandler.canHandle
@@ -1014,6 +1033,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: "Shift+Alt+V"
 
             enabled: ActionHandler.canHandle
@@ -1024,6 +1044,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: "Alt+,"
 
             enabled: ActionHandler.canHandle
@@ -1036,6 +1057,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: "Alt+."
 
             enabled: ActionHandler.canHandle
@@ -1046,6 +1068,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: "Ctrl+`"
 
             enabled: ActionHandler.canHandle
@@ -1056,6 +1079,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: "Ctrl+7"
 
             enabled: ActionHandler.canHandle
@@ -1066,6 +1090,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: "Ctrl+Shift+7"
 
             enabled: ActionHandler.canHandle
@@ -1076,6 +1101,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: "Ctrl+8"
 
             enabled: ActionHandler.canHandle
@@ -1086,6 +1112,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: "Ctrl+Alt+0"
 
             enabled: ActionHandler.canHandle
@@ -1096,6 +1123,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: Gui.shortcut(Qt.ControlModifier+Qt.AltModifier+Qt.Key_Up)
 
             enabled: ActionHandler.canHandle
@@ -1106,6 +1134,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: Gui.shortcut(Qt.ControlModifier+Qt.AltModifier+Qt.Key_Down)
 
             enabled: ActionHandler.canHandle
@@ -1116,6 +1145,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: Platform.isMacOSDesktop ? Gui.shortcut(Qt.AltModifier+Qt.Key_Up) : Gui.shortcut(Qt.ControlModifier+Qt.Key_Up)
 
             enabled: ActionHandler.canHandle
@@ -1126,6 +1156,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: Platform.isMacOSDesktop ? Gui.shortcut(Qt.AltModifier+Qt.Key_Down) : Gui.shortcut(Qt.ControlModifier+Qt.Key_Down)
 
             enabled: ActionHandler.canHandle
@@ -1136,6 +1167,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
 
             enabled: ActionHandler.canHandle
             objectName: "scrollPreviousScene"
@@ -1143,6 +1175,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
 
             enabled: ActionHandler.canHandle
             objectName: "scrollNextScene"
@@ -1150,6 +1183,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: Gui.shortcut(Qt.Key_PageUp)
 
             enabled: ActionHandler.canHandle
@@ -1160,6 +1194,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: Gui.shortcut(Qt.Key_PageDown)
 
             enabled: ActionHandler.canHandle
@@ -1170,6 +1205,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: "Ctrl+G"
 
             enabled: Runtime.dialogs.objectCount === 0
@@ -2126,6 +2162,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: "Ctrl+Alt+="
 
             enabled: ActionHandler.canHandle
@@ -2136,6 +2173,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: "Ctrl+Alt+-"
 
             enabled: ActionHandler.canHandle
@@ -2264,6 +2302,7 @@ Item {
         }
 
         Action {
+            readonly property bool nativeVisible: false
             property bool down: ActionHandler.active ? ActionHandler.active.down : false
             property string tooltip: ActionHandler.active && ActionHandler.active.tooltip !== "" ? ActionHandler.active.tooltip : "New text or form note."
             readonly property string defaultShortcut: "Ctrl+T"
@@ -2277,6 +2316,7 @@ Item {
         }
 
         Action {
+            readonly property bool nativeVisible: false
             readonly property bool allowShortcut: true
             property bool down: ActionHandler.active ? ActionHandler.active.down : false
 
