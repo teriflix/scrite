@@ -1313,6 +1313,8 @@ Item {
         }
 
         Action {
+            readonly property bool nativeVisible: false
+            readonly property bool hideInCommandCenter: true
             property bool down: popup !== null
             property QtObject popup
 
@@ -1334,6 +1336,8 @@ Item {
         }
 
         Action {
+            readonly property bool nativeVisible: false
+            readonly property bool hideInCommandCenter: true
             readonly property string tooltip: "Add a clickable hyperlink"
             readonly property string defaultShortcut: "Ctrl+Alt+K"
 
