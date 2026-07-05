@@ -20,6 +20,7 @@ import QtQuick.Controls
 import io.scrite.components
 
 import "../../globals"
+import "../../dialogs"
 import "../../controls"
 
 Item {
@@ -115,7 +116,12 @@ Item {
         id: _welcomeTextApi
 
         onFinished: {
-            if(hasResponse && !hasError) {
+            if(hasError) {
+                MessageBox.information("Error: " + errorCode, errorMessage, Qt.quit)
+                return
+            }
+
+            if(hasResponse) {
                 const wt = welcomeText || {}
                 switch(wt.format) {
                 case "html":

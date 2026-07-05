@@ -509,13 +509,13 @@ Item {
                 }
             }
         }
+    }
 
-        VclButton {
-            anchors.centerIn: parent
-            text: "Reload"
-            visible: _queryUserSubsCall.hasError
-            onClicked: _queryUserSubsCall.go()
-        }
+    VclButton {
+        anchors.centerIn: parent
+        text: "Reload"
+        visible: _queryUserSubsCall.hasError
+        onClicked: _queryUserSubsCall.go()
     }
 
     BusyIndicator {

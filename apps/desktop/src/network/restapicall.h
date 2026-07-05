@@ -43,9 +43,18 @@ public:
     static const QString E_SESSION;
     static const QString E_NO_SESSION;
     static const QString E_NETWORK;
+    static const QString E_INTERNET;
 
     static RestApi *instance();
     ~RestApi();
+
+    // clang-format off
+    Q_PROPERTY(bool networkAvailable
+               READ isNetworkAvailable
+               NOTIFY networkAvailableChanged)
+    // clang-format on
+    bool isNetworkAvailable() const;
+    Q_SIGNAL void networkAvailableChanged();
 
     // clang-format off
     Q_PROPERTY(QObject *sessionApiQueue
@@ -260,6 +269,7 @@ protected:
     virtual void setResponse(const QJsonObject &val);
     void onNetworkReplyError();
     void onNetworkReplyFinished();
+    void reportInternetConnectivityError();
     void maybeAutoDelete();
 
 private:

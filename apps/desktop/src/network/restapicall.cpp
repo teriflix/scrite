@@ -33,20 +33,35 @@
 #include <QJsonDocument>
 #include <QNetworkReply>
 #include <QRegularExpression>
+#include <QNetworkInformation>
 #include <QOperatingSystemVersion>
 
 const QString RestApi::E_API_KEY = QStringLiteral("E_API_KEY");
 const QString RestApi::E_SESSION = QStringLiteral("E_SESSION");
 const QString RestApi::E_NO_SESSION = QStringLiteral("E_NO_SESSION");
 const QString RestApi::E_NETWORK = QStringLiteral("E_NETWORK_");
+const QString RestApi::E_INTERNET = QStringLiteral("E_INTERNET");
 
 RestApi *RestApi::instance()
 {
+    QNetworkInformation::loadDefaultBackend();
+
     static RestApi *theInstance = new RestApi(qApp);
     return theInstance;
 }
 
 RestApi::~RestApi() { }
+
+bool RestApi::isNetworkAvailable() const
+{
+#if defined(REST_API_LOCALHOST) && !defined(SCRITE_PRODUCTION_BUILD)
+    return true;
+#else
+    return QNetworkInformation::instance() ? QNetworkInformation::instance()->reachability()
+                    == QNetworkInformation::Reachability::Online
+                                           : true; // we assume availability of Internet by default
+#endif
+}
 
 QObject *RestApi::sessionApiQueueObject() const
 {
@@ -113,6 +128,10 @@ void RestApi::requestNewSessionTokenNow()
 RestApi::RestApi(QObject *parent) : QObject(parent)
 {
     m_sessionApiQueue = new RestApiCallQueue(this);
+
+    if (QNetworkInformation::instance())
+        connect(QNetworkInformation::instance(), &QNetworkInformation::reachabilityChanged, this,
+                &RestApi::networkAvailableChanged);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -268,6 +287,11 @@ bool RestApiCall::call()
     this->clearResponse();
 
     emit aboutToCall();
+
+    if (!RestApi::instance()->isNetworkAvailable()) {
+        QTimer::singleShot(0, this, &RestApiCall::reportInternetConnectivityError);
+        return true;
+    }
 
     const QJsonObject compiledData = sanitizeJsonObject(LocalStorage::compile(this->data()));
 
@@ -487,6 +511,15 @@ void RestApiCall::onNetworkReplyFinished()
 
         emit finished();
     }
+}
+
+void RestApiCall::reportInternetConnectivityError()
+{
+    this->setError(QJsonObject(
+            { { "code", RestApi::E_INTERNET },
+              { "text", "Internet connectivity is required to complete this operation." } }));
+
+    emit finished();
 }
 
 void RestApiCall::maybeAutoDelete()
