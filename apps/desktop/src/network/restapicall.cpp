@@ -57,9 +57,12 @@ bool RestApi::isNetworkAvailable() const
 #if defined(REST_API_LOCALHOST) && !defined(SCRITE_PRODUCTION_BUILD)
     return true;
 #else
-    return QNetworkInformation::instance() ? QNetworkInformation::instance()->reachability()
-                    == QNetworkInformation::Reachability::Online
-                                           : true; // we assume availability of Internet by default
+    auto acceptable = QList<QNetworkInformation::Reachability>(
+            { QNetworkInformation::Reachability::Online,
+              QNetworkInformation::Reachability::Unknown });
+    return QNetworkInformation::instance()
+            ? acceptable.contains(QNetworkInformation::instance()->reachability())
+            : true; // we assume availability of Internet by default
 #endif
 }
 
