@@ -110,6 +110,7 @@ Item {
 
         Row {
             spacing: 20
+            visible: root.allowedExtensions && root.allowedExtensions.length > 1
 
             Repeater {
                 model: root.allowedExtensions
