@@ -487,7 +487,7 @@ ListView {
             case "actBreak": return actBreakDelegate;
             case "omittedScene": return omittedSceneDelegate;
             case "episodeBreak": return episodeBreakDelegate;
-            case "invervalBreak": return intervalBreakDelegate;
+            case "intervalBreak": return intervalBreakDelegate;
             }
             return null
         }
