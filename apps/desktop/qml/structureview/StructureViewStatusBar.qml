@@ -228,6 +228,12 @@ Rectangle {
             toolTipText: "Zoom One"
 
             onClicked: root.zoomOneRequest()
+
+            ActionHandler {
+                action: ActionHub.structureCanvasOperations.find("zoomOne")
+
+                onTriggered: _cmdZoomOne.clicked()
+            }
         }
 
         FlatToolButton {
@@ -242,6 +248,12 @@ Rectangle {
             toolTipText: "Zoom Fit"
 
             onClicked: root.zoomFitRequest(root.canvasItemsBoundingBox.boundingBox)
+
+            ActionHandler {
+                action: ActionHub.structureCanvasOperations.find("zoomFit")
+
+                onTriggered: _cmdZoomFit.clicked()
+            }
         }
 
         ZoomSlider {
@@ -259,7 +271,6 @@ Rectangle {
             onSliderMoved: root.zoomToRequest(zoomLevel)
             onZoomInRequest: root.zoomInRequest()
             onZoomOutRequest: root.zoomOutRequest()
-
 
             ActionHandler {
                 enabled: _zoomSlider.value < _zoomSlider.to

@@ -177,6 +177,16 @@ Native.MenuBar {
             action: ActionHub.structureCanvasOperations.find("zoomOut")
         }
 
+        NativeActionMenuItem {
+            visible: Runtime.mainWindowTab === Runtime.StructureTab
+            action: ActionHub.structureCanvasOperations.find("zoomOne")
+        }
+
+        NativeActionMenuItem {
+            visible: Runtime.mainWindowTab === Runtime.StructureTab
+            action: ActionHub.structureCanvasOperations.find("zoomFit")
+        }
+
         Native.MenuSeparator {
             visible: Runtime.mainWindowTab === Runtime.StructureTab
         }

@@ -2158,6 +2158,26 @@ Item {
             shortcut: defaultShortcut
             text: "Zoom Out"
         }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Gui.shortcut(Qt.AltModifier+Qt.Key_Right)
+
+            enabled: ActionHandler.canHandle
+            objectName: "zoomOne"
+            shortcut: defaultShortcut
+            text: "Zoom One"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Gui.shortcut(Qt.AltModifier+Qt.Key_Left)
+
+            enabled: ActionHandler.canHandle
+            objectName: "zoomFit"
+            shortcut: defaultShortcut
+            text: "Zoom Fit"
+        }
     }
 
     readonly property ActionManager timelineOperations: ActionManager {
@@ -2774,7 +2794,7 @@ Item {
 
             checkable: true
             checked: Runtime.applicationSettings.enableAnimations
-            text: (Runtime.applicationSettings.enableAnimations ? "Disable " : "Enable ") + "Animations"
+            text: "Enable Animations"
             shortcut: defaultShortcut
             objectName: "animations"
 
