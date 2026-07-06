@@ -50,7 +50,7 @@ GridBackground {
     property alias createItemMode: _createItemHandler.mode
     property alias rubberbandSelectionMode: _elementLayer.rubberbandSelectionMode
 
-    property bool scaleIsLessForEdit: (350*root.scale < root.canvasScrollHeight*0.25)
+    property bool scaleIsLessForEdit: Runtime.structureCanvasSettings.zoomOneDuringEditFocus ? (350*root.scale < root.canvasScrollHeight*0.25) : false
 
     readonly property alias hasFocus: _private.hasFocus
     readonly property alias selection: _elementLayer.selection

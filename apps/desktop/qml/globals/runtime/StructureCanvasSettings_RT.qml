@@ -25,6 +25,7 @@ Settings {
     property bool showGrid: true
     property bool showPreview: true
     property bool showPullHandleAnimation: true
+    property bool zoomOneDuringEditFocus: false
 
     property real connectorLineWidth: 2
     property real overflowFactor: 0.05

@@ -162,6 +162,24 @@ Item {
                     checked: Runtime.timelineViewSettings.showCursor
                     onToggled: Runtime.timelineViewSettings.showCursor = checked
                 }
+
+                VclCheckBox {
+                    id: _chkZoomOneForEdit
+
+                    Layout.fillWidth: true
+
+                    text: "Zoom One For Edit"
+                    checked: Runtime.structureCanvasSettings.zoomOneDuringEditFocus
+                    hoverEnabled: true
+
+                    onToggled: Runtime.structureCanvasSettings.zoomOneDuringEditFocus = checked
+
+                    ToolTipPopup {
+                        container: _chkZoomOneForEdit
+                        text: "Check this to automatically zoom one on the index card with focus while using structure canvas."
+                        visible: _chkZoomOneForEdit.hovered
+                    }
+                }
             }
         }
 
