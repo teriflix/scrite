@@ -26,6 +26,7 @@ Native.Menu {
     required property ActionManager actionManager
 
     title: actionManager ? actionManager.title : ""
+    type: Menu.EditMenu
 
     // Instantiator is used instead of Repeater because Native.MenuItem objects
     // are not QQuickItems and cannot be used with standard Repeater patterns.

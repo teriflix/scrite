@@ -875,7 +875,7 @@ Item {
 
         Action {
             property bool visible: ActionHandler.canHandle
-            readonly property bool nativeVisible: true
+            readonly property bool nativeVisible: false
 
             enabled: ActionHandler.canHandle
             objectName: "cut"
@@ -887,7 +887,7 @@ Item {
 
         Action {
             property bool visible: ActionHandler.canHandle
-            readonly property bool nativeVisible: true
+            readonly property bool nativeVisible: false
 
             enabled: ActionHandler.canHandle
             objectName: "copy"
@@ -899,7 +899,7 @@ Item {
 
         Action {
             property bool visible: ActionHandler.canHandle
-            readonly property bool nativeVisible: true
+            readonly property bool nativeVisible: false
 
             enabled: ActionHandler.canHandle
             objectName: "paste"
@@ -911,7 +911,7 @@ Item {
 
         Action {
             property bool visible: ActionHandler.canHandle
-            readonly property bool nativeVisible: true
+            readonly property bool nativeVisible: false
 
             enabled: Runtime.dialogs.objectCount === 0
             objectName: "undo"
@@ -929,7 +929,7 @@ Item {
 
         Action {
             property bool visible: ActionHandler.canHandle
-            readonly property bool nativeVisible: true
+            readonly property bool nativeVisible: false
 
             enabled: Runtime.dialogs.objectCount === 0
             objectName: "redo"
@@ -947,7 +947,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property bool nativeVisible: true
+            readonly property bool nativeVisible: false
 
             enabled: ActionHandler.canHandle
             objectName: "selectAll"
@@ -969,6 +969,7 @@ Item {
         }
 
         Action {
+            readonly property bool nativeVisible: false
             readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Find)
 
             enabled: ActionHandler.canHandle
@@ -981,7 +982,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property bool nativeVisible: true
+            readonly property bool nativeVisible: false
             readonly property string defaultShortcut: Platform.MacOSDesktop ? "Ctrl+Shift+F" : Gui.standardShortcut(StandardKey.Replace)
 
             enabled: ActionHandler.canHandle

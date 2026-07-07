@@ -28,6 +28,7 @@ Native.MenuBar {
         id: _fileMenu
 
         title: "File"
+        type: Menu.DefaultMenu
 
         NativeActionMenuItem {
             text: "New"
@@ -107,7 +108,54 @@ Native.MenuBar {
 
     Native.Menu {
         title: "Screenplay"
+        type: Menu.DefaultMenu
         visible: Runtime.screenplayEditor !== null
+
+        NativeActionMenuItem {
+            action: ActionHub.editOptions.find("cut")
+            visible: true
+        }
+
+        NativeActionMenuItem {
+            action: ActionHub.editOptions.find("copy")
+            visible: true
+        }
+
+        NativeActionMenuItem {
+            action: ActionHub.editOptions.find("paste")
+            visible: true
+        }
+
+        NativeActionMenuItem {
+            action: ActionHub.editOptions.find("selectAll")
+            visible: true
+        }
+
+        Native.MenuSeparator { }
+
+        NativeActionMenuItem {
+            action: ActionHub.editOptions.find("undo")
+            visible: true
+        }
+
+        NativeActionMenuItem {
+            action: ActionHub.editOptions.find("redo")
+            visible: true
+        }
+
+        Native.MenuSeparator { }
+
+        NativeActionMenuItem {
+            action: ActionHub.editOptions.find("find")
+            visible: true
+        }
+
+        NativeActionMenuItem {
+            action: ActionHub.editOptions.find("replace")
+            visible: true
+        }
+
+        Native.MenuSeparator { }
 
         ActionManagerNativeMenu {
             actionManager: ActionHub.editOptions
@@ -142,62 +190,52 @@ Native.MenuBar {
 
     Native.Menu {
         title: "Structure"
+        type: Menu.DefaultMenu
 
-        NativeActionMenuItem {
+        Native.Menu {
+            title: "Canvas"
+            type: Menu.DefaultMenu
             visible: Runtime.mainWindowTab === Runtime.StructureTab
-            action: ActionHub.structureCanvasOperations.find("copy")
-        }
 
-        NativeActionMenuItem {
-            visible: Runtime.mainWindowTab === Runtime.StructureTab
-            action: ActionHub.structureCanvasOperations.find("paste")
-        }
+            NativeActionMenuItem {
+                action: ActionHub.structureCanvasOperations.find("copy")
+            }
 
-        NativeActionMenuItem {
-            visible: Runtime.mainWindowTab === Runtime.StructureTab
-            action: ActionHub.structureCanvasOperations.find("delete")
-        }
+            NativeActionMenuItem {
+                action: ActionHub.structureCanvasOperations.find("paste")
+            }
 
-        NativeActionMenuItem {
-            visible: Runtime.mainWindowTab === Runtime.StructureTab
-            action: ActionHub.structureCanvasOperations.find("selectAll")
-        }
+            NativeActionMenuItem {
+                action: ActionHub.structureCanvasOperations.find("delete")
+            }
 
-        Native.MenuSeparator {
-            visible: Runtime.mainWindowTab === Runtime.StructureTab
-        }
+            NativeActionMenuItem {
+                action: ActionHub.structureCanvasOperations.find("selectAll")
+            }
 
-        NativeActionMenuItem {
-            visible: Runtime.mainWindowTab === Runtime.StructureTab
-            action: ActionHub.structureCanvasOperations.find("zoomIn")
-        }
+            Native.MenuSeparator {}
 
-        NativeActionMenuItem {
-            visible: Runtime.mainWindowTab === Runtime.StructureTab
-            action: ActionHub.structureCanvasOperations.find("zoomOut")
-        }
+            NativeActionMenuItem {
+                action: ActionHub.structureCanvasOperations.find("zoomIn")
+            }
 
-        NativeActionMenuItem {
-            visible: Runtime.mainWindowTab === Runtime.StructureTab
-            action: ActionHub.structureCanvasOperations.find("zoomOne")
-        }
+            NativeActionMenuItem {
+                action: ActionHub.structureCanvasOperations.find("zoomOut")
+            }
 
-        NativeActionMenuItem {
-            visible: Runtime.mainWindowTab === Runtime.StructureTab
-            action: ActionHub.structureCanvasOperations.find("zoomFit")
-        }
+            NativeActionMenuItem {
+                action: ActionHub.structureCanvasOperations.find("zoomOne")
+            }
 
-        Native.MenuSeparator {
-            visible: Runtime.mainWindowTab === Runtime.StructureTab
-        }
+            NativeActionMenuItem {
+                action: ActionHub.structureCanvasOperations.find("zoomFit")
+            }
 
-        NativeActionMenuItem {
-            visible: Runtime.mainWindowTab === Runtime.StructureTab
-            action: ActionHub.structureCanvasOperations.find("beatBoardLayout")
-        }
+            Native.MenuSeparator {}
 
-        Native.MenuSeparator {
-            visible: Runtime.mainWindowTab === Runtime.StructureTab
+            NativeActionMenuItem {
+                action: ActionHub.structureCanvasOperations.find("beatBoardLayout")
+            }
         }
 
         ActionManagerNativeMenu {
