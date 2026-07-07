@@ -2517,11 +2517,13 @@ void SceneDocumentBinder::onSpellCheckUpdated()
 
 void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int charsAdded)
 {
-    if (m_initializingDocument || m_sceneIsBeingReset || m_sceneElementTaskIsRunning
-        || m_cursorPosition < 0)
+    if (m_initializingDocument || m_sceneIsBeingReset || m_sceneElementTaskIsRunning)
         return;
 
     if (m_textDocument == nullptr || m_scene == nullptr || this->document() == nullptr)
+        return;
+
+    if (ScriteDocument::instance()->isReadOnly())
         return;
 
     /* If m_cursorPosition > 0, it means that the user is currently typing in the TextArea within
@@ -2540,8 +2542,6 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
         return newCursorPosition;
     };
     auto guard = qScopeGuard(updateCursorPosition);
-    if (m_cursorPosition < 0)
-        guard.dismiss();
 
     m_tabHistory.clear();
 
