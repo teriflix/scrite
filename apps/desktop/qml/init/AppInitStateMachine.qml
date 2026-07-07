@@ -70,6 +70,7 @@ QSM.StateMachine {
         signal failed()
 
         onEntered: {
+            root._deferredLicenseCheck = Scrite.user.loggedIn
             const info = Scrite.prelaunchChecks()
             if (info) {
                 if (info.uninstaller !== "YES") {
@@ -99,7 +100,14 @@ QSM.StateMachine {
             }
         }
 
-        QSM.SignalTransition { signal: s2Prelaunch.passed; targetState: s3License }
+        QSM.SignalTransition {
+            signal: s2Prelaunch.passed; targetState: s3License
+            guard: !root._deferredLicenseCheck
+        }
+        QSM.SignalTransition {
+            signal: s2Prelaunch.passed; targetState: s4AppInit
+            guard: root._deferredLicenseCheck
+        }
         QSM.SignalTransition { signal: s2Prelaunch.failed; targetState: sQuit }
     }
 
@@ -128,7 +136,14 @@ QSM.StateMachine {
             }
         }
 
-        QSM.SignalTransition { signal: s3License.accepted; targetState: s4AppInit }
+        QSM.SignalTransition {
+            signal: s3License.accepted; targetState: s4AppInit
+            guard: !root._deferredLicenseCheck
+        }
+        QSM.SignalTransition {
+            signal: s3License.accepted; targetState: sDone
+            guard: root._deferredLicenseCheck
+        }
         QSM.SignalTransition { signal: s3License.declined; targetState: sQuit }
     }
 
@@ -263,11 +278,17 @@ QSM.StateMachine {
             } else {
                 Scrite.document.open(Scrite.fileNameToOpen)
             }
-            Runtime.execLater(root, 2000, root._maybeOnboardUserSurvey)
             Qt.callLater(() => s7HomeOrFile.done())
         }
 
-        QSM.SignalTransition { signal: s7HomeOrFile.done; targetState: sDone }
+        QSM.SignalTransition {
+            signal: s7HomeOrFile.done; targetState: s3License
+            guard: root._deferredLicenseCheck
+        }
+        QSM.SignalTransition {
+            signal: s7HomeOrFile.done; targetState: sDone
+            guard: !root._deferredLicenseCheck
+        }
     }
 
     /*
@@ -303,9 +324,15 @@ QSM.StateMachine {
      */
     QSM.FinalState {
         id: sDone
+
+        onEntered: {
+            Runtime.execLater(root, 2000, root._maybeOnboardUserSurvey)
+        }
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
+
+    property bool _deferredLicenseCheck: false
 
     function _determineDefaultFontSize() {
         if (Scrite.app.customFontPointSize === 0) {
