@@ -586,6 +586,7 @@ Item {
 
         Action {
             readonly property bool hideInCommandCenter: true
+            readonly property bool nativeVisible: false
             readonly property string defaultShortcut: "F1"
 
             enabled: ActionHandler.canHandle
@@ -2926,7 +2927,8 @@ Item {
         objectName: "userOptions"
 
         Action {
-            readonly property var keywords: ["logout", "logs", "activity", "analytics"]
+            readonly property bool nativeVisible: true
+            readonly property var keywords: ["logout", "logs", "activity", "analytics", "telemetry"]
             readonly property string defaultShortcut: "F8"
             property bool visible: enabled
 
@@ -2937,16 +2939,7 @@ Item {
         }
 
         Action {
-            readonly property bool visible: false
-            readonly property string defaultShortcut: "F9"
-
-            enabled: ActionHandler.canHandle
-            objectName: "messages"
-            shortcut: defaultShortcut
-            text: "Messages"
-        }
-
-        Action {
+            readonly property bool nativeVisible: true
             readonly property bool visible: false
             readonly property var keywords: ["plan", "paid", "pay", "purchase", "buy", "license", "pricing", "price", "discount"]
             readonly property string defaultShortcut: "F10"
@@ -2958,6 +2951,7 @@ Item {
         }
 
         Action {
+            readonly property bool nativeVisible: true
             readonly property bool visible: false
             readonly property var keywords: ["device"]
             readonly property string defaultShortcut: "F11"
@@ -2966,6 +2960,18 @@ Item {
             objectName: "installations"
             shortcut: defaultShortcut
             text: "Installations"
+        }
+
+        Action {
+            readonly property bool nativeVisible: true
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "F9"
+            readonly property var keywords: ["notifications"]
+
+            enabled: ActionHandler.canHandle
+            objectName: "messages"
+            shortcut: defaultShortcut
+            text: "Messages"
         }
     }
 

@@ -226,13 +226,18 @@ Native.MenuBar {
     }
 
     ActionManagerNativeMenu {
+        title: "Tabs"
+        actionManager: ActionHub.mainWindowTabs
+    }
+
+    ActionManagerNativeMenu {
         title: "Tools"
         actionManager: ActionHub.appOptions
     }
 
     ActionManagerNativeMenu {
-        title: "Tabs"
-        actionManager: ActionHub.mainWindowTabs
+        title: "Account"
+        actionManager: ActionHub.userOptions
     }
 
     ActionManagerNativeMenu {
@@ -247,6 +252,7 @@ Native.MenuBar {
 
             delegate: NativeActionMenuItem {
                 action: ActionHub.appOptions.find("helpCenter")
+                visible: true
             }
 
             onObjectAdded: (index, object) => _helpMenu.addItem(object)
