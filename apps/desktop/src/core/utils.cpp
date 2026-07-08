@@ -250,11 +250,11 @@ QString Utils::Platform::modifierDescription(int modifier)
 
     switch (modifier) {
     case Qt::ShiftModifier:
-        return QStringLiteral("Shift") + (isMacOSDesktop() ? " ⇧" : "");
+        return QStringLiteral("Shift") + (isMacOSDesktop() ? QStringLiteral(" ⇧") : QString());
     case Qt::ControlModifier:
         return isMacOSDesktop() ? QStringLiteral("Cmd ⌘") : QStringLiteral("Ctrl");
     case Qt::AltModifier:
-        return QStringLiteral("Alt") + (isMacOSDesktop() ? " ⌥" : "");
+        return isMacOSDesktop() ? QStringLiteral("Opt ⌥") : QStringLiteral("Alt");
     case Qt::MetaModifier:
         return isMacOSDesktop() ? QStringLiteral("Ctrl ⌃") : QStringLiteral("Meta");
     }
