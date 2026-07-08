@@ -36,6 +36,11 @@ Native.MenuItem {
         return action.visible !== undefined ? action.visible && hasText : hasText
     }
     shortcut: qmlAction ? qmlAction.shortcut : ""
+    role: action.nativeMenuItemType !== undefined ? action.nativeMenuItemType : Native.MenuItem.NoRole
+    onRoleChanged: {
+        if(role !== Native.MenuItem.NoRole)
+            Gui.log(text + " has role as " + role)
+    }
 
     onTriggered: {
         if(qmlAction) {

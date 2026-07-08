@@ -28,7 +28,7 @@ Native.MenuBar {
         id: _fileMenu
 
         title: "File"
-        type: Menu.DefaultMenu
+        type: Native.Menu.DefaultMenu
 
         NativeActionMenuItem {
             text: "New"
@@ -108,7 +108,7 @@ Native.MenuBar {
 
     Native.Menu {
         title: "Screenplay"
-        type: Menu.DefaultMenu
+        type: Native.Menu.DefaultMenu
         visible: Runtime.screenplayEditor !== null
 
         NativeActionMenuItem {
@@ -157,14 +157,30 @@ Native.MenuBar {
 
         Native.MenuSeparator { }
 
-        ActionManagerNativeMenu {
-            actionManager: ActionHub.editOptions
+        NativeActionMenuItem {
+            action: ActionHub.screenplayOperations.find("titlePage")
+            visible: true
         }
 
-        ActionManagerNativeMenu {
-            title: "Options"
+        NativeActionMenuItem {
+            action: ActionHub.screenplayOperations.find("newScene")
+            visible: true
+        }
 
-            actionManager: ActionHub.screenplayOperations
+        NativeActionMenuItem {
+            action: ActionHub.screenplayOperations.find("actBreak")
+            visible: true
+        }
+
+        NativeActionMenuItem {
+            action: ActionHub.screenplayOperations.find("episodeBreak")
+            visible: true
+        }
+
+        Native.MenuSeparator { }
+
+        ActionManagerNativeMenu {
+            actionManager: ActionHub.editOptions
         }
 
         ActionManagerNativeMenu {
@@ -190,11 +206,11 @@ Native.MenuBar {
 
     Native.Menu {
         title: "Structure"
-        type: Menu.DefaultMenu
+        type: Native.Menu.DefaultMenu
 
         Native.Menu {
             title: "Canvas"
-            type: Menu.DefaultMenu
+            type: Native.Menu.DefaultMenu
             visible: Runtime.mainWindowTab === Runtime.StructureTab
 
             NativeActionMenuItem {

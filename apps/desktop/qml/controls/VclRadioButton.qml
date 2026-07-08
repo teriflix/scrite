@@ -26,11 +26,14 @@ RadioButton {
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
     contentItem: VclLabel {
+        leftPadding: root.indicator && !root.mirrored ? root.indicator.width + root.spacing : 0
+        rightPadding: root.indicator && root.mirrored ? root.indicator.width + root.spacing : 0
+
         text: root.text
         font: root.font
-        opacity: enabled ? 1.0 : 0.5
+        color: root.enabled ? root.Material.foreground : root.Material.hintTextColor
         wrapMode: Text.WordWrap
-        leftPadding: root.indicator.width + root.spacing
-        verticalAlignment: Text.AlignTop
+        opacity: root.enabled ? 1 : 0.5
+        verticalAlignment: Text.AlignVCenter
     }
 }

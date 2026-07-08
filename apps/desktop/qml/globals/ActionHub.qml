@@ -32,6 +32,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
+import Qt.labs.platform as Native
 
 import io.scrite.components
 
@@ -522,6 +523,7 @@ Item {
         objectName: "appOptions"
 
         Action {
+            readonly property int nativeMenuItemType: Native.MenuItem.PreferencesRole
             readonly property var keywords: ["colors"]
             readonly property string defaultShortcut: "Ctrl+,"
 
@@ -610,6 +612,7 @@ Item {
         }
 
         Action {
+            readonly property int nativeMenuItemType: Native.MenuItem.AboutRole
             readonly property bool allowShortcut: true
 
             text: "About"
@@ -1900,7 +1903,7 @@ Item {
 
             enabled: !Scrite.document.readOnly
             shortcut: defaultShortcut
-            text: "Title Page"
+            text: "Configure Title Page"
             objectName: "titlePage"
 
             icon.source: "qrc:/icons/action/edit_title_page.png"
@@ -2741,6 +2744,7 @@ Item {
         objectName: "applicationOptions"
 
         Action {
+            readonly property int nativeMenuItemType: Native.MenuItem.QuitRole
             readonly property bool visible: false
             readonly property bool allowShortcut: true
             readonly property var keywords: ["quit", "shutdown"]

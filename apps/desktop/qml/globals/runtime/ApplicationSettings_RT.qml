@@ -38,6 +38,7 @@ Settings {
     property bool reloadPrompt: true
     property bool useNativeTextRendering: false
     property bool useSoftwareRenderer: false
+    property bool showColorThemeIconOnToolbar: true
 
     property string uiTheme: Scrite.app.availableThemes[0]
 

@@ -29,6 +29,8 @@ import "../controls"
 Rectangle {
     id: root
 
+    readonly property real idealHeaderWidth: Platform.isMacOSDesktop ? 1470 : 1366
+
     color: Runtime.colors.primary.c50.background
 
     implicitHeight: _layout.height
@@ -38,6 +40,7 @@ Rectangle {
         id: _layout
 
         width: parent.width
+        spacing: 0
 
         ToolButton {
             id: _mainMenuButton
@@ -102,6 +105,7 @@ Rectangle {
         RowLayout {
             id: _group1
 
+            spacing: 0
             visible: Runtime.mainWindowTab !== Runtime.MainWindowTab.ScritedTab &&
                      root.width > _group1.width + _group2.width + _mainTabs.width + _userAccount.width
 
@@ -137,7 +141,7 @@ Rectangle {
 
             ActionToolButton {
                 action: ActionHub.appOptions.find("toggleColorTheme") as Action
-                visible: true
+                visible: root.width >= root.idealHeaderWidth && Runtime.applicationSettings.showColorThemeIconOnToolbar
                 tooltip: "Switch to " + (action.isDarkMode ? "Light" : "Dark") + " Mode (" + Gui.portableShortcut(action.shortcut) + ")"
             }
 
@@ -186,6 +190,7 @@ Rectangle {
         RowLayout {
             id: _group2
 
+            spacing: 0
             visible: Runtime.mainWindowTab !== Runtime.MainWindowTab.ScritedTab
 
             ActionManagerToolButton {
@@ -256,6 +261,7 @@ Rectangle {
         RowLayout {
             id: _scritedGroup
 
+            spacing: 0
             visible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScritedTab
 
             ActionToolButton {
@@ -283,6 +289,8 @@ Rectangle {
         RowLayout {
             id: _mainTabs
 
+            spacing: 0
+
             Repeater {
                 model: ActionHub.mainWindowTabs
 
@@ -305,7 +313,7 @@ Rectangle {
 
                     action: qmlAction
                     down: qmlAction.down
-                    display: down && root.width >= 1400 ? Button.TextBesideIcon : Button.IconOnly
+                    display: down && root.width >= root.idealHeaderWidth ? Button.TextBesideIcon : Button.IconOnly
                     flat: true
                     visible: qmlAction.visible !== undefined ? qmlAction.visible === true : true
 

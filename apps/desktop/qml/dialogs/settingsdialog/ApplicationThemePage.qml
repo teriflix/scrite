@@ -164,22 +164,42 @@ Item {
                 ColumnLayout {
                     width: parent.width
 
-                    VclRadioButton {
-                        text: "Light"
-                        checked: Runtime.applicationSettings.colorMode === "Light"
-                        onClicked: Runtime.applicationSettings.colorMode = "Light"
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        VclRadioButton {
+                            text: "Light"
+                            checked: Runtime.applicationSettings.colorMode === "Light"
+                            onClicked: Runtime.applicationSettings.colorMode = "Light"
+                        }
+
+                        VclRadioButton {
+                            text: "Dark"
+                            checked: Runtime.applicationSettings.colorMode === "Dark"
+                            onClicked: Runtime.applicationSettings.colorMode = "Dark"
+                        }
+
+                        VclRadioButton {
+                            text: "System"
+                            checked: Runtime.applicationSettings.colorMode === "System"
+                            onClicked: Runtime.applicationSettings.colorMode = "System"
+                        }
                     }
 
-                    VclRadioButton {
-                        text: "Dark"
-                        checked: Runtime.applicationSettings.colorMode === "Dark"
-                        onClicked: Runtime.applicationSettings.colorMode = "Dark"
+                    VclCheckBox {
+                        Layout.fillWidth: true
+
+                        text: "Show Toggle Switch on Toolbar"
+                        checked: Runtime.applicationSettings.showColorThemeIconOnToolbar
+                        onClicked: Runtime.applicationSettings.showColorThemeIconOnToolbar = !Runtime.applicationSettings.showColorThemeIconOnToolbar
                     }
 
-                    VclRadioButton {
-                        text: "System"
-                        checked: Runtime.applicationSettings.colorMode === "System"
-                        onClicked: Runtime.applicationSettings.colorMode = "System"
+                    VclLabel {
+                        Layout.fillWidth: true
+
+                        text: "NOTE: The toggle switch icon will automatically hide when there isnt enough space on the toolbar."
+                        visible: Runtime.applicationSettings.showColorThemeIconOnToolbar
+                        wrapMode: Text.WordWrap
                     }
                 }
             }
