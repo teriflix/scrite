@@ -2369,6 +2369,27 @@ LanguageEngine *LanguageEngine::instance()
     return theInstance;
 }
 
+static void configureFallbackFontList(QChar::Script script, const QStringList &scriptFontFamilies)
+{
+    QStringList result;
+    const QString safeDefault(QStringLiteral("Courier Prime"));
+
+    auto addFontIfNotPresent = [&result](const QString &fontFamily) {
+        if (!fontFamily.isEmpty() && !result.contains(fontFamily))
+            result.append(fontFamily);
+    };
+
+    for (const QString &family : scriptFontFamilies)
+        addFontIfNotPresent(family);
+
+    addFontIfNotPresent(safeDefault);
+
+    const QString appFontFamily = qApp->font().family();
+    addFontIfNotPresent(appFontFamily);
+
+    QFontDatabase::setApplicationFallbackFontFamilies(script, result);
+}
+
 LanguageEngine::LanguageEngine(QObject *parent) : QObject(parent)
 {
     m_availableLanguages = new AvailableLanguages(this);
@@ -2457,14 +2478,14 @@ LanguageEngine::LanguageEngine(QObject *parent) : QObject(parent)
         const QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
         if (!fontFamilies.isEmpty()) {
             m_defaultScriptFontFamily[script] = fontFamilies.constFirst();
-            QFontDatabase::setApplicationFallbackFontFamilies(script, fontFamilies);
+            configureFallbackFontList(script, fontFamilies);
         } else {
             m_defaultScriptFontFamily[script] = safeDefaultFontFamily;
+            configureFallbackFontList(script, QStringList());
         }
     }
     m_defaultScriptFontFamily[QChar::Script_Unknown] = safeDefaultFontFamily;
-    QFontDatabase::setApplicationFallbackFontFamilies(QChar::Script_Unknown,
-                                                       QStringList(safeDefaultFontFamily));
+    configureFallbackFontList(QChar::Script_Unknown, QStringList());
 
     connect(qApp, &QCoreApplication::aboutToQuit, this, &LanguageEngine::saveConfiguration);
 
@@ -2491,7 +2512,11 @@ bool LanguageEngine::setScriptFontFamily(QChar::Script script, const QString &fo
         return false;
 
     m_scriptFontFamily[script] = fontFamily;
-    QFontDatabase::setApplicationFallbackFontFamilies(script, QStringList(fontFamily));
+
+    // Changing it here can cause issues in some parts of the UI.
+    // Its best to defer this to next restart.
+    // configureFallbackFontList(script, QStringList(fontFamily));
+
     emit scriptFontFamilyChanged(script, fontFamily);
 
     return true;
@@ -2963,6 +2988,7 @@ void LanguageEngine::loadConfiguration()
                 const int scriptValue = scriptEnum.keyToValue(scriptName.toLatin1().constData());
                 if (scriptValue >= 0) {
                     m_scriptFontFamily[QChar::Script(scriptValue)] = fontFamily;
+                    configureFallbackFontList(QChar::Script(scriptValue), QStringList(fontFamily));
                 }
             }
         }
