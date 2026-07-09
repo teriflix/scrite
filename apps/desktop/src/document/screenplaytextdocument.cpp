@@ -3434,7 +3434,11 @@ void ScreenplayTextObjectInterface::drawSceneIcon(QPainter *painter, const QRect
     QRectF iconKeyRect = rect;
     iconKeyRect.moveTop(rect.bottom() + rect.height() * 0.5);
     painter->save();
-    painter->setFont(QFont(painter->font().family(), painter->font().pointSize() - 4));
+
+    QFont font = doc->defaultFont();
+    font.setPointSize(font.pointSize() - 4);
+    painter->setFont(font);
+
     this->drawText(painter, iconKeyRect, QStringLiteral("(") + iconKey + QStringLiteral(")"));
     painter->restore();
 }
