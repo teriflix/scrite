@@ -3383,6 +3383,8 @@ void ScreenplayTextObjectInterface::drawMoreMarker(QPainter *painter, const QRec
     QColor textColor = format.foreground().color();
     textColor.setAlphaF(textColor.alphaF() * 0.75);
     painter->setPen(textColor);
+
+    painter->setFont(doc->defaultFont());
     this->drawText(painter, rect, text);
 
     painter->setPen(oldPen);
