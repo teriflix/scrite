@@ -2455,10 +2455,16 @@ LanguageEngine::LanguageEngine(QObject *parent) : QObject(parent)
         m_bundledFontFiles[script] = fontFiles;
 
         const QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
-        m_defaultScriptFontFamily[script] =
-                fontFamilies.isEmpty() ? safeDefaultFontFamily : fontFamilies.constFirst();
+        if (!fontFamilies.isEmpty()) {
+            m_defaultScriptFontFamily[script] = fontFamilies.constFirst();
+            QFontDatabase::setApplicationFallbackFontFamilies(script, fontFamilies);
+        } else {
+            m_defaultScriptFontFamily[script] = safeDefaultFontFamily;
+        }
     }
     m_defaultScriptFontFamily[QChar::Script_Unknown] = safeDefaultFontFamily;
+    QFontDatabase::setApplicationFallbackFontFamilies(QChar::Script_Unknown,
+                                                       QStringList(safeDefaultFontFamily));
 
     connect(qApp, &QCoreApplication::aboutToQuit, this, &LanguageEngine::saveConfiguration);
 
@@ -2485,6 +2491,7 @@ bool LanguageEngine::setScriptFontFamily(QChar::Script script, const QString &fo
         return false;
 
     m_scriptFontFamily[script] = fontFamily;
+    QFontDatabase::setApplicationFallbackFontFamilies(script, QStringList(fontFamily));
     emit scriptFontFamilyChanged(script, fontFamily);
 
     return true;
