@@ -225,11 +225,13 @@ Rectangle {
             enabled: root.canvasItemsBoundingBox.itemCount > 0
             autoRepeat: true
             iconSource: Runtime.themedIcon("qrc:/icons/navigation/zoom_one.png")
-            toolTipText: "Zoom One"
+            toolTipText: "Zoom One\t(" + Gui.portableShortcut(_zoomOneHandler.action.shortcut) + ")"
 
             onClicked: root.zoomOneRequest()
 
             ActionHandler {
+                id: _zoomOneHandler
+
                 action: ActionHub.structureCanvasOperations.find("zoomOne")
 
                 onTriggered: _cmdZoomOne.clicked()
@@ -245,11 +247,13 @@ Rectangle {
             enabled: root.canvasItemsBoundingBox.itemCount > 0
             autoRepeat: true
             iconSource: Runtime.themedIcon("qrc:/icons/navigation/zoom_fit.png")
-            toolTipText: "Zoom Fit"
+            toolTipText: "Zoom Fit\t(" + Gui.portableShortcut(_zoomFitHandler.action.shortcut) + ")"
 
             onClicked: root.zoomFitRequest(root.canvasItemsBoundingBox.boundingBox)
 
             ActionHandler {
+                id: _zoomFitHandler
+
                 action: ActionHub.structureCanvasOperations.find("zoomFit")
 
                 onTriggered: _cmdZoomFit.clicked()

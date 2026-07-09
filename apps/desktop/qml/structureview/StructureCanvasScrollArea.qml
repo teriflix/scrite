@@ -136,7 +136,7 @@ ScrollArea {
         canvasPreviewUpdatingThumbnail: root.canvasPreviewUpdatingThumbnail
 
         onEditElementItemChanged: {
-            if(editElementItem && _canvas.scaleIsLessForEdit) {
+            if(editElementItem && _canvas.scaleIsLessForEdit && Runtime.structureCanvasSettings.zoomOneDuringEditFocus) {
                 Runtime.execLater(root, 500, function() { _private.zoomOneToItem(editElementItem) })
             }
         }
