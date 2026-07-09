@@ -45,6 +45,9 @@ static const char *_QQuickActionKeywordsChanged = SIGNAL(keywordsChanged());
 static const QByteArray _QQuickActionVisibleProperty = QByteArrayLiteral("visible");
 static const char *_QQuickActionVisibilityChanged = SIGNAL(visibleChanged());
 
+static const QByteArray _QQuickActionNativeVisibleProperty = QByteArrayLiteral("nativeVisible");
+static const char *_QQuickActionNativeVisibilityChanged = SIGNAL(nativeVisibleChanged());
+
 static const QByteArray _QQuickActionShortcutProperty = QByteArrayLiteral("shortcut");
 static const char *_QQuickActionShortcutChanged = SIGNAL(shortcutChanged(QKeySequence));
 
@@ -155,6 +158,8 @@ ActionManager::ActionManager(QObject *parent) : QAbstractListModel(parent)
     connect(this, &ActionManager::rowsRemoved, this, &ActionManager::countChanged);
     connect(this, &ActionManager::rowsInserted, this, &ActionManager::countChanged);
     connect(this, &ActionManager::countChanged, this, &ActionManager::visibleActionsChanged);
+    connect(this, &ActionManager::countChanged, this,
+            &ActionManager::nativelyVisibleActionsChanged);
 
     connect(this, &QObject::objectNameChanged, this, &ActionManager::scheduleApplySavedShortcuts);
 }
@@ -382,6 +387,37 @@ QList<QObject *> ActionManager::visibleActions() const
     return ret;
 }
 
+QList<QObject *> ActionManager::nativelyVisibleActions() const
+{
+
+    QList<QObject *> ret;
+
+    std::copy_if(m_actions.begin(), m_actions.end(), std::back_inserter(ret), [](QObject *action) {
+        const QMetaProperty nativeVisibleProperty = action->metaObject()->property(
+                action->metaObject()->indexOfProperty(_QQuickActionNativeVisibleProperty));
+        if (nativeVisibleProperty.isValid()
+            && nativeVisibleProperty.userType() == QMetaType::Bool) {
+            const QVariant nativeVisibleFlag =
+                    readQQuickActionProperty(action, _QQuickActionNativeVisibleProperty);
+            if (nativeVisibleFlag.isValid() && nativeVisibleFlag.userType() == QMetaType::Bool)
+                return nativeVisibleFlag.toBool();
+        }
+
+        const QMetaProperty visibleProperty = action->metaObject()->property(
+                action->metaObject()->indexOfProperty(_QQuickActionVisibleProperty));
+        if (visibleProperty.isValid() && visibleProperty.userType() == QMetaType::Bool) {
+            const QVariant visibleFlag =
+                    readQQuickActionProperty(action, _QQuickActionVisibleProperty);
+            if (visibleFlag.isValid() && visibleFlag.userType() == QMetaType::Bool)
+                return visibleFlag.toBool();
+        }
+
+        return true;
+    });
+
+    return ret;
+}
+
 QQmlListProperty<QObject> ActionManager::qmlActionsList()
 {
     return QQmlListProperty<QObject>(
@@ -507,6 +543,20 @@ bool ActionManager::addInternal(QObject *action)
                 connect(action, _QQuickActionVisibilityChanged, this, SLOT(onActionDataChanged()));
                 connect(action, _QQuickActionVisibilityChanged, this,
                         SIGNAL(visibleActionsChanged()));
+                connect(action, _QQuickActionVisibilityChanged, this,
+                        SIGNAL(nativelyVisibleActionsChanged()));
+            }
+        }
+
+        const QMetaProperty nativeVisibleProperty = action->metaObject()->property(
+                action->metaObject()->indexOfProperty(_QQuickActionNativeVisibleProperty));
+        if (nativeVisibleProperty.isValid()) {
+            if (nativeVisibleProperty.isWritable() && !nativeVisibleProperty.isConstant()
+                && nativeVisibleProperty.hasNotifySignal()) {
+                connect(action, _QQuickActionNativeVisibilityChanged, this,
+                        SLOT(onActionDataChanged()));
+                connect(action, _QQuickActionNativeVisibilityChanged, this,
+                        SIGNAL(nativelyVisibleActionsChanged()));
             }
         }
 

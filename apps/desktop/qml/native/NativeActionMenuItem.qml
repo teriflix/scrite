@@ -13,6 +13,7 @@
 **
 ****************************************************************************/
 
+import QtQml
 import QtQuick.Controls
 import Qt.labs.platform as Native
 
@@ -29,23 +30,20 @@ Native.MenuItem {
     checkable: (qmlAction ? qmlAction.checkable : false) || (action.down !== undefined)
     checked: qmlAction && qmlAction.checkable ? qmlAction.checked : (action.down !== undefined ? action.down : false)
     enabled: qmlAction ? qmlAction.enabled : false
-    visible: {
-        const hasText = action.text !== ""
-        if(action.nativeVisible !== undefined)
-            return action.nativeVisible && hasText
-        return action.visible !== undefined ? action.visible && hasText : hasText
-    }
+    visible: text !== ""
     shortcut: qmlAction ? qmlAction.shortcut : ""
-    role: action.nativeMenuItemType !== undefined ? action.nativeMenuItemType : Native.MenuItem.NoRole
-    onRoleChanged: {
-        if(role !== Native.MenuItem.NoRole)
-            Gui.log(text + " has role as " + role)
-    }
 
     onTriggered: {
         if(qmlAction) {
             // Calling trigger is enough even for checkable actions
             qmlAction.trigger(root)
         }
+    }
+
+    readonly property Binding _roleBinding: Binding {
+        target: root
+        property: "role"
+        value: root.action.nativeMenuItemRole
+        when: root.action.nativeMenuItemRole !== undefined
     }
 }

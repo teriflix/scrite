@@ -22,13 +22,11 @@ import "../globals"
 Native.MenuBar {
     id: root
 
-    property bool enabled: true
-
     Native.Menu {
         id: _fileMenu
 
         title: "File"
-        type: Native.Menu.DefaultMenu
+        // type: Native.Menu.DefaultMenu
 
         NativeActionMenuItem {
             text: "New"
@@ -99,6 +97,7 @@ Native.MenuBar {
 
             delegate: NativeActionMenuItem {
                 action: ActionHub.inputOptions.find("alphabetMappings")
+                visible: action.enabled
             }
 
             onObjectAdded: (index, object) => _languageMenu.addItem(object)
@@ -157,27 +156,10 @@ Native.MenuBar {
 
         Native.MenuSeparator { }
 
-        NativeActionMenuItem {
-            action: ActionHub.screenplayOperations.find("titlePage")
-            visible: true
+        ActionManagerNativeMenu {
+            title: "Components"
+            actionManager: ActionHub.screenplayOperations
         }
-
-        NativeActionMenuItem {
-            action: ActionHub.screenplayOperations.find("newScene")
-            visible: true
-        }
-
-        NativeActionMenuItem {
-            action: ActionHub.screenplayOperations.find("actBreak")
-            visible: true
-        }
-
-        NativeActionMenuItem {
-            action: ActionHub.screenplayOperations.find("episodeBreak")
-            visible: true
-        }
-
-        Native.MenuSeparator { }
 
         ActionManagerNativeMenu {
             actionManager: ActionHub.editOptions
@@ -192,7 +174,7 @@ Native.MenuBar {
         }
 
         ActionManagerNativeMenu {
-            title: "Editor"
+            title: "Editor Options"
             actionManager: ActionHub.screenplayEditorOptions
         }
 
@@ -206,11 +188,11 @@ Native.MenuBar {
 
     Native.Menu {
         title: "Structure"
-        type: Native.Menu.DefaultMenu
+        // type: Native.Menu.DefaultMenu
 
         Native.Menu {
             title: "Canvas"
-            type: Native.Menu.DefaultMenu
+            // type: Native.Menu.DefaultMenu
             visible: Runtime.mainWindowTab === Runtime.StructureTab
 
             NativeActionMenuItem {

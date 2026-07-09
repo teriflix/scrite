@@ -523,7 +523,7 @@ Item {
         objectName: "appOptions"
 
         Action {
-            readonly property int nativeMenuItemType: Native.MenuItem.PreferencesRole
+            readonly property int nativeMenuItemRole: Native.MenuItem.PreferencesRole
             readonly property var keywords: ["colors"]
             readonly property string defaultShortcut: "Ctrl+,"
 
@@ -557,7 +557,7 @@ Item {
         Action {
             readonly property string defaultShortcut: "Ctrl+E"
 
-            text: "Shortcuts"
+            text: "Customise Shortcuts"
             objectName: "shortcuts"
             shortcut: defaultShortcut
 
@@ -612,7 +612,7 @@ Item {
         }
 
         Action {
-            readonly property int nativeMenuItemType: Native.MenuItem.AboutRole
+            readonly property int nativeMenuItemRole: Native.MenuItem.AboutRole
             readonly property bool allowShortcut: true
 
             text: "About"
@@ -789,7 +789,12 @@ Item {
 
             icon.source: language.iconSource
 
-            onTriggered: if(checked) Runtime.language.setActiveCode(language.code)
+            onTriggered: {
+                if(Runtime.language.activeCode !== language.code)
+                    Runtime.language.setActiveCode(language.code)
+                else
+                    Qt.callLater(toggle) // to check this option back again!
+            }
         }
     }
 
@@ -1464,6 +1469,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
             readonly property string defaultShortcut: "Alt+0"
 
             objectName: "sidePanelVisibility"
@@ -1477,6 +1483,7 @@ Item {
         Action {
             readonly property bool allowShortcut: true
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
 
             objectName: "displayScreenplayTracks"
             checkable: true
@@ -2744,7 +2751,7 @@ Item {
         objectName: "applicationOptions"
 
         Action {
-            readonly property int nativeMenuItemType: Native.MenuItem.QuitRole
+            readonly property int nativeMenuItemRole: Native.MenuItem.QuitRole
             readonly property bool visible: false
             readonly property bool allowShortcut: true
             readonly property var keywords: ["quit", "shutdown"]

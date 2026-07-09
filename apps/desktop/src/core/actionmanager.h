@@ -85,6 +85,14 @@ public:
     QList<QObject *> visibleActions() const;
     Q_SIGNAL void visibleActionsChanged();
 
+    // clang-format off
+    Q_PROPERTY(QList<QObject*> nativelyVisibleActions
+                               READ nativelyVisibleActions
+                               NOTIFY nativelyVisibleActionsChanged)
+    // clang-format on
+    QList<QObject *> nativelyVisibleActions() const;
+    Q_SIGNAL void nativelyVisibleActionsChanged();
+
     Q_INVOKABLE bool add(QObject *action);
     Q_INVOKABLE bool remove(QObject *action);
     Q_INVOKABLE bool contains(QObject *action) const;
