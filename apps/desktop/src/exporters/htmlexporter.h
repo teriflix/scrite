@@ -45,7 +45,7 @@ public:
     Q_SIGNAL void includeSceneNumbersChanged();
 
     // clang-format off
-    Q_CLASSINFO("exportWithSceneColors_FieldLabel", "Export with scene colors")
+    Q_CLASSINFO("exportWithSceneColors_FieldLabel", "Export with scene colors.")
     Q_CLASSINFO("exportWithSceneColors_FieldEditor", "CheckBox")
     Q_PROPERTY(bool exportWithSceneColors
                READ isExportWithSceneColors
@@ -56,7 +56,20 @@ public:
     bool isExportWithSceneColors() const { return m_exportWithSceneColors; }
     Q_SIGNAL void exportWithSceneColorsChanged();
 
-    bool canBundleFonts() const { return false; }
+    // clang-format off
+    Q_CLASSINFO("bundleFonts_FieldLabel", "Export font files and reference them.")
+    Q_CLASSINFO("bundleFonts_FieldNote", "Only built in fonts are exported when checked. And when unchecked, fonts will be looked up in the system.")
+    Q_CLASSINFO("bundleFonts_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool bundleFonts
+               READ isBundleFonts
+               WRITE setBundleFonts
+               NOTIFY bundleFontsChanged)
+    // clang-format on
+    void setBundleFonts(bool val);
+    bool isBundleFonts() const { return m_bundleFonts; }
+    Q_SIGNAL void bundleFontsChanged();
+
+    bool canBundleFonts() const { return true; }
     bool requiresConfiguration() const { return true; }
 
 protected:
@@ -66,6 +79,7 @@ protected:
 private:
     bool m_includeSceneNumbers = false;
     bool m_exportWithSceneColors = false;
+    bool m_bundleFonts = true;
 };
 
 #endif // HTMLEXPORTER_H

@@ -21,7 +21,9 @@
 #include "scritedocument.h"
 
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
+#include <QRawFont>
 #include <QTextBoundaryFinder>
 
 HtmlExporter::HtmlExporter(QObject *parent) : AbstractExporter(parent) { }
@@ -44,6 +46,15 @@ void HtmlExporter::setIncludeSceneNumbers(bool val)
 
     m_includeSceneNumbers = val;
     emit includeSceneNumbersChanged();
+}
+
+void HtmlExporter::setBundleFonts(bool val)
+{
+    if (m_bundleFonts == val)
+        return;
+
+    m_bundleFonts = val;
+    emit bundleFontsChanged();
 }
 
 static void alignmentToCssValue(QTextStream &ts, Qt::Alignment alignment)
@@ -124,10 +135,83 @@ bool HtmlExporter::doExport(QIODevice *device)
     const QMetaEnum scriptEnum = QMetaEnum::fromType<QtChar::Script>();
     const QMetaEnum elementTypeEnum = QMetaEnum::fromType<SceneElement::Type>();
 
-    const QString fontsDir = QFileInfo(this->fileName()).absolutePath() + "/fonts";
+    if (m_bundleFonts) {
+        const QString fontsDir = QFileInfo(this->fileName()).absolutePath() + "/fonts";
 
-    if (!scriptFonts.isEmpty()) {
-        QDir().mkpath(fontsDir);
+        if (!scriptFonts.isEmpty()) {
+            QDir().mkpath(fontsDir);
+        }
+
+        auto it = scriptFonts.constBegin();
+        auto end = scriptFonts.constEnd();
+
+        while (it != end) {
+            const QChar::Script script = it.key();
+            const QStringList bundledFontFiles =
+                    LanguageEngine::instance()->bundledFontFilesForScript(script);
+
+            for (const QString &fontFile : bundledFontFiles) {
+                QFile srcFile(fontFile);
+                if (srcFile.open(QIODevice::ReadOnly)) {
+                    const QString fileName = QFileInfo(fontFile).fileName();
+                    const QString fontDest = fontsDir + "/" + fileName;
+                    QFile destFile(fontDest);
+                    if (destFile.open(QIODevice::WriteOnly)) {
+                        destFile.write(srcFile.readAll());
+                        destFile.close();
+                    }
+                    srcFile.close();
+
+                    ts << "    @font-face {\n";
+                    ts << "      font-family: \"" << it.value() << "\";\n";
+                    ts << "      src: url(fonts/" << fileName << ");\n";
+
+                    QRawFont rawFont(fontDest, 12);
+                    if (rawFont.isValid()) {
+                        const int weight = rawFont.weight();
+                        const QFont::Style style = rawFont.style();
+
+                        ts << "      font-weight: ";
+                        switch (weight) {
+                        case int(QFont::Light):
+                            ts << "lighter";
+                            break;
+                        case int(QFont::Normal):
+                            ts << "normal";
+                            break;
+                        case int(QFont::Bold):
+                            ts << "bold";
+                            break;
+                        case int(QFont::ExtraBold):
+                            ts << "bolder";
+                            break;
+                        default:
+                            ts << weight;
+                            break;
+                        }
+                        ts << ";\n";
+
+                        ts << "      font-style: ";
+                        switch (style) {
+                        case QFont::StyleNormal:
+                            ts << "normal";
+                            break;
+                        case QFont::StyleItalic:
+                            ts << "italic";
+                            break;
+                        case QFont::StyleOblique:
+                            ts << "oblique";
+                            break;
+                        }
+                        ts << ";\n";
+                    }
+
+                    ts << "    }\n";
+                }
+            }
+
+            ++it;
+        }
     }
 
     auto it = scriptFonts.constBegin();

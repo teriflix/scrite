@@ -2443,14 +2443,19 @@ LanguageEngine::LanguageEngine(QObject *parent) : QObject(parent)
 
     for (const std::tuple<QLocale::Language, QChar::Script, QStringList> &bundle : bundledFonts) {
         int fontId = -1;
-        for (const QString &fontFile : std::get<2>(bundle)) {
+        const QChar::Script script = std::get<1>(bundle);
+        const QStringList &fontFiles = std::get<2>(bundle);
+
+        for (const QString &fontFile : fontFiles) {
             const int id = QFontDatabase::addApplicationFont(fontFile);
             if (fontId < 0)
                 fontId = id;
         }
 
+        m_bundledFontFiles[script] = fontFiles;
+
         const QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
-        m_defaultScriptFontFamily[std::get<1>(bundle)] =
+        m_defaultScriptFontFamily[script] =
                 fontFamilies.isEmpty() ? safeDefaultFontFamily : fontFamilies.constFirst();
     }
     m_defaultScriptFontFamily[QChar::Script_Unknown] = safeDefaultFontFamily;
@@ -2549,6 +2554,11 @@ bool LanguageEngine::hasPlatformLanguages() const
 {
     const QList<int> languages = this->platformLanguages();
     return languages.size() > 1 || (languages.size() == 1 && languages.first() != QLocale::English);
+}
+
+QStringList LanguageEngine::bundledFontFilesForScript(QChar::Script script) const
+{
+    return m_bundledFontFiles.value(script, QStringList());
 }
 
 QList<int> LanguageEngine::platformLanguages() const
