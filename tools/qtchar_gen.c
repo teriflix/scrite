@@ -284,15 +284,17 @@ int write_header_if_changed(const char *output_file, const Script *scripts, int 
     buffer_append(buf, "    // with the actual Qt version being used.\n");
     buffer_append(buf, "    enum Script {\n");
 
-    /* Append all scripts except ScriptCount */
+    /* Append all scripts except ScriptCount with sequential values */
+    int value = 0;
     for (int i = 0; i < script_count; i++) {
         if (strcmp(scripts[i].name, "ScriptCount") != 0) {
-            buffer_printf(buf, "        %s,\n", scripts[i].name);
+            buffer_printf(buf, "        %s = %d,\n", scripts[i].name, value);
+            value++;
         }
     }
 
     /* Always append ScriptCount last without comma */
-    buffer_append(buf, "        ScriptCount\n");
+    buffer_printf(buf, "        ScriptCount = %d\n", value);
 
     buffer_append(buf, "    };\n");
     buffer_append(buf, "    Q_ENUM(Script)\n");

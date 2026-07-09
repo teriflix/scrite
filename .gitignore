@@ -31,6 +31,7 @@ Makefile*
 *build-*
 *.qm
 *.prl
+apps/desktop/src/core/languageengine_p.h
 
 # Qt unit tests
 target_wrapper.*
