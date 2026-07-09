@@ -245,6 +245,10 @@ Item {
                                                              if(success) {
                                                                  _private.reevalLanguageFont()
                                                                  _private.logLanguageFont(_private.language)
+                                                                 if(!_private.fontChangeWarningShown) {
+                                                                     MessageBox.information("Font Changes", "Language font changes will be reliably applied only after you restart the application.")
+                                                                     _private.fontChangeWarningShown = true
+                                                                 }
                                                              }
                                                          }
                                                      }
@@ -443,6 +447,8 @@ Item {
         property ListModel transliterationOptionsModel: ListModel { }
 
         property SpellCheckService spellCheckService: SpellCheckService { }
+
+        property bool fontChangeWarningShown: false
 
         Component.onCompleted: {
             previouslyActiveLanguage = Runtime.language.activeCode
