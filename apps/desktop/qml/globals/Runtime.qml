@@ -391,6 +391,13 @@ Item {
         return emailRegex.test(email);
     }
 
+    function tooltipText(base, shortcut) {
+        const sc = typeof shortcut === "string" ? shortcut : Gui.portableShortcut(shortcut)
+        if(sc === "")
+            return base
+        return base + " (" + sc + ")"
+    }
+
     visible: false
 
     onShowNotebookInStructureChanged: activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)

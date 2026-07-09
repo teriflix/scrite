@@ -63,11 +63,13 @@ Rectangle {
             id: _zoomIn
             autoRepeat: true
             iconSource: Runtime.themedIcon("qrc:/icons/navigation/zoom_in.png")
-            toolTipText: "Increase size of blocks in this view."
+            toolTipText: Runtime.tooltipText("Increase size of blocks in this view.", _zoomInHandler.action.shortcut)
 
             onClicked: root.zoomInRequest()
 
             ActionHandler {
+                id: _zoomInHandler
+
                 action: ActionHub.timelineOperations.find("zoomIn")
 
                 onTriggered: root.zoomInRequest()
@@ -78,11 +80,13 @@ Rectangle {
             id: _zoomOut
             autoRepeat: true
             iconSource: Runtime.themedIcon("qrc:/icons/navigation/zoom_out.png")
-            toolTipText: "Decrease size of blocks in this view."
+            toolTipText: Runtime.tooltipText("Decrease size of blocks in this view.", _zoomOutHandler.action.shortcut)
 
             onClicked: root.zoomOutRequest()
 
             ActionHandler {
+                id: _zoomOutHandler
+
                 action: ActionHub.timelineOperations.find("zoomOut")
 
                 onTriggered: root.zoomOutRequest()

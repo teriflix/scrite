@@ -289,8 +289,6 @@ Rectangle {
         RowLayout {
             id: _mainTabs
 
-            spacing: 0
-
             Repeater {
                 model: ActionHub.mainWindowTabs
 
@@ -299,7 +297,6 @@ Rectangle {
 
                     required property int index
                     required property var qmlAction
-
 
                     ToolTipPopup {
                         text: {

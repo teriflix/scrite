@@ -21,7 +21,6 @@ import QtQuick.Controls.Material
 
 import io.scrite.components
 
-
 import "../globals"
 import "../dialogs"
 import "../helpers"
@@ -378,8 +377,12 @@ Rectangle {
         to: zoomLevels.length-1
         from: 0
         stepSize: 1
+        zoomInTooltip: Runtime.tooltipText("Zoom In", _zoomInHandler.action.shortcut)
+        zoomOutTooltip: Runtime.tooltipText("Zoom Out", _zoomOutHandler.action.shortcut)
 
         ActionHandler {
+            id: _zoomInHandler
+
             enabled: _zoomSlider.value < _zoomSlider.to
             action: ActionHub.screenplayEditorOptions.find("zoomIn")
 
@@ -387,6 +390,8 @@ Rectangle {
         }
 
         ActionHandler {
+            id: _zoomOutHandler
+
             enabled: _zoomSlider.value > _zoomSlider.from
             action: ActionHub.screenplayEditorOptions.find("zoomOut")
 

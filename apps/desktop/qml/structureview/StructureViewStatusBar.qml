@@ -21,7 +21,6 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-
 import "../globals"
 import "../controls"
 import "../helpers"
@@ -225,7 +224,7 @@ Rectangle {
             enabled: root.canvasItemsBoundingBox.itemCount > 0
             autoRepeat: true
             iconSource: Runtime.themedIcon("qrc:/icons/navigation/zoom_one.png")
-            toolTipText: "Zoom One\t(" + Gui.portableShortcut(_zoomOneHandler.action.shortcut) + ")"
+            toolTipText: Runtime.tooltipText("Zoom One", _zoomOneHandler.action.shortcut)
 
             onClicked: root.zoomOneRequest()
 
@@ -247,7 +246,7 @@ Rectangle {
             enabled: root.canvasItemsBoundingBox.itemCount > 0
             autoRepeat: true
             iconSource: Runtime.themedIcon("qrc:/icons/navigation/zoom_fit.png")
-            toolTipText: "Zoom Fit\t(" + Gui.portableShortcut(_zoomFitHandler.action.shortcut) + ")"
+            toolTipText: Runtime.tooltipText("Zoom Fit", _zoomFitHandler.action.shortcut)
 
             onClicked: root.zoomFitRequest(root.canvasItemsBoundingBox.boundingBox)
 
@@ -271,12 +270,16 @@ Rectangle {
             from: root.canvasScrollMinimumScale
             value: root.canvasScale
             stepSize: 0.0
+            zoomInTooltip: Runtime.tooltipText("Zoom In", _zoomInHandler.action.shortcut)
+            zoomOutTooltip: Runtime.tooltipText("Zoom Out", _zoomOutHandler.action.shortcut)
 
             onSliderMoved: root.zoomToRequest(zoomLevel)
             onZoomInRequest: root.zoomInRequest()
             onZoomOutRequest: root.zoomOutRequest()
 
             ActionHandler {
+                id: _zoomInHandler
+
                 enabled: _zoomSlider.value < _zoomSlider.to
                 action: ActionHub.structureCanvasOperations.find("zoomIn")
 
@@ -284,6 +287,8 @@ Rectangle {
             }
 
             ActionHandler {
+                id: _zoomOutHandler
+
                 enabled: _zoomSlider.value > _zoomSlider.from
                 action: ActionHub.structureCanvasOperations.find("zoomOut")
 

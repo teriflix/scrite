@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
@@ -31,6 +33,8 @@ Item {
     property alias pressed: _slider.pressed
     property alias stepSize: _slider.stepSize
     property alias zoomLevel: _slider.zoomLevel
+    property alias zoomInTooltip: _zoomInButton.tooltipText
+    property alias zoomOutTooltip: _zoomOutButton.tooltipText
 
     signal sliderMoved()
     signal zoomInRequest()
@@ -122,6 +126,8 @@ Item {
     }
 
     component IconButton : Image {
+        id: _iconButton
+
         property string tooltipText
 
         signal clicked()
@@ -137,13 +143,14 @@ Item {
         MouseArea {
             id: _iconButtonMouseArea
 
-            ToolTip.text: parent.tooltipText
-            ToolTip.delay: Scrite.app.styleHints.mousePressAndHoldInterval
-            ToolTip.visible: containsMouse && !pressed
-
             anchors.fill: parent
-
             hoverEnabled: true
+
+            ToolTipPopup {
+                container: _iconButtonMouseArea
+                text: _iconButton.tooltipText
+                visible: text !== "" && _iconButtonMouseArea.containsMouse
+            }
 
             onClicked: parent.clicked()
         }
