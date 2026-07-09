@@ -2952,11 +2952,10 @@ void LanguageEngine::loadConfiguration()
                 if (fontFamily.isEmpty() || !QFontDatabase::hasFamily(fontFamily))
                     continue;
 
-                const int key = scriptFont.value("key").toInt();
-                const char *value = scriptEnum.valueToKey(key);
-                if (value != nullptr
-                    && scriptFont.value("name").toString() == QString::fromLatin1(value)) {
-                    m_scriptFontFamily[QChar::Script(key)] = fontFamily;
+                const QString scriptName = scriptFont.value("name").toString();
+                const int scriptValue = scriptEnum.keyToValue(scriptName.toLatin1().constData());
+                if (scriptValue >= 0) {
+                    m_scriptFontFamily[QChar::Script(scriptValue)] = fontFamily;
                 }
             }
         }
