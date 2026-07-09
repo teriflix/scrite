@@ -91,9 +91,10 @@ VclDialog {
                     }
                     selectedExtension: allowedExtensions[0]
 
-                    onAbsoluteFilePathChanged: {
-                        root.exporter.fileName = absoluteFilePath
-                        Runtime.workspaceSettings.lastOpenExportFolderUrl = Url.fromPath(File.path(absoluteFilePath))
+                    onAbsoluteFilePathChanged: root.exporter.fileName = absoluteFilePath
+
+                    onNewFolderSelected: (folderUrl) => {
+                        Runtime.workspaceSettings.lastOpenExportFolderUrl = folderUrl
                     }
                 }
 

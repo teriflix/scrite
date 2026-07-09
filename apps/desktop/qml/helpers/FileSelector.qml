@@ -42,6 +42,8 @@ Item {
     implicitWidth: 400
     implicitHeight: _layout.height
 
+    signal newFolderSelected(url folderUrl)
+
     BasicFileInfo {
         id: _fileInfo
     }
@@ -57,7 +59,10 @@ Item {
             return Url.fromPath(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
         }
 
-        onAccepted: _fileInfo.absolutePath = Url.toPath(selectedFolder)
+        onAccepted: {
+            _fileInfo.absolutePath = Url.toPath(selectedFolder)
+            root.newFolderSelected(selectedFolder)
+        }
          // The default Ctrl+U interfers with underline
     }
 

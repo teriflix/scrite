@@ -174,9 +174,9 @@ VclDialog {
                 }
 
                 onSelectedExtensionChanged: root.report.format = _fileSelector.selectedExtension.value
-                onAbsoluteFilePathChanged: {
-                    root.report.fileName = _fileSelector.absoluteFilePath
-                    Runtime.workspaceSettings.lastOpenReportsFolderUrl = Url.fromPath(File.path(absoluteFilePath))
+                onAbsoluteFilePathChanged: root.report.fileName = _fileSelector.absoluteFilePath
+                onNewFolderSelected: (folderUrl) => {
+                    Runtime.workspaceSettings.lastOpenReportsFolderUrl = folderUrl
                 }
 
                 Component.onCompleted: {
