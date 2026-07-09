@@ -4,6 +4,12 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DesktopPlatformSources.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DesktopGenericSources.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DesktopQmlAndAssetFiles.cmake")
 
+# Build qtchar_gen utility to generate languageengine_p.h
+add_executable(qtchar_gen "${CMAKE_SOURCE_DIR}/tools/qtchar_gen.c")
+set_target_properties(qtchar_gen PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)
+
 find_package(Qt6 6.11 REQUIRED COMPONENTS
   Core
   Gui
@@ -24,6 +30,33 @@ find_package(Qt6 6.11 REQUIRED COMPONENTS
   StateMachine
   StateMachineQml
 )
+
+# Auto-generate languageengine_p.h from Qt's QChar::Script enum
+# This ensures the QtChar::Script enum stays in sync with the Qt version used
+# Generate it in the source directory where languageengine.h can easily include it
+set(QTCHAR_GENERATED_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/src/core/languageengine_p.h")
+
+# Get Qt6Core include directory from the target properties
+get_target_property(_Qt6Core_INCLUDE_DIRS Qt6::Core INTERFACE_INCLUDE_DIRECTORIES)
+if(_Qt6Core_INCLUDE_DIRS)
+    list(GET _Qt6Core_INCLUDE_DIRS 0 _Qt6Core_INCLUDE_PATH)
+else()
+    message(FATAL_ERROR "Could not determine Qt6Core include directory")
+endif()
+
+add_custom_command(
+    OUTPUT ${QTCHAR_GENERATED_HEADER}
+    COMMAND qtchar_gen "${_Qt6Core_INCLUDE_PATH}" "${QTCHAR_GENERATED_HEADER}"
+    DEPENDS qtchar_gen
+    COMMENT "Generating QtChar::Script enum from Qt headers..."
+    VERBATIM
+)
+
+# Mark the generated header as generated so CMake understands its origin
+set_source_files_properties(${QTCHAR_GENERATED_HEADER} PROPERTIES GENERATED TRUE)
+
+# Ensure the header is generated before any compilation
+add_custom_target(generate_qtchar_header ALL DEPENDS ${QTCHAR_GENERATED_HEADER})
 
 if(APPLE)
   enable_language(OBJCXX)
@@ -60,6 +93,9 @@ target_sources(Scrite PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/src/crashpad/CrashRecoveryDialog.ui"
 )
 
+# Make Scrite depend on the generated header
+add_dependencies(Scrite generate_qtchar_header)
+
 # Production-only startup checks: NSIS migration guard, license acceptance, and
 # IEDN Technologies org name. Pass -DSCRITE_PRODUCTION_BUILD=ON from the
 # production build system (which lives outside this repository). Open-source
@@ -88,6 +124,7 @@ target_include_directories(Scrite PRIVATE
   "${CMAKE_SOURCE_DIR}/../apikeys"
   "${CMAKE_CURRENT_SOURCE_DIR}/src"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/core"
+  "${CMAKE_CURRENT_BINARY_DIR}"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/network"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/importers"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/exporters"
