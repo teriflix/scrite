@@ -534,10 +534,8 @@ Item {
             Loader {
                 id: _buttonIcon
 
-                property real h: _buttonLabel.contentHeight * 1.5
-
-                Layout.preferredWidth: h
-                Layout.preferredHeight: h
+                Layout.preferredWidth: Runtime.iconImageSize
+                Layout.preferredHeight: Runtime.iconImageSize
 
                 sourceComponent: {
                     if(_button.iconSource !== "")
