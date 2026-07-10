@@ -313,25 +313,22 @@ Item {
 
         font.family: Runtime.idealFontMetrics.font.family
         font.pointSize: {
-            const zl = root.sceneDelegate.zoomLevel
-            if(zl <= 0.5)
-                return Runtime.minimumFontMetrics.font.pointSize
+            const sizes = GMath.availableFontPointSizes(font.family, font.styleName)
+            const heightToMatch = Runtime.sceneEditorFontMetrics.height
 
-            const sizes = Runtime.idealFontMetrics.sizes
-            const baseFontSize = Runtime.idealFontMetrics.font.pointSize
-            let idx = 0
-            for(let i = 0; i < sizes.length; i++) {
-                if(Math.abs(sizes[i] - baseFontSize) < Math.abs(sizes[idx] - baseFontSize))
-                    idx = i
+            let fontMetrics = Qt.createQmlObject("import QtQuick; FontMetrics { }", _partFontMetrics) as FontMetrics
+            fontMetrics.font.family = font.family
+
+            let s=0, heightDiff=0
+            for(s=0; s<sizes.length; s++) {
+                fontMetrics.font.pointSize = sizes[s]
+                heightDiff = fontMetrics.height - heightToMatch
+                if(heightDiff > 0) {
+                    return sizes[ Math.max(0,s-1) ]
+                }
             }
-            idx = idx+1
-            if(Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab)
-                idx = idx+1
-            if(zl < 1.2)
-                return sizes[idx]
-            if(zl < 1.75)
-                return sizes[idx+2]
-            return sizes[idx+4]
+
+            return Runtime.idealFontMetrics.font.pointSize-1
         }
     }
 
