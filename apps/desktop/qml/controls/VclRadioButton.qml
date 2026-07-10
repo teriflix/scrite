@@ -31,7 +31,6 @@ RadioButton {
 
         text: root.text
         font: root.font
-        color: root.enabled ? root.Material.foreground : root.Material.hintTextColor
         wrapMode: Text.WordWrap
         opacity: root.enabled ? 1 : 0.5
         verticalAlignment: Text.AlignVCenter
