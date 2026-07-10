@@ -109,7 +109,7 @@ Flow {
 
         font.bold: true
         font.family: root.font.family
-        font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
+        font.pointSize: root.font.pointSize // Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
     }
 
     Repeater {
@@ -139,7 +139,7 @@ Flow {
             bottomPadding: topPadding
 
             font.family: root.font.family
-            font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
+            font.pointSize: root.font.pointSize //Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
             font.capitalization: root.font.capitalization
 
             onClicked: root.textClicked(modelData, _tagText)
@@ -188,7 +188,7 @@ Flow {
                 completionStrings: root.completionStrings
 
                 font.family: root.font.family
-                font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
+                font.pointSize: root.font.pointSize // Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
                 font.capitalization: root.font.capitalization
 
                 onEditingComplete: {

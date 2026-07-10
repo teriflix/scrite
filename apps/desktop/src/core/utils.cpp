@@ -1909,6 +1909,11 @@ QPointF Utils::GMath::translationRequiredToBringRectangleInRectangle(const QRect
     return ret;
 }
 
+QList<int> Utils::GMath::availableFontPointSizes(const QString &family, const QString &styleName)
+{
+    return QFontDatabase::pointSizes(family, styleName);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 /**

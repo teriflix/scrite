@@ -612,6 +612,7 @@ public:
 
     Q_INVOKABLE static QString nativeShortcut(const QString &shortcut);
     Q_INVOKABLE static QString portableShortcut(const QVariant &shortcut);
+
     Q_INVOKABLE static bool acceptsTextInput(QQuickItem *item);
 
     Q_INVOKABLE static void log(const QString &message);
@@ -852,6 +853,9 @@ public:
     Q_INVOKABLE static QPointF centerOf(const QRectF &rect);
     Q_INVOKABLE static QPointF
     translationRequiredToBringRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect);
+
+    Q_INVOKABLE static QList<int> availableFontPointSizes(const QString &family,
+                                                          const QString &styleName = QString());
 };
 
 class TMath : public QObject // short for Time Math

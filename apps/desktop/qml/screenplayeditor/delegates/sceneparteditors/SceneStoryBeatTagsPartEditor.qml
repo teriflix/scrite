@@ -44,6 +44,8 @@ AbstractScenePartEditor {
         anchors.leftMargin: root.pageLeftMargin
         anchors.rightMargin: root.pageRightMargin
 
+        spacing: 4 * root.zoomLevel
+
         RowLayout {
             Layout.fillWidth: true
 
@@ -77,8 +79,8 @@ AbstractScenePartEditor {
                 enabled: Runtime.appFeatures.structure.enabled
                 defaultColor: Runtime.colors.primary.editor.text
                 opacity: enabled ? 1 : 0.5
-                topPadding: 5
-                bottomPadding: 5
+                topPadding: 5 * root.zoomLevel
+                bottomPadding: 5 * root.zoomLevel
 
                 onClicked: _private.popupFormalTagsMenu()
             }

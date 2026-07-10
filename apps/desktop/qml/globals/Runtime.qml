@@ -89,14 +89,20 @@ Item {
 
     // App-wide font-metrics
     readonly property FontMetrics minimumFontMetrics: FontMetrics {
+        readonly property var sizes: GMath.availableFontPointSizes(font.family, font.styleName)
+
         font.pointSize: root.idealFontMetrics.font.pointSize-2
     }
 
     readonly property FontMetrics idealFontMetrics: FontMetrics {
+        readonly property var sizes: GMath.availableFontPointSizes(font.family, font.styleName)
+
         font.pointSize: Scrite.app.idealFontPointSize
     }
 
     readonly property FontMetrics shortcutFontMetrics: FontMetrics {
+        readonly property var sizes: GMath.availableFontPointSizes(font.family, font.styleName)
+
         font.pointSize: root.idealFontMetrics.font.pointSize
         font.family: {
             // We need ZERO and the letter O to be rendered distinctly
@@ -111,11 +117,15 @@ Item {
     }
 
     readonly property FontMetrics minimumShortcutFontMetrics: FontMetrics {
+        readonly property var sizes: GMath.availableFontPointSizes(font.family, font.styleName)
+
         font.pointSize: root.minimumFontMetrics.font.pointSize
         font.family: root.shortcutFontMetrics.font.family
     }
 
     readonly property FontMetrics sceneEditorFontMetrics: FontMetrics {
+        property var sizes: GMath.availableFontPointSizes(font.family, font.styleName)
+
         readonly property int lettersPerLine: 70
         readonly property int marginLetters: 5
 

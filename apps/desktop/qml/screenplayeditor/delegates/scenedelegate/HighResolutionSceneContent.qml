@@ -111,7 +111,7 @@ Item {
                         partName: "StoryBeats"
                         isCurrent: root.sceneDelegate.isCurrent
                         zoomLevel: root.sceneDelegate.zoomLevel
-                        fontMetrics: Runtime.idealFontMetrics
+                        fontMetrics: _partFontMetrics
                         pageMargins: root.sceneDelegate.pageMargins
                         screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
@@ -139,7 +139,7 @@ Item {
                         partName: "CharacterList"
                         isCurrent: root.sceneDelegate.isCurrent
                         zoomLevel: root.sceneDelegate.zoomLevel
-                        fontMetrics: Runtime.idealFontMetrics
+                        fontMetrics: _partFontMetrics
                         pageMargins: root.sceneDelegate.pageMargins
                         screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
@@ -165,20 +165,11 @@ Item {
                         partName: "Synopsis"
                         isCurrent: root.sceneDelegate.isCurrent
                         zoomLevel: root.sceneDelegate.zoomLevel
-                        fontMetrics: _synopsisFontMetrics
+                        fontMetrics: _partFontMetrics
                         pageMargins: root.sceneDelegate.pageMargins
                         screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
                         onEnsureVisible: (item, area) => { _ensureTimer.ensureVisible(item, area) }
-
-                        FontMetrics {
-                            id: _synopsisFontMetrics
-
-                            font.family: Runtime.idealFontMetrics.font.family
-                            font.pointSize: Math.min(
-                                                Math.max(Runtime.minimumFontMetrics.font.pointSize, Runtime.sceneEditorFontMetrics.font.pointSize - 2),
-                                                Runtime.idealFontMetrics.font.pointSize + 4 )
-                        }
                     }
                 }
 
@@ -314,6 +305,33 @@ Item {
 
         function __evaluateScreenY() {
             return root.sceneDelegate.listView.mapFromItem(root.sceneDelegate, 0, 0).y
+        }
+    }
+
+    FontMetrics {
+        id: _partFontMetrics
+
+        font.family: Runtime.idealFontMetrics.font.family
+        font.pointSize: {
+            const zl = root.sceneDelegate.zoomLevel
+            if(zl <= 0.5)
+                return Runtime.minimumFontMetrics.font.pointSize
+
+            const sizes = Runtime.idealFontMetrics.sizes
+            const baseFontSize = Runtime.idealFontMetrics.font.pointSize
+            let idx = 0
+            for(let i = 0; i < sizes.length; i++) {
+                if(Math.abs(sizes[i] - baseFontSize) < Math.abs(sizes[idx] - baseFontSize))
+                    idx = i
+            }
+            idx = idx+1
+            if(Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab)
+                idx = idx+1
+            if(zl < 1.2)
+                return sizes[idx]
+            if(zl < 1.75)
+                return sizes[idx+2]
+            return sizes[idx+4]
         }
     }
 
