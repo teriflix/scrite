@@ -136,6 +136,10 @@ Item {
         font: Scrite.document.formatting.defaultFont2
     }
 
+    readonly property FontMetrics partFontMetrics: FontMetrics {
+        font: Scrite.document.screenplay.partEditorFont(root.sceneEditorFontMetrics.font)
+    }
+
     // Colors
     readonly property Colors_RT colors: Colors_RT { applicationSettings: _applicationSettings  }
 

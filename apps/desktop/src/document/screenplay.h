@@ -900,6 +900,8 @@ public:
     Q_INVOKABLE void copySelection();
     Q_INVOKABLE void pasteAfter(int index);
 
+    Q_INVOKABLE static QFont partEditorFont(const QFont &reference);
+
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);

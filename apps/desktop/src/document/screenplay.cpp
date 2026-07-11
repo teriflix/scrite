@@ -1092,9 +1092,10 @@ void Screenplay::removeElements(const QList<ScreenplayElement *> &givenElements)
     QList<Batch> batches = QList<Batch>() << Batch();
     int leastIndex = INT_MAX;
 
-    std::sort(elements.begin(), elements.end(), [=](const ScreenplayElement *e1, const ScreenplayElement *e2) {
-        return m_elements.indexOf(e1) < m_elements.indexOf(e2);
-    });
+    std::sort(elements.begin(), elements.end(),
+              [=](const ScreenplayElement *e1, const ScreenplayElement *e2) {
+                  return m_elements.indexOf(e1) < m_elements.indexOf(e2);
+              });
     for (ScreenplayElement *element : std::as_const(elements)) {
         const int elementIndex = m_elements.indexOf(element);
         leastIndex = qMin(elementIndex, leastIndex);
@@ -1677,7 +1678,9 @@ private:
 
 UndoClearScreenplayCommand::UndoClearScreenplayCommand(Screenplay *screenplay,
                                                        const QStringList &sceneIds)
-    : QUndoCommand(QStringLiteral("Clear Screenplay")), m_sceneIds(sceneIds), m_screenplay(screenplay)
+    : QUndoCommand(QStringLiteral("Clear Screenplay")),
+      m_sceneIds(sceneIds),
+      m_screenplay(screenplay)
 {
     m_connection = QObject::connect(m_screenplay, &Screenplay::destroyed,
                                     [this]() { this->setObsolete(true); });
@@ -2988,7 +2991,10 @@ private:
 ScreenplayPasteFromFountainUndoCommand::ScreenplayPasteFromFountainUndoCommand(
         Screenplay *screenplay, Structure *structure, const Fountain::Body &body, int pasteAfter)
     : QUndoCommand(QStringLiteral("Paste Fountain")),
-      m_structure(structure), m_screenplay(screenplay), m_pasteAfter(pasteAfter), m_body(body)
+      m_structure(structure),
+      m_screenplay(screenplay),
+      m_pasteAfter(pasteAfter),
+      m_body(body)
 {
 }
 
@@ -3131,6 +3137,32 @@ void Screenplay::pasteAfter(int index)
         cmd->redo();
         delete cmd;
     }
+}
+
+QFont Screenplay::partEditorFont(const QFont &reference)
+{
+    const QFont defaultFont = qApp->font();
+    const QList<int> sizes =
+            Utils::GMath::availableFontPointSizes(defaultFont.family(), defaultFont.styleName());
+    const QFontMetrics referenceMetrics(reference);
+    const int heightToMatch = referenceMetrics.height();
+
+    int dHeight = 0;
+    for (int s = 0; s < sizes.size(); s++) {
+        QFont font = qApp->font();
+        font.setPointSize(sizes[s]);
+
+        QFontMetrics fontMetrics(font);
+        dHeight = fontMetrics.height() - heightToMatch;
+        if (dHeight > 0) {
+            font.setPointSize(sizes[qBound(0, s - 1, sizes.size() - 1)]);
+            return font;
+        }
+    }
+
+    QFont font = qApp->font();
+    font.setPointSize(Application::instance()->idealFontPointSize());
+    return font;
 }
 
 void Screenplay::serializeToJson(QJsonObject &json) const

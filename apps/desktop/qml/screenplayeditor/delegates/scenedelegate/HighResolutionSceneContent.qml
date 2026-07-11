@@ -111,7 +111,7 @@ Item {
                         partName: "StoryBeats"
                         isCurrent: root.sceneDelegate.isCurrent
                         zoomLevel: root.sceneDelegate.zoomLevel
-                        fontMetrics: _partFontMetrics
+                        fontMetrics: Runtime.partFontMetrics
                         pageMargins: root.sceneDelegate.pageMargins
                         screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
@@ -139,7 +139,7 @@ Item {
                         partName: "CharacterList"
                         isCurrent: root.sceneDelegate.isCurrent
                         zoomLevel: root.sceneDelegate.zoomLevel
-                        fontMetrics: _partFontMetrics
+                        fontMetrics: Runtime.partFontMetrics
                         pageMargins: root.sceneDelegate.pageMargins
                         screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
@@ -165,7 +165,7 @@ Item {
                         partName: "Synopsis"
                         isCurrent: root.sceneDelegate.isCurrent
                         zoomLevel: root.sceneDelegate.zoomLevel
-                        fontMetrics: _partFontMetrics
+                        fontMetrics: Runtime.partFontMetrics
                         pageMargins: root.sceneDelegate.pageMargins
                         screenplayAdapter: root.sceneDelegate.screenplayAdapter
 
@@ -305,30 +305,6 @@ Item {
 
         function __evaluateScreenY() {
             return root.sceneDelegate.listView.mapFromItem(root.sceneDelegate, 0, 0).y
-        }
-    }
-
-    FontMetrics {
-        id: _partFontMetrics
-
-        font.family: Runtime.idealFontMetrics.font.family
-        font.pointSize: {
-            const sizes = GMath.availableFontPointSizes(font.family, font.styleName)
-            const heightToMatch = Runtime.sceneEditorFontMetrics.height
-
-            let fontMetrics = Qt.createQmlObject("import QtQuick; FontMetrics { }", _partFontMetrics) as FontMetrics
-            fontMetrics.font.family = font.family
-
-            let s=0, heightDiff=0
-            for(s=0; s<sizes.length; s++) {
-                fontMetrics.font.pointSize = sizes[s]
-                heightDiff = fontMetrics.height - heightToMatch
-                if(heightDiff > 0) {
-                    return sizes[ Math.max(0,s-1) ]
-                }
-            }
-
-            return Runtime.idealFontMetrics.font.pointSize-1
         }
     }
 
