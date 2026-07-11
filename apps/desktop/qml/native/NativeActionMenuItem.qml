@@ -13,9 +13,13 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick.Controls
 import Qt.labs.platform as Native
+
+import io.scrite.components
 
 import "../globals"
 
@@ -24,19 +28,37 @@ Native.MenuItem {
 
     required property var action
 
-    property Action qmlAction: action as Action
+    property Action _qmlAction: action as Action
 
-    text: qmlAction ? qmlAction.text : ""
-    checkable: (qmlAction ? qmlAction.checkable : false) || (action.down !== undefined)
-    checked: qmlAction && qmlAction.checkable ? qmlAction.checked : (action.down !== undefined ? action.down : false)
-    enabled: qmlAction ? qmlAction.enabled : false
+    text: _qmlAction ? _qmlAction.text : ""
+    checkable: (_qmlAction ? _qmlAction.checkable : false) || (action.down !== undefined)
+    checked: _qmlAction && _qmlAction.checkable ? _qmlAction.checked : (action.down !== undefined ? action.down : false)
+    enabled: _qmlAction ? _qmlAction.enabled : false
     visible: text !== ""
-    shortcut: qmlAction ? qmlAction.shortcut : ""
+    shortcut: _qmlAction ? _qmlAction.shortcut : ""
 
     onTriggered: {
-        if(qmlAction) {
+        if(_qmlAction) {
             // Calling trigger is enough even for checkable actions
-            qmlAction.trigger(root)
+            _qmlAction.trigger(root)
+        }
+    }
+
+    onActionChanged: {
+        if(Object.changeProperty(_qmlAction, "#nativelyShown", true)) {
+            Runtime.nativelyNotShownActions.scheduleFilter()
+            Gui.log("onActionChanged: " + text + " Runtime.nativelyNotShownActions.scheduleFilter()")
+        }
+    }
+
+    readonly property QtObject _guard: QtObject {
+        Component.onDestruction: {
+            if(root._qmlAction) {
+                if(Object.resetProperty(root._qmlAction, "#nativelyShown")) {
+                    Runtime.nativelyNotShownActions.scheduleFilter()
+                    Gui.log("Component.onDestruction: " + text + " Runtime.nativelyNotShownActions.scheduleFilter()")
+                }
+            }
         }
     }
 

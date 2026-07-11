@@ -547,6 +547,14 @@ bool Utils::Object::changeProperty(QObject *object, const QString &name, const Q
     if (object == nullptr)
         return false;
 
+    // This is a dynamic property name
+    if (name.startsWith('#')) {
+        const QVariant currentValue = object->property(qPrintable(name));
+        if (currentValue != value)
+            return object->setProperty(qPrintable(name), value);
+        return false;
+    }
+
     const QMetaObject *mo = object->metaObject();
     const int propIndex = mo->indexOfProperty(qPrintable(name));
     if (propIndex < 0)
@@ -570,6 +578,14 @@ bool Utils::Object::resetProperty(QObject *object, const QString &propName)
     if (object == nullptr || propName.isEmpty())
         return false;
 
+    // This is a dynamic property name
+    if (propName.startsWith('#')) {
+        const QVariant currentValue = object->property(qPrintable(propName));
+        if (currentValue != QVariant())
+            return object->setProperty(qPrintable(propName), QVariant());
+        return false;
+    }
+
     const QMetaObject *mo = object->metaObject();
     const int propIndex = mo->indexOfProperty(qPrintable(propName));
     if (propIndex < 0)
@@ -592,6 +608,11 @@ QVariant Utils::Object::queryProperty(QObject *object, const QString &name)
 {
     if (object == nullptr)
         return QVariant();
+
+    // This is a dynamic property name
+    if (name.startsWith('#')) {
+        return object->property(qPrintable(name));
+    }
 
     const QMetaObject *mo = object->metaObject();
     const int propIndex = mo->indexOfProperty(qPrintable(name));

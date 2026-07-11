@@ -17,6 +17,8 @@ import QtQml
 import QtQuick
 import Qt.labs.platform as Native
 
+import io.scrite.components
+
 import "../globals"
 
 Native.MenuBar {
@@ -269,6 +271,36 @@ Native.MenuBar {
     ActionManagerNativeMenu {
         title: "Tools"
         actionManager: ActionHub.appOptions
+
+        // Catch all menu for every other action thats not already covered.
+        // macOS requires every action that can have a shortcut to go here.
+        Native.Menu {
+            id: _catchAllMenu
+
+            title: "Misc"
+            visible: false
+
+            Instantiator {
+                model: Runtime.nativelyNotShownActions
+
+                delegate: NativeActionMenuItem {
+                    required property int index
+                    required property var qmlAction
+                    required property var actionManager
+                    required property bool shortcutIsEditable
+                    required property string groupName
+
+                    property bool nativelyShownAlready: Object.queryProperty(action, "#nativelyShown")
+
+                    action: qmlAction
+                    text: actionManager.title + ": " + action.text
+                    visible: true
+                }
+
+                onObjectAdded: (index, object) => _catchAllMenu.addItem(object)
+                onObjectRemoved: (index, object) => _catchAllMenu.removeItem(object)
+            }
+        }
     }
 
     ActionManagerNativeMenu {

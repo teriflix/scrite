@@ -180,6 +180,17 @@ Item {
         screenplay: root.screenplayAdapter.screenplay
     }
 
+    readonly property ActionsModelFilter nativelyNotShownActions: ActionsModelFilter {
+        function scheduleFilter() { Qt.callLater(filter) }
+
+        filters: Platform.isMacOSDesktop ? ActionsModelFilter.CommandCenterFilters : ActionsModelFilter.NoActions
+        customFilterMode: true
+        onFilterRequest: (qmlAction, actionManager, result) => {
+                             const nativelyShown = Object.queryProperty(qmlAction, "#nativelyShown")
+                             result.value = nativelyShown === undefined
+                         }
+    }
+
     // Object communication
     readonly property AnnouncementIds_RT announcementIds: AnnouncementIds_RT { }
 
