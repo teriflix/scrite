@@ -295,6 +295,7 @@ Native.MenuBar {
                     action: qmlAction
                     text: actionManager.title + ": " + action.text
                     visible: true
+
                 }
 
                 onObjectAdded: (index, object) => _catchAllMenu.addItem(object)

@@ -47,7 +47,6 @@ Native.MenuItem {
     onActionChanged: {
         if(Object.changeProperty(_qmlAction, "#nativelyShown", true)) {
             Runtime.nativelyNotShownActions.scheduleFilter()
-            Gui.log("onActionChanged: " + text + " Runtime.nativelyNotShownActions.scheduleFilter()")
         }
     }
 
@@ -56,7 +55,6 @@ Native.MenuItem {
             if(root._qmlAction) {
                 if(Object.resetProperty(root._qmlAction, "#nativelyShown")) {
                     Runtime.nativelyNotShownActions.scheduleFilter()
-                    Gui.log("Component.onDestruction: " + text + " Runtime.nativelyNotShownActions.scheduleFilter()")
                 }
             }
         }
