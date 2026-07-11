@@ -3161,7 +3161,11 @@ QFont Screenplay::partEditorFont(const QFont &reference)
     }
 
     QFont font = qApp->font();
+#ifdef Q_OS_WIN
+    font.setPointSize(Application::instance()->idealFontPointSize() - 2);
+#else
     font.setPointSize(Application::instance()->idealFontPointSize());
+#endif
     return font;
 }
 

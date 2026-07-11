@@ -59,8 +59,11 @@ AbstractScenePartEditor {
                 text: root.scene && root.scene.hasSynopsis ? root.scene.synopsis : "Scene Synopsis"
                 opacity: root.scene && root.scene.hasSynopsis ? 1 : 0.5
                 readOnly: true
+                leftPadding: 0
+                rightPadding: 0
                 verticalAlignment: Text.AlignTop
                 background: Item { }
+
             }
 
             MouseArea {
@@ -102,6 +105,8 @@ AbstractScenePartEditor {
             initialText: ""
             undoRedoEnabled: true
             placeholderText: "Scene Synopsis"
+            leftPadding: 0
+            rightPadding: 0
             background: Item { }
 
             onTextEdited: root.scene.setSynopsisDirectly(text)
