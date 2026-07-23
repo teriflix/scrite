@@ -75,13 +75,13 @@ Item {
                         Component.onCompleted: {
                             const plans = Scrite.user.asSubscriptionPlanInfoList(_queryUserSubsCall.availablePlans)
                             let bestIdx = -1
-                            let bestPct = 0
+                            let lowestMonthlyPricePerDevice = Number.MAX_VALUE
                             for (let i = 0; i < plans.length; i++) {
                                 if (plans[i].exclusive) continue
                                 const p = plans[i].pricing
                                 if (p.actual > 0 && p.actual > p.price) {
-                                    const pct = (p.actual - p.price) / p.actual
-                                    if (pct > bestPct) { bestPct = pct; bestIdx = i }
+                                    const monthlyPricePerDevice = (p.price / (plans[i].duration / 30)) / plans[i].devices
+                                    if (monthlyPricePerDevice < lowestMonthlyPricePerDevice) { lowestMonthlyPricePerDevice = monthlyPricePerDevice; bestIdx = i }
                                 }
                             }
                             bestValueIndex = bestIdx
