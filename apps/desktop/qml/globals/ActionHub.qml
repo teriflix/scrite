@@ -344,7 +344,7 @@ Item {
                 ret = fileInfo.baseFileName
                 return ret
             }
-            enabled: Scrite.document.fileName !== fileInfo.filePath
+            enabled: Scrite.document.fileName !== fileInfo.filePath && Runtime.allowAppUsage
 
             icon.color: "transparent"
             icon.source: fileInfo.hasCoverPage ? ImageIcon.url : "qrc:/icons/filetype/document.png"
@@ -365,7 +365,7 @@ Item {
             readonly property bool visible: true
             readonly property string tooltip: "Create a new screenplay by interpreting text on the clipboard as fountain file."
 
-            enabled: Scrite.document.canImportFromClipboard
+            enabled: Scrite.document.canImportFromClipboard && Runtime.allowAppUsage
             text: "New from Clipboard"
             icon.source: "qrc:/icons/filetype/document.png"
 
@@ -400,7 +400,7 @@ Item {
             ActionManager.target: root.templateOperations
 
             text: record.name
-            enabled: Runtime.dialogs.objectCount === 0
+            enabled: Runtime.dialogs.objectCount === 0 && Runtime.allowAppUsage
 
             icon.color: "transparent"
             icon.source: index === 0 ? record.poster : Runtime.libraryService.templates.baseUrl + "/" + record.poster
@@ -441,7 +441,7 @@ Item {
             ActionManager.target: root.scriptalayOperations
 
             text: record.name
-            enabled: Runtime.dialogs.objectCount === 0
+            enabled: Runtime.dialogs.objectCount === 0 && Runtime.allowAppUsage
 
             icon.color: "transparent"
             icon.source: Runtime.libraryService.screenplays.baseUrl + "/" + record.poster
