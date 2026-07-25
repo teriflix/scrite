@@ -37,7 +37,6 @@ Settings {
 
     property bool allowSelectedTextTranslation: false
     property bool allowTaggingOfScenes: false
-    property bool applyUserDefinedLanguageFonts: true
     property bool autoAdjustEditorWidthInScreenplayEditor: true
     property bool autoSelectSceneUnderMouse: true
     property bool captureInvisibleCharacters: false
@@ -73,6 +72,7 @@ Settings {
     property bool showLanguageRefreshNoticeBox: true
     property bool showLoglineEditor: false
     property bool showSpellCheckRefreshNoticeBox: true
+    property bool useLanguageFonts: false // Starting with version 3.0.6, we don't need this ON by default.
 
     property real sidePanelWidth: 400
     property real spaceBetweenScenes: 0

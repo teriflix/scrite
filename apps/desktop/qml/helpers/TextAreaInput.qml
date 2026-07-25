@@ -40,7 +40,7 @@ TextArea {
 
     SyntaxHighlighter.delegates: [
         LanguageFontSyntaxHighlighterDelegate {
-            enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+            enabled: Runtime.screenplayEditorSettings.useLanguageFonts
             defaultFont: root.font
         },
 

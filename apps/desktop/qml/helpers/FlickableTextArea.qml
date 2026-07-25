@@ -88,7 +88,7 @@ Flickable {
 
         SyntaxHighlighter.delegates: [
             LanguageFontSyntaxHighlighterDelegate {
-                enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                enabled: Runtime.screenplayEditorSettings.useLanguageFonts
                 defaultFont: _textArea.font
                 enforceDefaultFont: root.enforceDefaultFont
             },

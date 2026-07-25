@@ -220,7 +220,7 @@ AbstractStructureElementUI {
 
                 SyntaxHighlighter.delegates: [
                     LanguageFontSyntaxHighlighterDelegate {
-                        enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                        enabled: Runtime.screenplayEditorSettings.useLanguageFonts
                         defaultFont: _basicHeadingField.font
                     }
                 ]
@@ -341,7 +341,7 @@ AbstractStructureElementUI {
 
                             SyntaxHighlighter.delegates: [
                                 LanguageFontSyntaxHighlighterDelegate {
-                                    enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                                    enabled: Runtime.screenplayEditorSettings.useLanguageFonts
                                     defaultFont: _synopsisTextDisplay.font
                                 },
 
@@ -401,7 +401,7 @@ AbstractStructureElementUI {
 
                                 SyntaxHighlighter.delegates: [
                                     LanguageFontSyntaxHighlighterDelegate {
-                                        enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                                        enabled: Runtime.screenplayEditorSettings.useLanguageFonts
                                         defaultFont: _synopsisField.font
                                     },
 

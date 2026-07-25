@@ -134,7 +134,7 @@ Column {
 
                 SyntaxHighlighter.delegates: [
                     LanguageFontSyntaxHighlighterDelegate {
-                        enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                        enabled: Runtime.screenplayEditorSettings.useLanguageFonts
                         defaultFont: _textArea.font
                     },
 
@@ -203,7 +203,7 @@ Column {
 
                 SyntaxHighlighter.delegates: [
                     LanguageFontSyntaxHighlighterDelegate {
-                        enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                        enabled: Runtime.screenplayEditorSettings.useLanguageFonts
                         defaultFont: _answerText.font
                     },
 

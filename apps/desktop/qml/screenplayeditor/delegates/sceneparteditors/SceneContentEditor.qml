@@ -330,7 +330,7 @@ AbstractScenePartEditor {
         screenplayElement: root.screenplayElement
         forceSyncDocument: !_sceneTextEditor.activeFocus
         spellCheckEnabled: !root.readOnly && _spellCheckEnabledFlag.value
-        applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+        applyLanguageFonts: Runtime.screenplayEditorSettings.useLanguageFonts
         autoPolishParagraphs: !root.readOnly && Runtime.screenplayEditorSettings.enableAutoPolishParagraphs
         selectionEndPosition: _sceneTextEditor.activeFocus ? _sceneTextEditor.selectionEnd : -1
         liveSpellCheckEnabled: _sceneTextEditor.activeFocus

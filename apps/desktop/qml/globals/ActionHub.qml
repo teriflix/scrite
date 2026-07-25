@@ -1692,6 +1692,18 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+            readonly property string tooltip: "Toggle this ON only if you require Scrite to explicitly apply language fonts to text snippets. This can come at a performance hit, and is largely unnecessary."
+
+            checkable: true
+            checked: Runtime.screenplayEditorSettings.useLanguageFonts
+            objectName: "useLanguageFonts"
+            text: "Expliclty Apply Language Fonts"
+
+            onToggled: Runtime.screenplayEditorSettings.useLanguageFonts = !Runtime.screenplayEditorSettings.useLanguageFonts
+        }
+
+        Action {
             readonly property string defaultShortcut: "Ctrl+Shift+H"
 
             checkable: true
