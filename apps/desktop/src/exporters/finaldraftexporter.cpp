@@ -212,6 +212,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                             (QChar::Script)format.format.property(QTextFormat::UserProperty)
                                     .toInt();
                     const QString fontFamily = LanguageEngine::instance()->scriptFontFamily(script);
+                    textE.removeAttribute(FDX_LanguageAttr);
                     textE.setAttribute(FDX_FontAttr, fontFamily);
                     textE.setAttribute(FDX_ScriptAttr,
                                        QString::fromLatin1(scriptEnum.valueToKey(script)));

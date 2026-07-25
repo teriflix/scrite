@@ -420,6 +420,19 @@ public:
     // clang-format on
     QString unicode;
 
+    AlphabetMapping() { }
+    AlphabetMapping(const QString &_latin, const QString &_unicode)
+        : latin(_latin), unicode(_unicode)
+    {
+    }
+    AlphabetMapping(const AlphabetMapping &other) { *this = other; }
+    ~AlphabetMapping() { }
+    AlphabetMapping &operator=(const AlphabetMapping &other)
+    {
+        this->latin = other.latin;
+        this->unicode = other.unicode;
+        return *this;
+    }
     bool operator==(const AlphabetMapping &other) const
     {
         return latin == other.latin && unicode == other.unicode;
@@ -474,6 +487,25 @@ public:
                MEMBER vowels)
     // clang-format on
     QList<AlphabetMapping> vowels;
+
+    AlphabetMappings() { }
+    AlphabetMappings(const AlphabetMappings &other) { *this = other; }
+    ~AlphabetMappings() { }
+    AlphabetMappings &operator=(const AlphabetMappings &other)
+    {
+        this->language = other.language;
+        this->consonants = other.consonants;
+        this->digits = other.digits;
+        this->symbols = other.symbols;
+        this->vowels = other.vowels;
+        return *this;
+    }
+    bool operator==(const AlphabetMappings &other) const
+    {
+        return language == other.language && consonants == other.consonants
+                && digits == other.digits && symbols == other.symbols && vowels == other.vowels;
+    }
+    bool operator!=(const AlphabetMappings &other) const { return !(*this == other); }
 };
 Q_DECLARE_METATYPE(AlphabetMappings)
 
@@ -875,6 +907,24 @@ public:
                READ isValid)
     // clang-format on
     bool isValid() const;
+
+    ScriptBoundary() { }
+    ScriptBoundary(const ScriptBoundary &other) { *this = other; }
+    ~ScriptBoundary() { }
+    ScriptBoundary &operator=(const ScriptBoundary &other)
+    {
+        this->start = other.start;
+        this->end = other.end;
+        this->text = other.text;
+        this->script = other.script;
+        return *this;
+    }
+    bool operator==(const ScriptBoundary &other) const
+    {
+        return start == other.start && end == other.end && text == other.text
+                && script == other.script;
+    }
+    bool operator!=(const ScriptBoundary &other) const { return !(*this == other); }
 };
 Q_DECLARE_METATYPE(ScriptBoundary)
 Q_DECLARE_METATYPE(QList<ScriptBoundary>)

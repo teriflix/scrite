@@ -211,6 +211,11 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
     // Lets create the document now.
     const QFont defaultFont = this->document()->printFormat()->defaultFont();
 
+    // This is done to avoid having the document relayout after every insert. That can make
+    // PDF generation insanely slow.
+    document->setLayoutEnabled(false);
+    auto layoutSignalBlockGuard = qScopeGuard([=]() { document->setLayoutEnabled(true); });
+
     QTextCursor cursor(document);
     document->setProperty("#rootFrameMarginNotRequired", true);
 

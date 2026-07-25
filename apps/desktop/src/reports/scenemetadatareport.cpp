@@ -288,6 +288,11 @@ bool SceneMetadataReport::doGenerate(QTextDocument *document)
     if (!paginatedDoc)
         return false;
 
+    // This is done to avoid having the document relayout after every insert. That can make
+    // PDF generation insanely slow.
+    document->setLayoutEnabled(false);
+    auto layoutSignalBlockGuard = qScopeGuard([=]() { document->setLayoutEnabled(true); });
+
     const QFont defaultFont = format->defaultFont();
 
     QTextBlockFormat defaultBlockFormat;

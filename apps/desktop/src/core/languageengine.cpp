@@ -1226,7 +1226,7 @@ QList<AlphabetMapping> loadFromPhTranslatorDefs(const T *array, int size)
             unicode = QString::fromWCharArray(&(item->uCode), 1);
         }
 
-        ret << AlphabetMapping({ latin, unicode });
+        ret << AlphabetMapping(latin, unicode);
     }
 
     return ret;
