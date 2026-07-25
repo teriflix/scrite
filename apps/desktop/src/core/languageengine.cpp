@@ -2737,6 +2737,55 @@ QList<ScriptBoundary> LanguageEngine::determineBoundaries(const QString &paragra
         }
     }
 
+    // Merge boundaries separated only by whitespace or punctuation, inheriting script
+    // from the adjacent non-gap boundaries.
+    auto isWhitespaceAndPunctuation = [](const QString &text) {
+        for (const QChar &ch : text) {
+            if (!ch.isSpace() && !ch.isPunct())
+                return false;
+        }
+        return true;
+    };
+
+    for (int i = 1; i < ret.size() - 1; i++) {
+        const ScriptBoundary &gap = ret[i];
+        if (isWhitespaceAndPunctuation(gap.text)) {
+            const ScriptBoundary &prev = ret[i - 1];
+            const ScriptBoundary &next = ret[i + 1];
+
+            if (prev.script == next.script) {
+                ScriptBoundary &merged = ret[i - 1];
+                merged.end = next.end;
+                merged.text = paragraph.mid(merged.start, merged.end - merged.start);
+                ret.removeAt(i + 1);
+                ret.removeAt(i);
+                i--;
+            }
+        }
+    }
+
+    // Handle last boundary if it's only whitespace or punctuation
+    if (ret.size() >= 2) {
+        const ScriptBoundary &last = ret[ret.size() - 1];
+        if (isWhitespaceAndPunctuation(last.text)) {
+            ScriptBoundary &prev = ret[ret.size() - 2];
+            prev.end = last.end;
+            prev.text = paragraph.mid(prev.start, prev.end - prev.start);
+            ret.removeLast();
+        }
+    }
+
+    // Handle first boundary if it's only whitespace or punctuation
+    if (ret.size() >= 2) {
+        const ScriptBoundary &first = ret[0];
+        if (isWhitespaceAndPunctuation(first.text)) {
+            ScriptBoundary &next = ret[1];
+            next.start = first.start;
+            next.text = paragraph.mid(next.start, next.end - next.start);
+            ret.removeFirst();
+        }
+    }
+
     return ret;
 }
 

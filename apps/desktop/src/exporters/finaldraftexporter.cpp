@@ -208,9 +208,9 @@ bool FinalDraftExporter::doExport(QIODevice *device)
 
                 if (m_markLanguagesExplicitly) {
                     const QMetaEnum scriptEnum = QMetaEnum::fromType<QtChar::Script>();
-                    QChar::Script script =
-                            (QChar::Script)format.format.property(QTextFormat::UserProperty)
-                                    .toInt();
+                    const QVariant scriptProp = format.format.property(QTextFormat::UserProperty);
+                    QChar::Script script = scriptProp.isValid() ? (QChar::Script)scriptProp.toInt()
+                                                                : QChar::Script_Latin;
                     const QString fontFamily = LanguageEngine::instance()->scriptFontFamily(script);
                     textE.removeAttribute(FDX_LanguageAttr);
                     textE.setAttribute(FDX_FontAttr, fontFamily);
