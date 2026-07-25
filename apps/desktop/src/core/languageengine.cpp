@@ -1404,8 +1404,19 @@ AbstractTransliterationEngine::~AbstractTransliterationEngine() { }
 
 bool AbstractTransliterationEngine::doActivate(const TransliterationOption &option)
 {
-    if (LanguageEngine::instance()->isHandleLanguageSwitch())
+    if (LanguageEngine::instance()->isHandleLanguageSwitch()) {
+        if (option.inApp) {
+            static PlatformTransliterationEngine *platformEngine =
+                    LanguageEngine::instance()->findChild<PlatformTransliterationEngine *>();
+            if (platformEngine && platformEngine != this) {
+                const QList<TransliterationOption> options =
+                        platformEngine->options(platformEngine->defaultLanguage());
+                if (!options.isEmpty())
+                    platformEngine->activate(options.first());
+            }
+        }
         return this->activate(option);
+    }
 
     return false;
 }
