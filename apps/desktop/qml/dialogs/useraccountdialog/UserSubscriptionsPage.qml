@@ -80,7 +80,7 @@ Item {
                                 if (plans[i].exclusive) continue
                                 const p = plans[i].pricing
                                 if (p.actual > 0 && p.actual > p.price) {
-                                    const monthlyPricePerDevice = (p.price / (plans[i].duration / 30)) / plans[i].devices
+                                    const monthlyPricePerDevice = (p.price / (plans[i].duration / 30)) / Math.max(plans[i].devices,1)
                                     if (monthlyPricePerDevice < lowestMonthlyPricePerDevice) { lowestMonthlyPricePerDevice = monthlyPricePerDevice; bestIdx = i }
                                 }
                             }

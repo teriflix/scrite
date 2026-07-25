@@ -1698,7 +1698,7 @@ Item {
             checkable: true
             checked: Runtime.screenplayEditorSettings.useLanguageFonts
             objectName: "useLanguageFonts"
-            text: "Expliclty Apply Language Fonts"
+            text: "Explicitly Apply Language Fonts"
 
             onToggled: Runtime.screenplayEditorSettings.useLanguageFonts = !Runtime.screenplayEditorSettings.useLanguageFonts
         }
