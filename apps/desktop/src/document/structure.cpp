@@ -1930,7 +1930,7 @@ void Character::write(QTextCursor &cursor, const WriteOptions &options) const
             const QString summary = m_summary.toString();
             if (!summary.isEmpty()) {
                 addSection(QLatin1String("Summary"));
-                LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, summary);
+                LanguageEngine::insertTextAtCursor(cursor, summary);
             }
         } else {
             const QJsonObject summary = m_summary.toObject();

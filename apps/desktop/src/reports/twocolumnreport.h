@@ -274,7 +274,7 @@ private:
     Layout m_layout = VideoAudioLayout;
     QStringList m_tags;
     QStringList m_keywords;
-    bool m_useSingleFont = false;
+    bool m_useSingleFont = true;
     bool m_includeLogline = true;
     qreal m_leftColumnWidth = 0.5;
     bool m_generateTitlePage = true;

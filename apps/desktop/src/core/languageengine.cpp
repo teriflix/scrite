@@ -2905,8 +2905,18 @@ LanguageEngine::mergeTextFormats(const QList<ScriptBoundary> &boundaries,
 void LanguageEngine::polishFontsAndInsertTextAtCursor(
         QTextCursor &cursor, const QString &text, const QVector<QTextLayout::FormatRange> &formats)
 {
+    insertTextAtCursor(cursor, text, formats, true);
+}
+
+void LanguageEngine::insertTextAtCursor(QTextCursor &cursor, const QString &text,
+                                        const QVector<QTextLayout::FormatRange> &formats,
+                                        bool polishFonts)
+{
     const int startPos = cursor.position();
-    determineBoundariesAndInsertText(cursor, text);
+    if (polishFonts)
+        determineBoundariesAndInsertText(cursor, text);
+    else
+        cursor.insertText(text);
     const int endPos = cursor.position();
 
     if (!formats.isEmpty()) {

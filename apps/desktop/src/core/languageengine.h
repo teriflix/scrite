@@ -955,6 +955,10 @@ public:
     static void polishFontsAndInsertTextAtCursor(
             QTextCursor &cursor, const QString &text,
             const QVector<QTextLayout::FormatRange> &formats = QVector<QTextLayout::FormatRange>());
+    static void insertTextAtCursor(
+            QTextCursor &cursor, const QString &text,
+            const QVector<QTextLayout::FormatRange> &formats = QVector<QTextLayout::FormatRange>(),
+            bool polishFonts = false);
 
     static void init(const char *uri, QQmlEngine *qmlEngine);
 

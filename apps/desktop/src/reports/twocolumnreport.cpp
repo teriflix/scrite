@@ -213,6 +213,11 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
     format->pageLayout()->configure(document);
     document->setIndentWidth(10);
 
+    // This is done to avoid having the document relayout after every insert. That can make
+    // PDF generation insanely slow.
+    document->setLayoutEnabled(false);
+    auto layoutSignalBlockGuard = qScopeGuard([=]() { document->setLayoutEnabled(true); });
+
     QTextCursor cursor(document);
 
     // Title Page
@@ -327,13 +332,14 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
 
         enum Column { LeftColumn, RightColumn };
 
+        QTextTableCellFormat cellFormat;
+        cellFormat.setLeftPadding(5);
+        cellFormat.setTopPadding(5);
+        cellFormat.setRightPadding(5);
+        cellFormat.setBottomPadding(5);
+
         auto placeCursor = [&](Column col, bool atEnd = false) -> QTextCursor {
             QTextTableCell cell = sceneTable->cellAt(currentRow, col == LeftColumn ? 0 : 1);
-            QTextTableCellFormat cellFormat;
-            cellFormat.setLeftPadding(5);
-            cellFormat.setTopPadding(5);
-            cellFormat.setRightPadding(5);
-            cellFormat.setBottomPadding(5);
             cell.setFormat(cellFormat);
             return atEnd ? cell.lastCursorPosition() : cell.firstCursorPosition();
         };
@@ -348,12 +354,10 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
 
         auto includeText = [=](QTextCursor &cursor, const QString &text,
                                const QVector<QTextLayout::FormatRange> &formats) {
-            if (m_useSingleFont)
-                cursor.insertText(text);
-            else
-                LanguageEngine::polishFontsAndInsertTextAtCursor(
-                        cursor, text,
-                        m_preserveMarkupFormatting ? formats : QVector<QTextLayout::FormatRange>());
+            LanguageEngine::insertTextAtCursor(
+                    cursor, text,
+                    m_preserveMarkupFormatting ? formats : QVector<QTextLayout::FormatRange>(),
+                    !m_useSingleFont);
         };
 
         // Create a two column table

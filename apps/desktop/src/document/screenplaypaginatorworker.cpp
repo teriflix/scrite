@@ -631,8 +631,7 @@ void ScreenplayPaginatorWorker::syncDocument()
                 cursor.insertBlock();
 
             prepareCursor(cursor, SceneElement::Type(paragraph.type), paragraph.alignment);
-            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, paragraph.text,
-                                                             paragraph.formats);
+            LanguageEngine::insertTextAtCursor(cursor, paragraph.text, paragraph.formats);
 
             ScreenplayPaginatorBlockData *blockData = new ScreenplayPaginatorBlockData;
             blockData->serialNumber = content.serialNumber;

@@ -535,7 +535,8 @@ QList<int> SceneElement::autoCapitalizePositions() const
                  .contains(m_type))
         return QList<int>();
 
-    return SceneElement::autoCapitalizePositions(m_text, SceneElement::autoCapitalizeExceptionsList());
+    return SceneElement::autoCapitalizePositions(m_text,
+                                                 SceneElement::autoCapitalizeExceptionsList());
 }
 
 QList<int> SceneElement::autoCapitalizePositions(const QStringList &exceptions) const
@@ -590,8 +591,7 @@ QList<int> SceneElement::autoCapitalizePositions(const QString &text, const QStr
                     // (e.g. the first '.' in "e.g."), so a prefix match is enough.
                     // At the end of the token (next char is space or end of string)
                     // we require an exact match.
-                    const bool nextIsSpace =
-                            (i + 1 >= text.length()) || text.at(i + 1).isSpace();
+                    const bool nextIsSpace = (i + 1 >= text.length()) || text.at(i + 1).isSpace();
                     for (const QString &exc : exceptions) {
                         const bool matched = nextIsSpace
                                 ? exc.compare(token, Qt::CaseInsensitive) == 0
@@ -2369,7 +2369,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
 
             cursor.insertBlock(blockFormat, charFormat);
 
-            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, synopsis);
+            LanguageEngine::insertTextAtCursor(cursor, synopsis);
         }
     }
 
@@ -2437,7 +2437,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             charFormat.setFont(textDocument->defaultFont());
 
             cursor.insertBlock(blockFormat, charFormat);
-            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, comments);
+            LanguageEngine::insertTextAtCursor(cursor, comments);
         }
     }
 
@@ -2459,7 +2459,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             const QTextCharFormat headingParaCharFormat = headingParaFormat->createCharFormat();
             cursor.setBlockFormat(headingParaBlockFormat);
             cursor.setBlockCharFormat(headingParaCharFormat);
-            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, m_heading->text());
+            LanguageEngine::insertTextAtCursor(cursor, m_heading->text());
             cursor.insertBlock();
         }
 
@@ -2470,8 +2470,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             const QTextCharFormat paraCharFormat = paraFormat->createCharFormat();
             cursor.setBlockFormat(paraBlockFormat);
             cursor.setBlockCharFormat(paraCharFormat);
-            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, para->text(),
-                                                             para->textFormats());
+            LanguageEngine::insertTextAtCursor(cursor, para->text(), para->textFormats());
             if (para != m_elements.last())
                 cursor.insertBlock();
         }
@@ -2925,7 +2924,7 @@ SceneSizeHintItem_TaskResult SceneSizeHintItem_Task2(const qreal devicePixelRati
         cursor.setCharFormat(charFormat);
         cursor.setBlockFormat(blockFormat);
 #if 0
-        LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, scene->heading()->text(),
+        LanguageEngine::insertTextAtCursor(cursor, scene->heading()->text(),
                                                                QVector<QTextLayout::FormatRange>());
 #else
         cursor.insertText(scene->heading()->text());
@@ -2947,7 +2946,7 @@ SceneSizeHintItem_TaskResult SceneSizeHintItem_Task2(const qreal devicePixelRati
         cursor.setCharFormat(charFormat);
         cursor.setBlockFormat(blockFormat);
 #if 0
-        LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, para->text(),
+        LanguageEngine::insertTextAtCursor(cursor, para->text(),
                                                                para->textFormats());
 #else
         cursor.insertText(para->text());

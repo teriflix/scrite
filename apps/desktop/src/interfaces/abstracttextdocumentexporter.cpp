@@ -80,6 +80,15 @@ void AbstractTextDocumentExporter::setIncludeSceneContents(bool val)
     emit includeSceneContentsChanged();
 }
 
+void AbstractTextDocumentExporter::setUseSingleFont(bool val)
+{
+    if (m_useSingleFont == val)
+        return;
+
+    m_useSingleFont = val;
+    emit useSingleFontChanged();
+}
+
 void AbstractTextDocumentExporter::setCapitalizeSentences(bool val)
 {
     if (m_capitalizeSentences == val)
@@ -121,6 +130,7 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
     stDoc.setPrintEachSceneOnANewPage(this->isPrintEachSceneOnANewPage());
     stDoc.setPrintEachActOnANewPage(this->isPrintEachActOnANewPage());
     stDoc.setIncludeActBreaks(this->isIncludeActBreaks());
+    stDoc.setUseSingleFont(m_useSingleFont);
     stDoc.setSyncEnabled(false);
     if (this->isExportForPrintingPurpose() || (this->usePageBreaks() && m_includeSceneContents)) {
         stDoc.setPurpose(ScreenplayTextDocument::ForPrinting);

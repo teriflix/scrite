@@ -523,6 +523,17 @@ void ScreenplayTextDocument::setIncludeMoreAndContdMarkers(bool val)
     this->loadScreenplayLater();
 }
 
+void ScreenplayTextDocument::setUseSingleFont(bool val)
+{
+    if (m_useSingleFont == val)
+        return;
+
+    m_useSingleFont = val;
+    emit useSingleFontChanged();
+
+    this->loadScreenplayLater();
+}
+
 void ScreenplayTextDocument::setSecondsPerPage(int val)
 {
     val = qBound(15, val, 300);
@@ -1296,11 +1307,11 @@ void ScreenplayTextDocument::loadScreenplay()
             cursor.insertText(QStringLiteral("Episode ")
                               + QString::number(element->episodeIndex() + 1)
                               + QStringLiteral(", "));
-        LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, element->breakTitle());
+        LanguageEngine::insertTextAtCursor(cursor, element->breakTitle(), QVector<QTextLayout::FormatRange>(), !m_useSingleFont);
 
         if (!element->breakSubtitle().isEmpty())
-            LanguageEngine::polishFontsAndInsertTextAtCursor(
-                    cursor, QStringLiteral(": ") + element->breakSubtitle().toUpper());
+            LanguageEngine::insertTextAtCursor(
+                    cursor, QStringLiteral(": ") + element->breakSubtitle().toUpper(), QVector<QTextLayout::FormatRange>(), !m_useSingleFont);
     };
 
     const int fsi = m_screenplay->firstSceneElementIndex();
@@ -1329,12 +1340,12 @@ void ScreenplayTextDocument::loadScreenplay()
                 episodeCharFormat.setFontWeight(QFont::ExtraBold);
                 cursor.setCharFormat(episodeCharFormat);
 
-                LanguageEngine::polishFontsAndInsertTextAtCursor(cursor,
-                                                                 element->breakTitle().toUpper());
+                LanguageEngine::insertTextAtCursor(cursor,
+                                                                 element->breakTitle().toUpper(), QVector<QTextLayout::FormatRange>(), !m_useSingleFont);
 
                 if (!element->breakSubtitle().isEmpty())
-                    LanguageEngine::polishFontsAndInsertTextAtCursor(
-                            cursor, QStringLiteral(": ") + element->breakSubtitle().toUpper());
+                    LanguageEngine::insertTextAtCursor(
+                            cursor, QStringLiteral(": ") + element->breakSubtitle().toUpper(), QVector<QTextLayout::FormatRange>(), !m_useSingleFont);
 
                 lastPrintedElement = element;
                 continue;
@@ -1502,7 +1513,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
         if (m_purpose == ForDisplay)
             cursor.insertText(characterName);
         else
-            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, characterName);
+            LanguageEngine::insertTextAtCursor(cursor, characterName, QVector<QTextLayout::FormatRange>(), !m_useSingleFont);
 
         QTextCharFormat contdMarkerFormat;
         contdMarkerFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
@@ -1609,8 +1620,8 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                     if (m_purpose == ForDisplay)
                         cursor.insertText(blockTextPart1);
                     else
-                        LanguageEngine::polishFontsAndInsertTextAtCursor(
-                                cursor, blockTextPart1, dialogElement->textFormats());
+                        LanguageEngine::insertTextAtCursor(
+                                cursor, blockTextPart1, dialogElement->textFormats(), !m_useSingleFont);
                     block = cursor.block();
                     block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
 
@@ -1618,7 +1629,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                     if (m_purpose == ForDisplay)
                         cursor.insertText(blockTextPart2);
                     else
-                        LanguageEngine::polishFontsAndInsertTextAtCursor(
+                        LanguageEngine::insertTextAtCursor(
                                 cursor, blockTextPart2,
                                 [](const QVector<QTextLayout::FormatRange> &formats, int position) {
                                     if (position == 0)
@@ -1639,7 +1650,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                                     }
 
                                     return ret;
-                                }(dialogElement->textFormats(), blockTextPart1.length() + 1));
+                                }(dialogElement->textFormats(), blockTextPart1.length() + 1), !m_useSingleFont);
                     block = cursor.block();
                     block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
 
@@ -2551,12 +2562,12 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
         if (!element->isOmitted()) {
             if (m_purpose == ForPrinting) {
                 if (heading->isEnabled()) {
-                    LanguageEngine::polishFontsAndInsertTextAtCursor(cursor,
-                                                                     heading->locationType());
+                    LanguageEngine::insertTextAtCursor(cursor,
+                                                                     heading->locationType(), QVector<QTextLayout::FormatRange>(), !m_useSingleFont);
                     cursor.insertText(QStringLiteral(". "));
-                    LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, heading->location());
+                    LanguageEngine::insertTextAtCursor(cursor, heading->location(), QVector<QTextLayout::FormatRange>(), !m_useSingleFont);
                     cursor.insertText(QStringLiteral(" - "));
-                    LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, heading->moment());
+                    LanguageEngine::insertTextAtCursor(cursor, heading->moment(), QVector<QTextLayout::FormatRange>(), !m_useSingleFont);
 
                     insertBlock = true;
                 } /*else {
@@ -2751,7 +2762,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                     chFormat.setFontWeight(QFont::Bold);
                     cursor.mergeCharFormat(chFormat);
 
-                    LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, title);
+                    LanguageEngine::insertTextAtCursor(cursor, title, QVector<QTextLayout::FormatRange>(), !m_useSingleFont);
 
                     if (!synopsis.isEmpty())
                         cursor.insertBlock();
@@ -2767,7 +2778,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                     chFormat.setFontWeight(QFont::Normal);
                     cursor.mergeCharFormat(chFormat);
 
-                    LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, synopsis);
+                    LanguageEngine::insertTextAtCursor(cursor, synopsis, QVector<QTextLayout::FormatRange>(), !m_useSingleFont);
                 }
 
                 cursor = frame->lastCursorPosition();
@@ -2796,7 +2807,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 charFormat.setFont(cursor.document()->defaultFont());
 
                 cursor.insertBlock(blockFormat, charFormat);
-                LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, comments);
+                LanguageEngine::insertTextAtCursor(cursor, comments, QVector<QTextLayout::FormatRange>(), !m_useSingleFont);
 
                 insertBlock = true;
             }
@@ -2840,7 +2851,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             const QString text = para->text();
             if (m_purpose == ForPrinting)
-                LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, text, para->textFormats());
+                LanguageEngine::insertTextAtCursor(cursor, text, para->textFormats(), !m_useSingleFont);
             else
                 cursor.insertText(text);
 

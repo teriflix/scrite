@@ -295,6 +295,19 @@ public:
     Q_SIGNAL void includeMoreAndContdMarkersChanged();
 
     // clang-format off
+    Q_CLASSINFO("useSingleFont_FieldGroup", "Options")
+    Q_CLASSINFO("useSingleFont_FieldLabel", "Use a single font, instead of separate ones for each language.")
+    Q_CLASSINFO("useSingleFont_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool useSingleFont
+                    READ isUseSingleFont
+                    WRITE setUseSingleFont
+                    NOTIFY useSingleFontChanged)
+    // clang-format on
+    void setUseSingleFont(bool val);
+    bool isUseSingleFont() const { return m_useSingleFont; }
+    Q_SIGNAL void useSingleFontChanged();
+
+    // clang-format off
     Q_PROPERTY(bool updating
                READ isUpdating
                NOTIFY updatingChanged)
@@ -524,6 +537,7 @@ private:
     bool m_includeSceneComments = false;
     bool m_screenplayIsBeingReset = false;
     bool m_includeMoreAndContdMarkers = true;
+    bool m_useSingleFont = true;
     QList<Scene *> m_sceneResetList;
     ExecLaterTimer m_sceneResetTimer;
     bool m_sceneResetHasTriggeredUpdateScheduled = false;

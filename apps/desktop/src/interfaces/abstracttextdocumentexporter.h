@@ -100,6 +100,19 @@ public:
     bool isIncludeSceneContents() const { return m_includeSceneContents; }
     Q_SIGNAL void includeSceneContentsChanged();
 
+    // clang-format off
+    Q_CLASSINFO("useSingleFont_FieldGroup", "Options")
+    Q_CLASSINFO("useSingleFont_FieldLabel", "Use a single font, instead of separate ones for each language.")
+    Q_CLASSINFO("useSingleFont_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool useSingleFont
+               READ isUseSingleFont
+               WRITE setUseSingleFont
+               NOTIFY useSingleFontChanged)
+    // clang-format on
+    void setUseSingleFont(bool val);
+    bool isUseSingleFont() const { return m_useSingleFont; }
+    Q_SIGNAL void useSingleFontChanged();
+
     // This property is not presented to the user, because it will be consistent with
     // options configured in Settings.
     // clang-format off
@@ -154,6 +167,7 @@ private:
     bool m_includeSceneComments = false;
     bool m_polishParagraphs = false;
     bool m_capitalizeSentences = false;
+    bool m_useSingleFont = true;
 };
 
 #endif // ABSTRACTTEXTDOCUMENTEXPORTER_H
