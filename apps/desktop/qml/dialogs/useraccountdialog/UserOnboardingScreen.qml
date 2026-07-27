@@ -237,7 +237,7 @@ Item {
                 return
             }
 
-            MessageBox.information("Error", "There was an error submitting form data. Please try again.")
+            MessageBox.information("Error", errorText === "" ? "There was an error submitting form data. Please try again." : errorText)
         }
     }
 

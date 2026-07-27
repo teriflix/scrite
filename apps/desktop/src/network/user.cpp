@@ -778,6 +778,29 @@ void User::checkIfInstallationInfoNeedsUpdate()
     }
 }
 
+void User::checkForPromotionText()
+{
+    if (!m_info.isValid())
+        return;
+
+    if (this->findChild<SubscriptionPromotionTextRestApiCall *>(QString(),
+                                                                Qt::FindDirectChildrenOnly))
+        return;
+
+    SubscriptionPromotionTextRestApiCall *call = new SubscriptionPromotionTextRestApiCall(this);
+    connect(call, &SubscriptionPromotionTextRestApiCall::finished, this, [=]() {
+        if (call->promotionText() != m_promotionText) {
+            m_promotionText = call->promotionText();
+            emit promotionTextChanged();
+        }
+        call->deleteLater();
+    });
+    if (!call->call()) {
+        Utils::Gui::log("Still not able to call.");
+        call->deleteLater();
+    }
+}
+
 void User::checkIfVersionTypeUseIsAllowed()
 {
     if (Application::versionType.isEmpty() || !m_info.isValid()
@@ -792,6 +815,8 @@ void User::checkForMessagesNow()
 {
     if (!this->isLoggedIn())
         return;
+
+    QTimer::singleShot(100, User::instance(), &User::checkForPromotionText);
 
     UserMessagesRestApiCall *api =
             this->findChild<UserMessagesRestApiCall *>(QString(), Qt::FindDirectChildrenOnly);

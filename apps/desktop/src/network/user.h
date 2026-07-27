@@ -849,6 +849,14 @@ public:
     Q_INVOKABLE void checkForMessages();
     Q_INVOKABLE void markMessagesAsRead();
 
+    // clang-format off
+    Q_PROPERTY(QString promotionText
+               READ promotionText
+               NOTIFY promotionTextChanged)
+    // clang-format on
+    QString promotionText() const { return m_promotionText; }
+    Q_SIGNAL void promotionTextChanged();
+
     void checkIfVersionTypeUseIsAllowed();
 
     Q_INVOKABLE static UserInstallationInfo asInstallationInfo(const QJsonObject &object);
@@ -881,6 +889,7 @@ private:
     void setMessages(const QList<UserMessage> &val);
     void checkIfSubscriptionIsAboutToExpire();
     void checkIfInstallationInfoNeedsUpdate();
+    void checkForPromotionText();
 
     void checkForMessagesNow();
     void storeMessages();
@@ -899,6 +908,7 @@ private:
     UserInfo m_info;
     QList<UserMessage> m_messages;
     QTimer *m_checkForMessagesTimer = nullptr;
+    QString m_promotionText;
 };
 
 class AppFeature : public QObject

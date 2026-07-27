@@ -91,7 +91,7 @@ Item {
     readonly property FontMetrics minimumFontMetrics: FontMetrics {
         readonly property var sizes: GMath.availableFontPointSizes(font.family, font.styleName)
 
-        font.pointSize: root.idealFontMetrics.font.pointSize-2
+        font.pointSize: Scrite.app.idealFontPointSize-2
     }
 
     readonly property FontMetrics idealFontMetrics: FontMetrics {
@@ -466,13 +466,13 @@ Item {
 
         function onLoggedInChanged() {
             if(Scrite.user.loggedIn) {
-                let api = Qt.createQmlObject("import io.scrite.components; UserHelpTipsRestApiCall {}", root)
-                api.finished.connect( () => {
-                                          root.helpTips = api.helpTips
-                                          api.destroy()
-                                      })
-                if(!api.call())
-                    api.destroy()
+                let helpTipsApi = Qt.createQmlObject("import io.scrite.components; UserHelpTipsRestApiCall {}", root)
+                helpTipsApi.finished.connect( () => {
+                                                  root.helpTips = helpTipsApi.helpTips
+                                                  helpTipsApi.destroy()
+                                              })
+                if(!helpTipsApi.call())
+                    helpTipsApi.destroy()
             }
         }
     }

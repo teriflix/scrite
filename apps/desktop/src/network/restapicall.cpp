@@ -283,8 +283,12 @@ QJsonObject sanitizeJsonObject(const QJsonObject &obj)
 
 bool RestApiCall::call()
 {
-    if (this->api().isEmpty() || m_reply != nullptr || this->isBusy())
+    if (this->api().isEmpty() || m_reply != nullptr || this->isBusy()) {
+        Utils::Gui::log("RestApiCall::call() failed: api=" + this->api()
+                        + " m_reply=" + QString::number((m_reply != nullptr))
+                        + " isBusy=" + QString::number(this->isBusy()));
         return false;
+    }
 
     this->clearError();
     this->clearResponse();
@@ -324,11 +328,13 @@ bool RestApiCall::call()
         const QByteArray userId = LocalStorage::load(LocalStorage::userId).toByteArray();
 
         if (sessionToken.isEmpty()) {
+            Utils::Gui::log(QStringLiteral("%1: %2").arg(Q_FUNC_INFO).arg(__LINE__));
             QTimer::singleShot(0, RestApi::instance(), &RestApi::requestNewSessionToken);
             return false;
         }
 
         if (userId.isEmpty()) {
+            Utils::Gui::log(QStringLiteral("%1: %2").arg(Q_FUNC_INFO).arg(__LINE__));
             QTimer::singleShot(0, RestApi::instance(), &RestApi::requestFreshActivation);
             return false;
         }
@@ -384,6 +390,7 @@ bool RestApiCall::call()
         return true;
     }
 
+    Utils::Gui::log(QStringLiteral("%1: %2").arg(Q_FUNC_INFO).arg(__LINE__));
     return false;
 }
 
@@ -1480,6 +1487,15 @@ void SubscriptionPlanActivationRestApiCall::setResponse(const QJsonObject &val)
     if (!api->queue(RestApi::instance()->sessionApiQueue()))
         api->deleteLater();
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+SubscriptionPromotionTextRestApiCall::SubscriptionPromotionTextRestApiCall(QObject *parent)
+    : RestApiCall(parent)
+{
+}
+
+SubscriptionPromotionTextRestApiCall::~SubscriptionPromotionTextRestApiCall() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 

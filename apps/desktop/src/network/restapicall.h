@@ -1281,6 +1281,28 @@ protected:
     void setResponse(const QJsonObject &val);
 };
 
+class SubscriptionPromotionTextRestApiCall : public RestApiCall
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    SubscriptionPromotionTextRestApiCall(QObject *parent = nullptr);
+    ~SubscriptionPromotionTextRestApiCall();
+
+    // clang-format off
+    Q_PROPERTY(QString promotionText
+               READ promotionText
+               NOTIFY responseChanged)
+    // clang-format on
+    QString promotionText() const { return this->responseData().value("text").toString(); }
+
+    // RestApiCall interface
+    Type type() const { return GET; }
+    bool useSessionToken() const { return true; }
+    QString api() const { return "subscription/promotionText"; }
+};
+
 class AbstractScriptalayRestApiCall : public RestApiCall
 {
     Q_OBJECT

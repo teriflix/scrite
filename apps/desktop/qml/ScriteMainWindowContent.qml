@@ -46,6 +46,52 @@ Item {
 
         spacing: 0
 
+        Loader {
+            id: _promoTextLoader
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: Runtime.idealFontMetrics.lineSpacing * 2
+            active: Scrite.user.promotionText !== ""
+            visible: active
+
+            sourceComponent: Rectangle {
+                id: _promoText
+
+                color: Runtime.colors.accent.c900.background
+
+                RowLayout {
+                    id: _promoTextLayout
+
+                    anchors.centerIn: parent
+
+                    spacing: 10
+
+                    VclText {
+                        text: Scrite.user.promotionText
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize-1
+                        color: Runtime.colors.accent.c900.text
+                    }
+
+                    VclText {
+                        text: "Click here ..."
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize-1
+                        font.underline: true
+                        color: Runtime.colors.accent.c900.text
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+
+                    onClicked: {
+                        UserAccountDialog.launch("Subscriptions")
+                        _promoTextLoader.active = false
+                    }
+                }
+            }
+        }
+
         Header {
             id: _header
 

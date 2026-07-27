@@ -27,10 +27,13 @@ dialog](./user-interface.md#keyboard-shortcuts).
 The Profile page displays the e‑mail address linked to your Scrite account and lets you edit your
 personal details. 
 
-Below the fields are two toggle switches:
+Below the fields are four checkboxes for managing your communication and data preferences:
 
-- Usage analytics – enable or disable data collection.
-- Marketing e‑mail – opt in or out of promotional messages.
+- Consent to send usage analytics – enable or disable [data collection](#usage-analytics).
+- Consent to receive emails – opt in or out of email [communications](#communication-consent).
+- Consent to product feedback calls – allow or disallow [phone calls](#communication-consent) for
+  feedback.
+- Consent to WhatsApp messages – opt in or out of [WhatsApp](#communication-consent) updates.
 
 After changing any field or toggle, click Save to apply the updates.
 
@@ -124,9 +127,9 @@ your request. Account deletion requests are typically processed within 90 days.
 
 **After account deletion:**
 
-You can recreate your Scrite account at any time using the same or a different email address. 
-However, any trial activations that were previously used on your devices will be counted against 
-your trial limits. This means future trial activations on those devices may be limited. You can 
+You can recreate your Scrite account at any time using the same or a different email address.
+However, any trial activations that were previously used on your devices will be counted against
+your trial limits. This means future trial activations on those devices may be limited. You can
 always sign up for available paid plans instead.
 
 ## Subscriptions Page
