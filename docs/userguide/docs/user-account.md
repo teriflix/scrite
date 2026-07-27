@@ -38,25 +38,66 @@ After changing any field or toggle, click Save to apply the updates.
 
 ### Usage Analytics
 
-The **Send usage analytics** (formerly Send analytics data) checkbox controls whether Scrite sends 
-activity logs to the Scrite servers. 
+The **Consent to send usage analytics** (formerly Send analytics data) checkbox controls whether
+Scrite sends activity logs to the Scrite servers. 
 
 **What is collected:** When enabled, Scrite periodically sends logs that record which features you
 use and how often. Each log includes enough information to identify your account and device so the
 team can attribute activity to a subscription tier and platform.
 
 **How this helps:** Telemetry data lets the team see which features are actually used and which are
-not. That informs decisions about where to invest development effort, what to improve in the product,
-and how to shape subscription offerings so they reflect how writers genuinely use Scrite.
+not. That informs decisions about where to invest development effort, what to improve in the
+product, and how to shape subscription offerings so they reflect how writers genuinely use Scrite.
 
 **What is never collected:** The logs contain no content from your screenplays or documents. Your
 creative work stays entirely on your device and is never transmitted to the Scrite servers.
 
-**When disabled:** Scrite still records the bare minimum needed to maintain your account and
-license — specifically, that the app was launched. All other in-app activity logging stops.
+**When disabled:** Scrite still records the bare minimum needed to maintain your account and license
+— specifically, that the app was launched. All other in-app activity logging stops.
 
 You can change this preference at any time. Click **Save** after toggling the checkbox for the
 change to take effect.
+
+> **NOTE:** The checkbox label changed from "Send usage analytics" to "Consent to send usage
+> analytics" in version 3.0.7 and later. The functionality remains the same across all versions.
+
+### Communication Consent
+
+Scrite uses the following channels to keep you informed about product updates and gather your
+feedback. Your personal information (email address or phone number) is never shared with third
+parties and is used exclusively by the Scrite team to communicate with you about the product. The
+only exceptions are when required for billing, payment processing, or compliance with relevant tax
+authorities and government agencies.
+
+You can change these preferences at any time. Click **Save** after toggling any checkbox for the
+change to take effect.
+
+**Email Communications**
+
+The **Consent to receive emails** checkbox controls whether Scrite can send you emails related to
+product updates, announcements, and feedback requests. Emails are sent only when we have important
+product updates, new features, or specific requests for your feedback on features you use. We never
+send random marketing emails or promotional offers unrelated to the product.
+
+**Product Feedback & Support Calls**
+
+The **Consent to product feedback calls** checkbox controls whether members of the Scrite team can
+reach you by phone for product support, feedback collection, and feature discussions. We only call
+when we want to understand how you use Scrite, gather feedback on specific features, or provide
+direct support for issues you've encountered. Calls are never for promotional or sales purposes.
+
+**WhatsApp Updates**
+
+The **Consent to send WhatsApp updates** checkbox controls whether Scrite can send you messages on
+WhatsApp about product updates, announcements, and feature availability. Messages are sent only for
+significant product updates, new features, and important announcements. We use WhatsApp as an
+alternative communication channel for users who prefer it, but follow the same principle as email:
+focused product information, never random promotional content.
+
+> **NOTE:** Separate consent checkboxes for each communication channel were introduced in version
+> 3.0.7. In earlier versions, a single "Send marketing email" toggle controlled consent for all
+> three channels at once. If you wish to manage communication preferences independently, please
+> update to version 3.0.7 or later.
 
 ### Logout
 
@@ -65,6 +106,28 @@ on the current device. This allows you to recycle your subscription on a new dev
 section on [Installations](#installations-page) for more information.
 
 <img src="../images/user-account/002-logout-button.jpg" width="85%"/>
+
+### Account Deletion
+
+To request account deletion, send an email to [support@scrite.io](mailto:support@scrite.io) with
+your request. Account deletion requests are typically processed within 90 days.
+
+**What gets deleted:**
+- All usage analytics logs associated with your account.
+
+**What we cannot delete:**
+- **Device information** – We retain device data to prevent trial abuse. This applies to all users,
+  including those on trial and paid subscriptions.
+- **Billing and compliance records** (paid subscribers only) – For paid subscribers, we cannot
+  delete your email, phone number, subscription details, and payment history. These records are
+  retained for legal compliance, tax purposes, and accounting requirements.
+
+**After account deletion:**
+
+You can recreate your Scrite account at any time using the same or a different email address. 
+However, any trial activations that were previously used on your devices will be counted against 
+your trial limits. This means future trial activations on those devices may be limited. You can 
+always sign up for available paid plans instead.
 
 ## Subscriptions Page
 
@@ -126,8 +189,9 @@ them.
 This page shows every device that has ever activated Scrite under your account. The current device
 is highlighted in **bold**; other devices are listed below in order of most recent session time.
 
-Each entry has a **Sign Out** button. Clicking it removes the device from the active list. The change
-takes effect on the remote device after it reconnects or restarts, which may take up to an hour.
+Each entry has a **Sign Out** button. Clicking it removes the device from the active list. The
+change takes effect on the remote device after it reconnects or restarts, which may take up to an
+hour.
 
 <img src="../images/user-account/008-installations.jpg" width="85%"/>
 

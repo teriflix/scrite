@@ -199,12 +199,17 @@ Item {
             onTextEdited: _userInfoFields.needsSaving = true
         }
 
-        RowLayout {
+        GridLayout {
             Layout.fillWidth: true
 
-            spacing: 25
+            columns: 2
+            columnSpacing: 40
+            rowSpacing: 15
 
             RowLayout {
+                Layout.column: 0
+                Layout.row: 0
+
                 spacing: 4
 
                 VclCheckBox {
@@ -213,7 +218,7 @@ Item {
                     TabSequenceItem.manager: _userInfoFields
                     TabSequenceItem.sequence: 5
 
-                    text: "Send usage analytics."
+                    text: "Consent to send usage analytics"
                     checked: root.userInfo.consentToActivityLog
                     padding: 0
 
@@ -221,28 +226,112 @@ Item {
                 }
 
                 Link {
-                    text: "More Info"
+                    text: "ⓘ"
+                    font.underline: false
                     onClicked: {
                         const url = HelpCenter.lookup("Usage Analytics")
-                        if(url !== "")
+                        if(url && typeof url === "string" && url !== "")
                             Qt.openUrlExternally(url);
                         else
-                            Qt.openUrlExternally("https://www.scrite.io/privacy-policy/")
+                            Qt.openUrlExternally("https://www.scrite.io/privacy-policy#data")
                     }
                 }
             }
 
-            VclCheckBox {
-                id: _chkEmailConsent
+            RowLayout {
+                Layout.column: 1
+                Layout.row: 0
 
-                TabSequenceItem.manager: _userInfoFields
-                TabSequenceItem.sequence: 6
+                spacing: 4
 
-                text: "Send marketing email."
-                checked: root.userInfo.consentToEmail
-                padding: 0
+                VclCheckBox {
+                    id: _chkEmailConsent
 
-                onToggled: _userInfoFields.needsSaving = true
+                    TabSequenceItem.manager: _userInfoFields
+                    TabSequenceItem.sequence: 6
+
+                    text: "Consent to receive emails"
+                    checked: root.userInfo.consentToEmail
+                    padding: 0
+
+                    onToggled: _userInfoFields.needsSaving = true
+                }
+
+                Link {
+                    text: "ⓘ"
+                    font.underline: false
+                    onClicked: {
+                        const url = HelpCenter.lookup("Communication Consent")
+                        if(url && typeof url === "string" && url !== "")
+                            Qt.openUrlExternally(url);
+                        else
+                            Qt.openUrlExternally("https://www.scrite.io/privacy-policy#data")
+                    }
+                }
+            }
+
+            RowLayout {
+                Layout.column: 0
+                Layout.row: 1
+
+                spacing: 4
+
+                VclCheckBox {
+                    id: _chkCallsConsent
+
+                    TabSequenceItem.manager: _userInfoFields
+                    TabSequenceItem.sequence: 7
+
+                    text: "Consent to product feedback calls"
+                    checked: root.userInfo.consentToCalls
+                    padding: 0
+
+                    onToggled: _userInfoFields.needsSaving = true
+                }
+
+                Link {
+                    text: "ⓘ"
+                    font.underline: false
+                    onClicked: {
+                        const url = HelpCenter.lookup("Communication Consent")
+                        if(url && typeof url === "string" && url !== "")
+                            Qt.openUrlExternally(url);
+                        else
+                            Qt.openUrlExternally("https://www.scrite.io/privacy-policy#data")
+                    }
+                }
+            }
+
+            RowLayout {
+                Layout.column: 1
+                Layout.row: 1
+
+                spacing: 4
+
+                VclCheckBox {
+                    id: _chkWhatsAppConsent
+
+                    TabSequenceItem.manager: _userInfoFields
+                    TabSequenceItem.sequence: 8
+
+                    text: "Consent to WhatsApp messages"
+                    checked: root.userInfo.consentToWhatsApp
+                    padding: 0
+
+                    onToggled: _userInfoFields.needsSaving = true
+                }
+
+                Link {
+                    text: "ⓘ"
+                    font.underline: false
+                    onClicked: {
+                        const url = HelpCenter.lookup("Communication Consent")
+                        if(url && typeof url === "string" && url !== "")
+                            Qt.openUrlExternally(url);
+                        else
+                            Qt.openUrlExternally("https://www.scrite.io/privacy-policy#data")
+                    }
+                }
             }
         }
 
@@ -335,6 +424,8 @@ Item {
                             wdyhas: _wdyhasField.text.trim(),
                             consentToActivityLog: _chkAnalyticsConsent.checked,
                             consentToEmail: _chkEmailConsent.checked,
+                            consentToCalls: _chkCallsConsent.checked,
+                            consentToWhatsApp: _chkWhatsAppConsent.checked,
                         }
 
                         _saveUserCall.updatedFields = newInfo

@@ -310,6 +310,8 @@ UserInfo::UserInfo(const QJsonObject &object)
     }();
     this->consentToActivityLog = object.value("consentToActivityLog").toBool();
     this->consentToEmail = object.value("consentToEmail").toBool();
+    this->consentToCalls = object.value("consentToCalls").toBool();
+    this->consentToWhatsApp = object.value("consentToWhatsApp").toBool();
 
     const QJsonArray _installations = object.value("installations").toArray();
     for (const QJsonValue &_installation : _installations) {

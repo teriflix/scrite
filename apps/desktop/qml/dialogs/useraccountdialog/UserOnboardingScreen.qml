@@ -555,6 +555,7 @@ Item {
                     list.push(_msCheckBoxes.itemAt(i).text)
             }
             formData[name] = list.join(";;")
+            return formData
         }
     }
 }

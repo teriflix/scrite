@@ -346,7 +346,7 @@ QSM.StateMachine {
     }
 
     function _maybeOnboardUserSurvey() {
-        if (Runtime.userAccountDialogSettings.userOnboardingStatus === "required")
+        if (Runtime.userAccountDialogSettings.userOnboardingStatus === "required" && Runtime.allowAppUsage)
             UserOnboardingDialog.launch()
     }
 }

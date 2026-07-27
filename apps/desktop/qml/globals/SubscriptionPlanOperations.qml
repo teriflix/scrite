@@ -40,6 +40,10 @@ Item {
         anchors.fill = parent
     }
 
+    function planHasExcludedFeatures(plan) {
+       return _private.planHasExcludedFeatures(plan)
+    }
+
     function planActionLinkText(plan) {
         if(!plan)
             return ""

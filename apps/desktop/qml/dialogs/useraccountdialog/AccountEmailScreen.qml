@@ -98,6 +98,40 @@ Item {
                 onReturnPressed: if(_submit.enabled) _submit.clicked()
             }
 
+            VclCheckBox {
+                id: _deviceIdConsent
+
+                Layout.fillWidth: true
+
+                TabSequenceItem.manager: _userInfoFields
+                TabSequenceItem.sequence: 1
+
+                text: "Use my email & device info to help secure my account."
+                topPadding: 0; bottomPadding: 0
+
+                onToggled: Qt.callLater(_submit.determineEnabled)
+            }
+
+            VclCheckBox {
+                id: _ipAddressConsent
+
+                Layout.fillWidth: true
+
+                TabSequenceItem.manager: _userInfoFields
+                TabSequenceItem.sequence: 1
+
+                text: "Use my IP address to determine my billing location and pricing."
+                topPadding: 0; bottomPadding: 0
+
+                onToggled: Qt.callLater(_submit.determineEnabled)
+            }
+
+            Link {
+                text: "How we use your data."
+
+                onClicked: Qt.openUrlExternally("https://www.scrite.io/privacy-policy#data")
+            }
+
             Item {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 20
@@ -110,7 +144,7 @@ Item {
                 Layout.alignment: Qt.AlignRight
 
                 function determineEnabled() {
-                    enabled = Runtime.validateEmail(_emailField.text.trim())
+                    enabled = Runtime.validateEmail(_emailField.text.trim()) && _deviceIdConsent.checked && _ipAddressConsent.checked
                 }
 
                 text: "Continue »"

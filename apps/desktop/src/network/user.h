@@ -511,6 +511,18 @@ public:
     bool consentToEmail = false;
 
     // clang-format off
+    Q_PROPERTY(bool consentToCalls
+               MEMBER consentToCalls)
+    // clang-format on
+    bool consentToCalls = false;
+
+    // clang-format off
+    Q_PROPERTY(bool consentToWhatsApp
+               MEMBER consentToWhatsApp)
+    // clang-format on
+    bool consentToWhatsApp = false;
+
+    // clang-format off
     Q_PROPERTY(QStringList allowedVersionTypes
                MEMBER allowedVersionTypes)
     // clang-format on

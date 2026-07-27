@@ -77,7 +77,8 @@ Item {
                             let bestIdx = -1
                             let lowestMonthlyPricePerDevice = Number.MAX_VALUE
                             for (let i = 0; i < plans.length; i++) {
-                                if (plans[i].exclusive) continue
+                                if (plans[i].exclusive || SubscriptionPlanOperations.planHasExcludedFeatures(plans[i]))
+                                    continue
                                 const p = plans[i].pricing
                                 if (p.actual > 0 && p.actual > p.price) {
                                     const monthlyPricePerDevice = (p.price / (plans[i].duration / 30)) / Math.max(plans[i].devices,1)
