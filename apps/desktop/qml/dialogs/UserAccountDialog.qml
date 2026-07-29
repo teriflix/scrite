@@ -46,6 +46,23 @@ Item {
         }
     }
 
+    function handleMessageEndpoint(endpoint) {
+        switch(endpoint) {
+        case "$subscribe":
+            launch("Subscriptions")
+            return
+        case "$profile":
+            launch("Profile")
+            return
+        case "$installations":
+            launch("Installations")
+            return
+        case "$homescreen":
+            HomeScreen.launch()
+            return
+        }
+    }
+
     VclDialog {
         id: _userAccountDialog
 
@@ -134,38 +151,8 @@ Item {
             }
         }
 
-        readonly property Connections trackSubscriptionExpiry: Connections {
-            enabled: Scrite.user.loggedIn
-
-            target: Scrite.user
-
-            Notification.active: false
-            Notification.title: "Subscription Expiry"
-            Notification.text: "Your active subscription is about to expire in a few days."
-            Notification.buttons: ["View Plans", "Dismiss"]
-            Notification.onButtonClicked: (index) => {
-                if(index === 0) {
-                    root.launch("Subscriptions")
-                }
-            }
-
-            function onSubscriptionAboutToExpire(nrDays) {
-                Notification.text = "Your active subscription is about to expire in " + nrDays + " day(s)."
-                Notification.active = true
-            }
-
-            function onInfoChanged() {
-                if(!Scrite.user.info.hasActiveSubscription) {
-                    root.launch("Subscriptions")
-                    return
-                }
-
-                if(Notification.active && Scrite.user.info.hasUpcomingSubscription)
-                    Notification.active = false
-
-                // _private.trackSessionStatus.configure()
-            }
-        }
+        property int unreadMessageCount: 0
+        property scriteUserMessage firstMessage
 
         readonly property Connections trackImportantMessages: Connections {
             enabled: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
@@ -173,29 +160,48 @@ Item {
             target: Scrite.user
 
             Notification.active: false
-            Notification.title: "Unread Notifications"
-            Notification.text: "You have one or more important unread notifications. Would you like to see them now?"
-            Notification.buttons: ["View Notifications", "Dismiss"]
-            Notification.onButtonClicked: (index) => {
-                if(index === 0) {
-                    root.launch("Notifications")
+            Notification.title: _private.unreadMessageCount === 1 ? _private.firstMessage.subject : "You have " + _private.unreadMessageCount + " unread messages."
+            Notification.text: _private.unreadMessageCount === 1 ? _private.firstMessage.body : (_private.firstMessage.subject + ", and " + (_private.unreadMessageCount-1) + " more ..")
+            Notification.image: _private.unreadMessageCount === 1 ? _private.firstMessage.image : ""
+            Notification.buttons: {
+                let ret = []
+                if(_private.unreadMessageCount === 1) {
+                    const buttons = _private.firstMessage.buttons
+                    for(let i=0; i<buttons.length; i++) {
+                        ret.push(buttons[i].text)
+                    }
+                } else {
+                    ret.push("Read Messages")
                 }
+
+                ret.push("Dismiss")
+                return ret
             }
+            Notification.onButtonClicked: (index) => {
+                                              let offset=0
+                                              if(_private.unreadMessageCount === 1) {
+                                                  const buttons = _private.firstMessage.buttons
+                                                  offset = buttons.length
+                                                  if(index < offset) {
+                                                      const button = buttons[index]
+                                                      Scrite.user.markMessagesAsRead()
+                                                      if(button.action === UserMessageButton.UrlAction) {
+                                                          Qt.openUrlExternally(button.endpoint)
+                                                          return
+                                                      }
+                                                      if(button.action === UserMessageButton.CommandAction) {
+                                                          root.handleMessageEndpoint(button.endpoint)
+                                                          return
+                                                      }
+                                                  }
+                                              } else if(index === 0)
+                                                  root.launch("Notifications")
+                                          }
 
             function onNotifyImportantMessages(messages) {
-                Notification.title = (() => {
-                                        const count = Scrite.user.unreadMessageCount
-                                        if(count === 1)
-                                          return "You have 1 unread notification"
-                                        return "You have " + count + " unread notifications."
-                                      })()
-                Notification.text = (() => {
-                                         const count = Scrite.user.unreadMessageCount
-                                         let ret = messages[0].subject
-                                         if(count > 1)
-                                            ret += ", and " + (count-1) + " more .."
-                                         return ret
-                                     })()
+                _private.unreadMessageCount = Scrite.user.unreadMessageCount
+                _private.firstMessage = messages[0]
+
                 Notification.active = true
             }
         }

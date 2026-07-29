@@ -26,6 +26,7 @@ import io.scrite.components
 
 import "../globals"
 import "../controls"
+import "../helpers"
 
 Rectangle {
     id: root
@@ -55,7 +56,7 @@ Rectangle {
         anchors.topMargin: -1
         anchors.horizontalCenter: parent.horizontalCenter
 
-        width: parent.width * 0.7
+        width: parent.width * 0.6
         height: Math.min( contentHeight, parent.height*0.25 )
 
         visible: height > 0
@@ -92,7 +93,7 @@ Rectangle {
 
                         width: parent.width-44
 
-                        spacing: 30
+                        spacing: 16
 
                         Rectangle {
                             Layout.preferredWidth: parent.width*0.25
@@ -135,7 +136,7 @@ Rectangle {
                         ColumnLayout {
                             Layout.fillWidth: true
 
-                            spacing: 20
+                            spacing: 12
 
                             VclLabel {
                                 Layout.fillWidth: true
@@ -145,8 +146,10 @@ Rectangle {
                                 text: _delegate.notification.title
                                 visible: text !== ""
                                 wrapMode: Text.WordWrap
+                                maximumLineCount: 2
+                                elide: Text.ElideRight
 
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             }
 
                             VclLabel {
@@ -155,37 +158,37 @@ Rectangle {
                                 color: Runtime.colors.tx(_delegate.notification.textColor)
                                 text: _delegate.notification.text
                                 wrapMode: Text.WordWrap
+                                maximumLineCount: 4
+                                elide: Text.ElideRight
 
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             }
-
-                            RowLayout {
-                                Layout.fillWidth: true
-
-                                spacing: 20
-
-                                Repeater {
-                                    model: _delegate.notification.buttons
-
-                                    delegate: VclButton {
-                                        required property int index
-                                        required property string modelData
-
-                                        width: Math.max(75, implicitWidth)
-
-                                        text: modelData
-
-                                        onClicked: _delegate.notification.notifyButtonClick(index)
-                                    }
-                                }
-                            }
                         }
 
-                        VclButton {
-                            visible: !_delegate.notification.autoClose && !_delegate.notification.hasButtons
-                            text: "Dismiss"
+                        ColumnLayout {
+                            spacing: 12
 
-                            onClicked: Scrite.notifications.dismissNotification(_delegate.index)
+                            Layout.alignment: Qt.AlignTop
+
+                            Repeater {
+                                model: _delegate.notification.buttons
+
+                                delegate: Link {
+                                    required property int index
+                                    required property string modelData
+
+                                    text: modelData
+
+                                    onClicked: _delegate.notification.notifyButtonClick(index)
+                                }
+                            }
+
+                            Link {
+                                text: "Dismiss"
+                                visible: !_delegate.notification.autoClose && !_delegate.notification.hasButtons
+
+                                onClicked: Scrite.notifications.dismissNotification(_delegate.index)
+                            }
                         }
                     }
                 }

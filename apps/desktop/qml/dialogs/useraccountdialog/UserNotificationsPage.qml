@@ -198,20 +198,8 @@ Item {
                                 }
 
                                 if(_buttonDelegate.modelData.action === UserMessageButton.CommandAction) {
-                                    switch(_buttonDelegate.modelData.endpoint) {
-                                    case "$subscribe":
-                                        Runtime.shoutout(Runtime.announcementIds.userProfileScreenPage, "Subscriptions")
-                                        return
-                                    case "$profile":
-                                        Runtime.shoutout(Runtime.announcementIds.userProfileScreenPage, "Profile")
-                                        return
-                                    case "$installations":
-                                        Runtime.shoutout(Runtime.announcementIds.userProfileScreenPage, "Installations")
-                                        return
-                                    case "$homescreen":
-                                        HomeScreen.launch()
-                                        return
-                                    }
+                                    UserAccountDialog.handleMessageEndpoint(_buttonDelegate.modelData.endpoint)
+                                    return
                                 }
 
                                 // Implement API and Code in a future update
