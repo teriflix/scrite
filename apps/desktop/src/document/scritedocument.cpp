@@ -2324,9 +2324,20 @@ void ScriteDocument::updateDocumentWindowTitle()
 
     title += QStringLiteral(" - ") + qApp->property("baseWindowTitle").toString();
 
-    if (User::instance()->isLoggedIn() && User::instance()->info().hasActiveSubscription) {
-        const UserSubscriptionInfo activeSub = User::instance()->info().subscriptions.first();
-        title += " [" + activeSub.description() + "]";
+    if (User::instance()->isLoggedIn()) {
+        const UserInfo userInfo = User::instance()->info();
+        title += " | ";
+        if (userInfo.hasActiveSubscription) {
+            if (userInfo.hasUpcomingSubscription) {
+                if (userInfo.subscriptions[0].kind != "trial")
+                    title += userInfo.subscriptions[0].plan.title + QStringLiteral(" → ")
+                            + userInfo.subscriptions[1].plan.title;
+                else
+                    title += userInfo.subscriptions[1].plan.title;
+            } else {
+                title += userInfo.subscriptions[0].description();
+            }
+        }
     }
 
     this->setDocumentWindowTitle(title);

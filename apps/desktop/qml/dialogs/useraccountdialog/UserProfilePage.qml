@@ -397,10 +397,6 @@ Item {
 
                 spacing: 20
 
-                Item {
-                    Layout.fillWidth: true
-                }
-
                 VclButton {
                     text: "Save"
 
@@ -440,6 +436,10 @@ Item {
                             _userInfoFields.needsSaving = false
                         }
                     }
+                }
+
+                Item {
+                    Layout.fillWidth: true
                 }
             }
         }
