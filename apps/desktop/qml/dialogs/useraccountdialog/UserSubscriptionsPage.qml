@@ -410,7 +410,7 @@ Item {
                         // ── Feature table — single instance, always from UserInfo ─────────
                         VclLabel {
                             Layout.fillWidth: true
-                            visible: _subgroup.hasUpcoming
+                            visible: _subGroup.hasUpcoming
 
                             text: "Features from both active and upcoming plan are enabled."
                         }

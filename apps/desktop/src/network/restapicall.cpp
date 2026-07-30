@@ -1491,6 +1491,16 @@ SubscriptionPromotionTextRestApiCall::SubscriptionPromotionTextRestApiCall(QObje
 
 SubscriptionPromotionTextRestApiCall::~SubscriptionPromotionTextRestApiCall() { }
 
+QString SubscriptionPromotionTextRestApiCall::promotionText() const
+{
+    return this->responseData().value("text").toString();
+}
+
+QJsonObject SubscriptionPromotionTextRestApiCall::button() const
+{
+    return this->responseData().value("button").toObject();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 AbstractScriptalayRestApiCall::AbstractScriptalayRestApiCall(QObject *parent) : RestApiCall(parent)

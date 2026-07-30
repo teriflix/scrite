@@ -21,6 +21,7 @@
 #include <QQmlEngine>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QJsonObject>
 #include <QQuickImageProvider>
 
 struct UserInstallationInfo
@@ -852,10 +853,17 @@ public:
     // clang-format off
     Q_PROPERTY(QString promotionText
                READ promotionText
-               NOTIFY promotionTextChanged)
+               NOTIFY promotionCallDataChanged)
     // clang-format on
-    QString promotionText() const { return m_promotionText; }
-    Q_SIGNAL void promotionTextChanged();
+    QString promotionText() const;
+    Q_SIGNAL void promotionCallDataChanged();
+
+    // clang-format off
+    Q_PROPERTY(UserMessageButton promotionButton
+               READ promotionButton
+               NOTIFY promotionCallDataChanged)
+    // clang-format on
+    UserMessageButton promotionButton() const;
 
     void checkIfVersionTypeUseIsAllowed();
 
@@ -908,7 +916,7 @@ private:
     UserInfo m_info;
     QList<UserMessage> m_messages;
     QTimer *m_checkForMessagesTimer = nullptr;
-    QString m_promotionText;
+    QJsonObject m_promotionData;
 };
 
 class AppFeature : public QObject

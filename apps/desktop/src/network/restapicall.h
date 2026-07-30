@@ -1295,7 +1295,14 @@ public:
                READ promotionText
                NOTIFY responseChanged)
     // clang-format on
-    QString promotionText() const { return this->responseData().value("text").toString(); }
+    QString promotionText() const;
+
+    // clang-format off
+    Q_PROPERTY(QJsonObject button
+               READ button
+               NOTIFY responseChanged)
+    // clang-format on
+    QJsonObject button() const;
 
     // RestApiCall interface
     Type type() const { return GET; }

@@ -73,7 +73,7 @@ Item {
                     }
 
                     VclText {
-                        text: "Click here ..."
+                        text: Scrite.user.promotionButton.text
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize-1
                         font.underline: true
                         color: Runtime.colors.accent.c900.text
@@ -85,7 +85,15 @@ Item {
                     cursorShape: Qt.PointingHandCursor
 
                     onClicked: {
-                        UserAccountDialog.launch("Subscriptions")
+                        const button = Scrite.user.promotionButton
+                        if(button.action === UserMessageButton.UrlAction) {
+                            Qt.openUrlExternally(button.endpoint)
+                        } else if(button.action === UserMessageButton.CommandAction) {
+                            UserAccountDialog.handleMessageEndpoint(button.endpoint)
+                        } else {
+                            UserAccountDialog.launch("Subscriptions") // Safe default
+                        }
+
                         _promoTextLoader.active = false
                     }
                 }

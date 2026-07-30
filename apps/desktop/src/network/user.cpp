@@ -688,6 +688,16 @@ void User::markMessagesAsRead()
         emit messagesChanged();
 }
 
+QString User::promotionText() const
+{
+    return m_promotionData.value("text").toString();
+}
+
+UserMessageButton User::promotionButton() const
+{
+    return UserMessageButton(m_promotionData.value("button").toObject());
+}
+
 void User::setInfo(const UserInfo &val)
 {
     if (m_info == val)
@@ -789,10 +799,8 @@ void User::checkForPromotionText()
 
     SubscriptionPromotionTextRestApiCall *call = new SubscriptionPromotionTextRestApiCall(this);
     connect(call, &SubscriptionPromotionTextRestApiCall::finished, this, [=]() {
-        if (call->promotionText() != m_promotionText) {
-            m_promotionText = call->promotionText();
-            emit promotionTextChanged();
-        }
+        m_promotionData = call->responseData();
+        emit promotionCallDataChanged();
         call->deleteLater();
     });
     if (!call->call()) {

@@ -172,9 +172,9 @@ Item {
                     }
                 } else {
                     ret.push("Read Messages")
+                    ret.push("Dismiss")
                 }
 
-                ret.push("Dismiss")
                 return ret
             }
             Notification.onButtonClicked: (index) => {
