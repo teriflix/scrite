@@ -386,17 +386,23 @@ Item {
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
         }
 
-        RowLayout {
+        GridLayout {
             Layout.fillWidth: true
             Layout.leftMargin: 20
-            Layout.rightMargin: parent.width * 0.25
+
+            rowSpacing: 5
+            columnSpacing: 15
+            columns: _binaryField.metaData.columnCount ? _binaryField.metaData.columnCount : 2
+            uniformCellWidths: true
 
             VclRadioButton {
                 id: _option1
 
+                Layout.fillWidth: true
                 TabSequenceItem.manager: _tabSequence
 
                 text: _binaryField.metaData.options[0]
+                leftPadding: 0
 
                 checked: text === _binaryField.value
 
@@ -406,9 +412,11 @@ Item {
             VclRadioButton {
                 id: _option2
 
+                Layout.fillWidth: true
                 TabSequenceItem.manager: _tabSequence
 
                 text: _binaryField.metaData.options[1]
+                leftPadding: 0
 
                 checked: text === _binaryField.value
 
@@ -520,15 +528,18 @@ Item {
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
         }
 
-        Flow {
+        GridLayout {
             Layout.fillWidth: true
             Layout.leftMargin: 20
-            Layout.rightMargin: _msFormField.width * 0.25
 
-            spacing: 10
+            rowSpacing: 5
+            columnSpacing: 15
+            columns: _msFormField.metaData.columnCount ? _msFormField.metaData.columnCount : 2
+            uniformCellWidths: true
 
             Repeater {
                 id: _msCheckBoxes
+
                 model: _msFormField.choices
 
                 delegate: VclCheckBox {
@@ -536,6 +547,8 @@ Item {
 
                     required property int index
                     required property string modelData
+
+                    Layout.fillWidth: true
 
                     TabSequenceItem.manager: _tabSequence
 
@@ -554,7 +567,7 @@ Item {
                 if(_msCheckBoxes.itemAt(i).checked)
                     list.push(_msCheckBoxes.itemAt(i).text)
             }
-            formData[name] = list.join(";;")
+            formData[name] = list.length > 0 ? list.join(";;") : undefined
             return formData
         }
     }

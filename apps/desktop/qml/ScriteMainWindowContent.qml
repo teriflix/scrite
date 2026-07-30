@@ -68,13 +68,13 @@ Item {
 
                     VclText {
                         text: Scrite.user.promotionText
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize-1
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         color: Runtime.colors.accent.c900.text
                     }
 
                     VclText {
                         text: Scrite.user.promotionButton.text
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize-1
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         font.underline: true
                         color: Runtime.colors.accent.c900.text
                     }

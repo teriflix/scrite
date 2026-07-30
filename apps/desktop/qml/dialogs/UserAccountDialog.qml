@@ -170,6 +170,7 @@ Item {
                     for(let i=0; i<buttons.length; i++) {
                         ret.push(buttons[i].text)
                     }
+                    ret.push("Show All Messages")
                 } else {
                     ret.push("Read Messages")
                     ret.push("Dismiss")
@@ -194,7 +195,9 @@ Item {
                                                           return
                                                       }
                                                   }
-                                              } else if(index === 0)
+                                              }
+
+                                              if(index-offset=== 0)
                                                   root.launch("Notifications")
                                           }
 

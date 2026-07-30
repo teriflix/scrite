@@ -120,7 +120,7 @@ Item {
                 TabSequenceItem.manager: _userInfoFields
                 TabSequenceItem.sequence: 1
 
-                text: "Use my IP address to determine my billing location and pricing."
+                text: "Use my IP address to determine billing location, pricing and currency."
                 topPadding: 0; bottomPadding: 0
 
                 onToggled: Qt.callLater(_submit.determineEnabled)

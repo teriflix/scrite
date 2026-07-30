@@ -135,6 +135,7 @@ Rectangle {
 
                         ColumnLayout {
                             Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignTop
 
                             spacing: 12
 
@@ -149,7 +150,7 @@ Rectangle {
                                 maximumLineCount: 2
                                 elide: Text.ElideRight
 
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                             }
 
                             VclLabel {
@@ -163,33 +164,34 @@ Rectangle {
 
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             }
-                        }
 
-                        ColumnLayout {
-                            spacing: 12
+                            Flow {
+                                spacing: 12
 
-                            Layout.alignment: Qt.AlignTop
+                                Layout.fillWidth: true
 
-                            Repeater {
-                                model: _delegate.notification.buttons
+                                Repeater {
+                                    model: _delegate.notification.buttons
 
-                                delegate: Link {
-                                    required property int index
-                                    required property string modelData
+                                    delegate: Link {
+                                        required property int index
+                                        required property string modelData
 
-                                    text: modelData
+                                        text: modelData
 
-                                    onClicked: _delegate.notification.notifyButtonClick(index)
+                                        onClicked: _delegate.notification.notifyButtonClick(index)
+                                    }
+                                }
+
+                                Link {
+                                    text: "Dismiss"
+                                    visible: !_delegate.notification.autoClose && !_delegate.notification.hasButtons
+
+                                    onClicked: Scrite.notifications.dismissNotification(_delegate.index)
                                 }
                             }
-
-                            Link {
-                                text: "Dismiss"
-                                visible: !_delegate.notification.autoClose && !_delegate.notification.hasButtons
-
-                                onClicked: Scrite.notifications.dismissNotification(_delegate.index)
-                            }
                         }
+
                     }
                 }
             }
