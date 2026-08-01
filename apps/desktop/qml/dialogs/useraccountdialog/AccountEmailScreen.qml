@@ -98,38 +98,39 @@ Item {
                 onReturnPressed: if(_submit.enabled) _submit.clicked()
             }
 
-            VclCheckBox {
-                id: _deviceIdConsent
-
+            RowLayout {
                 Layout.fillWidth: true
 
-                TabSequenceItem.manager: _userInfoFields
-                TabSequenceItem.sequence: 1
+                VclCheckBox {
+                    id: _userInfoConsent
 
-                text: "Use my email & device info to help secure my account."
-                topPadding: 0; bottomPadding: 0
+                    TabSequenceItem.manager: _userInfoFields
+                    TabSequenceItem.sequence: 1
 
-                onToggled: Qt.callLater(_submit.determineEnabled)
-            }
+                    text: "Use my email, device info and location to help secure my account."
+                    topPadding: 0; bottomPadding: 0
 
-            VclCheckBox {
-                id: _ipAddressConsent
+                    onToggled: Qt.callLater(_submit.determineEnabled)
+                }
 
-                Layout.fillWidth: true
+                VclLabel {
+                    text: "ⓘ" + (_userInfoConsentHelp.containsMouse ? " Privacy Policy" : "")
 
-                TabSequenceItem.manager: _userInfoFields
-                TabSequenceItem.sequence: 1
+                    MouseArea {
+                        id: _userInfoConsentHelp
 
-                text: "Use my IP address to determine billing location, pricing and currency."
-                topPadding: 0; bottomPadding: 0
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io/privacy-policy#data")
+                    }
 
-                onToggled: Qt.callLater(_submit.determineEnabled)
-            }
-
-            Link {
-                text: "How we use your data."
-
-                onClicked: Qt.openUrlExternally("https://www.scrite.io/privacy-policy#data")
+                    ToolTipPopup {
+                        container: _userInfoConsentHelp
+                        text: "Your email and user-info is used to identify your account, tag it to your device for security, determine applicable currency for billing, and tailor Scrite to your region. Click to read our privacy policy."
+                        visible: _userInfoConsentHelp.containsMouse
+                    }
+                }
             }
 
             Item {
@@ -144,7 +145,7 @@ Item {
                 Layout.alignment: Qt.AlignRight
 
                 function determineEnabled() {
-                    enabled = Runtime.validateEmail(_emailField.text.trim()) && _deviceIdConsent.checked && _ipAddressConsent.checked
+                    enabled = Runtime.validateEmail(_emailField.text.trim()) && _userInfoConsent.checked
                 }
 
                 text: "Continue »"
