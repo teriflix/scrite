@@ -92,121 +92,176 @@ Item {
         }
 
         delegate: Item {
-            id: _userMessageDelegate
+            id: _messageItem
 
             required property int index
             required property scriteUserMessage modelData
 
             width: _userMessagesView.width
-            height: _messageRect.height
+            height: Math.max(100, _contentLayout.implicitHeight + 44)
 
             Rectangle {
-                id: _messageRect
-
-                anchors.centerIn: parent
-
-                width: 450
-                height: _messageLayout.implicitHeight + 30
-                border {
-                    width: _userMessageDelegate.modelData.read ? 1 : 2
-                    color: Runtime.colors.primary.borderColor
-                }
+                width: parent.width - 28
+                height: parent.height
 
                 color: Runtime.colors.primary.c200.background
+                border.width: _messageItem.modelData.read ? 1 : 2
+                border.color: Runtime.colors.primary.borderColor
 
-                ColumnLayout {
-                    id: _messageLayout
+                RowLayout {
+                    id: _contentLayout
 
-                    anchors.centerIn: parent
+                    anchors.fill: parent
+                    anchors.margins: 11
 
-                    width: parent.width - 20
-                    spacing: 10
+                    spacing: 16
 
-                    VclLabel {
-                        Layout.fillWidth: true
+                    Item {
+                        Layout.alignment: Qt.AlignTop
+                        Layout.topMargin: _subject.mapToItem(_contentLayout, 0, 0).y
+                        Layout.preferredWidth: parent.width * 0.25
+                        Layout.fillHeight: true
 
-                        text: Runtime.formatDateIncludingYear(_userMessageDelegate.modelData.timestamp)
-                        color: Runtime.colors.primary.c200.text
-                        opacity: 0.75
-                        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                    }
+                        visible: _messageImage.status === Image.Ready
 
-                    VclLabel {
-                        Layout.fillWidth: true
+                        Image {
+                            id: _messageImageBg
 
-                        text: _userMessageDelegate.modelData.subject
-                        color: Runtime.colors.primary.c200.text
-                        wrapMode: Text.WordWrap
-                        font.bold: true
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                    }
-
-                    Image {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: sourceSize.height * (width/sourceSize.width)
-
-                        source: _userMessageDelegate.modelData.image
-                        mipmap: true
-                        visible: source !== ""
-                        fillMode: Image.PreserveAspectFit
-
-                        MouseArea {
                             anchors.fill: parent
+                            anchors.margins: 1
 
-                            enabled: _buttonsRepeater.count >= 1
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: _buttonsRepeater.itemAt(0).handleClick()
+                            fillMode: Image.PreserveAspectCrop
+                            source: _messageItem.modelData.image
+                        }
+
+                        Rectangle {
+                            anchors.fill: parent
+                            color: Runtime.colors.primary.editor.background
+                            opacity: 0.7
+                        }
+
+                        Rectangle {
+                            color: "transparent"
+                            width: _messageImage.paintedWidth
+                            height: _messageImage.paintedHeight
+                            border.width: 1
+                            border.color: "darkgray"
+                            anchors.centerIn: parent
+                        }
+
+                        Image {
+                            id: _messageImage
+
+                            anchors.fill: parent
+                            anchors.margins: 1
+
+                            fillMode: Image.PreserveAspectFit
+                            mipmap: true
+                            source: _messageItem.modelData.image
+
+                            MouseArea {
+                                anchors.fill: parent
+
+                                enabled: _actions.count > 0
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: _actions.itemAt(0).activate()
+                            }
+                        }
+
+                        BusyIndicator {
+                            anchors.centerIn: parent
+                            running: _messageImage.status !== Image.Ready
                         }
                     }
 
-                    VclLabel {
+                    ColumnLayout {
                         Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignTop
 
-                        text: _userMessageDelegate.modelData.body
-                        color: Runtime.colors.primary.c200.text
-                        wrapMode: Text.WordWrap
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                    }
+                        spacing: 12
 
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 1
+                        VclLabel {
+                            Layout.fillWidth: true
 
-                        color: Runtime.colors.primary.borderColor
-                    }
+                            text: Runtime.formatDateIncludingYear(_messageItem.modelData.timestamp)
+                            color: Runtime.colors.primary.c200.text
+                            opacity: 0.75
+                            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                        }
 
-                    Repeater {
-                        id: _buttonsRepeater
-                        model: _userMessageDelegate.modelData.buttons
-
-                        delegate: Link {
-                            id: _buttonDelegate
-
-                            required property int index
-                            required property scriteUserMessageButton modelData
+                        VclLabel {
+                            id: _subject
 
                             Layout.fillWidth: true
 
-                            padding: 4
-                            text: _buttonDelegate.modelData.text
-                            horizontalAlignment: Text.AlignHCenter
+                            text: _messageItem.modelData.subject
+                            color: Runtime.colors.primary.c200.text
+                            font.bold: true
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+                            wrapMode: Text.WordWrap
+                            maximumLineCount: 2
+                            elide: Text.ElideRight
+                        }
 
-                            function handleClick() {
-                                if(_buttonDelegate.modelData.action === UserMessageButton.UrlAction) {
-                                    Qt.openUrlExternally(_buttonDelegate.modelData.endpoint)
-                                    return
+                        VclLabel {
+                            id: _body
+
+                            Layout.fillWidth: true
+
+                            text: _messageItem.modelData.body
+                            color: Runtime.colors.primary.c200.text
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                            wrapMode: Text.WordWrap
+                            maximumLineCount: 6
+                            elide: Text.ElideRight
+
+                            MouseArea {
+                                id: _bodyMouseArea
+
+                                anchors.fill: parent
+
+                                enabled: parent.truncated
+                                hoverEnabled: true
+
+                                ToolTipPopup {
+                                    container: _bodyMouseArea
+                                    text: _body.text
+                                    visible: _bodyMouseArea.containsMouse
                                 }
-
-                                if(_buttonDelegate.modelData.action === UserMessageButton.CommandAction) {
-                                    UserAccountDialog.handleMessageEndpoint(_buttonDelegate.modelData.endpoint)
-                                    return
-                                }
-
-                                // Implement API and Code in a future update
-                                enabled = false
                             }
+                        }
 
-                            onClicked: handleClick()
+                        Flow {
+                            Layout.fillWidth: true
+
+                            spacing: 12
+
+                            Repeater {
+                                id: _actions
+
+                                model: _messageItem.modelData.buttons
+
+                                delegate: Link {
+                                    required property int index
+                                    required property scriteUserMessageButton modelData
+
+                                    text: modelData.text
+
+                                    function activate() {
+                                        if(modelData.action === UserMessageButton.UrlAction) {
+                                            Qt.openUrlExternally(modelData.endpoint)
+                                            return
+                                        }
+
+                                        if(modelData.action === UserMessageButton.CommandAction) {
+                                            UserAccountDialog.handleMessageEndpoint(modelData.endpoint)
+                                            return
+                                        }
+                                    }
+
+                                    onClicked: activate()
+                                }
+                            }
                         }
                     }
                 }
