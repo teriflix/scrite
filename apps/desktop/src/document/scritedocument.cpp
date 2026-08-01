@@ -2326,8 +2326,8 @@ void ScriteDocument::updateDocumentWindowTitle()
 
     if (User::instance()->isLoggedIn()) {
         const UserInfo userInfo = User::instance()->info();
-        title += " | ";
         if (userInfo.hasActiveSubscription) {
+            title += " | ";
             if (userInfo.hasUpcomingSubscription) {
                 if (userInfo.subscriptions[0].kind != "trial")
                     title += userInfo.subscriptions[0].plan.title + QStringLiteral(" → ")
