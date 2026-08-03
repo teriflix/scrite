@@ -324,10 +324,6 @@ public:
     // QUndoCommand interface
     void undo()
     {
-        Utils::Gui::log(QStringLiteral("ObjectListCommand::undo() op=")
-                        + QString::number(m_operation) + QStringLiteral(" child=")
-                        + (m_child ? QString::fromLatin1(m_child->metaObject()->className())
-                                   : QStringLiteral("(null)")));
         if (m_operation == ObjectList::InsertOperation)
             this->remove();
         else

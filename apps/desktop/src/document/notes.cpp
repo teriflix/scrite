@@ -521,7 +521,6 @@ public:
     }
     void undo()
     {
-        Utils::Gui::log(QStringLiteral("RemoveNoteUndoCommand::undo()"));
         if (m_notes == nullptr) {
             this->setObsolete(true);
             return;

@@ -134,9 +134,6 @@ void UndoStack::onIndexChanged(int index)
             return;
         }
     }
-
-    Utils::Gui::log(QStringLiteral("%1: Index Changed to [%2]")
-                            .arg(this->objectName(), QString::number(index)));
 #else
     Q_UNUSED(index)
 #endif

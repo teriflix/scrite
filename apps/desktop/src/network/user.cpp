@@ -804,7 +804,6 @@ void User::checkForPromotionText()
         call->deleteLater();
     });
     if (!call->call()) {
-        Utils::Gui::log("Still not able to call.");
         call->deleteLater();
     }
 }
