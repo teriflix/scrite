@@ -41,6 +41,9 @@ public:
 protected:
     bool doImport(QIODevice *device); // AbstractImporter interface
     bool doImport(const Fountain::Parser &parser);
+
+private:
+    void processDualDialogueMarkers(Screenplay *screenplay);
 };
 
 #endif // FOUNTAINIMPORTER_H

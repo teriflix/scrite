@@ -295,6 +295,8 @@ private:
     QMetaProperty m_actionTriggerMethodProperty;
 };
 
+Q_DECLARE_METATYPE(QList<ActionHandler *>)
+
 class ActionHandlerAttached : public QObject
 {
     Q_OBJECT

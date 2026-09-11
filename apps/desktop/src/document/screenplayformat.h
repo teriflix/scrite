@@ -24,6 +24,7 @@
 
 #include <QScreen>
 #include <QPageLayout>
+#include <QTextTable>
 #include <QTextCharFormat>
 #include <QTextBlockFormat>
 #include <QPagedPaintDevice>
@@ -227,7 +228,8 @@ public:
     Q_INVOKABLE void activateDefaultLanguage();
 
     QTextBlockFormat createBlockFormat(Qt::Alignment overrideAlignment,
-                                       const qreal *pageWidth = nullptr) const;
+                                       const qreal *pageWidth = nullptr,
+                                       bool dualDialogueMode = false) const;
     QTextCharFormat createCharFormat(const qreal *pageWidth = nullptr) const;
 
     Q_SIGNAL void elementFormatChanged();
@@ -679,6 +681,10 @@ public:
     // clang-format on
     bool isInTransaction() const { return m_inTransaction; }
     Q_SIGNAL void inTransactionChanged();
+
+    // Dual dialogue formatting
+    static QTextTableFormat createDualDialogueTableFormat();
+    static void polishDualDialogueTableFormat(QTextTable *table);
 
     // Interface interface
     void serializeToJson(QJsonObject &) const;

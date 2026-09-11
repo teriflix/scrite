@@ -250,6 +250,166 @@ void SceneHeading::evaluateWordCountLater()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+SceneDualDialogue::SceneDualDialogue(QObject *parent)
+    : QObject(parent), m_scene(qobject_cast<Scene *>(parent))
+{
+    connect(this, &SceneDualDialogue::leftCharacterChanged, this, &SceneDualDialogue::validChanged);
+    connect(this, &SceneDualDialogue::rightCharacterChanged, this,
+            &SceneDualDialogue::validChanged);
+
+    connect(m_scene, &Scene::aboutToRemoveSceneElement, this,
+            &SceneDualDialogue::onSceneAboutToRemoveElement);
+    connect(m_scene, &Scene::sceneElementChanged, this, &SceneDualDialogue::onSceneElementChanged);
+
+    connect(m_scene, &Scene::elementCountChanged, this,
+            &SceneDualDialogue::resetLeftAndRightElements);
+}
+
+SceneDualDialogue::~SceneDualDialogue()
+{
+    emit aboutToDelete(this);
+}
+
+bool SceneDualDialogue::isValid() const
+{
+    return m_leftCharacter != nullptr && m_rightCharacter != nullptr;
+}
+
+void SceneDualDialogue::setId(const QString &val)
+{
+    if (m_id == val || !m_id.isEmpty())
+        return;
+
+    m_id = val;
+    emit idChanged();
+}
+
+QString SceneDualDialogue::id() const
+{
+    if (m_id.isEmpty())
+        m_id = QUuid::createUuid().toString();
+
+    return m_id;
+}
+
+QList<SceneElement *> SceneDualDialogue::leftElements() const
+{
+    if (m_leftCharacter == nullptr || m_scene == nullptr)
+        return QList<SceneElement *>();
+
+    if (m_leftElements.isEmpty())
+        m_leftElements = m_scene->findCharacterDialogueRun(m_leftCharacter);
+
+    return m_leftElements;
+}
+
+QList<SceneElement *> SceneDualDialogue::rightElements() const
+{
+    if (m_rightCharacter == nullptr || m_scene == nullptr)
+        return QList<SceneElement *>();
+
+    if (m_rightElements.isEmpty())
+        m_rightElements = m_scene->findCharacterDialogueRun(m_rightCharacter);
+
+    return m_rightElements;
+}
+
+SceneElement *SceneDualDialogue::lastElement() const
+{
+    auto list = this->rightElements();
+    if (list.isEmpty())
+        list = this->leftElements();
+    return list.last();
+}
+
+bool SceneDualDialogue::contains(SceneElement *element) const
+{
+    if (element != nullptr) {
+        return element == m_leftCharacter || element == m_rightCharacter
+                || this->leftElements().contains(element)
+                || this->rightElements().contains(element);
+    }
+
+    return false;
+}
+
+void SceneDualDialogue::setLeftCharacter(SceneElement *element)
+{
+    if (m_leftCharacter == element)
+        return;
+
+    m_leftCharacter = element;
+    emit leftCharacterChanged();
+}
+
+void SceneDualDialogue::setRightCharacter(SceneElement *element)
+{
+    if (m_rightCharacter == element)
+        return;
+
+    m_rightCharacter = element;
+    emit rightCharacterChanged();
+}
+
+void SceneDualDialogue::onSceneAboutToRemoveElement(SceneElement *element)
+{
+    if (m_leftCharacter == element || m_rightCharacter == element) {
+        dissolveSelf();
+        return;
+    }
+
+    if (element->type() == SceneElement::Dialogue
+        || element->type() == SceneElement::Parenthetical) {
+        if (this->leftElements().size() <= 1 || this->rightElements().size() <= 1)
+            dissolveSelf();
+    }
+}
+
+void SceneDualDialogue::onSceneElementChanged(SceneElement *element, int type)
+{
+    if (type != Scene::ElementTypeChange)
+        return;
+
+    if (element == m_leftCharacter || element == m_rightCharacter) {
+        if (element->type() != SceneElement::Character) {
+            this->dissolveSelf();
+        }
+        return;
+    }
+
+    auto le = this->leftElements();
+    le.removeFirst();
+
+    auto re = this->rightElements();
+    re.removeFirst();
+
+    if (le.contains(element) || re.contains(element)) {
+        if (element->type() != SceneElement::Parenthetical
+            && element->type() != SceneElement::Dialogue) {
+            this->dissolveSelf();
+        }
+        return;
+    }
+
+    this->resetLeftAndRightElements();
+}
+
+void SceneDualDialogue::dissolveSelf()
+{
+    m_scene->dissolveDualDialogue(m_leftCharacter);
+    m_leftCharacter = nullptr;
+    m_rightCharacter = nullptr;
+    this->resetLeftAndRightElements();
+}
+
+void SceneDualDialogue::resetLeftAndRightElements()
+{
+    m_leftElements.clear();
+    m_rightElements.clear();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 SceneElement::SceneElement(QObject *parent)
     : QObject(parent), m_scene(qobject_cast<Scene *>(parent))
 {
@@ -721,6 +881,19 @@ void SceneElement::dropAllChanges()
     m_changeCounters.clear();
 }
 
+bool SceneElement::startsDualDialogue() const
+{
+    if (m_type == SceneElement::Character && m_scene != nullptr) {
+        const QList<SceneDualDialogue *> dds = m_scene->dualDialogues();
+        for (SceneDualDialogue *dd : dds) {
+            if (dd->leftCharacter() == this)
+                return true;
+        }
+    }
+
+    return false;
+}
+
 QJsonArray SceneElement::textFormatsToJson(const QVector<QTextLayout::FormatRange> &formats)
 {
     QJsonArray jtextFormats;
@@ -1047,6 +1220,7 @@ Scene::Scene(QObject *parent) : QAbstractListModel(parent)
 
     connect(this, &Scene::sceneElementChanged, this, &Scene::onSceneElementChanged);
     connect(this, &Scene::aboutToRemoveSceneElement, this, &Scene::onAboutToRemoveSceneElement);
+    connect(this, &Scene::dualDialoguesChanged, this, &Scene::sceneRefreshed);
 
     connect(this, &Scene::sceneAboutToReset, [this]() {
         m_isBeingReset = true;
@@ -1070,6 +1244,10 @@ Scene::Scene(QObject *parent) : QAbstractListModel(parent)
 Scene::~Scene()
 {
     GarbageCollector::instance()->avoidChildrenOf(this);
+    for (SceneElement *element : std::as_const(m_elements))
+        disconnect(element, nullptr, this, nullptr);
+    for (SceneDualDialogue *dialogue : std::as_const(m_dualDialogues))
+        disconnect(dialogue, nullptr, this, nullptr);
     emit aboutToDelete(this);
 }
 
@@ -1836,6 +2014,232 @@ void Scene::removeLastElementIfEmpty()
     }
 }
 
+SceneDualDialogue *Scene::createDualDialogue(SceneElement *element)
+{
+    // Check if we can create a dual dialogue for this element
+    if (!this->canCreateDualDialogue(element, nullptr))
+        return nullptr;
+
+    PushSceneUndoCommand cmd(new CreateDualDialogueCommand(element));
+
+    // Find the characters to create the dual dialogue
+    QList<SceneElement *> runA = this->findCharacterDialogueRun(element);
+    SceneElement *charA = runA.first();
+
+    int lastIdxA = this->indexOfElement(runA.last());
+    SceneElement *charB = this->elementAt(lastIdxA + 1);
+
+    SceneDualDialogue *group = new SceneDualDialogue(this);
+    connect(group, &SceneDualDialogue::aboutToDelete, this, &Scene::onAboutToRemoveDualDialogue);
+    group->setLeftCharacter(charA);
+    group->setRightCharacter(charB);
+    m_dualDialogues.append(group);
+    emit dualDialoguesChanged();
+    return group;
+}
+
+bool Scene::dissolveDualDialogue(SceneElement *element)
+{
+    if (!this->canDissolveDualDialogue(element, nullptr))
+        return false;
+
+    PushSceneUndoCommand cmd(new DissolveDualDialogueCommand(element));
+
+    SceneDualDialogue *group = this->findContainingDualDialogue(element);
+    m_dualDialogues.removeOne(group);
+    group->deleteLater();
+    emit dualDialoguesChanged();
+    return true;
+}
+
+Scene::DualDialogueToggleResult Scene::toggleDualDialogue(SceneElement *element)
+{
+    QString reason;
+    if (!this->canToggleDualDialogue(element, &reason)) {
+        return { DualDialogueToggleResult::Failed, nullptr, reason };
+    }
+
+    if (this->dissolveDualDialogue(element)) {
+        return { DualDialogueToggleResult::Dissolved, nullptr };
+    }
+
+    SceneDualDialogue *group = this->createDualDialogue(element);
+    if (group != nullptr) {
+        return { DualDialogueToggleResult::Created, group };
+    }
+
+    return { DualDialogueToggleResult::Failed, nullptr, "Unable to toggle dual-dialogue here." };
+}
+
+bool Scene::canCreateDualDialogue(SceneElement *element, QString *reason) const
+{
+    if (element == nullptr) {
+        if (reason)
+            *reason = "No element selected.";
+        return false;
+    }
+
+    if (element->scene() != this) {
+        if (reason)
+            *reason = "Element is not part of this scene.";
+        return false;
+    }
+
+    if (this->findContainingDualDialogue(element) != nullptr) {
+        if (reason)
+            *reason = "Element is already in a dual dialogue.";
+        return false;
+    }
+
+    QList<SceneElement *> runA = this->findCharacterDialogueRun(element);
+    if (runA.isEmpty() || runA.first()->type() != SceneElement::Character) {
+        if (reason)
+            *reason = "Element must be part of a character dialogue run.";
+        return false;
+    }
+
+    SceneElement *charA = runA.first();
+    Q_UNUSED(charA); // we store charA only for code-readability
+
+    int lastIdxA = m_elements.indexOf(runA.last());
+    SceneElement *charB = this->elementAt(lastIdxA + 1);
+
+    if (charB != nullptr) {
+        if (charB->type() != SceneElement::Character)
+            charB = nullptr;
+    }
+
+    if (charB != nullptr) {
+        if (this->findContainingDualDialogue(charB) != nullptr)
+            charB = nullptr;
+    }
+
+    if (charB != nullptr) {
+        QList<SceneElement *> runB = this->findCharacterDialogueRun(charB);
+        if (runB.isEmpty())
+            charB = nullptr;
+    }
+
+    if (charB == nullptr) {
+        if (reason)
+            *reason = "Next character must have non-empty dialogue content.";
+        return false;
+    }
+
+    return true;
+}
+
+bool Scene::canDissolveDualDialogue(SceneElement *element, QString *reason) const
+{
+    if (element == nullptr) {
+        if (reason)
+            *reason = "No element selected";
+        return false;
+    }
+
+    if (element->scene() != this) {
+        if (reason)
+            *reason = "Element is not part of this scene";
+        return false;
+    }
+
+    if (this->findContainingDualDialogue(element) == nullptr) {
+        if (reason)
+            *reason = "Element is not in a dual dialogue";
+        return false;
+    }
+
+    return true;
+}
+
+bool Scene::canToggleDualDialogue(SceneElement *element, QString *reason) const
+{
+    if (this->canDissolveDualDialogue(element, nullptr))
+        return true;
+
+    return this->canCreateDualDialogue(element, reason);
+}
+
+SceneDualDialogue *Scene::findContainingDualDialogue(SceneElement *element) const
+{
+    if (element == nullptr)
+        return nullptr;
+
+    for (SceneDualDialogue *group : m_dualDialogues) {
+        if (group->contains(element))
+            return group;
+    }
+
+    return nullptr;
+}
+
+QList<SceneElement *> Scene::findCharacterDialogueRun(SceneElement *element) const
+{
+    QList<SceneElement *> run;
+
+    if (element == nullptr)
+        return run;
+
+    int elementIdx = m_elements.indexOf(element);
+    if (elementIdx < 0)
+        return run; // Element not in this scene
+
+    // Element must be Character, Dialogue, or Parenthetical to be part of a run
+    const QList<SceneElement::Type> validElementTypes(
+            { SceneElement::Character, SceneElement::Dialogue, SceneElement::Parenthetical });
+    if (!validElementTypes.contains(element->type())) {
+        return run;
+    }
+
+    // If not a Character, walk backwards to find the Character that starts the run
+    while (elementIdx >= 0 && element) {
+        if (element->type() == SceneElement::Character)
+            break;
+
+        if (!validElementTypes.contains(element->type())) {
+            return run;
+        }
+
+        --elementIdx;
+        element = elementIdx >= 0 ? m_elements.at(elementIdx) : nullptr;
+    }
+
+    if (element == nullptr)
+        return run;
+
+    // Build the run from startIdx forward: Character + following Dialogue/Parenthetical
+    run.append(element);
+
+    for (int i = elementIdx + 1; i < m_elements.size(); ++i) {
+        SceneElement::Type type = m_elements.at(i)->type();
+
+        if (type == SceneElement::Dialogue || type == SceneElement::Parenthetical) {
+            run.append(m_elements.at(i));
+        } else {
+            // End of run
+            break;
+        }
+    }
+
+    // Validate: character must have non-empty text
+    if (element->text().trimmed().isEmpty())
+        return QList<SceneElement *>();
+
+    // Validate: at least one dialogue element must have non-empty text
+    bool hasDialogue = false;
+    for (int i = 1; i < run.size(); ++i) {
+        if (run.at(i)->type() == SceneElement::Dialogue && !run.at(i)->text().trimmed().isEmpty()) {
+            hasDialogue = true;
+            break;
+        }
+    }
+
+    if (!hasDialogue)
+        return QList<SceneElement *>();
+
+    return run;
+}
+
 void Scene::beginUndoCapture(bool allowMerging)
 {
     if (m_pushUndoCommand != nullptr)
@@ -2070,6 +2474,7 @@ QByteArray Scene::toByteArray() const
         ds << int(element->alignment());
         ds << element->text();
         ds << element->textFormats();
+        ds << element->startsDualDialogue();
     }
 
     return bytes;
@@ -2123,6 +2528,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
         int alignment = 0;
         QString text;
         QVector<QTextLayout::FormatRange> formats;
+        bool startsDualDialogue = false;
     };
     QVector<_Paragraph> paragraphs;
     QStringList paragraphIds;
@@ -2135,6 +2541,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
         ds >> e.alignment;
         ds >> e.text;
         ds >> e.formats;
+        ds >> e.startsDualDialogue;
         paragraphIds.append(e.id);
         paragraphs.append(e);
     }
@@ -2148,6 +2555,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
     }
 
     // Insert new paragraphs
+    QList<SceneElement *> dualDialogueElements;
     for (qsizetype i = 0; i < paragraphs.size(); i++) {
         const _Paragraph para = paragraphs.at(i);
         SceneElement *element = i <= m_elements.size() - 1 ? m_elements.at(i) : nullptr;
@@ -2164,7 +2572,13 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
 
         if (elementNeedsInsert)
             this->insertElementAt(element, i);
+
+        if (para.startsDualDialogue)
+            dualDialogueElements << element;
     }
+
+    for (SceneElement *element : std::as_const(dualDialogueElements))
+        this->createDualDialogue(element);
 
     emit sceneReset(curPosition);
 
@@ -2211,6 +2625,14 @@ void Scene::serializeToJson(QJsonObject &json) const
 
     if (!invisibleCharacters.isEmpty())
         json.insert(QStringLiteral("#invisibleCharacters"), invisibleCharacters);
+
+    QJsonArray dualDialoguesArray;
+    for (const SceneDualDialogue *group : m_dualDialogues) {
+        SceneElement *leftElement = group->leftCharacter();
+        dualDialoguesArray.append(leftElement->id());
+    }
+    if (!dualDialoguesArray.isEmpty())
+        json.insert(QStringLiteral("#dualDialogues"), dualDialoguesArray);
 }
 
 class AddInvisibleCharactersTimer : public QTimer
@@ -2254,6 +2676,13 @@ void Scene::deserializeFromJson(const QJsonObject &json)
     const QJsonValue notes = json.value(QStringLiteral("notes"));
     if (notes.isArray())
         m_notes->loadOldNotes(notes.toArray());
+
+    const QJsonArray dualDialoguesArray = json.value(QStringLiteral("#dualDialogues")).toArray();
+    for (const QJsonValue &elementIdValue : dualDialoguesArray) {
+        SceneElement *leftElement = this->findElementById(elementIdValue.toString());
+        if (leftElement)
+            this->createDualDialogue(leftElement);
+    }
 
     this->evaluateWordCountLater();
 
@@ -2580,6 +3009,29 @@ void Scene::onAboutToRemoveSceneElement(SceneElement *element)
 {
     if (m_characterElementMap.remove(element))
         this->evaluateSortedCharacterNames();
+
+    bool invalidDialoguesRemoved = false;
+    for (int i = m_dualDialogues.size() - 1; i >= 0; i--) {
+        SceneDualDialogue *group = m_dualDialogues.at(i);
+        if (!group->isValid()) {
+            m_dualDialogues.removeAt(i);
+            delete group;
+            invalidDialoguesRemoved = true;
+        }
+    }
+
+    if (invalidDialoguesRemoved)
+        emit dualDialoguesChanged();
+}
+
+void Scene::onAboutToRemoveDualDialogue(SceneDualDialogue *group)
+{
+    int idx = m_dualDialogues.indexOf(group);
+    if (idx < 0)
+        return;
+
+    m_dualDialogues.removeAt(idx);
+    emit dualDialoguesChanged();
 }
 
 void Scene::renameCharacter(const QString &from, const QString &to)

@@ -59,6 +59,7 @@ struct Element
     int sectionDepth = 0;
     QStringList notes;
     QVector<QTextLayout::FormatRange> formats;
+    bool isDualDialogueRightColumn = false;
 
     QJsonObject toJson() const;
 

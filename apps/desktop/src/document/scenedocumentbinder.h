@@ -21,11 +21,13 @@
 #include "execlatertimer.h"
 #include "qobjectproperty.h"
 
+#include <QStack>
+#include <QTextCharFormat>
 #include <QSyntaxHighlighter>
 #include <QQuickTextDocument>
-#include <QTextCharFormat>
 
 class ScreenplayFormat;
+class QTextTableFormat;
 class SpellCheckService;
 class SceneDocumentBlockUserData;
 
@@ -325,6 +327,12 @@ public:
     int selectedBlockCount() const;
     Q_SIGNAL void selectedBlockCountChanged();
 
+    Q_INVOKABLE int resolvedCursorPosition(SceneElement *element, int relativePosition) const;
+    Q_INVOKABLE int relativeCursorPosition(SceneElement *element, int absolutePosition) const;
+
+    Q_INVOKABLE void saveCursorState();
+    Q_INVOKABLE void restoreCursorState();
+
     enum TextCasing { LowerCase, UpperCase };
     Q_ENUM(TextCasing)
 
@@ -348,6 +356,7 @@ public:
     TextFormat *textFormat() const { return m_textFormat; }
 
     Q_SIGNAL void requestCursorPosition(int position);
+    Q_SIGNAL void requestSelection(int start, int end);
 
     // clang-format off
     Q_PROPERTY(QStringList characterNames
@@ -382,18 +391,32 @@ public:
     // clang-format off
     Q_PROPERTY(SceneElement *currentElement
                READ currentElement
-               NOTIFY currentElementChanged
-               RESET resetCurrentElement)
+               NOTIFY currentElementChanged)
     // clang-format on
     SceneElement *currentElement() const { return m_currentElement; }
     Q_SIGNAL void currentElementChanged();
 
     // clang-format off
+    Q_PROPERTY(SceneDualDialogue *currentDualDialogue
+               READ currentDualDialogue
+               NOTIFY currentDualDialogueChanged)
+    // clang-format on
+    SceneDualDialogue *currentDualDialogue() const { return m_currentDualDialogue; }
+    Q_SIGNAL void currentDualDialogueChanged();
+
+    Q_INVOKABLE QRectF evalCurrentDualDialogueRect() const;
+    Q_INVOKABLE QRectF evalDualDialogueRect(SceneDualDialogue *dd) const;
+
+    // clang-format off
     Q_PROPERTY(int currentElementCursorPosition
                READ currentElementCursorPosition
-               NOTIFY cursorPositionChanged)
+               NOTIFY currentElementCursorPositionChanged)
     // clang-format on
-    int currentElementCursorPosition() const { return m_currentElementCursorPosition; }
+    int currentElementCursorPosition() const
+    {
+        return this->relativeCursorPosition(m_currentElement, m_cursorPosition);
+    }
+    Q_SIGNAL void currentElementCursorPositionChanged();
 
     // clang-format off
     Q_PROPERTY(QList<SceneElement *>
@@ -452,6 +475,29 @@ public:
     Q_INVOKABLE int lastCursorPosition() const;
     Q_INVOKABLE int cursorPositionAtBlock(int blockNumber) const;
     Q_INVOKABLE int currentBlockPosition() const;
+    Q_INVOKABLE bool toggleDualDialogue();
+    Q_SIGNAL void toggleDualDialogueFailureReason(const QString &reason);
+
+    // clang-format off
+    Q_PROPERTY(bool canToggleDualDialogue
+               READ canToggleDualDialogue
+               NOTIFY canToggleDualDialogueChanged)
+    // clang-format on
+    bool canToggleDualDialogue() const;
+    Q_SIGNAL void canToggleDualDialogueChanged();
+
+    // When this property is set to false, the document will be rendered with
+    // elements in dual-dialogue serially placed with a background, instead of
+    // rendering them as tables.
+    // clang-format off
+    Q_PROPERTY(bool renderDualDialogues
+               READ isRenderDualDialogues
+               WRITE setRenderDualDialogues
+               NOTIFY renderDualDialoguesChanged)
+    // clang-format on
+    void setRenderDualDialogues(bool val);
+    bool isRenderDualDialogues() const { return m_renderDualDialogues; }
+    Q_SIGNAL void renderDualDialoguesChanged();
 
     // clang-format off
     Q_PROPERTY(QStringList spellingSuggestions
@@ -651,11 +697,22 @@ private:
     void resetScreenplayFormat();
     void resetScreenplayElement();
 
+    bool saveCursorPosition();
+    bool restoreCursorPosition();
+    void clearCursorPositionStack();
+
+    bool saveSelectionRange();
+    bool restoreSelectionRange();
+    void clearSelectionRangeStack();
+
     void initializeDocument();
     void initializeDocumentLater();
     void setDocumentLoadCount(int val);
     void setCurrentElement(SceneElement *val);
     void resetCurrentElement();
+    void setCurrentDualDialogue(SceneDualDialogue *val);
+    void resetCurrentDualDualogue();
+    void evalCurrentDualDialogue();
     void activateCurrentElementDefaultLanguage();
     void onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
     Q_SLOT void onSpellCheckUpdated();
@@ -673,7 +730,7 @@ private:
     void setWordUnderCursorIsMisspelled(bool val);
 
     void onSceneAboutToReset();
-    void onSceneReset(int position);
+    void onSceneReset(int position, SceneElement *inElement);
     void onSceneRefreshed();
 
     void rehighlightLater();
@@ -688,6 +745,9 @@ private:
 
     void performAllSceneElementTasks();
 
+    QTextBlock findElementBlock(SceneElement *element) const;
+    SceneElement *findElementAt(int cursorPosition) const;
+
 private:
     friend class SpellCheckService;
     friend class ForceCursorPositionHack;
@@ -695,8 +755,7 @@ private:
 
     int m_completionPrefixEnd = -1;
     int m_completionPrefixStart = -1;
-    int m_currentElementCursorPosition = -1;
-    int m_cursorPosition = -1;
+    int m_cursorPosition = -1, m_lastCursorPosition = -1;
     int m_documentLoadCount = 0;
     int m_selectionEndPosition = -1;
     int m_selectionStartPosition = -1;
@@ -707,12 +766,12 @@ private:
     bool m_applyNextCharFormat = false;
     bool m_applyTextFormat = false;
     bool m_autoCapitalizeSentences = true;
-    QStringList m_autoCapitalizeExceptions;
     bool m_autoPolishParagraphs = true;
     bool m_forceSyncDocument = false;
     bool m_initializingDocument = false;
     bool m_liveSpellCheckEnabled = true;
     bool m_pastingContent = false;
+    bool m_renderDualDialogues = true;
     bool m_sceneElementTaskIsRunning = false;
     bool m_sceneIsBeingRefreshed = false;
     bool m_sceneIsBeingReset = false;
@@ -724,6 +783,11 @@ private:
 
     QString m_completionPrefix;
 
+    typedef QPair<SceneElement *, int> ElementPositionPair;
+    QStack<ElementPositionPair> m_cursorPositionStack;
+    QStack<QPair<ElementPositionPair, ElementPositionPair>> m_selectionRangeStack;
+
+    QStringList m_autoCapitalizeExceptions;
     QStringList m_autoCompleteHints;
     QStringList m_characterNames;
     QStringList m_priorityAutoCompleteHints;
@@ -748,9 +812,11 @@ private:
 
     QObjectProperty<QQuickTextDocument> m_textDocument;
     QObjectProperty<Scene> m_scene;
-    QObjectProperty<SceneElement> m_currentElement;
     QObjectProperty<ScreenplayElement> m_screenplayElement;
     QObjectProperty<ScreenplayFormat> m_screenplayFormat;
+
+    SceneElement *m_currentElement = nullptr;
+    SceneDualDialogue *m_currentDualDialogue = nullptr;
 
     TextFormat *m_textFormat = nullptr;
 };

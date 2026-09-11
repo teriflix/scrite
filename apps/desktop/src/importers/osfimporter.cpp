@@ -42,6 +42,7 @@ static const QString OSF_TagText = QStringLiteral("text");
 static const QString OSF_AttrType = QStringLiteral("type");
 static const QString OSF_AttrDocType = QStringLiteral("Open Screenplay Format document");
 static const QString OSF_AttrBasestyle = QStringLiteral("basestyle");
+static const QString OSF_AttrDualDialogue = QStringLiteral("dualdialogue");
 static const QString OSF_AttrId = QStringLiteral("id");
 static const QString OSF_AttrRef = QStringLiteral("ref");
 static const QString OSF_AttrLabel = QStringLiteral("label");
@@ -121,11 +122,10 @@ bool OsfImporter::doImport(QIODevice *device)
     QDomDocument doc;
     QDomDocument::ParseResult parseResult = doc.setContent(xml);
     if (!parseResult) {
-        this->error()->setErrorMessage(
-                QStringLiteral("Parse Error: %1 at Line %2, Column %3")
-                        .arg(parseResult.errorMessage)
-                        .arg(parseResult.errorLine)
-                        .arg(parseResult.errorColumn));
+        this->error()->setErrorMessage(QStringLiteral("Parse Error: %1 at Line %2, Column %3")
+                                               .arg(parseResult.errorMessage)
+                                               .arg(parseResult.errorLine)
+                                               .arg(parseResult.errorColumn));
         return false;
     }
 
@@ -148,8 +148,7 @@ bool OsfImporter::doImport(QIODevice *device)
         QDomElement paraE = paragraphsE.firstChildElement(OSF_TagPara);
         while (!paraE.isNull()) {
             const QDomElement styleE = paraE.firstChildElement(OSF_TagStyle);
-            if (!styleE.isNull()
-                && styleE.attribute(OSF_AttrBasestyle) == OSF_StyleSceneHeading)
+            if (!styleE.isNull() && styleE.attribute(OSF_AttrBasestyle) == OSF_StyleSceneHeading)
                 ++count;
             paraE = paraE.nextSiblingElement(OSF_TagPara);
         }
@@ -175,6 +174,17 @@ bool OsfImporter::doImport(QIODevice *device)
     this->progress()->setProgressStep(1.0 / qreal(nrParas + 1));
 
     Scene *scene = nullptr;
+    QList<SceneElement *> dualDualogueCharacters;
+
+    auto createDualDialoguesInScene = [](Scene *scene, QList<SceneElement *> &elements) {
+        if (scene == nullptr || elements.isEmpty())
+            return;
+
+        for (SceneElement *element : elements) {
+            scene->toggleDualDialogue(element);
+        }
+        elements.clear();
+    };
 
     QDomElement paraE = paragraphsE.firstChildElement(OSF_TagPara);
     while (!paraE.isNull()) {
@@ -198,6 +208,7 @@ bool OsfImporter::doImport(QIODevice *device)
 
         switch (styleIndex) {
         case 0: { // Scene Heading
+            createDualDialoguesInScene(scene, dualDualogueCharacters);
             scene = this->createScene(text);
 
             // Restore the stable Scrite scene ID if present (Scrite-exported files).
@@ -213,9 +224,9 @@ bool OsfImporter::doImport(QIODevice *device)
 
             // Inline note on the scene heading para becomes a text note on the scene.
             if (paraE.hasAttribute(OSF_AttrNote)) {
-                const QString noteText = paraE.attribute(OSF_AttrNote)
-                                                 .replace(QStringLiteral("&#xA;"),
-                                                          QStringLiteral("\n"));
+                const QString noteText =
+                        paraE.attribute(OSF_AttrNote)
+                                .replace(QStringLiteral("&#xA;"), QStringLiteral("\n"));
                 Note *note = scene->notes()->addTextNote();
                 note->setContent(QJsonValue(noteText));
             }
@@ -227,6 +238,9 @@ bool OsfImporter::doImport(QIODevice *device)
 
         case 2: // Character
             sceneElement = this->addSceneElement(scene, SceneElement::Character, text);
+            if (styleE.hasAttribute(OSF_AttrDualDialogue)
+                && styleE.attribute(OSF_AttrDualDialogue).toInt() == 1)
+                dualDualogueCharacters.append(sceneElement);
             break;
 
         case 3: { // Parenthetical — OSF stores without parens; Scrite expects them.
@@ -255,14 +269,14 @@ bool OsfImporter::doImport(QIODevice *device)
             sceneElement->setTextFormats(formats);
     }
 
+    createDualDialoguesInScene(scene, dualDualogueCharacters);
+
     // --- Title page ---
     const QDomElement titlepageE = rootE.firstChildElement(OSF_TagTitlepage);
     if (!titlepageE.isNull()) {
         Screenplay *sp = this->document()->screenplay();
 
-        auto field = [&](const QString &bookmark) {
-            return extractParaText(titlepageE, bookmark);
-        };
+        auto field = [&](const QString &bookmark) { return extractParaText(titlepageE, bookmark); };
 
         if (!field(QStringLiteral("Title")).isEmpty())
             sp->setTitle(field(QStringLiteral("Title")));

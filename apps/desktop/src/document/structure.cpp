@@ -1190,7 +1190,11 @@ Character::Character(QObject *parent)
     }
 }
 
-Character::~Character() { }
+Character::~Character()
+{
+    for (Relationship *relationship : m_relationships.constList())
+        disconnect(relationship, nullptr, this, nullptr);
+}
 
 void Character::setName(const QString &val)
 {
@@ -2696,6 +2700,12 @@ Structure::Structure(QObject *parent)
 
 Structure::~Structure()
 {
+    for (StructureElement *element : m_elements.constList())
+        disconnect(element, nullptr, this, nullptr);
+    for (Character *character : m_characters.constList())
+        disconnect(character, nullptr, this, nullptr);
+    for (Annotation *annotation : m_annotations.constList())
+        disconnect(annotation, nullptr, this, nullptr);
     emit aboutToDelete(this);
 }
 

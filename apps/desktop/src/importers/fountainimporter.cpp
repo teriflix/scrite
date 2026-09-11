@@ -75,6 +75,8 @@ bool FountainImporter::doImport(const Fountain::Parser &parser)
     const auto body = parser.body();
 
     Scene *currentScene = nullptr;
+    SceneElement *lastCharacterElement = nullptr;
+
     for (const auto &element : body) {
         if (element.type == Fountain::Element::Section) {
             if (element.sectionDepth == 1) {
@@ -83,6 +85,7 @@ bool FountainImporter::doImport(const Fountain::Parser &parser)
                 ScreenplayElement *act = screenplay->elementAt(screenplay->elementCount() - 1);
                 act->setBreakSubtitle(element.text);
             }
+            lastCharacterElement = nullptr;
             continue;
         }
 
@@ -95,6 +98,7 @@ bool FountainImporter::doImport(const Fountain::Parser &parser)
                 spElement->setUserSceneNumber(element.sceneNumber);
             }
 
+            lastCharacterElement = nullptr;
             continue;
         }
 
@@ -113,6 +117,7 @@ bool FountainImporter::doImport(const Fountain::Parser &parser)
                 else
                     lastElement->setBreakSummary(synopsis);
             }
+            lastCharacterElement = nullptr;
             continue;
         }
 
@@ -134,9 +139,14 @@ bool FountainImporter::doImport(const Fountain::Parser &parser)
         default:
         case Fountain::Element::Action:
             para->setType(SceneElement::Action);
+            lastCharacterElement = nullptr;
             break;
         case Fountain::Element::Character:
             para->setType(SceneElement::Character);
+            if (element.isDualDialogueRightColumn && lastCharacterElement) {
+                para->setProperty("#markForDualDialogueRight", true);
+            }
+            lastCharacterElement = para;
             break;
         case Fountain::Element::Parenthetical:
             para->setType(SceneElement::Parenthetical);
@@ -146,14 +156,59 @@ bool FountainImporter::doImport(const Fountain::Parser &parser)
             break;
         case Fountain::Element::Shot:
             para->setType(SceneElement::Shot);
+            lastCharacterElement = nullptr;
             break;
         case Fountain::Element::Transition:
             para->setType(SceneElement::Transition);
+            lastCharacterElement = nullptr;
             break;
         }
 
         currentScene->addElement(para);
     }
 
+    processDualDialogueMarkers(screenplay);
+
     return true;
+}
+
+void FountainImporter::processDualDialogueMarkers(Screenplay *screenplay)
+{
+    const int nrElements = screenplay->elementCount();
+    for (int i = 0; i < nrElements; i++) {
+        ScreenplayElement *spElement = screenplay->elementAt(i);
+        if (spElement->elementType() != ScreenplayElement::SceneElementType)
+            continue;
+
+        Scene *scene = spElement->scene();
+        const int nrSceneElements = scene->elementCount();
+
+        for (int j = 0; j < nrSceneElements; j++) {
+            SceneElement *element = scene->elementAt(j);
+
+            if (!element->property("#markForDualDialogueRight").toBool())
+                continue;
+
+            if (element->type() != SceneElement::Character)
+                continue;
+
+            if (j == 0)
+                continue;
+
+            SceneElement *previousCharacter = nullptr;
+            for (int k = j - 1; k >= 0; k--) {
+                SceneElement *candidate = scene->elementAt(k);
+                if (candidate->type() == SceneElement::Character) {
+                    previousCharacter = candidate;
+                    break;
+                }
+            }
+
+            if (previousCharacter) {
+                scene->toggleDualDialogue(previousCharacter);
+            }
+
+            element->setProperty("#markForDualDialogueRight", QVariant());
+        }
+    }
 }

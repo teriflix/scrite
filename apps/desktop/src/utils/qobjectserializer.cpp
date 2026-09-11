@@ -404,6 +404,8 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
                     if (listRef.canAppend()) {
                         QObject *listItemObject =
                                 listItemFactory.create(className, listRef.object());
+                        if (listItemObject == nullptr)
+                            continue;
                         QObjectSerializer::fromJson(listItem, listItemObject, factory);
                         if (canAddObjects)
                             propertyObjects.append(listItemObject);

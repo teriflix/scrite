@@ -74,6 +74,7 @@ set(SCRITE_DESKTOP_ICON_FILES
   "icons/content/content_cut.png"
   "icons/content/content_paste.png"
   "icons/content/create.png"
+  "icons/content/dual_dialogue.png"
   "icons/content/empty_scene.png"
   "icons/content/episode.png"
   "icons/content/fight.png"

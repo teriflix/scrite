@@ -81,7 +81,6 @@ Loader {
 
             height: _titleCardLayout.height
 
-
             ColumnLayout {
                 id: _titleCardLayout
 
@@ -109,7 +108,9 @@ Loader {
                         }
                         return _titleCardLayout.width
                     }
-                    implicitHeight: _coverPicImage.sourceSize.height * (implicitWidth/_coverPicImage.sourceSize.width)
+                    implicitHeight: _coverPicImage.status === Image.Ready && _coverPicImage.sourceSize.width > 0
+                                    ? _coverPicImage.sourceSize.height * (implicitWidth/_coverPicImage.sourceSize.width)
+                                    : 0
 
                     Image {
                         id: _coverPicImage

@@ -260,6 +260,7 @@ void ScreenplayElement::setScene(Scene *val)
     connect(m_scene, &Scene::groupsChanged, this, &ScreenplayElement::onSceneGroupsChanged);
     connect(m_scene, &Scene::wordCountChanged, this, &ScreenplayElement::wordCountChanged);
     connect(m_scene, &Scene::elementCountChanged, this, &ScreenplayElement::sceneContentChanged);
+    connect(m_scene, &Scene::dualDialoguesChanged, this, &ScreenplayElement::sceneContentChanged);
     connect(m_scene, &Scene::sceneElementChanged, this, &ScreenplayElement::sceneElementChanged);
 
     connect(m_scene->heading(), &SceneHeading::enabledChanged, this,
@@ -615,6 +616,8 @@ Screenplay::Screenplay(QObject *parent)
 Screenplay::~Screenplay()
 {
     GarbageCollector::instance()->avoidChildrenOf(this);
+    for (ScreenplayElement *element : std::as_const(m_elements))
+        disconnect(element, nullptr, this, nullptr);
     emit aboutToDelete(this);
 }
 
@@ -2448,6 +2451,7 @@ void Screenplay::disconnectFromScreenplayElementSignals(ScreenplayElement *ptr)
                &Screenplay::evaluateSceneNumbersLater);
     disconnect(ptr, &ScreenplayElement::sceneGroupsChanged, this,
                &Screenplay::elementSceneGroupsChanged);
+    disconnect(ptr, &ScreenplayElement::sceneTagsChanged, this, &Screenplay::elementTagsChanged);
     disconnect(ptr, &ScreenplayElement::elementTypeChanged, this,
                &Screenplay::updateBreakTitlesLater);
     disconnect(ptr, &ScreenplayElement::breakTypeChanged, this,
@@ -3004,6 +3008,8 @@ void ScreenplayPasteFromFountainUndoCommand::redo()
 {
     QScopedValueRollback<bool> _urb(UndoHub::blocked, true);
 
+    QList<SceneElement *> dualDialogueElements;
+
     for (const Fountain::Element &fElement : std::as_const(m_body)) {
         if (fElement.type == Fountain::Element::SceneHeading || m_scenes.isEmpty()) {
             StructureElement *newStructureElement = new StructureElement(m_structure);
@@ -3018,7 +3024,23 @@ void ScreenplayPasteFromFountainUndoCommand::redo()
             m_scenes.append(newScene);
         }
 
-        Fountain::loadIntoScene(fElement, m_scenes.last(), m_screenplayElements.last());
+        Scene *lastScene = m_scenes.last();
+
+        if (fElement.type == Fountain::Element::Character && fElement.isDualDialogueRightColumn) {
+            for (int i = lastScene->elementCount() - 1; i >= 0; i--) {
+                SceneElement *maybeCharacterElement = lastScene->elementAt(i);
+                if (maybeCharacterElement->type() == SceneElement::Character)
+                    dualDialogueElements.append(maybeCharacterElement);
+            }
+        }
+
+        Fountain::loadIntoScene(fElement, lastScene, m_screenplayElements.last());
+    }
+
+    for (SceneElement *dualDialogueElement : std::as_const(dualDialogueElements)) {
+        Scene *scene = dualDialogueElement->scene();
+        if (scene != nullptr)
+            scene->createDualDialogue(dualDialogueElement);
     }
 
     if (m_screenplayElements.isEmpty())

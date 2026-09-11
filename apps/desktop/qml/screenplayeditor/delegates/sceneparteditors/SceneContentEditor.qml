@@ -90,12 +90,11 @@ AbstractScenePartEditor {
         EventFilter.onFilter: (object, event, result) => {
                                   result.filter = false
                                   result.acceptEvent = false
+
                                   if(event.type === EventFilter.FocusOut) {
                                       controlModifierPressed = false
                                   } else {
-                                      if(event.modifiers & Qt.ControlModifier) {
-                                          controlModifierPressed = event.type === EventFilter.KeyPress
-                                      }
+                                      controlModifierPressed = (event.type === EventFilter.KeyPress && event.modifiers & Qt.ControlModifier)
                                   }
                               }
 
@@ -122,7 +121,7 @@ AbstractScenePartEditor {
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
         focus: true
-        readOnly: root.readOnly
+        readOnly: _private.readOnly
         selectByMouse: true
         selectByKeyboard: true
         persistentSelection: true
@@ -156,7 +155,7 @@ AbstractScenePartEditor {
                 anchors.top: parent.bottom
                 anchors.left: parent.left
 
-                enabled: !root.readOnly
+                enabled: !_private.readOnly
                 textEditor: _sceneTextEditor
                 includeEmojis: true
                 textEditorHasCursorInterface: true
@@ -189,7 +188,7 @@ AbstractScenePartEditor {
                 id: _nextFormatHandler
 
                 action: ActionHub.paragraphFormats.find("nextFormat")
-                enabled: _sceneTextEditor.activeFocus && !root.readOnly && !_completion.model.hasSuggestion
+                enabled: _sceneTextEditor.activeFocus && !_private.readOnly && !_completion.model.hasSuggestion
                 onTriggered: () => {  } // Do nothing, since we already handle this in Keys.onTabPressed()
             }
         }
@@ -235,13 +234,13 @@ AbstractScenePartEditor {
         }
 
         onActiveFocusChanged: () => {
-            if(activeFocus) root.scene.undoRedoEnabled = !root.readOnly
-            Qt.callLater(_private.handleSceneTextEditorFocusChange)
-        }
+                                  if(activeFocus) root.scene.undoRedoEnabled = !_private.readOnly
+                                  Qt.callLater(_private.handleSceneTextEditorFocusChange)
+                              }
 
         onCursorRectangleChanged: () => {
-            Qt.callLater(_private.ensureSceneTextEditorCursorIsVisible)
-        }
+                                      Qt.callLater(_private.ensureSceneTextEditorCursorIsVisible)
+                                  }
     }
 
     SceneTextEditorSpellingSuggestionsMenu {
@@ -324,18 +323,19 @@ AbstractScenePartEditor {
         textDocument: _sceneTextEditor.textDocument
         bottomMargin: Runtime.sceneEditorFontMetrics.lineSpacing
         characterNames: Scrite.document.structure.characterNames
-        cursorPosition: _sceneTextEditor.activeFocus && !root.readOnly ? _sceneTextEditor.cursorPosition : -1
+        cursorPosition: _sceneTextEditor.activeFocus ? _sceneTextEditor.cursorPosition : -1
         applyTextFormat: true
+        renderDualDialogues: !_sceneTextEditor.activeFocus
         screenplayFormat: Scrite.document.displayFormat
         screenplayElement: root.screenplayElement
         forceSyncDocument: !_sceneTextEditor.activeFocus
-        spellCheckEnabled: !root.readOnly && _spellCheckEnabledFlag.value
+        spellCheckEnabled: !_private.readOnly && _spellCheckEnabledFlag.value
         applyLanguageFonts: Runtime.screenplayEditorSettings.useLanguageFonts
-        autoPolishParagraphs: !root.readOnly && Runtime.screenplayEditorSettings.enableAutoPolishParagraphs
+        autoPolishParagraphs: !_private.readOnly && Runtime.screenplayEditorSettings.enableAutoPolishParagraphs
         selectionEndPosition: _sceneTextEditor.activeFocus ? _sceneTextEditor.selectionEnd : -1
         liveSpellCheckEnabled: _sceneTextEditor.activeFocus
         selectionStartPosition: _sceneTextEditor.activeFocus ? _sceneTextEditor.selectionStart : -1
-        autoCapitalizeSentences: !root.readOnly &&
+        autoCapitalizeSentences: !_private.readOnly &&
                                  Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences &&
                                  Runtime.language.active.charScript() === QtChar.Script_Latin
         autoCapitalizeExceptions: Runtime.screenplayEditorSettings.autoCapitalizeExceptions
@@ -350,6 +350,11 @@ AbstractScenePartEditor {
         onRequestCursorPosition: (position) => {
                                      _sceneTextEditor.cursorPosition = position < 0 ? _sceneTextEditor.length : position
                                  }
+
+        onRequestSelection: (start, end) => {
+                                _sceneTextEditor.deselect()
+                                _sceneTextEditor.select(start, end)
+                            }
     }
 
     Connections {
@@ -425,7 +430,7 @@ AbstractScenePartEditor {
 
     ActionHandler {
         action: ActionHub.editOptions.find("cut")
-        enabled: !root.readOnly && root.isCurrent && _sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus
+        enabled: !_private.readOnly && root.isCurrent && _sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus
 
         onTriggered: () => {
                          _private.cut()
@@ -434,7 +439,7 @@ AbstractScenePartEditor {
 
     ActionHandler {
         action: ActionHub.editOptions.find("copy")
-        enabled: !root.readOnly && root.isCurrent && _sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus
+        enabled: !_private.readOnly && root.isCurrent && _sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus
 
         onTriggered: () => {
                          _private.copy()
@@ -443,7 +448,7 @@ AbstractScenePartEditor {
 
     ActionHandler {
         action: ActionHub.editOptions.find("paste")
-        enabled: !root.readOnly && root.isCurrent && _sceneTextEditor.activeFocus
+        enabled: !_private.readOnly && root.isCurrent && _sceneTextEditor.activeFocus
 
         onTriggered: () => {
                          _private.paste()
@@ -452,7 +457,7 @@ AbstractScenePartEditor {
 
     ActionHandler {
         action: ActionHub.editOptions.find("editSceneContent")
-        enabled: !root.readOnly && root.isCurrent && !_sceneTextEditor.activeFocus
+        enabled: !_private.readOnly && root.isCurrent && !_sceneTextEditor.activeFocus
 
         onTriggered: () => {
                          _sceneTextEditor.forceActiveFocus()
@@ -461,7 +466,7 @@ AbstractScenePartEditor {
 
     ActionHandler {
         action: ActionHub.editOptions.find("splitScene")
-        enabled: !root.readOnly && _private.canSplitScene
+        enabled: !_private.readOnly && _private.canSplitScene
 
         onTriggered: () => {
                          Qt.callLater(_private.splitSceneAt, _sceneTextEditor.cursorPosition)
@@ -470,7 +475,7 @@ AbstractScenePartEditor {
 
     ActionHandler {
         action: ActionHub.editOptions.find("mergeScene")
-        enabled: !root.readOnly && _private.canJoinToPreviousScene
+        enabled: !_private.readOnly && _private.canJoinToPreviousScene
 
         onTriggered: () => {
                          Qt.callLater(_private.mergeWithPreviousScene, _sceneTextEditor.cursorPosition)
@@ -588,6 +593,20 @@ AbstractScenePartEditor {
                      }
     }
 
+    ActionHandler {
+        action: ActionHub.paragraphFormats.find("toggleDualDialogue")
+        enabled: !_private.readOnly && root.isCurrent && _sceneTextEditor.activeFocus && (action.visible ? _sceneDocumentBinder.canToggleDualDialogue : true)
+
+        onTriggered: () => {
+                         const catchFailureReason = (reason) => {
+                             MessageBox.information("Dual Dialogue Toggle Error", reason)
+                         }
+                         _sceneDocumentBinder.toggleDualDialogueFailureReason.connect(catchFailureReason)
+                         _sceneDocumentBinder.toggleDualDialogue()
+                         _sceneDocumentBinder.toggleDualDialogueFailureReason.disconnect(catchFailureReason)
+                     }
+    }
+
     // Other private objects
     ResetOnChange {
         id: _spellCheckEnabledFlag
@@ -641,6 +660,32 @@ AbstractScenePartEditor {
                                          _sceneSearch.replaceCurrentSelection(replacementText)
                                      }
 
+    Connections {
+        target: Scrite.app
+
+        function onApplicationStateChanged(state) {
+            if(state === Qt.ApplicationActive) {
+                if(_private.cursorPositionBeforeAppSwitch >= 0) {
+                    _private.placeCursorAt(_private.cursorPositionBeforeAppSwitch)
+                }
+                _private.cursorPositionBeforeAppSwitch = -1
+            }
+        }
+    }
+
+    DelayedProperty {
+        id: _lastCursorPosition
+
+        set: _sceneDocumentBinder.cursorPosition
+        delay: 50
+
+        onGetChanged: {
+            if(Scrite.app.appState === Qt.ApplicationActive) {
+                _private.cursorPositionBeforeAppSwitch = _lastCursorPosition.get
+            }
+        }
+    }
+
     // Private stuff
     QtObject {
         id: _private
@@ -650,17 +695,20 @@ AbstractScenePartEditor {
         readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition") as Action
         readonly property Action translateToActiveLanguage: ActionHub.editOptions.find("translateToActiveLanguage") as Action
 
+        property bool readOnly: root.readOnly /*|| _sceneDocumentBinder.currentDualDialogue !== null*/
+
         property bool canSplitScene: _sceneTextEditor.activeFocus &&
-                                     !root.readOnly &&
+                                     !_private.readOnly &&
                                      _sceneDocumentBinder.currentElement &&
                                      _sceneDocumentBinder.currentElementCursorPosition === 0 &&
                                      Runtime.screenplayAdapter.isSourceScreenplay // TODO: We need to replace this with something else when we begin using ScreenplayAdapter for filtered scene editing.
         property bool canJoinToPreviousScene: _sceneTextEditor.activeFocus &&
-                                              !root.readOnly &&
+                                              !_private.readOnly &&
                                               _sceneTextEditor.cursorPosition === 0
                                               && root.index > 0
 
         property int numberOfWordsAddedToDict: 0
+        property int cursorPositionBeforeAppSwitch: -1
         property int cursorPositionBeforeSceneReset: -1
 
         property bool scrollingBetweenScenes: false
@@ -769,7 +817,7 @@ AbstractScenePartEditor {
         }
 
         function cut() {
-            if(root.readOnly)
+            if(_private.readOnly)
                 return
 
             if(_sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus) {
@@ -788,7 +836,7 @@ AbstractScenePartEditor {
         }
 
         function paste() {
-            if(root.readOnly)
+            if(_private.readOnly)
                 return
 
             if(_sceneTextEditor.canPaste && _sceneTextEditor.activeFocus) {
@@ -923,6 +971,7 @@ AbstractScenePartEditor {
                 cursorPositionBeforeZoom = _sceneTextEditor.cursorPosition
                 _sceneTextEditor.cursorPosition = cursorPositionBeforeZoom + (cursorPositionBeforeZoom >= _sceneTextEditor.length-1 ? -1 : 1)
             }
+            _sceneTextEditor.background.beforeZoomLevelChange()
         }
 
         function afterZoomLevelChange() {
@@ -931,6 +980,7 @@ AbstractScenePartEditor {
                 _sceneTextEditor.cursorPosition = cursorPositionBeforeZoom
                 cursorPositionBeforeZoom = -1
             }
+            _sceneTextEditor.background.afterZoomLevelChange()
         }
     }
 }

@@ -32,6 +32,7 @@ static QString FDX_DocumentTypeAttr = QStringLiteral("DocumentType");
 static QString FDX_ScriptDocumentType = QStringLiteral("Script");
 static QString FDX_ContentTag = QStringLiteral("Content");
 static QString FDX_ParagraphTag = QStringLiteral("Paragraph");
+static QString FDX_DualDialogueTag = QStringLiteral("DualDialogue");
 static QString FDX_TypeAttr = QStringLiteral("Type");
 static QString FDX_FlagsAttr = QStringLiteral("Flags");
 static QString FDX_OmittedFlag = QStringLiteral("Omitted");
@@ -321,6 +322,41 @@ bool FinalDraftExporter::doExport(QIODevice *device)
         const int nrSceneElements = scene->elementCount();
         for (int j = 0; j < nrSceneElements; j++) {
             const SceneElement *sceneElement = scene->elementAt(j);
+
+            if (const SceneDualDialogue *group = scene->findContainingDualDialogue(
+                    const_cast<SceneElement *>(sceneElement))) {
+                const QList<SceneElement *> &leftElements = group->leftElements();
+                const QList<SceneElement *> &rightElements = group->rightElements();
+
+                if (leftElements.contains(const_cast<SceneElement *>(sceneElement))) {
+                    QDomElement dualDialogueE = doc.createElement(FDX_DualDialogueTag);
+                    paragraphContainerE.appendChild(dualDialogueE);
+
+                    for (const SceneElement *leftElement : leftElements) {
+                        QDomElement paragraphE = doc.createElement(FDX_ParagraphTag);
+                        dualDialogueE.appendChild(paragraphE);
+
+                        paragraphE.setAttribute(QStringLiteral("Type"), leftElement->typeAsString());
+                        addTextToParagraph(paragraphE, leftElement->formattedText(),
+                                         leftElement->alignment(), leftElement->textFormats());
+                    }
+
+                    for (const SceneElement *rightElement : rightElements) {
+                        QDomElement paragraphE = doc.createElement(FDX_ParagraphTag);
+                        dualDialogueE.appendChild(paragraphE);
+
+                        paragraphE.setAttribute(QStringLiteral("Type"), rightElement->typeAsString());
+                        addTextToParagraph(paragraphE, rightElement->formattedText(),
+                                         rightElement->alignment(), rightElement->textFormats());
+                    }
+
+                    j += leftElements.size() + rightElements.size() - 1;
+                    continue;
+                } else if (rightElements.contains(const_cast<SceneElement *>(sceneElement))) {
+                    continue;
+                }
+            }
+
             QDomElement paragraphE = doc.createElement(FDX_ParagraphTag);
             paragraphContainerE.appendChild(paragraphE);
 

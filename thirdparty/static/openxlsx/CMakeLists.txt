@@ -18,4 +18,11 @@ if(TARGET OpenXLSX)
     ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${_scrite_binary_dir}"
     ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${_scrite_binary_dir}"
   )
+
+  # Enable /permissive- for RelWithDebInfo and MinSizeRel configurations on MSVC
+  # This allows C++ alternative operators (not, and, or) to be recognized
+  target_compile_options(OpenXLSX PRIVATE
+    $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:RelWithDebInfo>>:/permissive->
+    $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:MinSizeRel>>:/permissive->
+  )
 endif()

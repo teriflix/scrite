@@ -284,6 +284,46 @@ bool HtmlExporter::doExport(QIODevice *device)
     ts << "        margin-bottom: " << bottomMargin << "px;\n";
     ts << "    }\n";
 
+    ts << "\n    /* Dual dialogue formatting */\n";
+
+    const SceneElementFormat *actionFormat = formatting->elementFormat(SceneElement::Action);
+    const int tableLeftMargin = int(actionFormat->leftMargin() * contentWidth + leftMargin);
+    const int tableRightMargin = int(actionFormat->rightMargin() * contentWidth + rightMargin);
+
+    ts << "    table.scrite-dual-dialogue {\n";
+    ts << "      border: 0;\n";
+    ts << "      border-collapse: collapse;\n";
+    ts << "      margin-left: " << tableLeftMargin << "px;\n";
+    ts << "      margin-right: " << tableRightMargin << "px;\n";
+    ts << "      margin-top: 1em;\n";
+    ts << "      margin-bottom: 0px;\n";
+    ts << "      padding: 0px;\n";
+    ts << "    }\n";
+    ts << "    table.scrite-dual-dialogue td {\n";
+    ts << "      border: 0;\n";
+    ts << "      padding: 0;\n";
+    ts << "      width: 50%;\n";
+    ts << "      vertical-align: top;\n";
+    ts << "    }\n";
+
+    ts << "    table.scrite-dual-dialogue td p.scrite-Character-paragraph {\n";
+    ts << "      text-align: center !important;\n";
+    ts << "      padding-top: 0px !important;\n";
+    ts << "      padding-left: 0 !important;\n";
+    ts << "      padding-right: 0 !important;\n";
+    ts << "    }\n";
+
+    ts << "    table.scrite-dual-dialogue td p.scrite-Dialogue-paragraph {\n";
+    ts << "      padding-left: 1em !important;\n";
+    ts << "      padding-right: 1em !important;\n";
+    ts << "    }\n";
+
+    ts << "    table.scrite-dual-dialogue td p.scrite-Parenthetical-paragraph {\n";
+    ts << "      padding-left: 2em !important;\n";
+    ts << "      padding-right: 2em !important;\n";
+    ts << "      text-align: center !important;\n";
+    ts << "    }\n";
+
     ts << "    </style>\n\n";
 
     ts << "    <div class=\"scrite-screenplay\">\n";
@@ -427,8 +467,39 @@ bool HtmlExporter::doExport(QIODevice *device)
         const int nrElements = scene->elementCount();
         for (int j = 0; j < nrElements; j++) {
             SceneElement *element = scene->elementAt(j);
-            writeParagraph(element->type(), element->formattedText(), element->alignment(),
-                           element->textFormats());
+            SceneDualDialogue *dualDialogue = scene->findContainingDualDialogue(element);
+
+            if (dualDialogue) {
+                const QList<SceneElement *> &leftElements = dualDialogue->leftElements();
+                if (!leftElements.isEmpty() && leftElements.first() == element) {
+                    ts << "        <table class=\"scrite-dual-dialogue\">\n";
+                    ts << "          <tr>\n";
+                    ts << "            <td>\n";
+
+                    for (SceneElement *leftElement : leftElements) {
+                        writeParagraph(leftElement->type(), leftElement->formattedText(),
+                                       leftElement->alignment(), leftElement->textFormats());
+                    }
+
+                    ts << "            </td>\n";
+                    ts << "            <td>\n";
+
+                    const QList<SceneElement *> &rightElements = dualDialogue->rightElements();
+                    for (SceneElement *rightElement : rightElements) {
+                        writeParagraph(rightElement->type(), rightElement->formattedText(),
+                                       rightElement->alignment(), rightElement->textFormats());
+                    }
+
+                    ts << "            </td>\n";
+                    ts << "          </tr>\n";
+                    ts << "        </table>\n";
+
+                    j += leftElements.size() + rightElements.size();
+                }
+            } else {
+                writeParagraph(element->type(), element->formattedText(), element->alignment(),
+                               element->textFormats());
+            }
         }
 
         if (i == nrScenes - 1)

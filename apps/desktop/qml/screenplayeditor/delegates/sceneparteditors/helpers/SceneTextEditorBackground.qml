@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Layouts
@@ -20,12 +22,11 @@ import QtQuick.Controls
 
 import io.scrite.components
 
-
+import "../../.."
 import "../../../../helpers"
 import "../../../../globals"
 import "../../../../controls"
 import "../../../../structureview"
-import "../../.."
 
 Item {
     id: root
@@ -35,8 +36,19 @@ Item {
     required property TextEdit sceneTextEditor
     required property SceneDocumentBinder sceneDocumentBinder
 
+    function beforeZoomLevelChange() {
+        _private.zoomLevelSettled = false
+    }
+
+    function afterZoomLevelChange() {
+        _private.evalDualDialogueRects()
+        _private.zoomLevelSettled = true
+    }
+
     // Current line highlight
     Rectangle {
+        id: _currentLineHighlight
+
         x: 0
         y: root.sceneTextEditor.cursorRectangle.y-2*root.zoomLevel
         width: parent.width-1
@@ -51,6 +63,71 @@ Item {
 
             color: root.sceneDocumentBinder.scene.highlightColor
         }
+
+        onYChanged: _private.evalDualDialogueRects()
+    }
+
+    // Show a dotted rectangle around all dual-dialogues if the binder has its
+    // renderDualDialogues property set to false.
+    Repeater {
+        id: _otherDualDialogues
+
+        model: root.sceneDocumentBinder.renderDualDialogues ? [] : root.sceneDocumentBinder.scene.dualDialogues
+
+        delegate: Rectangle {
+            required property var modelData
+
+            property rect dualDialogueRect
+            property SceneDualDialogue dualDialogue: modelData as SceneDualDialogue
+
+            function evalDualDialogueRect() {
+                dualDialogueRect = root.sceneDocumentBinder.evalDualDialogueRect(dualDialogue)
+            }
+
+            x: root.sceneTextEditor.leftPadding - radius
+            y: dualDialogueRect.y + root.sceneTextEditor.topPadding - _currentLineHighlight.height * 0.33
+            width: root.sceneTextEditor.contentWidth + 2*radius
+            height: dualDialogueRect.height + _currentLineHighlight.height * 0.66
+            topLeftRadius: _currentLineHighlight.height
+            bottomRightRadius: topLeftRadius
+
+            color: dualDialogue === root.sceneDocumentBinder.currentDualDialogue ?
+                       Runtime.colors.tx( Runtime.colors.primary.c400.background ) : Qt.rgba(0,0,0,0)
+
+            border.width: 1
+            border.color: Runtime.colors.primary.editor.text
+
+            opacity: 0.5
+            visible: dualDialogueRect.height > 1
+
+            // Dual-dialogue indicator
+            Image {
+                anchors.left: parent.right
+                anchors.top: parent.top
+                anchors.margins: _currentLineHighlight.height/2
+
+                width: _currentLineHighlight.height
+                height: width
+
+                source: Runtime.themedIcon("qrc:/icons/content/dual_dialogue.png")
+
+                MouseArea {
+                    id: _ddiMouseArea
+
+                    anchors.fill: parent
+                    cursorShape: Qt.ArrowCursor
+                    hoverEnabled: true
+
+                    ToolTipPopup {
+                        container: _ddiMouseArea
+                        text: "This is a dual dialogue displayed sequentially while editing."
+                        visible: _ddiMouseArea.containsMouse
+                    }
+                }
+            }
+        }
+
+        onCountChanged: Qt.callLater(_private.evalDualDialogueRects)
     }
 
     VclText {
@@ -67,5 +144,18 @@ Item {
         text: "Click here to type scene content ..."
         visible: text === "" && !root.sceneTextEditor.activeFocus
         opacity: 0.5
+    }
+
+    QtObject {
+        id: _private
+
+        property bool zoomLevelSettled: true
+
+        function evalDualDialogueRects() {
+            for(let i=0; i<_otherDualDialogues.count; i++) {
+                let item = _otherDualDialogues.itemAt(i)
+                item.evalDualDialogueRect()
+            }
+        }
     }
 }

@@ -28,6 +28,7 @@
 #include <QSettings>
 #include <QMetaEnum>
 #include <QMimeData>
+#include <QTextTable>
 #include <QClipboard>
 #include <QPdfWriter>
 #include <QScopeGuard>
@@ -288,27 +289,58 @@ void SceneElementFormat::activateDefaultLanguage()
 }
 
 QTextBlockFormat SceneElementFormat::createBlockFormat(Qt::Alignment overrideAlignment,
-                                                       const qreal *givenContentWidth) const
+                                                       const qreal *givenContentWidth,
+                                                       bool dualDialogueMode) const
 {
+    // Takes a block format and alters few parameters to make it suitable
+    // for use in a dual dialogue construct
+    auto polish = [=](const QTextBlockFormat &in) {
+        if (!dualDialogueMode)
+            return in;
+
+        QTextBlockFormat format = in;
+        switch (m_elementType) {
+        case SceneElement::Character:
+            format.setAlignment(Qt::AlignHCenter);
+            format.setLeftMargin(0);
+            format.setRightMargin(0);
+            break;
+        case SceneElement::Dialogue:
+        case SceneElement::Parenthetical: {
+            const qreal blockWidth = format.rightMargin() - format.leftMargin();
+            format.setLeftMargin(format.leftMargin() * 0.25);
+            format.setRightMargin(format.leftMargin() + blockWidth * 0.75);
+            if (m_elementType == SceneElement::Parenthetical)
+                format.setAlignment(Qt::AlignHCenter);
+        } break;
+        default:
+            return in;
+        }
+
+        return format;
+    };
+
     if (m_lastCreatedBlockFormatPageWidth > 0 && givenContentWidth
         && *givenContentWidth == m_lastCreatedBlockFormatPageWidth
-        && overrideAlignment == m_lastCreatedBlockAlignment)
-        return m_lastCreatedBlockFormat;
+        && overrideAlignment == m_lastCreatedBlockAlignment) {
+        return polish(m_lastCreatedBlockFormat);
+    }
 
     const qreal dpr = m_format->devicePixelRatio();
     const QFontMetrics fm =
             m_format->screen() ? m_format->defaultFont2Metrics() : m_format->defaultFontMetrics();
     const qreal contentWidth =
             givenContentWidth ? *givenContentWidth : m_format->pageLayout()->contentWidth();
+    const qreal topMargin = fm.lineSpacing() * m_lineSpacingBefore * m_lineHeight;
     const qreal leftMargin = contentWidth * m_leftMargin * dpr;
     const qreal rightMargin = contentWidth * m_rightMargin * dpr;
-    const qreal topMargin = fm.lineSpacing() * m_lineSpacingBefore * m_lineHeight;
 
     QTextBlockFormat format;
-    format.setLeftMargin(leftMargin);
-    format.setRightMargin(rightMargin);
+
     format.setTopMargin(topMargin);
     format.setLineHeight(m_lineHeight * 100, QTextBlockFormat::ProportionalHeight);
+    format.setLeftMargin(leftMargin);
+    format.setRightMargin(rightMargin);
 
     if (m_textIndent > 0.0)
         format.setTextIndent(m_textIndent);
@@ -327,7 +359,7 @@ QTextBlockFormat SceneElementFormat::createBlockFormat(Qt::Alignment overrideAli
         m_lastCreatedBlockFormat = format;
     }
 
-    return format;
+    return polish(format);
 }
 
 QTextCharFormat SceneElementFormat::createCharFormat(const qreal *givenPageWidth) const
@@ -940,6 +972,50 @@ void ScreenplayFormat::commitTransaction()
         emit formatChanged();
 
     m_nrChangesDuringTransation = 0;
+}
+
+QTextTableFormat ScreenplayFormat::createDualDialogueTableFormat()
+{
+    QTextTableFormat fmt;
+    fmt.setBorder(0);
+    fmt.setColumns(2);
+    fmt.setCellSpacing(0);
+    fmt.setCellPadding(0);
+
+    QTextLength colWidth(QTextLength::PercentageLength, 50.0);
+    fmt.setColumnWidthConstraints({ colWidth, colWidth });
+
+    return fmt;
+}
+
+void ScreenplayFormat::polishDualDialogueTableFormat(QTextTable *table)
+{
+    if (table == nullptr || table->rows() != 1 || table->columns() != 2)
+        return;
+
+    QTextTableFormat tableFormat = table->format();
+    if (!qFuzzyCompare(tableFormat.topMargin(), 0))
+        return;
+
+    QTextTableCell cell = table->cellAt(0, 0);
+    QTextCursor cursor = cell.firstCursorPosition();
+    QTextBlock block = cursor.block();
+    QTextBlockFormat blockFormat = block.blockFormat();
+    if (qFuzzyCompare(blockFormat.topMargin(), 0))
+        return;
+
+    tableFormat.setTopMargin(blockFormat.topMargin());
+    table->setFormat(tableFormat);
+
+    blockFormat = QTextBlockFormat();
+    blockFormat.setTopMargin(0);
+
+    cursor.mergeBlockFormat(blockFormat);
+
+    cell = table->cellAt(0, 1);
+    cursor = cell.firstCursorPosition();
+    block = cursor.block();
+    cursor.mergeBlockFormat(blockFormat);
 }
 
 void ScreenplayFormat::serializeToJson(QJsonObject &json) const

@@ -129,7 +129,7 @@ Item {
                     id: _activateButton
 
                     text: "Verify »"
-                    enabled: _activationCodeField.text.length == 20
+                    enabled: _activationCodeField.text.length === 20
 
                     onClicked: _activateCall.call()
                 }

@@ -333,7 +333,7 @@ UserInfo::UserInfo(const QJsonObject &object)
     this->hasActiveSubscription = object.value("hasActiveSubscription").toBool();
     this->hasUpcomingSubscription = object.value("hasUpcomingSubscription").toBool();
     this->hasTrialSubscription = object.value("hasTrialSubscription").toBool();
-    this->paidSubscriptionCount = object.value("paidSubscriptionCount").toBool();
+    this->paidSubscriptionCount = object.value("paidSubscriptionCount").toInt();
     this->subscribedUntil =
             QDateTime::fromString(object.value("subscribedUntil").toString(), Qt::ISODateWithMs);
     this->isEarlyAdopter = object.value("isEarlyAdopter").toBool();

@@ -186,7 +186,6 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode,
             QSGGeometryNode *geometryNode = new QSGGeometryNode;
             geometryNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial
                                    | QSGNode::OwnedByParent);
-            rootNode->appendChildNode(geometryNode);
 
             QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), 6);
             geometry->setDrawingMode(QSGGeometry::DrawTriangles);
@@ -219,6 +218,8 @@ QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode,
             color.setAlphaF(color.alphaF() * this->opacity());
             material->setFlag(QSGMaterial::Blending);
             material->setColor(color);
+
+            rootNode->appendChildNode(geometryNode);
         }
     }
 

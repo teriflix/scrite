@@ -179,6 +179,20 @@ Below is an example scene with paragraphs properly formatted.
 
 <img src="../images/quickstart/018-formatted-scene.png" width="100%"/>
 
+### Dual Dialogue
+
+When two characters speak at the same time (overlapping), you can format them as
+dual dialogue to display side-by-side:
+
+1. Write two character lines back-to-back (no action between them)
+2. Select both character runs, or just place the cursor at the first character
+3. Press `Ctrl+Alt+D` (Windows/Linux) or `Ctrl+⌥+D` (macOS) to toggle dual
+   dialogue
+
+In the editor, they appear sequentially for easy editing. In PDF export and
+preview, they display side-by-side. Press the same shortcut again to revert to
+normal dialogue.
+
 ## Adding More Scenes
 Keep creating scenes and adding content. To add a new scene, click the button at
 the end of the page or use the toolbar.
@@ -229,8 +243,8 @@ the first scene.
 <img src="../images/quickstart/024-title-page.png" width="100%"/>
 
 ## Exporting to PDF
-Select `Export → PDF`, or press `Ctrl+P` (Windows/Linux) or `⌘+P` (macOS)
-to preview your PDF.
+Select `Export → PDF`, or press `Ctrl+P` (Windows/Linux) or `⌘+P` (macOS) to
+preview your PDF.
 
 The Export dialog offers options to customize your PDF—toggle title page,
 include synopsis, and more.

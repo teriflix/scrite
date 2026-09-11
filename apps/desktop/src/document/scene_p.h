@@ -191,16 +191,7 @@ protected:
         Qt::Alignment alignment = Qt::Alignment(0);
         QVector<QTextLayout::FormatRange> textFormats;
 
-        void capture(const SceneElement *element)
-        {
-            if (element) {
-                id = element->id();
-                type = element->type();
-                text = element->text();
-                alignment = element->alignment();
-                textFormats = element->textFormats();
-            }
-        }
+        void capture(const SceneElement *element);
     };
 
     // Creates a fresh SceneElement from saved data. Must be called with
@@ -332,6 +323,40 @@ private:
     int m_oldCursorPosition = -1, m_newCursorPosition = -1;
     QString m_oldText, m_newText;
     qint64 m_timestamp = 0;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// CreateDualDialogueCommand
+///////////////////////////////////////////////////////////////////////////////
+
+class CreateDualDialogueCommand : public AbstractSceneElementUndoCommand
+{
+public:
+    explicit CreateDualDialogueCommand(SceneElement *sceneElement);
+    ~CreateDualDialogueCommand();
+
+    enum { ID = UndoStack::CreateDualDialogueCommandID };
+    int id() const { return ID; }
+    void undo();
+    void redo();
+    bool mergeWith(const QUndoCommand *other) { return false; }
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// DissolveDualDialogueCommand
+///////////////////////////////////////////////////////////////////////////////
+
+class DissolveDualDialogueCommand : public AbstractSceneElementUndoCommand
+{
+public:
+    explicit DissolveDualDialogueCommand(SceneElement *sceneElement);
+    ~DissolveDualDialogueCommand();
+
+    enum { ID = UndoStack::DissolveDualDialogueCommandID };
+    int id() const { return ID; }
+    void undo();
+    void redo();
+    bool mergeWith(const QUndoCommand *other) { return false; }
 };
 
 #endif // SCENE_P_H

@@ -116,7 +116,9 @@ public:
         SceneElementAlignmentCommandID,
         SceneElementTextFormatsCommandID,
         SceneInsertElementCommandID,
-        SceneRemoveElementCommandID
+        SceneRemoveElementCommandID,
+        CreateDualDialogueCommandID,
+        DissolveDualDialogueCommandID
     };
     static QString commandName(int id);
 

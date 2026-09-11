@@ -14,7 +14,6 @@
 ****************************************************************************/
 
 #include "finaldraftimporter.h"
-#include "application.h"
 #include "scritedocument.h"
 
 static QString FDX_Suffix = QStringLiteral("fdx");
@@ -24,6 +23,7 @@ static QString FDX_DocumentTypeAttr = QStringLiteral("DocumentType");
 static QString FDX_ScriptDocumentType = QStringLiteral("Script");
 static QString FDX_ContentTag = QStringLiteral("Content");
 static QString FDX_ParagraphTag = QStringLiteral("Paragraph");
+static QString FDX_DualDialogueTag = QStringLiteral("DualDialogue");
 static QString FDX_TypeAttr = QStringLiteral("Type");
 static QString FDX_FlagsAttr = QStringLiteral("Flags");
 static QString FDX_OmittedFlag = QStringLiteral("Omitted");
@@ -54,6 +54,9 @@ static QString FDX_TitleProperty = QStringLiteral("Title");
 static QString FDX_ColorProperty = QStringLiteral("Color");
 static QString FDX_SummaryProperty = QStringLiteral("Summary");
 
+static const char *markForDualDialogueLeft_dynProp = "#markForDualDialogueLeft";
+static const char *markForDualDialogueRight_dynProp = "#markForDualDialogueRight";
+
 static void fixOmittedScenes(QDomElement &contentE);
 
 FinalDraftImporter::FinalDraftImporter(QObject *parent) : AbstractImporter(parent) { }
@@ -80,19 +83,6 @@ bool FinalDraftImporter::doImport(QIODevice *device)
     QString errMsg;
     int errLine = -1;
     int errCol = -1;
-
-    /**
-     * We cannot use QDomDocument::setContent(QIODevice*, QString*, int*, int*)
-     * because DOM Elements with spaces will be read as empty strings, instead of
-     * actual number of spaces. This is obviously a problem for us.
-     *
-     * The only way to address that is to actually use a QXmlInputSource over the
-     * QIODevice, and then parse that using QXmlSimpleReader instance.
-     *
-     * In Qt 5.15, QXmlInputSource and QXmlSimpleReader classes are depricated.
-     * But until we can find a replacement that also parses spaces properly,
-     * we will have to simply use these deprecated classes.
-     */
 
     const QByteArray xml = device->readAll();
 
@@ -143,6 +133,7 @@ bool FinalDraftImporter::doImport(QIODevice *device)
         return ret;
     }();
     this->configureCanvas(nrScenes);
+    this->progress()->setProgressStep(1.0 / qreal(paragraphs.size() + 1));
 
     auto parseParagraphTexts =
             [](const QDomElement &paragraphE) -> QPair<QString, QVector<QTextLayout::FormatRange>> {
@@ -190,18 +181,17 @@ bool FinalDraftImporter::doImport(QIODevice *device)
     const QStringList types({ FDX_SceneHeadingType, FDX_ActionType, FDX_CharacterType,
                               FDX_DialogueType, FDX_ParentheticalType, FDX_ShotType,
                               FDX_TransitionType });
-    QDomElement paragraphE = contentE.firstChildElement(FDX_ParagraphTag);
-    while (!paragraphE.isNull()) {
-        TraverseDomElement tde(paragraphE, this->progress());
 
+    auto processSingleParagraph = [&](const QDomElement &paragraphE, bool isDualDialogueRight,
+                                      bool isDualDialogueLeft) -> SceneElement * {
         const QString flags = paragraphE.attribute(FDX_FlagsAttr);
         if (flags == "Ignore")
-            continue;
+            return nullptr;
 
         const QString type = paragraphE.attribute(FDX_TypeAttr);
         const int typeIndex = types.indexOf(type);
         if (typeIndex < 0)
-            continue;
+            return nullptr;
 
         const QString alignmentHint = paragraphE.attribute(FDX_AlignmentAttr);
         const Qt::Alignment alignment = [alignmentHint]() {
@@ -257,6 +247,12 @@ bool FinalDraftImporter::doImport(QIODevice *device)
             break;
         case 2:
             sceneElement = this->addSceneElement(scene, SceneElement::Character, text);
+            if ((isDualDialogueLeft || isDualDialogueRight) && sceneElement) {
+                if (isDualDialogueRight)
+                    sceneElement->setProperty(markForDualDialogueRight_dynProp, true);
+                if (isDualDialogueLeft)
+                    sceneElement->setProperty(markForDualDialogueLeft_dynProp, true);
+            }
             break;
         case 3:
             sceneElement = this->addSceneElement(scene, SceneElement::Dialogue, text);
@@ -276,9 +272,86 @@ bool FinalDraftImporter::doImport(QIODevice *device)
             sceneElement->setAlignment(alignment);
             sceneElement->setTextFormats(formats);
         }
+
+        return sceneElement;
+    };
+
+    // Track which paragraphs belong to which dual dialogue column
+    QList<QDomElement> dualDialogueLeftNodes;
+    QList<QDomElement> dualDialogueRightNodes;
+
+    QDomElement child = contentE.firstChildElement();
+    while (!child.isNull()) {
+        if (child.tagName() == FDX_DualDialogueTag) {
+            QDomNodeList dualDialogueParagraphs = child.elementsByTagName(FDX_ParagraphTag);
+
+            // Find the index of the second Character element
+            int secondCharacterIndex = -1;
+            for (int i = 0; i < dualDialogueParagraphs.size(); i++) {
+                const QDomElement paragraphE = dualDialogueParagraphs.at(i).toElement();
+                if (paragraphE.attribute(FDX_TypeAttr) == FDX_CharacterType) {
+                    if (secondCharacterIndex == -1)
+                        secondCharacterIndex = i;
+                    else {
+                        secondCharacterIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            // Track elements for dual dialogue if we found two characters
+            if (secondCharacterIndex > 0) {
+                for (int i = 0; i < dualDialogueParagraphs.size(); i++) {
+                    QDomElement elem = dualDialogueParagraphs.at(i).toElement();
+                    if (i < secondCharacterIndex)
+                        dualDialogueLeftNodes.append(elem);
+                    else
+                        dualDialogueRightNodes.append(elem);
+                }
+            }
+        }
+        child = child.nextSiblingElement();
     }
 
+    // Process all paragraphs in order
+    for (int i = 0; i < paragraphs.size(); ++i) {
+        QDomElement paragraphE = paragraphs.at(i).toElement();
+        TraverseDomElement tde(paragraphE, this->progress());
+
+        const bool isDualDialogueLeft = dualDialogueLeftNodes.contains(paragraphE);
+        const bool isDualDialogueRight = dualDialogueRightNodes.contains(paragraphE);
+        processSingleParagraph(paragraphE, isDualDialogueRight, isDualDialogueLeft);
+    }
+
+    processDualDialogueMarkers(this->document()->screenplay());
+
     return true;
+}
+
+void FinalDraftImporter::processDualDialogueMarkers(Screenplay *screenplay)
+{
+    const int nrElements = screenplay->elementCount();
+    for (int i = 0; i < nrElements; i++) {
+        ScreenplayElement *spElement = screenplay->elementAt(i);
+        if (spElement->elementType() != ScreenplayElement::SceneElementType)
+            continue;
+
+        Scene *scene = spElement->scene();
+        const int nrSceneElements = scene->elementCount();
+
+        for (int j = 0; j < nrSceneElements; j++) {
+            SceneElement *element = scene->elementAt(j);
+
+            if (!element->property(markForDualDialogueLeft_dynProp).toBool())
+                continue;
+
+            if (element->type() != SceneElement::Character)
+                continue;
+
+            scene->toggleDualDialogue(element);
+            element->setProperty(markForDualDialogueLeft_dynProp, QVariant());
+        }
+    }
 }
 
 void fixOmittedScenes(QDomElement &contentE)

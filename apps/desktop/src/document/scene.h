@@ -43,6 +43,7 @@
 class Scene;
 class SceneHeading;
 class SceneElement;
+class SceneDualDialogue;
 class StructureElement;
 class SceneDocumentBinder;
 class SceneUndoCommand;
@@ -293,6 +294,8 @@ public:
     void reportAllChanges();
     void dropAllChanges();
 
+    bool startsDualDialogue() const;
+
     static QJsonArray textFormatsToJson(const QVector<QTextLayout::FormatRange> &formats);
     static QVector<QTextLayout::FormatRange> textFormatsFromJson(const QJsonArray &array);
 
@@ -320,6 +323,95 @@ private:
     QBasicTimer m_changeTimer;
     QBasicTimer m_wordCountTimer;
     QMap<int, int> m_changeCounters;
+};
+
+class SceneDualDialogue : public QObject
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
+
+public:
+    Q_INVOKABLE explicit SceneDualDialogue(QObject *parent = nullptr);
+    ~SceneDualDialogue();
+    Q_SIGNAL void aboutToDelete(SceneDualDialogue *ptr);
+
+    enum Column { NoColumn, LeftColumn, RightColumn };
+    Q_ENUM(Column)
+
+    // clang-format off
+    Q_PROPERTY(bool valid
+               READ isValid
+               NOTIFY validChanged)
+    // clang-format on
+    bool isValid() const;
+    Q_SIGNAL void validChanged();
+
+    /*
+     * The 'id' is a special property. It can be set only once. If it is not
+     * set an ID is automatically generated whenever the property value is
+     * queried for the first time.
+     */
+    // clang-format off
+    Q_PROPERTY(QString id
+               READ id
+               WRITE setId
+               NOTIFY idChanged)
+    // clang-format on
+    void setId(const QString &val);
+    QString id() const;
+    Q_SIGNAL void idChanged();
+
+    // clang-format off
+    Q_PROPERTY(Scene *scene
+               READ scene
+               CONSTANT STORED
+               false )
+    // clang-format on
+    Scene *scene() const { return m_scene; }
+
+    // clang-format off
+    Q_PROPERTY(SceneElement *leftCharacter
+               READ leftCharacter
+               NOTIFY leftCharacterChanged
+               STORED false)
+    // clang-format on
+    SceneElement *leftCharacter() const { return m_leftCharacter; }
+    Q_SIGNAL void leftCharacterChanged();
+
+    // clang-format off
+    Q_PROPERTY(SceneElement *rightCharacter
+               READ rightCharacter
+               NOTIFY rightCharacterChanged
+               STORED false)
+    // clang-format on
+    SceneElement *rightCharacter() const { return m_rightCharacter; }
+    Q_SIGNAL void rightCharacterChanged();
+
+    Q_INVOKABLE QList<SceneElement *> leftElements() const;
+    Q_INVOKABLE QList<SceneElement *> rightElements() const;
+
+    Q_INVOKABLE SceneElement *firstElement() const { return m_leftCharacter; }
+    Q_INVOKABLE SceneElement *lastElement() const;
+
+    Q_INVOKABLE bool contains(SceneElement *element) const;
+
+private:
+    friend class Scene;
+    void setScene(Scene *scene) { m_scene = scene; }
+    void setLeftCharacter(SceneElement *element);
+    void setRightCharacter(SceneElement *element);
+    void onSceneAboutToRemoveElement(SceneElement *element);
+    void onSceneElementChanged(SceneElement *element, int type);
+    void dissolveSelf();
+    void resetLeftAndRightElements();
+
+private:
+    mutable QString m_id;
+    Scene *m_scene = nullptr;
+    SceneElement *m_leftCharacter = nullptr;
+    SceneElement *m_rightCharacter = nullptr;
+    mutable QList<SceneElement *> m_leftElements, m_rightElements;
 };
 
 class DistinctElementValuesMap
@@ -724,13 +816,49 @@ public:
 
     Q_INVOKABLE void removeLastElementIfEmpty();
 
+    // clang-format off
+    Q_PROPERTY(QList<SceneDualDialogue *> dualDialogues
+               READ dualDialogues
+               NOTIFY dualDialoguesChanged
+               STORED false)
+    // clang-format on
+    QList<SceneDualDialogue *> dualDialogues() const { return m_dualDialogues; }
+    Q_SIGNAL void dualDialoguesChanged();
+
+    // clang-format off
+    Q_PROPERTY(bool hasDualDialogues
+               READ hasDualDialogues
+               NOTIFY dualDialoguesChanged)
+    // clang-format on
+    bool hasDualDialogues() const { return !m_dualDialogues.isEmpty(); }
+    Q_SIGNAL void hasDualDialoguesChanged();
+
+    struct DualDialogueToggleResult
+    {
+        enum Status { Unknown, Created, Dissolved, Failed };
+        Status status = Unknown;
+        SceneDualDialogue *group = nullptr;
+        QString reason;
+    };
+
+    SceneDualDialogue *createDualDialogue(SceneElement *element);
+    bool dissolveDualDialogue(SceneElement *element);
+    DualDialogueToggleResult toggleDualDialogue(SceneElement *element);
+
+    bool canCreateDualDialogue(SceneElement *element, QString *reason = nullptr) const;
+    bool canDissolveDualDialogue(SceneElement *element, QString *reason = nullptr) const;
+    bool canToggleDualDialogue(SceneElement *element, QString *reason = nullptr) const;
+
+    SceneDualDialogue *findContainingDualDialogue(SceneElement *element) const;
+    QList<SceneElement *> findCharacterDialogueRun(SceneElement *element) const;
+
     enum SceneElementChangeType { ElementTypeChange, ElementTextChange };
     Q_SIGNAL void sceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
     Q_SIGNAL void aboutToRemoveSceneElement(SceneElement *element);
     Q_SIGNAL void sceneChanged();
     Q_SIGNAL void sceneRefreshed();
     Q_SIGNAL void sceneAboutToReset();
-    Q_SIGNAL void sceneReset(int cursorPosition);
+    Q_SIGNAL void sceneReset(int cursorPosition, SceneElement *inElement = nullptr);
 
     // clang-format off
     Q_PROPERTY(Notes *notes
@@ -827,6 +955,7 @@ private:
     void setElementsList(const QList<SceneElement *> &list);
     void onSceneElementChanged(SceneElement *element, SceneElementChangeType type);
     void onAboutToRemoveSceneElement(SceneElement *element);
+    void onAboutToRemoveDualDialogue(SceneDualDialogue *group);
     const CharacterElementMap &characterElementMap() const { return m_characterElementMap; }
     void renameCharacter(const QString &from, const QString &to);
     void evaluateSortedCharacterNames();
@@ -844,6 +973,7 @@ private:
     friend class SceneElement;
     friend class SceneHeading;
     friend class SceneDocumentBinder;
+    friend class SceneDualDialogue;
 
     int m_actIndex = -1;
     int m_cursorPosition = -1;
@@ -887,6 +1017,8 @@ private:
     static SceneElement *staticElementAt(QQmlListProperty<SceneElement> *list, qsizetype index);
     static qsizetype staticElementCount(QQmlListProperty<SceneElement> *list);
     QList<SceneElement *> m_elements;
+
+    QList<SceneDualDialogue *> m_dualDialogues;
 };
 
 class ScreenplayFormat;

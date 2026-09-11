@@ -30,6 +30,7 @@
 #include <QSettings>
 #include <QMetaEnum>
 #include <QMimeData>
+#include <QTextTable>
 #include <QClipboard>
 #include <QPdfWriter>
 #include <QScopeGuard>
@@ -39,10 +40,15 @@
 #include <QStyleHints>
 #include <QFontDatabase>
 #include <QJsonDocument>
+#include <QStandardPaths>
+#include <QTextTableCell>
+#include <QTextTableFormat>
 #include <QTextBoundaryFinder>
 #include <QScopedValueRollback>
 #include <QTextDocumentFragment>
 #include <QAbstractTextDocumentLayout>
+
+#include <QTextDocumentWriter>
 
 Q_DECLARE_METATYPE(QTextCharFormat)
 
@@ -264,6 +270,43 @@ protected:
     }
 };
 
+namespace TextDocument {
+enum BlockType { UnknownBlock = 0, SceneElementBlock, DualDialogueBoundaryBlock };
+
+QList<QTextBlock> usableBlocks(QTextDocument *document)
+{
+    QList<QTextBlock> ret;
+
+    QTextBlock block = document->firstBlock();
+#if 0
+    QTextTable *table = nullptr;
+    while (block.isValid()) {
+        QTextCursor cursor(block);
+        bool includeBlock = true;
+        if (cursor.currentTable() != table) {
+            if (table == nullptr) {
+                if (!ret.isEmpty() && ret.last().userData() == nullptr)
+                    ret.removeLast();
+            } else
+                includeBlock = false;
+            table = cursor.currentTable();
+        }
+        if (includeBlock || block.userData() != nullptr)
+            ret.append(block);
+        block = block.next();
+    }
+#else
+    while (block.isValid()) {
+        if (block.userState() != DualDialogueBoundaryBlock)
+            ret.append(block);
+        block = block.next();
+    }
+#endif
+
+    return ret;
+}
+}
+
 SceneDocumentBlockUserData::SceneDocumentBlockUserData(const QTextBlock &textBlock,
                                                        SceneElement *element,
                                                        SceneDocumentBinder *binder)
@@ -302,7 +345,19 @@ void SceneDocumentBlockUserData::resetFormat()
 bool SceneDocumentBlockUserData::updateFromFormat(const SceneElementFormat *format)
 {
     if (format->isModified(&m_formatMTime)) {
-        this->blockFormat = format->createBlockFormat(m_sceneElement->alignment());
+        QTextCursor cursor(m_textBlock);
+
+        this->blockFormat = format->createBlockFormat(m_sceneElement->alignment(), nullptr,
+                                                      cursor.currentTable() != nullptr);
+
+        /* Text blocks for character scene elements already placed in a table with top-margin
+            configured in initializeDocument(), should have their own top-margin as 0. Otherwise
+            we will end up showing double margin. */
+        if (m_sceneElement->type() == SceneElement::Character && cursor.currentTable() != nullptr) {
+            const QTextTableFormat tblFmt = cursor.currentTable()->format();
+            if (tblFmt.topMargin() > 0)
+                this->blockFormat.setTopMargin(0);
+        }
         this->charFormat = format->createCharFormat();
         if (this->blockFormat.hasProperty(QTextFormat::BackgroundBrush))
             this->blockFormat.setBackground(colorTransformBrush(this->blockFormat.background()));
@@ -453,11 +508,7 @@ void SceneDocumentBlockUserData::polishTextNow()
         if (m_sceneElement == nullptr || !m_sceneElement->polishText(previousScene))
             return;
 
-        // Mark current cursor position if required, so that we can get back to it
-        // once we are done applying all edits done as a part of the polish operation.
-        bool cursorPositionMarked = false;
-        if (m_binder->m_cursorPosition > m_textBlock.position())
-            cursorPositionMarked = this->markCursorPosition();
+        m_binder->saveCursorState();
 
         // Reset format so that its applied by the highlighter again
         this->resetFormat();
@@ -471,11 +522,7 @@ void SceneDocumentBlockUserData::polishTextNow()
         else
             cursor.insertText(text);
 
-        // Restore cursor position
-        if (cursorPositionMarked) {
-            const int cp = this->markedCursorPosition(true);
-            emit m_binder->requestCursorPosition(cp);
-        }
+        m_binder->restoreCursorState();
     }
 
     // Rehighlight the block
@@ -505,12 +552,7 @@ void SceneDocumentBlockUserData::autoCapitalizeNow()
         // This is to avoid recursive edits
         QScopedValueRollback<bool> rollback(m_binder->m_sceneElementTaskIsRunning, true);
 
-        // Mark current cursor position if required, so that we can get back to it
-        // once we are done applying all edits done as a part of the capitalize
-        // operation
-        bool cursorPositionMarked = false;
-        if (m_binder->m_cursorPosition > m_textBlock.position())
-            cursorPositionMarked = this->markCursorPosition();
+        m_binder->saveCursorState();
 
         // Reset format so that its applied by the highlighter again
         this->resetFormat();
@@ -529,11 +571,7 @@ void SceneDocumentBlockUserData::autoCapitalizeNow()
         m_sceneElement->setText(m_textBlock.text());
         m_sceneElement->setTextFormats(m_textBlock.textFormats());
 
-        // Restore cursor position
-        if (cursorPositionMarked) {
-            const int cp = this->markedCursorPosition(true);
-            emit m_binder->requestCursorPosition(cp);
-        }
+        m_binder->restoreCursorState();
     }
 
     // Rehighlight the block
@@ -652,7 +690,6 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
       m_sceneElementTaskTimer("SceneDocumentBinder.m_sceneElementTaskTimer"),
       m_textDocument(this, "textDocument"),
       m_scene(this, "scene"),
-      m_currentElement(this, "currentElement"),
       m_screenplayElement(this, "screenplayElement"),
       m_screenplayFormat(this, "screenplayFormat"),
       m_textFormat(new TextFormat(this))
@@ -673,8 +710,25 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
     connect(LanguageEngine::instance(), &LanguageEngine::scriptFontFamilyChanged, this,
             &SceneDocumentBinder::refresh);
 
+    connect(this, &SceneDocumentBinder::currentElementChanged, this,
+            &SceneDocumentBinder::canToggleDualDialogueChanged);
+    connect(this, &SceneDocumentBinder::currentDualDialogueChanged, this,
+            &SceneDocumentBinder::canToggleDualDialogueChanged);
+
     QStyleHints *styleHints = qApp->styleHints();
     connect(styleHints, &QStyleHints::colorSchemeChanged, this, &SceneDocumentBinder::refresh);
+
+    connect(this, &SceneDocumentBinder::currentElementChanged, this,
+            &SceneDocumentBinder::currentElementCursorPositionChanged);
+    connect(this, &SceneDocumentBinder::cursorPositionChanged, this,
+            &SceneDocumentBinder::currentElementCursorPositionChanged);
+
+    connect(this, &SceneDocumentBinder::cursorPositionChanged, this, [=]() {
+        if (m_cursorPosition < 0) {
+            this->clearCursorPositionStack();
+            this->clearSelectionRangeStack();
+        }
+    });
 }
 
 SceneDocumentBinder::~SceneDocumentBinder() { }
@@ -928,6 +982,9 @@ void SceneDocumentBinder::setCursorPosition(int val)
     if (m_initializingDocument || m_pastingContent || m_cursorPosition == val)
         return;
 
+    m_lastCursorPosition = m_cursorPosition;
+    QTimer::singleShot(0, this, [=]() { m_lastCursorPosition = -1; });
+
     QScopedValueRollback<bool> rollbackAcceptTextFormatChanges(m_acceptTextFormatChanges, false);
     auto cleanup = qScopeGuard([=]() {
         this->evaluateAutoCompleteHintsAndCompletionPrefix();
@@ -939,19 +996,17 @@ void SceneDocumentBinder::setCursorPosition(int val)
 
     if (m_textDocument == nullptr || this->document() == nullptr) {
         m_cursorPosition = -1;
-        m_currentElementCursorPosition = -1;
         m_textFormat->reset();
         emit cursorPositionChanged();
         return;
     }
 
     m_cursorPosition = val;
-    m_currentElementCursorPosition = -1;
+
     if (m_scene != nullptr)
         m_scene->setCursorPosition(m_cursorPosition);
 
     if (m_cursorPosition < 0) {
-        m_currentElementCursorPosition = -1;
         m_textFormat->reset();
         emit cursorPositionChanged();
         this->setCurrentElement(nullptr);
@@ -976,9 +1031,24 @@ void SceneDocumentBinder::setCursorPosition(int val)
     SpellCheckCursor cursor(this->document(), val);
 
     QTextBlock block = cursor.block();
-    if (!block.isValid()) {
+    if (!block.isValid() || block.userState() == TextDocument::DualDialogueBoundaryBlock) {
         qDebug("[%d] There is no block at the cursor position %d.", __LINE__, val);
+        if (block.userState() == TextDocument::DualDialogueBoundaryBlock) {
+            int rcp = val;
+            if (m_lastCursorPosition < 0 || m_lastCursorPosition < val) {
+                block = block.next();
+                rcp = block.isValid() ? block.position()
+                                      : this->document()->lastBlock().position()
+                                + this->document()->lastBlock().length();
+            } else {
+                block = block.previous();
+                rcp = block.isValid() ? block.position() + block.length() - 1 : 0;
+            }
+            if (rcp != val)
+                QTimer::singleShot(0, this, [=]() { this->requestCursorPosition(rcp); });
+        }
         emit cursorPositionChanged();
+        this->setCurrentElement(nullptr);
         m_textFormat->reset();
         return;
     }
@@ -1008,7 +1078,6 @@ void SceneDocumentBinder::setCursorPosition(int val)
         m_textFormat->updateFromCharFormat(format);
     }
 
-    m_currentElementCursorPosition = m_cursorPosition - block.position();
     emit cursorPositionChanged();
 }
 
@@ -1062,6 +1131,136 @@ int SceneDocumentBinder::selectedBlockCount() const
     }
 
     return 0;
+}
+
+int SceneDocumentBinder::resolvedCursorPosition(SceneElement *element, int relativePosition) const
+{
+    QTextBlock block = this->findElementBlock(element);
+    if (block.isValid()) {
+        QTextCursor cursor(block);
+        cursor.movePosition(QTextCursor::EndOfBlock);
+        if (relativePosition < 0)
+            return cursor.position();
+        if (relativePosition == 0)
+            return block.position();
+
+        return qBound(block.position(), block.position() + relativePosition, cursor.position());
+    }
+
+    return 0;
+}
+
+int SceneDocumentBinder::relativeCursorPosition(SceneElement *element, int absolutePosition) const
+{
+    if (absolutePosition < 0)
+        return absolutePosition;
+
+    QTextBlock block = this->findElementBlock(element);
+    if (block.isValid()) {
+        return absolutePosition - block.position();
+    }
+
+    return 0;
+}
+
+bool SceneDocumentBinder::saveCursorPosition()
+{
+    if (m_cursorPosition < 0)
+        return false;
+
+    if (m_selectionStartPosition >= 0 && m_selectionEndPosition >= 0
+        && m_selectionEndPosition > m_selectionStartPosition) {
+        m_cursorPositionStack.push(qMakePair(nullptr, 0));
+        return false;
+    }
+
+    m_cursorPositionStack.push(qMakePair(m_currentElement, this->currentElementCursorPosition()));
+    return true;
+}
+
+bool SceneDocumentBinder::restoreCursorPosition()
+{
+    if (m_cursorPositionStack.isEmpty()) {
+        return false;
+    }
+
+    auto top = m_cursorPositionStack.pop();
+    if (top.first == nullptr)
+        return false;
+
+    int cp = this->resolvedCursorPosition(top.first, top.second);
+    emit requestCursorPosition(cp);
+    return true;
+}
+
+void SceneDocumentBinder::clearCursorPositionStack()
+{
+    m_cursorPositionStack.clear();
+}
+
+bool SceneDocumentBinder::saveSelectionRange()
+{
+    if (m_cursorPosition < 0)
+        return false;
+
+    if (m_selectionStartPosition >= 0 && m_selectionEndPosition >= 0
+        && m_selectionEndPosition > m_selectionStartPosition) {
+        ElementPositionPair selectionStart = m_selectionStartPosition >= 0
+                ? qMakePair(this->findElementAt(m_selectionStartPosition), m_selectionStartPosition)
+                : qMakePair(nullptr, 0);
+        ElementPositionPair selectionEnd = m_selectionEndPosition >= 0
+                ? qMakePair(this->findElementAt(m_selectionEndPosition), m_selectionEndPosition)
+                : qMakePair(nullptr, 0);
+
+        if (selectionStart.first)
+            selectionStart.second =
+                    this->relativeCursorPosition(selectionStart.first, selectionStart.second);
+        if (selectionEnd.first)
+            selectionEnd.second =
+                    this->relativeCursorPosition(selectionEnd.first, selectionEnd.second);
+
+        m_selectionRangeStack.push(qMakePair(selectionStart, selectionEnd));
+        return true;
+    }
+
+    m_selectionRangeStack.push(qMakePair(qMakePair(nullptr, 0), qMakePair(nullptr, 0)));
+    return false;
+}
+
+bool SceneDocumentBinder::restoreSelectionRange()
+{
+    if (m_selectionRangeStack.isEmpty())
+        return false;
+
+    auto top = m_selectionRangeStack.pop();
+    auto selectionStart = top.first;
+    auto selectionEnd = top.second;
+
+    if (selectionStart.first && selectionEnd.first) {
+        const int start = this->resolvedCursorPosition(selectionStart.first, selectionStart.second);
+        const int end = this->resolvedCursorPosition(selectionEnd.first, selectionEnd.second);
+        requestSelection(start, end);
+        return true;
+    }
+
+    return false;
+}
+
+void SceneDocumentBinder::clearSelectionRangeStack()
+{
+    m_selectionRangeStack.clear();
+}
+
+void SceneDocumentBinder::saveCursorState()
+{
+    if (!this->saveSelectionRange())
+        this->saveCursorPosition();
+}
+
+void SceneDocumentBinder::restoreCursorState()
+{
+    if (!this->restoreSelectionRange())
+        this->restoreCursorPosition();
 }
 
 bool SceneDocumentBinder::changeTextCase(TextCasing casing)
@@ -1172,6 +1371,69 @@ void SceneDocumentBinder::setShots(const QStringList &val)
 
     m_shots = val;
     emit shotsChanged();
+}
+
+QRectF SceneDocumentBinder::evalCurrentDualDialogueRect() const
+{
+    if (m_currentDualDialogue != nullptr)
+        return this->evalDualDialogueRect(m_currentDualDialogue);
+
+    return QRectF();
+}
+
+QRectF SceneDocumentBinder::evalDualDialogueRect(SceneDualDialogue *dd) const
+{
+    if (m_initializingDocument || m_sceneIsBeingReset || m_sceneIsBeingRefreshed
+        || m_scene == nullptr || m_textDocument == nullptr)
+        return QRectF();
+
+    if (dd == nullptr || dd->scene() != m_scene || !dd->isValid())
+        return QRectF();
+
+    QTextDocument *doc = this->document();
+    SceneElement *leftCharacter = dd->leftCharacter();
+    QTextBlock block = doc->firstBlock();
+
+    while (block.isValid()) {
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+        if (userData && userData->sceneElement() == leftCharacter)
+            break;
+        block = block.next();
+    }
+
+    if (!block.isValid())
+        return QRectF();
+
+#if 1
+    const auto elements = dd->leftElements() + dd->rightElements();
+
+    QRectF rect;
+    while (block.isValid()) {
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+        if (!userData || !elements.contains(userData->sceneElement()))
+            break;
+
+        if (rect.isEmpty())
+            rect = doc->documentLayout()->blockBoundingRect(block);
+        else
+            rect |= doc->documentLayout()->blockBoundingRect(block);
+
+        block = block.next();
+    }
+#else
+    SceneElement *lastElement = dd->lastElement();
+    QRectF rect = doc->documentLayout()->blockBoundingRect(block);
+    while (block.isValid()) {
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+        if (userData && userData->sceneElement() == lastElement) {
+            rect |= doc->documentLayout()->blockBoundingRect(block);
+            break;
+        }
+        block = block.next();
+    }
+#endif
+
+    return rect;
 }
 
 QList<SceneElement *> SceneDocumentBinder::selectedElements() const
@@ -1316,10 +1578,14 @@ int SceneDocumentBinder::nextTabFormat() const
     switch (m_currentElement->type()) {
     case SceneElement::Action:
         return SceneElement::Character;
-    case SceneElement::Character:
-        if (m_tabHistory.isEmpty())
-            return SceneElement::Action;
-        return SceneElement::Transition;
+    case SceneElement::Character: {
+        if (m_currentDualDialogue == nullptr) {
+            if (m_tabHistory.isEmpty())
+                return SceneElement::Action;
+            return SceneElement::Transition;
+        }
+        return SceneElement::Character;
+    }
     case SceneElement::Dialogue:
         return SceneElement::Parenthetical;
     case SceneElement::Parenthetical:
@@ -1357,7 +1623,8 @@ bool SceneDocumentBinder::canGoUp()
         return false;
 
     QTextCursor cursor(this->document());
-    cursor.setPosition(qMax(m_cursorPosition, 0));
+    cursor.movePosition(QTextCursor::End);
+    cursor.setPosition(qBound(0, m_cursorPosition, cursor.position()));
     return cursor.movePosition(QTextCursor::Up);
 }
 
@@ -1367,15 +1634,16 @@ bool SceneDocumentBinder::canGoDown()
         return false;
 
     QTextCursor cursor(this->document());
-    cursor.setPosition(qMax(m_cursorPosition, 0));
+    cursor.movePosition(QTextCursor::End);
+    cursor.setPosition(qBound(0, m_cursorPosition, cursor.position()));
     return cursor.movePosition(QTextCursor::Down);
 }
 
 void SceneDocumentBinder::refresh()
 {
     if (this->document()) {
-        QTextBlock block = this->document()->firstBlock();
-        while (block.isValid()) {
+        const QList<QTextBlock> blocks = TextDocument::usableBlocks(this->document());
+        for (const QTextBlock &block : blocks) {
             SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
             if (userData) {
                 userData->resetFormat();
@@ -1383,8 +1651,6 @@ void SceneDocumentBinder::refresh()
                 userData->autoCapitalizeLater();
                 userData->polishTextLater();
             }
-
-            block = block.next();
         }
 
         this->rehighlightLater();
@@ -1610,6 +1876,9 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
     }();
 
     QJsonArray content;
+    QSet<SceneElement *> copiedElements;
+    QMap<SceneElement *, int> elementToContentIndex;
+    QMap<SceneElement *, int> elementToFountainIndex;
 
     auto addParaToContent = [&content](int type, int alignment, const QString &text,
                                        const QVector<QTextLayout::FormatRange> &formats =
@@ -1693,6 +1962,8 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
 
         addParaToContent(element->type(), element->alignment(), cursor.selectedText(),
                          formatsToCopy);
+        elementToContentIndex[element] = content.size() - 1;
+        copiedElements.insert(element);
 
         Fountain::Element fElement;
         fElement.text = cursor.selectedText();
@@ -1720,8 +1991,56 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
         }
 
         fBody.append(fElement);
+        elementToFountainIndex[element] = fBody.size() - 1;
 
         block = block.next();
+    }
+
+    // Find complete dual-dialogue groups (both left and right columns present in copied range)
+    QSet<SceneDualDialogue *> completeDualDialogues;
+    for (SceneElement *elem : copiedElements) {
+        SceneDualDialogue *group = m_scene->findContainingDualDialogue(elem);
+        if (group == nullptr)
+            continue;
+
+        // Check if both left and right columns have at least one element in copied range
+        const QList<SceneElement *> leftElems = group->leftElements();
+        const QList<SceneElement *> rightElems = group->rightElements();
+
+        bool hasLeft = false, hasRight = false;
+        for (SceneElement *left : leftElems) {
+            if (copiedElements.contains(left)) {
+                hasLeft = true;
+                break;
+            }
+        }
+        for (SceneElement *right : rightElems) {
+            if (copiedElements.contains(right)) {
+                hasRight = true;
+                break;
+            }
+        }
+
+        if (hasLeft && hasRight)
+            completeDualDialogues.insert(group);
+    }
+
+    // Mark left character of complete groups with dualDialogue flag in JSON
+    // and mark right character in Fountain representation
+    for (SceneDualDialogue *group : completeDualDialogues) {
+        SceneElement *leftChar = group->leftCharacter();
+        if (leftChar != nullptr && elementToContentIndex.contains(leftChar)) {
+            int idx = elementToContentIndex[leftChar];
+            QJsonObject para = content[idx].toObject();
+            para.insert(QStringLiteral("dualDialogue"), true);
+            content[idx] = para;
+        }
+
+        SceneElement *rightChar = group->rightCharacter();
+        if (rightChar != nullptr && elementToFountainIndex.contains(rightChar)) {
+            int idx = elementToFountainIndex[rightChar];
+            fBody[idx].isDualDialogueRightColumn = true;
+        }
     }
 
     const QByteArray contentJson = QJsonDocument(content).toJson(QJsonDocument::Compact);
@@ -1755,6 +2074,7 @@ int SceneDocumentBinder::paste(int fromPosition)
         SceneElement::Type type = SceneElement::Action;
         Qt::Alignment alignment;
         QVector<QTextLayout::FormatRange> formats;
+        bool hasDualDialogueHint = false;
     };
 
     QVector<Paragraph> paragraphs;
@@ -1807,6 +2127,15 @@ int SceneDocumentBinder::paste(int fromPosition)
                         case Fountain::Element::Character:
                             paragraph.type = SceneElement::Character;
                             applySceneHeading = false;
+
+                            if (element.isDualDialogueRightColumn) {
+                                for (int i = paragraphs.size() - 1; i >= 0; i--) {
+                                    if (paragraphs[i].type == SceneElement::Character) {
+                                        paragraphs[i].hasDualDialogueHint = true;
+                                        break;
+                                    }
+                                }
+                            }
                             break;
                         case Fountain::Element::Parenthetical:
                             paragraph.type = SceneElement::Parenthetical;
@@ -1880,6 +2209,8 @@ int SceneDocumentBinder::paste(int fromPosition)
             paragraph.alignment = alignment == 0 ? Qt::Alignment() : Qt::Alignment(alignment);
             paragraph.formats = SceneElement::textFormatsFromJson(
                     itemObject.value(QStringLiteral("formats")).toArray());
+            paragraph.hasDualDialogueHint =
+                    itemObject.value(QStringLiteral("dualDialogue")).toBool();
             paragraphs.append(paragraph);
 
             applySceneHeading = false;
@@ -1893,6 +2224,8 @@ int SceneDocumentBinder::paste(int fromPosition)
 
     const bool pasteFormatting = paragraphs.size() > 1;
     QTextBlock lastPastedBlock;
+    QList<SceneElement *> dualDialogueElements;
+    ElementPositionPair cursorPositionAfterPaste;
 
     for (int i = 0; i < paragraphs.size(); i++) {
         const Paragraph paragraph = paragraphs.at(i);
@@ -1937,12 +2270,24 @@ int SceneDocumentBinder::paste(int fromPosition)
             }
         }
 
+        if (paragraph.hasDualDialogueHint && userData && userData->sceneElement())
+            dualDialogueElements.append(userData->sceneElement());
+
         cursor.setPosition(pasteEnd);
     }
+
+    cursorPositionAfterPaste.first = this->findElementAt(cursor.position());
+    cursorPositionAfterPaste.second =
+            this->relativeCursorPosition(cursorPositionAfterPaste.first, cursor.position());
 
     m_sceneElementTaskTimer.stop();
     this->performAllSceneElementTasks();
 
+    for (SceneElement *element : dualDialogueElements)
+        m_scene->createDualDialogue(element);
+
+    cursor.setPosition(this->resolvedCursorPosition(cursorPositionAfterPaste.first,
+                                                    cursorPositionAfterPaste.second));
     emit requestCursorPosition(cursor.position());
 
     // QTimer::singleShot(50, this, [this, cp]() {
@@ -2097,7 +2442,8 @@ void SceneDocumentBinder::timerEvent(QTimerEvent *te)
     } else if (te->timerId() == m_rehighlightTimer.timerId()) {
         m_rehighlightTimer.stop();
 
-        const int nrBlocks = this->document()->blockCount();
+        const int nrBlocks = TextDocument::usableBlocks(this->document())
+                                     .size(); // this->document()->blockCount();
         const int nrTresholdBlocks = nrBlocks >> 1;
         const QList<QTextBlock> queue = m_rehighlightBlockQueue;
         m_rehighlightBlockQueue.clear();
@@ -2190,10 +2536,14 @@ void SceneDocumentBinder::resetScreenplayElement()
 
 void SceneDocumentBinder::initializeDocument()
 {
-    if (m_textDocument == nullptr || m_scene == nullptr || m_screenplayFormat == nullptr)
+    if (m_textDocument == nullptr || m_scene == nullptr || m_screenplayFormat == nullptr
+        || m_initializingDocument)
         return;
 
-    m_initializingDocument = true;
+    this->saveCursorState();
+    auto cleanup = qScopeGuard([=]() { this->restoreCursorState(); });
+
+    QScopedValueRollback<bool> initingDocument(m_initializingDocument, true);
 
     m_tabHistory.clear();
 
@@ -2202,8 +2552,8 @@ void SceneDocumentBinder::initializeDocument()
 
     QTextDocument *document = m_textDocument->textDocument();
     QSignalBlocker documentSignalBlocker(document);
-    if (m_documentLoadCount > 0 && !m_sceneIsBeingReset)
-        documentSignalBlocker.unblock();
+    // if (m_documentLoadCount > 0 && !m_sceneIsBeingReset)
+    //     documentSignalBlocker.unblock();
     document->setDefaultFont(defaultFont);
     document->setUseDesignMetrics(true);
 
@@ -2211,33 +2561,110 @@ void SceneDocumentBinder::initializeDocument()
     cursor.select(QTextCursor::Document);
     cursor.removeSelectedText();
 
+    QTextBlock block = cursor.block();
+    if (!block.isValid())
+        cursor.insertBlock(QTextBlockFormat(), QTextCharFormat());
+
     const int nrElements = m_scene->elementCount();
 
     QList<QTextBlock> blocks;
+    QSet<SceneElement *> renderedElements;
 
-    // In the first pass, we simply insert text into the document.
+    // In the first pass, we insert text into the document, handling both plain elements
+    // and dual-dialogue tables.
     for (int i = 0; i < nrElements; i++) {
         SceneElement *element = m_scene->elementAt(i);
-        if (i > 0)
-            cursor.insertBlock();
 
-        QTextBlock block = cursor.block();
-        if (!block.isValid() && i == 0) {
-            cursor.insertBlock();
-            block = cursor.block();
+        if (renderedElements.contains(element)) {
+            continue;
         }
 
-        SceneDocumentBlockUserData *userData = new SceneDocumentBlockUserData(block, element, this);
-        block.setUserData(userData);
-        cursor.insertText(element->text());
-        blocks.append(block);
+        SceneDualDialogue *group =
+                m_renderDualDialogues ? m_scene->findContainingDualDialogue(element) : nullptr;
+        if (m_currentDualDialogue != nullptr && group != nullptr && group == m_currentDualDialogue)
+            group = nullptr;
+
+        // Befault there is an empty block in a QTextDocument when its cleared. Adding
+        // a new block for the first paragraph would needlessly create a newline
+        // in the beginning of each scene, which is pointless. But we need a new block
+        // to be created for each paragraph from there on
+        if (i > 0)
+            cursor.insertBlock(QTextBlockFormat(), QTextCharFormat());
+
+        if (group != nullptr && group->leftCharacter() == element) {
+            // This element starts the left column of a dual-dialogue group.
+            QTextTableFormat tableFormat = m_screenplayFormat->createDualDialogueTableFormat();
+            QTextTable *table = cursor.insertTable(1, 2, tableFormat);
+
+            // Populate left column
+            QTextTableCell leftCell = table->cellAt(0, 0);
+            QTextCursor leftCursor = leftCell.firstCursorPosition();
+
+            const auto leftElems = group->leftElements();
+            for (int j = 0; j < leftElems.size(); ++j) {
+                SceneElement *leftElem = leftElems.at(j);
+                if (j > 0)
+                    leftCursor.insertBlock(QTextBlockFormat(), QTextCharFormat());
+
+                QTextBlock leftBlock = leftCursor.block();
+                if (!leftBlock.isValid() && j == 0) {
+                    leftCursor.insertBlock(QTextBlockFormat(), QTextCharFormat());
+                    leftBlock = leftCursor.block();
+                }
+
+                SceneDocumentBlockUserData *leftUserData =
+                        new SceneDocumentBlockUserData(leftBlock, leftElem, this);
+                leftBlock.setUserData(leftUserData);
+                leftCursor.insertText(leftElem->text());
+                blocks.append(leftBlock);
+                renderedElements.insert(leftElem);
+            }
+
+            // Populate right column
+            QTextTableCell rightCell = table->cellAt(0, 1);
+            QTextCursor rightCursor = rightCell.firstCursorPosition();
+
+            const auto rightElems = group->rightElements();
+            for (int j = 0; j < rightElems.size(); ++j) {
+                SceneElement *rightElem = rightElems.at(j);
+                if (j > 0)
+                    rightCursor.insertBlock(QTextBlockFormat(), QTextCharFormat());
+
+                QTextBlock rightBlock = rightCursor.block();
+                if (!rightBlock.isValid() && j == 0) {
+                    rightCursor.insertBlock(QTextBlockFormat(), QTextCharFormat());
+                    rightBlock = rightCursor.block();
+                }
+
+                SceneDocumentBlockUserData *rightUserData =
+                        new SceneDocumentBlockUserData(rightBlock, rightElem, this);
+                rightBlock.setUserData(rightUserData);
+                rightCursor.insertText(rightElem->text());
+                blocks.append(rightBlock);
+                renderedElements.insert(rightElem);
+            }
+
+            cursor = table->parentFrame()->lastCursorPosition();
+        } else if (group == nullptr) {
+            // Ungrouped element: render as plain block.
+            QTextBlock block = cursor.block();
+            SceneDocumentBlockUserData *userData =
+                    new SceneDocumentBlockUserData(block, element, this);
+            block.setUserData(userData);
+            cursor.insertText(element->text());
+            blocks.append(block);
+            renderedElements.insert(element);
+        } else {
+            // Part of a group but not the leftCharacter
+            renderedElements.insert(element);
+        }
     }
 
-    // In the second pass, we apply formatting to inserted text. We have to do this in the second
-    // pass, because QTextDocument tends to pass character format at the last position of the
-    // previous block, into the next block also. So for instance, if we have a fully bold paragraph
-    // followed by a normal paragraph, QTextDocument will apply fully bold to both if we apply
-    // text-formats while inserting text.
+    // In the second pass, we apply formatting to inserted text. We have to do this in the
+    // second pass, because QTextDocument tends to pass character format at the last position of
+    // the previous block, into the next block also. So for instance, if we have a fully bold
+    // paragraph followed by a normal paragraph, QTextDocument will apply fully bold to both if
+    // we apply text-formats while inserting text.
     for (QTextBlock &block : blocks) {
         SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
         const SceneElement *element = userData->sceneElement();
@@ -2247,6 +2674,20 @@ void SceneDocumentBinder::initializeDocument()
 
         userData->resetFormat();
         userData->updateFromFormat(format);
+
+        if (cursor.currentTable()) {
+            QTextTableFormat format = cursor.currentTable()->format();
+            if (qFuzzyCompare(format.topMargin(), 0)) {
+                SceneDualDialogue *dd =
+                        m_scene->findContainingDualDialogue(userData->sceneElement());
+                if (dd->leftCharacter() == userData->sceneElement()) {
+                    format.setTopMargin(userData->blockFormat.topMargin());
+                    cursor.currentTable()->setFormat(format);
+                }
+            }
+            userData->blockFormat.setTopMargin(0);
+        }
+
         cursor.setBlockFormat(userData->blockFormat);
 
         const QVector<QTextLayout::FormatRange> formatRanges =
@@ -2255,7 +2696,6 @@ void SceneDocumentBinder::initializeDocument()
             continue;
 
         const int startPos = cursor.position();
-
         for (const QTextLayout::FormatRange &formatRange : formatRanges) {
             cursor.setPosition(startPos + formatRange.start);
             cursor.setPosition(startPos + formatRange.start + formatRange.length,
@@ -2267,16 +2707,24 @@ void SceneDocumentBinder::initializeDocument()
         cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
     }
 
+    block = document->firstBlock();
+    while (block.isValid()) {
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+        block.setUserState(userData == nullptr ? TextDocument::DualDialogueBoundaryBlock
+                                               : TextDocument::SceneElementBlock);
+        block = block.next();
+    }
+
     documentSignalBlocker.unblock();
 
-    if (m_sceneIsBeingReset)
+    if (m_sceneIsBeingReset || m_sceneIsBeingRefreshed)
         document->markContentsDirty(0, document->characterCount());
 
     if (m_cursorPosition <= 0 && m_currentElement == nullptr && nrElements == 1)
         this->setCurrentElement(m_scene->elementAt(0));
 
     this->setDocumentLoadCount(m_documentLoadCount + 1);
-    m_initializingDocument = false;
+    // m_initializingDocument = false;
 
     {
         QTextFrameFormat frameFormat = document->rootFrame()->frameFormat();
@@ -2284,7 +2732,7 @@ void SceneDocumentBinder::initializeDocument()
         document->rootFrame()->setFrameFormat(frameFormat);
     }
 
-    this->QSyntaxHighlighter::rehighlight();
+    QTimer::singleShot(0, this, &QSyntaxHighlighter::rehighlight);
     this->polishAllSceneElements();
 
     emit documentInitialized();
@@ -2323,6 +2771,10 @@ void SceneDocumentBinder::setCurrentElement(SceneElement *val)
                 &SceneDocumentBinder::resetCurrentElement);
         connect(m_currentElement, &SceneElement::typeChanged, this,
                 &SceneDocumentBinder::nextTabFormatChanged);
+        if (m_currentDualDialogue == nullptr || !m_currentDualDialogue->contains(m_currentElement))
+            this->setCurrentDualDialogue(m_scene->findContainingDualDialogue(m_currentElement));
+    } else {
+        this->resetCurrentDualDualogue();
     }
 
     emit currentElementChanged();
@@ -2335,6 +2787,9 @@ void SceneDocumentBinder::setCurrentElement(SceneElement *val)
 
 void SceneDocumentBinder::resetCurrentElement()
 {
+    if (m_currentElement == nullptr)
+        return;
+
     m_currentElement = nullptr;
     emit currentElementChanged();
 
@@ -2342,6 +2797,49 @@ void SceneDocumentBinder::resetCurrentElement()
     this->evaluateAutoCompleteHintsAndCompletionPrefix();
 
     emit currentFontChanged();
+}
+
+void SceneDocumentBinder::setCurrentDualDialogue(SceneDualDialogue *val)
+{
+    if (m_currentDualDialogue == val)
+        return;
+
+    if (m_currentDualDialogue != nullptr) {
+        disconnect(m_currentDualDialogue, &SceneDualDialogue::aboutToDelete, this,
+                   &SceneDocumentBinder::resetCurrentDualDualogue);
+    }
+
+    m_currentDualDialogue = val;
+
+    if (m_currentDualDialogue != nullptr) {
+        connect(m_currentDualDialogue, &SceneDualDialogue::aboutToDelete, this,
+                &SceneDocumentBinder::resetCurrentDualDualogue);
+    }
+
+    if (m_renderDualDialogues) {
+        this->initializeDocument();
+    }
+
+    emit currentDualDialogueChanged();
+}
+
+void SceneDocumentBinder::resetCurrentDualDualogue()
+{
+    if (m_currentDualDialogue == nullptr)
+        return;
+
+    m_currentDualDialogue = nullptr;
+    emit currentDualDialogueChanged();
+}
+
+void SceneDocumentBinder::evalCurrentDualDialogue()
+{
+    if (m_currentElement != nullptr) {
+        if (m_currentDualDialogue == nullptr || !m_currentDualDialogue->contains(m_currentElement))
+            this->setCurrentDualDialogue(m_scene->findContainingDualDialogue(m_currentElement));
+    } else {
+        this->setCurrentDualDialogue(nullptr);
+    }
 }
 
 void SceneDocumentBinder::activateCurrentElementDefaultLanguage()
@@ -2450,6 +2948,8 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element,
             format->activateDefaultLanguage();
     }
 
+    this->polishAllSceneElements();
+    this->evalCurrentDualDialogue();
     this->evaluateAutoCompleteHintsAndCompletionPrefix();
 
     auto updateBlock = [=](const QTextBlock &block) {
@@ -2484,12 +2984,10 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element,
             return;
     }
 
-    block = this->document()->firstBlock();
-    while (block.isValid()) {
-        if (updateBlock(block))
+    const QList<QTextBlock> blocks = TextDocument::usableBlocks(this->document());
+    for (const QTextBlock &blockIter : blocks) {
+        if (updateBlock(blockIter))
             return;
-
-        block = block.next();
     }
 }
 
@@ -2526,8 +3024,8 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
     if (ScriteDocument::instance()->isReadOnly())
         return;
 
-    /* If m_cursorPosition > 0, it means that the user is currently typing in the TextArea within
-     * SceneContentEditor. And it so happens that cursor-position will get set only after
+    /* If m_cursorPosition > 0, it means that the user is currently typing in the TextArea
+     * within SceneContentEditor. And it so happens that cursor-position will get set only after
      * the text on the sceneElement is set here. This causes the undo command to have
      * scene-position that is out of sync with the actual position. Hence, we evaluate the
      * cursor position based on the parameters given to this function before we set the text
@@ -2548,7 +3046,9 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
     if (m_sceneElementTaskTimer.isActive())
         m_sceneElementTaskTimer.start(500, this);
 
-    if (m_scene->elementCount() != this->document()->blockCount()) {
+    const int blockDiff =
+            m_scene->elementCount() - TextDocument::usableBlocks(this->document()).size();
+    if (blockDiff != 0) {
         /**
           If the number of paragraphs in the document is differnet from the number of
           paragraphs in our internal Scene data structure, then we better sync it once.
@@ -2635,8 +3135,9 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
     // which is entirely unnecessary. We use this boolean to avoid that.
     QScopedValueRollback<bool> rollback(m_sceneIsBeingRefreshed, true);
 
+    const QList<QTextBlock> textDocumentBlocks = TextDocument::usableBlocks(this->document());
     if (nrBlocks < 0)
-        nrBlocks = this->document()->blockCount();
+        nrBlocks = textDocumentBlocks.size();
 
     /*
      * Ensure that blocks on the QTextDocument are in sync with
@@ -2650,13 +3151,14 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
 
     bool doPolishElements = false;
 
-    // Decide whether to activate the undo capture. The capture collapses all individual inserts,
-    // text updates, and removals into a single atomic undo step. This is required for:
+    // Decide whether to activate the undo capture. The capture collapses all individual
+    // inserts, text updates, and removals into a single atomic undo step. This is required for:
     //   • Paste / bulk import (one or more new blocks with text)
     //   • Any operation that removes existing paragraphs (multi-paragraph delete, cut, or a
     //     Backspace/Delete that merges two paragraphs)
     // For an interactive Return keypress the capture is not needed — the lone
-    // SceneInsertElement command is sufficient — and adding it would create a redundant undo step.
+    // SceneInsertElement command is sufficient — and adding it would create a redundant undo
+    // step.
     //
     // Heuristics for new-block classification:
     //   1. More than one new block → definitely a paste / bulk insert.
@@ -2664,7 +3166,7 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
     //      A Return keypress always produces one new *empty* block.
     int newBlockCount = 0;
     bool anyNewBlockHasText = false;
-    for (QTextBlock b = this->document()->begin(); b.isValid(); b = b.next()) {
+    for (const QTextBlock &b : textDocumentBlocks) {
         if (SceneDocumentBlockUserData::get(b) == nullptr) {
             ++newBlockCount;
             if (!b.text().isEmpty())
@@ -2682,11 +3184,16 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
     QList<SceneElement *> elementList;
     elementList.reserve(nrBlocks);
 
-    QTextBlock block = this->document()->begin();
     QTextBlock previousBlock;
-    while (block.isValid()) {
+    for (QTextBlock block : textDocumentBlocks) {
+        QTextCursor blockCursor(block);
+
         SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
         if (userData == nullptr) {
+            if (blockCursor.currentTable() != nullptr) {
+                continue;
+            }
+
             SceneElement *newElement = new SceneElement(m_scene);
 
             if (previousBlock.isValid()) {
@@ -2704,7 +3211,9 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
                     newElement->setType(SceneElement::Dialogue);
                     break;
                 case SceneElement::Dialogue:
-                    newElement->setType(SceneElement::Character);
+                    newElement->setType(m_currentDualDialogue == nullptr
+                                                ? SceneElement::Character
+                                                : SceneElement::Parenthetical);
                     break;
                 case SceneElement::Parenthetical:
                     newElement->setType(SceneElement::Dialogue);
@@ -2755,6 +3264,14 @@ void SceneDocumentBinder::syncDocumentFromScene()
         || m_sceneIsBeingReset || m_sceneIsBeingRefreshed)
         return;
 
+    if (m_scene->hasDualDialogues()) {
+        // If we have to deal with table boundaries, then the rest of this function
+        // is not appropriate. We might as well delegate all table-bits to
+        // initializeDocument() only.
+        this->initializeDocument();
+        return;
+    }
+
     QTextDocument *document = m_textDocument->textDocument();
     const QList<SceneElement *> sceneElements = m_scene->elementsList();
 
@@ -2781,8 +3298,8 @@ void SceneDocumentBinder::syncDocumentFromScene()
             cursor.setPosition(b.position());
             cursor.setPosition(b.next().position(), QTextCursor::KeepAnchor);
         } else if (b.previous().isValid()) {
-            // Last block: select the separator of the previous block through end of this block's
-            // content, so the previous block absorbs the end-of-document position.
+            // Last block: select the separator of the previous block through end of this
+            // block's content, so the previous block absorbs the end-of-document position.
             cursor.setPosition(b.previous().position() + b.previous().length() - 1);
             cursor.setPosition(b.position() + b.length() - 1, QTextCursor::KeepAnchor);
         } else {
@@ -2841,6 +3358,58 @@ void SceneDocumentBinder::syncDocumentFromScene()
     this->rehighlightLater();
 }
 
+bool SceneDocumentBinder::toggleDualDialogue()
+{
+    if (m_scene == nullptr || m_textDocument == nullptr)
+        return false;
+
+    const auto selected = this->selectedElements();
+    SceneElement *element = selected.isEmpty() ? m_currentElement : selected.first();
+    if (element == nullptr)
+        return false;
+
+    this->saveCursorState();
+
+    Scene::DualDialogueToggleResult result = m_scene->toggleDualDialogue(element);
+
+    this->restoreCursorState();
+
+    if (result.status == Scene::DualDialogueToggleResult::Failed) {
+        emit toggleDualDialogueFailureReason(result.reason);
+        return false;
+    }
+
+    // Scene::toggleDualDialogue() emits dualDialoguesChanged(), which triggers
+    // sceneRefreshed(), which calls initializeDocument() to rebuild the document with the new
+    // groupings.
+
+    QTimer::singleShot(50, this, &SceneDocumentBinder::evalCurrentDualDialogue);
+
+    return true;
+}
+
+bool SceneDocumentBinder::canToggleDualDialogue() const
+{
+    if (m_scene == nullptr || m_currentElement == nullptr)
+        return false;
+
+    return m_scene->canToggleDualDialogue(m_currentElement);
+}
+
+void SceneDocumentBinder::setRenderDualDialogues(bool val)
+{
+    if (m_renderDualDialogues == val)
+        return;
+
+    m_renderDualDialogues = val;
+    emit renderDualDialoguesChanged();
+
+    if (!m_scene->hasDualDialogues())
+        return;
+
+    this->initializeDocument();
+}
+
 void SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix()
 {
     QStringList hints;
@@ -2873,40 +3442,43 @@ void SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix()
                     m_textDocument->textDocument()->find(bracketOpen, block.position());
             if (m_cursorPosition > bracketCursor.selectionStart()) {
                 /*
-                There are several common notations that can be used in brackets after a character's
-                name in a screenplay. Here are a few examples:
+                There are several common notations that can be used in brackets after a
+                character's name in a screenplay. Here are a few examples:
 
-                - (V.O.) - This stands for "voiceover" and indicates that the character's dialogue
-                is being heard on the soundtrack, but they are not physically present in the scene.
-                - (O.S.) - This stands for "off-screen" and indicates that the character is speaking
-                from outside the frame or from a location that is not visible to the audience.
-                - (O.C.) - This stands for "off-camera" and indicates that the character is speaking
-                from a location that is not within the frame of the camera, but they are physically
-                present in the scene.
+                - (V.O.) - This stands for "voiceover" and indicates that the character's
+                dialogue is being heard on the soundtrack, but they are not physically present
+                in the scene.
+                - (O.S.) - This stands for "off-screen" and indicates that the character is
+                speaking from outside the frame or from a location that is not visible to the
+                audience.
+                - (O.C.) - This stands for "off-camera" and indicates that the character is
+                speaking from a location that is not within the frame of the camera, but they
+                are physically present in the scene.
                 - (CONT'D) - This indicates that the character's dialogue continues from the
                 previous page or shot.
                 - (PHONE) - This indicates that the character is speaking on the phone.
-                - (INTO PHONE) - This indicates that the character is speaking into a phone or other
-                communication device.
+                - (INTO PHONE) - This indicates that the character is speaking into a phone or
+                other communication device.
                 - (FILTERED) - This indicates that the character's voice is being filtered or
                 altered in some way.
-                - (SUBTITLED) - This indicates that the character's dialogue is being presented as
-                subtitles on the screen.
+                - (SUBTITLED) - This indicates that the character's dialogue is being presented
+                as subtitles on the screen.
                 - (THROUGH TRANSLATOR) - This indicates that the character is speaking through a
                 translator or interpreter.
-                - (OVER RADIO) - This indicates that the character is speaking over a radio or other
-                communication device.
-                - (ON TV) - This indicates that the character is speaking on a television or other
-                video device.
-                - (ON COMPUTER) - This indicates that the character is speaking through a computer
-                or other electronic device.
+                - (OVER RADIO) - This indicates that the character is speaking over a radio or
+                other communication device.
+                - (ON TV) - This indicates that the character is speaking on a television or
+                other video device.
+                - (ON COMPUTER) - This indicates that the character is speaking through a
+                computer or other electronic device.
                 - (ON SPEAKERPHONE) - This indicates that the character is speaking on a
-                speakerphone or other device that allows multiple people to hear the conversation.
-                - (OVER INTERCOM) - This indicates that the character is speaking over an intercom
-                or other public address system.
+                speakerphone or other device that allows multiple people to hear the
+                conversation.
+                - (OVER INTERCOM) - This indicates that the character is speaking over an
+                intercom or other public address system.
 
-                In Scrite, CONT'D is automatically generated, so we don't really have to list it.
-                But we will list it anyway because users will flapg it as a bug.
+                In Scrite, CONT'D is automatically generated, so we don't really have to list
+                it. But we will list it anyway because users will flapg it as a bug.
                  */
                 static QStringList commonBracketNotations(
                         { QLatin1String("V.O."), QLatin1String("O.S."), QLatin1String("O.C."),
@@ -3014,21 +3586,34 @@ void SceneDocumentBinder::setWordUnderCursorIsMisspelled(bool val)
 
 void SceneDocumentBinder::onSceneAboutToReset()
 {
-    m_sceneIsBeingReset = true;
+    // NO-OP
 }
 
-void SceneDocumentBinder::onSceneReset(int position)
+void SceneDocumentBinder::onSceneReset(int position, SceneElement *inElement)
 {
+    if (m_sceneIsBeingReset)
+        return;
+
+    // QScopedValueRollback<bool> rollback1(m_sceneIsBeingRefreshed, true);
+    QScopedValueRollback<bool> rollback2(m_sceneIsBeingReset, true);
+
     this->initializeDocument();
 
-    if (position >= 0) {
-        QTextCursor cursor(this->document());
-        cursor.movePosition(QTextCursor::End);
-        position = qBound(0, position, cursor.position());
-        QTimer::singleShot(100, this, [=]() { emit requestCursorPosition(position); });
+    if (inElement == nullptr && position < 0) {
+        position = 0;
+    } else {
+        QTextDocument *doc = this->document();
+
+        if (inElement == nullptr) {
+            QTextCursor cursor(doc);
+            cursor.movePosition(QTextCursor::End);
+            position = qBound(0, position, cursor.position());
+        } else {
+            position = this->resolvedCursorPosition(inElement, position);
+        }
     }
 
-    m_sceneIsBeingReset = false;
+    QTimer::singleShot(100, this, [=]() { emit requestCursorPosition(position); });
 }
 
 void SceneDocumentBinder::onSceneRefreshed()
@@ -3037,13 +3622,9 @@ void SceneDocumentBinder::onSceneRefreshed()
         return;
 
     QScopedValueRollback<bool> rollback1(m_sceneIsBeingRefreshed, true);
-    QScopedValueRollback<bool> rollback2(m_sceneIsBeingReset, true);
+    // QScopedValueRollback<bool> rollback2(m_sceneIsBeingReset, true);
 
-    const int cp = m_cursorPosition;
-    this->setCursorPosition(-1);
     this->initializeDocument();
-    if (cp >= 0)
-        emit requestCursorPosition(cp);
 }
 
 void SceneDocumentBinder::rehighlightLater()
@@ -3176,12 +3757,11 @@ void SceneDocumentBinder::onTextFormatChanged(const QList<int> &properties)
 
 void SceneDocumentBinder::polishAllSceneElements()
 {
-    QTextBlock block = this->document()->firstBlock();
-    while (block.isValid()) {
+    const QList<QTextBlock> blocks = TextDocument::usableBlocks(this->document());
+    for (const QTextBlock &block : blocks) {
         SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
         if (userData)
             userData->polishTextLater();
-        block = block.next();
     }
 }
 
@@ -3198,24 +3778,64 @@ void SceneDocumentBinder::polishSceneElement(SceneElement *element)
         return;
     }
 
-    block = this->document()->firstBlock();
-    while (block.isValid()) {
-        userData = SceneDocumentBlockUserData::get(block);
+    const QList<QTextBlock> blocks = TextDocument::usableBlocks(this->document());
+    for (const QTextBlock &blk : blocks) {
+        userData = SceneDocumentBlockUserData::get(blk);
         if (userData && userData->sceneElement() == element) {
             userData->polishTextLater();
             return;
         }
-        block = block.next();
     }
 }
 
 void SceneDocumentBinder::performAllSceneElementTasks()
 {
-    QTextBlock block = this->document()->firstBlock();
-    while (block.isValid()) {
+    const QList<QTextBlock> blocks = TextDocument::usableBlocks(this->document());
+    for (const QTextBlock &block : blocks) {
         SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
         if (userData)
             userData->performPendingTasks();
+    }
+}
+
+QTextBlock SceneDocumentBinder::findElementBlock(SceneElement *element) const
+{
+    if (element == nullptr || m_scene == nullptr || element->scene() != m_scene
+        || m_initializingDocument)
+        return QTextBlock();
+
+    QTextDocument *doc = this->document();
+    if (doc == nullptr)
+        return QTextBlock();
+
+    QTextBlock block = doc->begin();
+    while (block.isValid()) {
+        SceneDocumentBlockUserData *ud = SceneDocumentBlockUserData::get(block);
+        if (ud && ud->sceneElement() == element)
+            return block;
+
         block = block.next();
     }
+
+    return QTextBlock();
+}
+
+SceneElement *SceneDocumentBinder::findElementAt(int cursorPosition) const
+{
+    if (m_initializingDocument)
+        return nullptr;
+
+    QTextDocument *doc = this->document();
+    if (doc == nullptr)
+        return nullptr;
+
+    QTextCursor cursor(doc);
+    cursor.setPosition(cursorPosition);
+
+    QTextBlock block = cursor.block();
+    SceneDocumentBlockUserData *ud = SceneDocumentBlockUserData::get(block);
+    if (ud)
+        return ud->sceneElement();
+
+    return nullptr;
 }

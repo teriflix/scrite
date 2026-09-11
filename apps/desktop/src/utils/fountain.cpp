@@ -89,6 +89,9 @@ QJsonObject Fountain::Element::toJson() const
     if (!this->notes.isEmpty())
         ret["notes"] = QJsonArray::fromStringList(this->notes);
 
+    if (this->isDualDialogueRightColumn)
+        ret["isDualDialogueRightColumn"] = true;
+
     if (!this->formats.isEmpty()) {
         QJsonArray formatsArray;
         for (const QTextLayout::FormatRange &format : this->formats) {
@@ -496,28 +499,35 @@ void Fountain::Parser::processCharacters()
                 || simplifiedText.startsWith('>') || simplifiedText.endsWith('<'))
                 continue;
 
+            bool isDualDialogueRightColumn = false;
+            QString processedText = simplifiedText;
+
             if (simplifiedText.startsWith('@')) {
-                element.type = Fountain::Element::Character;
-                element.text = simplifiedText.mid(1).trimmed();
-                continue;
+                processedText = simplifiedText.mid(1).trimmed();
+            }
+
+            if (processedText.endsWith('^')) {
+                isDualDialogueRightColumn = true;
+                processedText = processedText.left(processedText.length() - 1).trimmed();
             }
 
             bool isCharacter = false;
-            const int boIndex = simplifiedText.indexOf('(');
-            const int bcIndex = simplifiedText.lastIndexOf(')');
+            const int boIndex = processedText.indexOf('(');
+            const int bcIndex = processedText.lastIndexOf(')');
             if (boIndex > 0) {
                 if (bcIndex > 0 && bcIndex > boIndex) {
-                    const QString maybeCharacterName = simplifiedText.left(boIndex).trimmed();
+                    const QString maybeCharacterName = processedText.left(boIndex).trimmed();
                     isCharacter = (maybeCharacterName.toUpper() == maybeCharacterName);
                 }
             } else {
-                isCharacter = !element.containsNonLatinChars
-                        && simplifiedText.toUpper() == simplifiedText;
+                isCharacter =
+                        !element.containsNonLatinChars && processedText.toUpper() == processedText;
             }
 
             if (isCharacter) {
                 element.type = Fountain::Element::Character;
-                element.text = simplifiedText;
+                element.text = processedText;
+                element.isDualDialogueRightColumn = isDualDialogueRightColumn;
                 continue;
             }
         }
@@ -739,7 +749,9 @@ QString Fountain::Parser::cleanup(const QString &content) const
                                                  QRegularExpression::DotMatchesEverythingOption);
     ret = ret.remove(commentRegex);
 
-    QStringList lines = ret.split("\n");
+    // Normalize line endings: handle both \r\n and \n
+    static const QRegularExpression lineEndingRegex("\r\n|\r|\n");
+    QStringList lines = ret.split(lineEndingRegex);
     for (QString &line : lines) {
         static const QRegularExpression splitTxHeadingRegex(
                 "^[A-Z ]*: *\\b(INT|EXT|EST|INT\\.?\\/ ?EXT|I\\/E)\\b");
@@ -1113,7 +1125,13 @@ void Fountain::Writer::writeCharacter(QTextStream &ts, const Element &element) c
     if (m_options & StrictSyntaxOption)
         ts << "@";
 
-    ts << this->emphasisedText(element).toUpper() << newline;
+    ts << this->emphasisedText(element).toUpper();
+
+    // Dual-dialogue right column markers use ^ suffix
+    if (element.isDualDialogueRightColumn)
+        ts << " ^";
+
+    ts << newline;
 }
 
 void Fountain::Writer::writeParenthetical(QTextStream &ts, const Element &element) const
@@ -1306,6 +1324,11 @@ void Fountain::populateBody(const Scene *scene, Body &body, const ScreenplayElem
             break;
         case SceneElement::Character:
             fPara.type = Fountain::Element::Character;
+            if (const SceneDualDialogue *group =
+                        scene->findContainingDualDialogue(const_cast<SceneElement *>(para))) {
+                if (group->rightElements().contains(const_cast<SceneElement *>(para)))
+                    fPara.isDualDialogueRightColumn = true;
+            }
             break;
         case SceneElement::Action:
             fPara.type = Fountain::Element::Action;
@@ -1389,8 +1412,20 @@ void Fountain::loadIntoScene(const Body &body, Scene *scene, ScreenplayElement *
     if (scene == nullptr)
         return;
 
-    for (const Fountain::Element &fPara : body)
+    QList<SceneElement *> dualDialogueElements;
+    for (const Fountain::Element &fPara : body) {
+        if (fPara.type == Fountain::Element::Character && fPara.isDualDialogueRightColumn) {
+            for (int i = scene->elementCount() - 1; i >= 0; i--) {
+                SceneElement *maybeCharacterElement = scene->elementAt(i);
+                if (maybeCharacterElement->type() == SceneElement::Character)
+                    dualDialogueElements.append(maybeCharacterElement);
+            }
+        }
         Fountain::loadIntoScene(fPara, scene, element);
+    }
+
+    for (SceneElement *dualDialogueElement : std::as_const(dualDialogueElements))
+        scene->createDualDialogue(dualDialogueElement);
 }
 
 bool Fountain::loadIntoScene(const Element &fPara, Scene *scene, ScreenplayElement *element)

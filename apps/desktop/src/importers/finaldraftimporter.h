@@ -35,6 +35,9 @@ public:
 
 protected:
     bool doImport(QIODevice *device); // AbstractImporter interface
+
+private:
+    void processDualDialogueMarkers(Screenplay *screenplay);
 };
 
 #endif // FINALDRAFTIMPORTER_H

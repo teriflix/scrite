@@ -31,6 +31,7 @@ import ".."
 
 ListView {
     id: root
+    objectName: "SceneListPanel"
 
     required property bool readOnly
     required property bool tracksVisible

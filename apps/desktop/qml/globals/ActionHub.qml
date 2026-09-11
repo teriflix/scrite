@@ -828,6 +828,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property bool nativeVisible: true
 
             enabled: ActionHandler.canHandle
             objectName: "nextFormat"
@@ -835,6 +836,19 @@ Item {
             text: "Next Format"
 
             icon.source: "qrc:/icons/action/keyboard_tab.png"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool nativeVisible: true
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Meta+Alt+D" : "Ctrl+Alt+D"
+
+            enabled: ActionHandler.canHandle
+            objectName: "toggleDualDialogue"
+            shortcut: defaultShortcut
+            text: "Toggle Dual Dialogue"
+
+            icon.source: "qrc:/icons/content/dual_dialogue.png"
         }
     }
 
@@ -866,6 +880,11 @@ Item {
             onTriggered: {
                 // When index=0, its scene heading and that's handled separately.
                 if(enumValue !== SceneElement.Heading) {
+                    if(_private.binder.currentDualDialogue !== null) {
+                        MessageBox.information("Error", "Cannot change paragraph format within a dual dialogue.")
+                        return
+                    }
+
                     _private.persistBinderSelection()
 
                     const elements = _private.binder.selectedElements

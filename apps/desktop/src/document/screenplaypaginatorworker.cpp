@@ -27,9 +27,12 @@
 #include <QMetaProperty>
 #include <QPdfWriter>
 #include <QScopeGuard>
+#include <QScopedPointer>
 #include <QStandardPaths>
 #include <QTextDocument>
 #include <QTextDocumentWriter>
+#include <QTextTable>
+#include <QTextTableFormat>
 #include <QThread>
 #include <QtMath>
 #include <QElapsedTimer>
@@ -76,7 +79,8 @@ bool SceneParagraph::isValid() const
 
 SceneParagraph::SceneParagraph(const QString &_sceneId, const QString &_id, bool _enabled,
                                int _type, const QString _text, Qt::Alignment _alignment,
-                               const QVector<QTextLayout::FormatRange> &_formats)
+                               const QVector<QTextLayout::FormatRange> &_formats,
+                               const QString &_dualDialogueGroupId, int _column)
 {
     this->sceneId = _sceneId;
     this->id = _id;
@@ -85,13 +89,17 @@ SceneParagraph::SceneParagraph(const QString &_sceneId, const QString &_id, bool
     this->text = _text;
     this->alignment = _alignment;
     this->formats = _formats;
+    this->dualDialogueGroupId = _dualDialogueGroupId;
+    this->column = _column;
 }
 
 bool SceneParagraph::operator==(const SceneParagraph &other) const
 {
     return this->sceneId == other.sceneId && this->id == other.id && this->enabled == other.enabled
             && this->type == other.type && this->text == other.text
-            && this->alignment == other.alignment && this->formats == other.formats;
+            && this->alignment == other.alignment && this->formats == other.formats
+            && this->dualDialogueGroupId == other.dualDialogueGroupId
+            && this->column == other.column;
 }
 
 SceneParagraph &SceneParagraph::operator=(const SceneParagraph &other)
@@ -103,6 +111,8 @@ SceneParagraph &SceneParagraph::operator=(const SceneParagraph &other)
     this->text = other.text;
     this->alignment = other.alignment;
     this->formats = other.formats;
+    this->dualDialogueGroupId = other.dualDialogueGroupId;
+    this->column = other.column;
     return *this;
 }
 
@@ -121,8 +131,25 @@ SceneParagraph SceneParagraph::fromSceneElement(const SceneElement *element)
     if (element == nullptr || element->scene() == nullptr)
         return SceneParagraph();
 
-    return SceneParagraph(element->scene()->id(), element->id(), true, element->type(),
-                          element->formattedText(), element->alignment(), element->textFormats());
+    const Scene *scene = element->scene();
+    QString groupId;
+    int column = 0; // SceneDualDialogue::NoColumn
+
+    SceneDualDialogue *group =
+            scene->findContainingDualDialogue(const_cast<SceneElement *>(element));
+    if (group != nullptr) {
+        groupId = group->id();
+        const auto leftElements = group->leftElements();
+        const auto rightElements = group->rightElements();
+        if (leftElements.contains(const_cast<SceneElement *>(element)))
+            column = SceneDualDialogue::LeftColumn;
+        else if (rightElements.contains(const_cast<SceneElement *>(element)))
+            column = SceneDualDialogue::RightColumn;
+    }
+
+    return SceneParagraph(scene->id(), element->id(), true, element->type(),
+                          element->formattedText(), element->alignment(), element->textFormats(),
+                          groupId, column);
 }
 
 bool SceneContent::isValid() const
@@ -568,8 +595,9 @@ void ScreenplayPaginatorWorker::syncDocument()
     auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType,
                              Qt::Alignment overrideAlignment) {
         const SceneElementFormat *eformat = m_format->elementFormat(paraType);
-        QTextBlockFormat blockFormat = eformat->createBlockFormat(overrideAlignment, &pageWidth);
-        QTextCharFormat charFormat = eformat->createCharFormat(&pageWidth);
+        QTextBlockFormat blockFormat = eformat->createBlockFormat(overrideAlignment, nullptr,
+                                                                  cursor.currentTable() != nullptr);
+        QTextCharFormat charFormat = eformat->createCharFormat();
         cursor.setCharFormat(charFormat);
         cursor.setBlockFormat(blockFormat);
     };
@@ -621,17 +649,58 @@ void ScreenplayPaginatorWorker::syncDocument()
         range.until = QTextBlock();
         range.sceneId = content.id;
 
-        for (const SceneParagraph &paragraph : std::as_const(content.paragraphs)) {
+        QString currentGroupId;
+        QTextTable *currentTable = nullptr;
+        QSet<QTextTable *> tables;
+        QScopedPointer<QTextCursor> leftCellCursor;
+        QScopedPointer<QTextCursor> rightCellCursor;
+
+        for (int i = 0; i < content.paragraphs.size(); ++i) {
+            const SceneParagraph &paragraph = content.paragraphs.at(i);
+
             if (maybeAbort()) {
                 paginationComplete(QList<ScreenplayPaginatorRecord>(), 0, 0, QTime(), QString());
                 return;
             }
 
-            if (cursor.position() > 0)
-                cursor.insertBlock();
+            // Handle group transitions
+            if (paragraph.dualDialogueGroupId != currentGroupId) {
+                // Close current table if we're leaving a group
+                if (currentTable != nullptr) {
+                    cursor = currentTable->parentFrame()->lastCursorPosition();
+                    leftCellCursor.reset();
+                    rightCellCursor.reset();
+                    currentTable = nullptr;
+                }
 
-            prepareCursor(cursor, SceneElement::Type(paragraph.type), paragraph.alignment);
-            LanguageEngine::insertTextAtCursor(cursor, paragraph.text, paragraph.formats);
+                currentGroupId = paragraph.dualDialogueGroupId;
+
+                // Open new table if entering a group
+                if (!currentGroupId.isEmpty()) {
+                    if (cursor.position() > 0)
+                        cursor.insertBlock(QTextBlockFormat());
+
+                    QTextTableFormat tableFormat =
+                            ScreenplayFormat::createDualDialogueTableFormat();
+                    currentTable = cursor.insertTable(1, 2, tableFormat);
+                    tables.insert(currentTable);
+                    leftCellCursor.reset(
+                            new QTextCursor(currentTable->cellAt(0, 0).firstCursorPosition()));
+                    rightCellCursor.reset(
+                            new QTextCursor(currentTable->cellAt(0, 1).firstCursorPosition()));
+                }
+            }
+
+            QTextCursor &activeCursor = (currentTable == nullptr) ? cursor
+                    : (paragraph.column == 1)                     ? *leftCellCursor.data()
+                                                                  : *rightCellCursor.data();
+
+            if ((currentTable == nullptr && activeCursor.position() > 0)
+                || (currentTable != nullptr && paragraph.type != SceneElement::Character))
+                activeCursor.insertBlock(QTextBlockFormat());
+
+            prepareCursor(activeCursor, SceneElement::Type(paragraph.type), paragraph.alignment);
+            LanguageEngine::insertTextAtCursor(activeCursor, paragraph.text, paragraph.formats);
 
             ScreenplayPaginatorBlockData *blockData = new ScreenplayPaginatorBlockData;
             blockData->serialNumber = content.serialNumber;
@@ -639,7 +708,7 @@ void ScreenplayPaginatorWorker::syncDocument()
             blockData->sceneId = paragraph.sceneId;
             blockData->paragraphId = paragraph.id;
 
-            QTextBlock block = cursor.block();
+            QTextBlock block = activeCursor.block();
             block.setUserData(blockData);
 
             if (!range.from.isValid())
@@ -662,6 +731,17 @@ void ScreenplayPaginatorWorker::syncDocument()
 
             lastBlock = block;
         }
+
+        // Clean up any remaining table
+        if (currentTable != nullptr) {
+            leftCellCursor.reset();
+            rightCellCursor.reset();
+            currentTable = nullptr;
+        }
+
+        // Move top-margin setting to the table format itself.
+        for (QTextTable *table : tables)
+            ScreenplayFormat::polishDualDialogueTableFormat(table);
 
         insights.contentRangeMap.insert(range.serialNumber, range);
     }

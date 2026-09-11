@@ -39,13 +39,16 @@ struct SceneParagraph
     QString text;
     Qt::Alignment alignment;
     QVector<QTextLayout::FormatRange> formats;
+    QString dualDialogueGroupId;
+    int column = 0; // Must be one of SceneDualDialogue::Column
 
     bool isValid() const;
 
     SceneParagraph() { }
     SceneParagraph(const QString &_sceneId, const QString &_id, bool _enabled, int _type,
                    const QString _text, Qt::Alignment _alignment,
-                   const QVector<QTextLayout::FormatRange> &_formats);
+                   const QVector<QTextLayout::FormatRange> &_formats,
+                   const QString &_dualDialogueGroupId = QString(), int _column = 0);
     SceneParagraph(const SceneParagraph &other) { *this = other; }
     bool operator!=(const SceneParagraph &other) const { return !(*this == other); }
     bool operator==(const SceneParagraph &other) const;

@@ -119,6 +119,22 @@ MenuLoader {
                          }
         }
 
+        VclMenuItem {
+            readonly property bool isGrouped: _menu.sceneCurrentElement &&
+                                             root.sceneDocumentBinder.scene &&
+                                             root.sceneDocumentBinder.scene.dualDialogueContaining(_menu.sceneCurrentElement) !== null
+
+            text: isGrouped ? "Undo Dual Dialogue\t" + ActionHub.editOptions.find("toggleDualDialogue").shortcut
+                           : "Make Dual Dialogue\t" + ActionHub.editOptions.find("toggleDualDialogue").shortcut
+            enabled: _menu.sceneCurrentElement !== null
+            focusPolicy: Qt.NoFocus
+
+            onClicked: {
+                root.sceneDocumentBinder.toggleDualDialogue()
+                root.close()
+            }
+        }
+
         MenuSeparator {  }
 
         VclMenu {
