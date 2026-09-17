@@ -1,6 +1,4 @@
 set(SCRITE_DESKTOP_QML_SOURCES
-  "src/core/actionmanager.cpp"
-  "src/core/actionmanager.h"
   "src/core/application.cpp"
   "src/core/application.h"
   "src/core/appwindow.cpp"
@@ -78,6 +76,8 @@ set(SCRITE_DESKTOP_QML_SOURCES
   "src/network/user.h"
   "src/printing/qtextdocumentpagedprinter.cpp"
   "src/printing/qtextdocumentpagedprinter.h"
+  "src/quick/items/actionmanager.cpp"
+  "src/quick/items/actionmanager.h"
   "src/quick/items/boundingboxevaluator.cpp"
   "src/quick/items/boundingboxevaluator.h"
   "src/quick/items/gridbackgrounditem.cpp"
