@@ -639,6 +639,7 @@ class Object : public QObject
 
 public:
     Q_INVOKABLE static bool isOfType(const QVariant &value, const QString &typeName);
+    Q_INVOKABLE static QString check(const QVariant &value, const QStringList &typeNames);
     Q_INVOKABLE static QString typeOf(const QVariant &value);
 
     Q_INVOKABLE static bool changeProperty(QObject *object, const QString &name,
@@ -696,6 +697,9 @@ public:
 
     Q_INVOKABLE static QObject *find(const QString &name);
 
+    Q_INVOKABLE static QObject *findImplOf(const QString &ifaceName);
+    Q_INVOKABLE static QList<QObject *> findAllImplOf(const QString &ifaceName);
+
     template<class T>
     static T *lookup(const QString &name)
     {
@@ -703,6 +707,42 @@ public:
         if (object)
             return qobject_cast<T *>(object);
         return nullptr;
+    }
+
+    template<class T>
+    static T *lookupImplOf(const QString &ifaceName)
+    {
+        QObject *object = ObjectRegistry::findImplOf(ifaceName);
+        if (object)
+            return qobject_cast<T *>(object);
+        return nullptr;
+    }
+
+    template<class T>
+    static QList<T *> lookupAllImplOf(const QString &ifaceName)
+    {
+        QList<QObject *> objects = ObjectRegistry::findAllImplOf(ifaceName);
+        QList<T *> ret;
+        ret.reserve(objects.size());
+        for (QObject *object : std::as_const(objects)) {
+            T *iface = qobject_cast<T *>(object);
+            if (iface)
+                ret << iface;
+        }
+
+        return ret;
+    }
+
+    template<class T>
+    static T *lookupImplOf()
+    {
+        return lookupImplOf(T::staticMetaObject.className());
+    }
+
+    template<class T>
+    static QList<T *> lookupAllImplOf()
+    {
+        return lookupAllImplOf(T::staticMetaObject.className());
     }
 };
 

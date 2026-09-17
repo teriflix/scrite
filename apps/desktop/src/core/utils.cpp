@@ -518,6 +518,32 @@ bool Utils::Object::isOfType(const QVariant &value, const QString &typeName)
 }
 
 /**
+ * \brief Checks if a QVariant value is any of the specified typeNames
+ * \param value The QVariant to check.
+ * \param typeNames The type name to check against.
+ * \return True if the value is any of the specified type names, false otherwise.
+ */
+QString Utils::Object::check(const QVariant &value, const QStringList &typeNames)
+{
+    if (value.userType() == QMetaType::QObjectStar) {
+        QObject *object = value.value<QObject *>();
+        if (object && !typeNames.isEmpty()) {
+            for (const QString &type : typeNames) {
+                if (object->inherits(qPrintable(type)))
+                    return type;
+            }
+        }
+        return QString();
+    }
+
+    const QString typeName = QString::fromLatin1(value.typeName());
+    if (typeNames.contains(typeName))
+        return typeName;
+
+    return QString();
+}
+
+/**
  * \brief Returns the type name of a QVariant value.
  * \param value The QVariant to query.
  * \return The type name as a string.
@@ -1105,7 +1131,7 @@ QVariant Utils::Object::convertToPropertyType(const QVariant &value, const QMeta
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Q_GLOBAL_STATIC(QObjectListModel<QObject *>, ObjectRegistry)
+Q_GLOBAL_STATIC(ObjectListModel, ObjectRegistry)
 
 // When adding objects to the registry, we are not using the built-in objectName property itself,
 // but rather a dynamic property as mentioned here. This is done on purpose, to ensure separation
@@ -1173,6 +1199,30 @@ QObject *Utils::ObjectRegistry::find(const QString &name)
     }
 
     return nullptr;
+}
+
+QObject *Utils::ObjectRegistry::findImplOf(const QString &ifaceName)
+{
+    if (ifaceName.isEmpty())
+        return nullptr;
+
+    const QList<QObject *> allObjects = ::ObjectRegistry->constList();
+    auto it =
+            std::find_if(allObjects.constBegin(), allObjects.constEnd(), [ifaceName](QObject *obj) {
+                return obj->inherits(qPrintable(ifaceName));
+            });
+    if (it != allObjects.end())
+        return *it;
+    return nullptr;
+}
+
+QList<QObject *> Utils::ObjectRegistry::findAllImplOf(const QString &ifaceName)
+{
+    if (ifaceName.isEmpty())
+        return QList<QObject *>();
+
+    return ::ObjectRegistry->filteredList(
+            [ifaceName](QObject *obj) { return obj->inherits(qPrintable(ifaceName)); });
 }
 
 ///////////////////////////////////////////////////////////////////////////////
