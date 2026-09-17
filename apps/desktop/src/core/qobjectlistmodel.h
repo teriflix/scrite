@@ -13,8 +13,8 @@
 **
 ****************************************************************************/
 
-#ifndef QOBJECTLISTMODEL_H
-#define QOBJECTLISTMODEL_H
+#ifndef OBJECTLISTMODEL_H
+#define OBJECTLISTMODEL_H
 
 #include <QSet>
 #include <QList>
@@ -36,8 +36,8 @@ public:
 
     // clang-format off
     Q_PROPERTY(int objectCount
-               READ objectCount
-               NOTIFY objectCountChanged)
+                       READ objectCount
+                               NOTIFY objectCountChanged)
     // clang-format on
     virtual int objectCount() const = 0;
     Q_SIGNAL void objectCountChanged();
@@ -50,9 +50,35 @@ public:
 
     Q_INVOKABLE virtual QObject *objectAt(int row) const = 0;
 
+    enum FindOption { SimpleFind, RecursiveFind };
+    Q_ENUM(FindOption)
+
+    Q_INVOKABLE QObject *findByName(const QString &name, FindOption = SimpleFind) const;
+
+    // clang-format off
+    Q_PROPERTY(QStringList objectKinds
+               READ objectKinds
+               WRITE setObjectKinds
+               NOTIFY objectKindsChanged)
+    // clang-format on
+    void setObjectKinds(const QStringList &val);
+    QStringList objectKinds() const { return m_objectKinds; }
+    Q_SIGNAL void objectKindsChanged();
+
     // QAbstractListModel implementation
-    enum { ObjectItemRole = Qt::UserRole + 1, ModelDataRole };
+    enum {
+        ObjectItemRole = Qt::UserRole + 1,
+        ModelDataRole,
+        ObjectTypeRole,
+        ObjectTypeHierarchyRole,
+        ObjectKindRole
+    };
     QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+
+private:
+    QStringList m_objectKinds;
 };
 
 template<class T>
@@ -68,12 +94,6 @@ public:
     QList<T> &list() { return m_list; }
     const QList<T> &list() const { return m_list; }
     const QList<T> &constList() const { return m_list; }
-    const QList<T> sortedList(std::function<bool(T, T)> lessThanFunc) const
-    {
-        QList<T> ret = m_list;
-        std::sort(ret.begin(), ret.end(), lessThanFunc);
-        return ret;
-    }
 
     bool empty() const { return m_list.empty(); }
     bool isEmpty() const { return m_list.isEmpty(); }
@@ -184,9 +204,9 @@ public:
     }
 
     T last() const { return m_list.isEmpty() ? nullptr : m_list.last(); }
-    T takeLast() const
+    T takeLast()
     {
-        T ptr = this->first();
+        T ptr = this->last();
         if (ptr == nullptr)
             return ptr;
         this->removeAt(m_list.size() - 1);
@@ -219,16 +239,21 @@ public:
         }
     }
 
-    // QAbstractItemModel interface
-    int rowCount(const QModelIndex &parent) const { return parent.isValid() ? 0 : m_list.size(); }
-    QVariant data(const QModelIndex &index, int role) const
+    const QList<T> sortedList(std::function<bool(T, T)> lessThanFunc) const
     {
-        if (role == ObjectItemRole || role == ModelDataRole) {
-            QObject *ptr = index.row() < 0 || index.row() >= m_list.size() ? nullptr
-                                                                           : m_list.at(index.row());
-            return QVariant::fromValue<QObject *>(ptr);
+        QList<T> ret = m_list;
+        std::sort(ret.begin(), ret.end(), lessThanFunc);
+        return ret;
+    }
+
+    const QList<T> filteredList(std::function<bool(T)> filterFunc) const
+    {
+        QList<T> ret;
+        for (T item : m_list) {
+            if (filterFunc(item))
+                ret.append(item);
         }
-        return QVariant();
+        return ret;
     }
 
     // ObjectListPropertyModelBase interface
@@ -262,22 +287,35 @@ protected:
     virtual void itemInsertEvent(T ptr) { Q_UNUSED(ptr); }
     virtual void itemRemoveEvent(T ptr) { Q_UNUSED(ptr); }
 
-private:
+protected:
     QList<T> m_list;
 };
+
+class ObjectListModelAttached;
 
 class ObjectListModel : public QObjectListModel<QObject *>
 {
     Q_OBJECT
     QML_ELEMENT
+    QML_ATTACHED(ObjectListModelAttached)
 
 public:
-    ObjectListModel(QObject *parent = nullptr) : QObjectListModel<QObject *>(parent) { }
+    static ObjectListModelAttached *qmlAttachedProperties(QObject *object);
+
+    ObjectListModel(QObject *parent = nullptr);
     ~ObjectListModel() { }
 
     Q_INVOKABLE void include(QObject *ptr) { this->append(ptr); }
     Q_INVOKABLE void exclude(QObject *ptr) { this->remove(ptr); }
     Q_INVOKABLE void reset() { this->clear(); }
+
+    Q_CLASSINFO("DefaultProperty", "objects")
+    Q_PROPERTY(QQmlListProperty<QObject> objects READ objects NOTIFY objectsChanged)
+    QQmlListProperty<QObject> objects()
+    {
+        return QQmlListProperty<QObject>(reinterpret_cast<QObject *>(this), &m_list);
+    }
+    Q_SIGNAL void objectsChanged();
 
 protected:
     void itemInsertEvent(QObject *ptr)
@@ -288,6 +326,40 @@ protected:
     {
         disconnect(ptr, &QObject::destroyed, this, &ObjectListModel::objectDestroyed);
     }
+};
+
+class ObjectListModelAttached : public QObject
+{
+    Q_OBJECT
+    QML_ANONYMOUS
+
+public:
+    explicit ObjectListModelAttached(QObject *parent = nullptr);
+    ~ObjectListModelAttached();
+
+    // clang-format off
+    Q_PROPERTY(ObjectListModel* target
+               READ target
+               WRITE setTarget
+               NOTIFY targetChanged)
+    // clang-format on
+    void setTarget(ObjectListModel *val);
+    ObjectListModel *target() const { return m_target; }
+    Q_SIGNAL void targetChanged();
+
+    // clang-format off
+    Q_PROPERTY(int index
+               READ index
+               WRITE setIndex
+               NOTIFY indexChanged)
+    // clang-format on
+    void setIndex(int val);
+    int index() const { return m_index; }
+    Q_SIGNAL void indexChanged();
+
+private:
+    int m_index = -1;
+    ObjectListModel *m_target = nullptr;
 };
 
 class SortFilterObjectListModel : public QSortFilterProxyModel
@@ -369,6 +441,16 @@ public:
     QJSValue filterFunction() const { return m_filterFunction; }
     Q_SIGNAL void filterFunctionChanged();
 
+    // clang-format off
+    Q_PROPERTY(QJSEngine* jsEngine
+               READ jsEngine
+               WRITE setJsEngine
+               NOTIFY jsEngineChanged)
+    // clang-format on
+    void setJsEngine(QJSEngine *val);
+    QJSEngine *jsEngine() const { return m_jsEngine; }
+    Q_SIGNAL void jsEngineChanged();
+
     QHash<int, QByteArray> roleNames() const;
 
 protected:
@@ -379,6 +461,7 @@ protected:
 private:
     mutable QJSValue m_sortFunction;
     mutable QJSValue m_filterFunction;
+    QJSEngine *m_jsEngine = nullptr;
     QVariantList m_filterValues;
     QByteArray m_sortByProperty;
     QByteArray m_filterByProperty;
@@ -401,4 +484,4 @@ inline QList<T> qobject_list_cast(const QList<QObject *> &list, bool deleteUncas
     return ret;
 }
 
-#endif // QOBJECTLISTMODEL_H
+#endif // OBJECTLISTMODEL_H

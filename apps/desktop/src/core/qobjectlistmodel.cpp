@@ -17,6 +17,53 @@
 
 #include <QJSEngine>
 
+// Some duplication of code from Utils::Object, but that's acceptable.
+class TypeInfo : public QObject
+{
+public:
+    static bool check(QObject *ptr, const QString &typeName);
+    static QString check(QObject *ptr, const QStringList &typeNames);
+    static QString of(QObject *ptr);
+    static QStringList hierarchy(QObject *ptr);
+};
+
+bool TypeInfo::check(QObject *ptr, const QString &typeName)
+{
+    return ptr ? ptr->inherits(qPrintable(typeName)) : false;
+}
+
+QString TypeInfo::check(QObject *ptr, const QStringList &typeNames)
+{
+    if (ptr && !typeNames.isEmpty()) {
+        for (const QString &type : typeNames) {
+            if (ptr->inherits(qPrintable(type)))
+                return type;
+        }
+    }
+
+    return QString();
+}
+
+QString TypeInfo::of(QObject *ptr)
+{
+    return ptr ? ptr->metaObject()->className() : QString();
+}
+
+QStringList TypeInfo::hierarchy(QObject *ptr)
+{
+    QStringList ret;
+    if (ptr) {
+        const QMetaObject *mo = ptr->metaObject();
+        while (mo) {
+            ret << QString::fromLatin1(mo->className());
+            mo = mo->superClass();
+        }
+    }
+    return ret;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 AbstractQObjectListModel::AbstractQObjectListModel(QObject *parent) : QAbstractListModel(parent)
 {
     connect(this, &QAbstractListModel::rowsInserted, this,
@@ -28,10 +75,128 @@ AbstractQObjectListModel::AbstractQObjectListModel(QObject *parent) : QAbstractL
     connect(this, &QAbstractListModel::dataChanged, this, &AbstractQObjectListModel::dataChanged2);
 }
 
+QObject *AbstractQObjectListModel::findByName(const QString &name, FindOption option) const
+{
+    if (name.isEmpty())
+        return nullptr;
+
+    for (int i = 0; i < this->objectCount(); i++) {
+        QObject *ptr = this->objectAt(i);
+        if (ptr->objectName() == name)
+            return ptr;
+
+        if (option == RecursiveFind) {
+            if (ptr->metaObject()->inherits(&AbstractQObjectListModel::staticMetaObject)) {
+                AbstractQObjectListModel *model = qobject_cast<AbstractQObjectListModel *>(ptr);
+                ptr = model->findByName(name);
+                if (ptr)
+                    return ptr;
+            }
+
+            ptr = ptr->findChild<QObject *>(name, Qt::FindChildrenRecursively);
+            if (ptr)
+                return ptr;
+        }
+    }
+
+    return nullptr;
+}
+
+void AbstractQObjectListModel::setObjectKinds(const QStringList &val)
+{
+    if (m_objectKinds == val)
+        return;
+
+    m_objectKinds = val;
+    emit objectKindsChanged();
+}
+
 QHash<int, QByteArray> AbstractQObjectListModel::roleNames() const
 {
     return { { ObjectItemRole, QByteArrayLiteral("objectItem") },
-             { ModelDataRole, QByteArrayLiteral("modelData") } };
+             { ObjectTypeRole, QByteArrayLiteral("objectType") },
+             { ObjectTypeHierarchyRole, QByteArrayLiteral("objectTypeHierarchy") },
+             { ModelDataRole, QByteArrayLiteral("modelData") },
+             { ObjectKindRole, QByteArrayLiteral("objectKind") } };
+}
+
+int AbstractQObjectListModel::rowCount(const QModelIndex &parent) const
+{
+    return parent.isValid() ? 0 : this->objectCount();
+}
+
+QVariant AbstractQObjectListModel::data(const QModelIndex &index, int role) const
+{
+    if (index.isValid() && index.row() >= 0 && index.row() < this->objectCount()) {
+        QObject *ptr = this->objectAt(index.row());
+        switch (role) {
+        case ObjectItemRole:
+        case ModelDataRole:
+            return QVariant::fromValue<QObject *>(ptr);
+        case ObjectTypeRole:
+            return TypeInfo::of(ptr);
+        case ObjectTypeHierarchyRole:
+            return TypeInfo::hierarchy(ptr);
+        case ObjectKindRole:
+            return TypeInfo::check(ptr, m_objectKinds);
+        default:
+            break;
+        }
+    }
+
+    return QVariant();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ObjectListModelAttached *ObjectListModel::qmlAttachedProperties(QObject *object)
+{
+    return new ObjectListModelAttached(object);
+}
+
+ObjectListModel::ObjectListModel(QObject *parent) : QObjectListModel<QObject *>(parent)
+{
+    connect(this, &ObjectListModel::objectCountChanged, this, &ObjectListModel::objectsChanged);
+    connect(this, &ObjectListModel::rowsMoved, this, &ObjectListModel::objectsChanged);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ObjectListModelAttached::ObjectListModelAttached(QObject *parent) : QObject(parent) { }
+
+ObjectListModelAttached::~ObjectListModelAttached() { }
+
+void ObjectListModelAttached::setTarget(ObjectListModel *val)
+{
+    if (m_target == val)
+        return;
+
+    if (m_target != nullptr)
+        m_target->remove(this->parent());
+
+    m_target = val;
+
+    if (m_target != nullptr)
+        m_target->insert(m_index, this->parent());
+
+    emit targetChanged();
+}
+
+void ObjectListModelAttached::setIndex(int val)
+{
+    if (m_index == val)
+        return;
+
+    m_index = val;
+
+    if (m_target != nullptr) {
+        int row = m_target->indexOf(this->parent());
+        if (row != m_index && m_index >= 0 && m_index < m_target->size()) {
+            m_target->move(row, m_index);
+        }
+    }
+
+    emit indexChanged();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,10 +230,12 @@ void SortFilterObjectListModel::setFilterByProperty(const QByteArray &val)
     if (m_filterByProperty == val)
         return;
 
+    this->beginFilterChange();
+
     m_filterByProperty = val;
     emit filterByPropertyChanged();
 
-    this->beginFilterChange(); this->endFilterChange();
+    this->endFilterChange(QSortFilterProxyModel::Direction::Rows);
 }
 
 void SortFilterObjectListModel::setFilterValues(const QVariantList &val)
@@ -76,10 +243,12 @@ void SortFilterObjectListModel::setFilterValues(const QVariantList &val)
     if (m_filterValues == val)
         return;
 
+    this->beginFilterChange();
+
     m_filterValues = val;
     emit filterValuesChanged();
 
-    this->beginFilterChange(); this->endFilterChange();
+    this->endFilterChange(QSortFilterProxyModel::Direction::Rows);
 }
 
 void SortFilterObjectListModel::setFilterMode(FilterMode val)
@@ -87,10 +256,12 @@ void SortFilterObjectListModel::setFilterMode(FilterMode val)
     if (m_filterMode == val)
         return;
 
+    this->beginFilterChange();
+
     m_filterMode = val;
     emit filterModeChanged();
 
-    this->beginFilterChange(); this->endFilterChange();
+    this->endFilterChange(QSortFilterProxyModel::Direction::Rows);
 }
 
 void SortFilterObjectListModel::setSortFunction(const QJSValue &val)
@@ -103,6 +274,8 @@ void SortFilterObjectListModel::setSortFunction(const QJSValue &val)
 
     m_sortFunction = val;
     emit sortFunctionChanged();
+
+    this->sort(0, this->sortOrder());
 }
 
 void SortFilterObjectListModel::setFilterFunction(const QJSValue &val)
@@ -113,8 +286,21 @@ void SortFilterObjectListModel::setFilterFunction(const QJSValue &val)
     if (!val.isCallable())
         return;
 
+    this->beginFilterChange();
+
     m_filterFunction = val;
     emit filterFunctionChanged();
+
+    this->endFilterChange(QSortFilterProxyModel::Direction::Rows);
+}
+
+void SortFilterObjectListModel::setJsEngine(QJSEngine *val)
+{
+    if (m_jsEngine == val)
+        return;
+
+    m_jsEngine = val;
+    emit jsEngineChanged();
 }
 
 QHash<int, QByteArray> SortFilterObjectListModel::roleNames() const
@@ -140,7 +326,9 @@ bool SortFilterObjectListModel::lessThan(const QModelIndex &source_left,
     if (left_object == nullptr || right_object == nullptr)
         return false;
 
-    QJSEngine *engine = m_sortFunction.isCallable() ? qjsEngine(this) : nullptr;
+    QJSEngine *engine = m_jsEngine == nullptr
+            ? (m_sortFunction.isCallable() ? qjsEngine(this) : nullptr)
+            : m_jsEngine;
     if (engine != nullptr) {
         QJSValueList args;
         args.append(engine->newQObject(left_object));
@@ -173,7 +361,9 @@ bool SortFilterObjectListModel::filterAcceptsRow(int source_row,
     if (source_object == nullptr)
         return true;
 
-    QJSEngine *engine = m_filterFunction.isCallable() ? qjsEngine(this) : nullptr;
+    QJSEngine *engine = m_jsEngine == nullptr
+            ? (m_filterFunction.isCallable() ? qjsEngine(this) : nullptr)
+            : m_jsEngine;
     if (engine != nullptr) {
         QJSValueList args;
         args.append(engine->newQObject(source_object));
