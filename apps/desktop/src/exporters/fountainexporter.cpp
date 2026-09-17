@@ -43,6 +43,33 @@ void FountainExporter::setUseEmphasis(bool val)
     emit useEmphasisChanged();
 }
 
+void FountainExporter::setIncludeTitlePage(bool val)
+{
+    if (m_includeTitlePage == val)
+        return;
+
+    m_includeTitlePage = val;
+    emit includeTitlePageChanged();
+}
+
+void FountainExporter::setIncludeActBreaks(bool val)
+{
+    if (m_includeActBreaks == val)
+        return;
+
+    m_includeActBreaks = val;
+    emit includeActBreaksChanged();
+}
+
+void FountainExporter::setIncludeEpisodeBreaks(bool val)
+{
+    if (m_includeEpisodeBreaks == val)
+        return;
+
+    m_includeEpisodeBreaks = val;
+    emit includeEpisodeBreaksChanged();
+}
+
 bool FountainExporter::doExport(QIODevice *device)
 {
     const Screenplay *screenplay = this->document()->screenplay();
@@ -53,6 +80,27 @@ bool FountainExporter::doExport(QIODevice *device)
     if (m_followStrictSyntax)
         options += Fountain::Writer::StrictSyntaxOption;
 
-    Fountain::Writer writer(screenplay, options);
+    Fountain::TitlePage titlePage;
+    Fountain::Body body;
+
+    if (m_includeTitlePage)
+        Fountain::populateTitlePage(screenplay, titlePage);
+
+    Fountain::populateBody(screenplay, body, [=](const ScreenplayElement *element) -> bool {
+        if (element->elementType() == ScreenplayElement::BreakElementType) {
+            switch (element->breakType()) {
+            case Screenplay::Act:
+                return m_includeActBreaks;
+            case Screenplay::Episode:
+                return m_includeEpisodeBreaks;
+            default:
+                break;
+            }
+            return false;
+        }
+        return true;
+    });
+
+    Fountain::Writer writer(titlePage, body, options);
     return writer.write(device);
 }

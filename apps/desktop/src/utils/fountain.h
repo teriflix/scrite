@@ -78,7 +78,8 @@ typedef QList<Element> Body;
 void populateTitlePage(const Screenplay *screenplay, TitlePage &titlePage);
 
 void populateBody(const Scene *scene, Body &body, const ScreenplayElement *element = nullptr);
-void populateBody(const Screenplay *screenplay, Body &body);
+void populateBody(const Screenplay *screenplay, Body &body,
+                  std::function<bool(const ScreenplayElement *)> filterFunc = nullptr);
 void populateBody(const ScreenplayElement *element, Body &body);
 
 void loadTitlePage(const TitlePage &titlePage, Screenplay *screenplay);

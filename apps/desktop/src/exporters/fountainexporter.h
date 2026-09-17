@@ -33,7 +33,7 @@ public:
     ~FountainExporter();
 
     // clang-format off
-    Q_CLASSINFO( "followStrictSyntax_FieldLabel", "Use ., @, !, > to explicitly mark scene heading, character, action and transisitions.")
+    Q_CLASSINFO("followStrictSyntax_FieldLabel", "Use ., @, !, > to explicitly mark scene heading, character, action and transisitions.")
     Q_CLASSINFO("followStrictSyntax_FieldEditor", "CheckBox")
     Q_PROPERTY(bool followStrictSyntax
                READ isFollowStrictSyntax
@@ -56,6 +56,42 @@ public:
     bool isUseEmphasis() const { return m_useEmphasis; }
     Q_SIGNAL void useEmphasisChanged();
 
+    // clang-format off
+    Q_CLASSINFO("includeTitlePage_FieldLabel", "Include title page fields.")
+    Q_CLASSINFO("includeTitlePage_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeTitlePage
+               READ isIncludeTitlePage
+               WRITE setIncludeTitlePage
+               NOTIFY includeTitlePageChanged)
+    // clang-format on
+    void setIncludeTitlePage(bool val);
+    bool isIncludeTitlePage() const { return m_includeTitlePage; }
+    Q_SIGNAL void includeTitlePageChanged();
+
+    // clang-format off
+    Q_CLASSINFO("includeActBreaks_FieldLabel", "Include act breaks.")
+    Q_CLASSINFO("includeActBreaks_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeActBreaks
+               READ isIncludeActBreaks
+               WRITE setIncludeActBreaks
+               NOTIFY includeActBreaksChanged)
+    // clang-format on
+    void setIncludeActBreaks(bool val);
+    bool isIncludeActBreaks() const { return m_includeActBreaks; }
+    Q_SIGNAL void includeActBreaksChanged();
+
+    // clang-format off
+    Q_CLASSINFO("includeEpisodeBreaks_FieldLabel", "Include episode breaks.")
+    Q_CLASSINFO("includeEpisodeBreaks_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeEpisodeBreaks
+               READ isIncludeEpisodeBreaks
+               WRITE setIncludeEpisodeBreaks
+               NOTIFY includeEpisodeBreaksChanged)
+    // clang-format on
+    void setIncludeEpisodeBreaks(bool val);
+    bool isIncludeEpisodeBreaks() const { return m_includeEpisodeBreaks; }
+    Q_SIGNAL void includeEpisodeBreaksChanged();
+
     bool canCopyToClipboard() const { return true; }
     bool canBundleFonts() const { return false; }
     bool requiresConfiguration() const { return false; }
@@ -67,6 +103,9 @@ protected:
 private:
     bool m_useEmphasis = true;
     bool m_followStrictSyntax = true;
+    bool m_includeTitlePage = true;
+    bool m_includeActBreaks = true;
+    bool m_includeEpisodeBreaks = true;
 };
 
 #endif // FOUNTAINEXPORTER_H

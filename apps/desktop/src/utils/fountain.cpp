@@ -1348,7 +1348,8 @@ void Fountain::populateBody(const Scene *scene, Body &body, const ScreenplayElem
     }
 }
 
-void Fountain::populateBody(const Screenplay *screenplay, Body &body)
+void Fountain::populateBody(const Screenplay *screenplay, Body &body,
+                            std::function<bool(const ScreenplayElement *)> filterFunc)
 {
     if (screenplay == nullptr)
         return;
@@ -1356,6 +1357,9 @@ void Fountain::populateBody(const Screenplay *screenplay, Body &body)
     const int nrElements = screenplay->elementCount();
     for (int i = 0; i < nrElements; i++) {
         const ScreenplayElement *element = screenplay->elementAt(i);
+
+        if (filterFunc && !filterFunc(element))
+            continue;
 
         if (element->elementType() == ScreenplayElement::BreakElementType) {
             Fountain::Element fElement;
