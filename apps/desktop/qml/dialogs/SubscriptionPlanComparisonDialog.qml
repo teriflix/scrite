@@ -23,7 +23,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import Qt.labs.qmlmodels
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"

@@ -25,7 +25,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 

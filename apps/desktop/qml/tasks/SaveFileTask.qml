@@ -21,7 +21,7 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../helpers"
@@ -156,7 +156,7 @@ Item {
             property BasicFileInfo fileInfo
 
             Component.onCompleted: {
-                fileInfo = Qt.createQmlObject("import io.scrite.components; BasicFileInfo { }", _documentSavedButHasChangesItem)
+                fileInfo = Qt.createQmlObject("import Scrite.App; BasicFileInfo { }", _documentSavedButHasChangesItem)
                 fileInfo.absoluteFilePath = Scrite.document.fileName
 
                 if(silent)

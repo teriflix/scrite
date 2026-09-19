@@ -18,7 +18,7 @@ pragma Singleton
 import QtQuick
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "./runtime"
 
@@ -216,7 +216,7 @@ Item {
         const defaultImports = ["QtQuick",
                                 "QtQuick.Controls",
                                 "QtQuick.Controls.Material",
-                                "io.scrite.components",
+                                "Scrite.App",
                                 "\"../globals\"",
                                 "\"../helpers\"",
                                 "\"../controls\""]
@@ -300,7 +300,7 @@ Item {
         if(!parent || !type || !geometry)
             return null
 
-        let annotObject = Qt.createQmlObject("import io.scrite.components; Annotation { objectName: \"ica\" }", parent)
+        let annotObject = Qt.createQmlObject("import Scrite.App; Annotation { objectName: \"ica\" }", parent)
         let annot = annotObject as Annotation
         annot.type = type
         annot.geometry = geometry
@@ -466,7 +466,7 @@ Item {
 
         function onLoggedInChanged() {
             if(Scrite.user.loggedIn) {
-                let helpTipsApi = Qt.createQmlObject("import io.scrite.components; UserHelpTipsRestApiCall {}", root)
+                let helpTipsApi = Qt.createQmlObject("import Scrite.App; UserHelpTipsRestApiCall {}", root)
                 helpTipsApi.finished.connect( () => {
                                                   root.helpTips = helpTipsApi.helpTips
                                                   helpTipsApi.destroy()

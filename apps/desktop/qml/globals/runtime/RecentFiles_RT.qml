@@ -16,7 +16,7 @@
 import QtQuick
 import QtCore
 
-import io.scrite.components
+import Scrite.App
 
 ScriteFileListModel {
     id: root

@@ -21,7 +21,7 @@ import QtQuick.Layouts
 import Qt.labs.qmlmodels
 import QtQuick.Shapes
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"

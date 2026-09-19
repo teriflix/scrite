@@ -18,7 +18,7 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Layouts
 
-import io.scrite.components
+import Scrite.App
 
 import "./tasks"
 
@@ -163,7 +163,7 @@ Item {
                     Runtime.shoutout(Runtime.announcementIds.closeHomeScreenRequest, undefined)
                     OpenFileTask.open(fileName)
                 } else {
-                    let fileInfoObj = Qt.createQmlObject("import io.scrite.components; BasicFileInfo { }", _private)
+                    let fileInfoObj = Qt.createQmlObject("import Scrite.App; BasicFileInfo { }", _private)
                     let fileInfo = fileInfoObj as BasicFileInfo
                     fileInfo.absoluteFilePath = fileName
 

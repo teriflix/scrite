@@ -16,7 +16,7 @@
 import QtQuick
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 QtObject {
     id: root

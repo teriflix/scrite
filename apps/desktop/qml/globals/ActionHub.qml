@@ -34,7 +34,7 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 import Qt.labs.platform as Native
 
-import io.scrite.components
+import Scrite.App
 
 import "../tasks"
 import "../helpers"

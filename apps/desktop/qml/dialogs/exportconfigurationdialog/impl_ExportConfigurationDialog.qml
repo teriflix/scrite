@@ -20,7 +20,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../"
 import "../../globals"
@@ -130,7 +130,7 @@ VclDialog {
                         opacity: enabled ? 1 : 0.5
                         enabled: {
                             if(modelData.feature !== "") {
-                                let afcObject = Qt.createQmlObject("import io.scrite.components; AppFeature { }", _fieldLoader)
+                                let afcObject = Qt.createQmlObject("import Scrite.App; AppFeature { }", _fieldLoader)
                                 let afc = afcObject as AppFeature
                                 afc.featureName = modelData.feature
                                 const ret = afc.enabled

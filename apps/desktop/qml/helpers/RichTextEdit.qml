@@ -20,7 +20,7 @@ import QtQuick.Controls.Material
 import QtWebEngine
 import QtWebChannel
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../dialogs"

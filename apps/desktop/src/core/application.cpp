@@ -1133,9 +1133,9 @@ void Application::initialize(QQmlEngine *engine)
 {
     QObject::connect(engine, &QQmlEngine::quit, this, &Application::quit);
 
-    // Force registration of QML types in io.scrite.components
-    extern void qml_register_types_io_scrite_components();
-    qml_register_types_io_scrite_components();
+    // Force registration of QML types in Scrite.App
+    extern void qml_register_types_Scrite_App();
+    qml_register_types_Scrite_App();
 
     // Init modules
     const char *uri = SCRITE_QML_URI;

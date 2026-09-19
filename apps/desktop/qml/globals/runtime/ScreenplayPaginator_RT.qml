@@ -15,7 +15,7 @@
 
 import QtQuick
 
-import io.scrite.components
+import Scrite.App
 
 ScreenplayPaginator {
     property bool paused: false

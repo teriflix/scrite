@@ -18,7 +18,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../../../../globals"
 import "../../../../controls"

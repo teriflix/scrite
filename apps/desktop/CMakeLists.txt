@@ -72,7 +72,7 @@ set_source_files_properties(${SCRITE_DESKTOP_SINGLETON_QML_FILES}
 )
 
 qt_add_qml_module(Scrite
-  URI io.scrite.components
+  URI Scrite.App
   RESOURCE_PREFIX "/"
   VERSION 1.0
   QML_FILES
@@ -108,7 +108,7 @@ option(SCRITE_PRODUCTION_BUILD
 target_compile_definitions(Scrite PRIVATE
   SCRITE_VERSION="${PROJECT_VERSION}"
   SCRITE_VERSION_TYPE="${SCRITE_VERSION_TYPE}"
-  SCRITE_QML_URI="io.scrite.components"
+  SCRITE_QML_URI="Scrite.App"
   $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
   $<$<BOOL:${SCRITE_PRODUCTION_BUILD}>:SCRITE_PRODUCTION_BUILD>
 )

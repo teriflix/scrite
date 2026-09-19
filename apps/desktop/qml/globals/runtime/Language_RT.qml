@@ -15,7 +15,7 @@
 
 import QtQuick
 
-import io.scrite.components
+import Scrite.App
 
 QtObject {
     readonly property AvailableLanguages available: LanguageEngine.availableLanguages
