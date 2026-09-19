@@ -48,7 +48,7 @@ DialogLauncher {
         doLaunch({"subscription": subscription})
     }
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         property scriteUserSubscriptionInfo subscription
@@ -93,7 +93,7 @@ DialogLauncher {
                         Layout.fillWidth: true
                         spacing: 6
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
                             text: _dialog.subscription.plan.title
                             font.bold: true
@@ -101,7 +101,7 @@ DialogLauncher {
                             wrapMode: Text.WordWrap
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
                             text: _dialog.subscription.plan.subtitle
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -116,13 +116,13 @@ DialogLauncher {
                             Row {
                                 spacing: 4
 
-                                VclLabel {
+                                SctLabel {
                                     text: Runtime.daysSpanAsString(_dialog.subscription.plan.duration) + "  ·  " +
                                           "Device Count: " + _dialog.subscription.plan.devices
                                     font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                 }
 
-                                VclLabel {
+                                SctLabel {
                                     text: "ⓘ"
                                     font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
@@ -155,12 +155,12 @@ DialogLauncher {
                                 spacing: 4
                                 visible: !Scrite.isFeatureNameEnabled("support/email", _dialog.subscription.plan.features)
 
-                                VclLabel {
+                                SctLabel {
                                     text: "·  Discord community support only."
                                     font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                 }
 
-                                VclLabel {
+                                SctLabel {
                                     text: "ⓘ"
                                     font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
@@ -173,7 +173,7 @@ DialogLauncher {
                             }
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
                             text: "★  Exclusive Plan"
                             font.bold: true
@@ -186,7 +186,7 @@ DialogLauncher {
                     ColumnLayout {
                         spacing: 4
 
-                        VclLabel {
+                        SctLabel {
                             Layout.alignment: Qt.AlignHCenter
                             text: _dialog.subscription.isActive   ? "Active"
                                 : _dialog.subscription.isUpcoming ? "Upcoming"
@@ -200,7 +200,7 @@ DialogLauncher {
                                  : Runtime.colors.primary.c400.background
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.alignment: Qt.AlignHCenter
                             text: Runtime.formatDateIncludingYear(new Date(_dialog.subscription.from)) +
                                   "  —  " +
@@ -264,7 +264,7 @@ DialogLauncher {
 
             Item { Layout.fillWidth: true }
 
-            VclButton {
+            SctButton {
                 text: "Close"
                 onClicked: _dialog.close()
             }

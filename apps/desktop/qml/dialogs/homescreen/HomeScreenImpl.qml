@@ -179,7 +179,7 @@ Item {
             }
         }
 
-        VclLabel {
+        SctLabel {
             id: _topBannerToolTip
 
             width: parent.width * 0.75
@@ -309,7 +309,7 @@ Item {
                 anchors.fill: parent
                 spacing: 10
 
-                VclLabel {
+                SctLabel {
                     id: _sideBannerTooltip
 
                     Layout.fillWidth: true
@@ -551,7 +551,7 @@ Item {
                 }
             }
 
-            VclLabel {
+            SctLabel {
                 id: _buttonLabel
 
                 Layout.fillWidth: true
@@ -601,7 +601,7 @@ Item {
         ColumnLayout {
             anchors.fill: parent
 
-            VclLabel {
+            SctLabel {
                 id: _newFileLabel
 
                 text: "New File"
@@ -673,7 +673,7 @@ Item {
                     id: _templatesView
 
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-                    ScrollBar.vertical: VclScrollBar {
+                    ScrollBar.vertical: SctScrollBar {
                         flickable: _templatesView
                     }
 
@@ -858,7 +858,7 @@ Item {
             RowLayout {
                 Layout.fillWidth: true
 
-                VclToolButton {
+                SctToolButton {
                     Layout.preferredHeight: _quickFileOptionsLabel.height
                     Layout.preferredWidth: _quickFileOptionsLabel.height
 
@@ -872,7 +872,7 @@ Item {
                     onClicked: EditRecentFilesDialog.launch()
                 }
 
-                VclLabel {
+                SctLabel {
                     id: _quickFileOptionsLabel
 
                     Layout.fillWidth: true
@@ -896,7 +896,7 @@ Item {
                     id: quickFilesView // shows either Scriptalay or Recent Files
 
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-                    ScrollBar.vertical: VclScrollBar {
+                    ScrollBar.vertical: SctScrollBar {
                         flickable: quickFilesView
                     }
 
@@ -970,7 +970,7 @@ Item {
                     id: _screenplaysView
 
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-                    ScrollBar.vertical: VclScrollBar {
+                    ScrollBar.vertical: SctScrollBar {
                         flickable: _screenplaysView
                     }
 
@@ -1061,7 +1061,7 @@ Item {
                         Flickable {
                             id: _screenplayDetailsFlick
 
-                            ScrollBar.vertical: VclScrollBar {
+                            ScrollBar.vertical: SctScrollBar {
                                 flickable: _screenplayDetailsFlick
                             }
 
@@ -1159,7 +1159,7 @@ Item {
             id: _vaultFilesView
 
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-            ScrollBar.vertical: VclScrollBar { flickable: _vaultFilesView }
+            ScrollBar.vertical: SctScrollBar { flickable: _vaultFilesView }
 
             anchors.fill: parent
             anchors.margins: 1
@@ -1213,7 +1213,7 @@ Item {
 
             width: parent.width * 0.8
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
 
                 horizontalAlignment: Text.AlignHCenter
@@ -1313,7 +1313,7 @@ Item {
                     anchors.centerIn: parent
                     spacing: 20
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
 
                         horizontalAlignment: Text.AlignHCenter
@@ -1323,7 +1323,7 @@ Item {
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
                     }
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
 
                         horizontalAlignment: Text.AlignHCenter
@@ -1356,7 +1356,7 @@ Item {
                     width: parent.width-40
                     spacing: 20
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
 
                         horizontalAlignment: Text.AlignHCenter
@@ -1368,7 +1368,7 @@ Item {
                         font.bold: true
                     }
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
 
                         horizontalAlignment: Text.AlignHCenter
@@ -1422,7 +1422,7 @@ Item {
 
                 width: parent.width
 
-                VclButton {
+                SctButton {
                     text: "< Back"
 
                     EventFilter.target: Scrite.app
@@ -1475,7 +1475,7 @@ Item {
                 }
             }
 
-            buttons: VclButton {
+            buttons: SctButton {
                 text: "Open"
                 enabled: _scriptalayPageItem.contentItem.hasSelection && Runtime.libraryService.screenplays.count > 0
                 onClicked: _scriptalayPageItem.contentItem.openSelected()
@@ -1491,7 +1491,7 @@ Item {
 
             content: VaultPage { }
 
-            title: VclLabel {
+            title: SctLabel {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 text: Scrite.vault.documentCount > 0 ? "Select a file to restore from the vault." : ""
@@ -1502,13 +1502,13 @@ Item {
             buttons: RowLayout {
                 spacing: 10
 
-                VclButton {
+                SctButton {
                     text: "Open"
                     onClicked: _vaultPageItem.contentItem.openSelected()
                     enabled: Scrite.vault.documentCount > 0
                 }
 
-                VclButton {
+                SctButton {
                     text: "Clear"
                     enabled: Scrite.vault.documentCount > 0
                     onClicked: _vaultPageItem.contentItem.clearVault()
@@ -1528,7 +1528,7 @@ Item {
             title: Item { }
 
             buttons: RowLayout {
-                VclButton {
+                SctButton {
                     visible: _importPageItem.contentItem.hasActionButton
                     text: _importPageItem.contentItem.actionButtonText
                     onClicked: _importPageItem.contentItem.onActionButtonClicked()
@@ -1557,7 +1557,7 @@ Item {
         }
     }
 
-    VclDialog {
+    SctDialog {
         id: _missingRecentFilesNotificationDialog
 
         property var missingFiles: Runtime.recentFiles.missingFiles
@@ -1573,7 +1573,7 @@ Item {
 
                 spacing: 20
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: "The following recent file(s) were either deleted, renamed, moved, or otherwise not accessible and will no longer be shown in the home screen:"
@@ -1603,7 +1603,7 @@ Item {
                         clip: true
                         currentIndex: -1
 
-                        delegate: VclText {
+                        delegate: SctText {
                             id: _missingFileDelegate
 
                             required property int index
@@ -1643,7 +1643,7 @@ Item {
                 RowLayout {
                     Layout.fillWidth: true
 
-                    VclCheckBox {
+                    SctCheckBox {
                         text: "Don't show again"
                         checked: false
                         onToggled: Runtime.applicationSettings.notifyMissingRecentFiles = !checked

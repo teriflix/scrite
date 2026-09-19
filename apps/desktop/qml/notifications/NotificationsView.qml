@@ -139,7 +139,7 @@ Rectangle {
 
                             spacing: 12
 
-                            VclLabel {
+                            SctLabel {
                                 Layout.fillWidth: true
 
                                 color: Runtime.colors.tx(_delegate.notification.textColor)
@@ -153,7 +153,7 @@ Rectangle {
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                             }
 
-                            VclLabel {
+                            SctLabel {
                                 Layout.fillWidth: true
 
                                 color: Runtime.colors.tx(_delegate.notification.textColor)

@@ -342,7 +342,7 @@ Rectangle {
                                 width: _buttonRow.width * 1.4
                                 spacing: 40
 
-                                VclLabel {
+                                SctLabel {
                                     width: parent.width
 
                                     color: Runtime.colors.primary.c600.text
@@ -360,7 +360,7 @@ Rectangle {
 
                                     spacing: 20
 
-                                    VclButton {
+                                    SctButton {
                                         text: "Yes"
                                         focusPolicy: Qt.NoFocus
 
@@ -371,7 +371,7 @@ Rectangle {
                                         }
                                     }
 
-                                    VclButton {
+                                    SctButton {
                                         text: "No"
                                         focusPolicy: Qt.NoFocus
 
@@ -486,7 +486,7 @@ Rectangle {
 
         visible: _graph.dirty
 
-        VclLabel {
+        SctLabel {
             anchors.left: parent.left
             anchors.bottom: parent.bottom
             anchors.margins: 25
@@ -582,7 +582,7 @@ Rectangle {
                     border.color: _infoLabel.color
                 }
 
-                VclText {
+                SctText {
                     id: _infoLabel
 
                     anchors.bottom: parent.bottom
@@ -694,7 +694,7 @@ Rectangle {
                 color: _nameLabelMouseArea.containsMouse ? Runtime.colors.accent.c700.background : Runtime.colors.primary.c700.background
                 rotation: _crGraphEdge.modelData.labelAngle
 
-                VclLabel {
+                SctLabel {
                     id: _nameLabel
 
                     anchors.centerIn: parent

@@ -37,7 +37,7 @@ DialogLauncher {
     name: "StructureStoryBeatsDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         title: "Customise Story Beats"

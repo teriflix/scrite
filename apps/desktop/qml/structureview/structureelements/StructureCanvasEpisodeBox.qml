@@ -73,7 +73,7 @@ Rectangle {
         color: Runtime.colors.accent.c200.background
     }
 
-    VclLabel {
+    SctLabel {
         id: _episodeNameText
 
         anchors.top: parent.top

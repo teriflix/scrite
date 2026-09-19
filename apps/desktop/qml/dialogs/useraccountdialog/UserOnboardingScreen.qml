@@ -70,7 +70,7 @@ Item {
             border.width: 1
             border.color: Runtime.colors.primary.borderColor
 
-            VclScrollBar {
+            SctScrollBar {
                 id: _formFlickScrollBar
 
                 anchors.top: parent.top
@@ -108,7 +108,7 @@ Item {
                         Layout.fillWidth: true
                         Layout.topMargin: _formLayout.spacing
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
 
                             wrapMode: Text.WordWrap
@@ -117,7 +117,7 @@ Item {
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
 
                             wrapMode: Text.WordWrap
@@ -163,7 +163,7 @@ Item {
             }
         }
 
-        VclButton {
+        SctButton {
             id: _submit
 
             Layout.alignment: Qt.AlignRight
@@ -300,14 +300,14 @@ Item {
 
         Layout.fillWidth: true
 
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
 
             text: _textFormField.label + (_textFormField.mandatory ? " *" : "")
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
         }
 
-        VclTextField {
+        SctTextField {
             id: _textField
 
             Layout.fillWidth: true
@@ -338,14 +338,14 @@ Item {
 
         Layout.fillWidth: true
 
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
 
             text: _phFormField.label + (_phFormField.mandatory ? " *" : "")
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
         }
 
-        VclTextField {
+        SctTextField {
             id: _phoneField
 
             Layout.fillWidth: true
@@ -379,7 +379,7 @@ Item {
 
         Layout.fillWidth: true
 
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
 
             text: _binaryField.label + (_binaryField.mandatory ? " *" : "")
@@ -395,7 +395,7 @@ Item {
             columns: _binaryField.metaData.columnCount ? _binaryField.metaData.columnCount : 2
             uniformCellWidths: true
 
-            VclRadioButton {
+            SctRadioButton {
                 id: _option1
 
                 Layout.fillWidth: true
@@ -409,7 +409,7 @@ Item {
                 onToggled: if(_binaryField.mandatory) Qt.callLater(_submit.determineEnabled)
             }
 
-            VclRadioButton {
+            SctRadioButton {
                 id: _option2
 
                 Layout.fillWidth: true
@@ -445,7 +445,7 @@ Item {
 
         Layout.fillWidth: true
 
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
 
             text: _ssFormField.label + (_ssFormField.mandatory ? " *" : "")
@@ -453,7 +453,7 @@ Item {
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
         }
 
-        VclComboBox {
+        SctComboBox {
             id: _ssChoices
 
             Layout.fillWidth: true
@@ -477,7 +477,7 @@ Item {
             onActivated: if(_ssFormField.mandatory) Qt.callLater(_submit.determineEnabled)
         }
 
-        VclTextField {
+        SctTextField {
             id: _ssOtherText
 
             Layout.fillWidth: true
@@ -520,7 +520,7 @@ Item {
 
         Layout.fillWidth: true
 
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
 
             text: _msFormField.label + (_msFormField.mandatory ? " *" : "")
@@ -542,7 +542,7 @@ Item {
 
                 model: _msFormField.choices
 
-                delegate: VclCheckBox {
+                delegate: SctCheckBox {
                     id: _delegate
 
                     required property int index

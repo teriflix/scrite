@@ -38,7 +38,7 @@ DialogLauncher {
     name: "EditRecentFilesDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         title: "Modify Recent Files"
@@ -64,7 +64,7 @@ DialogLauncher {
 
                         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-                        ScrollBar.vertical: VclScrollBar {
+                        ScrollBar.vertical: SctScrollBar {
                             id: _recentFilesViewVScrollBar
                             flickable: _recentFilesView
                         }
@@ -136,7 +136,7 @@ DialogLauncher {
                                 ColumnLayout {
                                     Layout.fillWidth: true
 
-                                    VclLabel {
+                                    SctLabel {
                                         Layout.fillWidth: true
 
                                         font.bold: true
@@ -148,7 +148,7 @@ DialogLauncher {
                                         elide: Text.ElideRight
                                     }
 
-                                    VclLabel {
+                                    SctLabel {
                                         Layout.fillWidth: true
 
                                         font.italic: true
@@ -171,7 +171,7 @@ DialogLauncher {
                                     }
                                 }
 
-                                VclToolButton {
+                                SctToolButton {
                                     icon.source: Runtime.themedIcon("qrc:/icons/action/delete.png")
                                     hoverEnabled: true
                                     opacity: hovered ? 1 : 0.25
@@ -186,11 +186,11 @@ DialogLauncher {
                 RowLayout {
                     Layout.fillWidth: true
 
-                    VclLabel {
+                    SctLabel {
                         text: "Display Mode: "
                     }
 
-                    VclComboBox {
+                    SctComboBox {
                         Layout.preferredWidth: 250
 
                         model: ["Prefer Title (Version)", "File Name"]
@@ -202,7 +202,7 @@ DialogLauncher {
                         Layout.fillWidth: true
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Clear"
 
                         onClicked: {

@@ -55,7 +55,7 @@ QtObject {
 
         anchors.fill: parent
 
-        VclText {
+        SctText {
             id: textItem
             anchors.centerIn: parent
 

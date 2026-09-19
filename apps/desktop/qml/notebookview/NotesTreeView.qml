@@ -157,11 +157,11 @@ TreeView {
         }
     }
 
-    ScrollBar.horizontal: VclScrollBar {
+    ScrollBar.horizontal: SctScrollBar {
         policy: ScrollBar.AlwaysOff
     }
 
-    ScrollBar.vertical: VclScrollBar {
+    ScrollBar.vertical: SctScrollBar {
         policy: ScrollBar.AsNeeded
     }
 

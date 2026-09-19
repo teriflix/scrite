@@ -101,7 +101,7 @@ Item {
         }
     }
 
-    VclLabel {
+    SctLabel {
         width: parent.width * 0.75
 
         anchors.left: parent.left

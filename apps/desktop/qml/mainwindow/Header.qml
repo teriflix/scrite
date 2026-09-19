@@ -164,7 +164,7 @@ Rectangle {
                 visible: action.visible && LanguageEngine.handleLanguageSwitch
             }
 
-            VclLabel {
+            SctLabel {
                 Layout.preferredWidth: contentWidth + rightPadding
 
                 rightPadding: Runtime.minimumFontMetrics.averageCharacterWidth

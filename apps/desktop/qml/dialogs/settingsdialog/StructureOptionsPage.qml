@@ -45,14 +45,14 @@ Item {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            label: VclLabel {
+            label: SctLabel {
                 text: "Canvas Grid"
             }
 
             ColumnLayout {
                 width: parent.width
 
-                VclCheckBox {
+                SctCheckBox {
                     Layout.fillWidth: true
 
                     text: "Show Grid in Structure Canvas"
@@ -84,7 +84,7 @@ Item {
                         }
                     }
 
-                    VclLabel {
+                    SctLabel {
                         text: "Background Color"
                     }
 
@@ -108,7 +108,7 @@ Item {
                         }
                     }
 
-                    VclLabel {
+                    SctLabel {
                         text: "Grid Color"
                     }
 
@@ -126,7 +126,7 @@ Item {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            label: VclLabel {
+            label: SctLabel {
                 text: "Parameters"
             }
 
@@ -134,7 +134,7 @@ Item {
                 width: parent.width
                 spacing: 10
 
-                VclCheckBox {
+                SctCheckBox {
                     Layout.fillWidth: true
 
                     text: "Use Index Card UI"
@@ -147,7 +147,7 @@ Item {
                     }
                 }
 
-                /*VclCheckBox {
+                /*SctCheckBox {
                     Layout.fillWidth: true
 
                     text: "Show Pull Handle Animation"
@@ -155,7 +155,7 @@ Item {
                     onToggled: Runtime.structureCanvasSettings.showPullHandleAnimation = checked
                 }*/
 
-                VclCheckBox {
+                SctCheckBox {
                     Layout.fillWidth: true
 
                     text: "Show Cursor on Timeline"
@@ -163,7 +163,7 @@ Item {
                     onToggled: Runtime.timelineViewSettings.showCursor = checked
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     id: _chkZoomOneForEdit
 
                     Layout.fillWidth: true
@@ -188,7 +188,7 @@ Item {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            label: VclLabel {
+            label: SctLabel {
                 text: "Timeline"
             }
 
@@ -197,13 +197,13 @@ Item {
 
                 spacing: 10
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
                     text: "What text do you want to display on cards in the timeline?"
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 }
 
-                VclComboBox {
+                SctComboBox {
                     Layout.fillWidth: true
 
                     model: [
@@ -222,7 +222,7 @@ Item {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            label: VclLabel {
+            label: SctLabel {
                 text: "Zoom Speed"
             }
 
@@ -231,7 +231,7 @@ Item {
 
                 spacing: 10
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: "Configure how fast/slow you want zoom in/out to be on the structure canvas while using mouse wheel."
@@ -256,7 +256,7 @@ Item {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            label: VclLabel {
+            label: SctLabel {
                 text: "Defaults"
             }
 
@@ -289,7 +289,7 @@ Item {
                     }
                 }
 
-                VclLabel {
+                SctLabel {
                     text: "Default Scene Color"
                 }
 
@@ -306,7 +306,7 @@ Item {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            label: VclLabel {
+            label: SctLabel {
                 text: "Preview"
             }
 
@@ -315,14 +315,14 @@ Item {
 
                 spacing: 10
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: "Configure the max-size (width or height) the preview panel can occupy in the structure canvas."
                     wrapMode: Text.WordWrap
                 }
 
-                VclTextField {
+                SctTextField {
                     Layout.fillWidth: true
 
                     placeholderText: "Preview Size (50 - 1000)"

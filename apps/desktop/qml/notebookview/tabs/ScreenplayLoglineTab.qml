@@ -40,7 +40,7 @@ Item {
 
         width: Math.max(root.minTextAreaSize, Math.min(parent.width-20, root.maxTextAreaSize))
 
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
 
             text: "A logline should swiftly convey what a screenplay is about, including the main character, central conflict, setup and antagonist."
@@ -61,7 +61,7 @@ Item {
 
             Component.onCompleted: syntaxHighlighter.addDelegate(_textLimitHighlighter)
 
-            ScrollBar.vertical: VclScrollBar { }
+            ScrollBar.vertical: SctScrollBar { }
 
             Layout.fillWidth: true
             Layout.preferredHeight: Math.max(Runtime.idealFontMetrics.lineSpacing*10, contentHeight+10)
@@ -83,7 +83,7 @@ Item {
             onTextEdited: root.screenplay.logline = text
         }
 
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
 
             color: _textLimiter.limitReached ? "darkred" : Runtime.colors.primary.a700.background

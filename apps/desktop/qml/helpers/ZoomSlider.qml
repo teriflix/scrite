@@ -66,7 +66,7 @@ Item {
             }
         }
 
-        VclLabel {
+        SctLabel {
             Layout.preferredWidth: Runtime.minimumFontMetrics.advanceWidth("999%") + leftPadding + rightPadding
 
             text: Math.round(_slider.zoomLevel * 100) + "%"
@@ -83,10 +83,10 @@ Item {
                 onClicked: _sliderPopup.open()
             }
 
-            VclMenu {
+            SctMenu {
                 id: _sliderPopup
 
-                VclMenuItem {
+                SctMenuItem {
                     height: 40
                     background: Item { }
                     contentItem: Slider {

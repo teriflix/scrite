@@ -106,7 +106,7 @@ Rectangle {
         }
 
         readonly property Component unknownTab: Item {
-            VclLabel {
+            SctLabel {
                 anchors.centerIn: parent
 
                 text: "Unknown Tab"

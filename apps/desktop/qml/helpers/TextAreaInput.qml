@@ -157,26 +157,26 @@ TextArea {
         }
     }
 
-    VclMenu {
+    SctMenu {
         id: _contextMenu
 
         focus: false
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Cut\t" + ActionHub.editOptions.find("cut").shortcut
             enabled: root.selectedText !== ""
             onClicked: root.cut()
             focusPolicy: Qt.NoFocus
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Copy\t" + ActionHub.editOptions.find("copy").shortcut
             enabled: root.selectedText !== ""
             onClicked: root.copy()
             focusPolicy: Qt.NoFocus
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Paste\t" + ActionHub.editOptions.find("paste").shortcut
             onClicked: root.paste()
             focusPolicy: Qt.NoFocus

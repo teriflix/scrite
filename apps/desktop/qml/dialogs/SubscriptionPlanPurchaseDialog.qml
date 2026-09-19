@@ -42,7 +42,7 @@ DialogLauncher {
         doLaunch({"plan": plan})
     }
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         property var plan
@@ -95,7 +95,7 @@ DialogLauncher {
                         Layout.fillWidth: true
                         spacing: 6
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
                             text: _dialog.plan.title
                             font.bold: true
@@ -103,7 +103,7 @@ DialogLauncher {
                             wrapMode: Text.WordWrap
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
                             text: _dialog.plan.subtitle
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -115,13 +115,13 @@ DialogLauncher {
                             Layout.fillWidth: true
                             spacing: 6
 
-                            VclLabel {
+                            SctLabel {
                                 text: Runtime.daysSpanAsString(_dialog.plan.duration) + "  ·  " +
                                       "Device Count: " + _dialog.plan.devices
                                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                             }
 
-                            VclLabel {
+                            SctLabel {
                                 text: "ⓘ"
                                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
@@ -149,13 +149,13 @@ DialogLauncher {
                                 }
                             }
 
-                            VclLabel {
+                            SctLabel {
                                 text: "  ·  Discord community support only."
                                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                 visible: !Scrite.isFeatureNameEnabled("support/email", _dialog.plan.features)
                             }
 
-                            VclLabel {
+                            SctLabel {
                                 text: "ⓘ"
                                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                 visible: !Scrite.isFeatureNameEnabled("support/email", _dialog.plan.features)
@@ -170,7 +170,7 @@ DialogLauncher {
                             Item { Layout.fillWidth: true }
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
                             text: "★  Exclusive Plan"
                             font.bold: true
@@ -184,7 +184,7 @@ DialogLauncher {
                         Layout.fillWidth: true
                         spacing: 4
 
-                        VclLabel {
+                        SctLabel {
                             Layout.alignment: Qt.AlignHCenter
                             text: Scrite.currencySymbol(_dialog.plan.pricing.currency) + _dialog.plan.pricing.actual
                             font.family: Runtime.shortcutFontMetrics.font.family
@@ -194,7 +194,7 @@ DialogLauncher {
                             visible: _dialog.plan.pricing.actual > 0 && _dialog.plan.pricing.actual > _dialog.plan.pricing.price
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.alignment: Qt.AlignHCenter
                             text: _dialog.plan.pricing.price === 0
                                   ? "FREE"
@@ -204,7 +204,7 @@ DialogLauncher {
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 10
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.alignment: Qt.AlignHCenter
                             text: {
                                 const p = _dialog.plan.pricing
@@ -264,7 +264,7 @@ DialogLauncher {
 
             spacing: 20
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
                 Layout.leftMargin: 20
 
@@ -273,7 +273,7 @@ DialogLauncher {
                 visible: _dialog.plan && _dialog.plan.pricing.price > 0
             }
 
-            VclButton {
+            SctButton {
                 text: "Buy »"
                 onClicked: _dialog.acceptAction.trigger()
             }

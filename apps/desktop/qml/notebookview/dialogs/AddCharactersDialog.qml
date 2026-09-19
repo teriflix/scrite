@@ -36,7 +36,7 @@ DialogLauncher {
     name: "AddCharactersDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         width: Math.min(750, Scrite.window.width*0.8)
@@ -75,7 +75,7 @@ DialogLauncher {
                 anchors.margins: 20
                 spacing: 10
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: "Here are characters in your screenplay who don't already have a page in the Notebook."
@@ -96,7 +96,7 @@ DialogLauncher {
                         anchors.fill: parent
                         anchors.margins: 1
 
-                        ScrollBar.vertical: VclScrollBar { }
+                        ScrollBar.vertical: SctScrollBar { }
 
                         clip: contentHeight > height
                         contentWidth: _charactersComboBoxLayout.width
@@ -116,7 +116,7 @@ DialogLauncher {
 
                                 model: _charactersModel
 
-                                delegate: VclCheckBox {
+                                delegate: SctCheckBox {
                                     required property int index
                                     required property string modelData
 
@@ -131,7 +131,7 @@ DialogLauncher {
                     Layout.fillWidth: true
                     spacing: 20
 
-                    VclButton {
+                    SctButton {
                         text: "Select All"
                         enabled: _charactersModel.count > 0
 
@@ -143,7 +143,7 @@ DialogLauncher {
                         }
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Unselect All"
                         enabled: _charactersModel.count > 0
 
@@ -159,7 +159,7 @@ DialogLauncher {
                         Layout.fillWidth: true
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Add Selected"
                         enabled: _charactersModel.count > 0
 

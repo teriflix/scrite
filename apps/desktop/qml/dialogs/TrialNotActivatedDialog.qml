@@ -44,7 +44,7 @@ DialogLauncher {
     name: "TrialNotActivatedDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         title: {
@@ -83,7 +83,7 @@ DialogLauncher {
                 enabled: !_apiCalls.busy
                 opacity: enabled ? 1 : 0.5
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: "No credit card needed. Explore all features with zero commitment."
@@ -92,7 +92,7 @@ DialogLauncher {
                 }
 
                 ColumnLayout {
-                    VclRadioButton {
+                    SctRadioButton {
                         id: _activateTrialNowButton
 
                         Layout.fillWidth: true
@@ -101,7 +101,7 @@ DialogLauncher {
                         text: "I want to activate my free trial now."
                     }
 
-                    VclRadioButton {
+                    SctRadioButton {
                         id: _activateTrialLaterButton
 
                         Layout.fillWidth: true
@@ -110,7 +110,7 @@ DialogLauncher {
                         text: "I'll activate the trial later."
                     }
 
-                    VclRadioButton {
+                    SctRadioButton {
                         id: _subscriptionRequirementButton
 
                         Layout.fillWidth: true
@@ -119,7 +119,7 @@ DialogLauncher {
                         text: "I didn’t realize a subscription is required after the trial."
                     }
 
-                    VclRadioButton {
+                    SctRadioButton {
                         id: _othersButton
 
                         Layout.fillWidth: true
@@ -154,7 +154,7 @@ DialogLauncher {
                     }
                 }
 
-                VclButton {
+                SctButton {
                     Layout.alignment: Qt.AlignRight
 
                     enabled: _buttonGroup.checkState !== Qt.Unchecked &&

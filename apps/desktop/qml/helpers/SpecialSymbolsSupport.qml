@@ -51,7 +51,7 @@ Item {
         }
     }
 
-    VclMenu {
+    SctMenu {
         id: _symbolMenu
 
         width: 514
@@ -59,7 +59,7 @@ Item {
         focus: false
         autoWidth: false
 
-        VclMenuItem {
+        SctMenuItem {
             width: _symbolMenu.width
             height: 400
             focusPolicy: Qt.NoFocus
@@ -145,7 +145,7 @@ Item {
 
                         color: _symbolsPanel.currentIndex === index ? Runtime.colors.primary.windowColor : Qt.rgba(0,0,0,0)
 
-                        VclLabel {
+                        SctLabel {
                             anchors.right: parent.right
                             anchors.rightMargin: 10
                             anchors.verticalCenter: parent.verticalCenter
@@ -169,7 +169,7 @@ Item {
         GridView {
             id: _symbolsGridView
 
-            ScrollBar.vertical: VclScrollBar { flickable: _symbolsGridView }
+            ScrollBar.vertical: SctScrollBar { flickable: _symbolsGridView }
 
             anchors.top: parent.top
             anchors.left: _symbolsPanel.right
@@ -189,7 +189,7 @@ Item {
                 width: _symbolsGridView.width-14
                 height: _symbolsPanel.currentIndexIsEmoji ? 35 : 0
 
-                VclLabel {
+                SctLabel {
                     width: parent.width
 
                     anchors.centerIn: parent
@@ -224,7 +224,7 @@ Item {
                     border.color: Runtime.colors.primary.borderColor
                 }
 
-                VclText {
+                SctText {
                     anchors.centerIn: parent
 
                     text: _symbolsGridViewDelegate.modelData

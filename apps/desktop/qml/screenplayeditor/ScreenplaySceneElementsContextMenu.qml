@@ -27,14 +27,14 @@ import "../helpers"
 import "../dialogs"
 import "../structureview"
 
-VclMenu {
+SctMenu {
     id: root
 
     required property SceneGroup sceneGroup
 
     property ScreenplayElement element
 
-    VclMenuItem {
+    SctMenuItem {
         enabled: root.sceneGroup.sceneCount === 1 && root.element && root.element.scene
 
         action: Action {
@@ -46,12 +46,12 @@ VclMenu {
         onTriggered: root.element.scene.heading.enabled = action.checked
     }
 
-    VclMenu {
+    SctMenu {
         enabled: root.sceneGroup.sceneCount === 1
 
         title: "Page Breaks"
 
-        VclMenuItem {
+        SctMenuItem {
             action: Action {
                 text: "Before"
                 checkable: true
@@ -61,7 +61,7 @@ VclMenu {
             onTriggered: root.element.pageBreakBefore = action.checked
         }
 
-        VclMenuItem {
+        SctMenuItem {
             action: Action {
                 text: "After"
                 checkable: true
@@ -97,7 +97,7 @@ VclMenu {
         }
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Make Sequence\t" + ActionHub.sceneListPanelOptions.find("makeSequence").shortcut
 
         enabled: !Scrite.document.readOnly && root.sceneGroup.canBeStacked
@@ -110,7 +110,7 @@ VclMenu {
         }
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Break Sequence\t" + ActionHub.sceneListPanelOptions.find("breakSequence").shortcut
 
         enabled: !Scrite.document.readOnly && root.sceneGroup.canBeUnstacked
@@ -128,14 +128,14 @@ VclMenu {
         enabled: !Scrite.document.readOnly
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Keywords\t" + ActionHub.sceneListPanelOptions.find("keywords").shortcut
         enabled: !Scrite.document.readOnly
 
         onClicked: SceneGroupKeywordsDialog.launch(root.sceneGroup)
     }
 
-    VclMenu {
+    SctMenu {
         title: "Reports"
 
         width: 250
@@ -143,7 +143,7 @@ VclMenu {
         Repeater {
             model: Runtime.sceneReports.reports ? Runtime.sceneReports.reports : 0
 
-            delegate: VclMenuItem {
+            delegate: SctMenuItem {
                 required property int index
                 required property var modelData
 
@@ -164,13 +164,13 @@ VclMenu {
 
     MenuSeparator { }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Copy\t" + ActionHub.sceneListPanelOptions.find("copy").shortcut
 
         onClicked: Scrite.document.screenplay.copySelection()
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Paste After\t" + ActionHub.sceneListPanelOptions.find("paste").shortcut
         enabled: Scrite.document.screenplay.canPaste
 
@@ -179,7 +179,7 @@ VclMenu {
 
     MenuSeparator { }
 
-    VclMenuItem {
+    SctMenuItem {
         id: _omitIncludeMenuItem
 
         property bool omitted: Scrite.document.screenplay.selectedElementsOmitStatus !== Screenplay.NotOmitted
@@ -195,7 +195,7 @@ VclMenu {
         }
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Remove\t" + ActionHub.sceneListPanelOptions.find("remove").shortcut
         enabled: !Scrite.document.readOnly
 

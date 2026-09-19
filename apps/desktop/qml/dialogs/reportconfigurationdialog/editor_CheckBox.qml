@@ -25,7 +25,7 @@ import "../../globals"
 import "../../controls"
 import "../../helpers"
 
-VclCheckBox {
+SctCheckBox {
     id: root
     property scriteObjectConfigField fieldInfo
     property AbstractReportGenerator report

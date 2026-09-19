@@ -73,7 +73,7 @@ Item {
 
         spacing: 10
 
-        VclLabel {
+        SctLabel {
             id: _labelText
 
             width: parent.width
@@ -100,7 +100,7 @@ Item {
             }
         }
 
-        VclTextField {
+        SctTextField {
             TabSequenceItem.manager: root.tabSequenceManager
 
             width: parent.width
@@ -120,7 +120,7 @@ Item {
             Repeater {
                 model: root.allowedExtensions
 
-                delegate: VclRadioButton {
+                delegate: SctRadioButton {
                     id: _delegate
 
                     required property int index

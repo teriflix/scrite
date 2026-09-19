@@ -109,7 +109,7 @@ Item {
                     anchors.centerIn: parent
                     spacing: 40
 
-                    VclLabel {
+                    SctLabel {
                         width: parent.width
 
                         horizontalAlignment: Text.AlignHCenter
@@ -125,7 +125,7 @@ Item {
 
                         spacing: 20
 
-                        VclButton {
+                        SctButton {
                             text: "Yes"
                             focusPolicy: Qt.NoFocus
 
@@ -137,7 +137,7 @@ Item {
                             }
                         }
 
-                        VclButton {
+                        SctButton {
                             text: "No"
                             focusPolicy: Qt.NoFocus
 
@@ -170,7 +170,7 @@ Item {
             spacing: 10
             visible: !parent.active
 
-            VclLabel {
+            SctLabel {
                 width: parent.width
 
                 horizontalAlignment: Text.AlignHCenter
@@ -180,7 +180,7 @@ Item {
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
 
-            VclButton {
+            SctButton {
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 text: "Select Photo"

@@ -27,7 +27,7 @@ import "../helpers"
 import "../dialogs"
 import "../notifications"
 
-VclMenu {
+SctMenu {
     id: root
 
     property string innerTitle: ""
@@ -50,7 +50,7 @@ VclMenu {
         enabled: false
     }
 
-    VclMenuItem {
+    SctMenuItem {
         width: root.width
         height: root.height
 
@@ -74,7 +74,7 @@ VclMenu {
                     enabled: Runtime.appFeatures.structure.enabled && root.sceneGroup.sceneCount > 0
                     opacity: enabled ? 1 : 0.5
 
-                    VclLabel {
+                    SctLabel {
                         id: _innerTitleText
 
                         anchors.top: parent.top
@@ -140,7 +140,7 @@ VclMenu {
                             Runtime.execLater(_groupsView, 50, adjustScrolling)
                         }
 
-                        ScrollBar.vertical: VclScrollBar { flickable: _groupsView }
+                        ScrollBar.vertical: SctScrollBar { flickable: _groupsView }
                         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
                         anchors.left: parent.left
@@ -164,7 +164,7 @@ VclMenu {
                             height: 30
                             color: Runtime.colors.primary.windowColor
 
-                            VclLabel {
+                            SctLabel {
                                 id: _categoryLabel
 
                                 anchors.centerIn: parent
@@ -216,7 +216,7 @@ VclMenu {
                                     }
                                 }
 
-                                VclLabel {
+                                SctLabel {
                                     anchors.verticalCenter: parent.verticalCenter
 
                                     width: parent.width - parent.spacing - 24
@@ -253,7 +253,7 @@ VclMenu {
                     }
                 }
 
-                VclButton {
+                SctButton {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Customise"

@@ -63,7 +63,7 @@ Item {
 
         spacing: 10
 
-        VclTextField {
+        SctTextField {
             id: _sceneHeadingField
 
             TabSequenceItem.manager: _sceneTabSequence
@@ -85,7 +85,7 @@ Item {
             onEditingComplete: root.scene.heading.parseFrom(text)
         }
 
-        VclTextField {
+        SctTextField {
             id: _sceneTitleField
 
             TabSequenceItem.manager: _sceneTabSequence
@@ -122,7 +122,7 @@ Item {
                 onClicked: _private.popupFormalTagsMenu()
             }
 
-            VclLabel {
+            SctLabel {
                 anchors.verticalCenter: parent.verticalCenter
 
                 font: _sceneTagsList.label.font

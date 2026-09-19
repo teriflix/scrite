@@ -52,7 +52,7 @@ DialogLauncher {
         })
     }
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         width: Math.max(500, Math.min( Math.min(_private.maxDialogWidth,_private.idealColumnSize*(plans.length+1)), Scrite.window.width * 0.8))
@@ -87,11 +87,11 @@ DialogLauncher {
                 boundsBehavior: Flickable.StopAtBounds
                 boundsMovement: Flickable.StopAtBounds
 
-                ScrollBar.vertical: VclScrollBar {
+                ScrollBar.vertical: SctScrollBar {
                     id: _verticialScrollBar
                     flickable: _comparisionTableView
                 }
-                ScrollBar.horizontal: VclScrollBar {
+                ScrollBar.horizontal: SctScrollBar {
                     flickable: _verticialScrollBar
                 }
 
@@ -114,7 +114,7 @@ DialogLauncher {
                             DelegateChoice {
                                 roleValue: "label"
 
-                                delegate: VclLabel {
+                                delegate: SctLabel {
                                     id: _labelDelegate
                                     required property int index
                                     required property var attributes
@@ -143,7 +143,7 @@ DialogLauncher {
                             DelegateChoice {
                                 roleValue: "labelWithTooltip"
 
-                                delegate: VclLabel {
+                                delegate: SctLabel {
                                     id: _labelWithTooltipDelegate
                                     required property int index
                                     required property var attributes
@@ -213,7 +213,7 @@ DialogLauncher {
                         }
                     }
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
                         Layout.columnSpan: _comparisonTable.columns
 

@@ -45,7 +45,7 @@ QtObject {
     readonly property Component theTask: SequentialAnimation {
         id: _theTaskInstance
 
-        property VclDialog waitDialog
+        property SctDialog waitDialog
         property string filePath
         property string mode // can be one of ["open", "openAnonymously", "openOrImport"]
 

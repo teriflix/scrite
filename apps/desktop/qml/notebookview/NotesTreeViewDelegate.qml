@@ -135,7 +135,7 @@ TreeViewDelegate {
             }
         }
 
-        VclLabel {
+        SctLabel {
             id: _text
 
             anchors.verticalCenter: parent.verticalCenter

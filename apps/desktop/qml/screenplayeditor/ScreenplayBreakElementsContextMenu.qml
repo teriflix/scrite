@@ -25,14 +25,14 @@ import "../globals"
 import "../dialogs"
 import "../controls"
 
-VclMenu {
+SctMenu {
     id: root
 
     property ScreenplayElement element
 
     onClosed: element = null
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Paste After"
 
         enabled: Scrite.document.screenplay.canPaste && !Scrite.document.screenplay.hasSelectedElements
@@ -44,7 +44,7 @@ VclMenu {
         }
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Remove"
 
         enabled: !Scrite.document.readOnly && !Scrite.document.screenplay.hasSelectedElements
@@ -55,7 +55,7 @@ VclMenu {
         }
     }
 
-    VclMenu {
+    SctMenu {
         title: "Reports"
 
         width: 250
@@ -64,7 +64,7 @@ VclMenu {
         Repeater {
             model: Runtime.episodeReports.reports ? Runtime.episodeReports.reports : 0
 
-            delegate: VclMenuItem {
+            delegate: SctMenuItem {
                 required property int index
                 required property var modelData
 

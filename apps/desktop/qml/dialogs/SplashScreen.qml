@@ -80,7 +80,7 @@ DialogLauncher {
             smooth: true; mipmap: true
             asynchronous: false
 
-            VclText {
+            SctText {
                 id: _versionText
 
                 anchors.top: parent.top

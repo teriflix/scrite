@@ -45,7 +45,7 @@ ColumnLayout {
 
     spacing: 10
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         elide: Text.ElideRight
@@ -65,7 +65,7 @@ ColumnLayout {
             spacing: 5
             flow: Flow.LeftToRight
 
-            VclLabel {
+            SctLabel {
                 id: _charactersPrefix
                 text: root.characterNames.length === 0 ? "No Characters Selected" : "»"
                 topPadding: 0

@@ -34,7 +34,7 @@ Item {
 
     Component.onDestruction: Scrite.user.markMessagesAsRead()
 
-    VclLabel {
+    SctLabel {
         anchors.centerIn: parent
 
         visible: Scrite.user.totalMessageCount === 0
@@ -47,7 +47,7 @@ Item {
 
         anchors.fill: parent
 
-        ScrollBar.vertical: VclScrollBar { }
+        ScrollBar.vertical: SctScrollBar { }
         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
         clip: true
@@ -58,7 +58,7 @@ Item {
         spacing: 20
         boundsBehavior: Flickable.StopAtBounds
 
-        header: VclLabel {
+        header: SctLabel {
             width: _userMessagesView.width
             padding: 10
 
@@ -180,7 +180,7 @@ Item {
 
                         spacing: 12
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
 
                             text: Runtime.formatDateIncludingYear(_messageItem.modelData.timestamp)
@@ -189,7 +189,7 @@ Item {
                             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                         }
 
-                        VclLabel {
+                        SctLabel {
                             id: _subject
 
                             Layout.fillWidth: true
@@ -203,7 +203,7 @@ Item {
                             elide: Text.ElideRight
                         }
 
-                        VclLabel {
+                        SctLabel {
                             id: _body
 
                             Layout.fillWidth: true

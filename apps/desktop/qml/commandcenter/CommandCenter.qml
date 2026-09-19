@@ -68,7 +68,7 @@ Popup {
 
             spacing: 20
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
 
                 padding: 10
@@ -189,7 +189,7 @@ Popup {
 
                             spacing: 0
 
-                            VclText {
+                            SctText {
                                 id: _nameLabel
 
                                 Layout.fillWidth: true
@@ -203,7 +203,7 @@ Popup {
                                 text: "<b>" + _delegate.actionManager.title + "</b>: " + _delegate.qmlAction.text + (_delegate.qmlAction.checkable & _delegate.qmlAction.checked ? " ✔" : "")
                             }
 
-                            VclText {
+                            SctText {
                                 id: _descriptionLabel
 
                                 Layout.fillWidth: true

@@ -61,7 +61,7 @@ Item {
         id: _private
 
         readonly property Component emptyScreenplayContent: Item {
-            VclLabel {
+            SctLabel {
                 anchors.top: parent.top
                 anchors.topMargin: 50
                 anchors.horizontalCenter: parent.horizontalCenter

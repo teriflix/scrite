@@ -37,7 +37,7 @@ DialogLauncher {
     name: "BackupsDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         title: "Select a Backup to Load"
@@ -66,7 +66,7 @@ DialogLauncher {
                         model: Scrite.document.backupFilesModel
                         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                         currentIndex: -1
-                        ScrollBar.vertical: VclScrollBar { flickable: _backupFilesView }
+                        ScrollBar.vertical: SctScrollBar { flickable: _backupFilesView }
                         highlight: Rectangle {
                             color: Runtime.colors.primary.highlight.background
                         }
@@ -95,7 +95,7 @@ DialogLauncher {
                                 width: parent.width-20
                                 anchors.verticalCenter: parent.verticalCenter
 
-                                VclLabel {
+                                SctLabel {
                                     width: parent.width * 0.75
                                     text: _backupFilesViewDelegate.relativeTime + "<br/><font size=\"-2\">" + _backupFilesViewDelegate.timestampAsString + "</font>"
                                     padding: 5
@@ -105,7 +105,7 @@ DialogLauncher {
                                     anchors.top: parent.top
                                 }
 
-                                VclLabel {
+                                SctLabel {
                                     width: parent.width * 0.25
                                     anchors.top: parent.top
                                     property string fileSizeInfo: {
@@ -142,7 +142,7 @@ DialogLauncher {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: 20
 
-                    VclButton {
+                    SctButton {
                         text: "Open in This Window"
                         enabled: _backupFilesView.currentIndex >= 0
                         hoverEnabled: true
@@ -154,7 +154,7 @@ DialogLauncher {
                         }
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Open in New Window"
                         enabled: _backupFilesView.currentIndex >= 0
                         hoverEnabled: true

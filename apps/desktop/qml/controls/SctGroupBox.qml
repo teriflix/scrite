@@ -15,24 +15,32 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Controls.Material
 
 import Scrite.App
 
 import "../globals"
 
-RadioButton {
+GroupBox {
     id: root
 
-    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+    property color labelBackground: Runtime.colors.accent.c500.background
+    property color labelText: Runtime.colors.accent.c500.text
 
-    contentItem: VclLabel {
-        leftPadding: root.indicator && !root.mirrored ? root.indicator.width + root.spacing : 0
-        rightPadding: root.indicator && root.mirrored ? root.indicator.width + root.spacing : 0
+    topPadding: label.height + Runtime.idealFontMetrics.height
 
-        text: root.text
-        font: root.font
-        wrapMode: Text.WordWrap
-        opacity: root.enabled ? 1 : 0.5
-        verticalAlignment: Text.AlignVCenter
+    label: Rectangle {
+        // x: root.leftPadding
+        width: Math.min(_labelItem.width, root.availableWidth)
+        height: _labelItem.height
+        color: root.labelBackground
+
+        SctLabel {
+            id: _labelItem
+            padding: 5
+            text: root.title
+            font.bold: true
+            color: root.labelText
+        }
     }
 }

@@ -37,7 +37,7 @@ BasicAttachmentsDropArea {
     allowedType: Attachments.NoMedia
     allowedExtensions: Scrite.document.supportedImportFileExtensions
 
-    VclDialog {
+    SctDialog {
         id: _dialog
 
         title: root.active ? root.attachment.originalFileName : root.droppedFileName
@@ -49,7 +49,7 @@ BasicAttachmentsDropArea {
                 anchors.fill: parent
                 anchors.margins: 20
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: root.active ? "Drop the file here to open/import it." : "Do you want to open, import or cancel?"
@@ -57,7 +57,7 @@ BasicAttachmentsDropArea {
                     horizontalAlignment: Text.AlignHCenter
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: "NOTE: Any unsaved changes in the currently open document will be discarded."
@@ -74,7 +74,7 @@ BasicAttachmentsDropArea {
 
                     spacing: 20
 
-                    VclButton {
+                    SctButton {
                         text: "Open/Import"
 
                         onClicked: {
@@ -85,7 +85,7 @@ BasicAttachmentsDropArea {
                         }
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Cancel"
 
                         onClicked:  {

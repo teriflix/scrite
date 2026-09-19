@@ -145,7 +145,7 @@ Rectangle {
                                     color: _pageList.currentIndex === _pageRepeaterDelegate.index ? Runtime.colors.primary.c50.text : Runtime.colors.accent.c600.text
                                     visible: _pageRepeaterDelegate.pageCounter > 0
 
-                                    VclLabel {
+                                    SctLabel {
                                         id: _pageCounter
 
                                         anchors.centerIn: parent
@@ -180,7 +180,7 @@ Rectangle {
                                 }
                             }
 
-                            VclLabel {
+                            SctLabel {
                                 id: _pageLabel
 
                                 text: _pageRepeaterDelegate.pageTitle
@@ -239,7 +239,7 @@ Rectangle {
             contentWidth: _pageContentLoader.active && ScrollBar.vertical.needed ? (width-20) : width
             contentHeight: _pageContentLoader.height
 
-            ScrollBar.vertical: VclScrollBar { flickable: _pageContentArea }
+            ScrollBar.vertical: SctScrollBar { flickable: _pageContentArea }
 
             Loader {
                 id: _pageContentLoader

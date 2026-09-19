@@ -47,7 +47,7 @@ Popup {
 
         width: root.width - 22
 
-        VclLabel {
+        SctLabel {
             id: _message
 
             Layout.fillWidth: true
@@ -63,7 +63,7 @@ Popup {
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
 
-            VclButton {
+            SctButton {
                 focusPolicy: Qt.NoFocus
                 text: "Yes"
 
@@ -73,7 +73,7 @@ Popup {
                 }
             }
 
-            VclButton {
+            SctButton {
                 focusPolicy: Qt.NoFocus
                 text: "No"
 

@@ -63,7 +63,7 @@ Item {
         Repeater {
             model: _indexCardFieldsModel
 
-            delegate: VclLabel {
+            delegate: SctLabel {
                 required property int index
                 required property string name
 
@@ -119,7 +119,7 @@ Item {
     Component {
         id: _viewerField
 
-        VclLabel {
+        SctLabel {
             property int index
             property string description
             property string value
@@ -135,7 +135,7 @@ Item {
     Component {
         id: _editorField
 
-        VclTextField {
+        SctTextField {
             property int index
             property string description
             property string value

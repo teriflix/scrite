@@ -38,7 +38,7 @@ ColumnLayout {
 
     spacing: 5
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -46,7 +46,7 @@ ColumnLayout {
         text: root.fieldInfo.label
     }
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -67,7 +67,7 @@ ColumnLayout {
             border.width: 1
             border.color: Runtime.colors.primary.c50.text
 
-            VclText {
+            SctText {
                 anchors.centerIn: parent
 
                 width: parent.width * 0.8
@@ -104,7 +104,7 @@ ColumnLayout {
 
             clip: true
 
-            delegate: VclCheckBox {
+            delegate: SctCheckBox {
                 required property int index
                 required property scriteScreenplayBreakInfo modelData
 

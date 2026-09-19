@@ -42,7 +42,7 @@ DialogLauncher {
     name: "RenameCharacterDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         property Character character
@@ -61,7 +61,7 @@ DialogLauncher {
                 anchors.margins: 20
                 spacing: 20
 
-                VclTextField {
+                SctTextField {
                     id: _newNameField
 
                     Layout.fillWidth: true
@@ -82,7 +82,7 @@ DialogLauncher {
                     Layout.fillWidth: true
                     spacing: 20
 
-                    VclCheckBox {
+                    SctCheckBox {
                         id: _chkNotice
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignVCenter
@@ -90,7 +90,7 @@ DialogLauncher {
                         text: "I understand that the rename operation cannot be undone."
                     }
 
-                    VclButton {
+                    SctButton {
                         id: _renameButton
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignVCenter
@@ -239,7 +239,7 @@ DialogLauncher {
             property string orignalCharacterName
             property string newCharacterName
             property bool renameWasSuccessful: false
-            property VclDialog waitDialog
+            property SctDialog waitDialog
         }
     }
 }

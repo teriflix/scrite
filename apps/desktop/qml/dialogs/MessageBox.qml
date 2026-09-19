@@ -90,7 +90,7 @@ Item {
     Component {
         id: _dialogComponent
 
-        VclDialog {
+        SctDialog {
             id: _dialog
 
             property string message
@@ -161,7 +161,7 @@ Item {
                     anchors.margins: 20
                     spacing: 20
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
                         horizontalAlignment: lineCount > 3 ? Text.AlignLeft : Text.AlignHCenter
                         text: _dialog.message
@@ -175,7 +175,7 @@ Item {
                         Repeater {
                             model: _dialog.buttons
 
-                            delegate: VclButton {
+                            delegate: SctButton {
                                 id: _button
 
                                 required property string index

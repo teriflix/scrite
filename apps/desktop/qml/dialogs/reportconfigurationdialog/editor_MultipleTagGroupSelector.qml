@@ -34,7 +34,7 @@ ColumnLayout {
 
     spacing: 5
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -42,7 +42,7 @@ ColumnLayout {
         text: root.fieldInfo.label
     }
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -91,7 +91,7 @@ ColumnLayout {
                     anchors.margins: 3
                     color: Runtime.colors.primary.windowColor
 
-                    VclLabel {
+                    SctLabel {
                         text: _sectionDelegate.section
                         topPadding: 5
                         bottomPadding: 5
@@ -101,7 +101,7 @@ ColumnLayout {
                 }
             }
 
-            delegate: VclCheckBox {
+            delegate: SctCheckBox {
                 required property int index
                 required property string name
                 required property string label

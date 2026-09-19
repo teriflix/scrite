@@ -36,7 +36,7 @@ DialogLauncher {
     name: "RelationshipNameEditorDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         property Relationship relationship
@@ -91,7 +91,7 @@ DialogLauncher {
                             }
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.alignment: Qt.AlignHCenter
                             Layout.preferredWidth: 180
 
@@ -104,7 +104,7 @@ DialogLauncher {
                         }
                     }
 
-                    VclTextField {
+                    SctTextField {
                         id: _txtRelationshipName
 
                         Layout.fillWidth: true
@@ -144,7 +144,7 @@ DialogLauncher {
                             }
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.alignment: Qt.AlignHCenter
                             Layout.preferredWidth: 180
 
@@ -162,7 +162,7 @@ DialogLauncher {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: 20
 
-                    VclButton {
+                    SctButton {
                         id: _revertButton
 
                         text: "Revert"
@@ -171,7 +171,7 @@ DialogLauncher {
                         onClicked: _txtRelationshipName.text = _dialog.relationship.name
                     }
 
-                    VclButton {
+                    SctButton {
                         id: _doneButton
 
                         function click() {

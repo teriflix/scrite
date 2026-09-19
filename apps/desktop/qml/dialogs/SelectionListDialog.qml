@@ -44,7 +44,7 @@ DialogLauncher {
     name: "SelectionListDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         required property var list
@@ -64,7 +64,7 @@ DialogLauncher {
                 anchors.fill: parent
                 anchors.margins: 20
 
-                VclTextField {
+                SctTextField {
                     id: _textField
 
                     Layout.fillWidth: true
@@ -89,7 +89,7 @@ DialogLauncher {
                     ListView {
                         id: _listView
 
-                        ScrollBar.vertical: VclScrollBar { }
+                        ScrollBar.vertical: SctScrollBar { }
 
                         anchors.fill: parent
                         anchors.margins: 1
@@ -123,7 +123,7 @@ DialogLauncher {
                             }
                         }
 
-                        delegate: VclLabel {
+                        delegate: SctLabel {
                             id: _delegate
 
                             required property int index
@@ -144,14 +144,14 @@ DialogLauncher {
                 RowLayout {
                     Layout.fillWidth: true
 
-                    VclLabel {
+                    SctLabel {
                         Layout.alignment: Qt.AlignVCenter
                         Layout.fillWidth: true
 
                         text: _listView.count + " item(s)"
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Select"
 
                         onClicked: _dialog.acceptAction.trigger()

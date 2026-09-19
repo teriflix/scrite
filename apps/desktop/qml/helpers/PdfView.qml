@@ -69,10 +69,10 @@ Item {
                 property real spacing: Math.min( width*0.05, 30 )
                 property int  pdfPagesPerRow: Math.max(1,Math.floor(width/pdfPageCellWidth))
 
-                ScrollBar.vertical: VclScrollBar {
+                ScrollBar.vertical: SctScrollBar {
                     flickable: _pdfView
                 }
-                ScrollBar.horizontal: VclScrollBar {
+                ScrollBar.horizontal: SctScrollBar {
                     flickable: _pdfView
                 }
 
@@ -229,7 +229,7 @@ Item {
             spacing: 20
 
             // Page Count
-            VclLabel {
+            SctLabel {
                 text: _pdfDoc.pageCount + (_pdfDoc.pageCount > 1 ? " Pages" : " Page")
             }
 
@@ -242,7 +242,7 @@ Item {
             }
 
             // Pages per row:
-            VclComboBox {
+            SctComboBox {
                 Layout.preferredWidth: Runtime.idealFontMetrics.boundingRect("View 3 Page(s)").width + 40
 
                 model: {
@@ -266,7 +266,7 @@ Item {
             }
 
             // Download & Refresh buttons
-            VclToolButton {
+            SctToolButton {
                 text: "Refresh"
                 visible: root.displayRefreshButton
                 toolTipText: "Regenerates this PDF and refreshes its content."
@@ -276,7 +276,7 @@ Item {
                 onClicked: root.refreshRequest()
             }
 
-            VclToolButton {
+            SctToolButton {
                 id: _savePdfButton
 
                 text: "Save PDF"
@@ -301,19 +301,19 @@ Item {
 
                     height: 1
 
-                    VclMenu {
+                    SctMenu {
                         id: _saveMenu
 
                         width: 325
 
-                        VclMenuItem {
+                        SctMenuItem {
                             text: "To 'Downloads' folder"
                             property string targetFolder: StandardPaths.writableLocation(StandardPaths.DownloadLocation)
 
                             onClicked: _private.savePdf(targetFolder)
                         }
 
-                        VclMenuItem {
+                        SctMenuItem {
                             id: _aptFolderItem
 
                             text: Scrite.document.fileName === "" ?
@@ -330,7 +330,7 @@ Item {
                             }
                         }
 
-                        VclMenuItem {
+                        SctMenuItem {
                             id: _lastUsedFolderItem
 
                             text: 'Last used folder'
@@ -345,7 +345,7 @@ Item {
                             }
                         }
 
-                        VclMenuItem {
+                        SctMenuItem {
                             text: "Other ..."
 
                             onClicked: {
@@ -362,7 +362,7 @@ Item {
             RowLayout {
                 visible: !_savePdfButton.visible
 
-                VclLabel {
+                SctLabel {
                     text: "Save PDF is disabled."
                 }
 
@@ -385,7 +385,7 @@ Item {
                 }
             }
 
-            VclToolButton {
+            SctToolButton {
                 id: _revealFileButton
 
                 text: "Reveal"
@@ -469,7 +469,7 @@ Item {
         }
     }
 
-    VclDialog {
+    SctDialog {
         id: _saveDisabledNotice
 
         width: 640

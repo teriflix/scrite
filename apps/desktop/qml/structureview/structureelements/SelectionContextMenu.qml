@@ -26,7 +26,7 @@ import "../../dialogs"
 import "../../helpers"
 import "../../controls"
 
-VclMenu {
+SctMenu {
     id: root
 
     required property AbstractSelection selection
@@ -58,10 +58,10 @@ VclMenu {
         }
     }
 
-    VclMenu {
+    SctMenu {
         title: "Layout"
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Layout Horizontally"
             enabled: !Scrite.document.readOnly && (root.selection.hasItems ? root.selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
             icon.source: Runtime.themedIcon("qrc:/icons/action/layout_horizontally.png")
@@ -72,7 +72,7 @@ VclMenu {
             }
         }
 
-        VclMenuItem {
+        SctMenuItem {
             icon.source: Runtime.themedIcon("qrc:/icons/action/layout_vertically.png")
             text: "Layout Vertically"
             enabled: !Scrite.document.readOnly && (root.selection.hasItems ? root.selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
@@ -83,7 +83,7 @@ VclMenu {
             }
         }
 
-        VclMenuItem {
+        SctMenuItem {
             icon.source: Runtime.themedIcon("qrc:/icons/action/layout_flow_horizontally.png")
             text: "Flow Horizontally"
             enabled: !Scrite.document.readOnly && (root.selection.hasItems ? root.selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
@@ -94,7 +94,7 @@ VclMenu {
             }
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Flow Vertically"
             enabled: !Scrite.document.readOnly && (root.selection.hasItems ? root.selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
             icon.source: Runtime.themedIcon("qrc:/icons/action/layout_flow_vertically.png")
@@ -106,7 +106,7 @@ VclMenu {
         }
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Annotate With Rectangle"
 
         onClicked: {
@@ -115,7 +115,7 @@ VclMenu {
         }
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Stack"
 
         enabled: !Scrite.document.readOnly && _sceneGroup.canBeStacked
@@ -123,7 +123,7 @@ VclMenu {
         onTriggered: _sceneGroup.stack()
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Add To Timeline"
 
         onClicked: {
@@ -134,7 +134,7 @@ VclMenu {
         }
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Remove From Timeline"
 
         enabled: {
@@ -168,14 +168,14 @@ VclMenu {
         onToggled: Runtime.execLater(root.selection, 250, function() { root.selection.refit() })
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Keywords"
         enabled: !Scrite.document.readOnly
 
         onClicked: SceneGroupKeywordsDialog.launch(_sceneGroup)
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Delete"
         enabled: !Scrite.document.readOnly
 

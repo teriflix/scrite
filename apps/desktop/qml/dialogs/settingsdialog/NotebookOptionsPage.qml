@@ -41,7 +41,7 @@ Item {
         GroupBox {
             Layout.fillWidth: true
 
-            label: VclLabel {
+            label: SctLabel {
                 text: "Text Notes"
             }
 
@@ -59,7 +59,7 @@ Item {
                     text: "If you are unable to open scene, story or character notes, then uncheck this option. Scrite uses a web-based text editor for accepting rich formatted text notes. However, on some computers this may fail to launch causing Scrite to crash. In such cases unchecking the option below allows you to capture plain text notes."
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     text: "Use Rich Text Notes"
                     checked: Runtime.notebookSettings.richTextNotesEnabled
                     onToggled: Runtime.notebookSettings.richTextNotesEnabled = checked
@@ -70,7 +70,7 @@ Item {
         GroupBox {
             Layout.fillWidth: true
 
-            label: VclLabel {
+            label: SctLabel {
                 text: "Relationship Graph"
             }
 
@@ -100,7 +100,7 @@ Item {
                     ColumnLayout {
                         Layout.preferredWidth: (parent.width-parent.spacing)/2
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
 
                             font.bold: true
@@ -108,7 +108,7 @@ Item {
                             text: "Max Time In Milliseconds"
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
 
                             font.bold: false
@@ -141,7 +141,7 @@ Item {
                     ColumnLayout {
                         Layout.preferredWidth: (parent.width-parent.spacing)/2
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
 
                             font.bold: true
@@ -149,7 +149,7 @@ Item {
                             text: "Max Iterations"
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
 
                             font.bold: false

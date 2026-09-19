@@ -14,11 +14,11 @@
 ****************************************************************************/
 
 /**
-  Only difference between VclLabel and VclText is that, VclText does not specify default font.pointSize.
+  Only difference between SctLabel and SctText is that, SctText does not specify default font.pointSize.
 
-  Use VclText {} in cases where you need to use font.pixelSize.
+  Use SctText {} in cases where you need to use font.pixelSize.
 
-  For everything else, use VclLabel {}
+  For everything else, use SctLabel {}
   */
 
 import QtQuick

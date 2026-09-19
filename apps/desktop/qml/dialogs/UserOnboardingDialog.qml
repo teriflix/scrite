@@ -36,7 +36,7 @@ DialogLauncher {
     name: "UserOnboardingDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         width: 900

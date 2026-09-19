@@ -46,7 +46,7 @@ QtObject {
     readonly property Component delegate: AbstractAnnotationDelegate {
         id: _d
 
-        VclLabel {
+        SctLabel {
             anchors.fill: parent
             anchors.margins: 8
 

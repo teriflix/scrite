@@ -32,7 +32,7 @@ ColumnLayout {
 
     spacing: 5
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -42,7 +42,7 @@ ColumnLayout {
         text: root.fieldInfo.name
     }
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         visible: text !== ""
@@ -53,7 +53,7 @@ ColumnLayout {
         text: root.fieldInfo.note
     }
 
-    VclTextField {
+    SctTextField {
         Layout.fillWidth: true
 
         label: ""

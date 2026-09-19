@@ -46,7 +46,7 @@ Item {
         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
         property bool scrollBarVisible: contentHeight > height
-        ScrollBar.vertical: VclScrollBar { flickable: _propertyEditorView }
+        ScrollBar.vertical: SctScrollBar { flickable: _propertyEditorView }
 
         Column {
             id: _propertyEditorItems
@@ -58,7 +58,7 @@ Item {
                 width: parent.width
                 spacing: parent.spacing/4
 
-                VclLabel {
+                SctLabel {
                     width: parent.width
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                     font.bold: true
@@ -67,7 +67,7 @@ Item {
                     text: root.annotation ? root.annotation.type.toUpperCase() : ""
                 }
 
-                VclLabel {
+                SctLabel {
                     width: parent.width
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     horizontalAlignment: Text.AlignHCenter
@@ -104,7 +104,7 @@ Item {
                     width: _propertyEditorView.width - (_propertyEditorView.scrollBarVisible ? 20 : 0)
                     visible: propertyInfo.visible === true
 
-                    VclLabel {
+                    SctLabel {
                         width: parent.width
                         text: _editorDelegate.propertyInfo.title
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -159,7 +159,7 @@ Item {
                 spacing: 10
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                VclButton {
+                SctButton {
                     text: "Bring To Front"
                     onClicked: {
                         // var a = annotationGripLoader.root.annotation
@@ -168,7 +168,7 @@ Item {
                     }
                 }
 
-                VclButton {
+                SctButton {
                     text: "Send To Back"
                     onClicked: {
                         // var a = annotationGripLoader.root.annotation
@@ -178,7 +178,7 @@ Item {
                 }
             }
 
-            VclButton {
+            SctButton {
                 text: "Delete Annotation"
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
@@ -226,7 +226,7 @@ Item {
                     anchors.top: parent.bottom
                     anchors.left: parent.left
 
-                    menu: VclMenu {
+                    menu: SctMenu {
                         ColorMenu {
                             title: "Standard Colors"
                             onMenuItemClicked: (color) => {
@@ -237,7 +237,7 @@ Item {
 
                         MenuSeparator { }
 
-                        VclMenuItem {
+                        SctMenuItem {
                             text: "Custom Color"
                             onClicked: {
                                 var newColor = Color.pick(_colorEditor.propertyValue)
@@ -249,7 +249,7 @@ Item {
                 }
             }
 
-            VclLabel {
+            SctLabel {
                 anchors.verticalCenter: parent.verticalCenter
                 text: _colorEditor.propertyValue
                 font.capitalization: Font.AllUppercase
@@ -268,7 +268,7 @@ Item {
             property var propertyValue: parent.propertyValue
             function changePropertyValue(newValue) { parent.changePropertyValue(newValue) }
 
-            VclSpinBox {
+            SctSpinBox {
                 editable: true
                 from: _numberEditor.propertyInfo.min
                 stepSize: _numberEditor.propertyInfo.step
@@ -283,7 +283,7 @@ Item {
     Component {
         id: _booleanEditorComponent
 
-        VclCheckBox {
+        SctCheckBox {
             id: _booleanEditor
 
             property var propertyInfo: parent.propertyInfo
@@ -378,7 +378,7 @@ Item {
                 onAccepted: _urlEditor.changePropertyValue(text)
             }
 
-            VclLabel {
+            SctLabel {
                 width: parent.width
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize-1
                 visible: _urlEditor.propertyValue != _urlField.text
@@ -390,7 +390,7 @@ Item {
     Component {
         id: _fontFamilyEditorComponent
 
-        VclButton {
+        SctButton {
             id: _fontFamilyEditor
 
             property var propertyInfo: parent.propertyInfo
@@ -403,7 +403,7 @@ Item {
             font.family: propertyValue
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-            contentItem: VclLabel {
+            contentItem: SctLabel {
                 text: _fontFamilyEditor.text
                 font: _fontFamilyEditor.font
                 elide: Text.ElideRight
@@ -433,7 +433,7 @@ Item {
             Repeater {
                 model: ['bold', 'italic', 'underline']
 
-                delegate: VclCheckBox {
+                delegate: SctCheckBox {
                     required property int index
                     required property string modelData
 
@@ -471,7 +471,7 @@ Item {
             Repeater {
                 model: ['left', 'center', 'right']
 
-                delegate: VclRadioButton {
+                delegate: SctRadioButton {
                     required property int index
                     required property string modelData
 
@@ -499,7 +499,7 @@ Item {
             Repeater {
                 model: ['top', 'center', 'bottom']
 
-                delegate: VclRadioButton {
+                delegate: SctRadioButton {
                     required property int index
                     required property string modelData
 
@@ -566,7 +566,7 @@ Item {
                 anchors.centerIn: parent
                 spacing: 20
 
-                VclLabel {
+                SctLabel {
                     text: _imageEditor.propertyValue == "" ? "Set" : "Change"
                     color: "blue"
                     font.underline: true
@@ -579,7 +579,7 @@ Item {
                     }
                 }
 
-                VclLabel {
+                SctLabel {
                     text: "Remove"
                     color: "blue"
                     font.underline: true

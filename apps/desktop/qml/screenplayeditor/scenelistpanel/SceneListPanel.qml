@@ -45,7 +45,7 @@ ListView {
     function updateCacheBuffer() { _private.updateCacheBuffer() }
     function extents(startIndex, endIndex) { return _private.extents(startIndex, endIndex) }
 
-    ScrollBar.vertical: VclScrollBar { flickable: root }
+    ScrollBar.vertical: SctScrollBar { flickable: root }
 
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 

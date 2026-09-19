@@ -34,7 +34,7 @@ ColumnLayout {
 
     spacing: 5
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -42,7 +42,7 @@ ColumnLayout {
         text: root.fieldInfo.label
     }
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -52,7 +52,7 @@ ColumnLayout {
         text: root.fieldInfo.note
     }
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -72,7 +72,7 @@ ColumnLayout {
         Flickable {
             id: _keywordsFlick
 
-            ScrollBar.vertical: VclScrollBar { }
+            ScrollBar.vertical: SctScrollBar { }
 
             anchors.fill: parent
             anchors.margins: 1
@@ -95,7 +95,7 @@ ColumnLayout {
 
                     model: Scrite.document.structure.sceneTags
 
-                    delegate: VclCheckBox {
+                    delegate: SctCheckBox {
                         id: _keywordDelegate
 
                         required property int index

@@ -33,7 +33,7 @@ import "./annotations"
 Item {
     id: root
 
-    required property VclMenu canvasContextMenu
+    required property SctMenu canvasContextMenu
 
     readonly property var availableAnnotationKeys: AnnotationFactory.keys
 

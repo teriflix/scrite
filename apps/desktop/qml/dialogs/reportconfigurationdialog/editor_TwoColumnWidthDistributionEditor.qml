@@ -33,7 +33,7 @@ ColumnLayout {
     spacing: 5
     enabled: root.report !== null
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
         Layout.leftMargin: 10
         Layout.rightMargin: 20
@@ -67,7 +67,7 @@ ColumnLayout {
             border.color: Runtime.colors.primary.borderColor
             color: Runtime.colors.primary.c200.background
 
-            VclTextField {
+            SctTextField {
                 id: _leftColumnWidthEditor
 
                 anchors.centerIn: parent
@@ -97,7 +97,7 @@ ColumnLayout {
             border.color: Runtime.colors.primary.borderColor
             color: Runtime.colors.primary.c200.background
 
-            VclText {
+            SctText {
                 anchors.centerIn: parent
 
                 text: Math.round((1-_splitView.leftColumnWidth)*100) + "%"

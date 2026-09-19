@@ -155,7 +155,7 @@ Item {
                              _rightPainterPath.createObject(_tabShapeItem) as PainterPath :
                              _topPainterPath.createObject(_tabShapeItem) as PainterPath
 
-            VclLabel {
+            SctLabel {
                 id: _tabText
 
                 anchors.centerIn: parent

@@ -28,7 +28,7 @@ import "../../controls"
 import "../../helpers"
 import "../../notifications"
 
-VclDialog {
+SctDialog {
     id: root
 
     property AbstractExporter exporter
@@ -98,7 +98,7 @@ VclDialog {
                     }
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
                     Layout.rightMargin: 20
                     Layout.bottomMargin: 24
@@ -191,7 +191,7 @@ VclDialog {
 
                 spacing: 20
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     wrapMode: Text.WordWrap
@@ -202,7 +202,7 @@ VclDialog {
                     }
                 }
 
-                VclButton {
+                SctButton {
                     enabled: root.exporter.canCopyToClipboard
                     visible: root.exporter.canCopyToClipboard
                     text: "Copy to Clipboard"
@@ -212,7 +212,7 @@ VclDialog {
                     }
                 }
 
-                VclButton {
+                SctButton {
                     id: _exportButton
 
                     Component.onCompleted: Qt.callLater(_exportButton.forceActiveFocus)
@@ -322,7 +322,7 @@ VclDialog {
             featureName: root.exporter ? "export/" + root.exporter.format.toLowerCase() + (_private.isPdfExport ? "/save": "") : "export"
         }
 
-        property VclDialog waitDialog
+        property SctDialog waitDialog
     }
 
     onClosed: Runtime.execLater(root.exporter, 100, () => { if(root.exporter) root.exporter.discard() } )

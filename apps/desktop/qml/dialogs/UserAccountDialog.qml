@@ -63,7 +63,7 @@ Item {
         }
     }
 
-    VclDialog {
+    SctDialog {
         id: _userAccountDialog
 
         property string screenName: _private.startScreen
@@ -115,7 +115,7 @@ Item {
         property string startScreen: "WelcomeScreen" // Runtime.userAccountDialogSettings.welcomeScreenShown ? "AccountEmailScreen" : "WelcomeScreen"
 
         property SessionNewRestApiCall newSessionTokenCall: SessionNewRestApiCall {
-            property VclDialog waitDialog
+            property SctDialog waitDialog
 
             onAboutToCall: MessageBox.discardMessageBoxes()
             onJustIssuedCall: waitDialog = WaitDialog.launch("Fetching new access tokens ...")

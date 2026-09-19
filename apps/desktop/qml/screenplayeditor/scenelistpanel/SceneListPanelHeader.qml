@@ -49,7 +49,7 @@ Rectangle {
         anchors.leftMargin: root.leftPadding
         anchors.rightMargin: root.rightPadding
 
-        VclText {
+        SctText {
             id: _headingText
 
             Layout.fillWidth: true

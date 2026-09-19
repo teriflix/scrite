@@ -45,7 +45,7 @@ Item {
 
             spacing: 5
 
-            VclComboBox {
+            SctComboBox {
                 id: _paragraphTypeComboBox
 
                 Layout.fillWidth: true
@@ -77,7 +77,7 @@ Item {
                 valueRole: "value"
             }
 
-            VclComboBox {
+            SctComboBox {
                 id: _languageComboBox
 
                 Layout.preferredWidth: _private.languageModel.longestKeyWidth
@@ -93,7 +93,7 @@ Item {
                              }
             }
 
-            VclComboBox {
+            SctComboBox {
                 id: _fontSizesComboBox
 
                 readonly property var systemFonts: Scrite.app.systemFontInfo()
@@ -171,10 +171,10 @@ Item {
                     width: parent.width
                     anchors.bottom: parent.bottom
 
-                    VclMenu {
+                    SctMenu {
                         id: _textAlignmentMenu
 
-                        VclMenuItem {
+                        SctMenuItem {
                             text: "Left"
                             checkable: true
                             checked: _textAlignment.value === Qt.AlignLeft
@@ -187,7 +187,7 @@ Item {
                             }
                         }
 
-                        VclMenuItem {
+                        SctMenuItem {
                             text: "Center"
                             checkable: true
                             checked: _textAlignment.value === Qt.AlignHCenter
@@ -200,7 +200,7 @@ Item {
                             }
                         }
 
-                        VclMenuItem {
+                        SctMenuItem {
                             text: "Right"
                             checkable: true
                             checked: _textAlignment.value === Qt.AlignRight
@@ -213,7 +213,7 @@ Item {
                             }
                         }
 
-                        VclMenuItem {
+                        SctMenuItem {
                             text: "Justify"
                             checkable: true
                             checked: _textAlignment.value === Qt.AlignJustify
@@ -250,7 +250,7 @@ Item {
                     color: "white"
                     border.width: parent.colorsMenuVisible ? 2 : 0
 
-                    VclText {
+                    SctText {
                         anchors.centerIn: parent
 
                         color: _textForeground.selectedColor === Runtime.colors.transparent ? "black" : _textForeground.selectedColor
@@ -289,7 +289,7 @@ Item {
                     border.color: "black"
                     color: _textBackground.selectedColor === Runtime.colors.transparent ? "white" : _textBackground.selectedColor
 
-                    VclText {
+                    SctText {
                         anchors.centerIn: parent
 
                         color: _textForeground.selectedColor === Runtime.colors.transparent ? "black" : _textForeground.selectedColor
@@ -321,7 +321,7 @@ Item {
                     Popup {
                         id: _textLineHeightEditor
                         closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
-                        contentItem: VclSpinBox {
+                        contentItem: SctSpinBox {
                             editable: true
                             from: 25
                             stepSize: 5
@@ -360,7 +360,7 @@ Item {
                     Popup {
                         id: _firstLineIndentEditor
                         closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
-                        contentItem: VclSpinBox {
+                        contentItem: SctSpinBox {
                             editable: true
                             from: 0
                             stepSize: 5
@@ -547,7 +547,7 @@ Item {
 
             spacing: 20
 
-            VclButton {
+            SctButton {
                 text: "Factory Reset"
                 toolTipText: "Restores formatting options to defaults for current document only."
 
@@ -557,7 +557,7 @@ Item {
                 }
             }
 
-            VclButton {
+            SctButton {
                 text: "Make Default"
                 toolTipText: "Saves current formatting options as default for all current and future documents."
 
@@ -565,7 +565,7 @@ Item {
             }
         }
 
-        VclText {
+        SctText {
             Layout.fillWidth: true
             Layout.topMargin: 20
 
@@ -578,7 +578,7 @@ Item {
     }
 
     // Private implementation
-    VclDialog {
+    SctDialog {
         id: _copyAttribsDialog
 
         title: "Copy Attributes"
@@ -594,7 +594,7 @@ Item {
                 anchors.centerIn: parent
                 spacing: 20
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
                     text: "Select attributes of <b>" + _paragraphTypeComboBox.currentText + "</b> you want to copy to all other paragraph types."
@@ -605,14 +605,14 @@ Item {
 
                     spacing: 5
 
-                    VclCheckBox {
+                    SctCheckBox {
                         id: _copyFontSizeAttrib
                         text: "Font Size: " + _private.displayElementFormat.font.pointSize + " pt"
                         padding: 0
                         checked: false
                     }
 
-                    VclCheckBox {
+                    SctCheckBox {
                         id: _copyFontStyleAttrib
                         text: "Font Style: (" + fontStyle + ")"
                         padding: 0
@@ -631,7 +631,7 @@ Item {
                         }
                     }
 
-                    VclCheckBox {
+                    SctCheckBox {
                         id: _copyTextAlignmentAttrib
                         text: "Alignment: " + alignment
                         padding: 0
@@ -650,14 +650,14 @@ Item {
                         }
                     }
 
-                    VclCheckBox {
+                    SctCheckBox {
                         id: _copyLineHeightAttrib
                         text: "Line Height: " + Math.round(_private.displayElementFormat.lineHeight*100) + "%"
                         padding: 0
                         checked: false
                     }
 
-                    VclCheckBox {
+                    SctCheckBox {
                         id: _copyTextIndentAttrib
                         text: "First Line Indent: " + Math.round(_private.displayElementFormat.textIndent) + "pt"
                         padding: 0
@@ -667,7 +667,7 @@ Item {
                     RowLayout {
                         spacing: 10
 
-                        VclCheckBox {
+                        SctCheckBox {
                             id: _copyColorAttribs
                             text: "Colors"
                             padding: 0
@@ -681,7 +681,7 @@ Item {
                             border.width: 1
                             border.color: Runtime.colors.primary.borderColor
 
-                            VclText {
+                            SctText {
                                 font.pixelSize: parent.height * 0.7
                                 color: _private.displayElementFormat.textColor
                                 anchors.centerIn: parent
@@ -695,7 +695,7 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: 20
 
-                    VclButton {
+                    SctButton {
                         text: "Select All"
                         onClicked: {
                             _copyFontSizeAttrib.checked = true
@@ -707,7 +707,7 @@ Item {
                         }
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Unselect All"
                         onClicked: {
                             _copyFontSizeAttrib.checked = false
@@ -719,7 +719,7 @@ Item {
                         }
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Apply"
                         onClicked: {
                             var applyToAll = (props) => {

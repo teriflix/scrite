@@ -58,7 +58,7 @@ Rectangle {
 
                     color: Runtime.colors.primary.c600.background
 
-                    VclLabel {
+                    SctLabel {
                         anchors.centerIn: parent
 
                         text: _delegate.modelData.heading
@@ -86,7 +86,7 @@ Rectangle {
                             required property int index
                             required property var modelData
 
-                            VclLabel {
+                            SctLabel {
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.verticalCenterOffset: (_normalFontMetrics.height-_languageFontMetrics.height)*0.3
 
@@ -99,7 +99,7 @@ Rectangle {
                                 horizontalAlignment: Text.AlignRight
                             }
 
-                            VclLabel {
+                            SctLabel {
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 width: _private.textCellWidth

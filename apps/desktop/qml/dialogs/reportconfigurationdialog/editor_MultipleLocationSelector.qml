@@ -37,7 +37,7 @@ ColumnLayout {
 
     spacing: 5
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         elide: Text.ElideRight
@@ -48,7 +48,7 @@ ColumnLayout {
         text: root.fieldInfo.label
     }
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -71,7 +71,7 @@ ColumnLayout {
             id: _locationListView
 
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-            ScrollBar.vertical: VclScrollBar { }
+            ScrollBar.vertical: SctScrollBar { }
 
             anchors.fill: parent
             anchors.margins: 1
@@ -79,7 +79,7 @@ ColumnLayout {
             model: root.allLocations
             clip: true
 
-            delegate: VclCheckBox {
+            delegate: SctCheckBox {
                 required property int index
                 required property var modelData
 
@@ -107,7 +107,7 @@ ColumnLayout {
 
         spacing: 20
 
-        VclButton {
+        SctButton {
             text: "Select All"
             enabled: root.selectedLocations.length < root.allLocations.length
             onClicked: {
@@ -116,7 +116,7 @@ ColumnLayout {
             }
         }
 
-        VclButton {
+        SctButton {
             text: "Unselect All"
             enabled: root.selectedLocations.length > 0
             onClicked: {

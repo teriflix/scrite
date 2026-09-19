@@ -38,7 +38,7 @@ DialogLauncher {
     name: "ScreenplayTracksDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         width: Math.min(Scrite.window.width-80, 640)

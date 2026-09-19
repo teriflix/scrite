@@ -54,7 +54,7 @@ Rectangle {
     border.width: 1
     border.color: Runtime.colors.primary.borderColor
 
-    VclText {
+    SctText {
         id: _statusText
 
         anchors.left: parent.left
@@ -121,8 +121,8 @@ Rectangle {
                 anchors.bottom: parent.top
                 anchors.bottomMargin: item ? item.height : 0
 
-                menu: VclMenu {
-                    VclMenuItem {
+                menu: SctMenu {
+                    SctMenuItem {
                         property bool _checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI &&
                                                 Scrite.document.structure.indexCardContent === Structure.Synopsis
 
@@ -142,7 +142,7 @@ Rectangle {
                         }
                     }
 
-                    VclMenuItem {
+                    SctMenuItem {
                         property bool _checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI &&
                                                 Scrite.document.structure.indexCardContent === Structure.FeaturedPhoto
 
@@ -161,7 +161,7 @@ Rectangle {
                         }
                     }
 
-                    VclMenuItem {
+                    SctMenuItem {
                         property bool _checked: Scrite.document.structure.canvasUIMode === Structure.SynopsisEditorUI
 
                         text: "Synopsis Cards"

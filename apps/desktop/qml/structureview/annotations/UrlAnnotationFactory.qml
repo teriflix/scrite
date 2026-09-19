@@ -127,7 +127,7 @@ QtObject {
                     }
                 }
 
-                VclLabel {
+                SctLabel {
                     width: parent.width
 
                     text: _d.annotation.attributes.title
@@ -138,7 +138,7 @@ QtObject {
                     maximumLineCount: 2
                 }
 
-                VclLabel {
+                SctLabel {
                     width: parent.width
 
                     text: _d.annotation.attributes.description
@@ -148,7 +148,7 @@ QtObject {
                     maximumLineCount: 3
                 }
 
-                VclLabel {
+                SctLabel {
                     width: parent.width
 
                     text: _d.annotation.attributes.url
@@ -177,7 +177,7 @@ QtObject {
             running: _urlAttribs.status === UrlAttributes.Loading
         }
 
-        VclLabel {
+        SctLabel {
             anchors.fill: parent
             anchors.margins: 10
 

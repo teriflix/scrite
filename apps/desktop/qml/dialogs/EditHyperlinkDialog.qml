@@ -43,7 +43,7 @@ DialogLauncher {
     name: "EditHyperlinkDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         property string selectedText
@@ -63,7 +63,7 @@ DialogLauncher {
                 anchors.fill: parent
                 anchors.margins: 20
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: (_dialog.existingLink === "" ? "Add hyperlink for " : "Edit hyper link to ") +
@@ -73,7 +73,7 @@ DialogLauncher {
                     maximumLineCount: 3
                 }
 
-                VclTextField {
+                SctTextField {
                     id: _hyperlinkField
 
                     Layout.fillWidth: true
@@ -87,7 +87,7 @@ DialogLauncher {
                 }
 
                 RowLayout {
-                    VclButton {
+                    SctButton {
                         text: "Remove Link"
                         visible: _dialog.existingLink !== ""
 
@@ -101,7 +101,7 @@ DialogLauncher {
                         Layout.fillWidth: true
                     }
 
-                    VclButton {
+                    SctButton {
                         id: _acceptButton
 
                         text: _dialog.existingLink === "" ? "Insert Link" : "Update Link"

@@ -37,7 +37,7 @@ DialogLauncher {
     name: "StructureIndexCardFieldsDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         title: "Customise Index Card Fields"

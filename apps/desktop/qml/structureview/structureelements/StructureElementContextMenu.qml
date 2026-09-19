@@ -26,7 +26,7 @@ import "../../dialogs"
 import "../../controls"
 import ".."
 
-VclMenu {
+SctMenu {
     id: root
 
     property StructureElement element
@@ -37,7 +37,7 @@ VclMenu {
 
     width: 250
 
-    VclMenuItem {
+    SctMenuItem {
         action: Action {
             text: "Scene Heading"
             checkable: true
@@ -68,7 +68,7 @@ VclMenu {
         onTriggered: root.element = null
     }
 
-    VclMenuItem {
+    SctMenuItem {
         property Scene lastScene: Scrite.document.screenplay.elementCount > 0 && Scrite.document.screenplay.elementAt(Scrite.document.screenplay.elementCount-1).scene
 
         text: "Add To Timeline"
@@ -84,7 +84,7 @@ VclMenu {
         }
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Remove From Timeline"
         enabled: root.element && root.element.scene.addedToScreenplay
 
@@ -95,7 +95,7 @@ VclMenu {
         }
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Make Sequence"
 
         enabled: !Scrite.document.readOnly && _sceneGroup.canBeStacked
@@ -108,7 +108,7 @@ VclMenu {
         }
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Break Sequence"
 
         enabled: !Scrite.document.readOnly && _sceneGroup.canBeUnstacked
@@ -128,14 +128,14 @@ VclMenu {
         onToggled: root.refitSelectionRequest()
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Keywords"
         enabled: !Scrite.document.readOnly
 
         onClicked: SceneGroupKeywordsDialog.launch(_sceneGroup)
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Index Card Fields"
         enabled: root.element
 
@@ -144,7 +144,7 @@ VclMenu {
 
     MenuSeparator { }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Delete"
         enabled: root.element
 

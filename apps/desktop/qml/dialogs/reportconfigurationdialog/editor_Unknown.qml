@@ -25,7 +25,7 @@ import "../../globals"
 import "../../controls"
 import "../../helpers"
 
-VclLabel {
+SctLabel {
     id: root
     property scriteObjectConfigField fieldInfo
     property AbstractReportGenerator report

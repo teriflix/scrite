@@ -55,7 +55,7 @@ Item {
 
         spacing: 10
 
-        VclTextField {
+        SctTextField {
             id: _title
 
             TabSequenceItem.manager: _tabManager

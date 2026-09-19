@@ -23,7 +23,7 @@ import "../../globals"
 import "../../helpers"
 import "../../controls"
 
-VclMenu {
+SctMenu {
     id: root
 
     required property Note note
@@ -46,7 +46,7 @@ VclMenu {
 
     MenuSeparator { }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Delete Note"
         onClicked: () => {
                        root.deleteNoteRequest()

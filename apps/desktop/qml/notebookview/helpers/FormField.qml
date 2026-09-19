@@ -72,7 +72,7 @@ Column {
 
         spacing: 10
 
-        VclLabel {
+        SctLabel {
             id: _questionNumberText
 
             anchors.top: parent.top
@@ -84,7 +84,7 @@ Column {
             horizontalAlignment: Text.AlignRight
         }
 
-        VclLabel {
+        SctLabel {
             id: _questionText
 
             anchors.top: parent.top
@@ -310,26 +310,26 @@ Column {
                                               }
                 }
 
-                VclMenu {
+                SctMenu {
                     id: _contextMenu
 
                     focus: false
 
-                    VclMenuItem {
+                    SctMenuItem {
                         text: "Cut\t" + ActionHub.editOptions.find("cut").shortcut
                         enabled: _answerText.selectedText !== ""
                         onClicked: _answerText.cut()
                         focusPolicy: Qt.NoFocus
                     }
 
-                    VclMenuItem {
+                    SctMenuItem {
                         text: "Copy\t" + ActionHub.editOptions.find("copy").shortcut
                         enabled: _answerText.selectedText !== ""
                         onClicked: _answerText.copy()
                         focusPolicy: Qt.NoFocus
                     }
 
-                    VclMenuItem {
+                    SctMenuItem {
                         text: "Paste\t" + ActionHub.editOptions.find("paste").shortcut
                         onClicked: _answerText.paste()
                         focusPolicy: Qt.NoFocus

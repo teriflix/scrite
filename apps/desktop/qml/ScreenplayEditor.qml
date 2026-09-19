@@ -237,7 +237,7 @@ Rectangle {
             }
         }
 
-        VclScrollBar {
+        SctScrollBar {
             id: _scrollBar
 
             anchors.top: parent.top

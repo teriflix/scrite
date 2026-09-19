@@ -68,7 +68,7 @@ Item {
                 running: true
             }
 
-            VclLabel {
+            SctLabel {
                 Layout.preferredWidth: Math.min(640, Scrite.window.width * 0.8)
 
                 text: _private.messageStack.top()

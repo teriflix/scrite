@@ -13,14 +13,6 @@
 **
 ****************************************************************************/
 
-/**
-  Only difference between VclLabel and VclText is that, VclText does not specify default font.pointSize.
-
-  Use VclText {} in cases where you need to use font.pixelSize.
-
-  For everything else, use VclLabel {}
-  */
-
 import QtQuick
 import QtQuick.Controls
 
@@ -28,8 +20,19 @@ import Scrite.App
 
 import "../globals"
 
-Label {
+RadioButton {
     id: root
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+    contentItem: SctLabel {
+        leftPadding: root.indicator && !root.mirrored ? root.indicator.width + root.spacing : 0
+        rightPadding: root.indicator && root.mirrored ? root.indicator.width + root.spacing : 0
+
+        text: root.text
+        font: root.font
+        wrapMode: Text.WordWrap
+        opacity: root.enabled ? 1 : 0.5
+        verticalAlignment: Text.AlignVCenter
+    }
 }

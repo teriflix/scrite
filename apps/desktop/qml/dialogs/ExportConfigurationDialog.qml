@@ -89,6 +89,6 @@ Item {
         id: _private
 
         property Component dialogComponent: Qt.createComponent("./exportconfigurationdialog/impl_ExportConfigurationDialog.qml", Component.PreferSynchronous, root)
-        property VclDialog dialog
+        property SctDialog dialog
     }
 }

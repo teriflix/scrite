@@ -43,7 +43,7 @@ BasicAttachmentsDropArea {
             radius: 4
         }
 
-        VclLabel {
+        SctLabel {
             id: _notice
 
             anchors.centerIn: parent

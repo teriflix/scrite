@@ -55,7 +55,7 @@ Flickable {
 
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-    ScrollBar.vertical: VclScrollBar { flickable: root }
+    ScrollBar.vertical: SctScrollBar { flickable: root }
 
     contentWidth: _textArea.width
     contentHeight: _textArea.height
@@ -209,24 +209,24 @@ Flickable {
         onEditingFinished: root.editingFinished()
     }
 
-    VclMenu {
+    SctMenu {
         id: _contextMenu
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Cut\t" + ActionHub.editOptions.find("cut").shortcut
             enabled: _textArea.selectedText !== ""
             onClicked: _textArea.cut()
             focusPolicy: Qt.NoFocus
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Copy\t" + ActionHub.editOptions.find("copy").shortcut
             enabled: _textArea.selectedText !== ""
             onClicked: _textArea.copy()
             focusPolicy: Qt.NoFocus
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Paste\t" + ActionHub.editOptions.find("paste").shortcut
             onClicked: _textArea.paste()
             focusPolicy: Qt.NoFocus

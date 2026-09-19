@@ -23,7 +23,7 @@ import Scrite.App
 import "../globals"
 import "../controls"
 
-VclMenu {
+SctMenu {
     id: root
 
     readonly property real minCellSize: 50
@@ -34,7 +34,7 @@ VclMenu {
     width: minCellSize * 5 + 10
     height: minCellSize * (4 + Math.ceil((Runtime.workspaceSettings.customColors.length+1)/4)) +  10
 
-    VclMenuItem {
+    SctMenuItem {
         width: root.width
         height: _colorGrid.height
 
@@ -54,7 +54,7 @@ VclMenu {
                 delegate: _colorItemDelegate
             }
 
-            VclToolButton {
+            SctToolButton {
                 icon.source: Runtime.themedIcon("qrc:/icons/content/add_circle_outline.png")
                 suggestedWidth: _colorGrid.cellSize
                 suggestedHeight: _colorGrid.cellSize

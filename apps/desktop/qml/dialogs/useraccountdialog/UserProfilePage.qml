@@ -60,7 +60,7 @@ Item {
         opacity: enabled ? 1 : 0.5
         enabled: !root.callList.busy
 
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
 
             text: "You're logged in via <b>" + root.userInfo.email + "</b>."
@@ -74,7 +74,7 @@ Item {
         RowLayout {
             Layout.fillWidth: true
 
-            VclTextField {
+            SctTextField {
                 id: _nameField
 
                 Layout.fillWidth: true
@@ -90,7 +90,7 @@ Item {
                 onTextEdited: _userInfoFields.needsSaving = true
             }
 
-            VclTextField {
+            SctTextField {
                 id: _phoneField
 
                 Layout.fillWidth: true
@@ -112,7 +112,7 @@ Item {
         }
 
 
-        VclTextField {
+        SctTextField {
             id: _experienceField
 
             Layout.fillWidth: true
@@ -140,7 +140,7 @@ Item {
         RowLayout {
             Layout.fillWidth: true
 
-            VclTextField {
+            SctTextField {
                 id: _cityField
 
                 Layout.fillWidth: true
@@ -156,7 +156,7 @@ Item {
                 onTextEdited: _userInfoFields.needsSaving = true
             }
 
-            VclTextField {
+            SctTextField {
                 id: _countryField
 
                 Layout.fillWidth: true
@@ -167,7 +167,7 @@ Item {
             }
         }
 
-        VclTextField {
+        SctTextField {
             id: _wdyhasField
 
             Layout.fillWidth: true
@@ -212,7 +212,7 @@ Item {
 
                 spacing: 4
 
-                VclCheckBox {
+                SctCheckBox {
                     id: _chkAnalyticsConsent
 
                     TabSequenceItem.manager: _userInfoFields
@@ -244,7 +244,7 @@ Item {
 
                 spacing: 4
 
-                VclCheckBox {
+                SctCheckBox {
                     id: _chkEmailConsent
 
                     TabSequenceItem.manager: _userInfoFields
@@ -276,7 +276,7 @@ Item {
 
                 spacing: 4
 
-                VclCheckBox {
+                SctCheckBox {
                     id: _chkCallsConsent
 
                     TabSequenceItem.manager: _userInfoFields
@@ -308,7 +308,7 @@ Item {
 
                 spacing: 4
 
-                VclCheckBox {
+                SctCheckBox {
                     id: _chkWhatsAppConsent
 
                     TabSequenceItem.manager: _userInfoFields
@@ -350,7 +350,7 @@ Item {
 
                 spacing: 20
 
-                VclButton {
+                SctButton {
                     text: "Refresh"
                     onClicked: _refreshUserCall.call()
 
@@ -359,7 +359,7 @@ Item {
                     }
                 }
 
-                VclButton {
+                SctButton {
                     text: "Survey"
                     visible: ["recommended", "required"].indexOf(Runtime.userAccountDialogSettings.userOnboardingStatus) >= 0
 
@@ -370,7 +370,7 @@ Item {
                     Layout.fillWidth: true
                 }
 
-                VclButton {
+                SctButton {
                     text: "Logout"
 
                     onClicked: {
@@ -397,7 +397,7 @@ Item {
 
                 spacing: 20
 
-                VclButton {
+                SctButton {
                     text: "Save"
 
                     onClicked: {

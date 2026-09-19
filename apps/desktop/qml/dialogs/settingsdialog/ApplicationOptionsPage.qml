@@ -44,14 +44,14 @@ Item {
             Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
             Layout.fillHeight: true
 
-            label: VclLabel { text: "Graphics" }
+            label: SctLabel { text: "Graphics" }
 
             ColumnLayout {
                 width: parent.width
 
                 spacing: 0
 
-                VclCheckBox {
+                SctCheckBox {
                     TabSequenceItem.sequence: 0
                     TabSequenceItem.manager: _tabSequence
 
@@ -61,7 +61,7 @@ Item {
                     onToggled: Runtime.applicationSettings.enableAnimations = checked
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     id: _useNativeTextRendering
 
                     TabSequenceItem.sequence: 1
@@ -86,7 +86,7 @@ Item {
                     }
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     id: _useSoftwareRenderer
 
                     TabSequenceItem.sequence: 2
@@ -118,7 +118,7 @@ Item {
             Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
             Layout.fillHeight: true
 
-            label: VclLabel { text: "Display" }
+            label: SctLabel { text: "Display" }
             clip: true
 
             GridLayout {
@@ -127,14 +127,14 @@ Item {
                 columns: 2
                 rowSpacing: Runtime.idealFontMetrics.lineSpacing
 
-                VclLabel {
+                SctLabel {
                     Layout.alignment: Qt.AlignVCenter
 
                     text: "DPI:"
                     padding: 5
                 }
 
-                VclTextField {
+                SctTextField {
                     Layout.fillWidth: true
 
                     TabSequenceItem.sequence: 3
@@ -152,14 +152,14 @@ Item {
                     }
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.alignment: Qt.AlignVCenter
 
                     text: "Scale:"
                     padding: 5
                 }
 
-                VclTextField {
+                SctTextField {
                     Layout.fillWidth: true
 
                     TabSequenceItem.sequence: 4
@@ -169,14 +169,14 @@ Item {
                     text: "Follows OS Settings"
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.alignment: Qt.AlignVCenter
 
                     text: "Font Size:"
                     padding: 5
                 }
 
-                VclTextField {
+                SctTextField {
                     Layout.fillWidth: true
                     TabSequenceItem.sequence: 5
                     TabSequenceItem.manager: _tabSequence
@@ -205,13 +205,13 @@ Item {
             Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
             Layout.fillHeight: true
 
-            label: VclLabel { text: "Window Tabs" }
+            label: SctLabel { text: "Window Tabs" }
 
             ColumnLayout {
                 width: parent.width
                 spacing: 5
 
-                VclLabel {
+                SctLabel {
                     property string secondSentence: {
                         if(Runtime.canShowNotebookInStructure)
                             return ""
@@ -224,7 +224,7 @@ Item {
                     wrapMode: Text.WordWrap
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     Layout.fillWidth: true
                     TabSequenceItem.sequence: 6
                     TabSequenceItem.manager: _tabSequence
@@ -242,7 +242,7 @@ Item {
                     }
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     Layout.fillWidth: true
                     TabSequenceItem.sequence: 7
                     TabSequenceItem.manager: _tabSequence
@@ -270,14 +270,14 @@ Item {
             Layout.fillHeight: true
             Layout.rowSpan: 2
 
-            label: VclLabel { text: "Saving Files" }
+            label: SctLabel { text: "Saving Files" }
             clip: true
 
             GridLayout {
                 width: parent.width
                 columns: 2
 
-                VclCheckBox {
+                SctCheckBox {
                     TabSequenceItem.sequence: 8
                     TabSequenceItem.manager: _tabSequence
 
@@ -287,7 +287,7 @@ Item {
                     onToggled: Scrite.document.autoSave = checked
                 }
 
-                VclTextField {
+                SctTextField {
                     TabSequenceItem.sequence: 9
                     TabSequenceItem.manager: _tabSequence
 
@@ -302,7 +302,7 @@ Item {
                     onTextEdited: Scrite.document.autoSaveDurationInSeconds = parseInt(text)
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     TabSequenceItem.sequence: 10
                     TabSequenceItem.manager: _tabSequence
 
@@ -312,7 +312,7 @@ Item {
                     onToggled: Scrite.document.maxBackupCount = checked ? 20 : 0
                 }
 
-                VclTextField {
+                SctTextField {
                     TabSequenceItem.sequence: 11
                     TabSequenceItem.manager: _tabSequence
 
@@ -326,7 +326,7 @@ Item {
                     onTextEdited: Scrite.document.maxBackupCount = parseInt(text)
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     TabSequenceItem.sequence: 12
                     TabSequenceItem.manager: _tabSequence
 
@@ -338,7 +338,7 @@ Item {
                     onToggled: Scrite.vault.enabled = checked
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     TabSequenceItem.sequence: 13
                     TabSequenceItem.manager: _tabSequence
 
@@ -350,7 +350,7 @@ Item {
                     onToggled: Runtime.applicationSettings.reloadPrompt = checked
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     TabSequenceItem.sequence: 14
                     TabSequenceItem.manager: _tabSequence
 
@@ -369,7 +369,7 @@ Item {
             Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
             Layout.fillHeight: true
 
-            label: VclLabel { text: Platform.isMacOSDesktop ? "Scroll/Flick Speed (Windows/Linux Only)" : "Scroll/Flick Speed" }
+            label: SctLabel { text: Platform.isMacOSDesktop ? "Scroll/Flick Speed (Windows/Linux Only)" : "Scroll/Flick Speed" }
             enabled: !Platform.isMacOSDesktop
             opacity: enabled ? 1 : 0.5
 
@@ -398,7 +398,7 @@ Item {
                     }
                 }
 
-                VclLabel {
+                SctLabel {
                     text: Math.round( _flickSpeedSlider.value*100 ) + "%"
                 }
 

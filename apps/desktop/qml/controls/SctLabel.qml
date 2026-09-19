@@ -13,34 +13,23 @@
 **
 ****************************************************************************/
 
+/**
+  Only difference between SctLabel and SctText is that, SctText does not specify default font.pointSize.
+
+  Use SctText {} in cases where you need to use font.pixelSize.
+
+  For everything else, use SctLabel {}
+  */
+
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Controls.Material
 
 import Scrite.App
 
 import "../globals"
 
-GroupBox {
+Label {
     id: root
 
-    property color labelBackground: Runtime.colors.accent.c500.background
-    property color labelText: Runtime.colors.accent.c500.text
-
-    topPadding: label.height + Runtime.idealFontMetrics.height
-
-    label: Rectangle {
-        // x: root.leftPadding
-        width: Math.min(_labelItem.width, root.availableWidth)
-        height: _labelItem.height
-        color: root.labelBackground
-
-        VclLabel {
-            id: _labelItem
-            padding: 5
-            text: root.title
-            font.bold: true
-            color: root.labelText
-        }
-    }
+    font.pointSize: Runtime.idealFontMetrics.font.pointSize
 }

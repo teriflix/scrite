@@ -71,7 +71,7 @@ ToolButton {
 
                 spacing: parent.spacing/2
 
-                VclText {
+                SctText {
                     text: root.action.text
                     visible: root.display !== AbstractButton.IconOnly
 
@@ -84,7 +84,7 @@ ToolButton {
                     }
                 }
 
-                VclText {
+                SctText {
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     text: "[" + root.shortcutText + "]"

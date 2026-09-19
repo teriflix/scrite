@@ -74,7 +74,7 @@ Item {
                 color: Runtime.colors.primary.highlight.background
             }
 
-            delegate: VclLabel {
+            delegate: SctLabel {
                 id: _completionDelegate
 
                 required property int index

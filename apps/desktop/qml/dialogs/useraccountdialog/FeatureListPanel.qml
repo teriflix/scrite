@@ -54,7 +54,7 @@ Rectangle {
             border.color: Runtime.colors.primary.c400.background
             border.width: _panel.headerBorderWidth
 
-            VclLabel {
+            SctLabel {
                 id: _panelHeader
 
                 width: parent.width
@@ -77,7 +77,7 @@ Rectangle {
                 property color highlightColor: _panel.highlightColor
                 property string titlePrefix: _panel.titlePrefix
 
-                ScrollBar.vertical: VclScrollBar { }
+                ScrollBar.vertical: SctScrollBar { }
 
                 anchors.fill: parent
                 anchors.margins: 1
@@ -128,7 +128,7 @@ Rectangle {
                         width: parent.width
                         spacing: 0
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
 
                             text: _delegate.listView.titlePrefix + _delegate.featureTitle
@@ -143,7 +143,7 @@ Rectangle {
                             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
 
                             text: _delegate.featureDescription

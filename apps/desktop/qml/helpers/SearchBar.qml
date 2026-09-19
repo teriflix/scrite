@@ -124,7 +124,7 @@ Item {
 
                 spacing: 2
 
-                VclToolButton {
+                SctToolButton {
                     anchors.verticalCenter: parent.verticalCenter
 
                     suggestedHeight: 40
@@ -133,10 +133,10 @@ Item {
 
                     icon.source: Runtime.themedIcon("qrc:/icons/action/search.png")
 
-                    VclMenu {
+                    SctMenu {
                         id: _optionsMenu
 
-                        VclMenuItem {
+                        SctMenuItem {
                             text: "Case Sensitive"
                             checked: root.searchEngine.isSearchCaseSensitive
                             checkable: true
@@ -144,7 +144,7 @@ Item {
                             onToggled: root.searchEngine.isSearchCaseSensitive = checked
                         }
 
-                        VclMenuItem {
+                        SctMenuItem {
                             text: "Whole Words"
                             checked: root.searchEngine.isSearchWholeWords
                             checkable: true
@@ -158,7 +158,7 @@ Item {
                     onPressAndHold: _optionsMenu.popup()
                 }
 
-                VclLabel {
+                SctLabel {
                     anchors.verticalCenter: parent.verticalCenter
 
                     text: {
@@ -168,7 +168,7 @@ Item {
                     }
                 }
 
-                VclToolButton {
+                SctToolButton {
                     anchors.verticalCenter: parent.verticalCenter
 
                     suggestedHeight: 40
@@ -181,7 +181,7 @@ Item {
                     onClicked: root.searchEngine.previousSearchResult()
                 }
 
-                VclToolButton {
+                SctToolButton {
                     anchors.verticalCenter: parent.verticalCenter
 
                     suggestedHeight: 40
@@ -194,7 +194,7 @@ Item {
                     onClicked: root.searchEngine.nextSearchResult()
                 }
 
-                VclToolButton {
+                SctToolButton {
                     anchors.verticalCenter: parent.verticalCenter
 
                     suggestedHeight: 40
@@ -207,7 +207,7 @@ Item {
                     onClicked: _txtSearch.clearSearch()
                 }
 
-                VclToolButton {
+                SctToolButton {
                     anchors.verticalCenter: parent.verticalCenter
 
                     suggestedHeight: 40
@@ -274,7 +274,7 @@ Item {
                 anchors.right: parent.right
                 anchors.rightMargin: 5
 
-                VclButton {
+                SctButton {
                     id: _cmdReplace
 
                     text: "Replace"
@@ -288,7 +288,7 @@ Item {
                     }
                 }
 
-                VclButton {
+                SctButton {
                     text: "Replace All"
 
                     enabled: _txtReplace.text.length > 0 && _txtSearch.text.length > 0 && root.searchEngine.searchResultCount > 0

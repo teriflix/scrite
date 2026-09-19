@@ -31,7 +31,7 @@ ColumnLayout {
     property AbstractExporter exporter
     property TabSequenceManager tabSequence
 
-    VclCheckBox {
+    SctCheckBox {
         id: _checkBox
 
         Layout.fillWidth: true
@@ -47,7 +47,7 @@ ColumnLayout {
         onToggled: root.exporter ? root.exporter.setConfigurationValue(root.fieldInfo.name, _checkBox.checked) : false
     }
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         color: Runtime.colors.primary.c600.background

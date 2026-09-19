@@ -46,7 +46,7 @@ DialogLauncher {
     name: "JumpToSceneNumberDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         required property ScreenplayAdapter screenplayAdapter
@@ -65,14 +65,14 @@ DialogLauncher {
 
                 spacing: 20
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     wrapMode: Text.WordWrap
                     text: "Enter a scene, act or episode number to jump:"
                 }
 
-                VclTextField {
+                SctTextField {
                     id: _sceneNumberField
 
                     Layout.fillWidth: true
@@ -193,18 +193,18 @@ DialogLauncher {
                 RowLayout {
                     Layout.fillWidth: true
 
-                    VclLabel {
+                    SctLabel {
                         text: "Filter Mode: "
                     }
 
-                    VclRadioButton {
+                    SctRadioButton {
                         text: "Starts With"
 
                         checked: _sceneNumberField.completionFilterMode == CompletionModel.StartsWithPrefix
                         onClicked: Runtime.screenplayEditorSettings.jumpToSceneFilterMode = CompletionModel.StartsWithPrefix
                     }
 
-                    VclRadioButton {
+                    SctRadioButton {
                         text: "Contains"
 
                         checked: _sceneNumberField.completionFilterMode == CompletionModel.ContainsPrefix
@@ -215,7 +215,7 @@ DialogLauncher {
                         Layout.fillWidth: true
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Ok"
 
                         onClicked: _sceneNumberField.editingComplete()

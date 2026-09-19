@@ -39,7 +39,7 @@ Item {
         GroupBox {
             Layout.fillWidth: true
 
-            label: VclLabel {
+            label: SctLabel {
                 text: "Screenplay Editor"
             }
 
@@ -54,7 +54,7 @@ Item {
                     Layout.columnSpan: 2
                     Layout.fillWidth: true
 
-                    header: VclCheckBox {
+                    header: SctCheckBox {
                         id: _enableAutoCapitalizeSentences
 
                         text: "Capitalize Sentences, with the exception of:"
@@ -100,7 +100,7 @@ Item {
                     }
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
                     text: "Spell Check"
@@ -108,7 +108,7 @@ Item {
                     onToggled: Runtime.screenplayEditorSettings.enableSpellCheck = checked
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     id: _enableAutoPolishParagraphs
 
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
@@ -124,7 +124,7 @@ Item {
                     }
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     id: _captureInvisibleCharacters
 
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
@@ -140,7 +140,7 @@ Item {
                     }
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     id: _autoAdjustEditorWidthInScreenplayEditor
 
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
@@ -159,13 +159,13 @@ Item {
                 RowLayout {
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
-                    VclLabel {
+                    SctLabel {
                         Layout.preferredWidth: _sceneLoadingIntervalLabel.width
 
                         text: "Max Synopsis Lines: "
                     }
 
-                    VclSpinBox {
+                    SctSpinBox {
                         id: _slpSynopsisLineCount
 
                         Layout.fillWidth: true
@@ -187,14 +187,14 @@ Item {
                 RowLayout {
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
-                    VclCheckBox {
+                    SctCheckBox {
                         text: "Long Scene Warning"
 
                         checked: Runtime.screenplayEditorSettings.longSceneWarningEnabled
                         onToggled: Runtime.screenplayEditorSettings.longSceneWarningEnabled = checked
                     }
 
-                    VclTextField {
+                    SctTextField {
                         Layout.fillWidth: true
 
                         text: Runtime.screenplayEditorSettings.longSceneWordTreshold
@@ -217,13 +217,13 @@ Item {
                 RowLayout {
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
-                    VclLabel {
+                    SctLabel {
                         id: _sceneLoadingIntervalLabel
 
                         text: "Scene Loading Interval: "
                     }
 
-                    VclSpinBox {
+                    SctSpinBox {
                         id: _placeholderInterval
 
                         Layout.fillWidth: true
@@ -248,14 +248,14 @@ Item {
         GroupBox {
             Layout.fillWidth: true
 
-            label: VclText {
+            label: SctText {
                 text: "Copy Options"
             }
 
             ColumnLayout {
                 width: parent.width
 
-                VclCheckBox {
+                SctCheckBox {
                     Layout.fillWidth: true
 
                     text: "Copy text in Fountain format."
@@ -263,7 +263,7 @@ Item {
                     onToggled: Runtime.screenplayEditorSettings.copyAsFountain = checked
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     Layout.fillWidth: true
 
                     enabled: Runtime.screenplayEditorSettings.copyAsFountain
@@ -272,7 +272,7 @@ Item {
                     onToggled: Runtime.screenplayEditorSettings.copyFountainUsingStrictSyntax = checked
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     Layout.fillWidth: true
 
                     enabled: Runtime.screenplayEditorSettings.copyAsFountain
@@ -286,14 +286,14 @@ Item {
         GroupBox {
             Layout.fillWidth: true
 
-            label: VclText {
+            label: SctText {
                 text: "Paste Options"
             }
 
             ColumnLayout {
                 width: parent.width
 
-                VclCheckBox {
+                SctCheckBox {
                     Layout.fillWidth: true
 
                     text: "Interpret plaintext in Fountain format."
@@ -301,7 +301,7 @@ Item {
                     onToggled: Runtime.screenplayEditorSettings.pasteAsFountain = checked
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     Layout.fillWidth: true
 
                     enabled: Runtime.screenplayEditorSettings.pasteAsFountain
@@ -310,7 +310,7 @@ Item {
                     onToggled: Runtime.screenplayEditorSettings.pasteByMergingAdjacentElements = checked
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     Layout.fillWidth: true
 
                     enabled: Runtime.screenplayEditorSettings.pasteAsFountain
@@ -319,7 +319,7 @@ Item {
                     onToggled: Runtime.screenplayEditorSettings.pasteAfterResolvingEmphasis = checked
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     id: _pasteByLinkingScenesWhenPossible
 
                     Layout.fillWidth: true

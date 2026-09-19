@@ -58,7 +58,7 @@ StructureElementConnector {
         border.width: 1
         border.color: Runtime.colors.primary.borderColor
 
-        VclText {
+        SctText {
             id: _labelItem
 
             anchors.centerIn: parent

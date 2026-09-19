@@ -49,7 +49,7 @@ AbstractNotebookPage {
 
             width: parent.width >= root.maxTextAreaSize+20 ? root.maxTextAreaSize : parent.width-30
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
 
                 text: _private.breakElement.breakTitle
@@ -57,7 +57,7 @@ AbstractNotebookPage {
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 3
             }
 
-            VclTextField {
+            SctTextField {
                 id: _headingField
 
                 Layout.fillWidth: true
@@ -95,7 +95,7 @@ AbstractNotebookPage {
             }
         }
 
-        VclScrollBar {
+        SctScrollBar {
             id: _vscrollBar
 
             anchors.top: parent.top
@@ -126,7 +126,7 @@ AbstractNotebookPage {
         }
     }
 
-    VclLabel {
+    SctLabel {
         anchors.centerIn: parent
 
         width: parent.width * 0.6

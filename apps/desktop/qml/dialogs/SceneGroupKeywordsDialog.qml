@@ -47,7 +47,7 @@ DialogLauncher {
     name: "SceneGroupKeywordsDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         required property SceneGroup sceneGroup
@@ -69,7 +69,7 @@ DialogLauncher {
 
                 spacing: 20
 
-                VclLabel {
+                SctLabel {
                     id: _label
 
                     Layout.fillWidth: true
@@ -86,7 +86,7 @@ DialogLauncher {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    ScrollBar.vertical: VclScrollBar { }
+                    ScrollBar.vertical: SctScrollBar { }
 
                     contentWidth: width
                     contentHeight: _keywordsList.height

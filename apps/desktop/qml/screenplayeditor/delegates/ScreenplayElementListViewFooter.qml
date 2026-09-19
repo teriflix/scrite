@@ -67,7 +67,7 @@ Loader {
                 enabled: !root.readOnly
                 spacing: 20
 
-                VclToolButton {
+                SctToolButton {
                     toolTipText: "Add Scene (Ctrl+Shift+N)"
 
                     icon.source: Runtime.themedIcon("qrc:/icons/action/add_scene.png")
@@ -79,7 +79,7 @@ Loader {
                     }
                 }
 
-                VclToolButton {
+                SctToolButton {
                     toolTipText: "Add Act Break (Ctrl+Shift+B)"
 
                     icon.source: Runtime.themedIcon("qrc:/icons/action/add_act.png")
@@ -87,7 +87,7 @@ Loader {
                     onClicked: Scrite.document.screenplay.addBreakElement(Screenplay.Act)
                 }
 
-                VclToolButton {
+                SctToolButton {
                     toolTipText: "Add Episode Break (Ctrl+Shift+P)"
 
                     icon.source: Runtime.themedIcon("qrc:/icons/action/add_episode.png")

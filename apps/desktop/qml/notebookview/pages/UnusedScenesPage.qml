@@ -21,7 +21,7 @@ import "../../controls"
 AbstractNotebookPage {
     id: root
 
-    VclLabel {
+    SctLabel {
         anchors.fill: parent
         anchors.margins: 20
 

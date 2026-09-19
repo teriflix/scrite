@@ -54,7 +54,7 @@ Item {
     Component {
         id: _dialogComponent
 
-        VclDialog {
+        SctDialog {
             id: _dialog
 
             property string message
@@ -73,7 +73,7 @@ Item {
             contentItem: ColumnLayout {
                 spacing: 20
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: _dialog.message
@@ -103,7 +103,7 @@ Item {
                     visible: Platform.isMacOSDesktop
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: _dialog.progressReport ? (_dialog.progressReport.progressText + " (" + Math.round(_dialog.progressReport.progress*100,0) + "%)") : " - "

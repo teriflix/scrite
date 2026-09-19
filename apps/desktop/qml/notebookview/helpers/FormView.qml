@@ -120,7 +120,7 @@ Item {
                     height: 1
                 }
 
-                VclTextField {
+                SctTextField {
                     id: _title
 
                     TabSequenceItem.manager: _tabManager
@@ -146,7 +146,7 @@ Item {
                     }
                 }
 
-                VclTextField {
+                SctTextField {
                     id: _description
 
                     TabSequenceItem.manager: _tabManager
@@ -171,7 +171,7 @@ Item {
                     }
                 }
 
-                VclLabel {
+                SctLabel {
                     width: parent.width
 
                     elide: Text.ElideRight
@@ -187,20 +187,20 @@ Item {
             Row {
                 spacing: 10
 
-                VclLabel {
+                SctLabel {
                     text: "View"
 
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                VclRadioButton {
+                SctRadioButton {
                     text: "All"
                     checked: Runtime.notebookSettings.showAllFormQuestions
 
                     onToggled: Runtime.notebookSettings.showAllFormQuestions = true
                 }
 
-                VclRadioButton {
+                SctRadioButton {
                     text: "Answered"
                     checked: !Runtime.notebookSettings.showAllFormQuestions
 
@@ -308,7 +308,7 @@ Item {
         wrapAround: true
     }
 
-    VclScrollBar {
+    SctScrollBar {
         id: _vscrollBar
 
         anchors.top: parent.top
@@ -319,7 +319,7 @@ Item {
         orientation: Qt.Vertical
     }
 
-    VclScrollBar {
+    SctScrollBar {
         id: _hscrollBar
 
         anchors.left: parent.right

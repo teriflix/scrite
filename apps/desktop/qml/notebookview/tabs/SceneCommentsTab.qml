@@ -67,7 +67,7 @@ Item {
         onTextEdited: root.scene.comments = text
     }
 
-    VclScrollBar {
+    SctScrollBar {
         id: _scrollBar
 
         anchors.top: parent.top

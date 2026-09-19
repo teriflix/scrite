@@ -41,7 +41,7 @@ Item {
 
         spacing: 20
 
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
 
             font.bold: true
@@ -50,7 +50,7 @@ Item {
             text: root.target === root.e_CurrentDocumentTarget ? "Story beats used in the currently open document" : "Default story beats for use in all new documents created in the future"
         }
 
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
 
             wrapMode: Text.WordWrap
@@ -88,7 +88,7 @@ Item {
             Layout.fillWidth: true
             spacing: 10
 
-            VclButton {
+            SctButton {
                 text: "Help"
                 onClicked: Qt.openUrlExternally("https://www.scrite.io/story-beats/")
             }
@@ -97,7 +97,7 @@ Item {
                 Layout.fillWidth: true
             }
 
-            VclButton {
+            SctButton {
                 id: _applyButton
 
                 text: "Apply"

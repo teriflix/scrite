@@ -192,7 +192,7 @@ TextField {
         textEditorHasCursorInterface: true
     }
 
-    VclLabel {
+    SctLabel {
         id: _label
 
         anchors.left: parent.left
@@ -228,7 +228,7 @@ TextField {
 
             property real delegateHeight: _fontMetrics.lineSpacing + 10
 
-            ScrollBar.vertical: VclScrollBar { flickable: _completionView }
+            ScrollBar.vertical: SctScrollBar { flickable: _completionView }
 
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
@@ -245,7 +245,7 @@ TextField {
                 color: Runtime.colors.primary.highlight.background
             }
 
-            delegate: VclLabel {
+            delegate: SctLabel {
                 id: _completionDelegate
 
                 required property int index
@@ -287,14 +287,14 @@ TextField {
         }
     }
 
-    VclMenu {
+    SctMenu {
         id: _contextMenu
 
         property bool __persistentSelection: false
 
         focus: false
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Cut\t" + ActionHub.editOptions.find("cut").shortcut
             enabled: root.selectedText !== ""
             focusPolicy: Qt.NoFocus
@@ -302,7 +302,7 @@ TextField {
             onClicked: root.cut()
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Copy\t" + ActionHub.editOptions.find("copy").shortcut
             enabled: root.selectedText !== ""
             focusPolicy: Qt.NoFocus
@@ -310,7 +310,7 @@ TextField {
             onClicked: root.copy()
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Paste\t" + ActionHub.editOptions.find("paste").shortcut
             focusPolicy: Qt.NoFocus
 

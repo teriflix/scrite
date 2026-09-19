@@ -59,7 +59,7 @@ Item {
             enabled: !_checkUserCall.busy
             opacity: enabled ? 1 : 0.5
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
 
                 text: "Please provide us your email."
@@ -68,7 +68,7 @@ Item {
                 wrapMode: Text.WordWrap
             }
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
 
                 text: "Your free trial and other subscription plans will be linked to this email."
@@ -80,7 +80,7 @@ Item {
                 Layout.preferredHeight: 20
             }
 
-            VclTextField {
+            SctTextField {
                 id: _emailField
 
                 Layout.fillWidth: true
@@ -101,7 +101,7 @@ Item {
             RowLayout {
                 Layout.fillWidth: true
 
-                VclCheckBox {
+                SctCheckBox {
                     id: _userInfoConsent
 
                     TabSequenceItem.manager: _userInfoFields
@@ -113,7 +113,7 @@ Item {
                     onToggled: Qt.callLater(_submit.determineEnabled)
                 }
 
-                VclLabel {
+                SctLabel {
                     text: "ⓘ" + (_userInfoConsentHelp.containsMouse ? " Privacy Policy" : "")
 
                     MouseArea {
@@ -138,7 +138,7 @@ Item {
                 Layout.preferredHeight: 20
             }
 
-            VclButton {
+            SctButton {
                 id: _submit
 
                 Component.onCompleted: determineEnabled()

@@ -90,7 +90,7 @@ Rectangle {
                     fillMode: Image.PreserveAspectFit
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: root.featureName
@@ -102,7 +102,7 @@ Rectangle {
                 }
             }
 
-            VclLabel {
+            SctLabel {
                 id: _reasonSuggestion
 
                 Layout.fillWidth: true
@@ -131,7 +131,7 @@ Rectangle {
         }
     }
 
-    VclScrollBar {
+    SctScrollBar {
         id: _vscrollBar
 
         anchors.top: parent.top

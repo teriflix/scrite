@@ -144,7 +144,7 @@ Rectangle {
         }
     }
 
-    VclLabel {
+    SctLabel {
         id: _beatLabel
 
         anchors.left: parent.left

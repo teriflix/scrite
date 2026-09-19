@@ -40,7 +40,7 @@ DialogLauncher {
     name: "HomeScreen"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         property string mode

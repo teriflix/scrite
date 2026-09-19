@@ -31,7 +31,7 @@ Item {
 
     clip: true
 
-    VclGroupBox {
+    SctGroupBox {
         anchors.fill: parent
         anchors.margins: 10
         anchors.leftMargin: 0
@@ -41,7 +41,7 @@ Item {
         enabled: Runtime.appFeatures.structure.enabled
         opacity: enabled ? 1 : 0.5
 
-        label: VclCheckBox {
+        label: SctCheckBox {
             text: "Display tracks"
 
             checked: Runtime.screenplayTracksSettings.displayTracks
@@ -56,7 +56,7 @@ Item {
             opacity: enabled ? 1 : 0.5
 
             RowLayout {
-                VclCheckBox {
+                SctCheckBox {
                     Layout.fillWidth: true
 
                     text: "Display structure tracks"
@@ -65,7 +65,7 @@ Item {
                     onToggled: Runtime.screenplayTracksSettings.displayStructureTracks = !Runtime.screenplayTracksSettings.displayStructureTracks
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     Layout.fillWidth: true
 
                     text: "Display stack/sequence tracks"
@@ -75,11 +75,11 @@ Item {
                 }
             }
 
-            VclGroupBox {
+            SctGroupBox {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                label: VclCheckBox {
+                label: SctCheckBox {
                     id: _chkKeywordsTracks
 
                     text: "Display keywords tracks"
@@ -91,7 +91,7 @@ Item {
                 ColumnLayout {
                     anchors.fill: parent
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
                         Layout.bottomMargin: 10
 
@@ -105,7 +105,7 @@ Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        ScrollBar.vertical: VclScrollBar { }
+                        ScrollBar.vertical: SctScrollBar { }
 
                         contentWidth: width
                         contentHeight: _keywordsFlickLayout.height
@@ -148,7 +148,7 @@ Item {
                                 Repeater {
                                     model: Scrite.document.structure.sceneTags
 
-                                    delegate: VclCheckBox {
+                                    delegate: SctCheckBox {
                                         id: _delegate
                                         required property int index
                                         required property string modelData

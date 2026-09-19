@@ -34,7 +34,7 @@ ListView {
 
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-    ScrollBar.horizontal: VclScrollBar { flickable: root }
+    ScrollBar.horizontal: SctScrollBar { flickable: root }
 
     height: implicitHeight
     implicitHeight: scrollBarVisible ? 100 : 83
@@ -82,7 +82,7 @@ ListView {
                 source: "image://fileIcon/" + _delegate.objectItem.filePath
             }
 
-            VclLabel {
+            SctLabel {
                 id: _ofnLabel
 
                 width: parent.width
@@ -134,7 +134,7 @@ ListView {
         border.width: 1
         border.color: Runtime.colors.primary.borderColor
 
-        VclLabel {
+        SctLabel {
             anchors.fill: parent
             anchors.margins: 10
             anchors.leftMargin: root.delegateSize
@@ -162,10 +162,10 @@ ListView {
         }
     }
 
-    VclMenu {
+    SctMenu {
         id: _attachmentContextMenu
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Edit"
             enabled: root.currentIndex >= 0
 
@@ -178,7 +178,7 @@ ListView {
 
         MenuSeparator { }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Remove"
             enabled: root.currentIndex >= 0
 

@@ -44,7 +44,7 @@ AbstractScenePartEditor {
         contentHeight: _layout.height
         flickableDirection: Flickable.VerticalFlick
 
-        ScrollBar.vertical: VclScrollBar { }
+        ScrollBar.vertical: SctScrollBar { }
 
         ColumnLayout {
             id: _layout
@@ -68,7 +68,7 @@ AbstractScenePartEditor {
                 tabSequenceEnabled: true
             }
 
-            VclToolButton {
+            SctToolButton {
                 id: _icfEditButton
 
                 Layout.fillWidth: true

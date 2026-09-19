@@ -138,7 +138,7 @@ Item {
                 width: parent.width
                 spacing: 0
 
-                VclLabel {
+                SctLabel {
                     width: parent.width
 
                     font: _private.fontMetrics.font
@@ -273,7 +273,7 @@ Item {
         }
     }
 
-    VclScrollBar {
+    SctScrollBar {
         id: _vscrollBar
 
         anchors.top: parent.top
@@ -284,7 +284,7 @@ Item {
         flickable: _flickable
     }
 
-    VclScrollBar {
+    SctScrollBar {
         id: _hscrollBar
 
         anchors.left: parent.left

@@ -59,7 +59,7 @@ Item {
             enabled: !_activateCall.busy && !_sendActivationCodeCall.busy
             opacity: enabled ? 1 : 0.5
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
 
                 text: "A verification code was sent to <b>" + _private.userMeta.email + "</b>. Please paste it in the text field below, and click Verify."
@@ -83,7 +83,7 @@ Item {
             RowLayout {
                 Layout.fillWidth: true
 
-                VclButton {
+                SctButton {
                     text: "Resend" + (_resendTimer.running ? " (" + _resendTimer.secondsLeft + ")" : "")
                     enabled: !_resendTimer.running
 
@@ -111,7 +111,7 @@ Item {
                 Item {
                     Layout.fillWidth: true
 
-                    VclButton {
+                    SctButton {
                         anchors.centerIn: parent
 
                         visible: _clipboard.text.length === 20
@@ -125,7 +125,7 @@ Item {
                     }
                 }
 
-                VclButton {
+                SctButton {
                     id: _activateButton
 
                     text: "Verify »"

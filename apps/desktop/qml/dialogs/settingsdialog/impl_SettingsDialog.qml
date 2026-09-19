@@ -25,7 +25,7 @@ import "../../globals"
 import "../../controls"
 import "../../helpers"
 
-VclDialog {
+SctDialog {
     id: root
 
     property string activeTab

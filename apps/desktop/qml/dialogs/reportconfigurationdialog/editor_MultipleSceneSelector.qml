@@ -42,7 +42,7 @@ ColumnLayout {
 
     spacing: 5
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -50,7 +50,7 @@ ColumnLayout {
         text: root.fieldInfo.label
     }
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -84,7 +84,7 @@ ColumnLayout {
             return items
         }
 
-        VclTextField {
+        SctTextField {
             id: _locTypeFilter
 
             Layout.preferredWidth: (parent.width - parent.spacing*2)*0.25
@@ -96,7 +96,7 @@ ColumnLayout {
             font.capitalization: Font.AllUppercase
         }
 
-        VclTextField {
+        SctTextField {
             id: _locFilter
 
             Layout.fillWidth: true
@@ -108,7 +108,7 @@ ColumnLayout {
             font.capitalization: Font.AllUppercase
         }
 
-        VclTextField {
+        SctTextField {
             id: _momentFilter
 
             Layout.preferredWidth: (parent.width - parent.spacing*2)*0.25
@@ -195,7 +195,7 @@ ColumnLayout {
                 width: _sceneListView.width-1
                 height: _sceneCheckBox.visible ? _sceneCheckBox.height : 0
 
-                VclCheckBox {
+                SctCheckBox {
                     id: _sceneCheckBox
 
                     width: parent.width-1
@@ -224,7 +224,7 @@ ColumnLayout {
 
         spacing: 10
 
-        VclButton {
+        SctButton {
             text: "Select All"
 
             onClicked: {
@@ -242,7 +242,7 @@ ColumnLayout {
             }
         }
 
-        VclButton {
+        SctButton {
             text: "Unselect All"
             
             onClicked: {
@@ -261,7 +261,7 @@ ColumnLayout {
             }
         }
 
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
 
             text: _sceneListView.selectedSceneNumbers.length === 0 ? "All Scenes Are Selected" : ("" + _sceneListView.selectedSceneNumbers.length + " Scene(s) Are Selected")

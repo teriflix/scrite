@@ -43,7 +43,7 @@ Item {
 
         spacing: 20
 
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
 
             font.bold: true
@@ -52,7 +52,7 @@ Item {
             text: root.target === root.e_CurrentDocumentTarget ? "Fields on index cards in the currently open document" : "Default fields on index cards in all new documents created in the future"
         }
 
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
 
             wrapMode: Text.WordWrap
@@ -79,7 +79,7 @@ Item {
                 Repeater {
                     model: _indexCardFieldsModel.maxCount
 
-                    delegate: VclTextField {
+                    delegate: SctTextField {
                         required property int index
 
                         Layout.preferredWidth: Runtime.idealFontMetrics.averageCharacterWidth * (maximumLength+2)
@@ -103,7 +103,7 @@ Item {
                 Repeater {
                     model: _indexCardFieldsModel.maxCount
 
-                    delegate: VclTextField {
+                    delegate: SctTextField {
                         required property int index
 
                         Layout.fillWidth: true
@@ -125,7 +125,7 @@ Item {
                 Repeater {
                     model: _indexCardFieldsModel.maxCount
 
-                    delegate: VclToolButton {
+                    delegate: SctToolButton {
                         required property int index
 
                         enabled: index < _indexCardFieldsModel.count
@@ -143,7 +143,7 @@ Item {
 
             spacing: 20
 
-            VclButton {
+            SctButton {
                 text: "Help"
                 onClicked: Qt.openUrlExternally("https://www.scrite.io/index-card-fields/")
             }
@@ -152,7 +152,7 @@ Item {
                 Layout.fillWidth: true
             }
 
-            VclButton {
+            SctButton {
                 visible: root.target === root.e_CurrentDocumentTarget
                 enabled: JSON.stringify(Scrite.document.structure.defaultIndexCardFields) !== JSON.stringify(_indexCardFieldsModel.array)
 
@@ -179,13 +179,13 @@ Item {
                 }
             }
 
-            VclButton {
+            SctButton {
                 text: "Revert"
                 enabled: _indexCardFieldsModel.canReset
                 onClicked: _indexCardFieldsModel.reset()
             }
 
-            VclButton {
+            SctButton {
                 text: "Apply"
                 enabled: _indexCardFieldsModel.modified
                 onClicked: {

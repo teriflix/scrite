@@ -75,7 +75,7 @@ DialogLauncher {
     name: "FontSelectionDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         property scriteLanguage language: Runtime.language.available.findLanguage(languageCode)
@@ -202,7 +202,7 @@ DialogLauncher {
                             height: Runtime.idealFontMetrics.lineSpacing+15
                             color: Runtime.colors.accent.highlight.background
 
-                            VclText {
+                            SctText {
                                 id: _sectionLabel
 
                                 anchors.centerIn: parent
@@ -223,7 +223,7 @@ DialogLauncher {
                         anchors.fill: parent
                         anchors.margins: 1
 
-                        ScrollBar.vertical: VclScrollBar { }
+                        ScrollBar.vertical: SctScrollBar { }
 
                         clip: true
                         model: _fontFamiliesFilterModel
@@ -260,7 +260,7 @@ DialogLauncher {
                                 width: parent.width-10
                                 anchors.horizontalCenter: parent.horizontalCenter
 
-                                VclLabel {
+                                SctLabel {
                                     Layout.preferredWidth: parent.width * 0.5
 
                                     text: (_dialog.initialFontFamily === _fontListDelegate.family ? "* " : "") + _fontListDelegate.family
@@ -268,7 +268,7 @@ DialogLauncher {
                                     padding: 3
                                 }
 
-                                VclLabel {
+                                SctLabel {
                                     Layout.fillWidth: true
 
                                     text: _dialog.previewText
@@ -292,7 +292,7 @@ DialogLauncher {
                     }
                 }
 
-                VclButton {
+                SctButton {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Select"

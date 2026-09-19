@@ -34,7 +34,7 @@ DialogLauncher {
     name: "ViewLicenseDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         title: "License"

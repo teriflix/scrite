@@ -38,7 +38,7 @@ MenuLoader {
 
     enabled: !Scrite.document.readOnly
 
-    menu: VclMenu {
+    menu: SctMenu {
         property int cursorPosition: -1
 
         focus: false
@@ -51,7 +51,7 @@ MenuLoader {
 
             model: root.spellingSuggestions
 
-            delegate: VclMenuItem {
+            delegate: SctMenuItem {
                 id: _suggestionDelegate
 
                 required property int index
@@ -69,7 +69,7 @@ MenuLoader {
 
         MenuSeparator { }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Add to dictionary"
 
             focusPolicy: Qt.NoFocus
@@ -80,7 +80,7 @@ MenuLoader {
             }
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Ignore"
 
             focusPolicy: Qt.NoFocus

@@ -29,7 +29,7 @@ import "../controls"
 import "./annotations"
 import "./structureelements"
 
-VclMenu {
+SctMenu {
     id: root
 
     property alias coloredSceneColor: _colorMenu.selectedColor
@@ -37,7 +37,7 @@ VclMenu {
     signal createElementRequest(real x, real y, color sceneColor)
     signal createAnnotationRequest(real x, real y, string type)
 
-    VclMenuItem {
+    SctMenuItem {
         text: "New Scene"
         enabled: !Scrite.document.readOnly
 
@@ -63,13 +63,13 @@ VclMenu {
 
     MenuSeparator { }
 
-    VclMenu {
+    SctMenu {
         title: "Annotation"
 
         Repeater {
             model: AnnotationFactory.keys
 
-            delegate: VclMenuItem {
+            delegate: SctMenuItem {
                 required property int index
                 required property var modelData
 

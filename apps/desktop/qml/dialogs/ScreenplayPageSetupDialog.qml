@@ -38,7 +38,7 @@ DialogLauncher {
     name: "ScreenplayPageSetupDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         width: Math.min(Scrite.window.width-80, 800)
         height: Math.min(Scrite.window.height-80, 750)
 
@@ -50,7 +50,7 @@ DialogLauncher {
             contentWidth: _pageContainer.width
             contentHeight: _pageContainer.height
 
-            ScrollBar.vertical: VclScrollBar { }
+            ScrollBar.vertical: SctScrollBar { }
 
             Item {
                 id: _pageContainer

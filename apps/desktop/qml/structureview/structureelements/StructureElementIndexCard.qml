@@ -247,7 +247,7 @@ AbstractStructureElementUI {
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
 
-            highDetailComponent: VclTextField {
+            highDetailComponent: SctTextField {
                 id: _headingField
 
                 width: parent.width
@@ -384,7 +384,7 @@ AbstractStructureElementUI {
 
                             property bool scrollBarVisible: contentHeight > height
 
-                            ScrollBar.vertical: VclScrollBar { flickable: _synopsisFieldFlick }
+                            ScrollBar.vertical: SctScrollBar { flickable: _synopsisFieldFlick }
 
                             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
@@ -512,26 +512,26 @@ AbstractStructureElementUI {
                                                               }
                                 }
 
-                                VclMenu {
+                                SctMenu {
                                     id: _contextMenu
 
                                     focus: false
 
-                                    VclMenuItem {
+                                    SctMenuItem {
                                         text: "Cut\t" + ActionHub.editOptions.find("cut").shortcut
                                         enabled: _synopsisField.selectedText !== ""
                                         onClicked: _synopsisField.cut()
                                         focusPolicy: Qt.NoFocus
                                     }
 
-                                    VclMenuItem {
+                                    SctMenuItem {
                                         text: "Copy\t" + ActionHub.editOptions.find("copy").shortcut
                                         enabled: _synopsisField.selectedText !== ""
                                         onClicked: _synopsisField.copy()
                                         focusPolicy: Qt.NoFocus
                                     }
 
-                                    VclMenuItem {
+                                    SctMenuItem {
                                         text: "Paste\t" + ActionHub.editOptions.find("paste").shortcut
                                         onClicked: _synopsisField.paste()
                                         focusPolicy: Qt.NoFocus
@@ -645,7 +645,7 @@ AbstractStructureElementUI {
                             allowedType: Attachments.PhotosOnly
                             attachmentNoticeSuffix: "Drop this photo to tag it as featured image for this scene."
 
-                            VclLabel {
+                            SctLabel {
                                 anchors.centerIn: parent
 
                                 width: parent.width
@@ -720,7 +720,7 @@ AbstractStructureElementUI {
 
                     spacing: parent.spacing
 
-                    VclLabel {
+                    SctLabel {
                         id: _groupsLabel
 
                         Layout.fillWidth: true
@@ -732,7 +732,7 @@ AbstractStructureElementUI {
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
                     }
 
-                    VclLabel {
+                    SctLabel {
                         id: _characterList
 
                         Layout.fillWidth: true

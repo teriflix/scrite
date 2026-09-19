@@ -79,7 +79,7 @@ MenuItem {
                 fillMode: Image.PreserveAspectFit
             }
 
-            VclLabel {
+            SctLabel {
                 id: _label
 
                 Layout.fillWidth: true

@@ -40,7 +40,7 @@ DialogLauncher {
     name: "JoinDiscordCommunity"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         title: "Join us on Discord"
@@ -77,7 +77,7 @@ DialogLauncher {
                     }
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.preferredWidth: 450
                     Layout.alignment: Qt.AlignHCenter
 
@@ -90,7 +90,7 @@ DialogLauncher {
 
                     spacing: 20
 
-                    VclText {
+                    SctText {
                         id: _discordInviteLink
                         font.family: "Courier New"
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
@@ -112,7 +112,7 @@ DialogLauncher {
                     }
                 }
 
-                VclText {
+                SctText {
                     Layout.preferredWidth: 450
                     Layout.alignment: Qt.AlignHCenter
 
@@ -129,7 +129,7 @@ DialogLauncher {
 
                     spacing: 20
 
-                    VclButton {
+                    SctButton {
                         text: "More Info"
                         onClicked: {
                             Qt.openUrlExternally(root.infoUrl)
@@ -139,7 +139,7 @@ DialogLauncher {
                         }
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Open Discord"
                         onClicked: {
                             Qt.openUrlExternally(root.inviteUrl)

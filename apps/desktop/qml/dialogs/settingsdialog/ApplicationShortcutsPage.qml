@@ -116,7 +116,7 @@ FocusScope {
                 anchors.fill: parent
                 anchors.margins: 1
 
-                ScrollBar.vertical: VclScrollBar { }
+                ScrollBar.vertical: SctScrollBar { }
 
                 FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
@@ -132,7 +132,7 @@ FocusScope {
                 section.property: "groupName"
                 section.criteria: ViewSection.FullString
                 section.labelPositioning: ViewSection.InlineLabels
-                section.delegate: VclLabel {
+                section.delegate: SctLabel {
                     required property string section
 
                     width: _actionsView.width
@@ -195,7 +195,7 @@ FocusScope {
 
                             spacing: 0
 
-                            VclText {
+                            SctText {
                                 id: _nameLabel
 
                                 Layout.fillWidth: true
@@ -209,7 +209,7 @@ FocusScope {
                                 text: _delegate.qmlAction.text + (_delegate.qmlAction.checkable & _delegate.qmlAction.checked ? " ✔" : "")
                             }
 
-                            VclLabel {
+                            SctLabel {
                                 id: _descriptionLabel
 
                                 Layout.fillWidth: true

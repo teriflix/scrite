@@ -135,7 +135,7 @@ Item {
             radius: 4
         }
 
-        VclLabel {
+        SctLabel {
             id: _attachmentNotice
 
             anchors.centerIn: parent

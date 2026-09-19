@@ -205,7 +205,7 @@ Item {
                         visible: _urlOverlay.visible
                     }
 
-                    VclText {
+                    SctText {
                         id: _urlOverlay
 
                         anchors.bottom: parent.bottom
@@ -223,7 +223,7 @@ Item {
                         font.pixelSize: Math.max(24, Math.min(_videoOutput.width, _videoOutput.height)*0.125 * 0.25)
                     }
 
-                    VclLabel {
+                    SctLabel {
                         anchors.centerIn: parent
 
                         width: parent.width * 0.75
@@ -328,7 +328,7 @@ Item {
                             RowLayout {
                                 width: parent.width
 
-                                VclToolButton {
+                                SctToolButton {
                                     enabled: Scrite.document.screenplay.elementCount > 0
                                     focusPolicy: Qt.NoFocus
                                     suggestedHeight: 36
@@ -339,7 +339,7 @@ Item {
                                     onClicked: _fileDialog.open()
                                 }
 
-                                VclToolButton {
+                                SctToolButton {
                                     enabled: _mediaPlayer.mediaStatus !== MediaPlayer.NoMedia
                                     focusPolicy: Qt.NoFocus
                                     suggestedHeight: 36
@@ -354,7 +354,7 @@ Item {
                                     onClicked: _mediaPlayer.togglePlayback()
                                 }
 
-                                VclLabel {
+                                SctLabel {
                                     Layout.fillWidth: true
                                     Layout.alignment: Qt.AlignVCenter
 
@@ -382,7 +382,7 @@ Item {
                                     font.pointSize: 16
                                 }
 
-                                VclToolButton {
+                                SctToolButton {
                                     enabled: _mediaPlayer.mediaStatus !== MediaPlayer.NoMedia && _mediaPlayer.position > 0
                                     focusPolicy: Qt.NoFocus
                                     suggestedHeight: 36
@@ -393,7 +393,7 @@ Item {
                                     onClicked: _private.rewind()
                                 }
 
-                                VclToolButton {
+                                SctToolButton {
                                     enabled: _mediaPlayer.mediaStatus !== MediaPlayer.NoMedia && _mediaPlayer.position < _mediaPlayer.duration
                                     focusPolicy: Qt.NoFocus
                                     toolTipText: "Forward by " + _private.skipDuration + " seconds"
@@ -403,7 +403,7 @@ Item {
                                     onClicked: _private.forward()
                                 }
 
-                                VclToolButton {
+                                SctToolButton {
                                     enabled: _mediaPlayer.mediaStatus !== MediaPlayer.NoMedia
                                     focusPolicy: Qt.NoFocus
                                     suggestedHeight: 36
@@ -442,7 +442,7 @@ Item {
 
                                 color: "#65318f"
 
-                                VclLabel {
+                                SctLabel {
                                     id: _titleText
 
                                     color: "white"
@@ -462,7 +462,7 @@ Item {
                                 color: "#e665318f"
                                 visible: _subtitleText.text !== ""
 
-                                VclLabel {
+                                SctLabel {
                                     id: _subtitleText
 
                                     color: "white"
@@ -482,7 +482,7 @@ Item {
                                 color: "black"
                                 visible: _authorsText.text !== ""
 
-                                VclLabel {
+                                SctLabel {
                                     id: _authorsText
 
                                     color: "white"
@@ -560,7 +560,7 @@ Item {
                             }
                         }
 
-                        VclText {
+                        SctText {
                             anchors.centerIn: parent
 
                             opacity: 0.025
@@ -739,7 +739,7 @@ Item {
                             }
                         }
 
-                        VclScrollBar {
+                        SctScrollBar {
                             id: _textDocumentScrollBar
 
                             anchors.top: parent.top
@@ -891,7 +891,7 @@ Item {
 
                     spacing: _startingFrameOverlay.height * 0.025
 
-                    VclLabel {
+                    SctLabel {
                         Layout.alignment: Qt.AlignHCenter
 
                         color: "#f1be41"
@@ -911,7 +911,7 @@ Item {
                         source: Scrite.document.screenplay.coverPagePhoto !== "" ? "file:///" + Scrite.document.screenplay.coverPagePhoto : ""
                     }
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
 
                         color: "white"
@@ -923,7 +923,7 @@ Item {
                         font.pointSize: _closingFrameOverlay.height * 0.05
                     }
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
 
                         color: "white"
@@ -936,7 +936,7 @@ Item {
                         font.pointSize: _closingFrameOverlay.height * 0.0225
                     }
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
 
                         color: "white"
@@ -1123,7 +1123,7 @@ Item {
 
                 visible: _screenplayOffsetsView.count > 0
 
-                VclLabel {
+                SctLabel {
                     anchors.verticalCenter: parent.verticalCenter
 
                     width: parent.width * 0.1
@@ -1138,7 +1138,7 @@ Item {
                     font.pointSize: 16
                 }
 
-                VclLabel {
+                SctLabel {
                     anchors.verticalCenter: parent.verticalCenter
 
                     width: parent.width * (_screenplayOffsetsView.displayTimeOffset ? 0.6 : 0.8)
@@ -1152,7 +1152,7 @@ Item {
                     font.pointSize: 16
                 }
 
-                VclLabel {
+                SctLabel {
                     anchors.verticalCenter: parent.verticalCenter
 
                     clip: true
@@ -1166,7 +1166,7 @@ Item {
                     font.pointSize: 16
                 }
 
-                VclLabel {
+                SctLabel {
                     anchors.verticalCenter: parent.verticalCenter
 
                     width: parent.width * 0.2
@@ -1210,7 +1210,7 @@ Item {
 
                 FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-                ScrollBar.vertical: VclScrollBar { flickable: _screenplayOffsetsView }
+                ScrollBar.vertical: SctScrollBar { flickable: _screenplayOffsetsView }
 
                 anchors.top: _screenplayOffsesHeading.bottom
                 anchors.left: parent.left
@@ -1306,7 +1306,7 @@ Item {
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
 
-                        VclLabel {
+                        SctLabel {
                             anchors.verticalCenter: parent.verticalCenter
 
                             width: parent.width * 0.1
@@ -1320,7 +1320,7 @@ Item {
                             font.pointSize: 14
                         }
 
-                        VclLabel {
+                        SctLabel {
                             anchors.verticalCenter: parent.verticalCenter
 
                             width: parent.width * (_screenplayOffsetsView.displayTimeOffset ? 0.6 : 0.8)
@@ -1334,7 +1334,7 @@ Item {
                             font.pointSize: 14
                         }
 
-                        VclLabel {
+                        SctLabel {
                             anchors.verticalCenter: parent.verticalCenter
 
                             width: parent.width * 0.1
@@ -1348,7 +1348,7 @@ Item {
                             font.pointSize: 14
                         }
 
-                        VclLabel {
+                        SctLabel {
                             anchors.verticalCenter: parent.verticalCenter
 
                             width: parent.width * 0.2

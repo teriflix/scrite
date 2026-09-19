@@ -66,10 +66,10 @@ Item {
             _newSceneMenu.popup(source)
         }
 
-        VclMenu {
+        SctMenu {
             id: _newSceneMenu
 
-            VclMenuItem {
+            SctMenuItem {
                 text: "New Scene"
                 enabled: !Scrite.document.readOnly
 
@@ -102,13 +102,13 @@ Item {
             _newAnnotationMenu.popup(source)
         }
 
-        VclMenu {
+        SctMenu {
             id: _newAnnotationMenu
 
             Repeater {
                 model: root.canvasScroll.availableAnnotationKeys
 
-                delegate: VclMenuItem {
+                delegate: SctMenuItem {
                     required property int index
                     required property var modelData
 
@@ -149,7 +149,7 @@ Item {
             _layoutOptionsMenu.popup(source)
         }
 
-        VclMenu {
+        SctMenu {
             id: _layoutOptionsMenu
             width: 250
 
@@ -161,7 +161,7 @@ Item {
                     { "text": "Flow Vertically", "icon": "layout_flow_vertically.png", "type": Structure.FlowVerticalLayout }
                 ]
 
-                delegate: VclMenuItem {
+                delegate: SctMenuItem {
                     required property int index
                     required property var modelData
 
@@ -228,12 +228,12 @@ Item {
             _layoutGroupingMenu.popup(source)
         }
 
-        VclMenu {
+        SctMenu {
             id: _layoutGroupingMenu
 
             width: 350
 
-            VclMenuItem {
+            SctMenuItem {
                 text: "None"
                 checkable: true
                 checked: root.canvasScroll.groupCategory === "{NONE}"
@@ -241,7 +241,7 @@ Item {
                 onTriggered: root.groupCategoryRequest("{NONE}")
             }
 
-            VclMenuItem {
+            SctMenuItem {
                 text: "Acts"
                 checkable: true
                 checked: root.canvasScroll.groupCategory === ""
@@ -252,7 +252,7 @@ Item {
             Repeater {
                 model: Scrite.document.structure.groupCategories
 
-                delegate: VclMenuItem {
+                delegate: SctMenuItem {
                     required property int index
                     required property string modelData
 
@@ -266,7 +266,7 @@ Item {
 
             MenuSeparator { }
 
-            VclMenuItem {
+            SctMenuItem {
                 text: "Customise"
 
                 onTriggered: StructureStoryBeatsDialog.launch()

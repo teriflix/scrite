@@ -130,7 +130,7 @@ Item {
         onCountChanged: Qt.callLater(_private.evalDualDialogueRects)
     }
 
-    VclText {
+    SctText {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right

@@ -43,9 +43,9 @@ Item {
             Layout.alignment: Qt.AlignTop
             Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
 
-            label: VclLabel { text: "Paper Size" }
+            label: SctLabel { text: "Paper Size" }
 
-            VclComboBox {
+            SctComboBox {
                 width: parent.width
                 model: Object.typeEnumModel("ScreenplayPageLayout", "PaperSize", root)
                 textRole: "enumKey"
@@ -63,13 +63,13 @@ Item {
             Layout.alignment: Qt.AlignTop
             Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
 
-            label: VclLabel { text: "Time Per Page" }
+            label: SctLabel { text: "Time Per Page" }
 
             RowLayout {
                 width: parent.width
                 spacing: 10
 
-                VclTextField {
+                SctTextField {
                     Layout.preferredWidth: Runtime.sceneEditorFontMetrics.averageCharacterWidth*5
 
                     label: "Seconds (15 - 300)"
@@ -79,7 +79,7 @@ Item {
                     onTextEdited: Scrite.document.printFormat.secondsPerPage = parseInt(text)
                 }
 
-                VclLabel {
+                SctLabel {
                     text: "seconds per page."
                 }
             }
@@ -89,7 +89,7 @@ Item {
             Layout.alignment: Qt.AlignTop
             Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
 
-            label: VclLabel { text: "Header" }
+            label: SctLabel { text: "Header" }
 
             RowLayout {
                 width: parent.width
@@ -100,11 +100,11 @@ Item {
 
                     spacing: 10
 
-                    VclLabel {
+                    SctLabel {
                         text: "Left"
                     }
 
-                    VclComboBox {
+                    SctComboBox {
                         Layout.fillWidth: true
 
                         model: _private.fieldsModel
@@ -119,11 +119,11 @@ Item {
 
                     spacing: 10
 
-                    VclLabel {
+                    SctLabel {
                         text: "Center"
                     }
 
-                    VclComboBox {
+                    SctComboBox {
                         Layout.fillWidth: true
 
                         model: _private.fieldsModel
@@ -138,11 +138,11 @@ Item {
 
                     spacing: 10
 
-                    VclLabel {
+                    SctLabel {
                         text: "Right"
                     }
 
-                    VclComboBox {
+                    SctComboBox {
                         Layout.fillWidth: true
 
                         model: _private.fieldsModel
@@ -158,7 +158,7 @@ Item {
             Layout.alignment: Qt.AlignTop
             Layout.preferredWidth: (_layout.width-_layout.columnSpacing)/2
 
-            label: VclLabel { text: "Footer" }
+            label: SctLabel { text: "Footer" }
 
             RowLayout {
                 width: parent.width
@@ -169,11 +169,11 @@ Item {
 
                     spacing: 10
 
-                    VclLabel {
+                    SctLabel {
                         text: "Left"
                     }
 
-                    VclComboBox {
+                    SctComboBox {
                         Layout.fillWidth: true
 
                         model: _private.fieldsModel
@@ -188,11 +188,11 @@ Item {
 
                     spacing: 10
 
-                    VclLabel {
+                    SctLabel {
                         text: "Center"
                     }
 
-                    VclComboBox {
+                    SctComboBox {
                         Layout.fillWidth: true
 
                         model: _private.fieldsModel
@@ -207,11 +207,11 @@ Item {
 
                     spacing: 10
 
-                    VclLabel {
+                    SctLabel {
                         text: "Right"
                     }
 
-                    VclComboBox {
+                    SctComboBox {
                         Layout.fillWidth: true
 
                         model: _private.fieldsModel
@@ -228,7 +228,7 @@ Item {
             Layout.preferredWidth: _layout.width
             Layout.preferredHeight: _watermarkOptionsLayout.height+50 // !!!
 
-            label: VclLabel { text: "Watermark" }
+            label: SctLabel { text: "Watermark" }
 
             GridLayout {
                 id: _watermarkOptionsLayout
@@ -238,32 +238,32 @@ Item {
                 rowSpacing: 10
                 enabled: Runtime.appFeatures.watermark.enabled
 
-                VclLabel {
+                SctLabel {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Enable"
                 }
 
-                VclCheckBox {
+                SctCheckBox {
                     text: checked ? "ON" : "OFF"
                     checked: Runtime.appFeatures.watermark.enabled ? _private.pageSetupSettings.watermarkEnabled : true
                     onToggled: _private.pageSetupSettings.watermarkEnabled = checked
                 }
 
 
-                VclLabel {
+                SctLabel {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Font Family"
                 }
 
-                VclButton {
+                SctButton {
                     id: _fontFamilyButton
                     Layout.preferredWidth: 250
 
                     text: _private.pageSetupSettings.watermarkFont
 
-                    contentItem: VclLabel {
+                    contentItem: SctLabel {
                         text: _fontFamilyButton.text
                         elide: Text.ElideRight
                         verticalAlignment: Text.AlignVCenter
@@ -278,13 +278,13 @@ Item {
                                                                    }, _private.pageSetupSettings.watermarkFont)
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Text"
                 }
 
-                VclTextField {
+                SctTextField {
                     Layout.preferredWidth: 250
 
                     text: Runtime.appFeatures.watermark.enabled ?  _private.pageSetupSettings.watermarkText : "Scrite"
@@ -293,13 +293,13 @@ Item {
                     enableTransliteration: true
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Font Size"
                 }
 
-                VclSpinBox {
+                SctSpinBox {
                     Layout.preferredWidth: 250
 
                     editable: true
@@ -310,7 +310,7 @@ Item {
                     onValueModified:  _private.pageSetupSettings.watermarkFontSize = value
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Color"
@@ -332,12 +332,12 @@ Item {
                     }
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.alignment: Qt.AlignRight
                     text: "Rotation"
                 }
 
-                VclSpinBox {
+                SctSpinBox {
                     Layout.preferredWidth: 250
 
                     editable: true
@@ -364,19 +364,19 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             spacing: 10
 
-            VclButton {
+            SctButton {
                 text: "Save As Default"
                 onClicked: _private.pageSetupSettings.saveAsDefaults()
                 enabled: !_private.pageSetupSettings.usingSavedDefaults
             }
 
-            VclButton {
+            SctButton {
                 text: "Use Saved Defaults"
                 onClicked: _private.pageSetupSettings.useSavedDefaults()
                 enabled: !_private.pageSetupSettings.usingSavedDefaults
             }
 
-            VclButton {
+            SctButton {
                 text: "Use Factory Defaults"
                 onClicked: _private.pageSetupSettings.useFactoryDefaults()
                 enabled: !_private.pageSetupSettings.usingFactoryDefaults

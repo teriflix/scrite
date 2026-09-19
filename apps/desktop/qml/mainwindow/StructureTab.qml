@@ -131,7 +131,7 @@ Item {
                 showNotesIcon: Runtime.showNotebookInStructure
             }
 
-            VclLabel {
+            SctLabel {
                 anchors.centerIn: parent
 
                 elide: Text.ElideRight

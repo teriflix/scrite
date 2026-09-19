@@ -48,7 +48,7 @@ Item {
             Layout.preferredHeight: 1
         }
 
-        VclTextField {
+        SctTextField {
             id: _title
 
             Layout.fillWidth: true
@@ -67,7 +67,7 @@ Item {
             }
         }
 
-        VclTextField {
+        SctTextField {
             id: _description
 
             Layout.fillWidth: true
@@ -229,7 +229,7 @@ Item {
         }
     }
 
-    VclScrollBar {
+    SctScrollBar {
         id: _vscrollBar
 
         anchors.top: parent.top

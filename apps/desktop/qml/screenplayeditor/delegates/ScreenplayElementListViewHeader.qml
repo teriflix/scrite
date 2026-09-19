@@ -62,7 +62,7 @@ Loader {
         property Component editTitlePageButtonComponent: Item {
             height: _editTitlePageButton.height + 40
 
-            VclButton {
+            SctButton {
                 id: _editTitlePageButton
 
                 anchors.centerIn: parent
@@ -190,7 +190,7 @@ Loader {
 
                     spacing: 0
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
 
                         text: "Written By"
@@ -360,7 +360,7 @@ Loader {
                     spacing: 13
                     visible: Runtime.screenplayEditorSettings.showLoglineEditor
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
 
                         text: _logLineField.activeFocus ? ("Logline: (" + (_loglineLimiter.limitReached ? "WARNING: " : "") + _loglineLimiter.wordCount + "/" + _loglineLimiter.maxWordCount + " words, " +

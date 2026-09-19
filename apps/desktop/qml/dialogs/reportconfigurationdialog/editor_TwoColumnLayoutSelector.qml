@@ -75,7 +75,7 @@ RowLayout {
                 }
             }
 
-            VclRadioButton {
+            SctRadioButton {
                 Layout.alignment: Qt.AlignHCenter
 
                 text: _layoutOptionDelegate.modelData.title

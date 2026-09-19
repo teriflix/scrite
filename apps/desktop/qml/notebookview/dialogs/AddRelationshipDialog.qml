@@ -38,7 +38,7 @@ DialogLauncher {
     name: "AddRelationshipDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         property Character character
@@ -81,7 +81,7 @@ DialogLauncher {
                         clip: true
                         reuseItems: false
 
-                        ScrollBar.vertical: VclScrollBar { }
+                        ScrollBar.vertical: SctScrollBar { }
 
                         highlight: Item { }
                         highlightFollowsCurrentItem: true
@@ -131,12 +131,12 @@ DialogLauncher {
                                     opacity: _relationshipName.length > 0 ? 1 : 0.05
                                 }
 
-                                VclLabel {
+                                SctLabel {
                                     text: _characterRowItem.thisCharacterName + ": "
                                     color: _characterRowItem.foregroundColor
                                 }
 
-                                VclTextField {
+                                SctTextField {
                                     id: _relationshipName
 
                                     Layout.fillWidth: true
@@ -159,7 +159,7 @@ DialogLauncher {
                                     }
                                 }
 
-                                VclLabel {
+                                SctLabel {
                                     text: SMath.titleCased(_characterRowItem.otherCharacterName) + "."
                                     color: _characterRowItem.foregroundColor
                                 }
@@ -176,7 +176,7 @@ DialogLauncher {
                     }
                 }
 
-                VclButton {
+                SctButton {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Create Relationships"
@@ -236,7 +236,7 @@ DialogLauncher {
             QtObject {
                 id: _private
 
-                property VclDialog waitDialog
+                property SctDialog waitDialog
             }
         }
     }

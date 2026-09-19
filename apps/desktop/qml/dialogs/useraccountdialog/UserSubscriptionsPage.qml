@@ -62,7 +62,7 @@ Item {
                 active: _queryUserSubsCall.availablePlans.length > 0
                 visible: active
 
-                sourceComponent: VclGroupBox {
+                sourceComponent: SctGroupBox {
                     title: "Available Plans"
 
                     ColumnLayout {
@@ -137,7 +137,7 @@ Item {
                     visible: _queryUserSubsCall.responseData.acceptingReferralCode === true
                     onClicked: _referralCodeDialog.open()
 
-                    VclDialog {
+                    SctDialog {
                         id: _referralCodeDialog
                         width: 400
                         height: 240
@@ -161,7 +161,7 @@ Item {
                                     horizontalAlignment: Text.AlignHCenter
                                 }
 
-                                VclButton {
+                                SctButton {
                                     Layout.alignment: Qt.AlignHCenter
                                     text: "Submit"
                                     enabled: _txtReferralCode.length >= _queryUserSubsCall.responseData.minReferralCodeLength
@@ -194,7 +194,7 @@ Item {
                 Layout.fillWidth: true
                 visible: _queryUserSubsCall.availablePlans.length > 0
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
                     text: "Plans & prices are subject to change without notice."
                     wrapMode: Text.WordWrap
@@ -220,7 +220,7 @@ Item {
                 active: _queryUserSubsCall.activeSubscription !== undefined
                 visible: active
 
-                sourceComponent: VclGroupBox {
+                sourceComponent: SctGroupBox {
                     title: "Current Status"
 
                     ColumnLayout {
@@ -246,7 +246,7 @@ Item {
                                 Layout.fillWidth: true
                                 spacing: 6
 
-                                VclLabel {
+                                SctLabel {
                                     Layout.fillWidth: true
                                     text: _subGroup.activeSub.plan.title
                                     font.bold: true
@@ -254,7 +254,7 @@ Item {
                                     wrapMode: Text.WordWrap
                                 }
 
-                                VclLabel {
+                                SctLabel {
                                     Layout.fillWidth: true
                                     text: _subGroup.activeSub.plan.subtitle
                                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -269,13 +269,13 @@ Item {
                                     Row {
                                         spacing: 4
 
-                                        VclLabel {
+                                        SctLabel {
                                             text: Runtime.daysSpanAsString(_subGroup.activeSub.plan.duration) +
                                                   "  ·  Device Count: " + _subGroup.activeSub.plan.devices
                                             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                         }
 
-                                        VclLabel {
+                                        SctLabel {
                                             text: "ⓘ"
                                             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
@@ -307,12 +307,12 @@ Item {
                                         spacing: 4
                                         visible: !Scrite.isFeatureNameEnabled("support/email", _subGroup.activeSub.plan.features)
 
-                                        VclLabel {
+                                        SctLabel {
                                             text: "·  Discord community support only."
                                             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                         }
 
-                                        VclLabel {
+                                        SctLabel {
                                             text: "ⓘ"
                                             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
@@ -325,7 +325,7 @@ Item {
                                     }
                                 }
 
-                                VclLabel {
+                                SctLabel {
                                     Layout.fillWidth: true
                                     text: "★  Exclusive Plan"
                                     font.bold: true
@@ -338,7 +338,7 @@ Item {
                             ColumnLayout {
                                 spacing: 4
 
-                                VclLabel {
+                                SctLabel {
                                     Layout.alignment: Qt.AlignHCenter
                                     text: "Active"
                                     font.family: Runtime.shortcutFontMetrics.font.family
@@ -347,7 +347,7 @@ Item {
                                     color: Runtime.colors.primary.c700.background
                                 }
 
-                                VclLabel {
+                                SctLabel {
                                     Layout.alignment: Qt.AlignHCenter
                                     text: Runtime.formatDateIncludingYear(new Date(_subGroup.activeSub.from)) +
                                           "  —  " +
@@ -408,7 +408,7 @@ Item {
                         }
 
                         // ── Feature table — single instance, always from UserInfo ─────────
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
                             visible: _subGroup.hasUpcoming
 
@@ -484,7 +484,7 @@ Item {
                 active: _queryUserSubsCall.pastSubscriptions.length > 0
                 visible: active
 
-                sourceComponent: VclGroupBox {
+                sourceComponent: SctGroupBox {
                     title: "Plan History"
 
                     ColumnLayout {
@@ -519,7 +519,7 @@ Item {
         }
     }
 
-    VclButton {
+    SctButton {
         anchors.centerIn: parent
         text: "Reload"
         visible: _queryUserSubsCall.hasError
@@ -593,7 +593,7 @@ Item {
             anchors { left: parent.left; right: parent.right; top: parent.top; margins: 12 }
             spacing: 4
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
                 text: _subCard.badgeText
                 font.bold: true
@@ -601,7 +601,7 @@ Item {
                 color: _subCard.badgeColor
             }
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
                 text: _subCard.subscription.plan.title
                 font.bold: true
@@ -609,7 +609,7 @@ Item {
                 wrapMode: Text.WordWrap
             }
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
                 text: _subCard.subscription.plan.subtitle
                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize
@@ -621,13 +621,13 @@ Item {
             Row {
                 spacing: 4
 
-                VclLabel {
+                SctLabel {
                     text: Runtime.daysSpanAsString(_subCard.subscription.plan.duration) +
                           "  ·  Device Count: " + _subCard.subscription.plan.devices
                     font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                 }
 
-                VclLabel {
+                SctLabel {
                     text: "ⓘ"
                     font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
@@ -655,7 +655,7 @@ Item {
                 }
             }
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
                 text: _subCard.statusLine
                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize

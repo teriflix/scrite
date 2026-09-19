@@ -38,7 +38,7 @@ DialogLauncher {
     name: "LanguageOptionsDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         title: "Language Settings"

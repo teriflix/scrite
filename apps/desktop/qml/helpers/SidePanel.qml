@@ -96,7 +96,7 @@ Item {
             opacity: _label.opacity
         }
 
-        VclText {
+        SctText {
             id: _label
 
             anchors.top: parent.top

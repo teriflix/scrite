@@ -88,7 +88,7 @@ Item {
                     implicitWidth: _bvText.implicitWidth + 12
                     implicitHeight: _bvText.implicitHeight + 4
 
-                    VclLabel {
+                    SctLabel {
                         id: _bvText
                         anchors.centerIn: parent
                         text: "Best Value"
@@ -132,7 +132,7 @@ Item {
                 spacing: 6
                 visible: root.actualPrice !== "" || root.savingsLabel !== ""
 
-                VclLabel {
+                SctLabel {
                     text: root.actualPrice
                     font.family: root.useFixedFontForPrice ? Runtime.shortcutFontMetrics.font.family : Runtime.idealFontMetrics.font.family
                     font.strikeout: true
@@ -141,7 +141,7 @@ Item {
                     visible: root.actualPrice !== ""
                 }
 
-                VclLabel {
+                SctLabel {
                     text: root.savingsLabel
                     font.bold: true
                     font.pointSize: Runtime.minimumFontMetrics.font.pointSize
@@ -160,7 +160,7 @@ Item {
         }
 
         // Column 4: price
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
             Layout.preferredWidth: 15
             text: root.price
@@ -186,7 +186,7 @@ Item {
         }
     }
 
-    component LabelWithTooltip : VclLabel {
+    component LabelWithTooltip : SctLabel {
         id: _labelWithTooltip
 
         elide: Text.ElideRight

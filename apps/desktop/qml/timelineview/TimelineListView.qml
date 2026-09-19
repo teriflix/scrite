@@ -90,7 +90,7 @@ ListView {
         result.filter = true
     }
 
-    ScrollBar.horizontal: VclScrollBar {
+    ScrollBar.horizontal: SctScrollBar {
         flickable: root
         opacity: 1
     }

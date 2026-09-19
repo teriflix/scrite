@@ -40,7 +40,7 @@ DialogLauncher {
     name: "RequestVersionTypeAccess"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         title: "Request Access"
@@ -58,7 +58,7 @@ DialogLauncher {
                 opacity: enabled ? 1 : 0.5
                 spacing: 20
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: "To use this <b>" + Scrite.app.versionType + "</b> version of Scrite, you will need to request access."
@@ -66,7 +66,7 @@ DialogLauncher {
                     wrapMode: Text.WordWrap
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: "Please note that access will be granted on a case-by-case basis, only at the discretion of the Scrite team and may be subject to additional terms. You may have to wait for up to 72 hours before you hear from us."
@@ -83,7 +83,7 @@ DialogLauncher {
 
                     spacing: 20
 
-                    VclButton {
+                    SctButton {
                         text: "Request Access"
 
                         onClicked: {
@@ -93,7 +93,7 @@ DialogLauncher {
                         }
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Quit"
 
                         onClicked: {

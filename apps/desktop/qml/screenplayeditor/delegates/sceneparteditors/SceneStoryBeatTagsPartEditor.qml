@@ -63,7 +63,7 @@ AbstractScenePartEditor {
                 onClicked: _private.popupFormalTagsMenu()
             }
 
-            VclLabel {
+            SctLabel {
                 font: _tagsInput.label.font
                 text: "Formal Tags"
                 visible: _private.presentableGroupNames === ""

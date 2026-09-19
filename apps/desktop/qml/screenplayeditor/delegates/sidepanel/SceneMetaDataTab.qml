@@ -46,7 +46,7 @@ AbstractScenePartEditor {
         contentHeight: _layout.height
         flickableDirection: Flickable.VerticalFlick
 
-        ScrollBar.vertical: VclScrollBar { }
+        ScrollBar.vertical: SctScrollBar { }
 
         Column {
             id: _layout

@@ -29,7 +29,7 @@ import "../../helpers"
 import ".."
 import "../../notifications"
 
-VclDialog {
+SctDialog {
     id: root
 
     property AbstractReportGenerator report
@@ -60,7 +60,7 @@ VclDialog {
         ColumnLayout {
             spacing: 0
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
 
                 background: Rectangle {
@@ -186,7 +186,7 @@ VclDialog {
                 }
             }
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
                 Layout.rightMargin: 20
                 Layout.bottomMargin: 24
@@ -277,7 +277,7 @@ VclDialog {
                 width: parent.width-32
                 anchors.centerIn: parent
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     wrapMode: Text.WordWrap
@@ -288,7 +288,7 @@ VclDialog {
                     }
                 }
 
-                VclButton {
+                SctButton {
                     enabled: root.report.fileName !== "" && _private.reportEnabled
                     text: "Generate"
                     onClicked: _generateReportJob.start()
@@ -395,7 +395,7 @@ VclDialog {
             featureName: root.report ? "report/" + root.report.title.toLowerCase() + "/save" : "report"
         }
 
-        property VclDialog waitDialog
+        property SctDialog waitDialog
 
         function shouldPersonalizeFileName() {
             if(!root.report || root.report.fileName === "")

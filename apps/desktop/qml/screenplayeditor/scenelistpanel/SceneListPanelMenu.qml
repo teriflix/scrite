@@ -26,13 +26,13 @@ import "../../dialogs"
 import "../../helpers"
 import "../../controls"
 
-VclMenu {
+SctMenu {
     id: root
 
-    VclMenu {
+    SctMenu {
         title: "Text"
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Heading"
 
             readonly property string option: "HEADING"
@@ -42,7 +42,7 @@ VclMenu {
             onClicked: Runtime.sceneListPanelSettings.sceneTextMode = option
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Summary"
 
             readonly property string option: "SUMMARY"
@@ -54,7 +54,7 @@ VclMenu {
 
         MenuSeparator { }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Show Tooltip"
 
             icon.source: Runtime.sceneListPanelSettings.showTooltip ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
@@ -63,10 +63,10 @@ VclMenu {
         }
     }
 
-    VclMenu {
+    SctMenu {
         title: "Length"
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Scene Duration"
 
             readonly property string option: "TIME"
@@ -77,7 +77,7 @@ VclMenu {
             onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Page Length"
 
             readonly property string option: "PAGE"
@@ -88,7 +88,7 @@ VclMenu {
             onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "1/8th Length"
 
             readonly property string option: "PAGE_1_8"
@@ -99,7 +99,7 @@ VclMenu {
             onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "None"
 
             readonly property string option: "NO"
@@ -111,10 +111,10 @@ VclMenu {
         }
     }
 
-    VclMenu {
+    SctMenu {
         title: "Tracks"
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Display"
 
             enabled: Runtime.appFeatures.structure.enabled && Runtime.screenplayTracksSettings.displayTracks
@@ -123,7 +123,7 @@ VclMenu {
             onClicked: Runtime.sceneListPanelSettings.displayTracks = !Runtime.sceneListPanelSettings.displayTracks
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Configure"
 
             enabled: Runtime.appFeatures.structure.enabled

@@ -46,7 +46,7 @@ Item {
         anchors.fill: parent
         anchors.margins: 20
 
-        ScrollBar.vertical: VclScrollBar { }
+        ScrollBar.vertical: SctScrollBar { }
 
         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
@@ -59,7 +59,7 @@ Item {
 
             width: _flickable.width - (_flickable.clip ? 20 : 0)
 
-            VclGroupBox {
+            SctGroupBox {
                 Layout.fillWidth: true
 
                 title: "Visual Options"
@@ -67,7 +67,7 @@ Item {
                 RowLayout {
                     width: parent.width
 
-                    VclLabel {
+                    SctLabel {
                         text: "Color Intensity"
                     }
 
@@ -81,7 +81,7 @@ Item {
                 }
             }
 
-            VclGroupBox {
+            SctGroupBox {
                 Layout.fillWidth: true
 
                 title: "Toggleable Options"
@@ -97,7 +97,7 @@ Item {
                     Repeater {
                         model: ActionHub.screenplayEditorOptions.visibleActions
 
-                        delegate: VclCheckBox {
+                        delegate: SctCheckBox {
                             id: _delegate
 
                             required property int index

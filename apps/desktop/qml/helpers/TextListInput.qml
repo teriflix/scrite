@@ -99,7 +99,7 @@ Flow {
         onClicked: _newInputLoader.active = true
     }
 
-    VclLabel {
+    SctLabel {
         id: _label
 
         text: root.labelText + ": "
@@ -169,7 +169,7 @@ Flow {
             active: false
             visible: active
 
-            sourceComponent: VclTextField {
+            sourceComponent: SctTextField {
                 Component.onCompleted: {
                     forceActiveFocus()
                     root.ensureVisible(_newInputLoader, Qt.rect(0,0,width,height))

@@ -35,7 +35,7 @@ DialogLauncher {
     name: "CollaboratorsDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         width: 640
@@ -53,7 +53,7 @@ DialogLauncher {
                     Layout.fillWidth: true
                     spacing: 10
 
-                    VclLabel {
+                    SctLabel {
                         Layout.alignment: Qt.AlignVCenter
                         Layout.fillWidth: true
 
@@ -111,7 +111,7 @@ DialogLauncher {
                         anchors.leftMargin: 10
                         clip: true
                         property real viewportWidth: contentHeight > height ? width-20 : width-1
-                        ScrollBar.vertical: VclScrollBar {
+                        ScrollBar.vertical: SctScrollBar {
                             flickable: _collaboratorsList
                         }
                         header: Scrite.document.canModifyCollaborators ? _collaboratorsListHeader : null
@@ -141,7 +141,7 @@ DialogLauncher {
                                 width: parent.width-5
                                 anchors.centerIn: parent
 
-                                VclLabel {
+                                SctLabel {
                                     Layout.fillWidth: true
                                     Layout.alignment: Qt.AlignVCenter
 

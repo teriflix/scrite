@@ -39,7 +39,7 @@ DialogLauncher {
     name: "TitlePageDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         width: Math.min(Scrite.window.width-80, 1050)
@@ -115,7 +115,7 @@ DialogLauncher {
                         }
                     }
 
-                    VclLabel {
+                    SctLabel {
                         anchors.fill: parent
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignHCenter
@@ -155,7 +155,7 @@ DialogLauncher {
                         visible: Scrite.document.screenplay.coverPagePhoto !== ""
                         enabled: visible && !Scrite.document.readOnly
 
-                        VclLabel {
+                        SctLabel {
                             text: "Cover Photo Size"
                             font.bold: true
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -165,25 +165,25 @@ DialogLauncher {
                             opacity: enabled ? 1 : 0.5
                         }
 
-                        VclRadioButton {
+                        SctRadioButton {
                             text: "Small"
                             checked: Scrite.document.screenplay.coverPagePhotoSize === Screenplay.SmallCoverPhoto
                             onToggled: Scrite.document.screenplay.coverPagePhotoSize = Screenplay.SmallCoverPhoto
                         }
 
-                        VclRadioButton {
+                        SctRadioButton {
                             text: "Medium"
                             checked: Scrite.document.screenplay.coverPagePhotoSize === Screenplay.MediumCoverPhoto
                             onToggled: Scrite.document.screenplay.coverPagePhotoSize = Screenplay.MediumCoverPhoto
                         }
 
-                        VclRadioButton {
+                        SctRadioButton {
                             text: "Large"
                             checked: Scrite.document.screenplay.coverPagePhotoSize === Screenplay.LargeCoverPhoto
                             onToggled: Scrite.document.screenplay.coverPagePhotoSize = Screenplay.LargeCoverPhoto
                         }
 
-                        VclButton {
+                        SctButton {
                             text: "Remove"
                             onClicked: Scrite.document.screenplay.clearCoverPagePhoto()
                         }
@@ -257,7 +257,7 @@ DialogLauncher {
                                 width: parent.width
                                 spacing: 10
 
-                                VclLabel {
+                                SctLabel {
                                     width: _private.fieldLabelWidth
                                     horizontalAlignment: Text.AlignRight
                                     text: _titlePageFieldDelegate.name
@@ -266,7 +266,7 @@ DialogLauncher {
                                     color: Runtime.colors.primary.c800.background
                                 }
 
-                                VclTextField {
+                                SctTextField {
                                     id: _tpfField
                                     width: parent.width-parent.spacing-_private.fieldLabelWidth
                                     text: _tpfScreenplayProperty.value
@@ -297,7 +297,7 @@ DialogLauncher {
                     Layout.fillWidth: true
                     Layout.preferredHeight: _useAsDefaultsButton.height
 
-                    VclCheckBox {
+                    SctCheckBox {
                         anchors.left: parent.left
                         anchors.verticalCenter: parent.verticalCenter
 
@@ -306,7 +306,7 @@ DialogLauncher {
                         onToggled: Runtime.screenplayEditorSettings.includeTitlePageInPreview = checked
                     }
 
-                    VclButton {
+                    SctButton {
                         id: _useAsDefaultsButton
                         anchors.centerIn: parent
 
@@ -326,7 +326,7 @@ DialogLauncher {
                         }
                     }
 
-                    VclCheckBox {
+                    SctCheckBox {
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
 
@@ -338,7 +338,7 @@ DialogLauncher {
 
             }
 
-            VclLabel {
+            SctLabel {
                 id: _defaultsSavedNotice
                 anchors.top: _titlePageSettingsLayout.bottom
                 anchors.topMargin: 10

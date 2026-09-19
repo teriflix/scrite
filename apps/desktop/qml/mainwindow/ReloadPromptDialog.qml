@@ -30,7 +30,7 @@ import "../helpers"
 import "../controls"
 import "../notifications"
 
-VclDialog {
+SctDialog {
     id: root
 
     width: Math.min(500, Scrite.window.width * 0.5)
@@ -61,7 +61,7 @@ VclDialog {
 
             spacing: 10
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
 
                 text: "Current file was modified by another process in the background. Do you want to reload?"
@@ -74,7 +74,7 @@ VclDialog {
 
                 spacing: 20
 
-                VclButton {
+                SctButton {
                     text: "Yes"
                     onClicked: {
                         Scrite.document.reload()
@@ -82,7 +82,7 @@ VclDialog {
                     }
                 }
 
-                VclButton {
+                SctButton {
                     text: "No"
                     onClicked: root.close()
                 }
@@ -98,7 +98,7 @@ VclDialog {
                 }
 
                 RowLayout {
-                    VclCheckBox {
+                    SctCheckBox {
                         Layout.fillWidth: true
 
                         text: "Don't show this again."

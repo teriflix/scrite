@@ -43,7 +43,7 @@ DialogLauncher {
     name: "ShortcutInputDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         readonly property string delimiter: " + "
@@ -71,7 +71,7 @@ DialogLauncher {
 
                 spacing: 20
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
@@ -99,7 +99,7 @@ DialogLauncher {
                         RowLayout {
                             Layout.alignment: Qt.AlignHCenter
 
-                            VclLabel {
+                            SctLabel {
                                 Layout.alignment: Qt.AlignBaseline
 
                                 padding: 8
@@ -279,7 +279,7 @@ DialogLauncher {
 
                     spacing: parent.spacing
 
-                    VclButton {
+                    SctButton {
                         text: "Remove"
                         toolTipText: "Removes shortcut for this action."
                         visible: _dialog.shortcut !== ""
@@ -292,7 +292,7 @@ DialogLauncher {
                         }
                     }
 
-                    VclButton {
+                    SctButton {
                         visible: _dialog.shortcut !== ""
                         text: "Revert"
                         toolTipText: "Reverts to " + _dialog.shortcut
@@ -307,7 +307,7 @@ DialogLauncher {
                         }
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Ok"
 
                         focusPolicy: Qt.NoFocus
@@ -319,7 +319,7 @@ DialogLauncher {
                         }
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Cancel"
 
                         focusPolicy: Qt.NoFocus

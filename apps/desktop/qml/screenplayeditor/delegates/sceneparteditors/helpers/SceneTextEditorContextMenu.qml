@@ -45,7 +45,7 @@ MenuLoader {
     signal mergeWithPreviousSceneRequest()
     signal translateSelection()
 
-    menu: VclMenu {
+    menu: SctMenu {
         id: _menu
 
         property bool splitSceneEnabled: false
@@ -64,21 +64,21 @@ MenuLoader {
         }
         onAboutToHide: root.sceneTextEditor.persistentSelection = false
 
-        VclMenuItem {
+        SctMenuItem {
             focusPolicy: Qt.NoFocus
             text: "Cut\t" + ActionHub.editOptions.find("cut").shortcut
             enabled: root.sceneTextEditor.selectionEnd > root.sceneTextEditor.selectionStart
             onClicked: { root.cutRequest(); root.close() }
         }
 
-        VclMenuItem {
+        SctMenuItem {
             focusPolicy: Qt.NoFocus
             text: "Copy\t" + ActionHub.editOptions.find("copy").shortcut
             enabled: root.sceneTextEditor.selectionEnd > root.sceneTextEditor.selectionStart
             onClicked: { root.copyRequest(); root.close() }
         }
 
-        VclMenuItem {
+        SctMenuItem {
             focusPolicy: Qt.NoFocus
             text: "Paste\t" + ActionHub.editOptions.find("paste").shortcut
             enabled: root.sceneTextEditor.canPaste
@@ -87,7 +87,7 @@ MenuLoader {
 
         MenuSeparator {  }
 
-        VclMenuItem {
+        SctMenuItem {
             focusPolicy: Qt.NoFocus
             text: "Split Scene\t" + ActionHub.editOptions.find("splitScene").shortcut
             enabled: _menu.splitSceneEnabled
@@ -97,7 +97,7 @@ MenuLoader {
             }
         }
 
-        VclMenuItem {
+        SctMenuItem {
             focusPolicy: Qt.NoFocus
             text: "Join Previous Scene\t" + ActionHub.editOptions.find("mergeScene").shortcut
             enabled: _menu.mergeWithPreviousSceneEnabled
@@ -107,7 +107,7 @@ MenuLoader {
             }
         }
 
-        VclMenuItem {
+        SctMenuItem {
             readonly property Action txAction: ActionHub.editOptions.find("translateToActiveLanguage") as Action
 
             text: "Transliterate to " + Runtime.language.active.name + "\t" + txAction.shortcut
@@ -119,7 +119,7 @@ MenuLoader {
                          }
         }
 
-        VclMenuItem {
+        SctMenuItem {
             readonly property bool isGrouped: _menu.sceneCurrentElement &&
                                              root.sceneDocumentBinder.scene &&
                                              root.sceneDocumentBinder.scene.dualDialogueContaining(_menu.sceneCurrentElement) !== null
@@ -137,7 +137,7 @@ MenuLoader {
 
         MenuSeparator {  }
 
-        VclMenu {
+        SctMenu {
             title: "Format"
 
             Repeater {
@@ -150,7 +150,7 @@ MenuLoader {
                     { "value": SceneElement.Transition, "display": "Transition" }
                 ]
 
-                delegate: VclMenuItem {
+                delegate: SctMenuItem {
                     required property int index
                     required property var modelData
 

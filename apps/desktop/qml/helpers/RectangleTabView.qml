@@ -67,7 +67,7 @@ Item {
                     visible: parent.selected
                 }
 
-                VclLabel {
+                SctLabel {
                     id: _tabText
                     anchors.centerIn: parent
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize

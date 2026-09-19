@@ -33,7 +33,7 @@ ColumnLayout {
 
     spacing: 10
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         elide: Text.ElideRight
@@ -44,7 +44,7 @@ ColumnLayout {
         text: root.fieldInfo.label
     }
 
-    VclSpinBox {
+    SctSpinBox {
         TabSequenceItem.manager: root.tabSequence
 
         from: root.fieldInfo.min

@@ -32,13 +32,13 @@ ColumnLayout {
 
     spacing: 5
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         text: root.fieldInfo.label + ": "
     }
 
-    VclComboBox {
+    SctComboBox {
         Layout.fillWidth: true
         Layout.rightMargin: 30
 

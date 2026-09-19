@@ -48,12 +48,12 @@ Item {
             Layout.preferredWidth: (parent.width-(parent.columns-1)*parent.columnSpacing)/parent.columns
             spacing: 10
 
-            VclLabel {
+            SctLabel {
                 id: _themeLabel
                 text: "Theme: "
             }
 
-            VclComboBox {
+            SctComboBox {
                 id: _themesComboBox
 
                 Layout.fillWidth: true
@@ -89,7 +89,7 @@ Item {
             Layout.alignment: Qt.AlignTop
             Layout.preferredWidth: (parent.width-(parent.columns-1)*parent.columnSpacing)/parent.columns
 
-            label: VclLabel {
+            label: SctLabel {
                 text: "Colors"
             }
 
@@ -117,7 +117,7 @@ Item {
 
                             color: Material.color(modelData)
 
-                            VclLabel {
+                            SctLabel {
                                 anchors.centerIn: parent
                                 text: "✓"
                                 color: Color.textColorFor(parent.color)
@@ -157,7 +157,7 @@ Item {
             GroupBox {
                 Layout.fillWidth: true
 
-                label: VclLabel {
+                label: SctLabel {
                     text: "UI / Color Mode"
                 }
 
@@ -167,26 +167,26 @@ Item {
                     RowLayout {
                         Layout.fillWidth: true
 
-                        VclRadioButton {
+                        SctRadioButton {
                             text: "Light"
                             checked: Runtime.applicationSettings.colorMode === "Light"
                             onClicked: Runtime.applicationSettings.colorMode = "Light"
                         }
 
-                        VclRadioButton {
+                        SctRadioButton {
                             text: "Dark"
                             checked: Runtime.applicationSettings.colorMode === "Dark"
                             onClicked: Runtime.applicationSettings.colorMode = "Dark"
                         }
 
-                        VclRadioButton {
+                        SctRadioButton {
                             text: "System"
                             checked: Runtime.applicationSettings.colorMode === "System"
                             onClicked: Runtime.applicationSettings.colorMode = "System"
                         }
                     }
 
-                    VclCheckBox {
+                    SctCheckBox {
                         Layout.fillWidth: true
 
                         text: "Show Toggle Switch on Toolbar"
@@ -194,7 +194,7 @@ Item {
                         onClicked: Runtime.applicationSettings.showColorThemeIconOnToolbar = !Runtime.applicationSettings.showColorThemeIconOnToolbar
                     }
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
 
                         text: "NOTE: The toggle switch icon will automatically hide when there isnt enough space on the toolbar."
@@ -207,7 +207,7 @@ Item {
             GroupBox {
                 Layout.fillWidth: true
 
-                label: VclCheckBox {
+                label: SctCheckBox {
                     text: "Use Custom PDF Page Colors"
                     checked: Runtime.applicationSettings.useCustomPdfPageColor
                     onToggled: Runtime.applicationSettings.useCustomPdfPageColor = !Runtime.applicationSettings.useCustomPdfPageColor
@@ -237,7 +237,7 @@ Item {
                             }
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
 
                             text: "Light Mode Page"
@@ -275,7 +275,7 @@ Item {
                             }
                         }
 
-                        VclLabel {
+                        SctLabel {
                             Layout.fillWidth: true
 
                             text: "Dark Mode Page"
@@ -294,7 +294,7 @@ Item {
                         }
                     }
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
 
                         wrapMode: Text.WordWrap

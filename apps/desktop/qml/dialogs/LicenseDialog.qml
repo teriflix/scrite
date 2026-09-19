@@ -34,7 +34,7 @@ DialogLauncher {
     name: "LicenseDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         readonly property string _versionString: Scrite.app.versionAsString +
@@ -82,13 +82,13 @@ DialogLauncher {
                             Layout.alignment: Qt.AlignVCenter
                             spacing: 2
 
-                            VclLabel {
+                            SctLabel {
                                 text: "Welcome to Scrite"
                                 font.bold: true
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                             }
 
-                            VclLabel {
+                            SctLabel {
                                 text: "Version " + _dialog._versionString
                                 color: Runtime.colors.tx("#5d208e")
                             }
@@ -108,7 +108,7 @@ DialogLauncher {
                     Layout.bottomMargin: 12
                     spacing: 8
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
                         text: "Please read and accept the following license agreement to use Scrite:"
                         wrapMode: Text.WordWrap
@@ -145,12 +145,12 @@ DialogLauncher {
                     anchors.rightMargin: 16
                     spacing: 12
 
-                    VclButton {
+                    SctButton {
                         text: "Decline"
                         onClicked: _dialog.reject()
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Accept"
                         onClicked: {
                             Scrite.acceptLicense()

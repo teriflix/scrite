@@ -81,7 +81,7 @@ QtObject {
         property string mode // can be one of ["template", "screenplay"]
         property LibraryService libraryService
 
-        property VclDialog waitDialog
+        property SctDialog waitDialog
 
         running: false
 

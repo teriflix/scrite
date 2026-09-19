@@ -60,7 +60,7 @@ Rectangle {
                 Layout.alignment: Qt.AlignHCenter
             }
 
-            VclLabel {
+            SctLabel {
                 text: "Page Break"
                 font.pointSize: root.textFontSize
                 padding: root.fullSize ? 5 : 2

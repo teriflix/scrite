@@ -34,7 +34,7 @@ DialogLauncher {
     name: "LegacyDataMigrationDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         title: "Scrite Settings Migration"
@@ -49,13 +49,13 @@ DialogLauncher {
                 anchors.margins: 16
                 spacing: 16
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
                     text: "Your Scrite settings, recent files, and vault have been copied to a new location on this computer. You can look up the exact location by searching for \"Settings Folder\" in the Command Center."
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
                     text: "Please note: if you downgrade to an older version of Scrite, they will continue to use settings, vault and recent files from the old location."
@@ -68,7 +68,7 @@ DialogLauncher {
             Item {
                 height: _okButton.height + 20
 
-                VclButton {
+                SctButton {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: 16
@@ -80,7 +80,7 @@ DialogLauncher {
                     }
                 }
 
-                VclButton {
+                SctButton {
                     id: _okButton
 
                     anchors.verticalCenter: parent.verticalCenter

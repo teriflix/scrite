@@ -26,7 +26,7 @@ import "../../helpers"
 import "../../dialogs"
 import "../../controls"
 
-VclMenu {
+SctMenu {
     id: root
 
     property Character character
@@ -47,19 +47,19 @@ VclMenu {
         }
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Rename/Merge Character"
 
         onClicked: RenameCharacterDialog.launch(root.character)
     }
 
-    VclMenu {
+    SctMenu {
         title: "Reports"
 
         Repeater {
             model: Runtime.characterReports.reports ? Runtime.characterReports.reports : 0
 
-            delegate: VclMenuItem {
+            delegate: SctMenuItem {
                 required property int index
                 required property var modelData
 
@@ -77,7 +77,7 @@ VclMenu {
 
     MenuSeparator { }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Delete Character"
 
         onClicked: {

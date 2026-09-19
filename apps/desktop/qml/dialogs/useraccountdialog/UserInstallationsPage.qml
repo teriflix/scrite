@@ -40,7 +40,7 @@ Item {
         anchors.leftMargin: 0
 
         // Header Section
-        VclLabel {
+        SctLabel {
             Layout.fillWidth: true
 
             font.bold: true
@@ -72,7 +72,7 @@ Item {
                 enabled: !_deactivateOtherCall.busy && !Scrite.user.busy
                 opacity: enabled ? 1 : 0.5
 
-                ScrollBar.vertical: VclScrollBar { }
+                ScrollBar.vertical: SctScrollBar { }
                 FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
                 clip: contentHeight > height
@@ -123,7 +123,7 @@ Item {
                                         border.color: Runtime.colors.primary.borderColor
                                         radius: 4
 
-                                        VclText {
+                                        SctText {
                                             anchors.centerIn: parent
 
                                             text: "Mac"
@@ -160,7 +160,7 @@ Item {
                                             Layout.fillWidth: true
                                             spacing: 10
 
-                                            VclLabel {
+                                            SctLabel {
                                                 Layout.fillWidth: true
 
                                                 text: {
@@ -188,7 +188,7 @@ Item {
                                                 color: Runtime.colors.accent.c500.background
                                                 radius: 4
 
-                                                VclLabel {
+                                                SctLabel {
                                                     id: _thisDeviceLabel
                                                     anchors.centerIn: parent
 
@@ -200,14 +200,14 @@ Item {
                                             }
                                         }
 
-                                        VclLabel {
+                                        SctLabel {
                                             Layout.fillWidth: true
 
                                             text: _deviceDelegate.modelData.platform + " " + _deviceDelegate.modelData.platformVersion
                                             elide: Text.ElideRight
                                         }
 
-                                        VclLabel {
+                                        SctLabel {
                                             Layout.fillWidth: true
 
                                             text: "Scrite " + _deviceDelegate.modelData.appVersion
@@ -226,7 +226,7 @@ Item {
                                     Layout.fillWidth: true
                                     spacing: 10
 
-                                    VclLabel {
+                                    SctLabel {
                                         Layout.fillWidth: true
 
                                         text: _deviceDelegate.modelData.isCurrent ?
@@ -238,7 +238,7 @@ Item {
                                         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                     }
 
-                                    VclButton {
+                                    SctButton {
                                         visible: !_deviceDelegate.modelData.isCurrent
                                         enabled: _deviceDelegate.modelData.activated
 

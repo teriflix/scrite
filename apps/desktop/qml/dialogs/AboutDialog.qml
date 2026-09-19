@@ -34,7 +34,7 @@ DialogLauncher {
     name: "AboutDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         title: "About Scrite"
@@ -57,7 +57,7 @@ DialogLauncher {
                 smooth: true; mipmap: true
             }
 
-            VclLabel {
+            SctLabel {
                 id: _versionText
                 anchors.top: parent.top
                 anchors.right: parent.right
@@ -69,7 +69,7 @@ DialogLauncher {
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
 
-            VclText {
+            SctText {
                 font.pixelSize: 12
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Build Timestamp:\n" + Scrite.app.buildTimestamp
@@ -109,7 +109,7 @@ DialogLauncher {
                         onClicked: Qt.openUrlExternally("https://www.scrite.io/terms-of-use/")
                     }
 
-                    VclText {
+                    SctText {
                         text: "•"
                         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                     }
@@ -120,7 +120,7 @@ DialogLauncher {
                         onClicked: Qt.openUrlExternally("https://www.scrite.io/privacy-policy/")
                     }
 
-                    VclText {
+                    SctText {
                         text: "•"
                         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                     }
@@ -131,7 +131,7 @@ DialogLauncher {
                         onClicked: ViewLicenseDialog.launch()
                     }
 
-                    VclText {
+                    SctText {
                         text: "•"
                         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                     }
@@ -148,7 +148,7 @@ DialogLauncher {
                     Layout.preferredHeight: 14
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.alignment: Qt.AlignHCenter
 
                     text: "The app uses:"
@@ -229,7 +229,7 @@ DialogLauncher {
                             }
                         }
                         ScrollBar.vertical: ScrollBar { }
-                        delegate: VclLabel {
+                        delegate: SctLabel {
                             id: _creditsViewDelegate
 
                             required property int index
@@ -270,7 +270,7 @@ DialogLauncher {
                         source: Runtime.themedIcon("qrc:/icons/action/share.png")
                     }
 
-                    VclLabel {
+                    SctLabel {
                         Layout.alignment: Qt.AlignVCenter
 
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -281,7 +281,7 @@ DialogLauncher {
                     RowLayout {
                         spacing: -8
 
-                        VclToolButton {
+                        SctToolButton {
                             Layout.preferredWidth: 50
                             Layout.preferredHeight: 50
 
@@ -292,7 +292,7 @@ DialogLauncher {
                             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_facebook")
                         }
 
-                        VclToolButton {
+                        SctToolButton {
                             Layout.preferredWidth: 50
                             Layout.preferredHeight: 50
 
@@ -303,7 +303,7 @@ DialogLauncher {
                             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_linkedin")
                         }
 
-                        VclToolButton {
+                        SctToolButton {
                             Layout.preferredWidth: 50
                             Layout.preferredHeight: 50
 
@@ -314,7 +314,7 @@ DialogLauncher {
                             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_twitter")
                         }
 
-                        VclToolButton {
+                        SctToolButton {
                             readonly property string url: "mailto:?Subject=Take a look at Scrite&Body=I am using Scrite and I thought you should check it out as well. Visit https://www.scrite.io"
 
                             Layout.preferredWidth: 50
@@ -334,17 +334,17 @@ DialogLauncher {
 
                     spacing: 20
 
-                    VclButton {
+                    SctButton {
                         text: "Website"
                         onClicked: Qt.openUrlExternally("https://www.scrite.io")
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Learning Guides"
                         onClicked: Qt.openUrlExternally(Runtime.userGuidesUrl)
                     }
 
-                    VclButton {
+                    SctButton {
                         text: "Discord"
                         onClicked: JoinDiscordCommunity.launch()
                     }

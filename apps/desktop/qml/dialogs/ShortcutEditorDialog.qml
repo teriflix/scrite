@@ -39,7 +39,7 @@ DialogLauncher {
     name: "ShortcutEditorDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         property string lookup

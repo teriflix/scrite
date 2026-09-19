@@ -59,7 +59,7 @@ Item {
 
                         property real delegateWidth: contentHeight > height ? width-20 : width
 
-                        ScrollBar.vertical: VclScrollBar { }
+                        ScrollBar.vertical: SctScrollBar { }
 
                         anchors.fill: parent
                         anchors.margins: 1
@@ -105,7 +105,7 @@ Item {
                                     source: _supportedLanguageDelegate.language.iconSource
                                 }
 
-                                VclLabel {
+                                SctLabel {
                                     id: _delegateLabel
 
                                     Layout.fillWidth: true
@@ -116,7 +116,7 @@ Item {
                                     padding: 10
                                 }
 
-                                VclToolButton {
+                                SctToolButton {
                                     suggestedWidth: _delegateLabel.height
                                     suggestedHeight: _delegateLabel.height
 
@@ -148,7 +148,7 @@ Item {
                                 color: Runtime.colors.primary.borderColor
                             }
 
-                            VclButton {
+                            SctButton {
                                 Layout.margins: 10
                                 Layout.fillWidth: true
 
@@ -183,7 +183,7 @@ Item {
 
                         spacing: 30
 
-                        VclLabel {
+                        SctLabel {
                             Layout.alignment: Qt.AlignHCenter
 
                             text: _private.language !== undefined ? _private.language.nativeName : "- NA -"
@@ -197,7 +197,7 @@ Item {
 
                             spacing: parent.spacing/2
 
-                            VclGroupBox {
+                            SctGroupBox {
                                 Layout.fillWidth: true
 
                                 title: "Keyboard Shortcut"
@@ -222,7 +222,7 @@ Item {
                                 }
                             }
 
-                            VclGroupBox {
+                            SctGroupBox {
                                 Layout.fillWidth: true
 
                                 title: "Font"
@@ -230,7 +230,7 @@ Item {
                                 ColumnLayout {
                                     width: parent.width
 
-                                    VclComboBox {
+                                    SctComboBox {
                                         property var languageFonts: _private.language !== undefined ? _private.language.fontFamilies() : []
 
                                         Layout.fillWidth: true
@@ -254,7 +254,7 @@ Item {
                                                      }
                                     }
 
-                                    VclText {
+                                    SctText {
                                         Layout.fillWidth: true
 
                                         text: _private.language !== undefined ? "<b>NOTE:</b> Languages with " + _private.language.charScriptName() + " script, will share the same font." : ""
@@ -263,7 +263,7 @@ Item {
                                 }
                             }
 
-                            VclGroupBox {
+                            SctGroupBox {
                                 Layout.fillWidth: true
 
                                 title: "Input Method"
@@ -271,7 +271,7 @@ Item {
                                 ColumnLayout {
                                     width: parent.width
 
-                                    VclText {
+                                    SctText {
                                         Layout.fillWidth: true
 
                                         wrapMode: Text.WordWrap
@@ -280,7 +280,7 @@ Item {
                                               _handleLanguageSwitch.text + "</b> option to have Scrite resume control of this."
                                     }
 
-                                    VclCheckBox {
+                                    SctCheckBox {
                                         Layout.fillWidth: true
 
                                         text: "Auto Select"
@@ -303,7 +303,7 @@ Item {
                                         }
                                     }
 
-                                    VclComboBox {
+                                    SctComboBox {
                                         Layout.fillWidth: true
 
                                         model: _private.transliterationOptionsModel
@@ -325,7 +325,7 @@ Item {
                                 }
                             }
 
-                            VclLabel {
+                            SctLabel {
                                 Layout.fillWidth: true
 
                                 visible: _private.language !== undefined && _private.spellCheckService.canCheckLanguage(_private.language.code)
@@ -341,14 +341,14 @@ Item {
             }
         }
 
-        VclCheckBox {
+        SctCheckBox {
             id: _handleLanguageSwitch
 
             action: ActionHub.languageOptions.find("handleLanguageSwitch") as Action
         }
     }
 
-    VclDialog {
+    SctDialog {
         id: _newLanguageDialog
 
         width: root.width * 0.8
@@ -394,14 +394,14 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 20
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: "You can add Hindi, Marathi, Tamil, French, Vietnamese and more..."
                     wrapMode: Text.WordWrap
                 }
 
-                VclTextField {
+                SctTextField {
                     id: _languageNameField
 
                     Layout.fillWidth: true
@@ -415,7 +415,7 @@ Item {
                     Component.onCompleted: Qt.callLater(forceActiveFocus)
                 }
 
-                VclButton {
+                SctButton {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Add"
@@ -424,7 +424,7 @@ Item {
                     onClicked: _newLanguageDialogContent.addLanguage(_languageNameField.text)
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.fillWidth: true
 
                     text: "NOTE: RTL languages are not yet supported."

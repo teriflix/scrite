@@ -384,7 +384,7 @@ Item {
 
         property Component planActivationApi: SubscriptionPlanActivationRestApiCall {
             property var plan // Should ideally be scriteUserSubscriptionPlanInfo
-            property VclDialog waitDialog
+            property SctDialog waitDialog
 
             onJustIssuedCall: waitDialog = WaitDialog.launch("Activating plan ...")
 

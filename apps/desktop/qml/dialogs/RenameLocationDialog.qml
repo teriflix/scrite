@@ -35,7 +35,7 @@ DialogLauncher {
     name: "RenameLocationDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         required property string location
@@ -66,13 +66,13 @@ DialogLauncher {
                 ColumnLayout {
                     Layout.fillWidth: true
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
 
                         text: "Original Name"
                     }
 
-                    VclTextField {
+                    SctTextField {
                         id: _originalName
 
                         Layout.fillWidth: true
@@ -87,20 +87,20 @@ DialogLauncher {
                     }
                 }
 
-                VclLabel {
+                SctLabel {
                     text: " - to - "
                 }
 
                 ColumnLayout {
                     Layout.fillWidth: true
 
-                    VclLabel {
+                    SctLabel {
                         Layout.fillWidth: true
 
                         text: "New Name"
                     }
 
-                    VclTextField {
+                    SctTextField {
                         id: _newName
 
                         Layout.fillWidth: true
@@ -119,7 +119,7 @@ DialogLauncher {
                     Layout.fillHeight: true
                 }
 
-                VclButton {
+                SctButton {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Rename"

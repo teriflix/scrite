@@ -212,7 +212,7 @@ Rectangle {
                     }
                 }
 
-                VclLabel {
+                SctLabel {
                     id: _label
 
                     Layout.fillWidth: true
@@ -273,7 +273,7 @@ Rectangle {
                     }
                 }
 
-                VclLabel {
+                SctLabel {
                     Layout.alignment: _label.lineCount === 1 ? Qt.AlignVCenter : Qt.AlignTop
 
                     text: _private.sceneLengthWatcher.sceneLength

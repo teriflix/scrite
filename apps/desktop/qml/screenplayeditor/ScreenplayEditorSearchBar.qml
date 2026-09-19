@@ -155,7 +155,7 @@ Rectangle {
             required property string searchString
             required property string replacementText
 
-            property VclDialog waitDialog
+            property SctDialog waitDialog
 
             property int nrReplacements: 0
 

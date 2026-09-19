@@ -100,6 +100,6 @@ Item {
         id: _private
 
         property Component dialogComponent: Qt.createComponent("./reportconfigurationdialog/impl_ReportConfigurationDialog.qml", Component.PreferSynchronous, root)
-        property VclDialog dialog
+        property SctDialog dialog
     }
 }

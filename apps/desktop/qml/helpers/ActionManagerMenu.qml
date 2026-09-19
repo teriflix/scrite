@@ -23,7 +23,7 @@ import Scrite.App
 import "../globals"
 import "../controls"
 
-VclMenu {
+SctMenu {
     id: root
 
     required property ActionManager actionManager
@@ -45,7 +45,7 @@ VclMenu {
 
         model: root.actionManager ? root.actionManager.visibleActions : 0
 
-        delegate: VclMenuItem {
+        delegate: SctMenuItem {
             id: _menuItem
 
             required property int index

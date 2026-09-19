@@ -118,7 +118,7 @@ Rectangle {
             opacity: enabled ? 1 : 0.5
         }
 
-        VclText {
+        SctText {
             text: {
                 if(Runtime.paginator.paused)
                     return ""
@@ -155,7 +155,7 @@ Rectangle {
             }
         }
 
-        VclText {
+        SctText {
             text: {
                 if(Runtime.paginator.paused)
                     return ""
@@ -173,7 +173,7 @@ Rectangle {
             visible: _wordCountLabel.visible
         }
 
-        VclText {
+        SctText {
             id: _wordCountLabel
 
             visible: _taggingOptionsPosMapper.mappedPosition.x > width
@@ -233,7 +233,7 @@ Rectangle {
 
             visible: x > 0
 
-            VclLabel {
+            SctLabel {
                 id: _currentSceneNumber
 
                 property real recommendedMargin: root.sceneHeadingFontMetrics.averageCharacterWidth*5 + root.pageMargins.left*0.075
@@ -247,7 +247,7 @@ Rectangle {
                 text: _private.currentSceneHeading ? _private.currentSceneElement.resolvedSceneNumber + ". " : ''
             }
 
-            VclText {
+            SctText {
                 id: _currentSceneHeadingText
 
                 anchors.left: parent.left
@@ -287,10 +287,10 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.bottom: parent.top
 
-                menu: VclMenu {
+                menu: SctMenu {
                     width: 350
 
-                    VclMenuItem {
+                    SctMenuItem {
                         text: "None"
                         font.bold: Scrite.document.structure.preferredGroupCategory === ""
                         icon.source: font.bold ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
@@ -303,7 +303,7 @@ Rectangle {
                     Repeater {
                         model: Scrite.document.structure.groupCategories
 
-                        delegate: VclMenuItem {
+                        delegate: SctMenuItem {
                             required property int index
                             required property string modelData
 

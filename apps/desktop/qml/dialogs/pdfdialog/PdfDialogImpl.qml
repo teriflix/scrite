@@ -27,7 +27,7 @@ import "../../globals"
 import "../../helpers"
 import "../../controls"
 
-VclDialog {
+SctDialog {
     id: root
 
     width: Scrite.window.width - 51

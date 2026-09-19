@@ -38,7 +38,7 @@ DialogLauncher {
     name: "ScreenplayEditorOptionsDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         width: Math.min(Scrite.window.width-80, 800)
         height: Math.min(Scrite.window.height-80, 720)
 

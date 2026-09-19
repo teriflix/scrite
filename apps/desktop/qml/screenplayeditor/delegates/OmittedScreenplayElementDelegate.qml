@@ -41,7 +41,7 @@ AbstractScreenplayElementDelegate {
         /**
           Not using Row here on purpose.
 
-          The Layout.fillWidth attached property in the first VclText makes this part of the code looks
+          The Layout.fillWidth attached property in the first SctText makes this part of the code looks
           so much cleaner and maintainable than having to calculate width manually.
 
           Besides, we won't have too many break delegates anyway.
@@ -54,7 +54,7 @@ AbstractScreenplayElementDelegate {
             anchors.leftMargin: root.pageLeftMargin
             anchors.rightMargin: root.pageRightMargin
 
-            VclText {
+            SctText {
                 Layout.fillWidth: true
 
                 font: root.font
@@ -67,7 +67,7 @@ AbstractScreenplayElementDelegate {
                 elide: Text.ElideRight
             }
 
-            VclButton {
+            SctButton {
                 text: "Include"
 
                 onClicked: root.screenplayElement.omitted = false

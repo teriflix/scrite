@@ -115,7 +115,7 @@ Item {
 
                         spacing: parent.spacing/2
 
-                        VclLabel {
+                        SctLabel {
                             width: parent.width
 
                             elide: Text.ElideRight
@@ -125,7 +125,7 @@ Item {
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         }
 
-                        VclLabel {
+                        SctLabel {
                             width: parent.width
 
                             elide: Text.ElideRight
@@ -135,7 +135,7 @@ Item {
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
                         }
 
-                        VclLabel {
+                        SctLabel {
                             width: parent.width
 
                             elide: Text.ElideRight
@@ -213,7 +213,7 @@ Item {
 
                     spacing: 10
 
-                    VclTextField {
+                    SctTextField {
                         id: _nameField
 
                         Layout.fillWidth: true
@@ -261,7 +261,7 @@ Item {
         }
     }
 
-    VclScrollBar {
+    SctScrollBar {
         id: _vscrollBar
 
         anchors.top: parent.top

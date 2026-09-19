@@ -163,7 +163,7 @@ Flickable {
                         border.color: Qt.darker(modelData.color, 1.2)
                         border.width: 0.5
 
-                        VclLabel {
+                        SctLabel {
                             anchors.centerIn: parent
 
                             width: (_private.isHorizontalTrack ? parent.width : parent.height) - 10

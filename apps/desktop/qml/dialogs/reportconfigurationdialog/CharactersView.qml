@@ -58,7 +58,7 @@ Rectangle {
 
             onClicked: _tagsMenu.open()
 
-            VclText {
+            SctText {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
 
@@ -77,13 +77,13 @@ Rectangle {
 
                 height: 1
 
-                VclMenu {
+                SctMenu {
                     id: _tagsMenu
 
                     Repeater {
                         model: _charactersModel.availableTags
 
-                        delegate: VclMenuItem {
+                        delegate: SctMenuItem {
                             id: _tagMenuItemDelegate
                             required property int index
                             required property string modelData
@@ -115,7 +115,7 @@ Rectangle {
             contentX -= dp.x
         }
 
-        ScrollBar.horizontal: VclScrollBar { }
+        ScrollBar.horizontal: SctScrollBar { }
 
         anchors.left: parent.left
         anchors.right: parent.right
@@ -140,7 +140,7 @@ Rectangle {
             Repeater {
                 model: _charactersModel
 
-                delegate: VclCheckBox {
+                delegate: SctCheckBox {
                     id: _characterCheckBox
                     required property int index
                     required property string modelData
@@ -186,13 +186,13 @@ Rectangle {
         anchors.leftMargin: 10
         anchors.bottomMargin: 4
 
-        VclButton {
+        SctButton {
             text: "Select All"
             enabled: _charactersModel.count > 0
             onClicked: _charactersModel.selectAll()
         }
 
-        VclButton {
+        SctButton {
             text: "Unselect All"
             enabled: _charactersModel.count > 0
             onClicked: _charactersModel.unselectAll()

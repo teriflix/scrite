@@ -39,10 +39,10 @@ MenuLoader {
 
     property Scene scene: screenplayElement ? screenplayElement.scene : null
 
-    menu: VclMenu {
+    menu: SctMenu {
         id: _sceneMenu
 
-        VclMenuItem {
+        SctMenuItem {
             enabled: !root.screenplayElement.omitted
 
             action: Action {
@@ -57,10 +57,10 @@ MenuLoader {
             }
         }
 
-        VclMenu {
+        SctMenu {
             title: "Page Breaks"
 
-            VclMenuItem {
+            SctMenuItem {
                 action: Action {
                     text: "Before"
                     checkable: true
@@ -70,7 +70,7 @@ MenuLoader {
                 onTriggered: root.screenplayElement.pageBreakBefore = action.checked
             }
 
-            VclMenuItem {
+            SctMenuItem {
                 action: Action {
                     text: "After"
                     checkable: true
@@ -95,7 +95,7 @@ MenuLoader {
             enabled: !root.screenplayElement.omitted
         }
 
-        VclMenu {
+        SctMenu {
             title: "Reports"
 
             width: 250
@@ -103,7 +103,7 @@ MenuLoader {
             Repeater {
                 model: Runtime.sceneReports.reports ? Runtime.sceneReports.reports : 0
 
-                delegate: VclMenuItem {
+                delegate: SctMenuItem {
                     required property int index
                     required property var modelData
 
@@ -126,7 +126,7 @@ MenuLoader {
 
         MenuSeparator { }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Copy"
             enabled: root.screenplayAdapter.isSourceScreenplay
 
@@ -137,7 +137,7 @@ MenuLoader {
             }
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Paste After"
             enabled: root.screenplayAdapter.isSourceScreenplay && Scrite.document.screenplay.canPaste
 
@@ -146,7 +146,7 @@ MenuLoader {
 
         MenuSeparator { }
 
-        VclMenuItem {
+        SctMenuItem {
             text: root.screenplayElement.omitted ? "Include" : "Omit"
             enabled: root.screenplayAdapter.isSourceScreenplay
 
@@ -156,7 +156,7 @@ MenuLoader {
             }
         }
 
-        VclMenuItem {
+        SctMenuItem {
             text: "Remove"
             enabled: root.screenplayAdapter.isSourceScreenplay
 

@@ -81,7 +81,7 @@ AbstractScreenplayElementDelegate {
                 background: Item { }
             }
 
-            VclTextField {
+            SctTextField {
                 id: _titleField
 
                 Layout.fillWidth: true

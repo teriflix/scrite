@@ -63,7 +63,7 @@ Item {
                         contentY = fpos.y+field.height-height
                 }
 
-                ScrollBar.vertical: VclScrollBar { }
+                ScrollBar.vertical: SctScrollBar { }
 
                 anchors.fill: parent
                 anchors.margins: 1
@@ -132,7 +132,7 @@ Item {
                                         width: _photoSlideView.width
                                         height: _photoSlideView.height
 
-                                        VclButton {
+                                        SctButton {
                                             anchors.centerIn: parent
 
                                             enabled: !Scrite.document.readOnly && _photoSlideView.count <= 6
@@ -206,7 +206,7 @@ Item {
                                 }
                             }
 
-                            VclTextField {
+                            SctTextField {
                                 id: _designationField
 
                                 Layout.fillWidth: true
@@ -233,7 +233,7 @@ Item {
 
                                 spacing: 10
 
-                                VclTextField {
+                                SctTextField {
                                     id: _newTagField
 
                                     Layout.fillWidth: true
@@ -297,7 +297,7 @@ Item {
 
                                 spacing: 10
 
-                                VclLabel {
+                                SctLabel {
                                     Layout.preferredWidth: parent.width * 0.4
 
                                     function priority(val) {
@@ -341,7 +341,7 @@ Item {
                                 }
                             }
 
-                            VclTextField {
+                            SctTextField {
                                 id: _aliasesField
 
                                 Layout.fillWidth: true
@@ -371,7 +371,7 @@ Item {
                                 columns: 2
                                 rowSpacing: 20
 
-                                VclTextField {
+                                SctTextField {
                                     id: _typeField
 
                                     Layout.fillWidth: true
@@ -392,7 +392,7 @@ Item {
                                     }
                                 }
 
-                                VclTextField {
+                                SctTextField {
                                     id: _genderField
 
                                     Layout.fillWidth: true
@@ -411,7 +411,7 @@ Item {
                                     onTextEdited: root.character.gender = text
                                 }
 
-                                VclTextField {
+                                SctTextField {
                                     id: _ageField
 
                                     Layout.fillWidth: true
@@ -430,7 +430,7 @@ Item {
                                     onTextEdited: root.character.age = text
                                 }
 
-                                VclTextField {
+                                SctTextField {
                                     id: _bodyTypeField
 
                                     Layout.fillWidth: true
@@ -449,7 +449,7 @@ Item {
                                     onTextEdited: root.character.bodyType = text
                                 }
 
-                                VclTextField {
+                                SctTextField {
                                     id: _heightField
 
                                     Layout.fillWidth: true
@@ -468,7 +468,7 @@ Item {
                                     onTextEdited: root.character.height = text
                                 }
 
-                                VclTextField {
+                                SctTextField {
                                     id: _weightField
 
                                     Layout.fillWidth: true

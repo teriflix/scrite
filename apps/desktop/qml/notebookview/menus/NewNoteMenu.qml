@@ -23,7 +23,7 @@ import "../../globals"
 import "../../helpers"
 import "../../controls"
 
-VclMenu {
+SctMenu {
     id: root
 
     required property Notes notes

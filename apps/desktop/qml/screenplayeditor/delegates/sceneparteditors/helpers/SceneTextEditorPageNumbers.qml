@@ -65,7 +65,7 @@ Loader {
                     anchors.rightMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
 
-                    VclLabel {
+                    SctLabel {
                         id: _sceneNumberText
 
                         anchors.centerIn: parent

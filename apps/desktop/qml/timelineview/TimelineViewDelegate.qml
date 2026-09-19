@@ -123,7 +123,7 @@ Item {
                 visible: active
 
                 sourceComponent: Item {
-                    VclLabel {
+                    SctLabel {
                         anchors.centerIn: parent
 
                         width: parent.width

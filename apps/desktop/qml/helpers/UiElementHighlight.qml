@@ -83,7 +83,7 @@ Item {
             border.width: 1
             border.color: Runtime.colors.accent.borderColor
 
-            VclLabel {
+            SctLabel {
                 id: _descLabel
 
                 text: root.description
