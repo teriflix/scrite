@@ -83,6 +83,7 @@ qt_add_qml_module(Scrite
   RESOURCES
     ${SCRITE_DESKTOP_ICON_FILES}
     ${SCRITE_DESKTOP_IMAGE_FILES}
+    SOURCES src/quick/objects/featurehost.h src/quick/objects/featurehost.cpp
 )
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DesktopMiscAndFontsResources.cmake")
