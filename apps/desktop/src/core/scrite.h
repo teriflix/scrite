@@ -56,7 +56,7 @@ public:
         name = other.name;
     }
     bool operator==(const Country &other) const { return name == other.name && code == other.code; }
-    bool operator!=(const Country &other) const { return name != other.name && code != other.code; }
+    bool operator!=(const Country &other) const { return !(*this == other); }
     Country &operator=(const Country &other)
     {
         name = other.name;
@@ -94,10 +94,7 @@ public:
     {
         return code == other.code && symbol == other.symbol;
     }
-    bool operator!=(const Currency &other) const
-    {
-        return code != other.code || symbol != other.symbol;
-    }
+    bool operator!=(const Currency &other) const { return !(*this == other); }
     Currency &operator=(const Currency &other)
     {
         code = other.code;
@@ -135,10 +132,7 @@ public:
     {
         return country == other.country && currency == other.currency;
     }
-    bool operator!=(const Locale &other) const
-    {
-        return country != other.country || currency != other.currency;
-    }
+    bool operator!=(const Locale &other) const { return !(*this == other); }
     Locale &operator=(const Locale &other)
     {
         country = other.country;
