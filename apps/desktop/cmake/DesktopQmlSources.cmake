@@ -48,8 +48,6 @@ set(SCRITE_DESKTOP_QML_SOURCES
   "src/document/screenplaytextdocument.h"
   "src/document/screenplaytextdocumentoffsets.cpp"
   "src/document/screenplaytextdocumentoffsets.h"
-  "src/document/screenplaytreeadapter.cpp"
-  "src/document/screenplaytreeadapter.h"
   "src/document/scritedocument.cpp"
   "src/document/scritedocument.h"
   "src/document/scritedocumentvault.cpp"
