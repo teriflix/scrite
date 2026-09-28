@@ -189,9 +189,15 @@ dual dialogue to display side-by-side:
 3. Press `Ctrl+Alt+D` (Windows/Linux) or `Ctrl+⌥+D` (macOS) to toggle dual
    dialogue
 
+<img src="../images/quickstart/028-dual-dialogue.png" width="75%"/>
+
 In the editor, they appear sequentially for easy editing. In PDF export and
 preview, they display side-by-side. Press the same shortcut again to revert to
 normal dialogue.
+
+<img src="../images/quickstart/029-dual-dialogue.png" width="75%"/>
+
+> NOTE: Dual-dialogue formatting is available from version 3.2 onwards.
 
 ## Adding More Scenes
 Keep creating scenes and adding content. To add a new scene, click the button at
