@@ -141,6 +141,13 @@ public:
     static const QString versionType;
 
     // clang-format off
+    Q_PROPERTY(bool fossBuild
+               READ isFOSSBuild
+               CONSTANT)
+    // clang-format on
+    bool isFOSSBuild() const;
+
+    // clang-format off
     Q_PROPERTY(QStringList availableThemes
                READ availableThemes
                CONSTANT )

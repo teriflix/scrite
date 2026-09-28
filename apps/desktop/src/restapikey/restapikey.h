@@ -16,6 +16,7 @@
 #ifndef REST_API_KEY_H
 #define REST_API_KEY_H
 
+#define SCRITE_FOSS_BUILD
 #define REST_API_KEY "X3nHHfhlr6x97B7NfGuJ8gAInYLFhseowe3RlNkZhDKPUHtiwHZQc5pmMp7eJ1AL"
 #define REST_CRYPT_KEY 0xCE2CF0EC23BD1373
 #define REST_API_URL "https://www.scrite.io"

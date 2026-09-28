@@ -83,6 +83,7 @@ bool RestApi::isSessionTokenAvailable()
 
 void RestApi::requestNewSessionToken()
 {
+#ifndef SCRITE_FOSS_BUILD
     if (m_sessionTokenTimer == nullptr) {
         m_sessionTokenTimer = new QTimer(this);
         m_sessionTokenTimer->setInterval(500);
@@ -91,10 +92,12 @@ void RestApi::requestNewSessionToken()
         this->requestNewSessionTokenNow();
     } else if (!m_sessionTokenTimer->isActive())
         m_sessionTokenTimer->start();
+#endif
 }
 
 void RestApi::requestFreshActivation()
 {
+#ifndef SCRITE_FOSS_BUILD
     if (m_sessionTokenTimer)
         m_sessionTokenTimer->stop();
 
@@ -105,18 +108,22 @@ void RestApi::requestFreshActivation()
     User::instance()->loadInfoFromStorage();
 
     emit freshActivationRequired();
+#endif
 }
 
 void RestApi::reportInvalidApiKey()
 {
+#ifndef SCRITE_FOSS_BUILD
     if (m_sessionTokenTimer)
         m_sessionTokenTimer->stop();
 
     emit invalidApiKey();
+#endif
 }
 
 void RestApi::requestNewSessionTokenNow()
 {
+#ifndef SCRITE_FOSS_BUILD
     const QDateTime now = QDateTime::currentDateTime();
     if (m_lastSessionTokenRequestTimestamp.isValid()) {
         if (m_lastSessionTokenRequestTimestamp.msecsTo(now) < 1000)
@@ -126,6 +133,7 @@ void RestApi::requestNewSessionTokenNow()
 
     LocalStorage::store(LocalStorage::sessionToken, QVariant());
     emit newSessionTokenRequired();
+#endif
 }
 
 RestApi::RestApi(QObject *parent) : QObject(parent)
@@ -292,6 +300,14 @@ bool RestApiCall::call()
 
     emit aboutToCall();
 
+#ifdef SCRITE_FOSS_BUILD
+    QTimer::singleShot(0, this, [=]() {
+        this->setError(
+                QJsonObject({ { "code", "E_BUILD_TYPE" },
+                              { "text", "Production servers need not be used by FOSS builds." } }));
+    });
+    return true;
+#else
     if (!RestApi::instance()->isNetworkAvailable()) {
         QTimer::singleShot(0, this, &RestApiCall::reportInternetConnectivityError);
         return true;
@@ -386,6 +402,7 @@ bool RestApiCall::call()
     }
 
     return false;
+#endif
 }
 
 void RestApiCall::clearError()
@@ -413,6 +430,7 @@ void RestApiCall::setError(const QJsonObject &val)
 
     m_error = val;
 
+#ifndef SCRITE_FOSS_BUILD
     const QString errorCode = val.value("code").toString();
 
     const bool noApiKey = errorCode == RestApi::E_API_KEY;
@@ -456,6 +474,7 @@ void RestApiCall::setError(const QJsonObject &val)
         } else if (noApiKey)
             QTimer::singleShot(0, RestApi::instance(), &RestApi::reportInvalidApiKey);
     }
+#endif
 
     emit errorChanged();
 }
@@ -471,6 +490,7 @@ void RestApiCall::setResponse(const QJsonObject &val)
 
 void RestApiCall::onNetworkReplyError()
 {
+#ifndef SCRITE_FOSS_BUILD
     if (m_reply->error() == QNetworkReply::NoError)
         return;
 
@@ -494,10 +514,12 @@ void RestApiCall::onNetworkReplyError()
     emit busyChanged();
 
     emit finished();
+#endif
 }
 
 void RestApiCall::onNetworkReplyFinished()
 {
+#ifndef SCRITE_FOSS_BUILD
     if (m_reply->error() == QNetworkReply::NoError) {
         const QByteArray bytes = m_reply->readAll();
         const QJsonObject json = QJsonDocument::fromJson(bytes).object();
@@ -515,15 +537,18 @@ void RestApiCall::onNetworkReplyFinished()
 
         emit finished();
     }
+#endif
 }
 
 void RestApiCall::reportInternetConnectivityError()
 {
+#ifndef SCRITE_FOSS_BUILD
     this->setError(QJsonObject(
             { { "code", RestApi::E_INTERNET },
               { "text", "Internet connectivity is required to complete this operation." } }));
 
     emit finished();
+#endif
 }
 
 void RestApiCall::maybeAutoDelete()

@@ -20,6 +20,7 @@
 #include "restapicall.h"
 #include "localstorage.h"
 #include "peerapplookup.h"
+#include "restapikey/restapikey.h"
 
 #include <QImage>
 #include <QPainter>
@@ -582,6 +583,7 @@ QList<UserMessage> User::asMessageList(const QJsonArray &array)
 
 User *User::instance()
 {
+#ifndef SCRITE_FOSS_BUILD
     static bool firstTime = true;
 
     bool refreshSessionToken = firstTime;
@@ -598,9 +600,11 @@ User *User::instance()
             refreshSessionToken = false;
         }
     }
+#endif
 
     static User *theUser = new User(qApp);
 
+#ifndef SCRITE_FOSS_BUILD
     if (firstTime) {
         if (refreshSessionToken && LocalStorage::load(LocalStorage::loginToken).isValid()) {
             SessionNewRestApiCall *api = new SessionNewRestApiCall(theUser);
@@ -615,6 +619,7 @@ User *User::instance()
     }
 
     firstTime = false;
+#endif
 
     return theUser;
 }
@@ -624,6 +629,52 @@ User::User(QObject *parent) : QObject(parent)
     connect(this, &User::infoChanged, this, &User::loggedInChanged);
     connect(this, &User::loggedInChanged, this, &User::loadStoredMessages);
     connect(this, &User::messagesChanged, this, &User::storeMessages);
+
+#ifdef SCRITE_FOSS_BUILD
+    m_info.id = QUuid::createUuid().toString();
+    m_info.email = "opensourceuser@scrite.io";
+    m_info.signUpDate = QDateTime::fromString(Application::instance()->buildTimestamp());
+    m_info.timestamp = QDateTime::currentDateTime();
+    m_info.firstName = QStringLiteral("FOSS");
+    m_info.lastName = QStringLiteral("User");
+    m_info.firstName = m_info.firstName + QStringLiteral(" ") + m_info.lastName;
+    m_info.allowedVersionTypes = QStringList() << Application::instance()->versionAsString();
+    m_info.activeInstallationCount = 1;
+    m_info.hasActiveSubscription = true;
+    m_info.hasTrialSubscription = true;
+    m_info.paidSubscriptionCount = 0;
+    m_info.subscribedUntil = QDateTime::currentDateTime().addDays(28);
+    m_info.availableFeatures = QStringList({ "*" });
+
+    UserSubscriptionInfo info;
+    info.id = QUuid::createUuid().toString();
+    info.kind = QStringLiteral("trial");
+    info.from = m_info.signUpDate;
+    info.until = m_info.subscribedUntil;
+    info.isActive = true;
+    info.plan.name = QStringLiteral("foss");
+    info.plan.title = QStringLiteral("FOSS Plan");
+    info.plan.subtitle = QStringLiteral("Based on a FOSS Build from source code.");
+    info.plan.duration = m_info.signUpDate.daysTo(m_info.subscribedUntil);
+    info.plan.features = m_info.availableFeatures;
+    info.plan.featureNote = QStringLiteral("All features available in the source code.");
+    m_info.subscriptions.append(info);
+
+    UserInstallationInfo device;
+    device.id = QUuid::createUuid().toString();
+    device.clientId = Application::instance()->installationId();
+    device.deviceId = Application::instance()->deviceId();
+    device.platform = Utils::Platform::typeString();
+    device.platformVersion = Utils::Platform::osVersionString();
+    device.platformType = Utils::Platform::architectureString();
+    device.hostName = Utils::Platform::hostName();
+    device.appVersion = Application::instance()->versionAsString();
+    device.creationDate = m_info.signUpDate;
+    device.lastActivationDate = m_info.signUpDate;
+    device.lastSessionDate = m_info.signUpDate;
+    device.activated = true;
+    m_info.installations.append(device);
+#endif
 }
 
 User::~User() { }
@@ -641,12 +692,14 @@ bool User::canUseAppVersionType() const
 
 void User::logActivity2(const QString &activity, const QJsonValue &data)
 {
+#ifndef SCRITE_FOSS_BUILD
     if (m_info.isValid() && !this->isBusy() && m_info.consentToActivityLog) {
         UserActivityRestApiCall *call = new UserActivityRestApiCall(qApp);
         call->setActivity("desktop/" + activity);
         call->setActivityData(data);
         call->call();
     }
+#endif
 }
 
 bool User::isBusy() const
@@ -657,12 +710,17 @@ bool User::isBusy() const
 
 int User::unreadMessageCount() const
 {
+#ifndef SCRITE_FOSS_BUILD
     return std::count_if(m_messages.begin(), m_messages.end(),
                          [](const UserMessage &item) { return item.read == false; });
+#else
+    return 0;
+#endif
 }
 
 void User::checkForMessages()
 {
+#ifndef SCRITE_FOSS_BUILD
     if (!m_checkForMessagesTimer) {
         m_checkForMessagesTimer = new QTimer(this);
         m_checkForMessagesTimer->setInterval(30000);
@@ -672,10 +730,12 @@ void User::checkForMessages()
     } else if (!m_checkForMessagesTimer->isActive()) {
         m_checkForMessagesTimer->start();
     }
+#endif
 }
 
 void User::markMessagesAsRead()
 {
+#ifndef SCRITE_FOSS_BUILD
     int nrMessages = 0;
     for (UserMessage &message : m_messages) {
         if (!message.read) {
@@ -686,6 +746,7 @@ void User::markMessagesAsRead()
 
     if (nrMessages > 0)
         emit messagesChanged();
+#endif
 }
 
 QString User::promotionText() const
@@ -700,6 +761,7 @@ UserMessageButton User::promotionButton() const
 
 void User::setInfo(const UserInfo &val)
 {
+#ifndef SCRITE_FOSS_BUILD
     if (m_info == val)
         return;
 
@@ -708,19 +770,23 @@ void User::setInfo(const UserInfo &val)
 
     QTimer::singleShot(100, this, &User::checkIfSubscriptionIsAboutToExpire);
     QTimer::singleShot(100, this, &User::checkIfInstallationInfoNeedsUpdate);
+#endif
 }
 
 void User::setMessages(const QList<UserMessage> &val)
 {
+#ifndef SCRITE_FOSS_BUILD
     if (m_messages == val)
         return;
 
     m_messages = val;
     emit messagesChanged();
+#endif
 }
 
 void User::checkIfSubscriptionIsAboutToExpire()
 {
+#ifndef SCRITE_FOSS_BUILD
     if (!m_info.isValid() || !m_info.hasActiveSubscription)
         return;
 
@@ -750,10 +816,12 @@ void User::checkIfSubscriptionIsAboutToExpire()
     const int nrDays = QDate::currentDate().daysTo(m_info.subscribedUntil.date()) + 1;
     if (nrDays >= 0 && nrDays < subscriptionTreshold)
         emit subscriptionAboutToExpire(nrDays);
+#endif
 }
 
 void User::checkIfInstallationInfoNeedsUpdate()
 {
+#ifndef SCRITE_FOSS_BUILD
     static int checkCounter = 0;
     if (checkCounter > 0)
         return;
@@ -786,10 +854,12 @@ void User::checkIfInstallationInfoNeedsUpdate()
         call->setAutoDelete(true);
         call->queue(RestApi::instance()->sessionApiQueue());
     }
+#endif
 }
 
 void User::checkForPromotionText()
 {
+#ifndef SCRITE_FOSS_BUILD
     if (!m_info.isValid())
         return;
 
@@ -806,6 +876,7 @@ void User::checkForPromotionText()
     if (!call->call()) {
         call->deleteLater();
     }
+#endif
 }
 
 void User::checkIfVersionTypeUseIsAllowed()
@@ -820,6 +891,7 @@ void User::checkIfVersionTypeUseIsAllowed()
 
 void User::checkForMessagesNow()
 {
+#ifndef SCRITE_FOSS_BUILD
     if (!this->isLoggedIn())
         return;
 
@@ -860,10 +932,12 @@ void User::checkForMessagesNow()
     });
     if (!api->call())
         api->deleteLater();
+#endif
 }
 
 void User::storeMessages()
 {
+#ifndef SCRITE_FOSS_BUILD
     if (!this->isLoggedIn())
         return;
 
@@ -873,10 +947,12 @@ void User::storeMessages()
         ds << m_info.id << this->m_messages;
     }
     LocalStorage::store(LocalStorage::userMessages, messageBytes);
+#endif
 }
 
 void User::loadStoredMessages()
 {
+#ifndef SCRITE_FOSS_BUILD
     if (!this->isLoggedIn())
         return;
 
@@ -914,10 +990,12 @@ void User::loadStoredMessages()
     }
 
     emit messagesChanged();
+#endif
 }
 
 void User::loadInfoFromStorage()
 {
+#ifndef SCRITE_FOSS_BUILD
     const QString token = LocalStorage::load(LocalStorage::loginToken).toString();
     if (!token.isEmpty()) {
         const QByteArray userJson = LocalStorage::load(LocalStorage::user).toByteArray();
@@ -932,10 +1010,12 @@ void User::loadInfoFromStorage()
     } else {
         this->setInfo(UserInfo());
     }
+#endif
 }
 
 void User::loadInfoUsingRestApiCall()
 {
+#ifndef SCRITE_FOSS_BUILD
     UserMeRestApiCall *apiCall =
             this->findChild<UserMeRestApiCall *>(QString(), Qt::FindDirectChildrenOnly);
     if (apiCall)
@@ -944,6 +1024,7 @@ void User::loadInfoUsingRestApiCall()
     apiCall = new UserMeRestApiCall(this);
     if (!apiCall->call())
         apiCall->deleteLater();
+#endif
 }
 
 void User::childEvent(QChildEvent *e)

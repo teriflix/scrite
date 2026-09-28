@@ -17,6 +17,7 @@
 #include "application.h"
 #include "restapicall.h"
 #include "utils.h"
+#include "restapikey/restapikey.h"
 
 #include <QTimer>
 #include <QLabel>
@@ -395,6 +396,7 @@ bool SystemRequirements::hasSupportedScriteVersion()
 {
     bool success = true;
 
+#ifndef SCRITE_FOSS_BUILD
     if (isNetworkAvailable()) {
         AppMinimumVersionRestApiCall call;
         QEventLoop eventLoop;
@@ -410,6 +412,7 @@ bool SystemRequirements::hasSupportedScriteVersion()
 
         success = call.hasError() ? true : (call.hasResponse() && call.isVersionSupported());
     }
+#endif
 
     return success;
 }

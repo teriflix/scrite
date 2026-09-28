@@ -58,7 +58,7 @@ Item {
 
         spacing: 20
         opacity: enabled ? 1 : 0.5
-        enabled: !root.callList.busy
+        enabled: !root.callList.busy && !Scrite.app.fossBuild
 
         VclLabel {
             Layout.fillWidth: true

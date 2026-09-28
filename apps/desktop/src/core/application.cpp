@@ -24,6 +24,7 @@
 #include "notification.h"
 #include "localstorage.h"
 #include "scritedocument.h"
+#include "restapikey/restapikey.h"
 
 #ifdef ENABLE_CRASHPAD_CRASH_TEST
 #include "crashpadmodule.h"
@@ -497,6 +498,15 @@ void Application::setCustomFontPointSize(int val)
     emit customFontPointSizeChanged();
 
     this->computeIdealFontPointSize();
+}
+
+bool Application::isFOSSBuild() const
+{
+#ifdef SCRITE_FOSS_BUILD
+    return true;
+#else
+    return false;
+#endif
 }
 
 const QString Application::versionType = QStringLiteral(SCRITE_VERSION_TYPE);
