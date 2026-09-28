@@ -249,6 +249,7 @@ void LibraryServiceOpenRecordTask::openRecord()
         return;
     }
 
+#ifndef SCRITE_FOSS_BUILD
     QNetworkAccessManager &nam = ::LibraryNetworkAccess();
 
     const QJsonObject record = m_library->recordAt(m_index);
@@ -275,6 +276,7 @@ void LibraryServiceOpenRecordTask::openRecord()
     const QString activity = m_library == m_parent->templates() ? QStringLiteral("template")
                                                                 : QStringLiteral("scriptalay");
     User::instance()->logActivity2(activity, name);
+#endif
 }
 
 void LibraryServiceOpenRecordTask::complete()
