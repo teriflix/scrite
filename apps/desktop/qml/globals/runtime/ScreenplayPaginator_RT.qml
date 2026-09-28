@@ -28,4 +28,5 @@ ScreenplayPaginator {
     function toggle() { paused = !paused }
     function pause() { paused = true }
     function resume() { paused = false }
+    function pauseResume() { }
 }

@@ -55,6 +55,10 @@ Loader {
 
                 property rect cursorRect: _private.evaluateCursorRectAtPosition(cursorPosition)
 
+                function updateCursorRect() {
+                    cursorRect = _private.evaluateCursorRectAtPosition(cursorPosition)
+                }
+
                 x: 0
                 y: (cursorPosition >= 0 ? cursorRect.y : -root.zeroPositionOffset)
                 width: parent.width
@@ -115,14 +119,6 @@ Loader {
 
             paginator: _private.showPageNumbers ? Runtime.paginator : null
             element: root.screenplayElement
-        }
-
-        ResetOnChange {
-            id: _screenplayElement
-
-            from: null
-            to: root.screenplayElement
-            trackChangesOn: root.zoomLevel
         }
     }
 

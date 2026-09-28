@@ -355,6 +355,11 @@ AbstractScenePartEditor {
                                 _sceneTextEditor.deselect()
                                 _sceneTextEditor.select(start, end)
                             }
+
+        onRenderDualDialoguesChanged: () => {
+                                          Runtime.paginator.pause()
+                                          Qt.callLater(Runtime.paginator.resume)
+                                      }
     }
 
     Connections {
