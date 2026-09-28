@@ -19,7 +19,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"
@@ -68,7 +68,7 @@ Loader {
 
         readonly property FontMetrics fontMetrics: FontMetrics { }
 
-        readonly property Component textViewComponent: VclLabel {
+        readonly property Component textViewComponent: SctLabel {
             readonly property bool editorKind: false
 
             property var searchResults: []
@@ -242,7 +242,7 @@ Loader {
                     currentIndex: _completionModel.currentRow
                     keyNavigationEnabled: false
 
-                    delegate: VclLabel {
+                    delegate: SctLabel {
                         id: _completionDelegate
 
                         required property int index

@@ -17,7 +17,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 
@@ -35,7 +35,7 @@ GroupBox {
         height: _labelItem.height
         color: root.labelBackground
 
-        VclLabel {
+        SctLabel {
             id: _labelItem
             padding: 5
             text: root.title

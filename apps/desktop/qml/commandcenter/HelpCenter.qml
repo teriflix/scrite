@@ -21,7 +21,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../helpers"
@@ -71,7 +71,7 @@ Popup {
 
             spacing: 20
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
 
                 padding: 10
@@ -168,7 +168,7 @@ Popup {
 
                         spacing: 0
 
-                        VclText {
+                        SctText {
                             id: _titleLabel
 
                             Layout.fillWidth: true
@@ -183,7 +183,7 @@ Popup {
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         }
 
-                        VclText {
+                        SctText {
                             id: _descriptionLabel
 
                             Layout.fillWidth: true

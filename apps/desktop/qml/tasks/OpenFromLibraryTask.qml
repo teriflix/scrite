@@ -20,7 +20,7 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../dialogs"
@@ -81,7 +81,7 @@ QtObject {
         property string mode // can be one of ["template", "screenplay"]
         property LibraryService libraryService
 
-        property VclDialog waitDialog
+        property SctDialog waitDialog
 
         running: false
 

@@ -18,7 +18,7 @@ pragma ComponentBehavior: Bound
 import QtQml
 import QtQuick
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../dialogs"
@@ -155,7 +155,7 @@ Rectangle {
             required property string searchString
             required property string replacementText
 
-            property VclDialog waitDialog
+            property SctDialog waitDialog
 
             property int nrReplacements: 0
 

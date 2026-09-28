@@ -18,14 +18,14 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 
 import "../../globals"
 import "../../controls"
 import "../../helpers"
 
-VclCheckBox {
+SctCheckBox {
     id: root
     property scriteObjectConfigField fieldInfo
     property AbstractReportGenerator report

@@ -18,7 +18,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import ".."
 import "../globals"
@@ -131,7 +131,7 @@ Item {
                 showNotesIcon: Runtime.showNotebookInStructure
             }
 
-            VclLabel {
+            SctLabel {
                 anchors.centerIn: parent
 
                 elide: Text.ElideRight

@@ -18,7 +18,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../controls"
@@ -31,7 +31,7 @@ ColumnLayout {
 
     spacing: 6
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         elide: Text.ElideRight
@@ -41,7 +41,7 @@ ColumnLayout {
         text: root.fieldInfo.label
     }
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
         Layout.rightMargin: 10
 
@@ -53,7 +53,7 @@ ColumnLayout {
         text: root.fieldInfo.note
     }
 
-    VclSpinBox {
+    SctSpinBox {
         from: root.fieldInfo.min
         to: root.fieldInfo.max
 

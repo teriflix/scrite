@@ -27,7 +27,7 @@ void UndoHub::init(const char *uri, QQmlEngine *qmlEngine)
     if (initedOnce)
         return;
 
-    // @uri io.scrite.components
+    // @uri Scrite.App
     // @reason Instantiation from QML not allowed.
     qmlRegisterSingletonInstance(uri, 1, 0, "UndoHub", UndoHub::instance());
 

@@ -18,12 +18,12 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"
 
-VclMenu {
+SctMenu {
     id: root
 
     title: "Mark Scene As"
@@ -39,7 +39,7 @@ VclMenu {
             enumeration: "Type"
         }
 
-        delegate: VclMenuItem {
+        delegate: SctMenuItem {
             id: _delegate
 
             required property int index

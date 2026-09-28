@@ -18,7 +18,7 @@ import QtQuick
 import QtQuick.Shapes
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"
@@ -55,7 +55,7 @@ Item {
         opacity: _private.highlightAsDropArea ? 0.75 : 0.5
         visible: Scrite.document.structure.elementCount > 0 && root.dragDropEnabled
 
-        VclLabel {
+        SctLabel {
             anchors.fill: parent
             anchors.margins: 5
 

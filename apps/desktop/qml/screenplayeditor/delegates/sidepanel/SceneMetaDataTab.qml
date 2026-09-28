@@ -20,7 +20,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../../../globals"
 import "../../../helpers"
@@ -46,7 +46,7 @@ AbstractScenePartEditor {
         contentHeight: _layout.height
         flickableDirection: Flickable.VerticalFlick
 
-        ScrollBar.vertical: VclScrollBar { }
+        ScrollBar.vertical: SctScrollBar { }
 
         Column {
             id: _layout

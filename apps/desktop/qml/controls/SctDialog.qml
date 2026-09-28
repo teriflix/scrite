@@ -39,7 +39,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../helpers"
@@ -140,8 +140,8 @@ Dialog {
         Flickable {
             id: _contentItemScroll
 
-            ScrollBar.vertical: VclScrollBar { }
-            ScrollBar.horizontal: VclScrollBar { }
+            ScrollBar.vertical: SctScrollBar { }
+            ScrollBar.horizontal: SctScrollBar { }
 
             anchors.fill: parent
 
@@ -195,7 +195,7 @@ Dialog {
 
             spacing: 2
 
-            VclLabel {
+            SctLabel {
                 Layout.alignment: Qt.AlignVCenter
                 Layout.fillWidth: true
 

@@ -20,7 +20,7 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../dialogs"
@@ -45,7 +45,7 @@ QtObject {
     readonly property Component theTask: SequentialAnimation {
         id: _theTaskInstance
 
-        property VclDialog waitDialog
+        property SctDialog waitDialog
         property string filePath
         property string mode // can be one of ["open", "openAnonymously", "openOrImport"]
 

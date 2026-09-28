@@ -21,7 +21,7 @@ import QtQuick.Layouts
 import Qt.labs.qmlmodels
 import QtQuick.Shapes
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"
@@ -60,7 +60,7 @@ Rectangle {
                 Layout.alignment: Qt.AlignHCenter
             }
 
-            VclLabel {
+            SctLabel {
                 text: "Page Break"
                 font.pointSize: root.textFontSize
                 padding: root.fullSize ? 5 : 2

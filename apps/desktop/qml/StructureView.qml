@@ -19,7 +19,7 @@ import QtQuick.Window
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "./globals"
 import "./controls"
@@ -135,7 +135,7 @@ Item {
             radius: 4
         }
 
-        VclLabel {
+        SctLabel {
             id: _attachmentNotice
 
             anchors.centerIn: parent

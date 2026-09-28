@@ -18,7 +18,7 @@ pragma Singleton
 import QtQuick
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 
 import "../controls"
@@ -384,7 +384,7 @@ Item {
 
         property Component planActivationApi: SubscriptionPlanActivationRestApiCall {
             property var plan // Should ideally be scriteUserSubscriptionPlanInfo
-            property VclDialog waitDialog
+            property SctDialog waitDialog
 
             onJustIssuedCall: waitDialog = WaitDialog.launch("Activating plan ...")
 
@@ -429,7 +429,7 @@ Item {
         }
 
         function loadTaxonomy() {
-            let api = Qt.createQmlObject("import io.scrite.components; AppPlanTaxonomyRestApiCall {}", _private)
+            let api = Qt.createQmlObject("import Scrite.App; AppPlanTaxonomyRestApiCall {}", _private)
             api.finished.connect( () => {
                                      if(api.hasError || !api.hasResponse)
                                         Runtime.execLater(_private, 500, loadTaxonomy)

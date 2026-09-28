@@ -19,7 +19,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../dialogs"
@@ -49,7 +49,7 @@ Rectangle {
         anchors.leftMargin: root.leftPadding
         anchors.rightMargin: root.rightPadding
 
-        VclText {
+        SctText {
             id: _headingText
 
             Layout.fillWidth: true

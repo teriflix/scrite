@@ -17,7 +17,7 @@ import QtQml
 import QtQuick
 import QtQml.StateMachine as QSM
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../dialogs"

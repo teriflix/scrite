@@ -13,24 +13,15 @@
 **
 ****************************************************************************/
 
-/**
-  Only difference between VclLabel and VclText is that, VclText does not specify default font.pointSize.
-
-  Use VclText {} in cases where you need to use font.pixelSize.
-
-  For everything else, use VclLabel {}
-  */
-
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 
-Text {
+ComboBox {
     id: root
 
-    color: Runtime.colors.primary.editor.text
+    font.pointSize: Runtime.idealFontMetrics.font.pointSize
 }

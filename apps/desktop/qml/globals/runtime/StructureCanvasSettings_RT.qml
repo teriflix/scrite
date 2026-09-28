@@ -16,7 +16,7 @@
 import QtCore
 import QtQuick
 
-import io.scrite.components
+import Scrite.App
 
 import "../"
 

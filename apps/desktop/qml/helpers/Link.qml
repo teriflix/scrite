@@ -17,12 +17,12 @@ import QtQml
 import QtQuick
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"
 
-VclLabel {
+SctLabel {
     id: root
 
     property alias containsMouse: _mouseArea.containsMouse

@@ -21,7 +21,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../helpers"
@@ -94,7 +94,7 @@ Item {
 
                             spacing: 8
 
-                            VclLabel {
+                            SctLabel {
                                 id: _noteHeading
 
                                 width: parent.width
@@ -108,7 +108,7 @@ Item {
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             }
 
-                            VclLabel {
+                            SctLabel {
                                 width: parent.width
                                 height: parent.height - _noteHeading.height - parent.spacing
 
@@ -191,7 +191,7 @@ Item {
         }
     }
 
-    VclScrollBar {
+    SctScrollBar {
         id: _scrollBar
 
         anchors.top: parent.top

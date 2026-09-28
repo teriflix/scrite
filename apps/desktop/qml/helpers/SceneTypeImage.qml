@@ -16,7 +16,7 @@
 import QtQuick
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 Image {
     id: root

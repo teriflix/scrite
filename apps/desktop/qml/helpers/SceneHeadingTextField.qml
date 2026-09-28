@@ -18,12 +18,12 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"
 
-VclTextField {
+SctTextField {
     id: root
 
     required property bool sceneOmitted
@@ -201,7 +201,7 @@ VclTextField {
         // focus, disabling the ActionHandler and graying out the item before it can be
         // clicked. Instead we manage enabled independently and call forceActiveFocus()
         // before triggering, so the ActionHandler is active when the action fires.
-        VclMenuItem {
+        SctMenuItem {
             focusPolicy: Qt.NoFocus
             text: "Transliterate to " + Runtime.language.active.name + "\t" + _transliterateActionHandler.action.shortcut
             enabled: !root.readOnly && root.selectedText !== "" && Runtime.language.activeCode === QtLocale.English &&

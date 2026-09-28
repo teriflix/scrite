@@ -20,7 +20,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../../../helpers"
 import "../../../globals"
@@ -63,7 +63,7 @@ AbstractScenePartEditor {
                 onClicked: _private.popupFormalTagsMenu()
             }
 
-            VclLabel {
+            SctLabel {
                 font: _tagsInput.label.font
                 text: "Formal Tags"
                 visible: _private.presentableGroupNames === ""

@@ -17,7 +17,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../helpers"
@@ -96,7 +96,7 @@ Item {
 
             spacing: 2
 
-            VclLabel {
+            SctLabel {
                 id: _titleText
 
                 Layout.alignment: Qt.AlignVCenter

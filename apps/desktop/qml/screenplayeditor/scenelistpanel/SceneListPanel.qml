@@ -21,7 +21,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../dialogs"
@@ -45,7 +45,7 @@ ListView {
     function updateCacheBuffer() { _private.updateCacheBuffer() }
     function extents(startIndex, endIndex) { return _private.extents(startIndex, endIndex) }
 
-    ScrollBar.vertical: VclScrollBar { flickable: root }
+    ScrollBar.vertical: SctScrollBar { flickable: root }
 
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 

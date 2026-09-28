@@ -21,7 +21,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../dialogs"
@@ -61,7 +61,7 @@ Item {
         id: _private
 
         readonly property Component emptyScreenplayContent: Item {
-            VclLabel {
+            SctLabel {
                 anchors.top: parent.top
                 anchors.topMargin: 50
                 anchors.horizontalCenter: parent.horizontalCenter

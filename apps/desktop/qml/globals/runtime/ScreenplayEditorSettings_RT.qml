@@ -15,7 +15,7 @@
 
 import QtCore
 
-import io.scrite.components
+import Scrite.App
 
 Settings {
     category: "Screenplay Editor"

@@ -21,7 +21,7 @@ import "../../controls"
 AbstractNotebookPage {
     id: root
 
-    VclLabel {
+    SctLabel {
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
 

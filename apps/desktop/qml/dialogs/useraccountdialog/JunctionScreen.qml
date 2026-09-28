@@ -17,7 +17,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../"
 import "../../globals"
@@ -50,13 +50,13 @@ Item {
 
             spacing: 20
 
-            VclLabel {
+            SctLabel {
                 Layout.fillWidth: true
 
                 text: _sendActivationCodeCall.busy ? "Requesting activation code ..." : "Click the button below to request activation code."
             }
 
-            VclButton {
+            SctButton {
                 visible: !_sendActivationCodeCall.hasError && !_sendActivationCodeCall.busy
 
                 text: "Request Activation Code"

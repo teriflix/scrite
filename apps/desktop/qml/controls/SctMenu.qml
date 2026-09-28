@@ -13,26 +13,38 @@
 **
 ****************************************************************************/
 
+import QtQml
 import QtQuick
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 
-RadioButton {
+Menu {
     id: root
+
+    property bool autoWidth: true
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-    contentItem: VclLabel {
-        leftPadding: root.indicator && !root.mirrored ? root.indicator.width + root.spacing : 0
-        rightPadding: root.indicator && root.mirrored ? root.indicator.width + root.spacing : 0
+    closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
 
-        text: root.text
-        font: root.font
-        wrapMode: Text.WordWrap
-        opacity: root.enabled ? 1 : 0.5
-        verticalAlignment: Text.AlignVCenter
+    onAboutToShow: Qt.callLater(determineWidth)
+
+    function determineWidth() {
+        if(autoWidth)
+            Runtime.execLater(root, Runtime.stdAnimationDuration/2, __determineWidth)
+    }
+
+    function __determineWidth() {
+        if(autoWidth) {
+            let maxWidth = 0
+            for(let i=0; i<count; i++) {
+                let menuItem = itemAt(i)
+                maxWidth = Math.max(menuItem.implicitWidth, maxWidth)
+            }
+            width = maxWidth + leftPadding + rightPadding
+        }
     }
 }

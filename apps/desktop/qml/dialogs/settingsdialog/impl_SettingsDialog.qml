@@ -19,13 +19,13 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../controls"
 import "../../helpers"
 
-VclDialog {
+SctDialog {
     id: root
 
     property string activeTab

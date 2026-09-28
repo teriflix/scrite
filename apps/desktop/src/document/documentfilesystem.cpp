@@ -660,6 +660,8 @@ bool DocumentFileSystem::unpack(QDataStream &ds)
         while (bytesRead < fileSize) {
             const int rawDataLen =
                     ds.readRawData(buffer, qMin(int(fileSize - bytesRead), bufferSize));
+            if (rawDataLen <= 0)
+                return false;
             file.write(buffer, rawDataLen);
             bytesRead += qint64(rawDataLen);
         }

@@ -20,7 +20,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 
 import "../globals"
@@ -100,6 +100,6 @@ Item {
         id: _private
 
         property Component dialogComponent: Qt.createComponent("./reportconfigurationdialog/impl_ReportConfigurationDialog.qml", Component.PreferSynchronous, root)
-        property VclDialog dialog
+        property SctDialog dialog
     }
 }

@@ -20,7 +20,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../../.."
 import "../../../../helpers"
@@ -130,7 +130,7 @@ Item {
         onCountChanged: Qt.callLater(_private.evalDualDialogueRects)
     }
 
-    VclText {
+    SctText {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right

@@ -21,7 +21,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 
 import "../globals"
@@ -29,7 +29,7 @@ import "../dialogs"
 import "../helpers"
 import "../controls"
 
-VclMenu {
+SctMenu {
     id: root
 
     property Item popupSource
@@ -46,7 +46,7 @@ VclMenu {
     Repeater {
         model: Runtime.characterReports.reports ? Runtime.characterReports.reports : 0
 
-        delegate: VclMenuItem {
+        delegate: SctMenuItem {
             required property int index
             required property var modelData
 
@@ -63,7 +63,7 @@ VclMenu {
 
     MenuSeparator { }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Character Notes"
         icon.source: Runtime.themedIcon("qrc:/icons/content/note.png")
 
@@ -74,7 +74,7 @@ VclMenu {
         }
     }
 
-    VclMenuItem {
+    SctMenuItem {
         text: "Rename/Merge Character"
         icon.source: Runtime.themedIcon("qrc:/icons/screenplay/character.png")
 

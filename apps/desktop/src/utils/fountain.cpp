@@ -1193,7 +1193,11 @@ void Fountain::Writer::writeLyrics(QTextStream &ts, const Element &element) cons
     // http://fountain.io/syntax/#lyrics
     // You create a Lyric by starting with a line with a tilde ~.
 
-    ts << "~" << this->emphasisedText(element) << newline;
+    const QStringList lines = this->emphasisedText(element).split(newline, Qt::SkipEmptyParts);
+    for (const QString &line : lines) {
+        ts << "~ " << line << newline;
+    }
+    ts << newline;
 }
 
 void Fountain::Writer::writePageBreak(QTextStream &ts, const Element &element) const
@@ -1230,7 +1234,11 @@ void Fountain::Writer::writeSynopsis(QTextStream &ts, const Element &element) co
     // Synopses are single lines prefixed by an equals sign =. They can be located anywhere within
     // the screenplay.
 
-    ts << "= " << this->emphasisedText(element) << newline;
+    const QStringList lines = this->emphasisedText(element).split(newline, Qt::SkipEmptyParts);
+    for (const QString &line : lines) {
+        ts << "= " << line << newline;
+    }
+    ts << newline;
 }
 
 QString Fountain::Writer::emphasisedText(const Element &element) const

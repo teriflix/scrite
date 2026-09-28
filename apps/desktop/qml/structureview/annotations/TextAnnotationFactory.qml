@@ -18,7 +18,7 @@ pragma Singleton
 import QtQml
 import QtQuick
 
-import io.scrite.components
+import Scrite.App
 
 
 import "../../globals"
@@ -46,7 +46,7 @@ QtObject {
     readonly property Component delegate: AbstractAnnotationDelegate {
         id: _d
 
-        VclLabel {
+        SctLabel {
             anchors.fill: parent
             anchors.margins: 8
 

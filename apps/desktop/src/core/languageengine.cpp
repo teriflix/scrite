@@ -3010,7 +3010,7 @@ void LanguageEngine::init(const char *uri, QQmlEngine *qmlEngine)
 
     const char *reason = "Instantiation from QML not allowed.";
 
-    // @uri io.scrite.components
+    // @uri Scrite.App
     // @reason Instantiation from QML not allowed.
     qmlRegisterSingletonInstance(uri, 1, 0, "LanguageEngine", LanguageEngine::instance());
     qmlRegisterUncreatableMetaObject(QtChar::staticMetaObject, uri, 1, 0, "QtChar", reason);

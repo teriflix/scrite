@@ -18,7 +18,7 @@ pragma Singleton
 import QtQml
 import QtQuick
 
-import io.scrite.components
+import Scrite.App
 
 
 import "../../globals"

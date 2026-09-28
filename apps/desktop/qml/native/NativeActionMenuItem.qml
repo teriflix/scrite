@@ -19,7 +19,7 @@ import QtQml
 import QtQuick.Controls
 import Qt.labs.platform as Native
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 

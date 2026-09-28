@@ -21,7 +21,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 
 import "../helpers"
@@ -37,7 +37,7 @@ DialogLauncher {
     name: "StructureStoryBeatsDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         id: _dialog
 
         title: "Customise Story Beats"

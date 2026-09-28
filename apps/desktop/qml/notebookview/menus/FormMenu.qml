@@ -19,12 +19,12 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../controls"
 
-VclMenu {
+SctMenu {
     id: root
 
     property Notes notes
@@ -41,7 +41,7 @@ VclMenu {
     Repeater {
         model: _model
 
-        delegate: VclMenuItem {
+        delegate: SctMenuItem {
             required property int index
             required property var objectItem
 

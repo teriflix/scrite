@@ -21,7 +21,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../helpers"
@@ -63,7 +63,7 @@ Item {
 
         spacing: 10
 
-        VclTextField {
+        SctTextField {
             id: _sceneHeadingField
 
             TabSequenceItem.manager: _sceneTabSequence
@@ -85,7 +85,7 @@ Item {
             onEditingComplete: root.scene.heading.parseFrom(text)
         }
 
-        VclTextField {
+        SctTextField {
             id: _sceneTitleField
 
             TabSequenceItem.manager: _sceneTabSequence
@@ -122,7 +122,7 @@ Item {
                 onClicked: _private.popupFormalTagsMenu()
             }
 
-            VclLabel {
+            SctLabel {
                 anchors.verticalCenter: parent.verticalCenter
 
                 font: _sceneTagsList.label.font

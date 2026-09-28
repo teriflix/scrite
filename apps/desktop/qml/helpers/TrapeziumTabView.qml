@@ -19,7 +19,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"
@@ -155,7 +155,7 @@ Item {
                              _rightPainterPath.createObject(_tabShapeItem) as PainterPath :
                              _topPainterPath.createObject(_tabShapeItem) as PainterPath
 
-            VclLabel {
+            SctLabel {
                 id: _tabText
 
                 anchors.centerIn: parent

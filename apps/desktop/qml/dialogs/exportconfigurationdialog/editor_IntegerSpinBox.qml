@@ -18,7 +18,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../controls"
@@ -33,7 +33,7 @@ ColumnLayout {
 
     spacing: 10
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         elide: Text.ElideRight
@@ -44,7 +44,7 @@ ColumnLayout {
         text: root.fieldInfo.label
     }
 
-    VclSpinBox {
+    SctSpinBox {
         TabSequenceItem.manager: root.tabSequence
 
         from: root.fieldInfo.min

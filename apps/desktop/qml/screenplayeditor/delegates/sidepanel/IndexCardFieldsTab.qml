@@ -18,7 +18,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../../../globals"
 import "../../../helpers"
@@ -44,7 +44,7 @@ AbstractScenePartEditor {
         contentHeight: _layout.height
         flickableDirection: Flickable.VerticalFlick
 
-        ScrollBar.vertical: VclScrollBar { }
+        ScrollBar.vertical: SctScrollBar { }
 
         ColumnLayout {
             id: _layout
@@ -68,7 +68,7 @@ AbstractScenePartEditor {
                 tabSequenceEnabled: true
             }
 
-            VclToolButton {
+            SctToolButton {
                 id: _icfEditButton
 
                 Layout.fillWidth: true

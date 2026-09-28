@@ -18,7 +18,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../helpers"
@@ -73,7 +73,7 @@ Rectangle {
         color: Runtime.colors.accent.c200.background
     }
 
-    VclLabel {
+    SctLabel {
         id: _episodeNameText
 
         anchors.top: parent.top

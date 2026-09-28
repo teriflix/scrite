@@ -175,15 +175,16 @@ void Scrite::launchLegacyUninstaller(const QString &path)
 
 bool Scrite::isLicenseAccepted()
 {
-    return Application::instance()->settings()
+    return Application::instance()
+            ->settings()
             ->value(QStringLiteral("LicenseAccepted/") + QStringLiteral(SCRITE_VERSION), false)
             .toBool();
 }
 
 void Scrite::acceptLicense()
 {
-    Application::instance()->settings()
-            ->setValue(QStringLiteral("LicenseAccepted/") + QStringLiteral(SCRITE_VERSION), true);
+    Application::instance()->settings()->setValue(
+            QStringLiteral("LicenseAccepted/") + QStringLiteral(SCRITE_VERSION), true);
 }
 
 QString Scrite::licenseText()
@@ -382,6 +383,8 @@ bool Scrite::doUnzip(const QFileInfo &zipFileInfo, const QTemporaryDir &dstDir)
         return false;
     }
 
+    const QDir destDirectory(dstDir.path());
+
     qzip.goToFirstFile();
 
     while (1) {
@@ -391,6 +394,18 @@ bool Scrite::doUnzip(const QFileInfo &zipFileInfo, const QTemporaryDir &dstDir)
 
         const QFileInfo dstFileInfo(dstDir.filePath(qfileInfo.name));
         const QString dstFileName = dstFileInfo.absoluteFilePath();
+        const QString cleanedPath = QDir::cleanPath(dstFileName);
+
+        const QString relPath = destDirectory.relativeFilePath(cleanedPath);
+        if (relPath.startsWith("..")) {
+            // Security: reject entries with path traversal sequences (e.g., "../../etc/passwd")
+            // that would escape the destination directory. relativeFilePath() returns ".."
+            // for files outside the destination, allowing us to detect and block such attempts.
+            qInfo("Attempted path traversal in ZIP file: %s", qPrintable(qfileInfo.name));
+            qzip.goToNextFile();
+            continue;
+        }
+
         QDir().mkpath(dstFileInfo.absolutePath());
 
         QuaZipFile srcFile(&qzip);

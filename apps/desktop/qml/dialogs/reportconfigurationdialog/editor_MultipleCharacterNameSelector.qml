@@ -20,7 +20,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../helpers"
@@ -45,7 +45,7 @@ ColumnLayout {
 
     spacing: 10
 
-    VclLabel {
+    SctLabel {
         Layout.fillWidth: true
 
         elide: Text.ElideRight
@@ -65,7 +65,7 @@ ColumnLayout {
             spacing: 5
             flow: Flow.LeftToRight
 
-            VclLabel {
+            SctLabel {
                 id: _charactersPrefix
                 text: root.characterNames.length === 0 ? "No Characters Selected" : "»"
                 topPadding: 0

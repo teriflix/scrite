@@ -17,7 +17,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../dialogs"
@@ -58,7 +58,7 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 1
 
-                ScrollBar.vertical: VclScrollBar { }
+                ScrollBar.vertical: SctScrollBar { }
 
                 clip: contentHeight > height
                 contentWidth: _welcomeText.width
@@ -94,7 +94,7 @@ Item {
             }
         }
 
-        VclButton {
+        SctButton {
             Layout.alignment: Qt.AlignRight
 
             text: "Next »"

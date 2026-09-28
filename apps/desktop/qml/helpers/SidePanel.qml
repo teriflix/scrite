@@ -16,7 +16,7 @@
 import QtQuick
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"
@@ -96,7 +96,7 @@ Item {
             opacity: _label.opacity
         }
 
-        VclText {
+        SctText {
             id: _label
 
             anchors.top: parent.top

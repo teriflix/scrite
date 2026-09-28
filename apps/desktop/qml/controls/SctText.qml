@@ -13,15 +13,24 @@
 **
 ****************************************************************************/
 
+/**
+  Only difference between SctLabel and SctText is that, SctText does not specify default font.pointSize.
+
+  Use SctText {} in cases where you need to use font.pixelSize.
+
+  For everything else, use SctLabel {}
+  */
+
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 
-ComboBox {
+Text {
     id: root
 
-    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+    color: Runtime.colors.primary.editor.text
 }

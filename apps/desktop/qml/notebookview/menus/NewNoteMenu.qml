@@ -17,13 +17,13 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../helpers"
 import "../../controls"
 
-VclMenu {
+SctMenu {
     id: root
 
     required property Notes notes

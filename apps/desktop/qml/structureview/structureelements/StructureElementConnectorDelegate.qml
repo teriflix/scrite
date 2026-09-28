@@ -18,7 +18,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../helpers"
@@ -58,7 +58,7 @@ StructureElementConnector {
         border.width: 1
         border.color: Runtime.colors.primary.borderColor
 
-        VclText {
+        SctText {
             id: _labelItem
 
             anchors.centerIn: parent

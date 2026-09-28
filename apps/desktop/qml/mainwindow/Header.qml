@@ -20,7 +20,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../helpers"
@@ -164,7 +164,7 @@ Rectangle {
                 visible: action.visible && LanguageEngine.handleLanguageSwitch
             }
 
-            VclLabel {
+            SctLabel {
                 Layout.preferredWidth: contentWidth + rightPadding
 
                 rightPadding: Runtime.minimumFontMetrics.averageCharacterWidth

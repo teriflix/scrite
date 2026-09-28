@@ -21,7 +21,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"
@@ -80,7 +80,7 @@ DialogLauncher {
             smooth: true; mipmap: true
             asynchronous: false
 
-            VclText {
+            SctText {
                 id: _versionText
 
                 anchors.top: parent.top

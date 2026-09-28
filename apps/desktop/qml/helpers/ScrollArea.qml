@@ -17,7 +17,7 @@ import QtQml
 import QtQuick
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"
@@ -158,8 +158,8 @@ Flickable {
 
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-    ScrollBar.horizontal: VclScrollBar { flickable: root }
-    ScrollBar.vertical: VclScrollBar { flickable: root }
+    ScrollBar.horizontal: SctScrollBar { flickable: root }
+    ScrollBar.vertical: SctScrollBar { flickable: root }
 
     EventFilter.active: zoomOnScroll
     EventFilter.events: [EventFilter.Wheel]

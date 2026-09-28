@@ -18,7 +18,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"
@@ -62,7 +62,7 @@ Item {
 
         spacing: 16
 
-        VclLabel {
+        SctLabel {
             id: _nameText
 
             rightPadding: 10
@@ -80,7 +80,7 @@ Item {
 
             model: root.tabs
 
-            delegate: VclLabel {
+            delegate: SctLabel {
                 id: _tabDelegate
 
                 required property int index

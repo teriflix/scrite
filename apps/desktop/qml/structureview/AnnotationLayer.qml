@@ -21,7 +21,7 @@ import QtQuick.Window
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"
@@ -33,7 +33,7 @@ import "./annotations"
 Item {
     id: root
 
-    required property VclMenu canvasContextMenu
+    required property SctMenu canvasContextMenu
 
     readonly property var availableAnnotationKeys: AnnotationFactory.keys
 

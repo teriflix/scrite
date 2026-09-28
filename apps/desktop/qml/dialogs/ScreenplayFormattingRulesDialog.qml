@@ -21,7 +21,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../helpers"
@@ -38,7 +38,7 @@ DialogLauncher {
     name: "ScreenplayFormattingRulesDialog"
     singleInstanceOnly: true
 
-    dialogComponent: VclDialog {
+    dialogComponent: SctDialog {
         width: Math.min(Scrite.window.width-80, 850)
         height: Math.min(Scrite.window.height-80, 750)
 

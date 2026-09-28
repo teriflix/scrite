@@ -13,38 +13,23 @@
 **
 ****************************************************************************/
 
-import QtQml
+/**
+  Only difference between SctLabel and SctText is that, SctText does not specify default font.pointSize.
+
+  Use SctText {} in cases where you need to use font.pixelSize.
+
+  For everything else, use SctLabel {}
+  */
+
 import QtQuick
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 
-Menu {
+Label {
     id: root
 
-    property bool autoWidth: true
-
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
-
-    closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
-
-    onAboutToShow: Qt.callLater(determineWidth)
-
-    function determineWidth() {
-        if(autoWidth)
-            Runtime.execLater(root, Runtime.stdAnimationDuration/2, __determineWidth)
-    }
-
-    function __determineWidth() {
-        if(autoWidth) {
-            let maxWidth = 0
-            for(let i=0; i<count; i++) {
-                let menuItem = itemAt(i)
-                maxWidth = Math.max(menuItem.implicitWidth, maxWidth)
-            }
-            width = maxWidth + leftPadding + rightPadding
-        }
-    }
 }

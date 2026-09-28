@@ -21,7 +21,7 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../helpers"
@@ -117,7 +117,7 @@ QtObject {
             onStatusChanged: _d.BoundingBoxItem.livePreview = false
         }
 
-        VclLabel {
+        SctLabel {
             anchors.top: _image.bottom
             anchors.horizontalCenter: _d.horizontalCenter
             anchors.topMargin: 5

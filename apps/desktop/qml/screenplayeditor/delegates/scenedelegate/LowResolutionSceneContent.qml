@@ -21,7 +21,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../../../globals"
 import "../../../dialogs"
@@ -64,7 +64,7 @@ Rectangle {
 
             width: parent.width
 
-            VclLabel {
+            SctLabel {
                 width: root.sceneDelegate.pageLeftMargin
 
                 text: root.sceneDelegate.screenplayElement.resolvedSceneNumber
@@ -76,7 +76,7 @@ Rectangle {
                 horizontalAlignment: Text.AlignRight
             }
 
-            VclLabel {
+            SctLabel {
                 width: parent.width - root.sceneDelegate.pageLeftMargin - root.sceneDelegate.pageRightMargin
 
                 font: root.sceneDelegate.font

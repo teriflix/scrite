@@ -16,7 +16,7 @@
 import QtQuick
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"
@@ -43,7 +43,7 @@ BasicAttachmentsDropArea {
             radius: 4
         }
 
-        VclLabel {
+        SctLabel {
             id: _notice
 
             anchors.centerIn: parent

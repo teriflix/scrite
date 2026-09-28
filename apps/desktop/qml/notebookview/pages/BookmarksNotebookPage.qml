@@ -21,7 +21,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../helpers"
@@ -128,7 +128,7 @@ AbstractNotebookPage {
                             }
                         }
 
-                        VclLabel {
+                        SctLabel {
                             id: _headingText
 
                             anchors.verticalCenter: parent.verticalCenter
@@ -143,7 +143,7 @@ AbstractNotebookPage {
                         }
                     }
 
-                    VclLabel {
+                    SctLabel {
                         width: parent.width
                         height: parent.height - _headingText.height - parent.spacing
 
@@ -173,7 +173,7 @@ AbstractNotebookPage {
         }
     }
 
-    VclScrollBar {
+    SctScrollBar {
         id: _scrollBar
 
         anchors.top: parent.top

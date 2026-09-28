@@ -18,7 +18,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../../../../globals"
 import "../../../../controls"
@@ -69,7 +69,7 @@ Loader {
                     anchors.rightMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
 
-                    VclLabel {
+                    SctLabel {
                         id: _sceneNumberText
 
                         anchors.centerIn: parent

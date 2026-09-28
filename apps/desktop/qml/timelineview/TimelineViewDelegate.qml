@@ -20,7 +20,7 @@ import QtQuick
 import QtQuick.Shapes
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
 import "../controls"
@@ -123,7 +123,7 @@ Item {
                 visible: active
 
                 sourceComponent: Item {
-                    VclLabel {
+                    SctLabel {
                         anchors.centerIn: parent
 
                         width: parent.width

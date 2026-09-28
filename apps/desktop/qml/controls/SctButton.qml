@@ -13,23 +13,35 @@
 **
 ****************************************************************************/
 
-/**
-  Only difference between VclLabel and VclText is that, VclText does not specify default font.pointSize.
-
-  Use VclText {} in cases where you need to use font.pixelSize.
-
-  For everything else, use VclLabel {}
-  */
+pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../globals"
+import "../helpers"
 
-Label {
+Button {
     id: root
 
+    property bool toolTipVisible: hovered
+    property string toolTipText
+
+    Layout.minimumWidth: implicitWidth
+
+    Material.roundedScale: Material.NotRounded
+
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+    implicitWidth: Math.max(GMath.horizontalAdvance(text, font) + leftPadding + rightPadding + 20, 120)
+
+    ToolTipPopup {
+        container: root
+        text: root.toolTipText
+        visible: text !== "" && root.toolTipVisible
+    }
 }

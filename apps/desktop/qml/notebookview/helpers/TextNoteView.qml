@@ -20,7 +20,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../controls"
@@ -55,7 +55,7 @@ Item {
 
         spacing: 10
 
-        VclTextField {
+        SctTextField {
             id: _title
 
             TabSequenceItem.manager: _tabManager

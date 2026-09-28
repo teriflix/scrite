@@ -21,7 +21,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 
-import io.scrite.components
+import Scrite.App
 
 import "../../globals"
 import "../../dialogs"
@@ -81,7 +81,7 @@ AbstractScreenplayElementDelegate {
                 background: Item { }
             }
 
-            VclTextField {
+            SctTextField {
                 id: _titleField
 
                 Layout.fillWidth: true

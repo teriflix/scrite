@@ -18,7 +18,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import io.scrite.components
+import Scrite.App
 
 import "../"
 import "../../globals"
@@ -144,7 +144,7 @@ Rectangle {
         }
     }
 
-    VclLabel {
+    SctLabel {
         id: _beatLabel
 
         anchors.left: parent.left
