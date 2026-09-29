@@ -31,7 +31,7 @@ class PdfExporter : public AbstractTextDocumentExporter
 
 public:
     Q_INVOKABLE explicit PdfExporter(QObject *parent = nullptr);
-    ~PdfExporter();
+    ~PdfExporter() override;
 
     // clang-format off
     Q_CLASSINFO("generateTitlePage_FieldLabel", "Generate title page.")
@@ -54,7 +54,7 @@ public:
                NOTIFY includeLoglineChanged)
     // clang-format on
     void setIncludeLogline(bool val);
-    bool isIncludeLogline() const { return m_includeLogline; }
+    bool isIncludeLogline() const override { return m_includeLogline; }
     Q_SIGNAL void includeLoglineChanged();
 
     // clang-format off
@@ -66,7 +66,7 @@ public:
                NOTIFY usePageBreaksChanged)
     // clang-format on
     void setUsePageBreaks(bool val);
-    bool usePageBreaks() const { return m_usePageBreaks; }
+    bool usePageBreaks() const override { return m_usePageBreaks; }
     Q_SIGNAL void usePageBreaksChanged();
 
     // clang-format off
@@ -78,7 +78,7 @@ public:
                NOTIFY includeSceneNumbersChanged)
     // clang-format on
     void setIncludeSceneNumbers(bool val);
-    bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
+    bool isIncludeSceneNumbers() const override { return m_includeSceneNumbers; }
     Q_SIGNAL void includeSceneNumbersChanged();
 
     // clang-format off
@@ -90,7 +90,7 @@ public:
                NOTIFY includeSceneIconsChanged)
     // clang-format on
     void setIncludeSceneIcons(bool val);
-    bool isIncludeSceneIcons() const { return m_includeSceneIcons; }
+    bool isIncludeSceneIcons() const override { return m_includeSceneIcons; }
     Q_SIGNAL void includeSceneIconsChanged();
 
     // clang-format off
@@ -103,7 +103,7 @@ public:
                NOTIFY printEachSceneOnANewPageChanged)
     // clang-format on
     void setPrintEachSceneOnANewPage(bool val);
-    bool isPrintEachSceneOnANewPage() const { return m_printEachSceneOnANewPage; }
+    bool isPrintEachSceneOnANewPage() const override { return m_printEachSceneOnANewPage; }
     Q_SIGNAL void printEachSceneOnANewPageChanged();
 
     // clang-format off
@@ -116,7 +116,7 @@ public:
                NOTIFY printEachActOnANewPageChanged)
     // clang-format on
     void setPrintEachActOnANewPage(bool val);
-    bool isPrintEachActOnANewPage() const { return m_printEachActOnANewPage; }
+    bool isPrintEachActOnANewPage() const override { return m_printEachActOnANewPage; }
     Q_SIGNAL void printEachActOnANewPageChanged();
 
     // clang-format off
@@ -128,7 +128,7 @@ public:
                NOTIFY includeActBreaksChanged)
     // clang-format on
     void setIncludeActBreaks(bool val);
-    bool isIncludeActBreaks() const { return m_includeActBreaks; }
+    bool isIncludeActBreaks() const override { return m_includeActBreaks; }
     Q_SIGNAL void includeActBreaksChanged();
 
     // clang-format off
@@ -158,13 +158,13 @@ public:
     QString comment() const { return m_comment; }
     Q_SIGNAL void commentChanged();
 
-    bool generateTitlePage() const { return m_generateTitlePage; }
+    bool generateTitlePage() const override { return m_generateTitlePage; }
     bool canBundleFonts() const { return false; }
-    bool isExportForPrintingPurpose() const { return true; }
+    bool isExportForPrintingPurpose() const override { return true; }
 
 protected:
-    bool doExport(QIODevice *device); // AbstractExporter interface
-    QString fileNameExtension() const { return QStringLiteral("pdf"); }
+    bool doExport(QIODevice *device) override; // AbstractExporter interface
+    QString fileNameExtension() const override { return QStringLiteral("pdf"); }
 
 private:
     QString m_comment;

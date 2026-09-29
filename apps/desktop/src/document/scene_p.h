@@ -30,7 +30,7 @@
 class AbstractSceneUndoCommand : public QUndoCommand
 {
 public:
-    virtual ~AbstractSceneUndoCommand() { }
+    ~AbstractSceneUndoCommand() override { }
 
     static bool hasCurrent() { return current != nullptr; }
 
@@ -88,13 +88,13 @@ class SceneUndoCommand : public AbstractSceneUndoCommand
 public:
     explicit SceneUndoCommand(Scene *scene, bool allowMerging = true,
                               const QString &text = QStringLiteral("Scene Capture"));
-    ~SceneUndoCommand();
+    ~SceneUndoCommand() override;
 
     enum { ID = UndoStack::SceneCommandID };
-    int id() const { return ID; }
-    void undo();
-    void redo();
-    bool mergeWith(const QUndoCommand *other);
+    int id() const override { return ID; }
+    void undo() override;
+    void redo() override;
+    bool mergeWith(const QUndoCommand *other) override;
 
 private:
     QByteArray toByteArray(Scene *scene) const;
@@ -116,12 +116,12 @@ class SceneHeadingUndoCommand : public AbstractSceneUndoCommand
 {
 public:
     explicit SceneHeadingUndoCommand(SceneHeading *sceneHeading);
-    ~SceneHeadingUndoCommand() { }
+    ~SceneHeadingUndoCommand() override { }
 
-    int id() const { return UndoStack::SceneHeadingCommandID; }
-    void undo();
-    void redo();
-    bool mergeWith(const QUndoCommand *other);
+    int id() const override { return UndoStack::SceneHeadingCommandID; }
+    void undo() override;
+    void redo() override;
+    bool mergeWith(const QUndoCommand *other) override;
 
 private:
     struct
@@ -208,12 +208,12 @@ class SceneElementTypeUndoCommand : public AbstractSceneElementUndoCommand
 {
 public:
     explicit SceneElementTypeUndoCommand(SceneElement *sceneElement);
-    ~SceneElementTypeUndoCommand() { }
+    ~SceneElementTypeUndoCommand() override { }
 
-    int id() const { return UndoStack::SceneElementTypeCommandID; }
-    void undo();
-    void redo();
-    bool mergeWith(const QUndoCommand *other);
+    int id() const override { return UndoStack::SceneElementTypeCommandID; }
+    void undo() override;
+    void redo() override;
+    bool mergeWith(const QUndoCommand *other) override;
 
 private:
     SceneElement::Type m_before = SceneElement::Action;
@@ -228,12 +228,12 @@ class SceneElementAlignmentUndoCommand : public AbstractSceneElementUndoCommand
 {
 public:
     explicit SceneElementAlignmentUndoCommand(SceneElement *sceneElement);
-    ~SceneElementAlignmentUndoCommand() { }
+    ~SceneElementAlignmentUndoCommand() override { }
 
-    int id() const { return UndoStack::SceneElementAlignmentCommandID; }
-    void undo();
-    void redo();
-    bool mergeWith(const QUndoCommand *other);
+    int id() const override { return UndoStack::SceneElementAlignmentCommandID; }
+    void undo() override;
+    void redo() override;
+    bool mergeWith(const QUndoCommand *other) override;
 
 private:
     Qt::Alignment m_before = Qt::Alignment(0);
@@ -248,12 +248,12 @@ class SceneElementTextFormatsUndoCommand : public AbstractSceneElementUndoComman
 {
 public:
     explicit SceneElementTextFormatsUndoCommand(SceneElement *sceneElement);
-    ~SceneElementTextFormatsUndoCommand() { }
+    ~SceneElementTextFormatsUndoCommand() override { }
 
-    int id() const { return UndoStack::SceneElementTextFormatsCommandID; }
-    void undo();
-    void redo();
-    bool mergeWith(const QUndoCommand *other);
+    int id() const override { return UndoStack::SceneElementTextFormatsCommandID; }
+    void undo() override;
+    void redo() override;
+    bool mergeWith(const QUndoCommand *other) override;
 
 private:
     QVector<QTextLayout::FormatRange> m_before;
@@ -268,12 +268,12 @@ class SceneInsertElementUndoCommand : public AbstractSceneElementLifetimeUndoCom
 {
 public:
     explicit SceneInsertElementUndoCommand(Scene *scene, SceneElement *element, int index);
-    ~SceneInsertElementUndoCommand() { }
+    ~SceneInsertElementUndoCommand() override { }
 
-    int id() const { return UndoStack::SceneInsertElementCommandID; }
-    void undo();
-    void redo();
-    bool mergeWith(const QUndoCommand *) { return false; }
+    int id() const override { return UndoStack::SceneInsertElementCommandID; }
+    void undo() override;
+    void redo() override;
+    bool mergeWith(const QUndoCommand *) override { return false; }
 
 private:
     int m_index = -1;
@@ -288,12 +288,12 @@ class SceneRemoveElementUndoCommand : public AbstractSceneElementLifetimeUndoCom
 {
 public:
     explicit SceneRemoveElementUndoCommand(Scene *scene, SceneElement *element, int index);
-    ~SceneRemoveElementUndoCommand() { }
+    ~SceneRemoveElementUndoCommand() override { }
 
-    int id() const { return UndoStack::SceneRemoveElementCommandID; }
-    void undo();
-    void redo();
-    bool mergeWith(const QUndoCommand *) { return false; }
+    int id() const override { return UndoStack::SceneRemoveElementCommandID; }
+    void undo() override;
+    void redo() override;
+    bool mergeWith(const QUndoCommand *) override { return false; }
 
 private:
     int m_index = -1;
@@ -311,13 +311,13 @@ class SceneElementTextUndoCommand : public AbstractSceneElementUndoCommand
 
 public:
     SceneElementTextUndoCommand(SceneElement *sceneElement);
-    ~SceneElementTextUndoCommand();
+    ~SceneElementTextUndoCommand() override;
 
     enum { ID = UndoStack::SceneElementTextCommandID };
-    int id() const { return ID; }
-    void undo();
-    void redo();
-    bool mergeWith(const QUndoCommand *other);
+    int id() const override { return ID; }
+    void undo() override;
+    void redo() override;
+    bool mergeWith(const QUndoCommand *other) override;
 
 private:
     int m_oldCursorPosition = -1, m_newCursorPosition = -1;
@@ -333,13 +333,13 @@ class CreateDualDialogueCommand : public AbstractSceneElementUndoCommand
 {
 public:
     explicit CreateDualDialogueCommand(SceneElement *sceneElement);
-    ~CreateDualDialogueCommand();
+    ~CreateDualDialogueCommand() override;
 
     enum { ID = UndoStack::CreateDualDialogueCommandID };
-    int id() const { return ID; }
-    void undo();
-    void redo();
-    bool mergeWith(const QUndoCommand *other) { return false; }
+    int id() const override { return ID; }
+    void undo() override;
+    void redo() override;
+    bool mergeWith(const QUndoCommand *other) override { return false; }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -350,13 +350,13 @@ class DissolveDualDialogueCommand : public AbstractSceneElementUndoCommand
 {
 public:
     explicit DissolveDualDialogueCommand(SceneElement *sceneElement);
-    ~DissolveDualDialogueCommand();
+    ~DissolveDualDialogueCommand() override;
 
     enum { ID = UndoStack::DissolveDualDialogueCommandID };
-    int id() const { return ID; }
-    void undo();
-    void redo();
-    bool mergeWith(const QUndoCommand *other) { return false; }
+    int id() const override { return ID; }
+    void undo() override;
+    void redo() override;
+    bool mergeWith(const QUndoCommand *other) override { return false; }
 };
 
 #endif // SCENE_P_H

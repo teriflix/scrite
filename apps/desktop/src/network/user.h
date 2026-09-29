@@ -785,7 +785,7 @@ class User : public QObject
 
 public:
     static User *instance();
-    ~User();
+    ~User() override;
 
     // clang-format off
     Q_PROPERTY(bool loggedIn
@@ -908,7 +908,7 @@ public: // Don't use these methods
     void loadInfoUsingRestApiCall();
 
 protected:
-    void childEvent(QChildEvent *e);
+    void childEvent(QChildEvent *e) override;
 
 private:
     friend class UserMeRestApiCall;
@@ -926,7 +926,7 @@ class AppFeature : public QObject
 
 public:
     explicit AppFeature(QObject *parent = nullptr);
-    ~AppFeature();
+    ~AppFeature() override;
 
     static bool isEnabled(int feature);
     static bool isEnabled(const QString &featureName);

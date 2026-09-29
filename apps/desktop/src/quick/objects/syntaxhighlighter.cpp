@@ -170,7 +170,7 @@ class SyntaxHighlighterUserData : public QTextBlockUserData
 {
 public:
     explicit SyntaxHighlighterUserData() { }
-    ~SyntaxHighlighterUserData() { }
+    ~SyntaxHighlighterUserData() override { }
 
     void setDelegateUserData(AbstractSyntaxHighlighterDelegate *delegate, QTextBlockUserData *data)
     {
@@ -642,7 +642,7 @@ public:
                                  emit m_delegate->spellingMistakesDetected();
                          });
     }
-    ~SpellCheckSyntaxHighlighterUserData() { }
+    ~SpellCheckSyntaxHighlighterUserData() override { }
 
     void checkSpellings(const QString &text)
     {

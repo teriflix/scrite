@@ -32,12 +32,12 @@ class AbstractQObjectListModel : public QAbstractListModel
 
 public:
     explicit AbstractQObjectListModel(QObject *parent = nullptr);
-    ~AbstractQObjectListModel() { }
+    ~AbstractQObjectListModel() override { }
 
     // clang-format off
     Q_PROPERTY(int objectCount
-                       READ objectCount
-                               NOTIFY objectCountChanged)
+               READ objectCount
+               NOTIFY objectCountChanged)
     // clang-format on
     virtual int objectCount() const = 0;
     Q_SIGNAL void objectCountChanged();
@@ -73,9 +73,9 @@ public:
         ObjectTypeHierarchyRole,
         ObjectKindRole
     };
-    QHash<int, QByteArray> roleNames() const;
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
+    QHash<int, QByteArray> roleNames() const override;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
 
 private:
     QStringList m_objectKinds;
@@ -88,7 +88,7 @@ class QObjectListModel : public AbstractQObjectListModel
 
 public:
     explicit QObjectListModel(QObject *parent = nullptr) : AbstractQObjectListModel(parent) { }
-    ~QObjectListModel() { }
+    ~QObjectListModel() override { }
 
     operator QList<T>() { return m_list; }
     QList<T> &list() { return m_list; }
@@ -257,8 +257,8 @@ public:
     }
 
     // ObjectListPropertyModelBase interface
-    int objectCount() const { return m_list.size(); }
-    QObject *objectAt(int row) const { return this->at(row); }
+    int objectCount() const override { return m_list.size(); }
+    QObject *objectAt(int row) const override { return this->at(row); }
 
 public:
     void objectChanged()
@@ -303,7 +303,7 @@ public:
     static ObjectListModelAttached *qmlAttachedProperties(QObject *object);
 
     ObjectListModel(QObject *parent = nullptr);
-    ~ObjectListModel() { }
+    ~ObjectListModel() override { }
 
     Q_INVOKABLE void include(QObject *ptr) { this->append(ptr); }
     Q_INVOKABLE void exclude(QObject *ptr) { this->remove(ptr); }
@@ -318,11 +318,11 @@ public:
     Q_SIGNAL void objectsChanged();
 
 protected:
-    void itemInsertEvent(QObject *ptr)
+    void itemInsertEvent(QObject *ptr) override
     {
         connect(ptr, &QObject::destroyed, this, &ObjectListModel::objectDestroyed);
     }
-    void itemRemoveEvent(QObject *ptr)
+    void itemRemoveEvent(QObject *ptr) override
     {
         disconnect(ptr, &QObject::destroyed, this, &ObjectListModel::objectDestroyed);
     }
@@ -335,7 +335,7 @@ class ObjectListModelAttached : public QObject
 
 public:
     explicit ObjectListModelAttached(QObject *parent = nullptr);
-    ~ObjectListModelAttached();
+    ~ObjectListModelAttached() override;
 
     // clang-format off
     Q_PROPERTY(ObjectListModel* target
@@ -369,7 +369,7 @@ class SortFilterObjectListModel : public QSortFilterProxyModel
 
 public:
     explicit SortFilterObjectListModel(QObject *parent = nullptr);
-    ~SortFilterObjectListModel() { }
+    ~SortFilterObjectListModel() override { }
 
     // clang-format off
     Q_PROPERTY(int objectCount
@@ -451,12 +451,12 @@ public:
     QJSEngine *jsEngine() const { return m_jsEngine; }
     Q_SIGNAL void jsEngineChanged();
 
-    QHash<int, QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const override;
 
 protected:
     // QSortFilterProxyModel interface
-    bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;
-    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+    bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const override;
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 
 private:
     mutable QJSValue m_sortFunction;

@@ -36,7 +36,7 @@ class AbstractReportGenerator : public AbstractDeviceIO
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~AbstractReportGenerator();
+    ~AbstractReportGenerator() override;
     Q_SIGNAL void aboutToDelete(AbstractReportGenerator *gen);
 
     enum Format { PdfFormat, OpenDocumentFormat };
@@ -146,7 +146,7 @@ public:
 
 protected:
     // AbstractDeviceIO interface
-    QString fileNameExtension() const;
+    QString fileNameExtension() const override;
 
 protected:
     AbstractReportGenerator(QObject *parent = nullptr);

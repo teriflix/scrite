@@ -28,7 +28,7 @@ class Announcement : public QObject
 
 public:
     explicit Announcement(QObject *parent = nullptr);
-    ~Announcement();
+    ~Announcement() override;
 
     static Announcement *qmlAttachedProperties(QObject *object);
 
@@ -45,7 +45,7 @@ class AnnouncementBroadcast : public QObject
 
 public:
     static AnnouncementBroadcast *instance();
-    ~AnnouncementBroadcast();
+    ~AnnouncementBroadcast() override;
 
     void doShout(Announcement *from, const QString &type, const QJSValue &data);
     Q_SIGNAL void shout(Announcement *from, const QString &type, const QJSValue &data);

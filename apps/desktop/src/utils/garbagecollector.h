@@ -32,7 +32,7 @@ class GarbageCollector : public QObject
 
 public:
     static GarbageCollector *instance();
-    ~GarbageCollector();
+    ~GarbageCollector() override;
 
     void avoidChildrenOf(QObject *parent);
     void add(QObject *ptr);

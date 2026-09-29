@@ -39,7 +39,7 @@ class NotebookModel : public QStandardItemModel
 
 public:
     explicit NotebookModel(QObject *parent = nullptr);
-    ~NotebookModel();
+    ~NotebookModel() override;
 
     // clang-format off
     Q_MOC_INCLUDE("scritedocument.h")
@@ -98,8 +98,8 @@ public:
     Q_SIGNAL void bookmarkedNotesChanged();
 
     // QAbstractItemModel interface
-    QHash<int, QByteArray> roleNames() const;
-    QVariant data(const QModelIndex &index, int role) const;
+    QHash<int, QByteArray> roleNames() const override;
+    QVariant data(const QModelIndex &index, int role) const override;
     static QHash<int, QByteArray> staticRoleNames();
 
 signals:
@@ -142,7 +142,7 @@ class BookmarkedNotes : public QObjectListModel<QObject *>
 
 public:
     explicit BookmarkedNotes(QObject *parent = nullptr);
-    ~BookmarkedNotes();
+    ~BookmarkedNotes() override;
 
     Q_INVOKABLE bool toggleBookmark(QObject *object);
     Q_INVOKABLE bool addToBookmark(QObject *object);
@@ -150,8 +150,8 @@ public:
     Q_INVOKABLE bool isBookmarked(QObject *object) const;
 
     enum Roles { TitleRole, SummaryRole, ObjectRole };
-    QHash<int, QByteArray> roleNames() const;
-    QVariant data(const QModelIndex &index, int role) const;
+    QHash<int, QByteArray> roleNames() const override;
+    QVariant data(const QModelIndex &index, int role) const override;
 
 private:
     QVariant data(QObject *ptr, int role) const;

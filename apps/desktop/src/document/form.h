@@ -34,7 +34,7 @@ class FormQuestion : public QObject
 
 public:
     explicit FormQuestion(QObject *parent = nullptr);
-    ~FormQuestion();
+    ~FormQuestion() override;
     Q_SIGNAL void aboutToDelete(FormQuestion *ptr);
 
     // clang-format off
@@ -133,7 +133,7 @@ class Form : public QObject, public QObjectSerializer::Interface
 
 public:
     explicit Form(QObject *parent = nullptr);
-    ~Form();
+    ~Form() override;
     Q_SIGNAL void aboutToDelete(Form *ptr);
 
     enum Type {
@@ -227,8 +227,8 @@ public:
     int deref() { return --m_refCount; }
 
     // QObjectSerializer::Interface interface
-    void serializeToJson(QJsonObject &) const;
-    void deserializeFromJson(const QJsonObject &);
+    void serializeToJson(QJsonObject &) const override;
+    void deserializeFromJson(const QJsonObject &) override;
 
 private:
     void setType(Type val);
@@ -267,7 +267,7 @@ public:
     static Forms *global();
 
     explicit Forms(QObject *parent = nullptr);
-    ~Forms();
+    ~Forms() override;
 
     // clang-format off
     Q_PROPERTY(int formCount
@@ -287,12 +287,12 @@ public:
     Q_INVOKABLE QList<Form *> addFormsInFolder(const QString &dirPath);
 
     // QObjectSerializer::Interface interface
-    void serializeToJson(QJsonObject &) const;
-    void deserializeFromJson(const QJsonObject &);
+    void serializeToJson(QJsonObject &) const override;
+    void deserializeFromJson(const QJsonObject &) override;
 
 protected:
-    void itemInsertEvent(Form *ptr);
-    void itemRemoveEvent(Form *ptr);
+    void itemInsertEvent(Form *ptr) override;
+    void itemRemoveEvent(Form *ptr) override;
 
 private:
     Forms(bool fetchGlobal, QObject *parent = nullptr);

@@ -25,7 +25,7 @@ class FileManager : public QObject
 
 public:
     explicit FileManager(QObject *parent = nullptr);
-    ~FileManager();
+    ~FileManager() override;
 
     Q_INVOKABLE static QString generateUniqueTemporaryFileName(const QString &ext);
 

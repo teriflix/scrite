@@ -40,10 +40,10 @@ public:
     static QString name();
 
     explicit BasicFileIconProvider();
-    ~BasicFileIconProvider();
+    ~BasicFileIconProvider() override;
 
     // QQuickImageProvider interface
-    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
+    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize) override;
 
     static QImage requestImage(const QFileInfo &fi);
 };

@@ -30,7 +30,7 @@ class OdtExporter : public AbstractTextDocumentExporter
 
 public:
     Q_INVOKABLE explicit OdtExporter(QObject *parent = nullptr);
-    ~OdtExporter();
+    ~OdtExporter() override;
 
     // clang-format off
     Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated document.")
@@ -41,16 +41,16 @@ public:
                NOTIFY includeSceneNumbersChanged)
     // clang-format on
     void setIncludeSceneNumbers(bool val);
-    bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
+    bool isIncludeSceneNumbers() const override { return m_includeSceneNumbers; }
     Q_SIGNAL void includeSceneNumbersChanged();
 
-    bool generateTitlePage() const { return false; }
+    bool generateTitlePage() const override { return false; }
 
-    bool isExportForPrintingPurpose() const { return false; }
+    bool isExportForPrintingPurpose() const override { return false; }
 
 protected:
-    bool doExport(QIODevice *device); // AbstractExporter interface
-    QString fileNameExtension() const { return QStringLiteral("odt"); }
+    bool doExport(QIODevice *device) override; // AbstractExporter interface
+    QString fileNameExtension() const override { return QStringLiteral("odt"); }
 
 private:
     bool m_includeSceneNumbers = false;

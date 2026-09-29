@@ -31,7 +31,7 @@ class TabSequenceManager : public QObject
 
 public:
     explicit TabSequenceManager(QObject *parent = nullptr);
-    ~TabSequenceManager();
+    ~TabSequenceManager() override;
 
     // clang-format off
     Q_PROPERTY(bool enabled
@@ -147,8 +147,8 @@ private:
     void setCurrentItem(TabSequenceItem *val);
 
 protected:
-    void timerEvent(QTimerEvent *te);
-    bool eventFilter(QObject *watched, QEvent *event);
+    void timerEvent(QTimerEvent *te) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     int indexOf(TabSequenceItem *ptr) const { return m_tabSequenceItems.indexOf(ptr); }
@@ -183,7 +183,7 @@ class TabSequenceItem : public QObject
     QML_ATTACHED(TabSequenceItem)
 
 public:
-    ~TabSequenceItem();
+    ~TabSequenceItem() override;
 
     static TabSequenceItem *qmlAttachedProperties(QObject *object);
 

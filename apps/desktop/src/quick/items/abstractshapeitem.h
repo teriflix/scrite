@@ -27,7 +27,7 @@ class AbstractShapeItem : public QQuickPaintedItem
 
 public:
     explicit AbstractShapeItem(QQuickItem *parent = nullptr);
-    ~AbstractShapeItem();
+    ~AbstractShapeItem() override;
 
     enum RenderType {
         OutlineOnly = 1,
@@ -122,11 +122,11 @@ public:
 protected:
     bool updateShape();
 
-    QSGNode *updatePaintNode(QSGNode *, UpdatePaintNodeData *);
+    QSGNode *updatePaintNode(QSGNode *, UpdatePaintNodeData *) override;
     QSGNode *constructSceneGraph() const;
     QSGNode *polishSceneGraph(QSGNode *rootNode) const;
 
-    void paint(QPainter *paint);
+    void paint(QPainter *paint) override;
 
 private:
     QPainterPath m_path;

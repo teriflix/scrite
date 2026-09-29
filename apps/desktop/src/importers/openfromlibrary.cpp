@@ -81,7 +81,7 @@ public:
     {
         QTimer::singleShot(0, this, &LibraryServiceOpenRecordTask::start);
     }
-    ~LibraryServiceOpenRecordTask() { }
+    ~LibraryServiceOpenRecordTask() override { }
 
 private:
     void start();

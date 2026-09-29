@@ -30,7 +30,7 @@ class ContextMenuEvent : public QObject
 
 public:
     ContextMenuEvent(QObject *parent = nullptr);
-    ~ContextMenuEvent();
+    ~ContextMenuEvent() override;
 
     static ContextMenuEvent *qmlAttachedProperties(QObject *object);
 
@@ -61,7 +61,7 @@ signals:
     void popup(const QPointF &mouse);
 
 protected:
-    bool eventFilter(QObject *watched, QEvent *event);
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     void setupEventFilter();

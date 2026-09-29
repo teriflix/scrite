@@ -32,14 +32,14 @@ class FountainImporter : public AbstractImporter
 
 public:
     Q_INVOKABLE explicit FountainImporter(QObject *parent = nullptr);
-    ~FountainImporter();
+    ~FountainImporter() override;
 
-    bool canImport(const QString &fileName) const;
+    bool canImport(const QString &fileName) const override;
 
     bool importFromClipboard();
 
 protected:
-    bool doImport(QIODevice *device); // AbstractImporter interface
+    bool doImport(QIODevice *device) override; // AbstractImporter interface
     bool doImport(const Fountain::Parser &parser);
 
 private:

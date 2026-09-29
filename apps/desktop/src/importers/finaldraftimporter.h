@@ -29,12 +29,12 @@ class FinalDraftImporter : public AbstractImporter
 
 public:
     Q_INVOKABLE explicit FinalDraftImporter(QObject *parent = nullptr);
-    ~FinalDraftImporter();
+    ~FinalDraftImporter() override;
 
-    bool canImport(const QString &fileName) const;
+    bool canImport(const QString &fileName) const override;
 
 protected:
-    bool doImport(QIODevice *device); // AbstractImporter interface
+    bool doImport(QIODevice *device) override; // AbstractImporter interface
 
 private:
     void processDualDialogueMarkers(Screenplay *screenplay);

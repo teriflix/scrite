@@ -46,7 +46,7 @@ public:
     static Note *findById(const QString &id);
 
     explicit Note(QObject *parent = nullptr);
-    ~Note();
+    ~Note() override;
     Q_SIGNAL void aboutToDelete(Note *ptr);
 
     // clang-format off
@@ -158,9 +158,9 @@ public:
     Q_SIGNAL void noteModified();
 
     // QObjectSerializer::Interface interface
-    void prepareForSerialization();
-    void serializeToJson(QJsonObject &json) const;
-    void deserializeFromJson(const QJsonObject &);
+    void prepareForSerialization() override;
+    void serializeToJson(QJsonObject &json) const override;
+    void deserializeFromJson(const QJsonObject &) override;
 
     // Text Document Export Support
     struct WriteOptions
@@ -211,7 +211,7 @@ public:
     static Notes *findById(const QString &id);
 
     explicit Notes(QObject *parent = nullptr);
-    ~Notes();
+    ~Notes() override;
     Q_SIGNAL void aboutToDelete(Notes *ptr);
 
     enum OwnerType {
@@ -350,8 +350,8 @@ public:
     Q_SIGNAL void notesModified();
 
     // QObjectSerializer::Interface interface
-    void serializeToJson(QJsonObject &json) const;
-    void deserializeFromJson(const QJsonObject &);
+    void serializeToJson(QJsonObject &json) const override;
+    void deserializeFromJson(const QJsonObject &) override;
 
     // Helper method to port notes from old notes[]
     void loadOldNotes(const QJsonArray &array);

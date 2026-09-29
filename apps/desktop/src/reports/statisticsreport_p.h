@@ -27,7 +27,7 @@ class StatisticsReportPage : public PdfExportableGraphicsScene
 {
 public:
     explicit StatisticsReportPage(StatisticsReport *parent = nullptr);
-    ~StatisticsReportPage();
+    ~StatisticsReportPage() override;
 };
 
 class StatisticsReportKeyNumbers : public QGraphicsRectItem
@@ -35,7 +35,7 @@ class StatisticsReportKeyNumbers : public QGraphicsRectItem
 public:
     explicit StatisticsReportKeyNumbers(const StatisticsReport *report,
                                         QGraphicsItem *parent = nullptr);
-    ~StatisticsReportKeyNumbers();
+    ~StatisticsReportKeyNumbers() override;
 };
 
 class StatisticsReportTimeline : public QGraphicsRectItem
@@ -43,7 +43,7 @@ class StatisticsReportTimeline : public QGraphicsRectItem
 public:
     explicit StatisticsReportTimeline(qreal suggestedWidth, const StatisticsReport *report,
                                       QGraphicsItem *parent = nullptr);
-    ~StatisticsReportTimeline();
+    ~StatisticsReportTimeline() override;
 
 private:
     QGraphicsRectItem *createTimelineItem(const StatisticsReport *report,
@@ -88,7 +88,7 @@ class StatisticsReportDialogueActionRatio : public QGraphicsRectItem
 public:
     explicit StatisticsReportDialogueActionRatio(const StatisticsReport *report,
                                                  QGraphicsItem *parent = nullptr);
-    ~StatisticsReportDialogueActionRatio();
+    ~StatisticsReportDialogueActionRatio() override;
 };
 
 class StatisticsReportSceneHeadingStats : public QGraphicsRectItem
@@ -96,14 +96,14 @@ class StatisticsReportSceneHeadingStats : public QGraphicsRectItem
 public:
     explicit StatisticsReportSceneHeadingStats(const StatisticsReport *report,
                                                QGraphicsItem *parent = nullptr);
-    ~StatisticsReportSceneHeadingStats();
+    ~StatisticsReportSceneHeadingStats() override;
 };
 
 class StatisticsReportGraphVLegend : public QGraphicsRectItem
 {
 public:
     explicit StatisticsReportGraphVLegend(QGraphicsItem *parent = nullptr);
-    ~StatisticsReportGraphVLegend();
+    ~StatisticsReportGraphVLegend() override;
 
     void setFont(const QFont &val) { m_font = val; }
     QFont font() const { return m_font; }

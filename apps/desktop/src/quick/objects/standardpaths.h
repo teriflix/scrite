@@ -28,7 +28,7 @@ class StandardPaths : public QObject
 
 public:
     explicit StandardPaths(QObject *parent = nullptr);
-    ~StandardPaths();
+    ~StandardPaths() override;
 
     // Copied from QStandardPaths
     enum StandardLocation {

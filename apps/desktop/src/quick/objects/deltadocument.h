@@ -28,7 +28,7 @@ class DeltaDocument : public QObject
 
 public:
     explicit DeltaDocument(QObject *parent = nullptr);
-    ~DeltaDocument();
+    ~DeltaDocument() override;
 
     // clang-format off
     Q_PROPERTY(QJsonValue content

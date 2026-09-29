@@ -30,7 +30,7 @@ class HtmlExporter : public AbstractExporter
 
 public:
     Q_INVOKABLE explicit HtmlExporter(QObject *parent = nullptr);
-    ~HtmlExporter();
+    ~HtmlExporter() override;
 
     // clang-format off
     Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers in the generated HTML.")
@@ -70,11 +70,11 @@ public:
     Q_SIGNAL void bundleFontsChanged();
 
     bool canBundleFonts() const { return true; }
-    bool requiresConfiguration() const { return true; }
+    bool requiresConfiguration() const override { return true; }
 
 protected:
-    bool doExport(QIODevice *device); // AbstractExporter interface
-    QString fileNameExtension() const { return QStringLiteral("html"); }
+    bool doExport(QIODevice *device) override; // AbstractExporter interface
+    QString fileNameExtension() const override { return QStringLiteral("html"); }
 
 private:
     bool m_includeSceneNumbers = false;

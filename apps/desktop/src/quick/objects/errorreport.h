@@ -30,7 +30,7 @@ class ErrorReport : public QAbstractListModel
 
 public:
     explicit ErrorReport(QObject *parent = nullptr);
-    ~ErrorReport();
+    ~ErrorReport() override;
     Q_SIGNAL void aboutToDelete(ErrorReport *val);
 
     // clang-format off
@@ -97,9 +97,9 @@ public:
 
     // QAbstractItemModel interface
     enum Role { WarningMessageRole = Qt::DisplayRole };
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
 private:
     void resetProxyFor();

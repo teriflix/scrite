@@ -94,7 +94,7 @@ public:
                 [=](const QList<int> &languageCodes) { this->reloadSpellers(languageCodes); });
     }
 
-    ~Spellers() { this->clearItems(); }
+    ~Spellers() override { this->clearItems(); }
 
     QList<int> supportedLanguages() const { return m_supportedLanguages.keys(); }
 

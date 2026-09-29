@@ -495,7 +495,7 @@ public:
         m_connection2 =
                 QObject::connect(m_note, &Note::aboutToDelete, m_note, [=]() { m_note = nullptr; });
     }
-    ~RemoveNoteUndoCommand()
+    ~RemoveNoteUndoCommand() override
     {
         QObject::disconnect(m_connection1);
         QObject::disconnect(m_connection2);
@@ -503,9 +503,9 @@ public:
 
     static QPointer<Note> noteCurrentlyBeingRemoved;
 
-    int id() const { return UndoStack::RemoveNoteCommandID; }
+    int id() const override { return UndoStack::RemoveNoteCommandID; }
 
-    void redo()
+    void redo() override
     {
         if (m_note == nullptr || m_notes == nullptr) {
             this->setObsolete(true);
@@ -519,7 +519,7 @@ public:
         m_notes->removeNote(m_note);
         noteCurrentlyBeingRemoved = nullptr;
     }
-    void undo()
+    void undo() override
     {
         if (m_notes == nullptr) {
             this->setObsolete(true);

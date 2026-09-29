@@ -29,7 +29,7 @@ class PlaceholderVisibility : public QObject
 
 public:
     explicit PlaceholderVisibility(QObject *parent = nullptr);
-    ~PlaceholderVisibility();
+    ~PlaceholderVisibility() override;
 
     static PlaceholderVisibility *qmlAttachedProperties(QObject *parent);
 

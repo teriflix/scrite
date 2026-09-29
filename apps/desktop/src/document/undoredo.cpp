@@ -152,13 +152,13 @@ class ObjectPropertyInfoList : public QObject, public QList<ObjectPropertyInfo *
 {
 public:
     explicit ObjectPropertyInfoList() : QObject() { qApp->installEventFilter(this); }
-    ~ObjectPropertyInfoList()
+    ~ObjectPropertyInfoList() override
     {
         qDeleteAll(*this);
         this->clear();
     }
 
-    bool eventFilter(QObject *object, QEvent *event)
+    bool eventFilter(QObject *object, QEvent *event) override
     {
         if (event->type() != QEvent::DynamicPropertyChange)
             return false;

@@ -30,7 +30,7 @@ class AbstractDeviceIO : public QObject
     Q_OBJECT
 
 public:
-    ~AbstractDeviceIO();
+    ~AbstractDeviceIO() override;
 
     // clang-format off
     Q_PROPERTY(QString fileName

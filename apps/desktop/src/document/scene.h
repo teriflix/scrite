@@ -56,7 +56,7 @@ class SceneHeading : public QObject, public Modifiable
 
 public:
     explicit SceneHeading(QObject *parent = nullptr);
-    ~SceneHeading();
+    ~SceneHeading() override;
 
     // clang-format off
     Q_PROPERTY(Scene *scene
@@ -138,7 +138,7 @@ public:
     Q_SIGNAL void wordCountChanged();
 
 protected:
-    void timerEvent(QTimerEvent *event);
+    void timerEvent(QTimerEvent *event) override;
 
 private:
     friend class Scene;
@@ -168,7 +168,7 @@ class SceneElement : public QObject, public Modifiable, public QObjectSerializer
 
 public:
     Q_INVOKABLE explicit SceneElement(QObject *parent = nullptr);
-    ~SceneElement();
+    ~SceneElement() override;
     Q_SIGNAL void aboutToDelete(SceneElement *element);
 
     // clang-format off
@@ -285,8 +285,8 @@ public:
 
     Q_INVOKABLE QJsonArray find(const QString &text, int flags) const;
 
-    void serializeToJson(QJsonObject &) const;
-    void deserializeFromJson(const QJsonObject &obj);
+    void serializeToJson(QJsonObject &) const override;
+    void deserializeFromJson(const QJsonObject &obj) override;
 
     // For use with SceneDocumentBinder, ScreenplayTextDocument
     void setTextFormats(const QVector<QTextLayout::FormatRange> &formats);
@@ -300,8 +300,8 @@ public:
     static QVector<QTextLayout::FormatRange> textFormatsFromJson(const QJsonArray &array);
 
 protected:
-    bool event(QEvent *event);
-    void timerEvent(QTimerEvent *event);
+    bool event(QEvent *event) override;
+    void timerEvent(QTimerEvent *event) override;
 
 private:
     friend class Scene;
@@ -333,7 +333,7 @@ class SceneDualDialogue : public QObject
 
 public:
     Q_INVOKABLE explicit SceneDualDialogue(QObject *parent = nullptr);
-    ~SceneDualDialogue();
+    ~SceneDualDialogue() override;
     Q_SIGNAL void aboutToDelete(SceneDualDialogue *ptr);
 
     enum Column { NoColumn, LeftColumn, RightColumn };
@@ -490,7 +490,7 @@ class Scene : public QAbstractListModel, public QObjectSerializer::Interface, pu
 
 public:
     Q_INVOKABLE explicit Scene(QObject *parent = nullptr);
-    ~Scene();
+    ~Scene() override;
     Q_SIGNAL void aboutToDelete(Scene *scene);
     Q_SIGNAL void aboutToRemoveScene(Scene *scene);
 
@@ -897,9 +897,9 @@ public:
 
     // QAbstractItemModel interface
     enum Roles { SceneElementRole = Qt::UserRole };
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
     // Serializing functions for use with Undo/Redo
     QByteArray toByteArray() const;
@@ -924,10 +924,10 @@ public:
     Attachments *attachments() const { return m_attachments; }
 
     // QObjectSerializer::Interface interface
-    void serializeToJson(QJsonObject &json) const;
-    void deserializeFromJson(const QJsonObject &json);
-    bool canSetPropertyFromObjectList(const QString &propName) const;
-    void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects);
+    void serializeToJson(QJsonObject &json) const override;
+    void deserializeFromJson(const QJsonObject &json) override;
+    bool canSetPropertyFromObjectList(const QString &propName) const override;
+    void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects) override;
 
     // Text Document Export Support
     struct WriteOptions
@@ -946,8 +946,8 @@ public:
     void write(QTextCursor &cursor, const WriteOptions &options = WriteOptions()) const;
 
 protected:
-    bool event(QEvent *event);
-    void timerEvent(QTimerEvent *event);
+    bool event(QEvent *event) override;
+    void timerEvent(QTimerEvent *event) override;
 
 private:
     void setStructureElement(StructureElement *ptr);
@@ -1029,7 +1029,7 @@ class SceneSizeHintItem : public QQuickItem
 
 public:
     explicit SceneSizeHintItem(QQuickItem *parent = nullptr);
-    ~SceneSizeHintItem();
+    ~SceneSizeHintItem() override;
 
     // clang-format off
     Q_PROPERTY(Scene *scene
@@ -1118,12 +1118,12 @@ public:
     Q_SIGNAL void hasPendingComputeSizeChanged();
 
     // QQmlParserStatus interface
-    void classBegin();
-    void componentComplete();
+    void classBegin() override;
+    void componentComplete() override;
 
 protected:
-    void timerEvent(QTimerEvent *te);
-    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
+    void timerEvent(QTimerEvent *te) override;
+    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *) override;
 
 private:
     void updateSize(const QSizeF &size);
@@ -1162,7 +1162,7 @@ class SceneGroup : public GenericArrayModel
 
 public:
     explicit SceneGroup(QObject *parent = nullptr);
-    ~SceneGroup();
+    ~SceneGroup() override;
 
     Q_INVOKABLE void toggle(int row);
     Q_SIGNAL void toggled(int row);
@@ -1337,7 +1337,7 @@ signals:
     void lengthsUpdated();
 
 protected:
-    void timerEvent(QTimerEvent *te);
+    void timerEvent(QTimerEvent *te) override;
 
 private:
     void setOpenTags(const QStringList &val);

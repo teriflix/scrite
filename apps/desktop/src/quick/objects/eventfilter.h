@@ -32,7 +32,7 @@ class EventFilterResult : public QObject
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~EventFilterResult();
+    ~EventFilterResult() override;
 
     // clang-format off
     Q_PROPERTY(bool filter
@@ -72,7 +72,7 @@ class EventFilter : public QObject
 
 public:
     explicit EventFilter(QObject *parent = nullptr);
-    ~EventFilter();
+    ~EventFilter() override;
 
     static EventFilter *qmlAttachedProperties(QObject *object);
 
@@ -146,7 +146,7 @@ public:
 
 protected:
     void resetTarget();
-    bool eventFilter(QObject *watched, QEvent *event);
+    bool eventFilter(QObject *watched, QEvent *event) override;
     QEvent *cloneCurrentEvent() const;
 
 private:

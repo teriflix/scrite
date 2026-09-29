@@ -30,7 +30,7 @@ class SimpleTabBarItem : public QQuickPaintedItem
 
 public:
     explicit SimpleTabBarItem(QQuickItem *parent = nullptr);
-    ~SimpleTabBarItem();
+    ~SimpleTabBarItem() override;
 
     // clang-format off
     Q_PROPERTY(int tabCount
@@ -205,11 +205,11 @@ public:
     Q_SIGNAL void tabPathsUpdated();
 
     // QQuickPaintedItem interface
-    void paint(QPainter *painter);
+    void paint(QPainter *painter) override;
 
 protected:
     // QQuickItem interface
-    void mousePressEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event) override;
 
 private:
     void updateTabInfos();

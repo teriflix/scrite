@@ -37,10 +37,10 @@ class LibraryService : public AbstractImporter
 
 public:
     explicit LibraryService(QObject *parent = nullptr);
-    ~LibraryService();
+    ~LibraryService() override;
 
     // This this class cannot be used to import anything from a local file system
-    bool canImport(const QString &) const { return false; }
+    bool canImport(const QString &) const override { return false; }
 
     // clang-format off
     Q_PROPERTY(bool busy
@@ -71,7 +71,7 @@ public:
     Q_INVOKABLE void openLibraryRecordAt(Library *library, int index);
 
     // AbstractImporter interface
-    bool doImport(QIODevice *device);
+    bool doImport(QIODevice *device) override;
 
 signals:
     void importStarted(int index);
@@ -89,7 +89,7 @@ class Library : public QAbstractListModel
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~Library();
+    ~Library() override;
 
     enum Type { Screenplays, Templates };
     Q_ENUM(Type)
@@ -129,9 +129,9 @@ public:
 
     // QAbstractItemModel interface
     enum Roles { RecordRole = Qt::UserRole };
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
     Q_INVOKABLE void reload();
 

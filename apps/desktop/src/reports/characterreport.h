@@ -29,9 +29,9 @@ class CharacterReport : public AbstractReportGenerator
 
 public:
     Q_INVOKABLE explicit CharacterReport(QObject *parent = nullptr);
-    ~CharacterReport();
+    ~CharacterReport() override;
 
-    bool requiresConfiguration() const { return true; }
+    bool requiresConfiguration() const override { return true; }
 
     // clang-format off
     Q_CLASSINFO("characterNames_FieldGroup", "Characters")
@@ -89,7 +89,7 @@ public:
 protected:
     // AbstractReportGenerator interface
     QString personalizedFileName(const QString &fileName) const override;
-    bool doGenerate(QTextDocument *textDocument);
+    bool doGenerate(QTextDocument *textDocument) override;
 
 private:
     bool m_includeNotes = false;

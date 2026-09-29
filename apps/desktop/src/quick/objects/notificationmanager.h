@@ -33,7 +33,7 @@ public:
     static NotificationManager *instance();
 
     explicit NotificationManager(QObject *parent = nullptr);
-    ~NotificationManager();
+    ~NotificationManager() override;
 
     // clang-format off
     Q_PROPERTY(int count
@@ -46,9 +46,9 @@ public:
     Q_INVOKABLE Notification *notificationAt(int row) const;
 
     enum { NotificationRole = Qt::UserRole };
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
     Q_INVOKABLE void dismissNotification(int row);
 

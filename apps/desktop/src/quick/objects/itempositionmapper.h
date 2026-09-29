@@ -29,7 +29,7 @@ class ItemPositionMapper : public QObject
 
 public:
     explicit ItemPositionMapper(QObject *parent = nullptr);
-    ~ItemPositionMapper();
+    ~ItemPositionMapper() override;
 
     // clang-format off
     Q_PROPERTY(QPointF position

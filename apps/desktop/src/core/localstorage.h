@@ -50,7 +50,7 @@ class Session : public QObject
 
 public:
     Session(QObject *parent = nullptr);
-    ~Session();
+    ~Session() override;
 
     Q_INVOKABLE static void set(const QString &name, const QVariant &value);
     Q_INVOKABLE static QVariant get(const QString &name);

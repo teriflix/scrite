@@ -30,7 +30,7 @@ class OsfExporter : public AbstractExporter
 
 public:
     Q_INVOKABLE explicit OsfExporter(QObject *parent = nullptr);
-    ~OsfExporter();
+    ~OsfExporter() override;
 
     // clang-format off
     Q_CLASSINFO("includeSceneSynopsis_FieldLabel", "Include scene synopsis.")
@@ -57,11 +57,11 @@ public:
     Q_SIGNAL void includeSceneNotesChanged();
 
     bool canBundleFonts() const { return false; }
-    bool requiresConfiguration() const { return true; }
+    bool requiresConfiguration() const override { return true; }
 
 protected:
-    bool doExport(QIODevice *device);
-    QString fileNameExtension() const { return QStringLiteral("xml"); }
+    bool doExport(QIODevice *device) override;
+    QString fileNameExtension() const override { return QStringLiteral("xml"); }
 
 private:
     bool m_includeSceneSynopsis = true;

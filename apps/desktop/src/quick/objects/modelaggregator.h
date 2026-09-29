@@ -27,7 +27,7 @@ class ModelAggregator : public QObject
 
 public:
     explicit ModelAggregator(QObject *parent = nullptr);
-    ~ModelAggregator();
+    ~ModelAggregator() override;
 
     typedef std::function<void(const QModelIndex &, QVariant &)> AggregateFunction;
     void setAggregateFunction(AggregateFunction val) { m_aggregateFunction = val; }
@@ -98,7 +98,7 @@ public:
     Q_SIGNAL void delayChanged();
 
 protected:
-    void timerEvent(QTimerEvent *te);
+    void timerEvent(QTimerEvent *te) override;
 
 private:
     void setAggregateValue(const QVariant &val);

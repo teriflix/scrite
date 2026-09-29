@@ -43,7 +43,7 @@ class StructureElementConnectors : public QAbstractListModel
     Q_OBJECT
 
 public:
-    ~StructureElementConnectors();
+    ~StructureElementConnectors() override;
 
     // clang-format off
     Q_PROPERTY(int count
@@ -59,9 +59,9 @@ public:
 
     // QAbstractItemModel interface
     enum { FromElementRole = Qt::UserRole, ToElementRole, LabelRole };
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
 private:
     StructureElementConnectors(ScriteDocument *parent = nullptr);
@@ -90,7 +90,7 @@ class ScriteDocumentBackups : public QAbstractListModel
     Q_OBJECT
 
 public:
-    ~ScriteDocumentBackups();
+    ~ScriteDocumentBackups() override;
 
     // clang-format off
     Q_PROPERTY(QString documentFilePath
@@ -129,9 +129,9 @@ public:
         FileSizeRole,
         MetaDataRole
     };
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
     static QString relativeTime(const QDateTime &dt);
 
@@ -168,7 +168,7 @@ class ScriteDocumentCollaborators : public QAbstractListModel
 
 public:
     explicit ScriteDocumentCollaborators(QObject *parent = nullptr);
-    ~ScriteDocumentCollaborators();
+    ~ScriteDocumentCollaborators() override;
 
     // clang-format off
     Q_PROPERTY(ScriteDocument *document
@@ -182,9 +182,9 @@ public:
 
     // QAbstractItemModel interface
     enum { CollaboratorRole = Qt::UserRole, CollaboratorEmailRole, CollaboratorNameRole };
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
 private:
     int updateModel();
@@ -208,7 +208,7 @@ class PageSetup : public QObject
     PageSetup(QObject *parent = nullptr);
 
 public:
-    ~PageSetup();
+    ~PageSetup() override;
 
     // clang-format off
     Q_PROPERTY(bool usingFactoryDefaults
@@ -451,7 +451,7 @@ class ScriteDocument : public QObject, public QObjectSerializer::Interface
 
 public:
     static ScriteDocument *instance();
-    ~ScriteDocument();
+    ~ScriteDocument() override;
     Q_SIGNAL void aboutToDelete(ScriteDocument *doc);
 
     // clang-format off
@@ -915,7 +915,7 @@ public:
     Q_INVOKABLE void unblockUI() { this->setLoading(false); }
 
 protected:
-    void timerEvent(QTimerEvent *event);
+    void timerEvent(QTimerEvent *event) override;
 
 private:
     bool runSaveSanityChecks(const QString &fileName);
@@ -948,11 +948,11 @@ private:
 
 public:
     // QObjectSerializer::Interface implementation
-    void prepareForSerialization();
-    void prepareForDeserialization();
-    bool canSerialize(const QMetaObject *, const QMetaProperty &) const;
-    void serializeToJson(QJsonObject &) const;
-    void deserializeFromJson(const QJsonObject &);
+    void prepareForSerialization() override;
+    void prepareForDeserialization() override;
+    bool canSerialize(const QMetaObject *, const QMetaProperty &) const override;
+    void serializeToJson(QJsonObject &) const override;
+    void deserializeFromJson(const QJsonObject &) override;
 
 private:
     QString polishFileName(const QString &fileName) const;

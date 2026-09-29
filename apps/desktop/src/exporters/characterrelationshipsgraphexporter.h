@@ -32,12 +32,12 @@ class CharacterRelationshipsGraphExporter : public AbstractExporter
 
 public:
     explicit CharacterRelationshipsGraphExporter(QObject *parent = nullptr);
-    ~CharacterRelationshipsGraphExporter();
+    ~CharacterRelationshipsGraphExporter() override;
 
     void setGraph(CharacterRelationshipGraph *val);
     CharacterRelationshipGraph *graph() const { return m_graph; }
 
-    virtual bool requiresConfiguration() const { return true; }
+    bool requiresConfiguration() const override { return true; }
 
     // clang-format off
     Q_CLASSINFO("enableHeaderFooter_FieldLabel", "Include header & footer in the generated PDF.")
@@ -79,8 +79,8 @@ public:
     Q_SIGNAL void commentChanged();
 
 protected:
-    bool doExport(QIODevice *device); // AbstractExporter interface
-    QString fileNameExtension() const { return QStringLiteral("pdf"); }
+    bool doExport(QIODevice *device) override; // AbstractExporter interface
+    QString fileNameExtension() const override { return QStringLiteral("pdf"); }
 
 private:
     bool m_enableHeaderFooter = true;

@@ -30,7 +30,7 @@ public:
     static constexpr int minimumWindowHeight = 700;
 
     static QQuickWindow *instance();
-    ~AppWindow();
+    ~AppWindow() override;
 
     static AppWindow *qmlAttachedProperties(QObject *object);
 

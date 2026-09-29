@@ -29,7 +29,7 @@ class ValueIndexLookup : public QObject, public QObjectSerializer::Interface
 
 public:
     explicit ValueIndexLookup(QObject *parent = nullptr);
-    virtual ~ValueIndexLookup();
+    ~ValueIndexLookup() override;
 
     Q_INVOKABLE bool isEmpty() const { return m_lookup.isEmpty(); }
 
@@ -39,8 +39,8 @@ public:
     Q_INVOKABLE void prune(const QStringList &values);
 
     // Interface interface
-    void serializeToJson(QJsonObject &json) const;
-    void deserializeFromJson(const QJsonObject &json);
+    void serializeToJson(QJsonObject &json) const override;
+    void deserializeFromJson(const QJsonObject &json) override;
 
 private:
     QMap<QString, int> m_lookup;

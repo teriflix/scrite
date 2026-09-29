@@ -28,7 +28,7 @@ class QImageItem : public QQuickPaintedItem
 
 public:
     QImageItem(QQuickItem *parentItem = nullptr);
-    ~QImageItem();
+    ~QImageItem() override;
 
     // clang-format off
     Q_PROPERTY(bool useSoftwareRenderer
@@ -74,10 +74,10 @@ public:
 
 protected:
     // QQuickPaintedItem interface
-    void paint(QPainter *painter);
+    void paint(QPainter *painter) override;
 
     // QQuickItem interface
-    QSGNode *updatePaintNode(QSGNode *, UpdatePaintNodeData *);
+    QSGNode *updatePaintNode(QSGNode *, UpdatePaintNodeData *) override;
 
 private:
     QImage m_image;
@@ -97,7 +97,7 @@ class ImageIcon : public QObject
     QML_ATTACHED(ImageIcon)
 
 public:
-    virtual ~ImageIcon();
+    ~ImageIcon() override;
 
     static ImageIcon *qmlAttachedProperties(QObject *parent);
 
@@ -132,12 +132,12 @@ class ImageIconProvider : public QQuickImageProvider
 {
 public:
     explicit ImageIconProvider();
-    ~ImageIconProvider();
+    ~ImageIconProvider() override;
 
     static QString name();
 
     // QQuickImageProvider interface
-    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
+    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize) override;
 };
 
 #endif // QIMAGEITEM_H

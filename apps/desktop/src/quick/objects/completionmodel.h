@@ -26,7 +26,7 @@ class CompletionModel : public QAbstractListModel
 
 public:
     explicit CompletionModel(QObject *parent = nullptr);
-    ~CompletionModel();
+    ~CompletionModel() override;
 
     // clang-format off
     Q_PROPERTY(QStringList strings
@@ -185,12 +185,12 @@ public:
     Q_SIGNAL void requestCompletion(const QString &string);
 
     // QAbstractItemModel interface
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
 protected:
-    bool eventFilter(QObject *target, QEvent *event);
+    bool eventFilter(QObject *target, QEvent *event) override;
 
 private:
     void filterStrings();

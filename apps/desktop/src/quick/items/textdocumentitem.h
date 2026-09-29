@@ -27,7 +27,7 @@ class TextDocumentItem : public QQuickItem
 
 public:
     explicit TextDocumentItem(QQuickItem *parent = nullptr);
-    ~TextDocumentItem();
+    ~TextDocumentItem() override;
 
     // clang-format off
     Q_PROPERTY(QTextDocument *document

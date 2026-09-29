@@ -34,7 +34,7 @@ class ScriteFileListModel : public QAbstractListModel
 
 public:
     ScriteFileListModel(QObject *parent = nullptr);
-    ~ScriteFileListModel();
+    ~ScriteFileListModel() override;
 
     enum Source { RecentFiles, Custom };
     Q_ENUM(Source)
@@ -110,9 +110,9 @@ public:
     enum Roles { FileInfoRole = Qt::UserRole };
 
     // QAbstractItemModel interface
-    int rowCount(const QModelIndex &parent) const { return parent.isValid() ? 0 : m_files.size(); }
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const
+    int rowCount(const QModelIndex &parent) const override { return parent.isValid() ? 0 : m_files.size(); }
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override
     {
         return { { FileInfoRole, QByteArrayLiteral("fileInfo") } };
     }

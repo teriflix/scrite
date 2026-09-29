@@ -57,7 +57,7 @@ public:
     static void init(const char *uri, QQmlEngine *qmlEngine);
     static UndoHub *instance();
 
-    virtual ~UndoHub();
+    ~UndoHub() override;
 
     Q_INVOKABLE static void clearAllStacks();
 
@@ -99,7 +99,7 @@ class UndoStack : public QUndoStack
 
 public:
     explicit UndoStack(QObject *parent = nullptr);
-    ~UndoStack();
+    ~UndoStack() override;
 
     enum CommandID {
         SceneCommandID = 100,
@@ -174,15 +174,15 @@ class PushObjectPropertyUndoCommand;
 class ObjectPropertyUndoCommand : public QUndoCommand
 {
 public:
-    ~ObjectPropertyUndoCommand();
+    ~ObjectPropertyUndoCommand() override;
 
     void pushToActiveStack();
 
     // QUndoCommand interface
-    void undo();
-    void redo();
-    int id() const { return m_propertyInfo ? m_propertyInfo->id : -1; }
-    bool mergeWith(const QUndoCommand *other);
+    void undo() override;
+    void redo() override;
+    int id() const override { return m_propertyInfo ? m_propertyInfo->id : -1; }
+    bool mergeWith(const QUndoCommand *other) override;
 
 private:
     friend class PushObjectPropertyUndoCommand;
@@ -313,7 +313,7 @@ class ObjectListCommand : public QUndoCommand
     }
 
 public:
-    ~ObjectListCommand() { QObject::disconnect(m_connection); }
+    ~ObjectListCommand() override { QObject::disconnect(m_connection); }
 
     void pushToActiveStack()
     {
@@ -324,14 +324,14 @@ public:
     }
 
     // QUndoCommand interface
-    void undo()
+    void undo() override
     {
         if (m_operation == ObjectList::InsertOperation)
             this->remove();
         else
             this->insert();
     }
-    void redo()
+    void redo() override
     {
         if (!m_firstRedoDone) {
             m_firstRedoDone = true;
@@ -342,8 +342,8 @@ public:
         else
             this->remove();
     }
-    int id() const { return m_parentPropertyInfo->id; }
-    bool mergeWith(const QUndoCommand *) { return false; }
+    int id() const override { return m_parentPropertyInfo->id; }
+    bool mergeWith(const QUndoCommand *) override { return false; }
 
 private:
     void remove()

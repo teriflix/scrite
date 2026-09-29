@@ -753,7 +753,7 @@ class ObjectRegister : public QObject
     QML_ATTACHED(ObjectRegister)
 
 public:
-    virtual ~ObjectRegister();
+    ~ObjectRegister() override;
 
     static ObjectRegister *qmlAttachedProperties(QObject *parent);
 
@@ -977,7 +977,7 @@ class SystemClipboard : public QObject
 
 public:
     explicit SystemClipboard(QObject *parent = nullptr);
-    virtual ~SystemClipboard();
+    ~SystemClipboard() override;
 
     // clang-format off
     Q_PROPERTY(bool valid

@@ -27,7 +27,7 @@ class AbstractExporter : public AbstractDeviceIO
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~AbstractExporter();
+    ~AbstractExporter() override;
     Q_SIGNAL void aboutToDelete(AbstractExporter *ptr);
 
     // clang-format off

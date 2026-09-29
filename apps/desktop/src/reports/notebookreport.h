@@ -38,7 +38,7 @@ class NotebookReport : public AbstractReportGenerator
 
 public:
     Q_INVOKABLE NotebookReport(QObject *parent = nullptr);
-    ~NotebookReport();
+    ~NotebookReport() override;
 
     // clang-format off
     Q_CLASSINFO("actsOnNewPage_FieldGroup", "Basic")
@@ -92,17 +92,17 @@ public:
 
 protected:
     // AbstractDeviceIO interface
-    QString polishFileName(const QString &fileName) const;
+    QString polishFileName(const QString &fileName) const override;
 
     // AbstractReportGenerator interface
     QString personalizedFileName(const QString &fileName) const override;
 
 public:
-    bool requiresConfiguration() const { return false; }
-    void polishFormInfo(Utils::ObjectConfig &) const;
+    bool requiresConfiguration() const override { return false; }
+    void polishFormInfo(Utils::ObjectConfig &) const override;
 
 protected:
-    bool doGenerate(QTextDocument *);
+    bool doGenerate(QTextDocument *) override;
 
 private:
     void evaluateTitleAndSubtitle();

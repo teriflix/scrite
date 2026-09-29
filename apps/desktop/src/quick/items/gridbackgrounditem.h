@@ -27,7 +27,7 @@ class GridBackgroundItemBorder : public QObject
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~GridBackgroundItemBorder();
+    ~GridBackgroundItemBorder() override;
 
     // clang-format off
     Q_PROPERTY(QColor color
@@ -66,7 +66,7 @@ class GridBackgroundItem : public QQuickItem
 
 public:
     explicit GridBackgroundItem(QQuickItem *parent = nullptr);
-    ~GridBackgroundItem();
+    ~GridBackgroundItem() override;
 
     // clang-format off
     Q_PROPERTY(qreal tickDistance
@@ -168,7 +168,7 @@ public:
 
 protected:
     // QQuickItem interface
-    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *nodeData);
+    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *nodeData) override;
 
 private:
     bool m_gridIsVisible = true;

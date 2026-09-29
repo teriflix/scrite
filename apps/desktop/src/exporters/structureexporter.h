@@ -30,10 +30,10 @@ class StructureExporter : public AbstractExporter
 
 public:
     Q_INVOKABLE explicit StructureExporter(QObject *parent = nullptr);
-    ~StructureExporter();
+    ~StructureExporter() override;
 
     // AbstractExporter interface
-    bool requiresConfiguration() const { return true; }
+    bool requiresConfiguration() const override { return true; }
 
     // clang-format off
     Q_CLASSINFO("insertTitleCard_FieldLabel", "Include title card in the generated PDF.")
@@ -99,8 +99,8 @@ public:
     Q_SIGNAL void commentChanged();
 
 protected:
-    bool doExport(QIODevice *device); // AbstractExporter interface
-    QString fileNameExtension() const { return QStringLiteral("pdf"); }
+    bool doExport(QIODevice *device) override; // AbstractExporter interface
+    QString fileNameExtension() const override { return QStringLiteral("pdf"); }
 
 private:
     bool m_insertTitleCard = true;

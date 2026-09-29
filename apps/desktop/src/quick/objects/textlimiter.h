@@ -27,7 +27,7 @@ class AbstractTextLimiter : public QObject
     QML_UNCREATABLE("Create instance of TextLimiter or TextDocumentLimiter instead.")
 
 public:
-    ~AbstractTextLimiter();
+    ~AbstractTextLimiter() override;
 
     enum Mode { LowerOfWordAndLetterCount, MatchWordCountOnly, MatchLetterCountOnly };
     Q_ENUM(Mode)
@@ -126,7 +126,7 @@ class TextLimiter : public AbstractTextLimiter
 
 public:
     explicit TextLimiter(QObject *parent = nullptr);
-    ~TextLimiter();
+    ~TextLimiter() override;
 
     // clang-format off
     Q_PROPERTY(QString text
@@ -147,7 +147,7 @@ public:
     Q_SIGNAL void limitedTextChanged();
 
 protected:
-    void limitText();
+    void limitText() override;
 
 private:
     void setLimitedText(const QString &val);

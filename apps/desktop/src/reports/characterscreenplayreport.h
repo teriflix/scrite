@@ -29,7 +29,7 @@ class CharacterScreenplayReport : public AbstractScreenplaySubsetReport
 
 public:
     Q_INVOKABLE explicit CharacterScreenplayReport(QObject *parent = nullptr);
-    ~CharacterScreenplayReport();
+    ~CharacterScreenplayReport() override;
 
     // clang-format off
     Q_CLASSINFO("highlightDialogues_FieldGroup", "Characters")
@@ -63,9 +63,9 @@ protected:
     QString personalizedFileName(const QString &fileName) const override;
 
     // AbstractScreenplaySubsetReport interface
-    bool includeScreenplayElement(const ScreenplayElement *) const;
-    QString screenplaySubtitle() const;
-    void configureScreenplayTextDocument(ScreenplayTextDocument &stDoc);
+    bool includeScreenplayElement(const ScreenplayElement *) const override;
+    QString screenplaySubtitle() const override;
+    void configureScreenplayTextDocument(ScreenplayTextDocument &stDoc) override;
 
 private:
     QString m_comment;

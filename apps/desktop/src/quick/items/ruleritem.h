@@ -25,7 +25,7 @@ class RulerItem : public QQuickPaintedItem
 
 public:
     explicit RulerItem(QQuickItem *parent = nullptr);
-    ~RulerItem();
+    ~RulerItem() override;
 
     enum Unit { Inch, Centimeter, Pixels };
     Q_ENUM(Unit)
@@ -202,7 +202,7 @@ public:
 
 protected:
     // QQuickPaintedItem interface
-    void paint(QPainter *painter);
+    void paint(QPainter *painter) override;
 
 private:
     void setCanConvert(bool val);

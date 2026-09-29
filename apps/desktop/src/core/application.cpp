@@ -397,15 +397,11 @@ QVersionNumber Application::prepare()
     Application::setApplicationVersion(applicationVersionString + " (Windows 64-bit)");
 #endif
 
-    /*QPalette palette = Application::palette();
-    palette.setColor(QPalette::Active, QPalette::Highlight, QColor::fromRgbF(0, 0.4, 1));
-    palette.setColor(QPalette::Active, QPalette::HighlightedText, QColor(Qt::white));
-    palette.setColor(QPalette::Active, QPalette::Text, QColor(Qt::black));
-    Application::setPalette(palette);*/
-
-    if (legacyDataMigrated)
-        QFile(targetAppDataPath + QLatin1String("/migration_acknowledgement_pending"))
-                .open(QFile::WriteOnly);
+    if (legacyDataMigrated) {
+        auto ret = QFile(targetAppDataPath + QLatin1String("/migration_acknowledgement_pending"))
+                           .open(QFile::WriteOnly);
+        Q_UNUSED(ret)
+    }
 
     return applicationVersion;
 }

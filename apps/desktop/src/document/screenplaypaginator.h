@@ -175,7 +175,7 @@ class ScreenplayPaginator : public QObject, public QQmlParserStatus
 
 public:
     explicit ScreenplayPaginator(QObject *parent = nullptr);
-    virtual ~ScreenplayPaginator();
+    ~ScreenplayPaginator() override;
 
     Q_INVOKABLE void useDefaultFormatAndScreenplay();
 
@@ -332,8 +332,8 @@ public:
     Q_INVOKABLE QTime timeLength(ScreenplayElement *from, ScreenplayElement *until = nullptr) const;
 
     // QQmlParserStatus interface
-    void classBegin();
-    void componentComplete();
+    void classBegin() override;
+    void componentComplete() override;
 
 signals:
     void cursorUpdated();
@@ -408,7 +408,7 @@ class ScreenplayPaginatorWatcher : public QObject
 
 public:
     explicit ScreenplayPaginatorWatcher(QObject *parent = nullptr);
-    virtual ~ScreenplayPaginatorWatcher();
+    ~ScreenplayPaginatorWatcher() override;
 
     // clang-format off
     Q_PROPERTY(ScreenplayPaginator *paginator

@@ -30,11 +30,11 @@ class TextExporter : public AbstractExporter
 
 public:
     Q_INVOKABLE explicit TextExporter(QObject *parent = nullptr);
-    ~TextExporter();
+    ~TextExporter() override;
 
-    bool canCopyToClipboard() const { return true; }
+    bool canCopyToClipboard() const override { return true; }
     bool canBundleFonts() const { return false; }
-    bool requiresConfiguration() const { return true; }
+    bool requiresConfiguration() const override { return true; }
 
     // clang-format off
     Q_CLASSINFO("maxLettersPerLine_FieldLabel", "Number of characters per line:")
@@ -88,8 +88,8 @@ public:
     Q_SIGNAL void includeSceneSynopsisChanged();
 
 protected:
-    bool doExport(QIODevice *device); // AbstractExporter interface
-    QString fileNameExtension() const { return QStringLiteral("txt"); }
+    bool doExport(QIODevice *device) override; // AbstractExporter interface
+    QString fileNameExtension() const override { return QStringLiteral("txt"); }
 
 private:
     QString toString() const;

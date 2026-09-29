@@ -27,7 +27,7 @@ class LinuxIBusBackend : public QObject
 
 public:
     LinuxIBusBackend(QObject *parent = nullptr);
-    ~LinuxIBusBackend();
+    ~LinuxIBusBackend() override;
 
     int defaultLanguage() const;
     int activateDefaultLanguage() const;
@@ -45,7 +45,7 @@ public:
     bool release(const TransliterationOption &option,
                  PlatformTransliterationEngine *transliterator);
 
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject *object, QEvent *event) override;
 
 signals:
     void activeEnginesChanged();

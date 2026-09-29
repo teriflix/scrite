@@ -32,7 +32,7 @@ class PainterPathItem : public AbstractShapeItem
 
 public:
     explicit PainterPathItem(QQuickItem *parent = nullptr);
-    ~PainterPathItem();
+    ~PainterPathItem() override;
 
     // clang-format off
     Q_PROPERTY(PainterPath *painterPath
@@ -57,7 +57,7 @@ public:
 
     Q_INVOKABLE void setPathFromString(const QString &val);
 
-    QPainterPath shape() const;
+    QPainterPath shape() const override;
 
 private:
     void resetPainterPath();
@@ -75,7 +75,7 @@ class AbstractPathElement : public QObject
 
 public:
     explicit AbstractPathElement(QObject *parent = nullptr);
-    ~AbstractPathElement();
+    ~AbstractPathElement() override;
 
     // clang-format off
     Q_PROPERTY(bool enabled
@@ -103,7 +103,7 @@ class PainterPath : public QObject
 
 public:
     explicit PainterPath(QObject *parent = nullptr);
-    ~PainterPath();
+    ~PainterPath() override;
 
     // clang-format off
     Q_CLASSINFO("DefaultProperty", "elements")
@@ -168,7 +168,7 @@ class MoveToElement : public AbstractPathElement
 
 public:
     explicit MoveToElement(QObject *parent = nullptr);
-    ~MoveToElement();
+    ~MoveToElement() override;
 
     // clang-format off
     Q_PROPERTY(qreal x
@@ -190,7 +190,7 @@ public:
     qreal y() const { return m_y; }
     Q_SIGNAL void yChanged();
 
-    void apply(QPainterPath &path);
+    void apply(QPainterPath &path) override;
 
 protected:
     qreal m_x = 0;
@@ -205,9 +205,9 @@ class LineToElement : public MoveToElement
 
 public:
     explicit LineToElement(QObject *parent = nullptr);
-    ~LineToElement();
+    ~LineToElement() override;
 
-    void apply(QPainterPath &path);
+    void apply(QPainterPath &path) override;
 };
 
 class CloseSubpathElement : public AbstractPathElement
@@ -217,9 +217,9 @@ class CloseSubpathElement : public AbstractPathElement
 
 public:
     explicit CloseSubpathElement(QObject *parent = nullptr);
-    ~CloseSubpathElement();
+    ~CloseSubpathElement() override;
 
-    void apply(QPainterPath &path);
+    void apply(QPainterPath &path) override;
 };
 
 class CubicToElement : public AbstractPathElement
@@ -230,7 +230,7 @@ class CubicToElement : public AbstractPathElement
 
 public:
     explicit CubicToElement(QObject *parent = nullptr);
-    ~CubicToElement();
+    ~CubicToElement() override;
 
     // clang-format off
     Q_PROPERTY(QPointF controlPoint1
@@ -262,7 +262,7 @@ public:
     QPointF endPoint() const { return m_endPoint; }
     Q_SIGNAL void endPointChanged();
 
-    void apply(QPainterPath &path);
+    void apply(QPainterPath &path) override;
 
 private:
     QPointF m_endPoint;
@@ -278,7 +278,7 @@ class QuadToElement : public AbstractPathElement
 
 public:
     explicit QuadToElement(QObject *parent = nullptr);
-    ~QuadToElement();
+    ~QuadToElement() override;
 
     // clang-format off
     Q_PROPERTY(QPointF controlPoint
@@ -300,7 +300,7 @@ public:
     QPointF endPoint() const { return m_endPoint; }
     Q_SIGNAL void endPointChanged();
 
-    void apply(QPainterPath &path);
+    void apply(QPainterPath &path) override;
 
 private:
     QPointF m_endPoint;
@@ -315,7 +315,7 @@ class ArcToElement : public AbstractPathElement
 
 public:
     explicit ArcToElement(QObject *parent = nullptr);
-    ~ArcToElement();
+    ~ArcToElement() override;
 
     // clang-format off
     Q_PROPERTY(QRectF rectangle
@@ -347,7 +347,7 @@ public:
     qreal sweepLength() const { return m_sweepLength; }
     Q_SIGNAL void sweepLengthChanged();
 
-    void apply(QPainterPath &path);
+    void apply(QPainterPath &path) override;
 
 private:
     QRectF m_rectangle = QRectF(0, 0, 100, 100);

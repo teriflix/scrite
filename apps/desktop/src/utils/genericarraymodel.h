@@ -32,7 +32,7 @@ class GenericArrayModel : public QAbstractListModel
 
 public:
     explicit GenericArrayModel(QObject *parent = nullptr);
-    ~GenericArrayModel();
+    ~GenericArrayModel() override;
 
     // clang-format off
     Q_PROPERTY(QJsonArray array
@@ -105,11 +105,11 @@ public:
 
     // QAbstractItemModel interface
     enum { ArrayItemRole = Qt::UserRole, FirstMemberRole };
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    bool setData(const QModelIndex &index, const QVariant &value, int role);
-    Qt::ItemFlags flags(const QModelIndex &index) const;
-    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
 protected:
     QJsonArray &internalArray() { return m_array; }
@@ -128,7 +128,7 @@ class GenericArraySortFilterProxyModel : public QSortFilterProxyModel
 
 public:
     explicit GenericArraySortFilterProxyModel(QObject *parent = nullptr);
-    ~GenericArraySortFilterProxyModel();
+    ~GenericArraySortFilterProxyModel() override;
 
     // clang-format off
     Q_PROPERTY(GenericArrayModel *arrayModel
@@ -141,7 +141,7 @@ public:
     GenericArrayModel *arrayModel() const { return m_arrayModel; }
     Q_SIGNAL void arrayModelChanged();
 
-    QHash<int, QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const override;
 
     Q_INVOKABLE void refilter();
     Q_INVOKABLE void resort();
@@ -152,8 +152,8 @@ signals:
 
 protected:
     // QSortFilterProxyModel interface
-    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
-    bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+    bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const override;
 
 private:
     void resetArrayModel();

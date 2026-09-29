@@ -38,7 +38,7 @@ class ActionManager : public QAbstractListModel
 
 public:
     explicit ActionManager(QObject *parent = nullptr);
-    virtual ~ActionManager();
+    ~ActionManager() override;
 
     static ActionManagerAttached *qmlAttachedProperties(QObject *object);
 
@@ -122,12 +122,12 @@ private:
 public:
     // QAbstractItemModel interface
     enum RoleNames { ActionRole = Qt::UserRole };
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
 protected:
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject *object, QEvent *event) override;
 
 private:
     bool addInternal(QObject *action);
@@ -160,7 +160,7 @@ class ActionManagerAttached : public QObject
     QML_ANONYMOUS
 
 public:
-    virtual ~ActionManagerAttached();
+    ~ActionManagerAttached() override;
 
     // clang-format off
     Q_PROPERTY(ActionManager *target
@@ -197,7 +197,7 @@ class ActionHandler : public QQuickItem
 
 public:
     explicit ActionHandler(QQuickItem *parent = nullptr);
-    virtual ~ActionHandler();
+    ~ActionHandler() override;
 
     static ActionHandlerAttached *qmlAttachedProperties(QObject *parent);
 
@@ -270,7 +270,7 @@ public:
 
     Q_INVOKABLE QObject *findAction(const QString &managerName, const QString &actionName) const;
 
-    void componentComplete();
+    void componentComplete() override;
 
 signals:
     void actionAboutToChange();
@@ -302,7 +302,7 @@ class ActionHandlerAttached : public QObject
     Q_OBJECT
 
 public:
-    virtual ~ActionHandlerAttached();
+    ~ActionHandlerAttached() override;
 
     // clang-format off
     Q_PROPERTY(bool canHandle
@@ -348,7 +348,7 @@ class ActionHandlers : public QObject
 public:
     static ActionHandlers *instance();
 
-    virtual ~ActionHandlers();
+    ~ActionHandlers() override;
 
     ActionHandler *findFirst(QObject *object, bool enabledOnly = true) const;
     QList<ActionHandler *> findAll(QObject *object, bool enabledOnly = true) const;
@@ -384,7 +384,7 @@ class ActionsModel : public QAbstractListModel
 
 public:
     explicit ActionsModel(QObject *parent = nullptr);
-    virtual ~ActionsModel();
+    ~ActionsModel() override;
 
     // clang-format off
     Q_PROPERTY(int count
@@ -415,9 +415,9 @@ public:
 
     // QAbstractItemModel interface
     enum { GroupNameRole, ActionManagerRole, ActionRole, ShortcutIsEditableRole };
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
 private:
     void clear();
@@ -450,9 +450,9 @@ class ActionsModelFilter : public QSortFilterProxyModel, public QQmlParserStatus
 
 public:
     explicit ActionsModelFilter(QObject *parent = nullptr);
-    virtual ~ActionsModelFilter();
+    ~ActionsModelFilter() override;
 
-    void setSourceModel(QAbstractItemModel *model);
+    void setSourceModel(QAbstractItemModel *model) override;
 
     enum Filter {
         NoActions = -1,
@@ -518,8 +518,8 @@ public:
     Q_INVOKABLE ActionManager *actionManagerOf(QObject *action) const;
 
     // QQmlParserStatus interface
-    void classBegin() { }
-    void componentComplete();
+    void classBegin() override { }
+    void componentComplete() override;
 
 signals:
     void filterRequest(QObject *qmlAction, ActionManager *actionManager, BooleanResult *result);
@@ -527,7 +527,7 @@ signals:
 
 protected:
     // QSortFilterProxyModel interface
-    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 
 private:
     bool m_customFilterMode = false;

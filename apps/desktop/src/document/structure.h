@@ -54,7 +54,7 @@ class StructureElement : public QObject, public QObjectSerializer::Interface
 
 public:
     Q_INVOKABLE explicit StructureElement(QObject *parent = nullptr);
-    ~StructureElement();
+    ~StructureElement() override;
     Q_SIGNAL void aboutToDelete(StructureElement *element);
 
     Q_INVOKABLE StructureElement *duplicate();
@@ -261,10 +261,10 @@ public:
     Q_SIGNAL void sceneLocationChanged();
 
     // QObjectSerializer::Interface implementation
-    void serializeToJson(QJsonObject &) const;
+    void serializeToJson(QJsonObject &) const override;
 
 protected:
-    bool event(QEvent *event);
+    bool event(QEvent *event) override;
     void resetFollow();
     void syncWithFollowItem();
     void groupVerificationRequired();
@@ -300,7 +300,7 @@ class StructureElementStack : public QObjectListModel<StructureElement *>
     StructureElementStack(QObject *parent = nullptr);
 
 public:
-    ~StructureElementStack();
+    ~StructureElementStack() override;
     Q_SIGNAL void aboutToDelete(StructureElementStack *ptr);
 
     void setEnabled(bool val) { m_enabled = val; }
@@ -371,9 +371,9 @@ public:
     static void stackEm(const QList<StructureElement *> &elements);
 
 protected:
-    void timerEvent(QTimerEvent *te);
-    void itemInsertEvent(StructureElement *ptr);
-    void itemRemoveEvent(StructureElement *ptr);
+    void timerEvent(QTimerEvent *te) override;
+    void itemInsertEvent(StructureElement *ptr) override;
+    void itemRemoveEvent(StructureElement *ptr) override;
 
 private:
     void setHasCurrentElement(bool val);
@@ -406,7 +406,7 @@ class StructureElementStacks : public QObjectListModel<StructureElementStack *>
 
 public:
     explicit StructureElementStacks(QObject *parent = nullptr);
-    ~StructureElementStacks();
+    ~StructureElementStacks() override;
 
     // clang-format off
     Q_PROPERTY(Structure *structure
@@ -419,9 +419,9 @@ public:
     Q_INVOKABLE StructureElementStack *findStackByElement(StructureElement *element) const;
 
 protected:
-    void timerEvent(QTimerEvent *te);
-    void itemInsertEvent(StructureElementStack *ptr);
-    void itemRemoveEvent(StructureElementStack *ptr);
+    void timerEvent(QTimerEvent *te) override;
+    void itemInsertEvent(StructureElementStack *ptr) override;
+    void itemRemoveEvent(StructureElementStack *ptr) override;
 
 private:
     void resetAllStacks();
@@ -444,7 +444,7 @@ class Relationship : public QObject, public QObjectSerializer::Interface
 
 public:
     Q_INVOKABLE explicit Relationship(QObject *parent = nullptr);
-    ~Relationship();
+    ~Relationship() override;
     Q_SIGNAL void aboutToDelete(Relationship *ptr);
 
     enum Direction { OfWith, WithOf };
@@ -512,13 +512,13 @@ public:
     Q_SIGNAL void relationshipChanged();
 
     // QObjectSerializer::Interface interface
-    void serializeToJson(QJsonObject &) const;
-    void deserializeFromJson(const QJsonObject &);
+    void serializeToJson(QJsonObject &) const override;
+    void deserializeFromJson(const QJsonObject &) override;
 
     void resolveRelationship();
 
 protected:
-    bool event(QEvent *event);
+    bool event(QEvent *event) override;
 
 private:
     void setOf(Character *val);
@@ -542,7 +542,7 @@ class Character : public QObject, public QObjectSerializer::Interface
 
 public:
     Q_INVOKABLE explicit Character(QObject *parent = nullptr);
-    ~Character();
+    ~Character() override;
     Q_SIGNAL void aboutToDelete(Character *ptr);
 
     // clang-format off
@@ -839,10 +839,10 @@ public:
     Q_SIGNAL void characterChanged();
 
     // QObjectSerializer::Interface interface
-    void serializeToJson(QJsonObject &) const;
-    void deserializeFromJson(const QJsonObject &);
-    bool canSetPropertyFromObjectList(const QString &propName) const;
-    void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects);
+    void serializeToJson(QJsonObject &) const override;
+    void deserializeFromJson(const QJsonObject &) override;
+    bool canSetPropertyFromObjectList(const QString &propName) const override;
+    void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects) override;
 
     void resolveRelationships();
 
@@ -860,7 +860,7 @@ public:
     static bool LessThan(const Character *a, const Character *b);
 
 protected:
-    bool event(QEvent *event);
+    bool event(QEvent *event) override;
 
 private:
     bool isRelatedToImpl(Character *with, QStack<Character *> &stack) const;
@@ -906,7 +906,7 @@ class CharacterNamesModel : public QStringListModel
 
 public:
     explicit CharacterNamesModel(QObject *parent = nullptr);
-    ~CharacterNamesModel();
+    ~CharacterNamesModel() override;
 
     Q_INVOKABLE Character *findCharacter(const QString &name) const;
 
@@ -979,7 +979,7 @@ public:
     Q_INVOKABLE void unselectAll();
 
     // QAbstractItemModel interface
-    QHash<int, QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const override;
 
 private:
     void reload();
@@ -997,7 +997,7 @@ class Annotation : public QObject
 
 public:
     Q_INVOKABLE explicit Annotation(QObject *parent = nullptr);
-    ~Annotation();
+    ~Annotation() override;
     Q_SIGNAL void aboutToDelete(Annotation *ptr);
 
     // clang-format off
@@ -1099,7 +1099,7 @@ public:
     Q_SIGNAL void annotationChanged();
 
 protected:
-    bool event(QEvent *event);
+    bool event(QEvent *event) override;
     void polishAttributes();
     void onDfsAuction(const QString &filePath, int *claims);
 
@@ -1124,7 +1124,7 @@ class Structure : public QObject, public QObjectSerializer::Interface
 
 public:
     explicit Structure(QObject *parent = nullptr);
-    ~Structure();
+    ~Structure() override;
     Q_SIGNAL void aboutToDelete(Structure *ptr);
 
     // clang-format off
@@ -1576,11 +1576,11 @@ public:
     Q_INVOKABLE QObject *createExporterObject();
 
     // QObjectSerializer::Interface interface
-    void prepareForDeserialization();
-    void serializeToJson(QJsonObject &) const;
-    void deserializeFromJson(const QJsonObject &);
-    bool canSetPropertyFromObjectList(const QString &propName) const;
-    void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects);
+    void prepareForDeserialization() override;
+    void serializeToJson(QJsonObject &) const override;
+    void deserializeFromJson(const QJsonObject &) override;
+    bool canSetPropertyFromObjectList(const QString &propName) const override;
+    void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects) override;
 
     Q_INVOKABLE QStringList sortCharacterNames(const QStringList &names) const;
 
@@ -1595,8 +1595,8 @@ public:
     void write(QTextCursor &cursor, const WriteOptions &options = WriteOptions()) const;
 
 protected:
-    bool event(QEvent *event);
-    void timerEvent(QTimerEvent *event);
+    bool event(QEvent *event) override;
+    void timerEvent(QTimerEvent *event) override;
     void resetCurentElementIndex(int index = -1);
     void setCanPaste(bool val);
     void onClipboardDataChanged();
@@ -1703,7 +1703,7 @@ class StructureElementConnector : public AbstractShapeItem
 
 public:
     explicit StructureElementConnector(QQuickItem *parent = nullptr);
-    ~StructureElementConnector();
+    ~StructureElementConnector() override;
 
     enum LineType { StraightLine, CurvedLine };
     Q_ENUM(LineType)
@@ -1775,18 +1775,18 @@ public:
 
     Q_INVOKABLE bool intersects(const QRectF &rect) const;
 
-    QPainterPath shape() const;
+    QPainterPath shape() const override;
 
     static QPainterPath curvedArrowPath(const QRectF &rect1, const QRectF &rect2,
                                         const qreal arrowSize = 6, bool fillArrow = false);
 
 protected:
     // QObject interface
-    void timerEvent(QTimerEvent *te);
+    void timerEvent(QTimerEvent *te) override;
 
 protected:
     // QQuickItem interface
-    void itemChange(ItemChange, const ItemChangeData &);
+    void itemChange(ItemChange, const ItemChangeData &) override;
 
 private:
     void resetFromElement();
@@ -1816,7 +1816,7 @@ class StructureCanvasViewportFilterModel : public QSortFilterProxyModel
 
 public:
     explicit StructureCanvasViewportFilterModel(QObject *parent = nullptr);
-    ~StructureCanvasViewportFilterModel();
+    ~StructureCanvasViewportFilterModel() override;
 
     // clang-format off
     Q_PROPERTY(Structure *structure
@@ -1889,14 +1889,14 @@ public:
     Q_INVOKABLE int mapToSourceRow(int filter_row) const;
 
     // QAbstractProxyModel interface
-    void setSourceModel(QAbstractItemModel *model);
+    void setSourceModel(QAbstractItemModel *model) override;
 
 protected:
     // QSortFilterProxyModel interface
-    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 
     // QObject interface
-    void timerEvent(QTimerEvent *te);
+    void timerEvent(QTimerEvent *te) override;
 
 private:
     void resetStructure();
@@ -1921,10 +1921,10 @@ public:
     static QString name();
 
     explicit AnnotationImageProvider();
-    ~AnnotationImageProvider();
+    ~AnnotationImageProvider() override;
 
     // QQuickImageProvider interface
-    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
+    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize) override;
 };
 
 #endif // STRUCTURE_H

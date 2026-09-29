@@ -29,12 +29,12 @@ class HtmlImporter : public AbstractImporter
 
 public:
     Q_INVOKABLE explicit HtmlImporter(QObject *parent = nullptr);
-    ~HtmlImporter();
+    ~HtmlImporter() override;
 
-    bool canImport(const QString &fileName) const;
+    bool canImport(const QString &fileName) const override;
 
 protected:
-    bool doImport(QIODevice *device); // AbstractImporter interface
+    bool doImport(QIODevice *device) override; // AbstractImporter interface
     QByteArray preprocess(QIODevice *device) const;
     bool importFrom(const QByteArray &bytes);
 };

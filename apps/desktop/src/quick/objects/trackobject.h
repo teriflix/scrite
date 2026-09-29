@@ -32,7 +32,7 @@ class AbstractObjectTracker : public QObject, public QQmlParserStatus
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~AbstractObjectTracker();
+    ~AbstractObjectTracker() override;
 
     // clang-format off
     Q_PROPERTY(QObject *target
@@ -58,8 +58,8 @@ public:
     bool isInitialized() const { return m_initialized; }
 
     // QQmlParserStatus interface
-    void classBegin();
-    void componentComplete();
+    void classBegin() override;
+    void componentComplete() override;
 
 signals:
     void tracked();
@@ -85,7 +85,7 @@ class TrackProperty : public AbstractObjectTracker
 
 public:
     explicit TrackProperty(QObject *parent = nullptr);
-    ~TrackProperty();
+    ~TrackProperty() override;
 
     // clang-format off
     Q_PROPERTY(QString property
@@ -98,7 +98,7 @@ public:
     Q_SIGNAL void propertyChanged();
 
 protected:
-    void init();
+    void init() override;
 
 private:
     QString m_property;
@@ -111,7 +111,7 @@ class TrackModelRow : public AbstractObjectTracker
 
 public:
     explicit TrackModelRow(QObject *parent = nullptr);
-    ~TrackModelRow();
+    ~TrackModelRow() override;
 
     // clang-format off
     Q_PROPERTY(int row
@@ -146,7 +146,7 @@ public:
     Q_SIGNAL void eventChanged();
 
 private:
-    void init();
+    void init() override;
     void onRowsAboutToInsert(const QModelIndex &parent, int start, int end);
     void onRowsInserted();
     void onRowsAboutToDelete(const QModelIndex &parent, int start, int end);
@@ -178,7 +178,7 @@ class TrackSignal : public AbstractObjectTracker
 
 public:
     explicit TrackSignal(QObject *parent = nullptr);
-    ~TrackSignal();
+    ~TrackSignal() override;
 
     // clang-format off
     Q_PROPERTY(QString signal
@@ -191,7 +191,7 @@ public:
     Q_SIGNAL void signalChanged();
 
 protected:
-    void init();
+    void init() override;
 
 private:
     QString m_signal;
@@ -204,7 +204,7 @@ class TrackerPack : public QObject
 
 public:
     explicit TrackerPack(QObject *parent = nullptr);
-    ~TrackerPack();
+    ~TrackerPack() override;
 
     // clang-format off
     Q_PROPERTY(int delay
@@ -249,7 +249,7 @@ signals:
     void tracked();
 
 protected:
-    void timerEvent(QTimerEvent *event);
+    void timerEvent(QTimerEvent *event) override;
     void emitChangesTrackedSignal();
 
 private:

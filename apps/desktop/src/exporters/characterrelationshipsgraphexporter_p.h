@@ -26,17 +26,17 @@ class CharacterRelationshipsGraphScene : public PdfExportableGraphicsScene
 public:
     explicit CharacterRelationshipsGraphScene(const CharacterRelationshipGraph *graph,
                                               QObject *parent = nullptr);
-    ~CharacterRelationshipsGraphScene();
+    ~CharacterRelationshipsGraphScene() override;
 };
 
 class CharacterRelationshipsGraphNodeItem : public QGraphicsRectItem
 {
 public:
     explicit CharacterRelationshipsGraphNodeItem(const CharacterRelationshipGraphNode *node);
-    ~CharacterRelationshipsGraphNodeItem();
+    ~CharacterRelationshipsGraphNodeItem() override;
 
     // QGraphicsItem interface
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
     const CharacterRelationshipGraphNode *m_node;
@@ -46,7 +46,7 @@ class CharacterRelationshipsGraphEdgeItem : public QGraphicsPathItem
 {
 public:
     explicit CharacterRelationshipsGraphEdgeItem(const CharacterRelationshipGraphEdge *edge);
-    ~CharacterRelationshipsGraphEdgeItem();
+    ~CharacterRelationshipsGraphEdgeItem() override;
 };
 
 #endif // CHARACTERRELATIONSHIPSGRAPHEXPORTER_P_H

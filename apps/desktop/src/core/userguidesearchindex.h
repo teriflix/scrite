@@ -26,7 +26,7 @@ class UserGuideSearchIndex : public QAbstractListModel
 
 public:
     explicit UserGuideSearchIndex(QObject *parent = nullptr);
-    ~UserGuideSearchIndex();
+    ~UserGuideSearchIndex() override;
 
     Q_PROPERTY(bool isBusy READ isBusy NOTIFY busyChanged)
     bool isBusy() const { return m_busy; }
@@ -37,9 +37,9 @@ public:
     enum { LocationRole = Qt::UserRole, TitleRole, FullTitleRole, RichTextRole, PlainTextRole };
 
     // QAbstractItemModel interface
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
 private:
     void loadSearchIndex();
@@ -75,7 +75,7 @@ class UserGuideSearchIndexFilter : public QSortFilterProxyModel
 
 public:
     explicit UserGuideSearchIndexFilter(QObject *parent = nullptr);
-    ~UserGuideSearchIndexFilter();
+    ~UserGuideSearchIndexFilter() override;
 
     // clang-format off
     Q_PROPERTY(QString filter
@@ -94,8 +94,8 @@ public:
 
 protected:
     // QSortFilterProxyModel interface
-    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
-    bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+    bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const override;
 
 private:
     QString m_filter, m_trimmedFilter;

@@ -256,10 +256,10 @@ class BlockKeyStrokes : public QObject
 {
 public:
     BlockKeyStrokes() { qApp->installEventFilter(this); }
-    ~BlockKeyStrokes() { qApp->removeEventFilter(this); }
+    ~BlockKeyStrokes() override { qApp->removeEventFilter(this); }
 
 protected:
-    bool eventFilter(QObject *watched, QEvent *event)
+    bool eventFilter(QObject *watched, QEvent *event) override
     {
         Q_UNUSED(watched);
         if (QList<int>({ QEvent::KeyPress, QEvent::KeyRelease, QEvent::ShortcutOverride,
@@ -333,6 +333,11 @@ SceneDocumentBlockUserData::~SceneDocumentBlockUserData()
 bool SceneDocumentBlockUserData::isValid() const
 {
     return m_textBlock.isValid() && !m_sceneElement.isNull();
+}
+
+SceneElement *SceneDocumentBlockUserData::sceneElement() const
+{
+    return m_sceneElement;
 }
 
 void SceneDocumentBlockUserData::resetFormat()
@@ -2861,9 +2866,9 @@ class ForceCursorPositionHack : public QObject
 {
 public:
     explicit ForceCursorPositionHack(const QTextBlock &block, int cp, SceneDocumentBinder *binder);
-    ~ForceCursorPositionHack();
+    ~ForceCursorPositionHack() override;
 
-    void timerEvent(QTimerEvent *event);
+    void timerEvent(QTimerEvent *event) override;
 
 private:
     QTextBlock m_block;

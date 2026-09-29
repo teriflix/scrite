@@ -39,7 +39,7 @@ class TextFormat : public QObject
 
 public:
     explicit TextFormat(QObject *parent = nullptr);
-    ~TextFormat();
+    ~TextFormat() override;
 
     // clang-format off
     Q_PROPERTY(bool bold
@@ -167,7 +167,7 @@ class SceneDocumentBinder : public QSyntaxHighlighter, public QQmlParserStatus
 
 public:
     explicit SceneDocumentBinder(QObject *parent = nullptr);
-    ~SceneDocumentBinder();
+    ~SceneDocumentBinder() override;
 
     // clang-format off
     Q_PROPERTY(ScreenplayFormat *screenplayFormat
@@ -677,16 +677,16 @@ public:
     Q_SIGNAL void applyFormattingEvenInTransactionChanged();
 
     // QQmlParserStatus interface
-    void classBegin();
-    void componentComplete();
+    void classBegin() override;
+    void componentComplete() override;
 
 protected:
     // QSyntaxHighlighter interface
-    void highlightBlock(const QString &text);
+    void highlightBlock(const QString &text) override;
 
     // QObject interface
-    void timerEvent(QTimerEvent *te);
-    bool eventFilter(QObject *watched, QEvent *event);
+    void timerEvent(QTimerEvent *te) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
     // Helpers
     void mergeFormat(int start, int count, const QTextCharFormat &format);

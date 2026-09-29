@@ -26,7 +26,7 @@ class QObjectPropertyBase : public QObject
 
 protected:
     explicit QObjectPropertyBase(QObject *notify, const char *resettablePropertyName);
-    ~QObjectPropertyBase();
+    ~QObjectPropertyBase() override;
 
     void setPointer(QObject *pointer);
     inline QObject *pointer() const { return m_pointer; }
@@ -48,7 +48,7 @@ public:
         : QObjectPropertyBase(notify, resettablePropertyName)
     {
     }
-    ~QObjectProperty() { this->setPointer(nullptr); }
+    ~QObjectProperty() override { this->setPointer(nullptr); }
 
     inline QObjectProperty &operator=(T *pointer)
     {
@@ -66,7 +66,7 @@ public:
     inline bool isNull() const { return m_tpointer == nullptr; }
 
 protected:
-    void resetPointer() { m_tpointer = nullptr; }
+    void resetPointer() override { m_tpointer = nullptr; }
 
 private:
     T *m_tpointer = nullptr;

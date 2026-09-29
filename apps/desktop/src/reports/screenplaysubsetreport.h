@@ -29,7 +29,7 @@ class ScreenplaySubsetReport : public AbstractScreenplaySubsetReport
 
 public:
     Q_INVOKABLE explicit ScreenplaySubsetReport(QObject *parent = nullptr);
-    ~ScreenplaySubsetReport();
+    ~ScreenplaySubsetReport() override;
 
     // clang-format off
     Q_CLASSINFO("sceneNumbers_FieldGroup", "Scenes")
@@ -64,12 +64,12 @@ protected:
     QString personalizedFileName(const QString &fileName) const override;
 
     // AbstractScreenplaySubsetReport interface
-    bool includeScreenplayElement(const ScreenplayElement *) const;
-    QString screenplaySubtitle() const;
-    void configureScreenplayTextDocument(ScreenplayTextDocument &stDoc);
+    bool includeScreenplayElement(const ScreenplayElement *) const override;
+    QString screenplaySubtitle() const override;
+    void configureScreenplayTextDocument(ScreenplayTextDocument &stDoc) override;
 
     // AbstractScreenplayTextDocumentInjectionInterface interface
-    void inject(QTextCursor &, InjectLocation);
+    void inject(QTextCursor &, InjectLocation) override;
 
 private:
     QList<int> m_sceneNumbers;

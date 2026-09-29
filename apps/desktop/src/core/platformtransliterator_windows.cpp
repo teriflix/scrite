@@ -103,7 +103,9 @@ void PlatformLanguageObserver::setupObservation()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "Windows.h"
+#include "windows.h" /* Even though Qt Creator says that this header is not used,
+                        please note that it is actually used here. So, do not
+                        remove this header. */
 
 struct TextInputSource
 {
@@ -285,8 +287,8 @@ bool WindowsBackend::reload()
 
             // HKL is a 4-byte number where last 2 bytes is language code and first 2 bytes is
             // layout type
-            LANGID languageId = LANGID(quint32(keyboard) & 0x0000FFFF);
-            int layoutType = (quint32(keyboard) & 0xFFFF0000) >> 16;
+            LANGID languageId = LANGID(reinterpret_cast<uintptr_t>(keyboard) & 0x0000FFFF);
+            int layoutType = (reinterpret_cast<uintptr_t>(keyboard) & 0xFFFF0000) >> 16;
             auto toHex = [](const int number) {
                 QString ret = QString::number(number, 16).toUpper();
                 if (ret.length() < 4)

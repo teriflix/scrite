@@ -29,7 +29,7 @@ class UrlAttributes : public QObject
 
 public:
     explicit UrlAttributes(QObject *parent = nullptr);
-    ~UrlAttributes();
+    ~UrlAttributes() override;
 
     enum Status {
         Null, // No URL set

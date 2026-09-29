@@ -34,7 +34,7 @@ class CharacterRelationshipGraphNode : public QObject, public GraphLayout::Abstr
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~CharacterRelationshipGraphNode();
+    ~CharacterRelationshipGraphNode() override;
 
     // clang-format off
     Q_PROPERTY(Character *character
@@ -78,14 +78,14 @@ public:
     bool isPlacedByUser() const { return m_placedByUser; }
 
     // GraphLayout::AbstractNode interface
-    bool canBeMoved() const { return !m_placedByUser; }
-    QSizeF size() const { return m_rect.size(); }
-    QObject *containerObject() { return this; }
-    const QObject *containerObject() const { return this; }
+    bool canBeMoved() const override { return !m_placedByUser; }
+    QSizeF size() const override { return m_rect.size(); }
+    QObject *containerObject() override { return this; }
+    const QObject *containerObject() const override { return this; }
 
 protected:
     // GraphLayout::AbstractNode interface
-    void move(const QPointF &pos);
+    void move(const QPointF &pos) override;
 
 protected:
     friend class CharacterRelationshipGraph;
@@ -97,7 +97,7 @@ protected:
     void updateRectFromItemLater();
     void setRect(const QRectF &val);
 
-    void timerEvent(QTimerEvent *te);
+    void timerEvent(QTimerEvent *te) override;
 
 private:
     QRectF m_rect;
@@ -115,7 +115,7 @@ class CharacterRelationshipGraphEdge : public QObject, public GraphLayout::Abstr
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~CharacterRelationshipGraphEdge();
+    ~CharacterRelationshipGraphEdge() override;
 
     // clang-format off
     Q_PROPERTY(Relationship *relationship
@@ -172,11 +172,11 @@ public:
     qreal labelAngle() const { return m_labelAngle; }
 
     // GraphLayout::AbstractEdge interface
-    GraphLayout::AbstractNode *node1() const { return m_fromNode; }
-    GraphLayout::AbstractNode *node2() const { return m_toNode; }
-    void evaluateEdge() { this->evaluatePath(); }
-    QObject *containerObject() { return this; }
-    const QObject *containerObject() const { return this; }
+    GraphLayout::AbstractNode *node1() const override { return m_fromNode; }
+    GraphLayout::AbstractNode *node2() const override { return m_toNode; }
+    void evaluateEdge() override { this->evaluatePath(); }
+    QObject *containerObject() override { return this; }
+    const QObject *containerObject() const override { return this; }
 
     void setEvaluatePathAllowed(bool val);
     bool isEvaluatePathAllowed() const { return m_evaluatePathAllowed; }
@@ -213,7 +213,7 @@ class CharacterRelationshipGraph : public QObject, public QQmlParserStatus
 
 public:
     explicit CharacterRelationshipGraph(QObject *parent = nullptr);
-    ~CharacterRelationshipGraph();
+    ~CharacterRelationshipGraph() override;
 
     // clang-format off
     Q_PROPERTY(QAbstractListModel *nodes
@@ -393,11 +393,11 @@ public:
     void updateGraphJsonFromNode(CharacterRelationshipGraphNode *node);
 
     // QQmlParserStatus interface
-    void classBegin();
-    void componentComplete();
+    void classBegin() override;
+    void componentComplete() override;
 
 protected:
-    void timerEvent(QTimerEvent *te);
+    void timerEvent(QTimerEvent *te) override;
 
 private:
     void setGraphBoundingRect(const QRectF &val);

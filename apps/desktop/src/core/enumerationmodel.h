@@ -33,7 +33,7 @@ public:
     explicit EnumerationModel(QObject *parent = nullptr);
     explicit EnumerationModel(const QMetaObject *mo, const QString &enumName,
                               QObject *parent = nullptr);
-    ~EnumerationModel();
+    ~EnumerationModel() override;
 
     // clang-format off
     Q_PROPERTY(int count
@@ -90,13 +90,13 @@ public:
 
     // QAbstractItemModel interface
     enum { KeyRole = Qt::UserRole, ValueRole, IconRole };
-    QHash<int, QByteArray> roleNames() const;
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
+    QHash<int, QByteArray> roleNames() const override;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
 
     // QQmlParserStatus interface
-    void classBegin() { m_componentComplete = false; }
-    void componentComplete();
+    void classBegin() override { m_componentComplete = false; }
+    void componentComplete() override;
 
 private:
     void resetObject();

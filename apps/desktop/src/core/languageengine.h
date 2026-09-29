@@ -231,7 +231,7 @@ class AbstractLanguagesModel : public QAbstractListModel
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~AbstractLanguagesModel();
+    ~AbstractLanguagesModel() override;
 
     Q_INVOKABLE int indexOfLanguage(int code) const;
     Q_INVOKABLE bool hasLanguage(int code) const; // here code should be from QLocale::Language
@@ -261,9 +261,9 @@ public:
         KeySequenceRole,
         PreferredTransliterationOptionIdRole
     };
-    QHash<int, QByteArray> roleNames() const;
-    QVariant data(const QModelIndex &index, int role) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    QHash<int, QByteArray> roleNames() const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
 signals:
     void languagesCodesChanged(const QList<int> &languageCodes);
@@ -298,7 +298,7 @@ class SupportedLanguages : public AbstractLanguagesModel
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~SupportedLanguages();
+    ~SupportedLanguages() override;
 
     // clang-format off
     Q_PROPERTY(int activeLanguageCode
@@ -357,7 +357,7 @@ signals:
     void languageTransliteratorChanged(int code);
 
 protected:
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject *object, QEvent *event) override;
 
 private:
     explicit SupportedLanguages(QObject *parent = nullptr);
@@ -367,9 +367,9 @@ private:
     void transliterationOptionsUpdated();
     void onScriptFontFamilyChanged(QChar::Script script, const QString &fontFamily);
 
-    void initialize();
-    QJsonValue toJson() const;
-    void fromJson(const QJsonValue &value);
+    void initialize() override;
+    QJsonValue toJson() const override;
+    void fromJson(const QJsonValue &value) override;
 
     void onDataChanged(const QModelIndex &start, const QModelIndex &end);
     void verifyActiveLanguage();
@@ -389,12 +389,12 @@ class AvailableLanguages : public AbstractLanguagesModel
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~AvailableLanguages();
+    ~AvailableLanguages() override;
 
 private:
     explicit AvailableLanguages(QObject *parent = nullptr);
 
-    void initialize();
+    void initialize() override;
 
     friend class LanguageEngine;
 };
@@ -517,7 +517,7 @@ class DefaultTransliteration : public QObject
 
 public:
     explicit DefaultTransliteration(QObject *parent = nullptr);
-    ~DefaultTransliteration();
+    ~DefaultTransliteration() override;
 
     // clang-format off
     Q_PROPERTY(QString driver
@@ -551,7 +551,7 @@ class AbstractTransliterationEngine : public QObject
 
 public:
     explicit AbstractTransliterationEngine(QObject *parent = nullptr);
-    ~AbstractTransliterationEngine();
+    ~AbstractTransliterationEngine() override;
 
     /** Returns the default language supported by this engine */
     // clang-format off
@@ -611,15 +611,15 @@ class StaticTransliterationEngine : public AbstractTransliterationEngine
 
 public:
     explicit StaticTransliterationEngine(QObject *parent = nullptr);
-    ~StaticTransliterationEngine();
+    ~StaticTransliterationEngine() override;
 
     // AbstractTransliterator interface
-    QString name() const;
-    QList<TransliterationOption> options(int lang) const;
-    bool canActivate(const TransliterationOption &option);
-    bool activate(const TransliterationOption &option);
-    QString transliterateWord(const QString &word, const TransliterationOption &option) const;
-    AlphabetMappings alphabetMappings(int langCode) const;
+    QString name() const override;
+    QList<TransliterationOption> options(int lang) const override;
+    bool canActivate(const TransliterationOption &option) override;
+    bool activate(const TransliterationOption &option) override;
+    QString transliterateWord(const QString &word, const TransliterationOption &option) const override;
+    AlphabetMappings alphabetMappings(int langCode) const override;
 };
 
 class QJSEngine;
@@ -635,14 +635,14 @@ class SanscriptjsTransliterationEngine : public AbstractTransliterationEngine
 
 public:
     explicit SanscriptjsTransliterationEngine(QObject *parent = nullptr);
-    ~SanscriptjsTransliterationEngine();
+    ~SanscriptjsTransliterationEngine() override;
 
     // AbstractTransliterationEngine interface
-    QString name() const;
-    QList<TransliterationOption> options(int lang) const;
-    bool canActivate(const TransliterationOption &option);
-    bool activate(const TransliterationOption &option);
-    QString transliterateWord(const QString &word, const TransliterationOption &option) const;
+    QString name() const override;
+    QList<TransliterationOption> options(int lang) const override;
+    bool canActivate(const TransliterationOption &option) override;
+    bool activate(const TransliterationOption &option) override;
+    QString transliterateWord(const QString &word, const TransliterationOption &option) const override;
 
 private:
     bool ensureEngine() const;
@@ -668,16 +668,16 @@ class DictpressTransliterationEngine : public AbstractTransliterationEngine
 
 public:
     explicit DictpressTransliterationEngine(int language, QObject *parent = nullptr);
-    ~DictpressTransliterationEngine();
+    ~DictpressTransliterationEngine() override;
 
     bool isValid() const;
 
     // AbstractTransliterationEngine interface
-    QString name() const;
-    QList<TransliterationOption> options(int lang) const;
-    bool canActivate(const TransliterationOption &option);
-    bool activate(const TransliterationOption &option);
-    QString transliterateWord(const QString &word, const TransliterationOption &option) const;
+    QString name() const override;
+    QList<TransliterationOption> options(int lang) const override;
+    bool canActivate(const TransliterationOption &option) override;
+    bool activate(const TransliterationOption &option) override;
+    QString transliterateWord(const QString &word, const TransliterationOption &option) const override;
 
 protected:
     void requestSuggestions(const QString &word);
@@ -706,20 +706,20 @@ class PlatformTransliterationEngine : public AbstractTransliterationEngine
 
 public:
     explicit PlatformTransliterationEngine(QObject *parent = nullptr);
-    ~PlatformTransliterationEngine();
+    ~PlatformTransliterationEngine() override;
 
-    int defaultLanguage() const;
+    int defaultLanguage() const override;
 
     // Activates the default language and returns its code
     int activateDefaultLanguage();
     QList<int> supportedLanguageCodes() const;
 
     // AbstractTransliterator interface
-    QString name() const;
-    QList<TransliterationOption> options(int lang) const;
-    bool canActivate(const TransliterationOption &option);
-    bool activate(const TransliterationOption &option);
-    QString transliterateWord(const QString &word, const TransliterationOption &option) const;
+    QString name() const override;
+    QList<TransliterationOption> options(int lang) const override;
+    bool canActivate(const TransliterationOption &option) override;
+    bool activate(const TransliterationOption &option) override;
+    QString transliterateWord(const QString &word, const TransliterationOption &option) const override;
 };
 
 /*
@@ -733,15 +733,15 @@ class FallbackTransliterationEngine : public AbstractTransliterationEngine
 public:
     explicit FallbackTransliterationEngine(AbstractTransliterationEngine *platformEngine,
                                            QObject *parent = nullptr);
-    ~FallbackTransliterationEngine();
+    ~FallbackTransliterationEngine() override;
 
     // AbstractTransliterator interface
-    int defaultLanguage() const;
-    QString name() const;
-    QList<TransliterationOption> options(int lang) const;
-    bool canActivate(const TransliterationOption &option);
-    bool activate(const TransliterationOption &option);
-    QString transliterateWord(const QString &word, const TransliterationOption &option) const;
+    int defaultLanguage() const override;
+    QString name() const override;
+    QList<TransliterationOption> options(int lang) const override;
+    bool canActivate(const TransliterationOption &option) override;
+    bool activate(const TransliterationOption &option) override;
+    QString transliterateWord(const QString &word, const TransliterationOption &option) const override;
 
 private:
     QPointer<AbstractTransliterationEngine> m_platformEngine;
@@ -759,7 +759,7 @@ class LanguageTransliterator : public QObject
     QML_UNCREATABLE("Use as attached property.")
 
 public:
-    ~LanguageTransliterator();
+    ~LanguageTransliterator() override;
 
     static LanguageTransliterator *qmlAttachedProperties(QObject *object);
 
@@ -833,7 +833,7 @@ public:
     QObject *editor() const { return m_editor; }
 
 protected:
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject *object, QEvent *event) override;
 
 private:
     LanguageTransliterator(QObject *parent = nullptr);
@@ -933,13 +933,13 @@ class LanguageIconProvider : public QQuickImageProvider
 {
 public:
     explicit LanguageIconProvider();
-    ~LanguageIconProvider();
+    ~LanguageIconProvider() override;
 
     static QString name();
     static QUrl iconUrlFor(const Language &language);
 
     // QQuickImageProvider interface
-    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
+    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize) override;
 };
 
 /*
@@ -953,7 +953,7 @@ class LanguageEngine : public QObject
 
 public:
     static LanguageEngine *instance();
-    ~LanguageEngine();
+    ~LanguageEngine() override;
 
     // clang-format off
     Q_PROPERTY(AvailableLanguages *availableLanguages
@@ -1017,7 +1017,7 @@ signals:
     void transliterationOptionsUpdated();
 
 protected:
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject *object, QEvent *event) override;
 
 private:
     explicit LanguageEngine(QObject *parent = nullptr);
@@ -1043,7 +1043,7 @@ class PlatformLanguageObserver : public QQuickItem
 
 public:
     PlatformLanguageObserver(QQuickItem *parent = nullptr);
-    ~PlatformLanguageObserver();
+    ~PlatformLanguageObserver() override;
 
     // clang-format off
     Q_PROPERTY(int activeLanguageCode

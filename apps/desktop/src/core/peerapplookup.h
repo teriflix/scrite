@@ -36,7 +36,7 @@ class PeerAppLookup : public QObject
 
 public:
     static PeerAppLookup *instance();
-    ~PeerAppLookup();
+    ~PeerAppLookup() override;
 
     // clang-format off
     Q_PROPERTY(QString instanceId

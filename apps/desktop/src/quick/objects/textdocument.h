@@ -31,7 +31,7 @@ class TextDocument : public QObject
     QML_ATTACHED(TextDocument)
 
 public:
-    ~TextDocument();
+    ~TextDocument() override;
 
     static TextDocument *qmlAttachedProperties(QObject *object);
 

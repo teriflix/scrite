@@ -34,7 +34,7 @@ public:
     static void setMarker(const QByteArray &marker);
 
     explicit DocumentFileSystem(QObject *parent = nullptr);
-    ~DocumentFileSystem();
+    ~DocumentFileSystem() override;
 
     void hardReset();
 
@@ -92,7 +92,7 @@ private:
 class DocumentFile : public QFile
 {
 public:
-    ~DocumentFile();
+    ~DocumentFile() override;
 
 private:
     explicit DocumentFile(const QString &filePath, DocumentFileSystem *parent = nullptr);

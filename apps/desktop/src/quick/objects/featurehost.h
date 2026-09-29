@@ -28,7 +28,7 @@ class FeatureHost : public QObject, public QQmlParserStatus
 
 public:
     explicit FeatureHost(QObject *parent = nullptr);
-    ~FeatureHost();
+    ~FeatureHost() override;
     Q_SIGNAL void aboutToDelete(FeatureHost *host);
 
     // clang-format off
@@ -49,8 +49,8 @@ public:
     QQuickItem *item() const { return m_item; }
 
     // QQmlParserStatus interface
-    void classBegin();
-    void componentComplete();
+    void classBegin() override;
+    void componentComplete() override;
 
 signals:
     void featureAdded(QObject *feature);
@@ -77,7 +77,7 @@ class FeatureProvider : public QObject
 
 public:
     explicit FeatureProvider(QObject *parent = nullptr);
-    ~FeatureProvider();
+    ~FeatureProvider() override;
 
     // clang-format off
     Q_PROPERTY(QString hostUri

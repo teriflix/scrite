@@ -30,7 +30,7 @@ class Aggregation : public QObject
 
 public:
     explicit Aggregation(QObject *parent = nullptr);
-    ~Aggregation();
+    ~Aggregation() override;
 
     static Aggregation *qmlAttachedProperties(QObject *object);
 

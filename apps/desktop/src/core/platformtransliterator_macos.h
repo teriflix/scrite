@@ -27,7 +27,7 @@ class MacOSBackend : public QObject
 
 public:
     explicit MacOSBackend(QObject *parent = nullptr);
-    ~MacOSBackend();
+    ~MacOSBackend() override;
 
     int defaultLanguage() const;
     int activateDefaultLanguage() const;

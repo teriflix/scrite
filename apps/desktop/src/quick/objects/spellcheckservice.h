@@ -94,7 +94,7 @@ public:
     static void scheduleUpdateAll();
 
     SpellCheckService(QObject *parent = nullptr);
-    ~SpellCheckService();
+    ~SpellCheckService() override;
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
     void setText(const QString &val);
@@ -134,8 +134,8 @@ public:
     Q_INVOKABLE static bool canCheckLanguage(int language);
 
     // QQmlParserStatus interface
-    void classBegin();
-    void componentComplete();
+    void classBegin() override;
+    void componentComplete() override;
 
 signals:
     void started();
@@ -144,7 +144,7 @@ signals:
 private:
     void setMisspelledFragments(const QList<TextFragment> &val);
     void doUpdate();
-    void timerEvent(QTimerEvent *event);
+    void timerEvent(QTimerEvent *event) override;
     Q_SLOT void spellCheckComplete();
     void acceptResult(const SpellCheckServiceResult &result);
 

@@ -28,7 +28,7 @@ class FileModificationTracker : public QObject
 
 public:
     FileModificationTracker(QObject *parent = nullptr);
-    ~FileModificationTracker();
+    ~FileModificationTracker() override;
 
     // clang-format off
     Q_PROPERTY(QString filePath

@@ -34,7 +34,7 @@ class BasicFileInfo : public QObject
 
 public:
     explicit BasicFileInfo(QObject *parent = nullptr);
-    ~BasicFileInfo();
+    ~BasicFileInfo() override;
 
     // clang-format off
     Q_PROPERTY(bool exists

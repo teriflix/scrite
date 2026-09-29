@@ -26,7 +26,7 @@ class BatchChange : public QObject
 
 public:
     explicit BatchChange(QObject *parent = nullptr);
-    ~BatchChange();
+    ~BatchChange() override;
 
     // clang-format off
     Q_PROPERTY(QVariant trackChangesOn
@@ -57,7 +57,7 @@ public:
     Q_SIGNAL void valueChanged();
 
 private:
-    void timerEvent(QTimerEvent *event);
+    void timerEvent(QTimerEvent *event) override;
 
 private:
     int m_delay = 35;

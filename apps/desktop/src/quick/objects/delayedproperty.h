@@ -28,7 +28,7 @@ class DelayedProperty : public QQuickItem
 
 public:
     explicit DelayedProperty(QQuickItem *parent = nullptr);
-    ~DelayedProperty();
+    ~DelayedProperty() override;
 
     QML_ATTACHED(DelayedPropertyAttached)
     static DelayedPropertyAttached *qmlAttachedProperties(QObject *parent);
@@ -84,7 +84,7 @@ public:
 private:
     void setGet(const QVariant &val);
     void schedule();
-    void timerEvent(QTimerEvent *te);
+    void timerEvent(QTimerEvent *te) override;
     void parentHasChanged();
 
 private:
@@ -102,7 +102,7 @@ class DelayedPropertyAttached : public QObject
     QML_ANONYMOUS
 
 public:
-    virtual ~DelayedPropertyAttached();
+    ~DelayedPropertyAttached() override;
 
     // clang-format off
     Q_PROPERTY(QString name
@@ -162,7 +162,7 @@ public:
 protected:
     explicit DelayedPropertyAttached(QObject *parent = nullptr);
 
-    void timerEvent(QTimerEvent *te);
+    void timerEvent(QTimerEvent *te) override;
     void setValue(const QVariant &val);
 
 private:

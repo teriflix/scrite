@@ -2647,7 +2647,7 @@ public:
         this->start();
     }
 
-    ~AddInvisibleCharactersTimer() { }
+    ~AddInvisibleCharactersTimer() override { }
 
 private:
     void itsTime()

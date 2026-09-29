@@ -34,7 +34,7 @@ class TwoColumnReport : public AbstractReportGenerator
 
 public:
     Q_INVOKABLE TwoColumnReport(QObject *parent = nullptr);
-    ~TwoColumnReport();
+    ~TwoColumnReport() override;
 
     enum Layout { VideoAudioLayout, EverythingLeft, EverythingRight };
     Q_ENUM(Layout)
@@ -258,9 +258,9 @@ public:
     Q_SIGNAL void keywordsChanged();
 
 protected:
-    bool doGenerate(QTextDocument *document);
-    bool requiresOdtContentPolish() const;
-    bool polishOdtContent(QDomDocument &);
+    bool doGenerate(QTextDocument *document) override;
+    bool requiresOdtContentPolish() const override;
+    bool polishOdtContent(QDomDocument &) override;
 
     // These functions must return true if element should be included in the
     // final report.

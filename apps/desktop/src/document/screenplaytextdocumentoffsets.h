@@ -31,7 +31,7 @@ class ScreenplayTextDocumentOffsets : public GenericArrayModel
 
 public:
     explicit ScreenplayTextDocumentOffsets(QObject *parent = nullptr);
-    ~ScreenplayTextDocumentOffsets();
+    ~ScreenplayTextDocumentOffsets() override;
 
     // clang-format off
     Q_PROPERTY(Screenplay *screenplay

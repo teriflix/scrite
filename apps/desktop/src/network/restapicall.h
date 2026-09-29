@@ -46,7 +46,7 @@ public:
     static const QString E_INTERNET;
 
     static RestApi *instance();
-    ~RestApi();
+    ~RestApi() override;
 
     // clang-format off
     Q_PROPERTY(bool networkAvailable
@@ -98,7 +98,7 @@ class RestApiCall : public QObject, public QQmlParserStatus
 
 public:
     explicit RestApiCall(QObject *parent = nullptr);
-    ~RestApiCall();
+    ~RestApiCall() override;
     Q_SIGNAL void aboutToDelete(RestApiCall *call);
 
     enum Type { GET, POST };
@@ -255,8 +255,8 @@ public:
     void setAutoDelete(bool val);
 
     // QQmlParserStatus interface
-    void classBegin() { m_isQmlInstance = true; }
-    void componentComplete() { m_isQmlInstance = true; }
+    void classBegin() override { m_isQmlInstance = true; }
+    void componentComplete() override { m_isQmlInstance = true; }
 
 signals:
     void aboutToCall();
@@ -296,7 +296,7 @@ class RestApiCallQueue : public QObject
 
 public:
     RestApiCallQueue(QObject *parent = nullptr);
-    ~RestApiCallQueue();
+    ~RestApiCallQueue() override;
 
     static RestApiCallQueue *find(RestApiCall *call);
 
@@ -359,7 +359,7 @@ class RestApiCallList : public QObjectListModel<RestApiCall *>
 
 public:
     RestApiCallList(QObject *parent = nullptr);
-    ~RestApiCallList();
+    ~RestApiCallList() override;
 
     // clang-format off
     Q_PROPERTY(int busyCount
@@ -400,8 +400,8 @@ private:
     static qsizetype staticCallCount(QQmlListProperty<RestApiCall> *list);
 
 protected:
-    void itemInsertEvent(RestApiCall *ptr);
-    void itemRemoveEvent(RestApiCall *ptr);
+    void itemInsertEvent(RestApiCall *ptr) override;
+    void itemRemoveEvent(RestApiCall *ptr) override;
 
 private:
     void setBusyCount(int val);
@@ -418,7 +418,7 @@ class AppMinimumVersionRestApiCall : public RestApiCall
 
 public:
     AppMinimumVersionRestApiCall(QObject *parent = nullptr);
-    ~AppMinimumVersionRestApiCall();
+    ~AppMinimumVersionRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QVersionNumber minimumVersion
@@ -442,9 +442,9 @@ public:
     bool isVersionSupported() const;
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return false; }
-    QString api() const { return "app/minimumVersion"; }
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return false; }
+    QString api() const override { return "app/minimumVersion"; }
 };
 
 class AppUserGuideSearchIndexRestApiCall : public RestApiCall
@@ -454,7 +454,7 @@ class AppUserGuideSearchIndexRestApiCall : public RestApiCall
 
 public:
     AppUserGuideSearchIndexRestApiCall(QObject *parent = nullptr);
-    ~AppUserGuideSearchIndexRestApiCall();
+    ~AppUserGuideSearchIndexRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QUrl userGuideBaseUrl
@@ -485,13 +485,13 @@ public:
     bool isUpdateRequired() const;
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return false; }
-    QString api() const { return "app/userGuideSearchIndex"; }
-    QJsonObject data() const;
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return false; }
+    QString api() const override { return "app/userGuideSearchIndex"; }
+    QJsonObject data() const override;
 
 protected:
-    void setResponse(const QJsonObject &val);
+    void setResponse(const QJsonObject &val) override;
 };
 
 class AppWelcomeTextApiCall : public RestApiCall
@@ -501,7 +501,7 @@ class AppWelcomeTextApiCall : public RestApiCall
 
 public:
     AppWelcomeTextApiCall(QObject *parent = nullptr);
-    ~AppWelcomeTextApiCall();
+    ~AppWelcomeTextApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QJsonObject welcomeText
@@ -511,9 +511,9 @@ public:
     QJsonObject welcomeText() const { return this->responseData(); }
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return false; }
-    QString api() const { return "app/welcomeText"; }
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return false; }
+    QString api() const override { return "app/welcomeText"; }
 };
 
 class AppCheckUserRestApiCall : public RestApiCall
@@ -523,7 +523,7 @@ class AppCheckUserRestApiCall : public RestApiCall
 
 public:
     AppCheckUserRestApiCall(QObject *parent = nullptr);
-    ~AppCheckUserRestApiCall();
+    ~AppCheckUserRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QString email
@@ -593,10 +593,10 @@ public:
     QJsonObject userInfo() const { return this->responseData(); }
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return false; }
-    QString api() const { return "app/checkUser"; }
-    QJsonObject data() const;
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return false; }
+    QString api() const override { return "app/checkUser"; }
+    QJsonObject data() const override;
 
 private:
     QString m_email;
@@ -614,7 +614,7 @@ class AppLatestReleaseRestApiCall : public RestApiCall
 
 public:
     AppLatestReleaseRestApiCall(QObject *parent = nullptr);
-    ~AppLatestReleaseRestApiCall();
+    ~AppLatestReleaseRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QJsonObject latestRelease
@@ -631,13 +631,13 @@ public:
     QJsonObject update() const { return m_update; }
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return false; }
-    QString api() const { return "app/latestRelease"; }
-    QJsonObject data() const;
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return false; }
+    QString api() const override { return "app/latestRelease"; }
+    QJsonObject data() const override;
 
 protected:
-    void setResponse(const QJsonObject &val);
+    void setResponse(const QJsonObject &val) override;
 
 private:
     QJsonObject m_update;
@@ -650,13 +650,13 @@ class AppRequestActivationCodeRestApiCall : public RestApiCall
 
 public:
     AppRequestActivationCodeRestApiCall(QObject *parent = nullptr);
-    ~AppRequestActivationCodeRestApiCall();
+    ~AppRequestActivationCodeRestApiCall() override;
 
     // RestApiCall interface
-    Type type() const { return POST; }
-    bool useSessionToken() const { return false; }
-    QString api() const { return "app/requestActivationCode"; }
-    QJsonObject data() const;
+    Type type() const override { return POST; }
+    bool useSessionToken() const override { return false; }
+    QString api() const override { return "app/requestActivationCode"; }
+    QJsonObject data() const override;
 };
 
 class AppActivateDeviceRestApiCall : public RestApiCall
@@ -666,7 +666,7 @@ class AppActivateDeviceRestApiCall : public RestApiCall
 
 public:
     AppActivateDeviceRestApiCall(QObject *parent = nullptr);
-    ~AppActivateDeviceRestApiCall();
+    ~AppActivateDeviceRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QString activationCode
@@ -686,13 +686,13 @@ public:
     QJsonObject tokens() const { return this->responseData(); }
 
     // RestApiCall interface
-    Type type() const { return POST; }
-    bool useSessionToken() const { return false; }
-    QString api() const { return "app/activateDevice"; }
-    QJsonObject data() const;
+    Type type() const override { return POST; }
+    bool useSessionToken() const override { return false; }
+    QString api() const override { return "app/activateDevice"; }
+    QJsonObject data() const override;
 
 protected:
-    void setResponse(const QJsonObject &val);
+    void setResponse(const QJsonObject &val) override;
 
 private:
     QString m_activationCode;
@@ -705,7 +705,7 @@ class AppPlanTaxonomyRestApiCall : public RestApiCall
 
 public:
     AppPlanTaxonomyRestApiCall(QObject *parent = nullptr);
-    ~AppPlanTaxonomyRestApiCall();
+    ~AppPlanTaxonomyRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QJsonObject taxonomy
@@ -715,9 +715,9 @@ public:
     QJsonObject taxonomy() const { return this->responseData(); }
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return false; }
-    QString api() const { return "app/planTaxonomy"; }
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return false; }
+    QString api() const override { return "app/planTaxonomy"; }
 };
 
 class UserMeRestApiCall : public RestApiCall
@@ -727,7 +727,7 @@ class UserMeRestApiCall : public RestApiCall
 
 public:
     UserMeRestApiCall(QObject *parent = nullptr);
-    ~UserMeRestApiCall();
+    ~UserMeRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QJsonObject userInfo
@@ -747,13 +747,13 @@ public:
     Q_SIGNAL void updatedFieldsChanged();
 
     // RestApiCall interface
-    Type type() const { return m_updatedFields.isEmpty() ? GET : POST; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "user/me"; }
-    QJsonObject data() const { return m_updatedFields; }
+    Type type() const override { return m_updatedFields.isEmpty() ? GET : POST; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "user/me"; }
+    QJsonObject data() const override { return m_updatedFields; }
 
 protected:
-    void setResponse(const QJsonObject &val);
+    void setResponse(const QJsonObject &val) override;
 
 private:
     QJsonObject m_updatedFields;
@@ -766,12 +766,12 @@ class UserOnboardingFormApiCall : public RestApiCall
 
 public:
     UserOnboardingFormApiCall(QObject *parent = nullptr);
-    ~UserOnboardingFormApiCall();
+    ~UserOnboardingFormApiCall() override;
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "user/onboardingForm"; }
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "user/onboardingForm"; }
 };
 
 class UserSubmitOnboardingFormApiCall : public RestApiCall
@@ -781,7 +781,7 @@ class UserSubmitOnboardingFormApiCall : public RestApiCall
 
 public:
     UserSubmitOnboardingFormApiCall(QObject *parent = nullptr);
-    ~UserSubmitOnboardingFormApiCall();
+    ~UserSubmitOnboardingFormApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QJsonObject formData
@@ -794,13 +794,13 @@ public:
     Q_SIGNAL void formDataChanged();
 
     // RestApiCall interface
-    Type type() const { return POST; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "user/submitOnboardingForm"; }
-    QJsonObject data() const { return { { "formData", m_formData } }; }
+    Type type() const override { return POST; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "user/submitOnboardingForm"; }
+    QJsonObject data() const override { return { { "formData", m_formData } }; }
 
 protected:
-    void setResponse(const QJsonObject &val);
+    void setResponse(const QJsonObject &val) override;
 
 private:
     QJsonObject m_formData;
@@ -813,17 +813,17 @@ class UserRequestVersionTypeApiCall : public RestApiCall
 
 public:
     UserRequestVersionTypeApiCall(QObject *parent = nullptr);
-    ~UserRequestVersionTypeApiCall();
+    ~UserRequestVersionTypeApiCall() override;
 
-    Type type() const { return POST; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "user/requestVersionType"; }
-    QJsonObject data() const;
+    Type type() const override { return POST; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "user/requestVersionType"; }
+    QJsonObject data() const override;
 
-    bool call();
+    bool call() override;
 
 protected:
-    void setResponse(const QJsonObject &val);
+    void setResponse(const QJsonObject &val) override;
 };
 
 class UserMessagesRestApiCall : public RestApiCall
@@ -834,7 +834,7 @@ private:
     UserMessagesRestApiCall(QObject *parent = nullptr);
 
 public:
-    ~UserMessagesRestApiCall();
+    ~UserMessagesRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QJsonArray messages
@@ -844,9 +844,9 @@ public:
     QJsonArray messages() const { return this->response().value("data").toArray(); }
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "user/messages"; }
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "user/messages"; }
 
 private:
     friend class User;
@@ -859,7 +859,7 @@ class UserHelpTipsRestApiCall : public RestApiCall
 
 public:
     UserHelpTipsRestApiCall(QObject *parent = nullptr);
-    ~UserHelpTipsRestApiCall();
+    ~UserHelpTipsRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QJsonObject helpTips
@@ -869,9 +869,9 @@ public:
     QJsonObject helpTips() const { return this->responseData(); }
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "user/helpTips"; }
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "user/helpTips"; }
 };
 
 class UserCheckRestApiCall : public RestApiCall
@@ -881,7 +881,7 @@ class UserCheckRestApiCall : public RestApiCall
 
 public:
     UserCheckRestApiCall(QObject *parent = nullptr);
-    ~UserCheckRestApiCall();
+    ~UserCheckRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QStringList emails
@@ -894,10 +894,10 @@ public:
     Q_SIGNAL void emailsChanged();
 
     // RestApiCall interface
-    Type type() const { return m_emails.length() == 1 ? GET : POST; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "user/check"; }
-    QJsonObject data() const;
+    Type type() const override { return m_emails.length() == 1 ? GET : POST; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "user/check"; }
+    QJsonObject data() const override;
 
 private:
     QStringList m_emails;
@@ -910,7 +910,7 @@ class UserActivityRestApiCall : public RestApiCall
 
 public:
     UserActivityRestApiCall(QObject *parent = nullptr);
-    ~UserActivityRestApiCall();
+    ~UserActivityRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QString activity
@@ -933,10 +933,10 @@ public:
     Q_SIGNAL void activityDataChanged();
 
     // RestApiCall interface
-    Type type() const { return POST; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "user/activity"; }
-    QJsonObject data() const;
+    Type type() const override { return POST; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "user/activity"; }
+    QJsonObject data() const override;
 
 private:
     QString m_activity;
@@ -950,7 +950,7 @@ class InstallationCurrentRestApiCall : public RestApiCall
 
 public:
     InstallationCurrentRestApiCall(QObject *parent = nullptr);
-    ~InstallationCurrentRestApiCall();
+    ~InstallationCurrentRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QJsonObject installationInfo
@@ -960,9 +960,9 @@ public:
     QJsonObject installationInfo() const { return this->responseData(); }
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "installation/current"; }
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "installation/current"; }
 };
 
 class InstallationAllRestApiCall : public RestApiCall
@@ -972,7 +972,7 @@ class InstallationAllRestApiCall : public RestApiCall
 
 public:
     InstallationAllRestApiCall(QObject *parent = nullptr);
-    ~InstallationAllRestApiCall();
+    ~InstallationAllRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(int activeInstallationCount
@@ -996,9 +996,9 @@ public:
     QJsonArray installationsInfo() const;
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "installation/all"; }
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "installation/all"; }
 };
 
 class InstallationDeactivateRestApiCall : public RestApiCall
@@ -1008,20 +1008,20 @@ class InstallationDeactivateRestApiCall : public RestApiCall
 
 public:
     InstallationDeactivateRestApiCall(QObject *parent = nullptr);
-    ~InstallationDeactivateRestApiCall();
+    ~InstallationDeactivateRestApiCall() override;
 
     // RestApiCall interface
-    Type type() const { return POST; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "installation/deactivate"; }
+    Type type() const override { return POST; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "installation/deactivate"; }
 
-    bool call();
+    bool call() override;
 
 private:
     void resetEverything();
 
 protected:
-    void setResponse(const QJsonObject &val);
+    void setResponse(const QJsonObject &val) override;
 };
 
 class InstallationUpdateRestApiCall : public RestApiCall
@@ -1031,16 +1031,16 @@ class InstallationUpdateRestApiCall : public RestApiCall
 
 public:
     InstallationUpdateRestApiCall(QObject *parent = nullptr);
-    ~InstallationUpdateRestApiCall();
+    ~InstallationUpdateRestApiCall() override;
 
     // RestApiCall interface
-    Type type() const { return POST; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "installation/update"; }
-    QJsonObject data() const;
+    Type type() const override { return POST; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "installation/update"; }
+    QJsonObject data() const override;
 
 protected:
-    void setResponse(const QJsonObject &val);
+    void setResponse(const QJsonObject &val) override;
 };
 
 class InstallationDeactivateOtherRestApiCall : public RestApiCall
@@ -1050,7 +1050,7 @@ class InstallationDeactivateOtherRestApiCall : public RestApiCall
 
 public:
     InstallationDeactivateOtherRestApiCall(QObject *parent = nullptr);
-    ~InstallationDeactivateOtherRestApiCall();
+    ~InstallationDeactivateOtherRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QString installationId
@@ -1062,13 +1062,13 @@ public:
     QString installationId() const { return m_installationId; }
     Q_SIGNAL void installationIdChanged();
 
-    Type type() const { return POST; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "installation/deactivateOther"; }
-    QJsonObject data() const;
+    Type type() const override { return POST; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "installation/deactivateOther"; }
+    QJsonObject data() const override;
 
 protected:
-    void setResponse(const QJsonObject &val);
+    void setResponse(const QJsonObject &val) override;
 
 private:
     QString m_installationId;
@@ -1081,7 +1081,7 @@ class SessionCurrentRestApiCall : public RestApiCall
 
 public:
     SessionCurrentRestApiCall(QObject *parent = nullptr);
-    ~SessionCurrentRestApiCall();
+    ~SessionCurrentRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QJsonObject user
@@ -1105,14 +1105,14 @@ public:
     QDateTime since() const;
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "session/current"; }
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "session/current"; }
 
-    bool call();
+    bool call() override;
 
 protected:
-    void setResponse(const QJsonObject &val);
+    void setResponse(const QJsonObject &val) override;
 };
 
 class SessionStatusRestApiCall : public RestApiCall
@@ -1122,7 +1122,7 @@ class SessionStatusRestApiCall : public RestApiCall
 
 public:
     SessionStatusRestApiCall(QObject *parent = nullptr);
-    ~SessionStatusRestApiCall();
+    ~SessionStatusRestApiCall() override;
 
     enum Status { Unknown = -1, Invalid, Valid };
     Q_ENUM(Status)
@@ -1136,14 +1136,14 @@ public:
     Q_SIGNAL void statusChanged();
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "session/status"; }
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "session/status"; }
 
-    bool call();
+    bool call() override;
 
 protected:
-    void setResponse(const QJsonObject &val);
+    void setResponse(const QJsonObject &val) override;
 };
 
 class SessionNewRestApiCall : public RestApiCall
@@ -1155,19 +1155,19 @@ public:
     static bool isCallUnderway();
 
     SessionNewRestApiCall(QObject *parent = nullptr);
-    ~SessionNewRestApiCall();
+    ~SessionNewRestApiCall() override;
 
     // RestApiCall interface
-    Type type() const { return POST; }
-    bool useSessionToken() const { return false; }
-    QString api() const { return "session/new"; }
-    QJsonObject data() const;
+    Type type() const override { return POST; }
+    bool useSessionToken() const override { return false; }
+    QString api() const override { return "session/new"; }
+    QJsonObject data() const override;
 
-    bool call();
+    bool call() override;
 
 protected:
-    void setError(const QJsonObject &val);
-    void setResponse(const QJsonObject &val);
+    void setError(const QJsonObject &val) override;
+    void setResponse(const QJsonObject &val) override;
 };
 
 class SubscriptionPlansRestApiCall : public RestApiCall
@@ -1177,7 +1177,7 @@ class SubscriptionPlansRestApiCall : public RestApiCall
 
 public:
     SubscriptionPlansRestApiCall(QObject *parent = nullptr);
-    ~SubscriptionPlansRestApiCall();
+    ~SubscriptionPlansRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QJsonArray plans
@@ -1194,9 +1194,9 @@ public:
     QJsonArray subscriptionHistory() const;
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "subscription/plans"; }
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "subscription/plans"; }
 };
 
 class SubscriptionReferralCodeRestApiCall : public RestApiCall
@@ -1206,7 +1206,7 @@ class SubscriptionReferralCodeRestApiCall : public RestApiCall
 
 public:
     SubscriptionReferralCodeRestApiCall(QObject *parent = nullptr);
-    ~SubscriptionReferralCodeRestApiCall();
+    ~SubscriptionReferralCodeRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QString code
@@ -1219,10 +1219,10 @@ public:
     Q_SIGNAL void codeChanged();
 
     // RestApiCall interface
-    Type type() const { return POST; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "subscription/referralCode"; }
-    QJsonObject data() const;
+    Type type() const override { return POST; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "subscription/referralCode"; }
+    QJsonObject data() const override;
 
 private:
     QString m_code;
@@ -1235,7 +1235,7 @@ class SubscriptionTrialDeclineReasonApiCall : public RestApiCall
 
 public:
     SubscriptionTrialDeclineReasonApiCall(QObject *parent = nullptr);
-    ~SubscriptionTrialDeclineReasonApiCall();
+    ~SubscriptionTrialDeclineReasonApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QString reason
@@ -1248,10 +1248,10 @@ public:
     Q_SIGNAL void reasonChanged();
 
     // RestApiCall interface
-    Type type() const { return POST; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "subscription/trialDeclineReason"; }
-    QJsonObject data() const;
+    Type type() const override { return POST; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "subscription/trialDeclineReason"; }
+    QJsonObject data() const override;
 
 private:
     QString m_reason;
@@ -1264,7 +1264,7 @@ class SubscriptionPlanActivationRestApiCall : public RestApiCall
 
 public:
     SubscriptionPlanActivationRestApiCall(QObject *parent = nullptr);
-    ~SubscriptionPlanActivationRestApiCall();
+    ~SubscriptionPlanActivationRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QString activationApi
@@ -1274,11 +1274,11 @@ public:
     // clang-format on
 
     // RestApiCall interface
-    Type type() const { return POST; }
-    bool useSessionToken() const { return true; }
+    Type type() const override { return POST; }
+    bool useSessionToken() const override { return true; }
 
 protected:
-    void setResponse(const QJsonObject &val);
+    void setResponse(const QJsonObject &val) override;
 };
 
 class SubscriptionPromotionTextRestApiCall : public RestApiCall
@@ -1288,7 +1288,7 @@ class SubscriptionPromotionTextRestApiCall : public RestApiCall
 
 public:
     SubscriptionPromotionTextRestApiCall(QObject *parent = nullptr);
-    ~SubscriptionPromotionTextRestApiCall();
+    ~SubscriptionPromotionTextRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QString promotionText
@@ -1305,9 +1305,9 @@ public:
     QJsonObject button() const;
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return true; }
-    QString api() const { return "subscription/promotionText"; }
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override { return "subscription/promotionText"; }
 };
 
 class AbstractScriptalayRestApiCall : public RestApiCall
@@ -1316,7 +1316,7 @@ class AbstractScriptalayRestApiCall : public RestApiCall
 
 public:
     AbstractScriptalayRestApiCall(QObject *parent = nullptr);
-    ~AbstractScriptalayRestApiCall();
+    ~AbstractScriptalayRestApiCall() override;
 
     // clang-format off
     Q_PROPERTY(QUrl baseUrl
@@ -1335,13 +1335,13 @@ public:
     Q_SIGNAL void recordsChanged();
 
     // RestApiCall interface
-    Type type() const { return GET; }
-    bool useSessionToken() const { return true; }
-    QString api() const;
+    Type type() const override { return GET; }
+    bool useSessionToken() const override { return true; }
+    QString api() const override;
 
 protected:
     virtual QString endpoint() const = 0;
-    void setResponse(const QJsonObject &val);
+    void setResponse(const QJsonObject &val) override;
 
 private:
     void setBaseUrl(const QUrl &val);
@@ -1359,10 +1359,10 @@ class ScriptalayFormsRestApiCall : public AbstractScriptalayRestApiCall
 
 public:
     ScriptalayFormsRestApiCall(QObject *parent = nullptr);
-    ~ScriptalayFormsRestApiCall();
+    ~ScriptalayFormsRestApiCall() override;
 
 protected:
-    QString endpoint() const { return "forms"; }
+    QString endpoint() const override { return "forms"; }
 };
 
 class ScriptalayTemplatesRestApiCall : public AbstractScriptalayRestApiCall
@@ -1372,10 +1372,10 @@ class ScriptalayTemplatesRestApiCall : public AbstractScriptalayRestApiCall
 
 public:
     ScriptalayTemplatesRestApiCall(QObject *parent = nullptr);
-    ~ScriptalayTemplatesRestApiCall();
+    ~ScriptalayTemplatesRestApiCall() override;
 
 protected:
-    QString endpoint() const { return "templates"; }
+    QString endpoint() const override { return "templates"; }
 };
 
 class ScriptalayScreenplaysRestApiCall : public AbstractScriptalayRestApiCall
@@ -1385,10 +1385,10 @@ class ScriptalayScreenplaysRestApiCall : public AbstractScriptalayRestApiCall
 
 public:
     ScriptalayScreenplaysRestApiCall(QObject *parent = nullptr);
-    ~ScriptalayScreenplaysRestApiCall();
+    ~ScriptalayScreenplaysRestApiCall() override;
 
 protected:
-    QString endpoint() const { return "screenplays"; }
+    QString endpoint() const override { return "screenplays"; }
 };
 
 #endif // RESTAPICALL_H

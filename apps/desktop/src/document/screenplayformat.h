@@ -43,7 +43,7 @@ class SceneElementFormat : public QObject, public Modifiable, public QObjectSeri
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~SceneElementFormat();
+    ~SceneElementFormat() override;
 
     // clang-format off
     Q_MOC_INCLUDE("screenplayformat.h")
@@ -262,8 +262,8 @@ public:
     void resetToFactoryDefaults();
 
     // Interface interface
-    void serializeToJson(QJsonObject &) const;
-    void deserializeFromJson(const QJsonObject &);
+    void serializeToJson(QJsonObject &) const override;
+    void deserializeFromJson(const QJsonObject &) override;
 
 private:
     friend class ScreenplayFormat;
@@ -312,7 +312,7 @@ class ScreenplayPageLayout : public QObject
 
 public:
     explicit ScreenplayPageLayout(ScreenplayFormat *parent = nullptr);
-    ~ScreenplayPageLayout();
+    ~ScreenplayPageLayout() override;
 
     // clang-format off
     Q_PROPERTY(ScreenplayFormat *format
@@ -480,7 +480,7 @@ signals:
 private:
     void evaluateRects();
     void evaluateRectsLater();
-    void timerEvent(QTimerEvent *event);
+    void timerEvent(QTimerEvent *event) override;
 
     void setResolution(qreal val);
     void setDefaultResolution(qreal val);
@@ -512,7 +512,7 @@ class ScreenplayFormat : public QAbstractListModel,
 
 public:
     explicit ScreenplayFormat(QObject *parent = nullptr);
-    ~ScreenplayFormat();
+    ~ScreenplayFormat() override;
 
     // clang-format off
     Q_MOC_INCLUDE("scritedocument.h")
@@ -651,9 +651,9 @@ public:
     void applyToAll(const SceneElementFormat *from, SceneElementFormat::Properties properties);
 
     enum Role { SceneElementFomat = Qt::UserRole };
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
     // clang-format off
     Q_PROPERTY(int secondsPerPage
@@ -687,8 +687,8 @@ public:
     static void polishDualDialogueTableFormat(QTextTable *table);
 
     // Interface interface
-    void serializeToJson(QJsonObject &) const;
-    void deserializeFromJson(const QJsonObject &);
+    void serializeToJson(QJsonObject &) const override;
+    void deserializeFromJson(const QJsonObject &) override;
 
 private:
     void resetScreen();

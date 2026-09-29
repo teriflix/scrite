@@ -84,7 +84,7 @@ class ScreenplayTextDocument : public QObject, public QQmlParserStatus
 public:
     explicit ScreenplayTextDocument(QObject *parent = nullptr);
     explicit ScreenplayTextDocument(QTextDocument *document, QObject *parent = nullptr);
-    ~ScreenplayTextDocument();
+    ~ScreenplayTextDocument() override;
 
     static int headingFontPointSize(int headingLevel);
 
@@ -431,11 +431,11 @@ signals:
 
 protected:
     // QQmlParserStatus implementation
-    void classBegin();
-    void componentComplete();
+    void classBegin() override;
+    void componentComplete() override;
 
     // QObject interface
-    void timerEvent(QTimerEvent *event);
+    void timerEvent(QTimerEvent *event) override;
 
 private:
     void init();
@@ -571,14 +571,14 @@ class ScreenplayTitlePageObjectInterface : public QObject, public QTextObjectInt
 
 public:
     explicit ScreenplayTitlePageObjectInterface(QObject *parent = nullptr);
-    ~ScreenplayTitlePageObjectInterface();
+    ~ScreenplayTitlePageObjectInterface() override;
 
     enum { Kind = QTextFormat::UserObject + 2 };
     enum Property { ScreenplayProperty = QTextFormat::UserProperty + 10, TitlePageIsCentered };
 
-    QSizeF intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format);
+    QSizeF intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format) override;
     void drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument,
-                    const QTextFormat &format);
+                    const QTextFormat &format) override;
 };
 
 class ScreenplayTextObjectInterface : public QObject, public QTextObjectInterface
@@ -588,16 +588,16 @@ class ScreenplayTextObjectInterface : public QObject, public QTextObjectInterfac
 
 public:
     explicit ScreenplayTextObjectInterface(QObject *parent = nullptr);
-    ~ScreenplayTextObjectInterface();
+    ~ScreenplayTextObjectInterface() override;
 
     enum { Kind = QTextFormat::UserObject + 1 };
     enum Type { SceneNumberType, MoreMarkerType, ContdMarkerType, SceneIconType };
     enum Property { TypeProperty = QTextFormat::UserProperty + 1, DataProperty };
 
     // QTextObjectInterface interface
-    QSizeF intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format);
+    QSizeF intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format) override;
     void drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument,
-                    const QTextFormat &format);
+                    const QTextFormat &format) override;
 
 private:
     void drawSceneNumber(QPainter *painter, const QRectF &rect, QTextDocument *doc,
@@ -617,11 +617,11 @@ public:
     static void completeOthers(SceneElementBlockTextUpdater *than);
 
     explicit SceneElementBlockTextUpdater(ScreenplayTextDocument *document, SceneElement *para);
-    ~SceneElementBlockTextUpdater();
+    ~SceneElementBlockTextUpdater() override;
 
     void schedule();
     void abort();
-    void timerEvent(QTimerEvent *event);
+    void timerEvent(QTimerEvent *event) override;
     void update();
 
 private:

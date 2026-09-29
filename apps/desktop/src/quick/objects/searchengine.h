@@ -36,7 +36,7 @@ class SearchAgent : public QObject
     QML_ATTACHED(SearchAgent)
 
 public:
-    ~SearchAgent();
+    ~SearchAgent() override;
     Q_SIGNAL void aboutToDelete(SearchAgent *agent);
 
     static SearchAgent *qmlAttachedProperties(QObject *object);
@@ -132,7 +132,7 @@ class SearchEngine : public QObject
 
 public:
     explicit SearchEngine(QObject *parent = nullptr);
-    ~SearchEngine();
+    ~SearchEngine() override;
 
     // clang-format off
     Q_PROPERTY(QQmlListProperty<SearchAgent> searchAgents
@@ -224,7 +224,7 @@ public:
                                     const QBrush &fg);
 
 protected:
-    void timerEvent(QTimerEvent *event);
+    void timerEvent(QTimerEvent *event) override;
 
 private:
     void addSearchAgent(SearchAgent *ptr);
@@ -258,7 +258,7 @@ class TextDocumentSearch : public QObject
 
 public:
     explicit TextDocumentSearch(QObject *parent = nullptr);
-    ~TextDocumentSearch();
+    ~TextDocumentSearch() override;
 
     // clang-format off
     Q_PROPERTY(QQuickTextDocument *textDocument

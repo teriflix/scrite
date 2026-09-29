@@ -22,12 +22,12 @@ class ThemedIconProvider : public QQuickImageProvider
 {
 public:
     explicit ThemedIconProvider();
-    ~ThemedIconProvider();
+    ~ThemedIconProvider() override;
 
     static QString name();
 
     // QQuickImageProvider interface
-    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
+    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize) override;
 };
 
 #endif // THEMEDICONPROVIDER_H

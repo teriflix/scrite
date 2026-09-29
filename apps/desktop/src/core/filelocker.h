@@ -57,7 +57,7 @@ class FileLocker : public QObject
 
 public:
     explicit FileLocker(QObject *parent = nullptr);
-    ~FileLocker();
+    ~FileLocker() override;
 
     // clang-format off
     Q_PROPERTY(QString filePath

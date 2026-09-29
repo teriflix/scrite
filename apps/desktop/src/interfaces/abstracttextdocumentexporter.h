@@ -26,7 +26,7 @@ class AbstractTextDocumentExporter : public AbstractExporter,
     Q_INTERFACES(AbstractScreenplayTextDocumentInjectionInterface)
 
 public:
-    ~AbstractTextDocumentExporter();
+    ~AbstractTextDocumentExporter() override;
 
     // clang-format off
     Q_CLASSINFO("listSceneCharacters_FieldLabel", "List characters for each scene")
@@ -149,14 +149,14 @@ public:
     virtual bool isIncludeActBreaks() const { return false; }
     virtual bool isExportForPrintingPurpose() const { return true; }
 
-    bool requiresConfiguration() const { return true; }
+    bool requiresConfiguration() const override { return true; }
 
 protected:
     AbstractTextDocumentExporter(QObject *parent = nullptr);
     void generate(QTextDocument *textDocument, const qreal pageWidth);
 
     // AbstractScreenplayTextDocumentInjectionInterface interface
-    bool filterSceneElement() const;
+    bool filterSceneElement() const override;
 
 private:
     bool m_listSceneCharacters = false;

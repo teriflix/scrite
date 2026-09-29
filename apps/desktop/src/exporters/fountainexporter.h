@@ -30,7 +30,7 @@ class FountainExporter : public AbstractExporter
 
 public:
     Q_INVOKABLE explicit FountainExporter(QObject *parent = nullptr);
-    ~FountainExporter();
+    ~FountainExporter() override;
 
     // clang-format off
     Q_CLASSINFO("followStrictSyntax_FieldLabel", "Use ., @, !, > to explicitly mark scene heading, character, action and transisitions.")
@@ -92,13 +92,13 @@ public:
     bool isIncludeEpisodeBreaks() const { return m_includeEpisodeBreaks; }
     Q_SIGNAL void includeEpisodeBreaksChanged();
 
-    bool canCopyToClipboard() const { return true; }
+    bool canCopyToClipboard() const override { return true; }
     bool canBundleFonts() const { return false; }
-    bool requiresConfiguration() const { return false; }
+    bool requiresConfiguration() const override { return false; }
 
 protected:
-    bool doExport(QIODevice *device); // AbstractExporter interface
-    QString fileNameExtension() const { return QStringLiteral("fountain"); }
+    bool doExport(QIODevice *device) override; // AbstractExporter interface
+    QString fileNameExtension() const override { return QStringLiteral("fountain"); }
 
 private:
     bool m_useEmphasis = true;

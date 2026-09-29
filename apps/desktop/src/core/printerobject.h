@@ -25,7 +25,7 @@ class PrinterObject : public QObject, public QPrinter
 
 public:
     explicit PrinterObject(QObject *parent = nullptr) : QObject(parent) { }
-    ~PrinterObject() { }
+    ~PrinterObject() override { }
 };
 
 #endif // PRINTEROBJECT_H

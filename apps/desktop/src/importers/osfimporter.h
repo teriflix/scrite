@@ -29,12 +29,12 @@ class OsfImporter : public AbstractImporter
 
 public:
     Q_INVOKABLE explicit OsfImporter(QObject *parent = nullptr);
-    ~OsfImporter();
+    ~OsfImporter() override;
 
-    bool canImport(const QString &fileName) const;
+    bool canImport(const QString &fileName) const override;
 
 protected:
-    bool doImport(QIODevice *device); // AbstractImporter interface
+    bool doImport(QIODevice *device) override; // AbstractImporter interface
 };
 
 #endif // OSFIMPORTER_H

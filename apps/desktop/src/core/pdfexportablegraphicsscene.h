@@ -29,7 +29,7 @@ class PdfExportableGraphicsScene : public QGraphicsScene
 
 public:
     explicit PdfExportableGraphicsScene(QObject *parent = nullptr);
-    ~PdfExportableGraphicsScene();
+    ~PdfExportableGraphicsScene() override;
 
     // clang-format off
     Q_PROPERTY(QString title
@@ -89,14 +89,14 @@ class GraphicsHeaderFooterItem : public QGraphicsItem
 public:
     explicit GraphicsHeaderFooterItem(HeaderFooter *headerFooter,
                                       const QMap<HeaderFooter::Field, QString> &fields);
-    ~GraphicsHeaderFooterItem();
+    ~GraphicsHeaderFooterItem() override;
 
     void setRect(const QRectF &rect);
     QRectF rect() const { return m_rect; }
 
     // QGraphicsItem interface
-    QRectF boundingRect() const { return m_rect; }
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QRectF boundingRect() const override { return m_rect; }
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
     QRectF m_rect;
@@ -108,14 +108,14 @@ class GraphicsWatermarkItem : public QGraphicsItem
 {
 public:
     explicit GraphicsWatermarkItem(Watermark *watermark);
-    ~GraphicsWatermarkItem();
+    ~GraphicsWatermarkItem() override;
 
     void setRect(const QRectF &rect);
     QRectF rect() const { return m_rect; }
 
     // QGraphicsItem interface
-    QRectF boundingRect() const { return m_rect; }
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QRectF boundingRect() const override { return m_rect; }
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
     QRectF m_rect;
@@ -127,7 +127,7 @@ class GraphicsHeaderItem : public QGraphicsRectItem
 public:
     explicit GraphicsHeaderItem(const QString &title, const QString &subtitle,
                                 qreal containerWidth);
-    ~GraphicsHeaderItem();
+    ~GraphicsHeaderItem() override;
 
     static qreal idealContainerWidth(const QString &title);
 };
@@ -136,7 +136,7 @@ class GraphicsImageRectItem : public QGraphicsRectItem
 {
 public:
     explicit GraphicsImageRectItem(QGraphicsItem *parent = nullptr);
-    ~GraphicsImageRectItem();
+    ~GraphicsImageRectItem() override;
 
     enum FillMode { Stretch, PreserveAspectFit, PreserveAspectCrop };
 
@@ -146,7 +146,7 @@ public:
     void setImage(const QImage &image) { m_image = image; }
     QImage image() const { return m_image; }
 
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
     QImage m_image;

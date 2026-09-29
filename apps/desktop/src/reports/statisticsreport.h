@@ -39,15 +39,15 @@ class StatisticsReport : public AbstractReportGenerator
 
 public:
     Q_INVOKABLE explicit StatisticsReport(QObject *parent = nullptr);
-    ~StatisticsReport();
+    ~StatisticsReport() override;
 
     enum ColorGroup { Character, Location, Beat, Act, Episode };
     static const QVector<QColor> colors(ColorGroup group = Character);
     static const QColor pickColor(int index, bool cycleAround = true, ColorGroup group = Character);
     static const QColor pickRandomColor(ColorGroup group);
 
-    bool requiresConfiguration() const { return true; }
-    bool isSinglePageReport() const { return true; }
+    bool requiresConfiguration() const override { return true; }
+    bool isSinglePageReport() const override { return true; }
 
     // clang-format off
     Q_CLASSINFO("includeCharacterPresenceGraphs_FieldGroup", "Basic")
@@ -185,11 +185,11 @@ public:
 
 protected:
     // AbstractReportGenerator interface
-    bool doGenerate(QTextDocument *textDocument);
+    bool doGenerate(QTextDocument *textDocument) override;
 
-    bool canDirectPrintToPdf() const;
-    bool usePdfWriter() const;
-    bool directPrintToPdf(QPdfWriter *);
+    bool canDirectPrintToPdf() const override;
+    bool usePdfWriter() const override;
+    bool directPrintToPdf(QPdfWriter *) override;
 
 private:
     friend class StatisticsReportTimeline;

@@ -27,7 +27,7 @@ class AbstractImporter : public AbstractDeviceIO
     Q_OBJECT
 
 public:
-    ~AbstractImporter();
+    ~AbstractImporter() override;
 
     // clang-format off
     Q_PROPERTY(QString format

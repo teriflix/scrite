@@ -27,7 +27,7 @@ class BooleanResult : public QObject
 
 public:
     BooleanResult(QObject *parent = nullptr) : QObject(parent) { }
-    ~BooleanResult() { }
+    ~BooleanResult() override { }
 
     // clang-format off
     Q_PROPERTY(bool value

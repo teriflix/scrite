@@ -38,14 +38,14 @@ public:
     {
         this->setData(id >= 0 ? id : ::nextItemId(), NotebookModel::IdRole);
     }
-    ~StandardItemWithId() { }
+    ~StandardItemWithId() override { }
 };
 
 class BookmarksItem : public StandardItemWithId
 {
 public:
     explicit BookmarksItem();
-    ~BookmarksItem();
+    ~BookmarksItem() override;
 
 private:
     void updateText();
@@ -58,7 +58,7 @@ class ObjectItem : public StandardItemWithId
 {
 public:
     explicit ObjectItem(QObject *object);
-    ~ObjectItem();
+    ~ObjectItem() override;
 
 private:
     void objectDestroyed(QObject *ptr);
@@ -75,7 +75,7 @@ class NoteItem : public ObjectItem
 {
 public:
     explicit NoteItem(Note *note);
-    ~NoteItem();
+    ~NoteItem() override;
 
 private:
     void updateText();
@@ -88,7 +88,7 @@ class NotesItem : public ObjectItem
 {
 public:
     explicit NotesItem(Notes *notes);
-    ~NotesItem();
+    ~NotesItem() override;
 
     void sync();
     void updateText();
@@ -102,7 +102,7 @@ class ActItem : public ObjectItem
 {
 public:
     explicit ActItem(ScreenplayElement *element);
-    ~ActItem();
+    ~ActItem() override;
 
     void updateText();
 
@@ -114,7 +114,7 @@ class EpisodeItem : public ObjectItem
 {
 public:
     explicit EpisodeItem(ScreenplayElement *element);
-    ~EpisodeItem();
+    ~EpisodeItem() override;
 
     void updateText();
 

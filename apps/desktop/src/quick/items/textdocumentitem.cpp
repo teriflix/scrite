@@ -27,7 +27,7 @@ class TextDocumentViewportItem : public QQuickPaintedItem
 {
 public:
     explicit TextDocumentViewportItem(TextDocumentItem *parent);
-    ~TextDocumentViewportItem();
+    ~TextDocumentViewportItem() override;
 
     void setViewportImage(const QImage &image)
     {
@@ -37,7 +37,7 @@ public:
     QImage viewportImage() const { return m_image; }
 
     // QQuickPaintedItem interface
-    void paint(QPainter *painter);
+    void paint(QPainter *painter) override;
 
 private:
     QImage m_image;

@@ -1169,7 +1169,7 @@ class ScreenplayElementsMoveCommand : public QUndoCommand
 {
 public:
     explicit ScreenplayElementsMoveCommand(Screenplay *screenplay);
-    ~ScreenplayElementsMoveCommand();
+    ~ScreenplayElementsMoveCommand() override;
 
     void setMovement(const QHash<ScreenplayElement *, QPair<int, int>> &movement)
     {
@@ -1178,9 +1178,9 @@ public:
     }
     QHash<ScreenplayElement *, QPair<int, int>> movement() const { return m_movement; }
 
-    int id() const { return UndoStack::ScreenplayElementsMoveCommandID; }
-    void undo();
-    void redo();
+    int id() const override { return UndoStack::ScreenplayElementsMoveCommandID; }
+    void undo() override;
+    void redo() override;
 
 private:
     QVariantList save() const;
@@ -1423,11 +1423,11 @@ class ScreenplayRemoveElementsUndoCommand : public QUndoCommand
 {
 public:
     explicit ScreenplayRemoveElementsUndoCommand(Screenplay *screenplay);
-    ~ScreenplayRemoveElementsUndoCommand() { }
+    ~ScreenplayRemoveElementsUndoCommand() override { }
 
-    int id() const { return UndoStack::ScreenplayRemoveElementsCommandID; }
-    void undo();
-    void redo();
+    int id() const override { return UndoStack::ScreenplayRemoveElementsCommandID; }
+    void undo() override;
+    void redo() override;
 
 private:
     QJsonArray save() const;
@@ -1665,12 +1665,12 @@ class UndoClearScreenplayCommand : public QUndoCommand
 {
 public:
     explicit UndoClearScreenplayCommand(Screenplay *screenplay, const QStringList &sceneIds);
-    ~UndoClearScreenplayCommand();
+    ~UndoClearScreenplayCommand() override;
 
     // QUndoCommand interface
-    int id() const { return UndoStack::UndoClearScreenplayCommandID; }
-    void undo();
-    void redo();
+    int id() const override { return UndoStack::UndoClearScreenplayCommandID; }
+    void undo() override;
+    void redo() override;
 
 private:
     bool m_firstRedoDone = false;
@@ -1792,15 +1792,15 @@ class SplitElementUndoCommand : public QUndoCommand
 {
 public:
     explicit SplitElementUndoCommand(ScreenplayElement *ptr);
-    ~SplitElementUndoCommand();
+    ~SplitElementUndoCommand() override;
 
     void prepare();
     void commit(Scene *splitScene);
 
     // QUndoCommand interface
-    int id() const { return UndoStack::SplitElementCommandID; }
-    void undo();
-    void redo();
+    int id() const override { return UndoStack::SplitElementCommandID; }
+    void undo() override;
+    void redo() override;
 
 private:
     QByteArray captureScreenplayElements() const;
@@ -2874,11 +2874,11 @@ public:
     explicit ScreenplayPasteUndoCommand(Screenplay *screenplay, Structure *structure,
                                         const QJsonArray &elements, const QJsonObject &scenes,
                                         int pasteAfter);
-    ~ScreenplayPasteUndoCommand();
+    ~ScreenplayPasteUndoCommand() override;
 
-    int id() const { return UndoStack::ScreenplayPasteCommandID; }
-    void redo();
-    void undo();
+    int id() const override { return UndoStack::ScreenplayPasteCommandID; }
+    void redo() override;
+    void undo() override;
 
 private:
     Structure *m_structure = nullptr;
@@ -2977,11 +2977,11 @@ class ScreenplayPasteFromFountainUndoCommand : public QUndoCommand
 public:
     explicit ScreenplayPasteFromFountainUndoCommand(Screenplay *screenplay, Structure *structure,
                                                     const Fountain::Body &body, int pasteAfter);
-    ~ScreenplayPasteFromFountainUndoCommand();
+    ~ScreenplayPasteFromFountainUndoCommand() override;
 
-    int id() const { return UndoStack::ScreenplayPasteFromFountainCommandID; }
-    void redo();
-    void undo();
+    int id() const override { return UndoStack::ScreenplayPasteFromFountainCommandID; }
+    void redo() override;
+    void undo() override;
 
 private:
     Structure *m_structure = nullptr;

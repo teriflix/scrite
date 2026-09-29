@@ -39,14 +39,14 @@ public:
 
     explicit SceneDocumentBlockUserData(const QTextBlock &block, SceneElement *element,
                                         SceneDocumentBinder *binder);
-    ~SceneDocumentBlockUserData();
+    ~SceneDocumentBlockUserData() override;
 
     QTextBlockFormat blockFormat;
     QTextCharFormat charFormat;
 
     bool isValid() const;
 
-    SceneElement *sceneElement() const { return m_sceneElement; }
+    SceneElement *sceneElement() const;
 
     void resetFormat();
     bool updateFromFormat(const SceneElementFormat *format);
@@ -76,8 +76,8 @@ private:
     friend class SceneDocumentBinder;
     QTextBlock m_textBlock;
     QSet<int> m_pendingTasks;
-    QPointer<SpellCheckService> m_spellCheck;
     QPointer<SceneElement> m_sceneElement;
+    QPointer<SpellCheckService> m_spellCheck;
     QPointer<SceneDocumentBinder> m_binder;
     QString m_highlightedText;
     int m_formatMTime = -1;

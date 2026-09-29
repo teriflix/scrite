@@ -35,7 +35,7 @@ class AbstractSyntaxHighlighterDelegate : public QObject, public QQmlParserStatu
 
 public:
     explicit AbstractSyntaxHighlighterDelegate(QObject *parent = nullptr);
-    ~AbstractSyntaxHighlighterDelegate();
+    ~AbstractSyntaxHighlighterDelegate() override;
 
     Q_SIGNAL void aboutToDelete(AbstractSyntaxHighlighterDelegate *ptr);
 
@@ -54,8 +54,8 @@ public:
     Q_SIGNAL void enabledChanged();
 
     // QQmlParserStatus interface
-    void classBegin() { m_intantiatedInQml = true; }
-    void componentComplete() { m_intantiatedInQml = true; }
+    void classBegin() override { m_intantiatedInQml = true; }
+    void componentComplete() override { m_intantiatedInQml = true; }
 
 public Q_SLOTS:
     void rehighlight();
@@ -118,7 +118,7 @@ class SyntaxHighlighter : public QSyntaxHighlighter
 
 public:
     explicit SyntaxHighlighter(QObject *parent = nullptr);
-    ~SyntaxHighlighter();
+    ~SyntaxHighlighter() override;
 
     static SyntaxHighlighter *qmlAttachedProperties(QObject *object);
     static SyntaxHighlighter *get(QObject *object) { return qmlAttachedProperties(object); }
@@ -145,7 +145,7 @@ public:
 
 protected:
     // QSyntaxHighlighter interface
-    void highlightBlock(const QString &text);
+    void highlightBlock(const QString &text) override;
 
 public:
     // clang-format off
@@ -237,7 +237,7 @@ class LanguageFontSyntaxHighlighterDelegate : public AbstractSyntaxHighlighterDe
 
 public:
     explicit LanguageFontSyntaxHighlighterDelegate(QObject *parent = nullptr);
-    ~LanguageFontSyntaxHighlighterDelegate();
+    ~LanguageFontSyntaxHighlighterDelegate() override;
 
     // If specified, it has to be a QFont value. When enforceDefaultFont is true,
     // the default font set here or that of this->document().defaultFont() will be
@@ -265,8 +265,8 @@ public:
 
 protected:
     // AbstractSyntaxHighlighterDelegate interface
-    void highlightBlock(const QString &text);
-    int priority() const { return -1; } // because default font has to be applied first.
+    void highlightBlock(const QString &text) override;
+    int priority() const override { return -1; } // because default font has to be applied first.
 
 private:
     bool m_enforceDefaultFont = true;
@@ -280,7 +280,7 @@ class HeadingFontSyntaxHighlighterDelegate : public AbstractSyntaxHighlighterDel
 
 public:
     explicit HeadingFontSyntaxHighlighterDelegate(QObject *parent = nullptr);
-    ~HeadingFontSyntaxHighlighterDelegate();
+    ~HeadingFontSyntaxHighlighterDelegate() override;
 
     // All attributes of the font, except family will be applied.
 
@@ -348,7 +348,7 @@ public:
 
 protected:
     // AbstractSyntaxHighlighterDelegate interface
-    void highlightBlock(const QString &text);
+    void highlightBlock(const QString &text) override;
 
 private:
     QFont m_h1;
@@ -368,7 +368,7 @@ class SpellCheckSyntaxHighlighterDelegate : public AbstractSyntaxHighlighterDele
 
 public:
     explicit SpellCheckSyntaxHighlighterDelegate(QObject *parent = nullptr);
-    ~SpellCheckSyntaxHighlighterDelegate();
+    ~SpellCheckSyntaxHighlighterDelegate() override;
 
     // clang-format off
     Q_PROPERTY(QColor textColor
@@ -446,7 +446,7 @@ signals:
 
 protected:
     // AbstractSyntaxHighlighterDelegate interface
-    void highlightBlock(const QString &text);
+    void highlightBlock(const QString &text) override;
 
 private:
     void setWordUnderCursorIsMisspelled(bool val);
@@ -472,7 +472,7 @@ class TextLimiterSyntaxHighlighterDelegate : public AbstractSyntaxHighlighterDel
 
 public:
     explicit TextLimiterSyntaxHighlighterDelegate(QObject *parent = nullptr);
-    ~TextLimiterSyntaxHighlighterDelegate();
+    ~TextLimiterSyntaxHighlighterDelegate() override;
 
     // clang-format off
     Q_PROPERTY(TextLimiter *textLimiter
@@ -514,8 +514,8 @@ public:
 
 protected:
     // AbstractSyntaxHighlighterDelegate interface
-    void highlightBlock(const QString &text);
-    void documentContentsChanged() { this->evaluateCursorLimitPosition(); }
+    void highlightBlock(const QString &text) override;
+    void documentContentsChanged() override { this->evaluateCursorLimitPosition(); }
 
 private:
     void setCursorLimitPosition(int val);

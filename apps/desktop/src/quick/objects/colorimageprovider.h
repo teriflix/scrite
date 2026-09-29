@@ -24,10 +24,10 @@ public:
     static QString name();
 
     explicit ColorImageProvider();
-    ~ColorImageProvider();
+    ~ColorImageProvider() override;
 
     // QQuickImageProvider interface
-    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
+    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize) override;
 };
 
 #endif // COLORIMAGEPROVIDER_H

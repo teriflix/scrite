@@ -29,13 +29,13 @@ class LocationReport : public AbstractReportGenerator
 
 public:
     Q_INVOKABLE explicit LocationReport(QObject *parent = nullptr);
-    ~LocationReport();
+    ~LocationReport() override;
 
-    bool requiresConfiguration() const { return true; }
+    bool requiresConfiguration() const override { return true; }
 
 protected:
     // AbstractReportGenerator interface
-    bool doGenerate(QTextDocument *textDocument);
+    bool doGenerate(QTextDocument *textDocument) override;
 };
 
 #endif // LOCATIONREPORT_H

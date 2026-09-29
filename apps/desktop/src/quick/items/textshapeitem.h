@@ -25,7 +25,7 @@ class TextShapeItem : public AbstractShapeItem
 
 public:
     explicit TextShapeItem(QQuickItem *parent = nullptr);
-    ~TextShapeItem();
+    ~TextShapeItem() override;
 
     // clang-format off
     Q_PROPERTY(QString text
@@ -48,7 +48,7 @@ public:
     Q_SIGNAL void fontChanged();
 
 protected:
-    QPainterPath shape() const;
+    QPainterPath shape() const override;
 
 private:
     QFont m_font;

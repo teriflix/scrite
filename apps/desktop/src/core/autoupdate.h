@@ -31,7 +31,7 @@ class AutoUpdate : public QObject
 
 public:
     static AutoUpdate *instance();
-    ~AutoUpdate();
+    ~AutoUpdate() override;
 
     // clang-format off
     Q_PROPERTY(bool updateAvailable

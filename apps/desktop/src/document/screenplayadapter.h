@@ -37,7 +37,7 @@ class ScreenplayAdapter : public QIdentityProxyModel
 
 public:
     explicit ScreenplayAdapter(QObject *parent = nullptr);
-    ~ScreenplayAdapter();
+    ~ScreenplayAdapter() override;
 
     // clang-format off
     Q_PROPERTY(QObject *source
@@ -50,7 +50,7 @@ public:
     QObject *source() const { return m_source; }
     Q_SIGNAL void sourceChanged();
 
-    void setSourceModel(QAbstractItemModel *model);
+    void setSourceModel(QAbstractItemModel *model) override;
 
     // clang-format off
     Q_PROPERTY(bool isSourceScene
@@ -151,8 +151,8 @@ public:
         ModelDataRole
     };
     Q_ENUM(Roles)
-    QHash<int, QByteArray> roleNames() const;
-    QVariant data(const QModelIndex &index, int role) const;
+    QHash<int, QByteArray> roleNames() const override;
+    QVariant data(const QModelIndex &index, int role) const override;
 
 private:
     QVariant data(ScreenplayElement *element, int row, int role) const;

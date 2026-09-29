@@ -26,9 +26,9 @@ class AbstractScreenplaySubsetReport : public AbstractReportGenerator,
     Q_INTERFACES(AbstractScreenplayTextDocumentInjectionInterface)
 
 public:
-    ~AbstractScreenplaySubsetReport();
+    ~AbstractScreenplaySubsetReport() override;
 
-    bool requiresConfiguration() const { return true; }
+    bool requiresConfiguration() const override { return true; }
 
     // clang-format off
     Q_CLASSINFO("listSceneCharacters_FieldGroup", "Options")
@@ -279,14 +279,14 @@ protected:
     Screenplay *screenplaySubset() const { return m_screenplaySubset; }
 
     // AbstractReportGenerator interface
-    bool doGenerate(QTextDocument *);
+    bool doGenerate(QTextDocument *) override;
 
     // AbstractReportGenerator interface
-    void configureTextDocumentPrinter(QTextDocumentPagedPrinter *, const QTextDocument *);
+    void configureTextDocumentPrinter(QTextDocumentPagedPrinter *, const QTextDocument *) override;
 
     // AbstractScreenplayTextDocumentInjectionInterface interface
-    void inject(QTextCursor &, InjectLocation);
-    bool filterSceneElement() const;
+    void inject(QTextCursor &, InjectLocation) override;
+    bool filterSceneElement() const override;
 
     virtual void configureScreenplayTextDocument(ScreenplayTextDocument &) { }
 

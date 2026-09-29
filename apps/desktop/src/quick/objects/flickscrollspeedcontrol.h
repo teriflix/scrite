@@ -31,7 +31,7 @@ class FlickScrollSpeedControl : public QObject
 
 public:
     explicit FlickScrollSpeedControl(QObject *parent = nullptr);
-    ~FlickScrollSpeedControl();
+    ~FlickScrollSpeedControl() override;
 
     static FlickScrollSpeedControl *qmlAttachedProperties(QObject *object);
 
@@ -96,7 +96,7 @@ public:
     Q_SIGNAL void factorChanged();
 
 protected:
-    bool eventFilter(QObject *watched, QEvent *event);
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     void resetFlickable();

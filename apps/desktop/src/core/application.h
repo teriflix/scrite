@@ -52,7 +52,7 @@ public:
     static Application *instance();
 
     explicit Application(int &argc, char **argv, const QVersionNumber &version);
-    virtual ~Application();
+    ~Application() override;
 
     QString deviceId() const;
     QString installationId() const;
@@ -223,7 +223,7 @@ public:
     void initialize(QQmlEngine *engine);
 
     // QCoreApplication interface
-    bool notify(QObject *, QEvent *);
+    bool notify(QObject *, QEvent *) override;
 
     // Although public, please do not call it.
     bool notifyInternal(QObject *object, QEvent *event);
@@ -234,7 +234,7 @@ public:
     void setHandleFileOpenEvents(bool val = true) { m_handleFileOpenEvents = val; }
 #endif
 
-    bool event(QEvent *event);
+    bool event(QEvent *event) override;
 
 signals:
     void minimizeWindowRequest();

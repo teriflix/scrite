@@ -26,7 +26,7 @@ class ScreenplayTreeAdapter : public QAbstractItemModel, public QQmlParserStatus
 
 public:
     explicit ScreenplayTreeAdapter(QObject *parent = nullptr);
-    virtual ~ScreenplayTreeAdapter();
+    ~ScreenplayTreeAdapter() override;
 
     enum ItemType { UnknownType, EpisodeType, ActType, FormalTagType, OpenTagType, SceneType };
     Q_ENUM(ItemType)
@@ -72,17 +72,17 @@ public:
     Q_SIGNAL void screenplayChanged();
 
     // QQmlParserStatus interface
-    void classBegin();
-    void componentComplete();
+    void classBegin() override;
+    void componentComplete() override;
 
     // QAbstractItemModel interface
     enum { TextRole = Qt::DisplayRole, ScreenplayElementRole = Qt::UserRole };
-    QModelIndex index(int row, int column, const QModelIndex &parent) const;
-    QModelIndex parent(const QModelIndex &child) const;
-    int rowCount(const QModelIndex &parent) const;
-    int columnCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+    QModelIndex parent(const QModelIndex &child) const override;
+    int rowCount(const QModelIndex &parent) const override;
+    int columnCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
 private:
     void clear();

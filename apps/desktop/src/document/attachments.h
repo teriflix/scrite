@@ -35,7 +35,7 @@ class Attachment : public QObject, public QObjectSerializer::Interface
 
 public:
     explicit Attachment(QObject *parent = nullptr);
-    ~Attachment();
+    ~Attachment() override;
     Q_SIGNAL void aboutToDelete(Attachment *ptr);
 
     enum Type { Photo, Video, Audio, Document };
@@ -120,8 +120,8 @@ public:
     bool isRemoveFileOnDelete() const { return m_removeFileOnDelete; }
 
     // QObjectSerializer::Interface interface
-    void serializeToJson(QJsonObject &) const;
-    void deserializeFromJson(const QJsonObject &);
+    void serializeToJson(QJsonObject &) const override;
+    void deserializeFromJson(const QJsonObject &) override;
 
     static Type determineType(const QFileInfo &fi);
 
@@ -159,7 +159,7 @@ class Attachments : public QObjectListModel<Attachment *>, public QObjectSeriali
 
 public:
     explicit Attachments(QObject *parent = nullptr);
-    ~Attachments();
+    ~Attachments() override;
 
     enum AllowedType {
         PhotosOnly = 1,
@@ -228,8 +228,8 @@ public:
     Q_SIGNAL void attachmentsModified();
 
     // QObjectSerializer::Interface interface
-    void serializeToJson(QJsonObject &json) const;
-    void deserializeFromJson(const QJsonObject &json);
+    void serializeToJson(QJsonObject &json) const override;
+    void deserializeFromJson(const QJsonObject &json) override;
 
 private:
     void includeAttachment(Attachment *ptr);
@@ -255,7 +255,7 @@ class AttachmentsDropArea : public QQuickItem
 
 public:
     explicit AttachmentsDropArea(QQuickItem *parent = nullptr);
-    ~AttachmentsDropArea();
+    ~AttachmentsDropArea() override;
 
     // clang-format off
     Q_PROPERTY(Attachments *target
@@ -336,10 +336,10 @@ signals:
 
 protected:
     // QQuickItem interface
-    void dragEnterEvent(QDragEnterEvent *);
-    void dragMoveEvent(QDragMoveEvent *);
-    void dragLeaveEvent(QDragLeaveEvent *);
-    void dropEvent(QDropEvent *);
+    void dragEnterEvent(QDragEnterEvent *) override;
+    void dragMoveEvent(QDragMoveEvent *) override;
+    void dragLeaveEvent(QDragLeaveEvent *) override;
+    void dropEvent(QDropEvent *) override;
 
 private:
     void resetAttachments();

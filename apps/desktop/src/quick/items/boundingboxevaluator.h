@@ -47,7 +47,7 @@ class BoundingBoxEvaluator : public QObject
 
 public:
     explicit BoundingBoxEvaluator(QObject *parent = nullptr);
-    ~BoundingBoxEvaluator();
+    ~BoundingBoxEvaluator() override;
 
     // clang-format off
     Q_PROPERTY(qreal margin
@@ -174,7 +174,7 @@ public:
     Q_INVOKABLE void recomputeBoundingBox() { this->evaluateNow(); }
 
 protected:
-    void timerEvent(QTimerEvent *event);
+    void timerEvent(QTimerEvent *event) override;
     void setBoundingBox(const QRectF &val);
     void setTightBoundingBox(const QRectF &val);
     void evaluateLater() { m_evaluationTimer.start(100, this); }
@@ -215,7 +215,7 @@ class BoundingBoxItem : public QObject
 
 public:
     explicit BoundingBoxItem(QObject *parent = nullptr);
-    ~BoundingBoxItem();
+    ~BoundingBoxItem() override;
 
     Q_SIGNAL void aboutToDestroy(BoundingBoxItem *ptr);
 
@@ -377,7 +377,7 @@ public:
     QJsonObject asJson() const { return m_json; }
 
 protected:
-    void timerEvent(QTimerEvent *event);
+    void timerEvent(QTimerEvent *event) override;
 
 private:
     void requestReevaluation();
@@ -420,7 +420,7 @@ class BoundingBoxPreview : public QQuickPaintedItem
 
 public:
     explicit BoundingBoxPreview(QQuickItem *parent = nullptr);
-    ~BoundingBoxPreview();
+    ~BoundingBoxPreview() override;
 
     // clang-format off
     Q_PROPERTY(QColor backgroundColor
@@ -462,7 +462,7 @@ public:
     Q_SIGNAL void isUpdatingPreviewChanged();
 
     // QQuickPaintedItem interface
-    void paint(QPainter *painter);
+    void paint(QPainter *painter) override;
 
 private:
     void updatePreviewImage();

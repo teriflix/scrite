@@ -150,7 +150,7 @@ class Scrite : public QObject
 
 public:
     explicit Scrite(QObject *parent = nullptr);
-    ~Scrite();
+    ~Scrite() override;
 
     enum AppFeature {
         ScreenplayFeature,

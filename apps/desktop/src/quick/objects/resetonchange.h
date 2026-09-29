@@ -26,7 +26,7 @@ class ResetOnChange : public QQuickItem
 
 public:
     explicit ResetOnChange(QQuickItem *parent = nullptr);
-    ~ResetOnChange();
+    ~ResetOnChange() override;
 
     // clang-format off
     Q_PROPERTY(QVariant trackChangesOn
@@ -85,7 +85,7 @@ signals:
 private:
     void setValue(const QVariant &val);
     void reset();
-    void timerEvent(QTimerEvent *te);
+    void timerEvent(QTimerEvent *te) override;
 
 private:
     int m_delay = 0;

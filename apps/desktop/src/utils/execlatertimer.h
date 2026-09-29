@@ -28,7 +28,7 @@ public:
 
     explicit ExecLaterTimer(const QString &name = QStringLiteral("Scrite ExecLaterTimer"),
                             QObject *parent = nullptr);
-    ~ExecLaterTimer();
+    ~ExecLaterTimer() override;
 
     // clang-format off
     Q_PROPERTY(QString name

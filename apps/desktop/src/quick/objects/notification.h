@@ -31,7 +31,7 @@ class Notification : public QObject
 
 public:
     explicit Notification(QObject *parent = nullptr);
-    ~Notification();
+    ~Notification() override;
 
     static Notification *qmlAttachedProperties(QObject *object);
 
@@ -159,7 +159,7 @@ signals:
 
 private:
     void doAutoClose();
-    void timerEvent(QTimerEvent *te);
+    void timerEvent(QTimerEvent *te) override;
 
 private:
     bool m_active = false;

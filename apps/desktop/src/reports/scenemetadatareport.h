@@ -32,13 +32,13 @@ class SceneMetadataReport : public AbstractReportGenerator
 
 public:
     Q_INVOKABLE explicit SceneMetadataReport(QObject *parent = nullptr);
-    ~SceneMetadataReport();
+    ~SceneMetadataReport() override;
 
-    virtual QString formatDescription(Format format) const;
-    virtual QString formatFileExtension(Format format) const;
+    QString formatDescription(Format format) const override;
+    QString formatFileExtension(Format format) const override;
 
-    bool requiresConfiguration() const { return true; }
-    bool isSinglePageReport() const { return false; }
+    bool requiresConfiguration() const override { return true; }
+    bool isSinglePageReport() const override { return false; }
 
     // clang-format off
     Q_CLASSINFO("showSynopsisColumn_FieldGroup", "Columns")
@@ -133,16 +133,16 @@ public:
 
 protected:
     // AbstractDeviceIO interface
-    QString fileNameExtension() const;
+    QString fileNameExtension() const override;
 
     // AbstractReportGenerator interface
     QString personalizedFileName(const QString &fileName) const override;
-    bool usePdfWriter() const { return false; }
-    bool doGenerate(QTextDocument *document);
-    void configureWriter(QPdfWriter *pdfWriter, const QTextDocument *document) const;
-    void configureWriter(QPrinter *printer, const QTextDocument *document) const;
-    virtual bool canDirectExportToOdf() const;
-    virtual bool directExportToOdf(QIODevice *);
+    bool usePdfWriter() const override { return false; }
+    bool doGenerate(QTextDocument *document) override;
+    void configureWriter(QPdfWriter *pdfWriter, const QTextDocument *document) const override;
+    void configureWriter(QPrinter *printer, const QTextDocument *document) const override;
+    bool canDirectExportToOdf() const override;
+    bool directExportToOdf(QIODevice *) override;
 
 private:
     void configureWriterImpl(QPagedPaintDevice *ppd, const QTextDocument *document) const;

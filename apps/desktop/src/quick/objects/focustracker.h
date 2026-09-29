@@ -32,7 +32,7 @@ class FocusTrackerIndicator : public QObject
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~FocusTrackerIndicator();
+    ~FocusTrackerIndicator() override;
 
     // clang-format off
     Q_PROPERTY(QObject *target
@@ -99,7 +99,7 @@ class FocusTracker : public QObject
 
 public:
     explicit FocusTracker(QObject *parent = nullptr);
-    ~FocusTracker();
+    ~FocusTracker() override;
 
     static FocusTracker *qmlAttachedProperties(QObject *object);
 

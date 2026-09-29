@@ -30,7 +30,7 @@ class FinalDraftExporter : public AbstractExporter
 
 public:
     Q_INVOKABLE explicit FinalDraftExporter(QObject *parent = nullptr);
-    ~FinalDraftExporter();
+    ~FinalDraftExporter() override;
 
     // clang-format off
     Q_CLASSINFO("markLanguagesExplicitly_FieldLabel", "Explicity mark text-fragments of different languages.")
@@ -57,11 +57,11 @@ public:
     Q_SIGNAL void includeSceneSynopsisChanged();
 
     bool canBundleFonts() const { return false; }
-    bool requiresConfiguration() const { return true; }
+    bool requiresConfiguration() const override { return true; }
 
 protected:
-    bool doExport(QIODevice *device);
-    QString fileNameExtension() const { return QStringLiteral("fdx"); }
+    bool doExport(QIODevice *device) override;
+    QString fileNameExtension() const override { return QStringLiteral("fdx"); }
 
 private:
 #ifdef Q_OS_WIN

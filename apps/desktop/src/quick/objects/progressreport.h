@@ -28,7 +28,7 @@ class ProgressReport : public QObject
 
 public:
     explicit ProgressReport(QObject *parent = nullptr);
-    ~ProgressReport();
+    ~ProgressReport() override;
     Q_SIGNAL void aboutToDelete(ProgressReport *val);
 
     // clang-format off

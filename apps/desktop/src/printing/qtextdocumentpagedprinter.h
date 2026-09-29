@@ -38,7 +38,7 @@ public:
     Q_ENUM(Type)
 
     explicit HeaderFooter(Type type, QObject *parent = nullptr);
-    ~HeaderFooter();
+    ~HeaderFooter() override;
 
     // clang-format off
     Q_PROPERTY(Type type
@@ -176,7 +176,7 @@ class Watermark : public QObject
 
 public:
     explicit Watermark(QObject *parent = nullptr);
-    ~Watermark();
+    ~Watermark() override;
 
     // clang-format off
     Q_PROPERTY(bool enabled
@@ -297,7 +297,7 @@ class QTextDocumentPagedPrinter : public QObject
 
 public:
     explicit QTextDocumentPagedPrinter(QObject *parent = nullptr);
-    ~QTextDocumentPagedPrinter();
+    ~QTextDocumentPagedPrinter() override;
 
     // clang-format off
     Q_PROPERTY(HeaderFooter *header

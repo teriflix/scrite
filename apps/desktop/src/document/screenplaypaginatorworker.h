@@ -132,7 +132,7 @@ class ScreenplayPaginatorWorker : public QObject
     Q_OBJECT
 
 public:
-    virtual ~ScreenplayPaginatorWorker();
+    ~ScreenplayPaginatorWorker() override;
 
     // clang-format off
     Q_PROPERTY(bool synchronousSync
@@ -199,7 +199,7 @@ class ScreenplayPaginatorWorkerNode : public QObject
 
 public:
     ScreenplayPaginatorWorkerNode(QObject *parent = nullptr);
-    ~ScreenplayPaginatorWorkerNode();
+    ~ScreenplayPaginatorWorkerNode() override;
 
     void setWorker(ScreenplayPaginatorWorker *worker);
     ScreenplayPaginatorWorker *worker() const { return m_worker; }

@@ -28,7 +28,7 @@ class LocationScreenplayReport : public AbstractScreenplaySubsetReport
 
 public:
     Q_INVOKABLE explicit LocationScreenplayReport(QObject *parent = nullptr);
-    ~LocationScreenplayReport();
+    ~LocationScreenplayReport() override;
 
     // clang-format off
     Q_CLASSINFO("locations_FieldGroup", "Locations")
@@ -61,12 +61,12 @@ protected:
     QString personalizedFileName(const QString &fileName) const override;
 
     // AbstractScreenplaySubsetReport interface
-    bool includeScreenplayElement(const ScreenplayElement *) const;
-    QString screenplaySubtitle() const;
-    void configureScreenplayTextDocument(ScreenplayTextDocument &stDoc);
+    bool includeScreenplayElement(const ScreenplayElement *) const override;
+    QString screenplaySubtitle() const override;
+    void configureScreenplayTextDocument(ScreenplayTextDocument &stDoc) override;
 
     // AbstractScreenplayTextDocumentInjectionInterface interface
-    void inject(QTextCursor &, InjectLocation);
+    void inject(QTextCursor &, InjectLocation) override;
 
 private:
     int m_summaryLocation = -1;

@@ -136,7 +136,7 @@ class PdfSideBar : public QTextDocumentPageSideBarInterface
 {
 public:
     // AbstractPageSideBar interface
-    void paint(QPainter *paint, Side side, const QRectF &rect, const QRectF &docRect)
+    void paint(QPainter *paint, Side side, const QRectF &rect, const QRectF &docRect) override
     {
 #if 0
         if (side == RightSide)

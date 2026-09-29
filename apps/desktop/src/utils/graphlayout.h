@@ -93,7 +93,7 @@ public:
     ~ForceDirectedLayout();
 
     // AbstractGraphLayout interface
-    bool layout(const Graph &graph);
+    bool layout(const Graph &graph) override;
 
 private:
     void calculateRepulsion(QVector<QPointF> &forces, const Graph &graph);

@@ -124,7 +124,7 @@ class TransformAttributes : public QObject
 
 public:
     explicit TransformAttributes(QObject *parent = nullptr) : QObject(parent) { }
-    ~TransformAttributes() { }
+    ~TransformAttributes() override { }
 
     Q_INVOKABLE QJsonObject getContent() const { return content; }
 

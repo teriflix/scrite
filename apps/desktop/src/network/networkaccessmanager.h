@@ -22,12 +22,12 @@ class NetworkAccessManager : public QNetworkAccessManager
 {
 public:
     static NetworkAccessManager *instance();
-    ~NetworkAccessManager();
+    ~NetworkAccessManager() override;
 
 protected:
     // QNetworkAccessManager interface
     QNetworkReply *createRequest(Operation op, const QNetworkRequest &request,
-                                 QIODevice *outgoingData);
+                                 QIODevice *outgoingData) override;
 
 private:
     static NetworkAccessManager *INSTANCE;

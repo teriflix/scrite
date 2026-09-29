@@ -29,7 +29,7 @@ class NetworkStatus : public QObject
 
 public:
     explicit NetworkStatus(QObject *parent = nullptr);
-    virtual ~NetworkStatus();
+    ~NetworkStatus() override;
 
     // clang-format off
     Q_PROPERTY(bool busy

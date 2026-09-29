@@ -28,7 +28,7 @@ class WindowsBackend : public QObject, public QAbstractNativeEventFilter
 
 public:
     explicit WindowsBackend(QObject *parent = nullptr);
-    ~WindowsBackend();
+    ~WindowsBackend() override;
 
     int defaultLanguage() const;
     int activateDefaultLanguage() const;
@@ -46,8 +46,8 @@ public:
     bool release(const TransliterationOption &option,
                  PlatformTransliterationEngine *transliterator);
 
-    bool eventFilter(QObject *object, QEvent *event);
-    bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result);
+    bool eventFilter(QObject *object, QEvent *event) override;
+    bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override;
 
 signals:
     void activeLanguageChanged();

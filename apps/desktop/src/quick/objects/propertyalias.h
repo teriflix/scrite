@@ -26,7 +26,7 @@ class PropertyAlias : public QObject
 
 public:
     explicit PropertyAlias(QObject *parent = nullptr);
-    ~PropertyAlias();
+    ~PropertyAlias() override;
 
     // clang-format off
     Q_PROPERTY(QObject *sourceObject

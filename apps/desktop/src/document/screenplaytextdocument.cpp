@@ -72,7 +72,7 @@ public:
     const int type = Type;
 
     explicit ScreenplayParagraphBlockData(const SceneElement *element);
-    ~ScreenplayParagraphBlockData();
+    ~ScreenplayParagraphBlockData() override;
 
     bool contains(const SceneElement *other) const;
     SceneElement::Type elementType() const;

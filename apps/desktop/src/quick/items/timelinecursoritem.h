@@ -25,7 +25,7 @@ class TimelineCursorItem : public QQuickPaintedItem
 
 public:
     explicit TimelineCursorItem(QQuickItem *parent = nullptr);
-    virtual ~TimelineCursorItem();
+    ~TimelineCursorItem() override;
 
     // clang-format off
     Q_PROPERTY(QColor color
@@ -48,7 +48,7 @@ public:
     Q_SIGNAL void lineWidthChanged();
 
     // QQuickPaintedItem interface
-    void paint(QPainter *painter);
+    void paint(QPainter *painter) override;
 
 private:
     QColor m_color = Qt::black;
