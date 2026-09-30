@@ -95,7 +95,7 @@ Check that it works. Open Qt Creator, create a new "Qt Widgets Application" or
 "Qt Quick Application" project, and click Run. If a window appears, you're all
 set.
 
-# Linux Build Instructions
+# Getting the Source Code
 
 ## Folder Structure
 We recommend that you prepare the following folder structure
@@ -136,6 +136,8 @@ That's it. You should have all the code needed for building Scrite.
 
 # Building from Code
 
+## On Linux
+
 - Launch Qt Creator
 - Click on File -> Open File or Project
 - Select `~/Scrite/Code/CMakeLists.txt` in the file dialog and click `Open`
@@ -153,7 +155,7 @@ from Scriptalay. Other than that, you will be able to make use of all features.
 > NOTE: Production builds may come bundled with certain extra features, the
 > source for which may not be available in the public repository.
 
-## Runtime environment
+### Runtime environment
 
 Consider having the following environment variables configured against Run
 settings for the Scrite project in Qt Creator.
@@ -171,10 +173,10 @@ QT_IM_MODULE=ibus
 XIM_PROGRAM="/usr/bin/ibus-daemon -drx"
 ```
 
-# Windows Build Instructions
+## On Windows
 
 > TODO
 
-# macOS Build Instructions
+## On macOS
 
 > TODO
