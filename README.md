@@ -17,20 +17,6 @@ A complete user guide can be found [here](https://www.scrite.io/docs/userguide).
 
 <img src="./docs/screenshots/banner.jpeg" alt="Banner" width="720"/>
 
-## Building from source
-Scrite is developed using Qt 6.11. To build Scrite, install Qt 6.11+ on your computer (Windows,
-macOS, or Linux) and CMake 3.27+.
-
-Open the project in Qt Creator (it auto-detects CMakeLists.txt) and set the build configuration to
-**Release**, or build from the command line:
-
-```bash
-cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-cmake --build build --config Release
-```
-
-Build artifacts are placed in the `binary/` directory.
-
 ## Reporting Issues
 If you run into bugs, crashes or find missing features OR features that are not working as expected,
 we recommend that you post a message on our Discord server, discuss it with us there before creating
@@ -72,110 +58,6 @@ These talks may help you find your way around the code.
 [Grant Funding (2026)](https://www.scrite.io/fossunited-grants/): Covering essential expenses 
 related to server hosting, software licensing, code signing certificates, and legal document 
 reviews.
-
-## Dependencies
-
-### mkdocs
-If you want to generate documentation from the docs folder, you will also need to install Python and
-mkdocs.
-
-#### On macOS
-
-Most users prefer to install python from homebrew on macOS. In such cases, it works best if a
-separate environment is created for serving docs.
-
-    # Switch to docs/userguide
-    cd ./docs/userguide
-
-    # Fresh Homebrew Python (ensures pip works)
-    brew install python
-
-    # Project-specific virtualenv (isolates from system)
-    cd your-scrite-docs-folder
-    python3 -m venv venv
-    source venv/bin/activate
-
-    # Install MkDocs ecosystem
-    pip install mkdocs mkdocs-material mkdocs-video mkdocs-rss-plugin
-
-    # Serve docs
-    mkdocs serve --livereload
-
-    # Open http://127.0.0.1:8000 on your browser
-
-#### On Windows & Linux
-
-Once you have python and pip installed,
-
-    # Switch to docs/userguide
-    cd ./docs/userguide
-
-    # Install Mkdocs ecosystem
-    pip install mkdocs mkdocs-material mkdocs-video
-
-    # Serve docs
-    python -m mkdocs serve
-
-    # Open http://127.0.0.1:8000 on your browser
-
-Further reading: https://www.mkdocs.org/user-guide/installation/
-
-### Qt
-We use a commercial license of Qt 6.11 for all production and beta builds. You should be able to use
-any Qt 6.11+ release for building Scrite. The code is organized to work well with our webservices in
-production, so if you build from the source code here — it may not work with our production servers.
-You should be able to comment away all references to our webservices and construct a purely
-open-source build. At some point, we will introduce compile time config settings to make this easy.
-
-### Windows
-Ensure that you have OpenSSL 3 installed. We use Windows 11 for development, although the app also
-works on Windows 10. Earlier versions of Windows are not supported.
-
-### macOS
-Any version of macOS supported by Qt 6.11 should work. macOS builds are universal binaries (x86_64 +
-arm64).
-
-### Linux
-To build the app on Linux, there are a couple of dependencies to take care of first.
-
-#### Hunspell (for spellcheck)
-To build Scrite with Hunspell support on Linux, install hunspell-dev. On Ubuntu:
-
-    sudo apt-get install libhunspell-dev
-
-#### xcb and xinerama
-Make sure that you have cursor, xinerama installed
-
-    sudo apt install libxcb-cursor0 libxcb-xinerama0
-
-#### OpenSSL
-You will also need OpenSSL 3:
-
-    sudo apt install libssl-dev
-
-#### imagemagick
-For running the package scripts, you will need imagemagick and linuxdeployqt
-
-    sudo apt install imagemagick
-
-#### linuxdeployqt (for packaging)
-    wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
-
-#### lib-ibus-1.0 for Language support
-Language support on Linux requirres IBUS.
-
-    sudo apt install ibus ibus-m17n libibus-1.0-dev
-
-Additionally, ensure that ibus daemon is running and that you setup languages using
-
-    ibus-setup
-
-You may also need to include the following lines into environment variables.
-
-    export GTK_IM_MODULE=ibus
-    export XMODIFIERS=@im=ibus
-    export QT_IM_MODULE=ibus
-    export XIM_PROGRAM="/usr/bin/ibus-daemon -drx"
 
 ## Screenshots
 

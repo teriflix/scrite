@@ -189,6 +189,10 @@ dual dialogue to display side-by-side:
 3. Press `Ctrl+Alt+D` (Windows/Linux) or `Ctrl+⌥+D` (macOS) to toggle dual
    dialogue
 
+> NOTE: If your OS already has these keyboard shortcuts mapped to something
+> else, then its unlikely to work for dual-dialogue in Scrite. Please [customise
+> the shortcut](user-interface.md#keyboard-shortcuts) to any other combination that works for you.
+
 <img src="../images/quickstart/028-dual-dialogue.png" width="75%"/>
 
 In the editor, they appear sequentially for easy editing. In PDF export and
