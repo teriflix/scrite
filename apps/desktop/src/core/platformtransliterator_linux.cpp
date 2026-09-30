@@ -303,7 +303,9 @@ bool LinuxIBusBackend::reload()
 
     IBusConfig *config = ibus_bus_get_config(d->bus);
     if (config != nullptr) {
-        auto configCleanup = qScopeGuard([config]() { g_object_unref(config); });
+        // There is no need to cleanup config, because it is owned by the bus and will be 
+        // cleaned up when the bus is destroyed.
+        // auto configCleanup = qScopeGuard([config]() { g_object_unref(config); });
 
         GVariant *value = ibus_config_get_value(config, "general", "preload-engines");
         if (value != nullptr) {
