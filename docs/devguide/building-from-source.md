@@ -13,25 +13,25 @@ A desktop or a laptop with
 
 In general it is a good idea to [download the latest production
 build](https://www.scrite.io/downloads) of Scrite and verify that it works on
-your system. It is recommended that you go sign up for a trail to check if all
-features are working. If you are already a Scrite user and hold an active
-subscription, then you can check with those credentials.
+your system. It is recommended that you sign up for a trial to check if all
+features are working. If you are already a Scrite user with an active
+subscription, use those credentials.
 
 ## Qt Development Environment Setup
-The Qt Online Installer asks you to log in with a free Qt Account. You can
-create one while running the installer, but you'll need to verify your email
-address, so allow a few minutes for that.
 
-Qt Online Installer (open source):
+The Qt Online Installer requires a free Qt Account. You can create one during
+installation, but allow a few minutes to verify your email address.
+
+**Qt Online Installer (open source):**
 https://www.qt.io/development/download-qt-installer-oss
 
-In the installer, choose the open-source option and select Qt > Qt 6.11.2, plus
-the component for your platform listed below. Qt Creator is installed
-automatically.
+In the installer, select the open-source option and choose the latest Qt 6 release
+(6.11.2 or newer) for your platform (see below). Qt Creator is installed automatically.
 
-## Linux
+### Linux
+
 1. Install the compiler and OpenGL development headers:
-   - Debian/Ubuntu:
+   - **Debian/Ubuntu:**
      ```bash
      sudo apt-get install \
        build-essential git \
@@ -45,7 +45,7 @@ automatically.
        libminizip-dev zlib1g-dev \
        hunspell libhunspell-dev
      ```
-     Packages by category:
+   - **Packages by category:**
      - **Build Essentials:** `build-essential`, `git`
      - **OpenGL & Graphics:** `libgl1-mesa-dev`, `libgl1`, `libxcb-glx0`
      - **X11 Bridge:** `libx11-xcb1`
@@ -59,113 +59,100 @@ automatically.
      - **System Libraries:** `libfontconfig1`, `libglib2.0-dev`
      - **Compression & Archives:** `libminizip-dev`, `zlib1g-dev`
      - **Spell Checking:** `hunspell`, `libhunspell-dev`
-2. Download the Linux installer (x64 or ARM64) from the link above, make it
-   executable with `chmod +x qt-online-installer-*.run`, and run it.
-3. Select Qt 6.11.2 > Desktop (gcc 64-bit).
-4. Note: Qt 6.11 requires glibc 2.34 or newer (Ubuntu 22.04+, Debian 12, RHEL 9+
-   are fine).
+
+   > NOTE: Dependencies vary by distribution. Search for distribution-specific instructions if needed.
+
+2. Download the Linux installer (x64 or ARM64), make it executable, and run:
+   ```bash
+   chmod +x qt-online-installer-*.run
+   ./qt-online-installer-*.run
+   ```
+3. In the installer, select **Qt 6.x > Desktop (gcc 64-bit)** (latest 6.11+ recommended)
+4. Note: Qt 6 requires glibc 2.34 or newer (Ubuntu 22.04+, Debian 12, RHEL 9+ are supported)
 5. Reference: https://doc.qt.io/qt-6/linux.html
 
-> NOTE: Dependencies for each GNU Linux Distribution may vary. Please search for
-> appropriate instructions.
+### Windows
 
-## Windows
-1. Install Visual Studio 2022 Community using Microsoft's direct installer link:
-   https://aka.ms/vs/17/release/vs_community.exe (The main Visual Studio website
-   now offers VS 2026, so please use this link.)
-2. In the Visual Studio Installer, tick the Desktop development with C++
-   workload. This includes the MSVC compiler and a Windows SDK.
-3. (Optional) If you want a newer standalone Windows SDK:
+1. Install Visual Studio 2022 Community using this direct link:
+   https://aka.ms/vs/17/release/vs_community.exe
+   
+   > Note: The main Visual Studio website now offers VS 2026; use the link above for 2022.
+
+2. In the Visual Studio Installer, enable the **Desktop development with C++** workload
+3. (Optional) For a newer Windows SDK:
    https://developer.microsoft.com/windows/downloads/windows-sdk/
-4. Run the Qt Online Installer and select Qt 6.11.2 > MSVC 2022 64-bit (or MSVC
-   2022 ARM64 on ARM laptops).
+4. Run the Qt Online Installer and select **Qt 6.x > MSVC 2022 64-bit** (latest 6.11+ recommended; or ARM64 on ARM laptops)
 
-## macOS
-1. Install Xcode (version 15 or newer) from the Mac App Store:
+### macOS
+
+1. Install Xcode 15 or newer from the Mac App Store:
    https://apps.apple.com/app/xcode/id497799835
-2. Open Xcode once after installing so it can finish setting up its components
-   and you can accept the license.
-3. Run the Qt Online Installer and select Qt 6.11.2 > macOS.
+2. After installation, open Xcode once to complete setup and accept the license
+3. Run the Qt Online Installer and select **Qt 6.x > macOS** (latest 6.11+ recommended)
 
-> NOTE: We recommend that you install all components in `Additional Libraries`
-> section, and the `Desktop` component of `Qt PDF` and `Qt WebEngine` for the
-> version of Qt you install.
+### Verify Installation
 
-Check that it works. Open Qt Creator, create a new "Qt Widgets Application" or
-"Qt Quick Application" project, and click Run. If a window appears, you're all
-set.
+Open Qt Creator and create a new "Qt Widgets Application" or "Qt Quick Application"
+project. Click Run — if a window appears, your setup is complete.
 
 # Getting the Source Code
 
-## Folder Structure
-We recommend that you prepare the following folder structure
-```
-+ Scrite
-|-- Code
-|-- Release
-```
+## Cloning the Repository
 
-The commands to do so in your home directory on Linux would be
+Clone the official repository into a folder of your choice:
 
 ```bash
-# cd ~
-# mkdir Scrite
-# cd Scrite
-# mkdir Code
-# mkdir Release
+git clone https://github.com/teriflix/scrite.git
+cd scrite
 ```
 
-## Cloning the repository
-Shown below are commands to clone from the official repository of Scrite on a
-GNU/Linux desktop. You can do something similar on Windows & macOS as well.
+Initialize submodules for third-party dependencies:
 
 ```bash
-# cd ~/Scrite/Code
-# git clone https://github.com/teriflix/scrite.git ~/Scrite/Code
+git submodule update --init --recursive
 ```
 
-The Scrite code makes use of several third party dependencies. You will now need
-to init submodules related to those.
-
-```bash
-# cd ~/Scrite/Code
-# git submodule update --init --recursive
-```
-
-That's it. You should have all the code needed for building Scrite.
+You now have all the source code needed to build Scrite.
 
 # Building from Code
 
-## On Linux
+Before building, ensure you have completed the [Qt Development Environment Setup](#qt-development-environment-setup) above with the latest Qt 6 release.
 
-- Launch Qt Creator
-- Click on File -> Open File or Project
-- Select `~/Scrite/Code/CMakeLists.txt` in the file dialog and click `Open`
-- We recommend checking Release target and selecting that as the build target.
-- Hit the Play/Run button on Qt Creator and let it build the whole app.
+Using Qt's `MaintenanceTool`, we recommend installing:
+- All components in the **Additional Libraries** section
+- The **Desktop** component of **Qt PDF**
+- The **Desktop** component of **Qt WebEngine**
+
+## Building the Project
+
+1. Launch Qt Creator
+2. Click on File → Open File or Project
+3. Navigate to your cloned scrite folder and select `CMakeLists.txt`, then click `Open`
+4. We recommend selecting the Release target as the build target
+5. Hit the Play/Run button to build and run the app
 
 > NOTE: Building Scrite from code might take 10-30 minutes depending on CPU
-> speed and available RAM. So, please be patient.
+> speed and available RAM.
 
-Once built, the Scrite app will launch and would have activated itself using a
-standard email-id. You cannot change that or make use of our production servers.
-This means you will not be able to access templates and pre-packaged scripts
-from Scriptalay. Other than that, you will be able to make use of all features.
+Once built, the Scrite app will launch and activate itself using a standard
+email address. You cannot change that or use the production servers. This means
+you will not have access to templates and pre-packaged scripts from Scriptalay.
+All other features are fully functional.
 
-> NOTE: Production builds may come bundled with certain extra features, the
-> source for which may not be available in the public repository.
+> NOTE: Production builds may include extra features not in the public repository.
 
-### Runtime environment
+## Platform-Specific Notes
 
-Consider having the following environment variables configured against Run
-settings for the Scrite project in Qt Creator.
+### Linux
+
+Consider configuring these environment variables in Qt Creator's Run settings:
 
 ```
 LIBGL_ALWAYS_SOFTWARE=1
 QT_QPA_PLATFORM=xcb
 ```
 
-Optionally, you could also set the following additionally:
+Optionally, for better input method support:
 ```
 GTK_IM_MODULE=ibus
 XMODIFIERS=@im=ibus
@@ -173,10 +160,10 @@ QT_IM_MODULE=ibus
 XIM_PROGRAM="/usr/bin/ibus-daemon -drx"
 ```
 
-## On Windows
+### Windows
 
-> TODO
+No additional platform-specific configuration needed beyond the standard build steps above.
 
-## On macOS
+### macOS
 
-> TODO
+No additional platform-specific configuration needed beyond the standard build steps above.
