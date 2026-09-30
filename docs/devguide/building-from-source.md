@@ -95,7 +95,7 @@ Check that it works. Open Qt Creator, create a new "Qt Widgets Application" or
 "Qt Quick Application" project, and click Run. If a window appears, you're all
 set.
 
-# Getting the Source Code
+# Linux Build Instructions
 
 ## Folder Structure
 We recommend that you prepare the following folder structure
@@ -170,3 +170,11 @@ XMODIFIERS=@im=ibus
 QT_IM_MODULE=ibus
 XIM_PROGRAM="/usr/bin/ibus-daemon -drx"
 ```
+
+# Windows Build Instructions
+
+> TODO
+
+# macOS Build Instructions
+
+> TODO
