@@ -305,6 +305,7 @@ bool RestApiCall::call()
         this->setError(
                 QJsonObject({ { "code", "E_BUILD_TYPE" },
                               { "text", "Production servers need not be used by FOSS builds." } }));
+        emit finished();
     });
     return true;
 #else
