@@ -62,8 +62,9 @@ Item {
 
     property string currentTheme
 
-    property Item screenplayEditor
+    property Item modules
     property Item structureView
+    property Item screenplayEditor
     property Item screenplayEditorToolbar
 
     property ObjectListModel dialogs: ObjectListModel { }
@@ -202,6 +203,26 @@ Item {
         parent = _parent
         visible = false
         anchors.fill = parent
+
+        Qt.callLater(loadModules)
+    }
+
+    function loadModules() {
+        if(root.modules !== null)
+            return
+
+        const extensionsInfo = File.info(Scrite.app.applicationDirPath + "/extensions.qml")
+        if(extensionsInfo.valid && extensionsInfo.exists && extensionsInfo.readable && extensionsInfo.isFile && extensionsInfo.suffix == "qml") {
+            const modulesUrl = Url.fromPath(extensionsInfo.absoluteFilePath)
+            let modulesComponent = Qt.createComponent(modulesUrl)
+
+            let instantiateFn = () => {
+                if(modulesComponent.status === Component.Ready)
+                    root.modules = modulesComponent.createObject(root)
+            }
+            modulesComponent.statusChanged.connect(instantiateFn)
+            instantiateFn()
+        }
     }
 
     function closeAllDialogs() {

@@ -94,6 +94,12 @@ public:
     // clang-format on
 
     // clang-format off
+    Q_PROPERTY(QString applicationDirPath
+               READ applicationDirPath
+               CONSTANT )
+    // clang-format on
+
+    // clang-format off
     Q_PROPERTY(QFont font
                READ applicationFont
                NOTIFY applicationFontChanged)

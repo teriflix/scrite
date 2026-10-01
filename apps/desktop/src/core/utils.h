@@ -137,6 +137,18 @@ public:
     bool exists() const { return info.exists(); }
 
     // clang-format off
+    Q_PROPERTY(bool isFile
+               READ isFile)
+    // clang-format on
+    bool isFile() const { return info.isFile(); }
+
+    // clang-format off
+    Q_PROPERTY(bool isDir
+               READ isDir)
+    // clang-format on
+    bool isDir() const { return info.isDir(); }
+
+    // clang-format off
     Q_PROPERTY(bool readable
                READ readable)
     // clang-format on
