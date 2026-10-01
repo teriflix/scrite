@@ -51,3 +51,10 @@ endif()
 
 add_subdirectory(thirdparty)
 add_subdirectory(apps)
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/extra/CMakeLists.txt")
+    set(SCRITE_EXTRA TRUE)
+    add_subdirectory(extra)
+else()
+    set(SCRITE_EXTRA FALSE)
+endif()

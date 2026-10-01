@@ -94,3 +94,5 @@ binary/packages/
 # Production-only Windows version resource (provided by the production build system)
 apps/desktop/version.rc.in
 
+# Ignore anything in the extra folder.
+extra/
