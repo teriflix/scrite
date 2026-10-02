@@ -57,6 +57,7 @@ int main(int argc, char **argv)
 
     QQmlApplicationEngine qmlEngine;
     scriteApp.initialize(&qmlEngine);
+    qmlEngine.addImportPath("qrc:/");
     qmlEngine.load(QUrl("qrc:/Scrite/App/main.qml"));
 
     return scriteApp.exec();
