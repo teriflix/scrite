@@ -31,6 +31,7 @@ import "./homescreen"
 DialogLauncher {
     id: root
 
+    function init() { }
     function launch(mode) { return doLaunch({"mode": mode}) }
     function firstLaunch() {
         if(_private.launchCounter === 0)

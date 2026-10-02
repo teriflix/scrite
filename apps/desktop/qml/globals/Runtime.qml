@@ -62,7 +62,7 @@ Item {
 
     property string currentTheme
 
-    property Item modules
+    property Item extensions
     property Item structureView
     property Item screenplayEditor
     property Item screenplayEditorToolbar
@@ -203,12 +203,10 @@ Item {
         parent = _parent
         visible = false
         anchors.fill = parent
-
-        Qt.callLater(loadModules)
     }
 
-    function loadModules() {
-        if(root.modules !== null)
+    function loadExtensions() {
+        if(root.extensions !== null)
             return
 
         const extensionsInfo = File.info(Scrite.app.applicationDirPath + "/extensions.qml")
@@ -218,7 +216,7 @@ Item {
 
             let instantiateFn = () => {
                 if(modulesComponent.status === Component.Ready)
-                    root.modules = modulesComponent.createObject(root)
+                    root.extensions = modulesComponent.createObject(root)
             }
             modulesComponent.statusChanged.connect(instantiateFn)
             instantiateFn()

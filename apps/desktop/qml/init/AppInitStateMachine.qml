@@ -174,6 +174,9 @@ QSM.StateMachine {
             FloatingDockLayer.init(root.contentLoader)
             OverlaysLayer.init(root.contentLoader)
             NotificationsLayer.init(root.contentLoader)
+            HomeScreen.init()
+
+            Runtime.loadExtensions()
 
             Qt.callLater(() => s4AppInit.done())
         }
