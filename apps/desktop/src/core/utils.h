@@ -704,8 +704,8 @@ public:
     // clang-format on
     static QAbstractListModel *model();
 
-    static void remove(QObject *object);
-    static QString add(QObject *object, const QString &name);
+    Q_INVOKABLE static void remove(QObject *object);
+    Q_INVOKABLE static QString add(QObject *object, const QString &name);
 
     Q_INVOKABLE static QObject *find(const QString &name);
 
@@ -785,6 +785,89 @@ private:
 private:
     friend class ObjectRegistry;
     QString m_name;
+};
+
+class ObjectDiscovery : public QObject
+{
+    Q_OBJECT
+    QML_NAMED_ELEMENT(ObjectDiscovery)
+
+public:
+    explicit ObjectDiscovery(QObject *parent = nullptr);
+    ~ObjectDiscovery() override;
+
+    enum Mode { DiscoverByName, DiscoverByInterface };
+    Q_ENUM(Mode)
+
+    // clang-format off
+    Q_PROPERTY(Mode mode
+               READ mode
+               WRITE setMode
+               NOTIFY modeChanged)
+    // clang-format on
+    void setMode(Mode val);
+    Mode mode() const { return m_mode; }
+    Q_SIGNAL void modeChanged();
+
+    // clang-format off
+    Q_PROPERTY(QString term
+               READ term
+               WRITE setTerm
+               NOTIFY termChanged)
+    // clang-format on
+    void setTerm(const QString &val);
+    QString term() const { return m_term; }
+    Q_SIGNAL void termChanged();
+
+    // clang-format off
+    Q_PROPERTY(QObject* object
+               READ object
+               NOTIFY objectChanged)
+    // clang-format on
+    QObject *object() const { return m_object; }
+    Q_SIGNAL void objectChanged();
+
+    // clang-format off
+    Q_PROPERTY(bool hasObject
+               READ hasObject
+               NOTIFY objectChanged)
+    // clang-format on
+    bool hasObject() const { return m_object != nullptr; }
+
+    // clang-format off
+    Q_PROPERTY(QAbstractListModel *objects
+               READ objects
+               CONSTANT)
+    // clang-format on
+    QAbstractListModel *objects() const { return m_objects; }
+
+    // clang-format off
+    Q_PROPERTY(bool hasObjects
+               READ hasObjects
+               NOTIFY hasObjectsChanged)
+    // clang-format on
+    bool hasObjects() const { return m_objects->rowCount() > 0; }
+    Q_SIGNAL void hasObjectsChanged();
+
+private:
+    void discover();
+
+    void setObject(QObject *val);
+    void onObjectDestroyed(QObject *ptr);
+
+    void objectAddedToRegistry(QObject *ptr, const QString &name);
+    void objectRemovedFromRegistry(QObject *ptr);
+
+    static void notifyObjectAddedToRegistry(QObject *ptr, const QString &name);
+    static void notifyObjectRemovedFromRegistry(QObject *ptr);
+
+private:
+    friend class ObjectRegistry;
+
+    Mode m_mode = DiscoverByName;
+    QString m_term;
+    QObject *m_object = nullptr;
+    QAbstractListModel *m_objects = nullptr;
 };
 
 class Color : public QObject

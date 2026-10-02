@@ -1153,6 +1153,8 @@ QAbstractListModel *Utils::ObjectRegistry::model()
  */
 void Utils::ObjectRegistry::remove(QObject *object)
 {
+    ObjectDiscovery::notifyObjectRemovedFromRegistry(object);
+
     ::ObjectRegistry->removeAt(::ObjectRegistry->indexOf(object));
 }
 
@@ -1175,11 +1177,19 @@ QString Utils::ObjectRegistry::add(QObject *object, const QString &name)
 
     int index = 0;
     QString finalObjName = objName;
-    while (find(finalObjName))
+    while (1) {
+        QObject *obj = find(finalObjName);
+        if (obj == nullptr)
+            break;
+        if (obj == object)
+            return finalObjName;
         finalObjName = objName + QString::number(index++);
+    }
 
     object->setProperty(objectNameProperty, finalObjName);
     ::ObjectRegistry->append(object);
+
+    ObjectDiscovery::notifyObjectAddedToRegistry(object, finalObjName);
 
     return finalObjName;
 }
@@ -1253,6 +1263,134 @@ void Utils::ObjectRegister::setName(const QString &val)
         Utils::ObjectRegistry::add(this->parent(), m_name);
 
     emit nameChanged();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+Q_GLOBAL_STATIC(QList<Utils::ObjectDiscovery *>, ObjectDiscoveryList)
+
+Utils::ObjectDiscovery::ObjectDiscovery(QObject *parent) : QObject(parent)
+{
+    ObjectListModel *objectsModel = new ObjectListModel(this);
+    connect(objectsModel, &ObjectListModel::objectCountChanged, this,
+            &ObjectDiscovery::hasObjectsChanged);
+    m_objects = objectsModel;
+
+    ::ObjectDiscoveryList->append(this);
+}
+
+Utils::ObjectDiscovery::~ObjectDiscovery()
+{
+    ::ObjectDiscoveryList->removeOne(this);
+}
+
+void Utils::ObjectDiscovery::setMode(Mode val)
+{
+    if (m_mode == val)
+        return;
+
+    m_mode = val;
+    emit modeChanged();
+
+    this->discover();
+}
+
+void Utils::ObjectDiscovery::setTerm(const QString &val)
+{
+    if (m_term == val)
+        return;
+
+    m_term = val;
+    emit termChanged();
+
+    this->discover();
+}
+
+void Utils::ObjectDiscovery::discover()
+{
+    this->setObject(nullptr);
+    ObjectListModel *model = qobject_cast<ObjectListModel *>(m_objects);
+    model->clear();
+
+    const ObjectListModel *allObjectsModel =
+            qobject_cast<ObjectListModel *>(ObjectRegistry::model());
+    const QList<QObject *> allObjects = allObjectsModel->constList();
+    for (QObject *object : allObjects) {
+        const QString name = object->property(objectNameProperty).toString();
+        this->objectAddedToRegistry(object, name);
+    }
+}
+
+void Utils::ObjectDiscovery::setObject(QObject *val)
+{
+    if (m_object == val)
+        return;
+
+    if (m_object != nullptr)
+        disconnect(m_object, &QObject::destroyed, this, &ObjectDiscovery::onObjectDestroyed);
+
+    m_object = val;
+
+    if (m_object != nullptr)
+        connect(m_object, &QObject::destroyed, this, &ObjectDiscovery::onObjectDestroyed,
+                Qt::UniqueConnection);
+
+    emit objectChanged();
+}
+
+void Utils::ObjectDiscovery::onObjectDestroyed(QObject *ptr)
+{
+    if (m_object == ptr) {
+        this->setObject(nullptr);
+    }
+}
+
+void Utils::ObjectDiscovery::objectAddedToRegistry(QObject *ptr, const QString &name)
+{
+    if (m_mode == DiscoverByName) {
+        if (name == m_term) {
+            this->setObject(ptr);
+        } else if (m_object == ptr) {
+            this->setObject(nullptr);
+        }
+    } else if (m_mode == DiscoverByInterface) {
+        if (ptr->inherits(qPrintable(m_term))) {
+            ObjectListModel *model = qobject_cast<ObjectListModel *>(m_objects);
+            model->append(ptr);
+        }
+    }
+}
+
+void Utils::ObjectDiscovery::objectRemovedFromRegistry(QObject *ptr)
+{
+    if (m_mode == DiscoverByName) {
+        if (m_object == ptr) {
+            this->setObject(nullptr);
+        }
+    } else if (m_mode == DiscoverByInterface) {
+        ObjectListModel *model = qobject_cast<ObjectListModel *>(m_objects);
+        int index = model->indexOf(ptr);
+        if (index >= 0)
+            model->removeAt(index);
+    }
+}
+
+void Utils::ObjectDiscovery::notifyObjectAddedToRegistry(QObject *ptr, const QString &name)
+{
+    const QList<ObjectDiscovery *> list = *::ObjectDiscoveryList;
+    for (ObjectDiscovery *d : list) {
+        if (::ObjectDiscoveryList->contains(d))
+            d->objectAddedToRegistry(ptr, name);
+    }
+}
+
+void Utils::ObjectDiscovery::notifyObjectRemovedFromRegistry(QObject *ptr)
+{
+    const QList<ObjectDiscovery *> list = *::ObjectDiscoveryList;
+    for (ObjectDiscovery *d : list) {
+        if (::ObjectDiscoveryList->contains(d))
+            d->objectRemovedFromRegistry(ptr);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
