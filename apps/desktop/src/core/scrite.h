@@ -149,9 +149,6 @@ class Scrite : public QObject
     QML_SINGLETON
 
 public:
-    explicit Scrite(QObject *parent = nullptr);
-    ~Scrite() override;
-
     enum AppFeature {
         ScreenplayFeature,
         StructureFeature,

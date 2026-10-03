@@ -21,10 +21,6 @@
 #include <QtDebug>
 #include <QMetaEnum>
 
-StandardPaths::StandardPaths(QObject *parent) : QObject(parent) { }
-
-StandardPaths::~StandardPaths() { }
-
 QString StandardPaths::writableLocation(StandardPaths::StandardLocation type)
 {
     switch (type) {

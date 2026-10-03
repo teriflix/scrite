@@ -927,7 +927,8 @@ public:
     void serializeToJson(QJsonObject &json) const override;
     void deserializeFromJson(const QJsonObject &json) override;
     bool canSetPropertyFromObjectList(const QString &propName) const override;
-    void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects) override;
+    void setPropertyFromObjectList(const QString &propName,
+                                   const QList<QObject *> &objects) override;
 
     // Text Document Export Support
     struct WriteOptions

@@ -804,10 +804,13 @@ ScriteDocument::ScriteDocument(QObject *parent)
     });
 
     this->initializeFileModificationTracker();
+
+    Utils::ObjectRegistry::add(this, "scriteDocument");
 }
 
 ScriteDocument::~ScriteDocument()
 {
+    Utils::ObjectRegistry::remove(this);
     emit aboutToDelete(this);
 }
 

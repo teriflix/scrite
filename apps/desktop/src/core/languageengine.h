@@ -516,9 +516,6 @@ class DefaultTransliteration : public QObject
     QML_SINGLETON
 
 public:
-    explicit DefaultTransliteration(QObject *parent = nullptr);
-    ~DefaultTransliteration() override;
-
     // clang-format off
     Q_PROPERTY(QString driver
                READ driver
@@ -533,7 +530,7 @@ public:
     // clang-format on
     static QList<int> supportedLanguageCodes();
 
-    Q_INVOKABLE bool supportsLanguageCode(int code) const;
+    Q_INVOKABLE static bool supportsLanguageCode(int code);
 
     Q_INVOKABLE static QString onWord(const QString &word, int code);
     Q_INVOKABLE static QString onParagraph(const QString &paragraph, int code);

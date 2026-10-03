@@ -142,7 +142,8 @@ static const QMap<QChar::Script, QString> glyphForScript()
 {
     QMap<QChar::Script, QString> ret = {
         { QChar::Script_Unknown, QString(QChar::fromUcs4(0x002A)) }, // '*'
-        { QChar::Script_Inherited, QString(QChar::fromUcs4(0x0300)) }, // '◌̀' (Combining Grave Accent)
+        { QChar::Script_Inherited,
+          QString(QChar::fromUcs4(0x0300)) }, // '◌̀' (Combining Grave Accent)
         { QChar::Script_Common, QString(QChar::fromUcs4(0x003F)) }, // '?'
         { QChar::Script_Adlam, QString(QChar::fromUcs4(0x1E900)) }, // '𞤀'
         { QChar::Script_Ahom, QString(QChar::fromUcs4(0x11700)) }, // '𑜴'
@@ -1105,10 +1106,6 @@ void AvailableLanguages::initialize()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DefaultTransliteration::DefaultTransliteration(QObject *parent) : QObject(parent) { }
-
-DefaultTransliteration::~DefaultTransliteration() { }
-
 QString DefaultTransliteration::driver()
 {
     return QStringLiteral("PhTranslator");
@@ -1121,7 +1118,7 @@ QList<int> DefaultTransliteration::DefaultTransliteration::supportedLanguageCode
              QLocale::Sanskrit,  QLocale::Tamil,    QLocale::Telugu };
 }
 
-bool DefaultTransliteration::supportsLanguageCode(int code) const
+bool DefaultTransliteration::supportsLanguageCode(int code)
 {
     return supportedLanguageCodes().contains(code);
 }

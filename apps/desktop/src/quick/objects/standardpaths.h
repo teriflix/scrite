@@ -27,9 +27,6 @@ class StandardPaths : public QObject
     QML_SINGLETON
 
 public:
-    explicit StandardPaths(QObject *parent = nullptr);
-    ~StandardPaths() override;
-
     // Copied from QStandardPaths
     enum StandardLocation {
         DesktopLocation,

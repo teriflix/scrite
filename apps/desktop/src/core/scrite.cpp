@@ -32,16 +32,6 @@
 #include <QProcess>
 #include <QSettings>
 
-Scrite::Scrite(QObject *parent) : QObject(parent)
-{
-    qDebug() << "Warning: Scrite namespace being created.";
-}
-
-Scrite::~Scrite()
-{
-    qDebug() << "Warning: Scrite namespace being destroyed.";
-}
-
 Application *Scrite::app()
 {
     return Application::instance();
