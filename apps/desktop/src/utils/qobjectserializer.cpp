@@ -14,6 +14,7 @@
 ****************************************************************************/
 
 #include "qobjectserializer.h"
+#include "qobjecttextserializer.h"
 #include "timeprofiler.h"
 
 #include <QtDebug>
@@ -862,6 +863,11 @@ QVariant QRectFHelper::fromJson(const QJsonValue &value, int type) const
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+QString QObjectSerializer::toText(const QObject *object)
+{
+    return QObjectTextSerializer::toText(object);
+}
 
 QVariantMap QObjectSerializer::cacheDefaultPropertyValues(const QObject *object, bool readonly)
 {

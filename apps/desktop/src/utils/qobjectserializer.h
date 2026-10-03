@@ -58,6 +58,8 @@ bool fromJsonString(const QString &json, QObject *object, QObjectFactory *factor
 QJsonObject toJson(const QObject *object);
 bool fromJson(const QJsonObject &json, QObject *object, QObjectFactory *factory = nullptr);
 
+QString toText(const QObject *object);
+
 QVariantMap cacheDefaultPropertyValues(const QObject *object, bool readonly = false);
 };
 
@@ -68,7 +70,6 @@ QVariantMap cacheDefaultPropertyValues(const QObject *object, bool readonly = fa
         defaultPropertyValuesCached = true;                                                        \
     }
 
-Q_DECLARE_INTERFACE(QObjectSerializer::Interface,
-                    "com.prashanthudupa.QObjectSerializer.Interface/1.0")
+Q_DECLARE_INTERFACE(QObjectSerializer::Interface, "Scrite.App.QObjectSerializer.Interface/1.0")
 
 #endif // QOBJECTSERIALIZER_H
