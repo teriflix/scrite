@@ -1206,6 +1206,9 @@ Scene::Scene(QObject *parent) : QAbstractListModel(parent)
 {
     this->setStructureElement(qobject_cast<StructureElement *>(parent));
 
+    connect(this, &Scene::synopsisChanged, this, &Scene::summaryChanged);
+    connect(this, &Scene::excerptChanged, this, &Scene::summaryChanged);
+
     connect(this, &Scene::synopsisChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::colorChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::groupsChanged, this, &Scene::sceneChanged);
@@ -1234,11 +1237,11 @@ Scene::Scene(QObject *parent) : QAbstractListModel(parent)
     connect(m_attachments, &Attachments::attachmentsModified, this, &Scene::sceneChanged);
     this->evaluateWordCountLater();
 
-    QTimer *summaryChangeTimer = new QTimer(this);
-    summaryChangeTimer->setSingleShot(true);
-    summaryChangeTimer->setInterval(100);
-    connect(summaryChangeTimer, &QTimer::timeout, this, &Scene::evaluateSummary);
-    connect(this, &Scene::sceneChanged, summaryChangeTimer, qOverload<>(&QTimer::start));
+    QTimer *excerptChangeTimer = new QTimer(this);
+    excerptChangeTimer->setSingleShot(true);
+    excerptChangeTimer->setInterval(100);
+    connect(excerptChangeTimer, &QTimer::timeout, this, &Scene::evaluateExcerpt);
+    connect(this, &Scene::sceneChanged, excerptChangeTimer, qOverload<>(&QTimer::start));
 }
 
 Scene::~Scene()
@@ -2293,13 +2296,13 @@ bool Scene::capitalizeSentences()
     return ret;
 }
 
-void Scene::setSummary(const QString &val)
+void Scene::setExcerpt(const QString &val)
 {
-    if (m_summary == val)
+    if (m_excerpt == val)
         return;
 
-    m_summary = val;
-    emit summaryChanged();
+    m_excerpt = val;
+    emit excerptChanged();
 }
 
 QHash<QString, QList<SceneElement *>> Scene::dialogueElements() const
@@ -3151,17 +3154,17 @@ void Scene::trimIndexCardFieldValues()
     }
 }
 
-void Scene::evaluateSummary()
+void Scene::evaluateExcerpt()
 {
-    QString summary;
+    QString excerpt;
 
     if (m_structureElement != nullptr)
-        summary = m_structureElement->nativeTitle();
+        excerpt = m_structureElement->nativeTitle();
 
-    if (summary.isEmpty())
-        summary = m_synopsis;
+    if (excerpt.isEmpty())
+        excerpt = m_synopsis;
 
-    if (summary.isEmpty()) {
+    if (excerpt.isEmpty()) {
         if (!m_elements.isEmpty()) {
             // Find the first element with some text in it.
             SceneElement *element = nullptr;
@@ -3175,19 +3178,19 @@ void Scene::evaluateSummary()
 
             if (element != nullptr) {
                 if (element->type() == SceneElement::Character) {
-                    summary = element->text();
+                    excerpt = element->text();
                     if (elementIndex + 1 < m_elements.size())
-                        summary += ": " + m_elements.at(elementIndex + 1)->text();
+                        excerpt += ": " + m_elements.at(elementIndex + 1)->text();
                 } else
-                    summary = element->text();
+                    excerpt = element->text();
             }
         }
     }
 
-    if (summary.isEmpty())
-        summary = QStringLiteral("Empty scene");
+    if (excerpt.isEmpty())
+        excerpt = QStringLiteral("Empty scene");
 
-    this->setSummary(summary);
+    this->setExcerpt(excerpt);
 }
 
 void Scene::staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr)

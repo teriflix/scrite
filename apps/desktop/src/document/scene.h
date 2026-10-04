@@ -882,11 +882,19 @@ public:
     Q_INVOKABLE bool capitalizeSentences();
 
     // clang-format off
+    Q_PROPERTY(QString excerpt
+               READ excerpt
+               NOTIFY excerptChanged)
+    // clang-format on
+    QString excerpt() const { return m_excerpt; }
+    Q_SIGNAL void excerptChanged();
+
+    // clang-format off
     Q_PROPERTY(QString summary
                READ summary
                NOTIFY summaryChanged)
     // clang-format on
-    QString summary() const { return m_summary; }
+    QString summary() const { return this->hasSynopsis() ? m_synopsis : m_excerpt; }
     Q_SIGNAL void summaryChanged();
 
     // Used by stats report generator code.
@@ -965,8 +973,8 @@ private:
     void evaluateWordCountLater();
     void trimIndexCardFieldValues();
 
-    void evaluateSummary();
-    void setSummary(const QString &val);
+    void evaluateExcerpt();
+    void setExcerpt(const QString &val);
 
 private:
     friend class Structure;
@@ -991,7 +999,7 @@ private:
     QString m_act;
     QString m_comments;
     QString m_episode;
-    QString m_summary;
+    QString m_excerpt;
     QString m_synopsis;
     mutable QString m_id;
 
