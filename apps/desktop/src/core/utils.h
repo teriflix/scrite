@@ -593,6 +593,20 @@ public:
     // clang-format on
     static QUrl settingsLocation(); // URL form of settingsFile() for QML APIs expecting urls
 
+    // clang-format off
+    Q_PROPERTY(QString extensionsPath
+               READ extensionsPath
+               CONSTANT)
+    // clang-format on
+    static QString extensionsPath();
+
+    // clang-format off
+    Q_PROPERTY(QString extensionsQml
+               READ extensionsQml
+               CONSTANT)
+    // clang-format on
+    static QString extensionsQml();
+
     Q_INVOKABLE static QString configPath(const QString &relativeName);
 
     Q_INVOKABLE static QString modifierDescription(int modifier);

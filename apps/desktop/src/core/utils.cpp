@@ -233,6 +233,32 @@ QUrl Utils::Platform::settingsLocation()
     return QUrl::fromLocalFile(Utils::Platform::settingsFile());
 }
 
+QString Utils::Platform::extensionsPath()
+{
+#ifdef Q_OS_MAC
+    return qApp->applicationDirPath() + "/../PlugIns";
+#else
+#ifdef Q_OS_WIN
+    return qApp->applicationDirPath();
+#else
+    return qApp->applicationDirPath();
+#endif
+#endif
+}
+
+QString Utils::Platform::extensionsQml()
+{
+#ifdef Q_OS_MAC
+    return qApp->applicationDirPath() + "/../PlugIns/Extensions/extensions.qml";
+#else
+#ifdef Q_OS_WIN
+    return qApp->applicationDirPath() + "Extensions/extensions.qml";
+#else
+    return qApp->applicationDirPath() + "Extensions/extensions.qml";
+#endif
+#endif
+}
+
 /**
  * Returns complete path for the relative name supplied here, such that it shows up
  * in the same folder as settings.ini file for this platform.

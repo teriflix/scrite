@@ -209,7 +209,7 @@ Item {
         if(root.extensions !== null)
             return
 
-        const extensionsInfo = File.info(Scrite.app.applicationDirPath + "/extensions.qml")
+        const extensionsInfo = File.info(Platform.extensionsQml)
         if(extensionsInfo.valid && extensionsInfo.exists && extensionsInfo.readable && extensionsInfo.isFile && extensionsInfo.suffix == "qml") {
             const modulesUrl = Url.fromPath(extensionsInfo.absoluteFilePath)
             let extensionsLoader = Qt.createComponent(modulesUrl)

@@ -1128,6 +1128,7 @@ bool Application::registerFileTypes()
 #endif
 }
 
+#include "utils.h"
 #include "qimageitem.h"
 #include "structure.h"
 #include "languageengine.h"
@@ -1142,6 +1143,8 @@ void Application::initialize(QQmlEngine *engine)
     // Force registration of QML types in Scrite.App
     extern void qml_register_types_Scrite_App();
     qml_register_types_Scrite_App();
+
+    engine->addImportPath(Utils::Platform::extensionsPath());
 
     // Init modules
     const char *uri = SCRITE_QML_URI;
