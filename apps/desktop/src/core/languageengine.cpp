@@ -1955,8 +1955,7 @@ bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
             const QKeyEvent *keyEvent = static_cast<const QKeyEvent *>(event);
 
             if (keyEvent->key() == Qt::Key_Escape) {
-                this->resetCurrentWord();
-                return true;
+                return this->resetCurrentWord();
             }
 
             if (keyEvent->key() == Qt::Key_Up) {
@@ -2192,8 +2191,10 @@ bool LanguageTransliterator::commitWordToEditor()
     return true;
 }
 
-void LanguageTransliterator::resetCurrentWord()
+bool LanguageTransliterator::resetCurrentWord()
 {
+    const bool hadWord = m_currentWord.isValid();
+
     m_currentWord.start = -1;
     m_currentWord.end = -1;
 
@@ -2212,6 +2213,8 @@ void LanguageTransliterator::resetCurrentWord()
             emit textRectChanged();
         }
     });
+
+    return hadWord;
 }
 
 void LanguageTransliterator::useSuggestions(const QString &word, const QStringList &suggestions)

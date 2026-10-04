@@ -615,7 +615,8 @@ public:
     QList<TransliterationOption> options(int lang) const override;
     bool canActivate(const TransliterationOption &option) override;
     bool activate(const TransliterationOption &option) override;
-    QString transliterateWord(const QString &word, const TransliterationOption &option) const override;
+    QString transliterateWord(const QString &word,
+                              const TransliterationOption &option) const override;
     AlphabetMappings alphabetMappings(int langCode) const override;
 };
 
@@ -639,7 +640,8 @@ public:
     QList<TransliterationOption> options(int lang) const override;
     bool canActivate(const TransliterationOption &option) override;
     bool activate(const TransliterationOption &option) override;
-    QString transliterateWord(const QString &word, const TransliterationOption &option) const override;
+    QString transliterateWord(const QString &word,
+                              const TransliterationOption &option) const override;
 
 private:
     bool ensureEngine() const;
@@ -674,7 +676,8 @@ public:
     QList<TransliterationOption> options(int lang) const override;
     bool canActivate(const TransliterationOption &option) override;
     bool activate(const TransliterationOption &option) override;
-    QString transliterateWord(const QString &word, const TransliterationOption &option) const override;
+    QString transliterateWord(const QString &word,
+                              const TransliterationOption &option) const override;
 
 protected:
     void requestSuggestions(const QString &word);
@@ -716,7 +719,8 @@ public:
     QList<TransliterationOption> options(int lang) const override;
     bool canActivate(const TransliterationOption &option) override;
     bool activate(const TransliterationOption &option) override;
-    QString transliterateWord(const QString &word, const TransliterationOption &option) const override;
+    QString transliterateWord(const QString &word,
+                              const TransliterationOption &option) const override;
 };
 
 /*
@@ -738,7 +742,8 @@ public:
     QList<TransliterationOption> options(int lang) const override;
     bool canActivate(const TransliterationOption &option) override;
     bool activate(const TransliterationOption &option) override;
-    QString transliterateWord(const QString &word, const TransliterationOption &option) const override;
+    QString transliterateWord(const QString &word,
+                              const TransliterationOption &option) const override;
 
 private:
     QPointer<AbstractTransliterationEngine> m_platformEngine;
@@ -838,7 +843,7 @@ private:
     bool handleBackspace(const QKeyEvent *keyEvent);
     bool handleDelete(const QKeyEvent *keyEvent);
     bool commitWordToEditor();
-    void resetCurrentWord();
+    bool resetCurrentWord();
     void useSuggestions(const QString &word, const QStringList &suggestions);
     void setCurrentSuggestions(const QStringList &suggestions);
     void setCurrentSuggestionIndex(int val);
@@ -852,6 +857,8 @@ private:
         QString originalString;
         QStringList suggestions;
         int currentSuggestionIndex = 0;
+
+        bool isValid() const { return !originalString.isEmpty() || !suggestions.isEmpty(); }
     } m_currentWord;
 
     bool m_enabled = false;
