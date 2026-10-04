@@ -410,6 +410,13 @@ Form *Forms::addForm(const QJsonObject &val)
         return nullptr;
     }
 
+    const QString id = val.value("id").toString();
+    if (!id.isEmpty()) {
+        Form *form = this->findForm(id);
+        if (form != nullptr)
+            return form;
+    }
+
     Form *form = new Form(this);
     if (QObjectSerializer::fromJson(val, form)) {
         this->append(form);
