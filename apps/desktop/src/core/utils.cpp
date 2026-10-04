@@ -252,9 +252,9 @@ QString Utils::Platform::extensionsQml()
     return qApp->applicationDirPath() + "/../PlugIns/Extensions/extensions.qml";
 #else
 #ifdef Q_OS_WIN
-    return qApp->applicationDirPath() + "Extensions/extensions.qml";
+    return qApp->applicationDirPath() + "/Extensions/extensions.qml";
 #else
-    return qApp->applicationDirPath() + "Extensions/extensions.qml";
+    return qApp->applicationDirPath() + "/Extensions/extensions.qml";
 #endif
 #endif
 }
