@@ -26,21 +26,33 @@ import "../../globals"
 import "../../controls"
 import "../../helpers"
 
-PageView {
+SettingsTabPageView {
     id: root
 
     objectName: "ApplicationSettingsTab"
 
-    pagesArray: ["Options", "Theme", "Shortcuts"]
-    currentIndex: 0
-    pageContentSpacing: currentIndex === 2 ? 0 : 20
+    pagesModel: _pagesModel
 
-    pageContent: Loader {
-        width: root.availablePageContentWidth
-        source: "./Application" + root.pagesArray[root.currentIndex] + "Page.qml"
-        onItemChanged: {
-            if(item && item.availableHeight !== undefined)
-                item.availableHeight = root.availablePageContentHeight
+    ListModel {
+        id: _pagesModel
+
+        ObjectRegister.name: "Scrite.App.SettingsDialog.ApplicationTabPages"
+
+        ListElement {
+            title: "Options"
+            qmlSource: "./ApplicationOptionsPage.qml"
+        }
+
+        ListElement {
+            title: "Theme"
+            qmlSource: "./ApplicationThemePage.qml"
+        }
+
+        ListElement {
+            title: "Shortcuts"
+            qmlSource: "./ApplicationShortcutsPage.qml"
+            fillHeight: true
+            noContentSpacing: true
         }
     }
 }

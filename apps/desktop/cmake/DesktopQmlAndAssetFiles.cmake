@@ -55,6 +55,7 @@ set(SCRITE_DESKTOP_QML_FILES
   "qml/dialogs/settingsdialog/ScreenplayPageSetupPage.qml"
   "qml/dialogs/settingsdialog/ScreenplaySettingsTab.qml"
   "qml/dialogs/settingsdialog/ScreenplayTracksPage.qml"
+  "qml/dialogs/settingsdialog/SettingsTabPageView.qml"
   "qml/dialogs/settingsdialog/StructureIndexCardFieldsPage.qml"
   "qml/dialogs/settingsdialog/StructureOptionsPage.qml"
   "qml/dialogs/settingsdialog/StructureSettingsTab.qml"

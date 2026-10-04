@@ -26,21 +26,42 @@ import "../../globals"
 import "../../controls"
 import "../../helpers"
 
-PageView {
+SettingsTabPageView {
     id: root
 
-    pagesArray: ["Options", "Editor", "Formatting Rules", "Tracks", "Page Setup"]
-    currentIndex: 0
-    pageContent: Loader {
-        source: {
-            const pageNames = ["Options", "EditorOptions", "FormattingRules", "Tracks", "PageSetup"]
-            return "./Screenplay" + pageNames[root.currentIndex] + "Page.qml"
+    pagesModel: _pagesModel
+
+    ListModel {
+        id: _pagesModel
+
+        ObjectRegister.name: "Scrite.App.SettingsDialog.ScreenplayTabPages"
+
+        ListElement {
+            title: "Options"
+            qmlSource: "./ScreenplayOptionsPage.qml"
         }
-        onItemChanged: {
-            if(root.currentIndex >= 1 && root.currentIndex <= 3) {
-                item.width = root.availablePageContentWidth
-                item.height = root.availablePageContentHeight
-            }
+
+        ListElement {
+            title: "Editor"
+            qmlSource: "./ScreenplayEditorOptionsPage.qml"
+            fillHeight: true
+        }
+
+        ListElement {
+            title: "Formatting Rules"
+            qmlSource: "./ScreenplayFormattingRulesPage.qml"
+            fillHeight: true
+        }
+
+        ListElement {
+            title: "Tracks"
+            qmlSource: "./ScreenplayTracksPage.qml"
+            fillHeight: true
+        }
+
+        ListElement {
+            title: "Page Setup"
+            qmlSource: "./ScreenplayPageSetupPage.qml"
         }
     }
 }

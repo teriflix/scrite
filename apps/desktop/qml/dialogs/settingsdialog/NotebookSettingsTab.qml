@@ -26,13 +26,19 @@ import "../../globals"
 import "../../controls"
 import "../../helpers"
 
-PageView {
+SettingsTabPageView {
     id: root
 
-    pagesArray: ["Options"]
-    currentIndex: 0
-    pageContent: Loader {
-        width: root.availablePageContentWidth
-        source: "./NotebookOptionsPage.qml"
+    pagesModel: _pagesModel
+
+    ListModel {
+        id: _pagesModel
+
+        ObjectRegister.name: "Scrite.App.SettingsDialog.NotebookTabPages"
+
+        ListElement {
+            title: "Options"
+            qmlSource: "./NotebookOptionsPage.qml"
+        }
     }
 }

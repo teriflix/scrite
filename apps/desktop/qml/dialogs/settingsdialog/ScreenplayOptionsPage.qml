@@ -26,6 +26,7 @@ import "../../helpers"
 
 Item {
     id: root
+    
     height: _layout.height+30
 
     ColumnLayout {

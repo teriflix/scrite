@@ -26,29 +26,32 @@ import "../../globals"
 import "../../controls"
 import "../../helpers"
 
-PageView {
+SettingsTabPageView {
     id: root
 
-    pagesArray: ["Options", "Story Beats", "Index Cards"]
-    currentIndex: 0
-    pageContent: Loader {
-        width: root.availablePageContentWidth
-        height: root.availablePageContentHeight
-        source: {
-            var ret = "./Structure"
-            switch(root.currentIndex) {
-            case 0:
-                ret += "Options"
-                break
-            case 1:
-                ret += "StoryBeats"
-                break
-            case 2:
-                ret += "IndexCardFields"
-                break
-            }
-            ret += "Page.qml"
-            return ret
+    pagesModel: _pagesModel
+
+    ListModel {
+        id: _pagesModel
+
+        ObjectRegister.name: "Scrite.App.SettingsDialog.StructureTabPages"
+
+        ListElement {
+            title: "Options"
+            qmlSource: "./StructureOptionsPage.qml"
+            fillHeight: true
+        }
+
+        ListElement {
+            title: "Story Beats"
+            qmlSource: "./StructureStoryBeatsPage.qml"
+            fillHeight: true
+        }
+
+        ListElement {
+            title: "Index Cards"
+            qmlSource: "./StructureIndexCardFieldsPage.qml"
+            fillHeight: true
         }
     }
 }

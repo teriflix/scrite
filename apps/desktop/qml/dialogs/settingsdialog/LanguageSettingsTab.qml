@@ -26,13 +26,20 @@ import "../../globals"
 import "../../controls"
 import "../../helpers"
 
-PageView {
+SettingsTabPageView {
     id: root
 
-    pagesArray: ["Options"]
-    currentIndex: 0
-    pageContent: LanguageOptionsPage {
-        width: root.availablePageContentWidth
-        height: root.availablePageContentHeight
+    pagesModel: _pagesModel
+
+    ListModel {
+        id: _pagesModel
+
+        ObjectRegister.name: "Scrite.App.SettingsDialog.LanguageTabPages"
+
+        ListElement {
+            title: "Options"
+            qmlSource: "./LanguageOptionsPage.qml"
+            fillHeight: true
+        }
     }
 }
