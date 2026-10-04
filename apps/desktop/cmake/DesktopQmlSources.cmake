@@ -25,6 +25,8 @@ set(SCRITE_DESKTOP_QML_SOURCES
   "src/document/attachments.h"
   "src/document/characterrelationshipgraph.cpp"
   "src/document/characterrelationshipgraph.h"
+  "src/document/documentfilesystementry.cpp"
+  "src/document/documentfilesystementry.h"
   "src/document/form.cpp"
   "src/document/form.h"
   "src/document/notebookmodel.cpp"
