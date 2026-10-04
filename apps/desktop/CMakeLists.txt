@@ -216,12 +216,12 @@ if(APPLE)
   add_custom_command(TARGET Scrite POST_BUILD
     COMMAND "${CMAKE_COMMAND}" -E make_directory
             "$<TARGET_FILE_DIR:Scrite>/../Frameworks"
-    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
             "$<TARGET_FILE:KF6SonnetCore>"
-            "$<TARGET_FILE_DIR:Scrite>/../Frameworks/$<TARGET_FILE_NAME:KF6SonnetCore>"
+            "$<TARGET_FILE_DIR:Scrite>/../Frameworks/$<TARGET_SONAME_FILE_NAME:KF6SonnetCore>"
     COMMAND "${CMAKE_COMMAND}" -E copy_if_different
             "$<TARGET_FILE:phtranslator>"
-            "$<TARGET_FILE_DIR:Scrite>/../Frameworks/$<TARGET_FILE_NAME:phtranslator>"
+            "$<TARGET_FILE_DIR:Scrite>/../Frameworks/$<TARGET_SONAME_FILE_NAME:phtranslator>"
     COMMAND "${CMAKE_COMMAND}" -E copy_directory
             "${CMAKE_SOURCE_DIR}/binary/kf6"
             "$<TARGET_FILE_DIR:Scrite>/../PlugIns/kf6"
