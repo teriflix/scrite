@@ -75,6 +75,8 @@ Item {
         }
 
         Repeater {
+            id: _indexCardFieldsView
+
             model: _indexCardFieldsModel
 
             delegate: LodLoader {
@@ -111,6 +113,12 @@ Item {
                 function maybeAssumeFocus() {
                     if(focus && lod === LodLoader.LOD.High && item)
                         item.assumeFocus()
+                }
+
+                function updateValue() {
+                    value = _private.getFieldValue(index)
+                    if(item)
+                        item.value = value
                 }
             }
         }
@@ -189,6 +197,11 @@ Item {
                 newValues[index] = value
 
             root.structureElement.scene.indexCardFieldValues = newValues
+        }
+
+        onFieldValuesChanged: {
+            for(let i=0; i<_indexCardFieldsView.count; i++)
+                _indexCardFieldsView.itemAt(i).updateValue()
         }
     }
 }
