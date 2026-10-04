@@ -23,6 +23,7 @@
 #include <QStack>
 #include <QApplication>
 #include <QJsonDocument>
+#include <QVersionNumber>
 
 FormQuestion::FormQuestion(QObject *parent) : QObject(parent) { }
 
@@ -144,15 +145,44 @@ QJsonObject Form::formDataTemplate() const
 
 void Form::validateFormData(QJsonObject &val)
 {
-    QJsonObject validated = this->formDataTemplate();
-    QJsonObject::iterator it = validated.begin();
-    QJsonObject::iterator end = validated.end();
-    while (it != end) {
-        it.value() = val.value(it.key());
-        ++it;
-    }
+    // Assigning QJsonValue::Undefined through a QJsonObject iterator removes the key and
+    // invalidates the iterators, so we build the validated object afresh instead.
+    const QJsonObject formTemplate = this->formDataTemplate();
+
+    QJsonObject validated;
+    for (auto it = formTemplate.constBegin(); it != formTemplate.constEnd(); ++it)
+        validated.insert(it.key(), val.contains(it.key()) ? val.value(it.key()) : it.value());
 
     val = validated;
+}
+
+bool Form::upgradeFrom(const Form *other)
+{
+    if (other == nullptr || other == this || other->id() != m_id)
+        return false;
+
+    const QVersionNumber thisVersion = QVersionNumber::fromString(m_version);
+    const QVersionNumber otherVersion = QVersionNumber::fromString(other->version());
+    if (otherVersion <= thisVersion)
+        return false;
+
+    // Setters accept a value only if the current one is empty, so we clear them first.
+    m_title.clear();
+    m_subtitle.clear();
+    m_createdBy.clear();
+    m_version.clear();
+    m_moreInfoUrl.clear();
+    m_formDataTemplate = QJsonObject();
+
+    const QList<FormQuestion *> oldQuestions = m_questions.list();
+    this->deserializeFromJson(QObjectSerializer::toJson(other));
+    for (FormQuestion *question : oldQuestions)
+        question->deleteLater();
+
+    if (m_questions.size() != oldQuestions.size())
+        emit questionCountChanged();
+
+    return true;
 }
 
 void Form::serializeToJson(QJsonObject &json) const

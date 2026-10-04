@@ -1030,6 +1030,7 @@ Form *ScriteDocument::requestForm(const QString &id)
 {
     Form *ret = m_forms->findForm(id);
     if (ret) {
+        ret->upgradeFrom(Forms::global()->findForm(id));
         ret->ref();
         return ret;
     }

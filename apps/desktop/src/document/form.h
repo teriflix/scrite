@@ -223,6 +223,10 @@ public:
     QJsonObject formDataTemplate() const;
     void validateFormData(QJsonObject &val);
 
+    // Replaces the contents of this form with that of other, but only if other has
+    // the same id and a newer version. Returns true if the form was upgraded.
+    Q_INVOKABLE bool upgradeFrom(const Form *other);
+
     int ref() { return ++m_refCount; }
     int deref() { return --m_refCount; }
 
