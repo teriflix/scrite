@@ -805,7 +805,7 @@ ScriteDocument::ScriteDocument(QObject *parent)
 
     this->initializeFileModificationTracker();
 
-    Utils::ObjectRegistry::add(this, "scriteDocument");
+    Utils::ObjectRegistry::add(this, "Scrite.Document");
 }
 
 ScriteDocument::~ScriteDocument()

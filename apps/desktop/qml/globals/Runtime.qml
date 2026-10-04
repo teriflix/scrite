@@ -212,13 +212,17 @@ Item {
         const extensionsInfo = File.info(Scrite.app.applicationDirPath + "/extensions.qml")
         if(extensionsInfo.valid && extensionsInfo.exists && extensionsInfo.readable && extensionsInfo.isFile && extensionsInfo.suffix == "qml") {
             const modulesUrl = Url.fromPath(extensionsInfo.absoluteFilePath)
-            let modulesComponent = Qt.createComponent(modulesUrl)
+            let extensionsLoader = Qt.createComponent(modulesUrl)
 
             let instantiateFn = () => {
-                if(modulesComponent.status === Component.Ready)
-                    root.extensions = modulesComponent.createObject(root)
+                if(extensionsLoader.status === Component.Ready) {
+                    root.extensions = extensionsLoader.createObject(root)
+                } else if(extensionsLoader.status === Component.Error) {
+                    Gui.log("ERROR loading extensions: " + extensionsLoader.errorString())
+                }
+
             }
-            modulesComponent.statusChanged.connect(instantiateFn)
+            extensionsLoader.statusChanged.connect(instantiateFn)
             instantiateFn()
         }
     }

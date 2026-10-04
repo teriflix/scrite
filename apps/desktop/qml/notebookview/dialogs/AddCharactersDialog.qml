@@ -184,7 +184,7 @@ DialogLauncher {
                                                        _dialog.close)
                             }
 
-                            let notebookView = ObjectRegistry.find("notebookView")
+                            let notebookView = ObjectRegistry.find("Scrite.App.Notebook.View")
                             if(notebookView)
                                 notebookView.scheduleSwitchTo("Characters")
                         }

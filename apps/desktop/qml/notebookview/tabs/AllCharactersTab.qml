@@ -239,7 +239,7 @@ Item {
                             else if(!Scrite.document.readOnly) {
                                 ch = Scrite.document.structure.addCharacter(chName)
 
-                                let notebookModel = ObjectRegistry.find("notebookModel")
+                                let notebookModel = ObjectRegistry.find("Scrite.App.Notebook.Model")
                                 if(notebookModel)
                                     notebookModel.preferredItem = ch.notes
                                 else

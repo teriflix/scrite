@@ -2319,7 +2319,7 @@ QImage LanguageIconProvider::requestImage(const QString &id, QSize *size,
     paint.setRenderHint(QPainter::TextAntialiasing);
 
     // TODO: handle light-mode / dark-mode eventually
-    const QObject *primaryColors = Utils::ObjectRegistry::find("primaryColors");
+    const QObject *primaryColors = Utils::ObjectRegistry::find("Scrite.App.Runtime.Colors.Primary");
 
     auto fetchColor = [primaryColors](const QString &groupName, const QString &key,
                                       const QColor &defaultColor) -> QColor {

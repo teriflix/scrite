@@ -70,14 +70,14 @@ Item {
     palette.linkVisited:     hoveredLinkColor
 
     readonly property ColorTheme_RT primary: ColorTheme_RT {
-        ObjectRegister.name: "primaryColors"
+        ObjectRegister.name: "Scrite.App.Runtime.Colors.Primary"
 
         key: Material.Grey // applicationSettings.primaryColor
         theme: _private.theme
     }
 
     readonly property ColorTheme_RT accent: ColorTheme_RT {
-        ObjectRegister.name: "accentColors"
+        ObjectRegister.name: "Scrite.App.Runtime.Colors.Accent"
 
         key: root.applicationSettings.accentColor
         theme: _private.theme
@@ -95,7 +95,7 @@ Item {
         return Color.transform(c, backdrop !== undefined ? backdrop : "white", _private.scheme)
     }
 
-    ObjectRegister.name: "runtimeColors"
+    ObjectRegister.name: "Scrite.App.Runtime.Colors"
 
     QtObject {
         id: _private

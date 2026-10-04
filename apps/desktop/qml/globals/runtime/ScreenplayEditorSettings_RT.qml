@@ -21,8 +21,6 @@ Settings {
     category: "Screenplay Editor"
     location: Platform.settingsLocation
 
-    ObjectRegister.name: "screenplayEditorSettings"
-
     property var zoomLevelModifiers: { "tab0": 0, "tab1": 0, "tab2": 0, "tab3": 0 }
 
     property int embeddedEditorZoomValue: -1

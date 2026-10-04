@@ -41,7 +41,7 @@ Item {
     function switchToSceneTab() { _private.switchToSceneTab() }
     function switchToStoryTab() { _private.switchToStoryTab() }
 
-    ObjectRegister.name: "notebookView"
+    ObjectRegister.name: "Scrite.App.Notebook.View"
 
     HelpTipNotification {
         tipName: "notebook"
@@ -265,7 +265,7 @@ Item {
         property var currentItem
         property var preferredItem
 
-        ObjectRegister.name: "notebookModel"
+        ObjectRegister.name: "Scrite.App.Notebook.Model"
 
         function noteCurrentItem() {
             currentItem = _notebookTree.currentData.notebookItemObject

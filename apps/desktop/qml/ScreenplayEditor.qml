@@ -63,8 +63,6 @@ Rectangle {
     ScreenplayEditorSearchBar {
         id: _searchBarArea
 
-        ObjectRegister.name: "screenplayEditorSearchBar"
-
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
