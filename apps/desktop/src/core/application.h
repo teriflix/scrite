@@ -22,6 +22,7 @@
 #include <QColor>
 #include <QAction>
 #include <QPalette>
+#include <QSettings>
 #include <QUndoGroup>
 #include <QUndoStack>
 #include <QJsonArray>
@@ -35,7 +36,6 @@
 #include "errorreport.h"
 
 class Forms;
-class QSettings;
 class AutoUpdate;
 class QQmlEngine;
 class QNetworkConfigurationManager;
@@ -208,6 +208,7 @@ public:
     // Use File.revealOnDesktop(), which calls this function anyway
     void revealFileOnDesktop(const QString &pathIn);
 
+    Q_PROPERTY(QSettings *settings READ settings CONSTANT)
     QSettings *settings() const { return m_settings; }
 
     Q_INVOKABLE static QScreen *windowScreen(QObject *window);
