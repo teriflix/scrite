@@ -2287,6 +2287,38 @@ QString Utils::TMath::dateTimeToString(const QDateTime &dateTime)
     return dateTime.toString(format);
 }
 
+/**
+ * Length of a duration given in milliseconds, for example "420 ms", "4.2 s", "1h 3m 5s" or
+ * "2d 5h". Unlike timeLengthString(), it keeps fractions of a second and handles durations of a
+ * day or more. Returns an empty string for negative durations.
+ */
+QString Utils::TMath::durationString(qint64 ms)
+{
+    if (ms < 0)
+        return QString();
+
+    if (ms < 1000)
+        return QStringLiteral("%1 ms").arg(ms);
+
+    if (ms < 60000)
+        return QStringLiteral("%1 s").arg(qreal(ms) / 1000.0, 0, 'f', 1);
+
+    const qint64 totalSeconds = qRound64(qreal(ms) / 1000.0);
+    const qint64 d = totalSeconds / 86400;
+    const qint64 h = (totalSeconds % 86400) / 3600;
+    const qint64 m = (totalSeconds % 3600) / 60;
+    const qint64 s = totalSeconds % 60;
+
+    // Minutes and seconds don't matter much once a duration runs into days
+    if (d > 0)
+        return QStringLiteral("%1d %2h").arg(d).arg(h);
+
+    if (h > 0)
+        return QStringLiteral("%1h %2m %3s").arg(h).arg(m).arg(s);
+
+    return QStringLiteral("%1m %2s").arg(m).arg(s);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -2480,6 +2512,15 @@ QString Utils::SMath::removeNewlineAndTabsIn(const QString &val)
     QString val2 = val;
     val2.replace(QRegularExpression("[\\n\\t]"), " ");
     return val2;
+}
+
+/**
+ * \brief Formats a whole number with the digit grouping of the user's locale, for example
+ * 58301 as "58,301".
+ */
+QString Utils::SMath::formatNumber(qint64 val)
+{
+    return QLocale::system().toString(val);
 }
 
 /**

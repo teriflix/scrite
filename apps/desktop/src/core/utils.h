@@ -1007,6 +1007,7 @@ public:
     Q_INVOKABLE static QString timeToString(const QTime &time);
     Q_INVOKABLE static QString dateToString(const QDate &date);
     Q_INVOKABLE static QString dateTimeToString(const QDateTime &dateTime);
+    Q_INVOKABLE static QString durationString(qint64 ms);
 };
 
 class Clipboard : public QObject
@@ -1053,6 +1054,8 @@ public:
     Q_INVOKABLE static QString formatAsBulletPoints(const QVariantList &items);
 
     Q_INVOKABLE static QString removeNewlineAndTabsIn(const QString &val);
+
+    Q_INVOKABLE static QString formatNumber(qint64 val);
 
     static QString painterPathToString(const QPainterPath &val);
 
