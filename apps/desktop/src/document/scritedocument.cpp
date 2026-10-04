@@ -1026,11 +1026,6 @@ void ScriteDocument::addToSpellCheckIgnoreList(const QString &word)
     emit spellCheckIgnoreListChanged();
 }
 
-Forms *ScriteDocument::globalForms() const
-{
-    return Forms::global();
-}
-
 Form *ScriteDocument::requestForm(const QString &id)
 {
     Form *ret = m_forms->findForm(id);

@@ -680,14 +680,6 @@ public:
 
     Q_INVOKABLE void addToSpellCheckIgnoreList(const QString &word);
 
-    // clang-format off
-    Q_MOC_INCLUDE("form.h")
-    Q_PROPERTY(Forms *globalForms
-               READ globalForms
-               CONSTANT STORED false)
-    // clang-format on
-    Forms *globalForms() const;
-
     Form *requestForm(const QString &id);
     void releaseForm(Form *form);
 

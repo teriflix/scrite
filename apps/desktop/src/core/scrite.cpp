@@ -16,6 +16,7 @@
 #include "scrite.h"
 
 #include "user.h"
+#include "form.h"
 #include "utils.h"
 #include "quazip.h"
 #include "appwindow.h"
@@ -55,6 +56,11 @@ RestApi *Scrite::restApi()
 ScriteDocument *Scrite::document()
 {
     return ScriteDocument::instance();
+}
+
+Forms *Scrite::globalForms()
+{
+    return Forms::global();
 }
 
 ScriteDocumentVault *Scrite::vault()

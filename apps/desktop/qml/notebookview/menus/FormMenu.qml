@@ -65,6 +65,6 @@ SctMenu {
         filterByProperty: "type"
         filterValues: root.notes ? [root.notes.compatibleFormType] : []
         sortByProperty: "title"
-        sourceModel: Scrite.document.globalForms
+        sourceModel: Scrite.globalForms
     }
 }

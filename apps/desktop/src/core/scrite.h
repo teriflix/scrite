@@ -212,6 +212,14 @@ public:
     static ScriteDocument *document();
 
     // clang-format off
+    Q_MOC_INCLUDE("form.h")
+    Q_PROPERTY(Forms *globalForms
+               READ globalForms
+               CONSTANT)
+    // clang-format on
+    static Forms *globalForms();
+
+    // clang-format off
     Q_PROPERTY(ScriteDocumentVault *vault
                READ vault
                CONSTANT )
