@@ -8,6 +8,11 @@ add_library(simplecrypt STATIC
   simplecrypt.h
 )
 
+# Required so that shared libraries (like LLMTask in extra/) can link this static library
+set_target_properties(simplecrypt PROPERTIES
+  POSITION_INDEPENDENT_CODE ON
+)
+
 target_include_directories(simplecrypt
   PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}"
