@@ -815,6 +815,34 @@ Note *Notes::noteAt(int index) const
     return this->at(index);
 }
 
+Note *Notes::findFirstFormNote(const QString &id) const
+{
+    const QList<Note *> &list = this->list();
+    for (Note *note : list) {
+        if (note->type() == Note::FormNoteType) {
+            if (id.isEmpty() || note->form()->id() == id)
+                return note;
+        }
+    }
+
+    return nullptr;
+}
+
+QList<Note *> Notes::findAllFormNotes(const QString &id) const
+{
+    QList<Note *> ret;
+    const QList<Note *> &list = this->list();
+    for (Note *note : list) {
+        if (note->type() == Note::FormNoteType) {
+            if (id.isEmpty() || note->form()->id() == id) {
+                ret.append(note);
+            }
+        }
+    }
+
+    return ret;
+}
+
 void Notes::clearNotes()
 {
     while (this->size())

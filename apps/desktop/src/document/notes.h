@@ -330,6 +330,8 @@ public:
     Q_INVOKABLE Note *noteAt(int index) const;
     Q_INVOKABLE Note *firstNote() const { return this->noteAt(0); }
     Q_INVOKABLE Note *lastNote() const { return this->noteAt(this->noteCount() - 1); }
+    Q_INVOKABLE Note *findFirstFormNote(const QString &id) const;
+    Q_INVOKABLE QList<Note *> findAllFormNotes(const QString &id) const;
     Q_INVOKABLE void clearNotes();
 
     // clang-format off
