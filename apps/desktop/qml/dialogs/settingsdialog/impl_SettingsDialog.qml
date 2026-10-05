@@ -30,6 +30,8 @@ SctDialog {
 
     property string activeTab
 
+    ObjectRegister.name: "Scrite.App.SettingsDialog"
+
     title: "Settings"
     width: Math.min(Scrite.window.width-80, 1049)
     height: Math.min(Scrite.window.height-80, 750)
