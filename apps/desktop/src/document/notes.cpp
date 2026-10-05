@@ -51,6 +51,13 @@ Note::Note(QObject *parent) : QObject(parent), m_form(this, "form")
 
 Note::~Note()
 {
+    // Gives back the form requested in setFormId(). On shutdown, m_form is already null by the time
+    // notes are destroyed, because ScriteDocument::reset() creates Forms before Structure, and so
+    // forms are destroyed first. Keep that order, or this would call into a ScriteDocument that is
+    // being destroyed.
+    if (m_form.data() != nullptr)
+        ScriteDocument::instance()->releaseForm(m_form.data());
+
     ::GlobalIdNoteMap->remove(m_id);
     emit aboutToDelete(this);
 }
@@ -728,6 +735,14 @@ Note *Notes::addFormNote(const QString &id)
         return nullptr;
     }
 
+    if (ptr->form()->isSingleton()) {
+        Note *other = this->findFirstFormNote(id);
+        if (other != nullptr) {
+            delete ptr;
+            return other;
+        }
+    }
+
     this->addNote(ptr);
     return ptr;
 }
@@ -798,9 +813,6 @@ void Notes::removeNote(Note *ptr)
 
     disconnect(ptr, &Note::aboutToDelete, this, &Notes::removeNote);
     disconnect(ptr, &Note::noteModified, this, &Notes::notesModified);
-
-    if (ptr->type() == Note::FormNoteType && ptr->form() != nullptr)
-        ScriteDocument::instance()->releaseForm(ptr->form());
 
     this->removeAt(index);
 

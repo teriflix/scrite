@@ -197,6 +197,7 @@ void Form::serializeToJson(QJsonObject &json) const
     json.insert(QStringLiteral("createdBy"), m_createdBy);
     json.insert(QStringLiteral("version"), m_version);
     json.insert(QStringLiteral("moreInfoUrl"), m_moreInfoUrl.toString());
+    json.insert(QStringLiteral("singleton"), m_singleton);
 
     const QMetaEnum formQuestionTypeEnum = FormQuestion::staticMetaObject.enumerator(
             FormQuestion::staticMetaObject.indexOfEnumerator("Type"));
@@ -237,6 +238,7 @@ void Form::deserializeFromJson(const QJsonObject &json)
     this->setCreatedBy(json.value(QStringLiteral("createdBy")).toString());
     this->setVersion(json.value(QStringLiteral("version")).toString());
     this->setMoreInfoUrl(QUrl(json.value(QStringLiteral("moreInfoUrl")).toString()));
+    this->setSingleton(json.value(QStringLiteral("singleton")).toBool(false));
 
     const QMetaEnum formQuestionTypeEnum = FormQuestion::staticMetaObject.enumerator(
             FormQuestion::staticMetaObject.indexOfEnumerator("Type"));
@@ -363,6 +365,15 @@ void Form::setMoreInfoUrl(const QUrl &val)
 
     m_moreInfoUrl = val;
     emit moreInfoUrlChanged();
+}
+
+void Form::setSingleton(bool val)
+{
+    if (m_singleton == val)
+        return;
+
+    m_singleton = val;
+    emit singletonChanged();
 }
 
 void Form::setTypeFromString(const QString &val)

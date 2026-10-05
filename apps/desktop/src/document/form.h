@@ -203,6 +203,14 @@ public:
     Q_SIGNAL void moreInfoUrlChanged();
 
     // clang-format off
+    Q_PROPERTY(bool singleton
+               READ isSingleton
+               NOTIFY singletonChanged)
+    // clang-format on
+    bool isSingleton() const { return m_singleton; }
+    Q_SIGNAL void singletonChanged();
+
+    // clang-format off
     Q_PROPERTY(QAbstractListModel *questionsModel
                READ questionsModel
                CONSTANT STORED
@@ -242,19 +250,24 @@ private:
     void setCreatedBy(const QString &val);
     void setVersion(const QString &val);
     void setMoreInfoUrl(const QUrl &val);
+    void setSingleton(bool val);
 
     void setTypeFromString(const QString &val);
     QString typeAsString() const;
 
 private:
+    int m_refCount = 0;
+    Type m_type = GeneralForm;
+
+    bool m_singleton = false;
+
+    QUrl m_moreInfoUrl;
+
     QString m_id;
     QString m_title;
     QString m_subtitle;
-    QUrl m_moreInfoUrl;
-    int m_refCount = 0;
     QString m_version;
     QString m_createdBy;
-    Type m_type = GeneralForm;
     QJsonObject m_formDataTemplate;
 
     QObjectListModel<FormQuestion *> m_questions;
