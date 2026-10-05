@@ -18,6 +18,7 @@
 
 #include <QImage>
 #include <QtMath>
+#include <QJSValue>
 #include <QFileInfo>
 #include <QDateTime>
 #include <QQuickItem>
@@ -700,6 +701,17 @@ public:
     typeEnumModel(const QString &typeName, const QString &enumName, QObject *parent = nullptr);
 
     Q_INVOKABLE static QVariant clone(const QVariant &value);
+
+    // This type hides JavaScript's Object in QML, so these stand in for its namesakes. assign()
+    // copies properties of up to two sources into target, and returns target.
+    //
+    // They are meant for plain JavaScript objects. Given a QObject, keys() also lists its
+    // methods and signals, and assign() copies those as functions, or fails to write properties
+    // that the target QObject doesn't have or can't write. Use queryProperty() and
+    // changeProperty() to read and write properties of QObjects.
+    Q_INVOKABLE static QStringList keys(const QJSValue &value);
+    Q_INVOKABLE static QJSValue assign(const QJSValue &target, const QJSValue &source,
+                                       const QJSValue &source2 = QJSValue());
 
     static QVariant convertToPropertyType(const QVariant &value, const QMetaProperty &prop);
 };

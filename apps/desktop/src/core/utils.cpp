@@ -27,6 +27,7 @@
 #include <QTimer>
 #include <QLocale>
 #include <QHostInfo>
+#include <QJSValueIterator>
 #include <QSettings>
 #include <QClipboard>
 #include <QSslSocket>
@@ -1132,6 +1133,44 @@ QAbstractListModel *Utils::Object::typeEnumModel(const QString &typeName, const 
 QVariant Utils::Object::clone(const QVariant &value)
 {
     return value;
+}
+
+QStringList Utils::Object::keys(const QJSValue &value)
+{
+    QStringList ret;
+    if (!value.isObject())
+        return ret;
+
+    QJSValueIterator it(value);
+    while (it.hasNext()) {
+        it.next();
+        ret << it.name();
+    }
+
+    return ret;
+}
+
+QJSValue Utils::Object::assign(const QJSValue &target, const QJSValue &source,
+                               const QJSValue &source2)
+{
+    // A QJSValue refers to the JavaScript object it was created from, so this modifies target
+    // in place, like Object.assign() does in JavaScript.
+    QJSValue ret = target;
+    if (!ret.isObject())
+        return ret;
+
+    for (const QJSValue &src : { source, source2 }) {
+        if (!src.isObject())
+            continue;
+
+        QJSValueIterator it(src);
+        while (it.hasNext()) {
+            it.next();
+            ret.setProperty(it.name(), it.value());
+        }
+    }
+
+    return ret;
 }
 
 QVariant Utils::Object::convertToPropertyType(const QVariant &value, const QMetaProperty &prop)
