@@ -22,6 +22,7 @@
 #include "application.h"
 #include "scritedocument.h"
 
+#include <QSet>
 #include <QtMath>
 #include <QtDebug>
 #include <QFuture>
@@ -642,38 +643,56 @@ void CharacterRelationshipGraph::load()
             node->setMarked(sceneCharacters.contains(node->character()));
         nodes.append(node);
         nodeMap[character] = node;
+    }
 
-        if (character->relationshipCount() == 0) {
-            graphs.first().nodes.append(node);
-            continue;
-        }
+    // Two characters are directly connected in this graph, if either one has a relationship
+    // with the other and both of them are included in the graph.
+    auto directlyRelated = [](Character *c1, Character *c2) {
+        return c1->findRelationship(c2) != nullptr || c2->findRelationship(c1) != nullptr;
+    };
 
-        bool grouped = false;
-
-        // This is a character which has a relationship. We group it into a graph/group
-        // in which this character has relationships. Otherwise, we create a new group.
-        for (GraphLayout::Graph &graph : graphs) {
-            for (GraphLayout::AbstractNode *agnode : std::as_const(graph.nodes)) {
-                CharacterRelationshipGraphNode *gnode =
-                        qobject_cast<CharacterRelationshipGraphNode *>(agnode->containerObject());
-                if (character->isRelatedTo(gnode->character())) {
-                    graph.nodes.append(node);
-                    grouped = true;
+    // Characters that don't have a relationship with anybody else in this graph go into
+    // the first group. Others are grouped into connected components, such that every edge
+    // connects nodes within the same group.
+    QList<CharacterRelationshipGraphNode *> relatedNodes;
+    for (CharacterRelationshipGraphNode *node : std::as_const(nodes)) {
+        bool related = false;
+        if (node->character()->relationshipCount() > 0) {
+            for (CharacterRelationshipGraphNode *other : std::as_const(nodes)) {
+                if (other != node && directlyRelated(node->character(), other->character())) {
+                    related = true;
                     break;
                 }
             }
-
-            if (grouped)
-                break;
         }
 
-        if (grouped)
+        if (related)
+            relatedNodes.append(node);
+        else
+            graphs.first().nodes.append(node);
+    }
+
+    QSet<CharacterRelationshipGraphNode *> groupedNodes;
+    for (CharacterRelationshipGraphNode *seed : std::as_const(relatedNodes)) {
+        if (groupedNodes.contains(seed))
             continue;
 
-        // Since we did not find a graph to which this node can belong, we are adding
-        // this to a new graph all together.
         GraphLayout::Graph newGraph;
-        newGraph.nodes.append(node);
+        QList<CharacterRelationshipGraphNode *> queue({ seed });
+        groupedNodes.insert(seed);
+        while (!queue.isEmpty()) {
+            CharacterRelationshipGraphNode *gnode = queue.takeFirst();
+            newGraph.nodes.append(gnode);
+
+            for (CharacterRelationshipGraphNode *other : std::as_const(relatedNodes)) {
+                if (groupedNodes.contains(other)
+                    || !directlyRelated(gnode->character(), other->character()))
+                    continue;
+                groupedNodes.insert(other);
+                queue.append(other);
+            }
+        }
+
         graphs.append(newGraph);
     }
 
@@ -758,7 +777,7 @@ void CharacterRelationshipGraph::load()
             GraphLayout::ForceDirectedLayout layout;
             layout.setMaxTime(m_maxTime);
             layout.setMaxIterations(m_maxIterations);
-            layout.setMinimumEdgeLength(fm.horizontalAdvance(longestRelationshipName) * 0.5);
+            layout.setMinimumEdgeLength(fm.horizontalAdvance(longestRelationshipName));
             layout.layout(graph);
         }
 

@@ -86,6 +86,16 @@ private:
 };
 
 // https://en.wikipedia.org/wiki/Force-directed_graph_drawing
+//
+// Stress majorization layout (as in Graphviz's neato), which works directly in pixel
+// space. Connected nodes are placed such that the gap between their boundaries is
+// roughly the minimum edge length (for example, to accommodate edge labels), and
+// other nodes are placed proportional to the number of edges between them.
+//
+// The layout is attempted multiple times from different starting positions (a radial
+// placement around the most connected node, and variations of it), and the attempt
+// with the least edge crossings, overlaps and spread is picked. A fixed random seed
+// is used, so that the same graph always produces the same layout.
 class ForceDirectedLayout : public AbstractLayout
 {
 public:
@@ -94,11 +104,6 @@ public:
 
     // AbstractGraphLayout interface
     bool layout(const Graph &graph) override;
-
-private:
-    void calculateRepulsion(QVector<QPointF> &forces, const Graph &graph);
-    void calculateAttraction(QVector<QPointF> &forces, const Graph &graph);
-    bool placeNodes(const QVector<QPointF> &forces, const Graph &graph);
 };
 
 }
