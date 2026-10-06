@@ -25,14 +25,13 @@
 
 #include <QPen>
 #include <QBrush>
-#include <QChart>
-#include <QBarSet>
-#include <QPieSlice>
-#include <QPieSeries>
-#include <QValueAxis>
-#include <QBarCategoryAxis>
-#include <QStackedBarSeries>
+#include <QtMath>
+#include <QPainterPath>
+#include <QFontMetricsF>
+#include <QGraphicsLineItem>
+#include <QGraphicsPathItem>
 #include <QGraphicsBlurEffect>
+#include <QGraphicsSimpleTextItem>
 
 /**
  * Note from Prashanth:
@@ -1277,34 +1276,19 @@ StatisticsReportDialogueActionRatio::StatisticsReportDialogueActionRatio(
 
     auto textDistrubution = report->textDistribution(true);
 
-    QChart *chart = new QChart(this);
-    chart->legend()->setVisible(false);
-    chart->setMargins(QMargins(0, 0, 0, 0));
-    chart->resize(chartSize, chartSize);
-    chart->setBackgroundVisible(true);
-
     QFont smallFont = Application::font();
     smallFont.setPointSize(8);
 
-    // I can never get QChart's own legend to show up on the right
-    // I give up. I am going to manually put together a legend.
+    StatisticsReportPieChart *chart = new StatisticsReportPieChart(chartSize, this);
     StatisticsReportGraphVLegend *legend = new StatisticsReportGraphVLegend(this);
 
-    QPieSeries *pieSeries = new QPieSeries(chart);
+    int sliceIndex = 0;
     for (const auto &dist : std::as_const(textDistrubution)) {
-        const QColor color = StatisticsReport::pickColor(pieSeries->slices().size());
-        QPieSlice *slice = pieSeries->append(dist.key, dist.ratio);
-        slice->setBrush(color);
-        slice->setLabel(dist.percent);
-        slice->setLabelFont(smallFont);
-        slice->setLabelColor(Utils::Color::textColorFor(color));
-        slice->setLabelVisible(true);
-        slice->setLabelPosition(QPieSlice::LabelInsideNormal);
+        const QColor color = StatisticsReport::pickColor(sliceIndex++);
+        chart->addSlice(dist.ratio, color, dist.percent, smallFont);
         legend->add(color, dist.key);
     }
-
-    chart->addSeries(pieSeries);
-    chart->setPlotArea(QRectF(0, 0, chartSize, chartSize));
+    chart->finish();
 
     legend->place(chart->boundingRect(), Qt::AlignRight);
 
@@ -1405,150 +1389,63 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
     StatisticsReportGraphVLegend *typeLegend = new StatisticsReportGraphVLegend(this);
 
     // Pie chart for INT,EXT distribution
-    QChart *typeChart = new QChart(this);
-    typeChart->legend()->setVisible(false);
-    typeChart->setMargins(QMargins(0, 0, 0, 0));
-    typeChart->resize(chartSize, chartSize);
-    typeChart->setBackgroundVisible(false);
-    QPieSeries *typeSeries = new QPieSeries(typeChart);
-    auto it1 = typeMap.vector.constBegin();
-    auto end1 = typeMap.vector.constEnd();
-    while (it1 != end1) {
-        const int percent = qRound(100.0 * qreal(it1->second) / qreal(sceneElements.size()));
-        const QColor color = StatisticsReport::pickColor(typeSeries->slices().size(), false);
-        const QString label = QString::number(it1->second) + QStringLiteral(" Scenes: ")
+    StatisticsReportPieChart *typeChart = new StatisticsReportPieChart(chartSize, this);
+    for (const auto &item : std::as_const(typeMap.vector)) {
+        const int percent = qRound(100.0 * qreal(item.second) / qreal(sceneElements.size()));
+        const QColor color = StatisticsReport::pickColor(typeColorMap.size(), false);
+        const QString label = QString::number(item.second) + QStringLiteral(" Scenes: ")
                 + QString::number(percent) + QStringLiteral("%");
-        QPieSlice *slice = typeSeries->append(label, it1->second);
-        slice->setBrush(color);
-        slice->setLabel(label);
-        slice->setLabelColor(Utils::Color::textColorFor(color));
-        slice->setLabelPosition(QPieSlice::LabelInsideNormal);
-        slice->setLabelVisible(true);
-        slice->setLabelFont(tinyFont);
+        typeChart->addSlice(item.second, color, label, tinyFont);
 
-        typeLegend->add(color, it1->first);
-        typeColorMap[it1->first] = color;
-
-        ++it1;
+        typeLegend->add(color, item.first);
+        typeColorMap[item.first] = color;
     }
-    typeChart->addSeries(typeSeries);
-    typeChart->setPlotArea(QRectF(0, 0, chartSize, chartSize));
+    typeChart->finish();
 
-    // Stacked bar chart for DAY, NIGHT etc..
-    auto it2 = momentMap.vector.constBegin();
-    auto end2 = momentMap.vector.constEnd();
-    QChart *momentChart = new QChart(this);
-    QStackedBarSeries *momentSeries = new QStackedBarSeries(momentChart);
-    QBarCategoryAxis *momentNameAxis = new QBarCategoryAxis(momentSeries);
-    QValueAxis *momentValueAxis = new QValueAxis(momentSeries);
-    momentNameAxis->setVisible(true);
-    momentNameAxis->setLabelsVisible(true);
-    momentNameAxis->append(momentMap.keys());
-    momentNameAxis->setLabelsFont(smallFont);
-    momentNameAxis->setGridLineVisible(false);
-    momentValueAxis->setVisible(true);
-    momentValueAxis->setLabelFormat(QStringLiteral("%d"));
-    momentValueAxis->setLabelsFont(tinyFont);
-    momentChart->legend()->setVisible(false);
-    momentChart->setMargins(QMargins(0, 0, 0, 0));
-    momentChart->setBackgroundVisible(false);
-    momentChart->addAxis(momentNameAxis, Qt::AlignBottom);
-    momentChart->addAxis(momentValueAxis, Qt::AlignLeft);
-    momentSeries->attachAxis(momentNameAxis);
-    momentSeries->attachAxis(momentValueAxis);
-    momentSeries->setLabelsVisible(true);
-    momentSeries->setLabelsPosition(QStackedBarSeries::LabelsCenter);
-
+    // Stacked bar chart for DAY, NIGHT etc.., with one segment per location type
     qreal categoryWidth = 60;
-    QFontMetricsF fm(momentNameAxis->labelsFont());
-    int momentValueAxisMax = 0;
-    while (it2 != end2) {
-        categoryWidth = qMax(categoryWidth, fm.boundingRect(it2->first).width());
-
-        int maxValue = 0;
-        const QStringList types = typeColorMap.keys();
-        for (const QString &type : types) {
-            QBarSet *barSet = momentSeries->findChild<QBarSet *>(type, Qt::FindDirectChildrenOnly);
-            if (barSet == nullptr) {
-                barSet = new QBarSet(type, momentSeries);
-                barSet->setObjectName(type);
-                barSet->setColor(typeColorMap.value(type));
-                barSet->setLabelFont(smallFont);
-                barSet->setLabelColor(Utils::Color::textColorFor(barSet->color()));
-                momentSeries->append(barSet);
-            }
-
-            const int value = it2->second.value(type);
-            barSet->append(value);
-            maxValue += value;
-        }
-
-        momentValueAxisMax = qMax(maxValue, momentValueAxisMax);
-
-        ++it2;
-    }
-
+    const QFontMetricsF fm(smallFont);
+    for (const auto &item : std::as_const(momentMap.vector))
+        categoryWidth = qMax(categoryWidth, fm.boundingRect(item.first).width());
     categoryWidth *= 1.2;
-    momentNameAxis->setLabelsFont(tinyFont);
-    momentValueAxis->setRange(0, momentValueAxisMax);
-    momentChart->addSeries(momentSeries);
-    momentChart->resize(categoryWidth * momentMap.size(), chartSize);
 
-    // Another pie chart for locations (legend only for top-5 locations)
-    auto it3 = locationMap.vector.constBegin();
-    auto end3 = locationMap.vector.constEnd();
-    QChart *locationChart = new QChart(this);
-    QStackedBarSeries *locationSeries = new QStackedBarSeries(locationChart);
-    QBarCategoryAxis *locationNameAxis = new QBarCategoryAxis(locationSeries);
-    QValueAxis *locationValueAxis = new QValueAxis(locationSeries);
-    locationNameAxis->setVisible(true);
-    locationNameAxis->setLabelsVisible(true);
-    locationNameAxis->setLabelsFont(smallFont);
-    locationNameAxis->setGridLineVisible(false);
-    locationValueAxis->setVisible(true);
-    locationValueAxis->setLabelsFont(tinyFont);
-    locationValueAxis->setLabelFormat(QStringLiteral("%d"));
-    locationChart->legend()->setVisible(false);
-    locationChart->setMargins(QMargins(0, 0, 0, 0));
-    locationChart->setBackgroundVisible(false);
-    locationSeries->setLabelsVisible(true);
-    locationSeries->setLabelsPosition(QStackedBarSeries::LabelsCenter);
+    StatisticsReportStackedBarChart *momentChart =
+            new StatisticsReportStackedBarChart(categoryWidth, chartSize, this);
+    momentChart->setFonts(tinyFont, smallFont);
 
-    QBarSet *locationBarSet = new QBarSet(QString(), locationSeries);
-    locationBarSet->setColor(StatisticsReport::pickColor(0, false, StatisticsReport::Location));
-    locationSeries->append(locationBarSet);
-    locationBarSet->setLabelFont(tinyFont);
-    locationBarSet->setLabelColor(Utils::Color::textColorFor(locationBarSet->color()));
+    const QStringList types = typeColorMap.keys();
+    for (const auto &item : std::as_const(momentMap.vector)) {
+        QList<QPair<QColor, int>> segments;
+        for (const QString &type : types)
+            segments.append(qMakePair(typeColorMap.value(type), item.second.value(type)));
+        momentChart->addCategory(item.first, segments);
+    }
+    momentChart->finish();
 
-    // Location lookup will be another legend, but without color.
+    // Bar chart for locations. Bars are named L1, L2.., and another legend, without colors, lists
+    // the locations they stand for.
+    const QColor locationColor =
+            StatisticsReport::pickColor(0, false, StatisticsReport::Location);
+    StatisticsReportStackedBarChart *locationChart =
+            new StatisticsReportStackedBarChart(categoryWidth, chartSize, this);
+    locationChart->setFonts(tinyFont, tinyFont);
+
     StatisticsReportGraphVLegend *locationLegend = new StatisticsReportGraphVLegend(this);
     locationLegend->setFont(smallFont);
-    while (it3 != end3) {
-        const bool othersLoc = it3->first == othersKey;
-        if (!othersLoc) {
-            const QString locName = othersLoc
-                    ? it3->first
-                    : QStringLiteral("L%1").arg(locationNameAxis->count() + 1);
-            locationBarSet->append(it3->second);
-            locationNameAxis->append(locName);
+    for (const auto &item : std::as_const(locationMap.vector)) {
+        const QString count =
+                QStringLiteral(" (") + QString::number(item.second) + QStringLiteral(")");
+        if (item.first == othersKey) {
             locationLegend->add(Qt::transparent,
-                                locName + QStringLiteral(": ") + it3->first + QStringLiteral(" (")
-                                        + QString::number(it3->second) + QStringLiteral(")"));
-        } else
-            locationLegend->add(Qt::transparent,
-                                othersKey + QStringLiteral(": ") + otherLocations
-                                        + QStringLiteral(" (") + QString::number(it3->second)
-                                        + QStringLiteral(")"));
-        ++it3;
-    }
+                                othersKey + QStringLiteral(": ") + otherLocations + count);
+            continue;
+        }
 
-    locationNameAxis->setLabelsFont(tinyFont);
-    locationChart->addSeries(locationSeries);
-    locationChart->addAxis(locationNameAxis, Qt::AlignBottom);
-    locationChart->addAxis(locationValueAxis, Qt::AlignLeft);
-    locationSeries->attachAxis(locationNameAxis);
-    locationSeries->attachAxis(locationValueAxis);
-    locationChart->resize(categoryWidth * (locationMap.size() - 1), chartSize);
+        const QString locName = QStringLiteral("L%1").arg(locationChart->categoryCount() + 1);
+        locationChart->addCategory(locName, { qMakePair(locationColor, item.second) });
+        locationLegend->add(Qt::transparent, locName + QStringLiteral(": ") + item.first + count);
+    }
+    locationChart->finish();
 
     // Place them in a horizontal row
     typeChart->setPos(0, 0);
@@ -1561,6 +1458,216 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
 }
 
 StatisticsReportSceneHeadingStats::~StatisticsReportSceneHeadingStats() { }
+
+////////////////////////////////////////////////////////////////////////////////////
+
+StatisticsReportPieChart::StatisticsReportPieChart(qreal size, QGraphicsItem *parent)
+    : QGraphicsRectItem(parent), m_size(size)
+{
+    this->setPen(Qt::NoPen);
+    this->setBrush(Qt::NoBrush);
+    this->setRect(0, 0, m_size, m_size);
+}
+
+StatisticsReportPieChart::~StatisticsReportPieChart() { }
+
+void StatisticsReportPieChart::addSlice(qreal value, const QColor &color, const QString &label,
+                                        const QFont &labelFont)
+{
+    Slice slice;
+    slice.value = value;
+    slice.color = color;
+    slice.label = label;
+    slice.labelFont = labelFont;
+    m_slices.append(slice);
+}
+
+void StatisticsReportPieChart::finish()
+{
+    qreal total = 0;
+    for (const Slice &slice : std::as_const(m_slices))
+        total += qMax(slice.value, 0.0);
+
+    if (qFuzzyIsNull(total))
+        return;
+
+    const qreal radius = m_size * 0.7 / 2;
+    const QPointF center(m_size / 2, m_size / 2);
+    const QRectF pieRect(center.x() - radius, center.y() - radius, 2 * radius, 2 * radius);
+
+    // Angles are in degrees, counter-clockwise from 3 o'clock. Slices start at 12 o'clock, and go
+    // clockwise.
+    qreal angle = 90;
+    for (const Slice &slice : std::as_const(m_slices)) {
+        if (slice.value <= 0)
+            continue;
+
+        const qreal span = 360.0 * slice.value / total;
+        const bool fullCircle = qFuzzyCompare(span, 360.0);
+
+        QPainterPath path;
+        if (fullCircle)
+            path.addEllipse(pieRect);
+        else {
+            path.moveTo(center);
+            path.arcTo(pieRect, angle, -span);
+            path.closeSubpath();
+        }
+
+        QGraphicsPathItem *sliceItem = new QGraphicsPathItem(path, this);
+        sliceItem->setBrush(slice.color);
+        sliceItem->setPen(QPen(Qt::white, 1));
+
+        if (!slice.label.isEmpty()) {
+            // Centered half way along the radius through the middle of the slice.
+            const qreal midAngle = qDegreesToRadians(angle - span / 2);
+            const QPointF labelCenter = fullCircle
+                    ? center
+                    : center + QPointF(qCos(midAngle), -qSin(midAngle)) * radius * 0.5;
+
+            QGraphicsSimpleTextItem *labelItem = new QGraphicsSimpleTextItem(slice.label, this);
+            labelItem->setFont(slice.labelFont);
+            labelItem->setBrush(Utils::Color::textColorFor(slice.color));
+            labelItem->setZValue(1);
+
+            QRectF labelRect = labelItem->boundingRect();
+            labelRect.moveCenter(labelCenter);
+            labelItem->setPos(labelRect.topLeft());
+        }
+
+        angle -= span;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+
+StatisticsReportStackedBarChart::StatisticsReportStackedBarChart(qreal categoryWidth, qreal height,
+                                                                 QGraphicsItem *parent)
+    : QGraphicsRectItem(parent), m_height(height), m_categoryWidth(categoryWidth)
+{
+    this->setPen(Qt::NoPen);
+    this->setBrush(Qt::NoBrush);
+}
+
+StatisticsReportStackedBarChart::~StatisticsReportStackedBarChart() { }
+
+void StatisticsReportStackedBarChart::setFonts(const QFont &axisFont, const QFont &barLabelFont)
+{
+    m_axisFont = axisFont;
+    m_barLabelFont = barLabelFont;
+}
+
+void StatisticsReportStackedBarChart::addCategory(const QString &name,
+                                                  const QList<QPair<QColor, int>> &segments)
+{
+    m_categories.append(qMakePair(name, segments));
+}
+
+void StatisticsReportStackedBarChart::finish()
+{
+    int maxTotal = 0;
+    for (const auto &category : std::as_const(m_categories)) {
+        int total = 0;
+        for (const auto &segment : category.second)
+            total += qMax(segment.second, 0);
+        maxTotal = qMax(maxTotal, total);
+    }
+
+    // Integer ticks, about four intervals of them.
+    const int tickStep = qMax(1, qCeil(maxTotal / 4.0));
+    const int axisMax = qMax(tickStep, tickStep * qCeil(qreal(maxTotal) / qreal(tickStep)));
+
+    const qreal gap = 4;
+    const QFontMetricsF axisMetrics(m_axisFont);
+    const QFontMetricsF barLabelMetrics(m_barLabelFont);
+
+    qreal tickLabelWidth = 0;
+    for (int value = 0; value <= axisMax; value += tickStep)
+        tickLabelWidth =
+                qMax(tickLabelWidth, axisMetrics.horizontalAdvance(QString::number(value)));
+
+    // The plot area leaves room for tick labels on the left, half a tick label on top, and
+    // category labels below.
+    const qreal plotLeft = tickLabelWidth + gap;
+    const qreal plotTop = axisMetrics.height() / 2;
+    const qreal plotBottom = qMax(m_height - axisMetrics.height() - gap, plotTop + 1);
+    const qreal plotHeight = plotBottom - plotTop;
+    const qreal plotWidth = m_categoryWidth * m_categories.size();
+    auto yFor = [=](int value) { return plotBottom - plotHeight * value / axisMax; };
+
+    const QPen axisPen(QColor(Qt::gray), 1);
+    const QPen gridPen(QColor(220, 220, 220), 0.5);
+
+    // Grid lines and tick labels of the value axis
+    for (int value = 0; value <= axisMax; value += tickStep) {
+        const qreal y = yFor(value);
+        if (value > 0) {
+            QGraphicsLineItem *gridLine =
+                    new QGraphicsLineItem(plotLeft, y, plotLeft + plotWidth, y, this);
+            gridLine->setPen(gridPen);
+        }
+
+        QGraphicsSimpleTextItem *tickLabel =
+                new QGraphicsSimpleTextItem(QString::number(value), this);
+        tickLabel->setFont(m_axisFont);
+        const QRectF tickRect = tickLabel->boundingRect();
+        tickLabel->setPos(plotLeft - gap - tickRect.width(), y - tickRect.height() / 2);
+    }
+
+    QGraphicsLineItem *valueAxis =
+            new QGraphicsLineItem(plotLeft, plotTop, plotLeft, plotBottom, this);
+    valueAxis->setPen(axisPen);
+
+    QGraphicsLineItem *categoryAxis =
+            new QGraphicsLineItem(plotLeft, plotBottom, plotLeft + plotWidth, plotBottom, this);
+    categoryAxis->setPen(axisPen);
+
+    // Bars, with their segments stacked bottom to top, and category labels below them
+    const qreal barWidth = m_categoryWidth / 2;
+    for (int i = 0; i < m_categories.size(); i++) {
+        const auto &category = m_categories.at(i);
+        const qreal categoryCenter = plotLeft + m_categoryWidth * (i + 0.5);
+
+        int base = 0;
+        for (const auto &segment : category.second) {
+            if (segment.second <= 0)
+                continue;
+
+            const qreal top = yFor(base + segment.second);
+            const qreal bottom = yFor(base);
+            const QRectF segmentRect(categoryCenter - barWidth / 2, top, barWidth, bottom - top);
+
+            QGraphicsRectItem *segmentItem = new QGraphicsRectItem(segmentRect, this);
+            segmentItem->setBrush(segment.first);
+            segmentItem->setPen(Qt::NoPen);
+
+            // Values are shown only on segments large enough to hold them.
+            const QString valueText = QString::number(segment.second);
+            QRectF valueRect = barLabelMetrics.boundingRect(valueText);
+            if (valueRect.width() <= segmentRect.width()
+                && valueRect.height() <= segmentRect.height()) {
+                QGraphicsSimpleTextItem *valueLabel =
+                        new QGraphicsSimpleTextItem(valueText, segmentItem);
+                valueLabel->setFont(m_barLabelFont);
+                valueLabel->setBrush(Utils::Color::textColorFor(segment.first));
+                valueRect = valueLabel->boundingRect();
+                valueRect.moveCenter(segmentRect.center());
+                valueLabel->setPos(valueRect.topLeft());
+            }
+
+            base += segment.second;
+        }
+
+        QGraphicsSimpleTextItem *categoryLabel = new QGraphicsSimpleTextItem(category.first, this);
+        categoryLabel->setFont(m_axisFont);
+        QRectF categoryRect = categoryLabel->boundingRect();
+        categoryRect.moveCenter(QPointF(categoryCenter, 0));
+        categoryRect.moveTop(plotBottom + gap);
+        categoryLabel->setPos(categoryRect.topLeft());
+    }
+
+    this->setRect(QRectF(0, 0, plotLeft + plotWidth, m_height) | this->childrenBoundingRect());
+}
 
 ////////////////////////////////////////////////////////////////////////////////////
 

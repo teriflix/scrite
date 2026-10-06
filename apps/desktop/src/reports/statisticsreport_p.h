@@ -99,6 +99,59 @@ public:
     ~StatisticsReportSceneHeadingStats() override;
 };
 
+// Pie chart drawn with plain graphics items. Slices start at 12 o'clock and go clockwise, and
+// the pie takes up 70% of the box, leaving room around it.
+class StatisticsReportPieChart : public QGraphicsRectItem
+{
+public:
+    explicit StatisticsReportPieChart(qreal size, QGraphicsItem *parent = nullptr);
+    ~StatisticsReportPieChart() override;
+
+    void addSlice(qreal value, const QColor &color, const QString &label, const QFont &labelFont);
+
+    // Creates items for slices added so far.
+    void finish();
+
+private:
+    struct Slice
+    {
+        qreal value = 0;
+        QColor color;
+        QString label;
+        QFont labelFont;
+    };
+    qreal m_size = 0;
+    QList<Slice> m_slices;
+};
+
+// Stacked bar chart drawn with plain graphics items: a value axis on the left, and one bar per
+// category with its label underneath. Bars are half as wide as their categories.
+class StatisticsReportStackedBarChart : public QGraphicsRectItem
+{
+public:
+    explicit StatisticsReportStackedBarChart(qreal categoryWidth, qreal height,
+                                             QGraphicsItem *parent = nullptr);
+    ~StatisticsReportStackedBarChart() override;
+
+    // Font of labels on the axes, and of values on the bars.
+    void setFonts(const QFont &axisFont, const QFont &barLabelFont);
+
+    // Segments are stacked bottom to top, in the order given.
+    void addCategory(const QString &name, const QList<QPair<QColor, int>> &segments);
+
+    int categoryCount() const { return m_categories.size(); }
+
+    // Creates items for categories added so far.
+    void finish();
+
+private:
+    qreal m_height = 0;
+    qreal m_categoryWidth = 0;
+    QFont m_axisFont;
+    QFont m_barLabelFont;
+    QList<QPair<QString, QList<QPair<QColor, int>>>> m_categories;
+};
+
 class StatisticsReportGraphVLegend : public QGraphicsRectItem
 {
 public:

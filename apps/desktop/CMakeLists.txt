@@ -23,7 +23,6 @@ find_package(Qt6 6.11 REQUIRED COMPONENTS
   Multimedia
   PrintSupport
   Svg
-  Charts
   Pdf
   WebEngineQuick
   Core5Compat
@@ -179,7 +178,6 @@ target_link_libraries(Scrite PRIVATE
   Qt6::Multimedia
   Qt6::PrintSupport
   Qt6::Svg
-  Qt6::Charts
   Qt6::Pdf
   Qt6::WebEngineQuick
   Qt6::Core5Compat
