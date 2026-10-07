@@ -261,8 +261,7 @@ QJsonValue sanitizeJsonValue(const QJsonValue &value)
         QString str = value.toString();
         // Trim + remove NUL and basic control chars only
         return str.trimmed()
-                .replace(QChar::Null, "")
-                .replace(QRegularExpression("[\x00-\x1F\x7F]"), "");
+                .replace(QRegularExpression(QStringLiteral("[\\x{00}-\\x{1F}\\x{7F}]")), "");
     }
 
     if (value.isObject()) {
