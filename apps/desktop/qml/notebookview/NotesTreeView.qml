@@ -53,7 +53,10 @@ TreeView {
         return null
     }
 
+    property Scene currentScene: currentNotes && currentNotes.ownerType === Notes.SceneOwner ? currentNotes.scene : null
     property Character currentCharacter: currentNotes && currentNotes.ownerType === Notes.CharacterOwner ? currentNotes.character : null
+    property Structure currentStructure: currentNotes && currentNotes.ownerType === Notes.StructureOwner ? currentNotes.structure : null
+    property ScreenplayElement currentBreak: currentNotes && currentNotes.ownerType === Notes.BreakOwner ? currentNotes.breakElement : null
 
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
     signal deleteCharacterRequest(Character character)

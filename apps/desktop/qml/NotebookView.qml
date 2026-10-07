@@ -35,6 +35,15 @@ import "./notifications"
 Item {
     id: root
 
+    readonly property alias currentNote: _notebookTree.currentNote
+    readonly property alias currentData: _notebookTree.currentCharacter
+    readonly property alias currentNotes: _notebookTree.currentNotes
+
+    readonly property alias currentScene: _notebookTree.currentScene
+    readonly property alias currentBreak: _notebookTree.currentBreak
+    readonly property alias currentCharacter: _notebookTree.currentCharacter
+    readonly property alias currentStructure: _notebookTree.currentStructure
+
     function scheduleSwitchTo(item) { _private.scheduleSwitchTo(item) }
     function switchTo(item) { _private.switchTo(item) }
     function switchToCharacterTab(name) { _private.switchToCharacterTab(name) }
