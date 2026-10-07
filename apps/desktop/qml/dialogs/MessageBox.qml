@@ -98,7 +98,7 @@ Item {
 
             signal buttonClicked(string buttonText)
 
-            width: Math.min(500, Scrite.window.width * 0.5)
+            width: Math.min(Scrite.window.width * 0.9, Math.max(500, _buttonRow.implicitWidth + 40))
             height: _layout.implicitHeight + 40 + header.height
 
             focus: true
@@ -169,6 +169,8 @@ Item {
                     }
 
                     RowLayout {
+                        id: _buttonRow
+
                         Layout.alignment: Qt.AlignHCenter
                         spacing: 20
 
