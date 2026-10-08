@@ -13,11 +13,13 @@
 **
 ****************************************************************************/
 
-#ifndef OBJECTHOST_H
-#define OBJECTHOST_H
+#ifndef FEATUREHOST_H
+#define FEATUREHOST_H
 
 #include <QObject>
 #include <QQuickItem>
+#include <QQmlComponent>
+#include <QQmlParserStatus>
 
 class FeatureHost : public QObject, public QQmlParserStatus
 {
@@ -120,6 +122,7 @@ private:
     bool resolveHost(FeatureHost *host);
     void hostDestroyed(FeatureHost *host);
     void featureDestroyed(QObject *obj);
+    void delegateDestroyed(QObject *obj);
     void provideFeature();
     void repealFeature();
 
@@ -131,4 +134,4 @@ private:
     QQmlComponent *m_delegate = nullptr;
 };
 
-#endif // OBJECTHOST_H
+#endif // FEATUREHOST_H

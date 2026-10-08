@@ -15,7 +15,6 @@
 
 #include "featurehost.h"
 #include <QQmlEngine>
-#include <QTimer>
 
 Q_GLOBAL_STATIC(QList<FeatureHost *>, FeatureHosts)
 Q_GLOBAL_STATIC(QList<FeatureProvider *>, FeatureProviders)
@@ -29,15 +28,28 @@ FeatureHost::FeatureHost(QObject *parent)
 FeatureHost::~FeatureHost()
 {
     emit aboutToDelete(this);
-    ::FeatureHosts->removeOne(this);
+
+    if (!::FeatureHosts.isDestroyed())
+        ::FeatureHosts->removeOne(this);
 }
 
 void FeatureHost::setUri(const QString &val)
 {
-    if (m_uri == val || !m_uri.isEmpty() || find(val) != nullptr)
+    if (!m_uri.isEmpty()) {
+        qWarning("FeatureHost: URI can only be set once in %s", qPrintable(m_uri));
+        return;
+    }
+
+    const QString val2 = val.trimmed();
+    if (val2.isEmpty())
         return;
 
-    m_uri = val;
+    if (find(val2) != nullptr) {
+        qWarning("FeatureHost: URI %s already taken.", qPrintable(val2));
+        return;
+    }
+
+    m_uri = val2;
     emit uriChanged();
 
     resolveProviderHosts(this);
@@ -74,12 +86,10 @@ int FeatureHost::resolveProviderHosts(FeatureHost *host)
 {
     int count = 0;
 
-    if (host->m_componentComplete) {
-        if (host != nullptr && !host->uri().isEmpty()) {
-            for (FeatureProvider *provider : std::as_const(*::FeatureProviders)) {
-                if (provider->resolveHost(host))
-                    ++count;
-            }
+    if (host != nullptr && host->m_componentComplete && !host->uri().isEmpty()) {
+        for (FeatureProvider *provider : std::as_const(*::FeatureProviders)) {
+            if (provider->resolveHost(host))
+                ++count;
         }
     }
 
@@ -101,16 +111,19 @@ FeatureProvider::~FeatureProvider()
 {
     this->repealFeature();
 
-    ::FeatureProviders->removeOne(this);
+    if (!::FeatureProviders.isDestroyed())
+        ::FeatureProviders->removeOne(this);
 }
 
 void FeatureProvider::setHostUri(const QString &val)
 {
+    const QString val2 = val.trimmed();
+
     // Target names are set-once
-    if (m_hostUri == val || !m_hostUri.isEmpty())
+    if (!m_hostUri.isEmpty() || val2.isEmpty())
         return;
 
-    m_hostUri = val;
+    m_hostUri = val2;
     emit hostUriChanged();
 
     for (FeatureHost *host : std::as_const(*::FeatureHosts)) {
@@ -126,14 +139,24 @@ void FeatureProvider::setDelegate(QQmlComponent *val)
     if (m_delegate == val)
         return;
 
+    if (m_delegate != nullptr)
+        disconnect(m_delegate, &QObject::destroyed, this, &FeatureProvider::delegateDestroyed);
+
     m_delegate = val;
+
+    if (m_delegate != nullptr)
+        connect(m_delegate, &QObject::destroyed, this, &FeatureProvider::delegateDestroyed);
+
     emit delegateChanged();
 }
 
 bool FeatureProvider::resolveHost(FeatureHost *host)
 {
-    if (m_host != nullptr || m_hostUri.isEmpty())
-        return false;
+    if (m_host != nullptr)
+        return false; // Already resolved to a host
+
+    if (m_hostUri.isEmpty())
+        return false; // Nothing to resolve yet
 
     if (host == nullptr)
         host = FeatureHost::find(m_hostUri);
@@ -150,7 +173,8 @@ bool FeatureProvider::resolveHost(FeatureHost *host)
 
 void FeatureProvider::hostDestroyed(FeatureHost *host)
 {
-    if (host == m_host) {
+    if (m_host != nullptr && host == m_host) {
+        repealFeature();
         m_host = nullptr;
         emit hostChanged();
     }
@@ -158,16 +182,24 @@ void FeatureProvider::hostDestroyed(FeatureHost *host)
 
 void FeatureProvider::featureDestroyed(QObject *obj)
 {
-    if (m_feature == obj) {
+    if (m_feature != nullptr && m_feature == obj) {
         m_feature = nullptr;
         emit featureChanged();
     }
 }
 
+void FeatureProvider::delegateDestroyed(QObject *obj)
+{
+    this->setDelegate(nullptr);
+}
+
 void FeatureProvider::provideFeature()
 {
     if (m_host != nullptr && m_feature == nullptr && m_delegate != nullptr) {
-        QQmlContext *context = QQmlEngine::contextForObject(this);
+        QQmlContext *context = m_delegate->creationContext();
+        if (context == nullptr)
+            context = QQmlEngine::contextForObject(this);
+
         m_feature = m_delegate->create(context);
         if (m_feature != nullptr) {
             QQuickItem *qmlItem = qobject_cast<QQuickItem *>(m_feature);
@@ -178,7 +210,6 @@ void FeatureProvider::provideFeature()
             }
             m_host->featureAdded(m_feature);
 
-            connect(m_host, &FeatureHost::aboutToDelete, m_feature, &QObject::deleteLater);
             connect(m_feature, &QObject::destroyed, this, &FeatureProvider::featureDestroyed);
             emit featureChanged();
         }
@@ -188,8 +219,10 @@ void FeatureProvider::provideFeature()
 void FeatureProvider::repealFeature()
 {
     if (m_host != nullptr && m_feature != nullptr) {
+        disconnect(m_feature, &QObject::destroyed, this, &FeatureProvider::featureDestroyed);
         m_host->featureRemoved(m_feature);
         m_feature->deleteLater();
         m_feature = nullptr;
+        emit featureChanged();
     }
 }
