@@ -85,10 +85,10 @@ Item {
             }
 
             x: root.sceneTextEditor.leftPadding - radius
-            y: dualDialogueRect.y + root.sceneTextEditor.topPadding - _currentLineHighlight.height * 0.33
+            y: dualDialogueRect.y + root.sceneTextEditor.topPadding - Runtime.sceneEditorFontMetrics.lineSpacing * 0.33
             width: root.sceneTextEditor.contentWidth + 2*radius
-            height: dualDialogueRect.height + _currentLineHighlight.height * 0.66
-            topLeftRadius: _currentLineHighlight.height
+            height: dualDialogueRect.height + Runtime.sceneEditorFontMetrics.lineSpacing * 0.66
+            topLeftRadius: Runtime.sceneEditorFontMetrics.lineSpacing
             bottomRightRadius: topLeftRadius
 
             color: dualDialogue === root.sceneDocumentBinder.currentDualDialogue ?
@@ -104,9 +104,9 @@ Item {
             Image {
                 anchors.left: parent.right
                 anchors.top: parent.top
-                anchors.margins: _currentLineHighlight.height/2
+                anchors.margins: Runtime.sceneEditorFontMetrics.lineSpacing/2
 
-                width: _currentLineHighlight.height
+                width:Runtime.sceneEditorFontMetrics.lineSpacing
                 height: width
 
                 source: Runtime.themedIcon("qrc:/icons/content/dual_dialogue.png")
