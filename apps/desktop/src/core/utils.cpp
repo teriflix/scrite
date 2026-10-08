@@ -1251,6 +1251,9 @@ QString Utils::ObjectRegistry::add(QObject *object, const QString &name)
         finalObjName = objName + QString::number(index++);
     }
 
+    if (name != finalObjName)
+        qWarning("Name upgraded from %s to %s", qPrintable(name), qPrintable(finalObjName));
+
     object->setProperty(objectNameProperty, finalObjName);
     ::ObjectRegistry->append(object);
 
@@ -1333,6 +1336,7 @@ void Utils::ObjectRegister::setName(const QString &val)
 ///////////////////////////////////////////////////////////////////////////////
 
 Q_GLOBAL_STATIC(QList<Utils::ObjectDiscovery *>, ObjectDiscoveryList)
+Q_GLOBAL_STATIC(QList<Utils::ObjectsDiscovery *>, ObjectsDiscoveryList)
 
 Utils::ObjectDiscovery::ObjectDiscovery(QObject *parent) : QObject(parent)
 {
@@ -1447,6 +1451,12 @@ void Utils::ObjectDiscovery::notifyObjectAddedToRegistry(QObject *ptr, const QSt
         if (::ObjectDiscoveryList->contains(d))
             d->objectAddedToRegistry(ptr, name);
     }
+
+    const QList<ObjectsDiscovery *> list2 = *::ObjectsDiscoveryList;
+    for (ObjectsDiscovery *d : list2) {
+        if (::ObjectsDiscoveryList->contains(d))
+            d->objectAddedToRegistry(ptr, name);
+    }
 }
 
 void Utils::ObjectDiscovery::notifyObjectRemovedFromRegistry(QObject *ptr)
@@ -1455,6 +1465,188 @@ void Utils::ObjectDiscovery::notifyObjectRemovedFromRegistry(QObject *ptr)
     for (ObjectDiscovery *d : list) {
         if (::ObjectDiscoveryList->contains(d))
             d->objectRemovedFromRegistry(ptr);
+    }
+
+    const QList<ObjectsDiscovery *> list2 = *::ObjectsDiscoveryList;
+    for (ObjectsDiscovery *d : list2) {
+        if (::ObjectsDiscoveryList->contains(d))
+            d->objectRemovedFromRegistry(ptr);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+Utils::ObjectsDiscovery::ObjectsDiscovery(QObject *parent) : QObject(parent)
+{
+    ::ObjectsDiscoveryList->append(this);
+}
+
+Utils::ObjectsDiscovery::~ObjectsDiscovery()
+{
+    ::ObjectsDiscoveryList->removeOne(this);
+}
+
+void Utils::ObjectsDiscovery::setTerms(const QStringList &val)
+{
+    if (m_terms == val)
+        return;
+
+    const QStringList oldTerms = m_terms;
+
+    // Terms that were dropped lose their objects.
+    for (const QString &term : oldTerms) {
+        if (!val.contains(term))
+            this->forgetTerm(term);
+    }
+
+    m_terms = val;
+    emit termsChanged();
+
+    // Terms that are new are discovered right away, for objects that already exist.
+    for (const QString &term : std::as_const(m_terms)) {
+        if (!oldTerms.contains(term))
+            this->discoverTerm(term);
+    }
+}
+
+void Utils::ObjectsDiscovery::setMode(Mode val)
+{
+    if (m_mode == val)
+        return;
+
+    for (const QString &term : m_terms)
+        this->forgetTerm(term);
+
+    m_mode = val;
+
+    for (const QString &term : m_terms)
+        this->discoverTerm(term);
+
+    emit modeChanged();
+}
+
+QObjectList Utils::ObjectsDiscovery::objects() const
+{
+    QObjectList ret;
+    for (const Entry &entry : m_objects) {
+        // An object discovered under more than one term is listed once.
+        if (!entry.second.isNull() && !ret.contains(entry.second))
+            ret.append(entry.second);
+    }
+
+    return ret;
+}
+
+QString Utils::ObjectsDiscovery::termOf(QObject *object) const
+{
+    auto it =
+            std::find_if(m_objects.constBegin(), m_objects.constEnd(), [object](const auto &item) {
+                return !item.second.isNull() && item.second == object;
+            });
+    if (it != m_objects.constEnd())
+        return it->first;
+
+    return QString();
+}
+
+QStringList Utils::ObjectsDiscovery::termsOf(QObject *object) const
+{
+    QStringList ret;
+
+    for (const auto &item : m_objects) {
+        if (!item.second.isNull() && item.second == object && !ret.contains(item.first)) {
+            ret << item.first;
+        }
+    }
+
+    return ret;
+}
+
+QObject *Utils::ObjectsDiscovery::objectOf(const QString &term) const
+{
+    for (const Entry &entry : m_objects) {
+        if (entry.first == term && !entry.second.isNull())
+            return entry.second;
+    }
+
+    return nullptr;
+}
+
+QObjectList Utils::ObjectsDiscovery::objectsOf(const QString &term) const
+{
+    QObjectList ret;
+    for (const Entry &entry : m_objects) {
+        if (entry.first == term && !entry.second.isNull() && !ret.contains(entry.second))
+            ret.append(entry.second);
+    }
+
+    return ret;
+}
+
+bool Utils::ObjectsDiscovery::matches(QObject *ptr, const QString &name, const QString &term) const
+{
+    return m_mode == ObjectDiscovery::DiscoverByName ? name == term
+                                                     : ptr->inherits(qPrintable(term));
+}
+
+void Utils::ObjectsDiscovery::discoverTerm(const QString &term)
+{
+    const ObjectListModel *allObjectsModel =
+            qobject_cast<ObjectListModel *>(ObjectRegistry::model());
+    const QList<QObject *> allObjects = allObjectsModel->constList();
+    for (QObject *object : allObjects) {
+        const QString name = object->property(objectNameProperty).toString();
+        if (!this->matches(object, name, term))
+            continue;
+
+        const Entry entry(term, object);
+        if (!m_objects.contains(entry)) {
+            m_objects.append(entry);
+            emit objectsChanged();
+            emit objectDiscovered(object, term);
+        }
+    }
+}
+
+void Utils::ObjectsDiscovery::forgetTerm(const QString &term)
+{
+    const QList<Entry> entries = m_objects;
+    for (const Entry &entry : entries) {
+        if (entry.first != term)
+            continue;
+
+        m_objects.removeOne(entry);
+        emit objectsChanged();
+        if (!entry.second.isNull())
+            emit objectDisappeared(entry.second, term);
+    }
+}
+
+void Utils::ObjectsDiscovery::objectAddedToRegistry(QObject *ptr, const QString &name)
+{
+    for (const QString &term : m_terms) {
+        if (!this->matches(ptr, name, term))
+            continue;
+
+        const Entry entry(term, ptr);
+        if (!m_objects.contains(entry)) {
+            m_objects.append(entry);
+            emit objectsChanged();
+            emit objectDiscovered(ptr, term);
+        }
+    }
+}
+
+void Utils::ObjectsDiscovery::objectRemovedFromRegistry(QObject *ptr)
+{
+    const QList<Entry> entries = m_objects;
+    for (const Entry &entry : entries) {
+        if (entry.second != ptr)
+            continue;
+
+        m_objects.removeOne(entry);
+        emit objectsChanged();
+        emit objectDisappeared(ptr, entry.first);
     }
 }
 

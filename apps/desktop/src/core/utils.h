@@ -19,6 +19,7 @@
 #include <QImage>
 #include <QtMath>
 #include <QJSValue>
+#include <QPointer>
 #include <QFileInfo>
 #include <QDateTime>
 #include <QQuickItem>
@@ -894,6 +895,72 @@ private:
     QString m_term;
     QObject *m_object = nullptr;
     QAbstractListModel *m_objects = nullptr;
+};
+
+class ObjectsDiscovery : public QObject
+{
+    Q_OBJECT
+    QML_NAMED_ELEMENT(ObjectsDiscovery)
+
+public:
+    explicit ObjectsDiscovery(QObject *parent = nullptr);
+    ~ObjectsDiscovery() override;
+
+    using Mode = ObjectDiscovery::Mode;
+
+    // clang-format off
+    Q_PROPERTY(ObjectDiscovery::Mode mode
+               READ mode
+               WRITE setMode
+               NOTIFY modeChanged)
+    // clang-format on
+    void setMode(Mode val);
+    Mode mode() const { return m_mode; }
+    Q_SIGNAL void modeChanged();
+
+    // clang-format off
+    Q_PROPERTY(QStringList terms
+               READ terms
+               WRITE setTerms
+               NOTIFY termsChanged)
+    // clang-format on
+    void setTerms(const QStringList &val);
+    QStringList terms() const { return m_terms; }
+    Q_SIGNAL void termsChanged();
+
+    // clang-format off
+    Q_PROPERTY(QObjectList objects
+               READ objects
+               NOTIFY objectsChanged)
+    // clang-format on
+    QObjectList objects() const;
+    Q_SIGNAL void objectsChanged();
+
+    Q_INVOKABLE QString termOf(QObject *object) const;
+    Q_INVOKABLE QStringList termsOf(QObject *object) const;
+    Q_INVOKABLE QObject *objectOf(const QString &term) const;
+    Q_INVOKABLE QObjectList objectsOf(const QString &term) const;
+
+signals:
+    void objectDiscovered(QObject *object, const QString &term);
+    void objectDisappeared(QObject *object, const QString &term);
+
+private:
+    bool matches(QObject *ptr, const QString &name, const QString &term) const;
+    void discoverTerm(const QString &term);
+    void forgetTerm(const QString &term);
+
+    void objectAddedToRegistry(QObject *ptr, const QString &name);
+    void objectRemovedFromRegistry(QObject *ptr);
+
+private:
+    friend class ObjectDiscovery;
+
+    typedef QPair<QString, QPointer<QObject>> Entry; // term, object
+
+    Mode m_mode = ObjectDiscovery::DiscoverByName;
+    QStringList m_terms;
+    QList<Entry> m_objects;
 };
 
 class Color : public QObject

@@ -26,6 +26,75 @@ Menu {
 
     property bool autoWidth: true
 
+    property int minInsertIndex: 0
+    property int insertIndex: minInsertIndex
+
+    function includeMenu(object) {
+        let menu = object as Menu
+        if(menu) {
+            insertMenu(insertIndex, menu)
+            ++insertIndex
+            return
+        }
+    }
+
+    function includeMenuItem(object) {
+        let menuItem = object as MenuItem
+        if(menuItem) {
+            insertItem(insertIndex, menuItem)
+            ++insertIndex
+            return
+        }
+    }
+
+    function includeAction(object) {
+        let action = object as Action
+        if(action) {
+            insertAction(insertIndex, action)
+            ++insertIndex
+            return
+        }
+    }
+
+    function excludeMenu(object) {
+        let menu = object as Menu
+        if(menu) {
+            for(let i=0; i<count; i++) {
+                if(menuAt(i) === menu) {
+                    takeMenu(i)
+                    insertIndex = Math.max(insertIndex-1, minInsertIndex)
+                    return
+                }
+            }
+        }
+    }
+
+    function excludeMenuItem(object) {
+        let menuItem = object as MenuItem
+        if(menuItem) {
+            for(let i=0; i<count; i++) {
+                if(itemAt(i) === menuItem) {
+                    takeItem(i)
+                    insertIndex = Math.max(insertIndex-1, minInsertIndex)
+                    return
+                }
+            }
+        }
+    }
+
+    function excludeAction(object) {
+        let action = object as Action
+        if(action) {
+            for(let i=0; i<count; i++) {
+                if(actionAt(i) === action) {
+                    takeAction(i)
+                    insertIndex = Math.max(insertIndex-1, minInsertIndex)
+                    return
+                }
+            }
+        }
+    }
+
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
     closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
