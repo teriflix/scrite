@@ -325,7 +325,7 @@ AbstractScenePartEditor {
         characterNames: Scrite.document.structure.characterNames
         cursorPosition: _sceneTextEditor.activeFocus ? _sceneTextEditor.cursorPosition : -1
         applyTextFormat: true
-        renderDualDialogues: !_sceneTextEditor.activeFocus
+        renderDualDialogues: scene.hasDualDialogues ? !_sceneTextEditor.activeFocus : false
         screenplayFormat: Scrite.document.displayFormat
         screenplayElement: root.screenplayElement
         forceSyncDocument: !_sceneTextEditor.activeFocus
@@ -341,25 +341,27 @@ AbstractScenePartEditor {
         autoCapitalizeExceptions: Runtime.screenplayEditorSettings.autoCapitalizeExceptions
 
         onDocumentInitialized: () => {
-                                   if(!_private.firstInitializationDone && !_private.scrollingBetweenScenes) {
-                                       _sceneTextEditor.cursorPosition = 0
-                                   }
-                                   _private.firstInitializationDone = true
-                               }
+            if(!_private.firstInitializationDone && !_private.scrollingBetweenScenes) {
+                _sceneTextEditor.cursorPosition = 0
+            }
+            _private.firstInitializationDone = true
+        }
 
         onRequestCursorPosition: (position) => {
-                                     _sceneTextEditor.cursorPosition = position < 0 ? _sceneTextEditor.length : position
-                                 }
+            _sceneTextEditor.cursorPosition = position < 0 ? _sceneTextEditor.length : position
+        }
 
         onRequestSelection: (start, end) => {
-                                _sceneTextEditor.deselect()
-                                _sceneTextEditor.select(start, end)
-                            }
+            _sceneTextEditor.deselect()
+            _sceneTextEditor.select(start, end)
+        }
 
         onRenderDualDialoguesChanged: () => {
-                                          Runtime.paginator.pause()
-                                          Qt.callLater(Runtime.paginator.resume)
-                                      }
+            if(scene.hasDualDialogues) {
+                Runtime.paginator.pause()
+                Qt.callLater(Runtime.paginator.resume)
+            }
+        }
     }
 
     Connections {
