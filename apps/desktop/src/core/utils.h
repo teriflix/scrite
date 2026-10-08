@@ -919,6 +919,16 @@ public:
     Q_SIGNAL void modeChanged();
 
     // clang-format off
+    Q_PROPERTY(bool matchPrefix
+               READ matchPrefix
+               WRITE setMatchPrefix
+               NOTIFY matchPrefixChanged)
+    // clang-format on
+    void setMatchPrefix(bool val);
+    bool matchPrefix() const { return m_matchPrefix; }
+    Q_SIGNAL void matchPrefixChanged();
+
+    // clang-format off
     Q_PROPERTY(QStringList terms
                READ terms
                WRITE setTerms
@@ -959,6 +969,7 @@ private:
     typedef QPair<QString, QPointer<QObject>> Entry; // term, object
 
     Mode m_mode = ObjectDiscovery::DiscoverByName;
+    bool m_matchPrefix = false;
     QStringList m_terms;
     QList<Entry> m_objects;
 };

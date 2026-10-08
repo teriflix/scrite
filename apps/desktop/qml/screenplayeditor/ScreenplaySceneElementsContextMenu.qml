@@ -34,6 +34,8 @@ SctMenu {
 
     property ScreenplayElement element
 
+    ObjectRegister.name: "Scrite.App.ScreenplayEditor.SceneElementsContextMenu"
+
     SctMenuItem {
         enabled: root.sceneGroup.sceneCount === 1 && root.element && root.element.scene
 

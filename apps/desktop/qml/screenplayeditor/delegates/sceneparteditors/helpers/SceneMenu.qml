@@ -42,6 +42,8 @@ MenuLoader {
     menu: SctMenu {
         id: _sceneMenu
 
+        ObjectRegister.name: "Scrite.App.ScreenplayEditor.SceneMenu"
+
         SctMenuItem {
             enabled: !root.screenplayElement.omitted
 

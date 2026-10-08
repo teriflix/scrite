@@ -30,6 +30,8 @@ SctMenu {
 
     property ScreenplayElement element
 
+    ObjectRegister.name: "Scrite.App.ScreenplayEditor.BreakElementsContextMenu"
+
     onClosed: element = null
 
     SctMenuItem {

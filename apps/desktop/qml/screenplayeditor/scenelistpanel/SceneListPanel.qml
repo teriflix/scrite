@@ -146,15 +146,11 @@ ListView {
     ScreenplayBreakElementsContextMenu {
         id: _breakElementContextMenu
 
-        ObjectRegister.name: "Scrite.App.SceneListPanel.BreakElementsContextMenu"
-
         enabled: !root.readOnly
     }
 
     ScreenplaySceneElementsContextMenu {
         id: _sceneElementsContextMenu
-
-        ObjectRegister.name: "Scrite.App.SceneListPanel.SceneElementsContextMenu"
 
         enabled: !root.readOnly
         sceneGroup: _private.sceneGroup

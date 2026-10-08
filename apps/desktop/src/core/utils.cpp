@@ -1525,6 +1525,22 @@ void Utils::ObjectsDiscovery::setMode(Mode val)
     emit modeChanged();
 }
 
+void Utils::ObjectsDiscovery::setMatchPrefix(bool val)
+{
+    if (m_matchPrefix == val)
+        return;
+
+    for (const QString &term : m_terms)
+        this->forgetTerm(term);
+
+    m_matchPrefix = val;
+
+    for (const QString &term : m_terms)
+        this->discoverTerm(term);
+
+    emit matchPrefixChanged();
+}
+
 QObjectList Utils::ObjectsDiscovery::objects() const
 {
     QObjectList ret;
@@ -1585,8 +1601,10 @@ QObjectList Utils::ObjectsDiscovery::objectsOf(const QString &term) const
 
 bool Utils::ObjectsDiscovery::matches(QObject *ptr, const QString &name, const QString &term) const
 {
-    return m_mode == ObjectDiscovery::DiscoverByName ? name == term
-                                                     : ptr->inherits(qPrintable(term));
+    if (m_mode == ObjectDiscovery::DiscoverByName)
+        return m_matchPrefix ? name.startsWith(term) : name == term;
+
+    return ptr->inherits(qPrintable(term));
 }
 
 void Utils::ObjectsDiscovery::discoverTerm(const QString &term)

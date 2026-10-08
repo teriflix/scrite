@@ -176,14 +176,10 @@ Item {
 
     ScreenplayBreakElementsContextMenu {
         id: _breakElementContextMenu
-
-        ObjectRegister.name: "Scrite.App.TimelineView.BreakElementsContextMenu"
     }
 
     ScreenplaySceneElementsContextMenu {
         id: _sceneElementsContextMenu
-
-        ObjectRegister.name: "Scrite.App.TimelineView.SceneElementsContextMenu"
 
         sceneGroup: _sceneGroup
     }
