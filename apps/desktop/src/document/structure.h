@@ -842,7 +842,8 @@ public:
     void serializeToJson(QJsonObject &) const override;
     void deserializeFromJson(const QJsonObject &) override;
     bool canSetPropertyFromObjectList(const QString &propName) const override;
-    void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects) override;
+    void setPropertyFromObjectList(const QString &propName,
+                                   const QList<QObject *> &objects) override;
 
     void resolveRelationships();
 
@@ -1513,6 +1514,13 @@ public:
     QString preferredGroupCategory() const { return m_preferredGroupCategory; }
     Q_SIGNAL void preferredGroupCategoryChanged();
 
+    // clang-format off
+    Q_PROPERTY(QJsonArray preferredGroupModel
+               READ preferredGroupModel
+               NOTIFY preferredGroupCategoryChanged)
+    // clang-format on
+    QJsonArray preferredGroupModel() const;
+
     Q_INVOKABLE QString presentableGroupNames(const QStringList &groups) const;
 
     // Local to the current Scrite document
@@ -1580,7 +1588,8 @@ public:
     void serializeToJson(QJsonObject &) const override;
     void deserializeFromJson(const QJsonObject &) override;
     bool canSetPropertyFromObjectList(const QString &propName) const override;
-    void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects) override;
+    void setPropertyFromObjectList(const QString &propName,
+                                   const QList<QObject *> &objects) override;
 
     Q_INVOKABLE QStringList sortCharacterNames(const QStringList &names) const;
 

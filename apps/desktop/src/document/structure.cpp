@@ -4443,6 +4443,19 @@ void Structure::setPreferredGroupCategory(const QString &val)
     emit preferredGroupCategoryChanged();
 }
 
+QJsonArray Structure::preferredGroupModel() const
+{
+    QJsonArray ret;
+    for (const QJsonValue &item : m_groupsModel) {
+        const QJsonObject obj = item.toObject();
+        if (m_preferredGroupCategory.compare(obj.value("category").toString(), Qt::CaseInsensitive)
+            == 0)
+            ret.append(obj);
+    }
+
+    return ret;
+}
+
 QString Structure::presentableGroupNames(const QStringList &groups) const
 {
     const QString slash = QStringLiteral("/");
