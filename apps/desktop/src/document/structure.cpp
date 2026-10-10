@@ -4179,69 +4179,74 @@ struct CategoryOrGroup
 typedef CategoryOrGroup Category;
 typedef CategoryOrGroup Group;
 
-QMap<Category, QList<Group>> parseGroupsData(const QString &text)
+Category fromCategoryLine(const QString &line)
 {
-    const QString sqbo = QStringLiteral("[");
-    const QString sqbc = QStringLiteral("]");
+    Category ret;
+
+    if (line.isEmpty())
+        return ret;
+
+    if (!line.startsWith(QStringLiteral("[")))
+        return ret;
+
+    const int closingBraceIndex = line.indexOf(QStringLiteral("]"));
+    if (closingBraceIndex < 0)
+        return ret;
+
+    const QString name = line.mid(1, closingBraceIndex - 1);
+    const QString desc = line.section(QStringLiteral(":"), 1);
+    ret = CategoryOrGroup(name, desc);
+
+    return ret;
+}
+
+Group fromGroupLine(const QString &line)
+{
+    Group ret;
+
+    if (line.isEmpty())
+        return ret;
+
     const QString dash = QStringLiteral("- ");
     const QString colon = QStringLiteral(":");
     const QString abc = QStringLiteral(">");
 
-    auto fromCategoryLine = [&](const QString &line) -> Category {
-        Category ret;
+    QString line2 = line;
+    const int type = line.startsWith(dash) ? 1 : 0;
+    if (type == 1)
+        line2 = line.mid(2).trimmed();
 
-        if (line.isEmpty())
-            return ret;
+    const QString field1 = line2.section(colon, 0, 0);
+    const QString act =
+            field1.startsWith("<") ? field1.mid(1).section(abc, 0, 0).trimmed() : QString();
+    const QString name = act.isEmpty() ? field1 : field1.section(abc, 1);
+    const QString desc = line2.section(colon, 1);
+    ret = CategoryOrGroup(name, desc);
+    ret.type = type;
+    ret.act = act.toUpper();
 
-        if (!line.startsWith(sqbo))
-            return ret;
+    return ret;
+}
 
-        const int closingBraceIndex = line.indexOf(sqbc);
-        if (closingBraceIndex < 0)
-            return ret;
+Category defaultCategory()
+{
+    return Category(QStringLiteral("Default Category"));
+}
 
-        const QString name = line.mid(1, closingBraceIndex - 1);
-        const QString desc = line.section(colon, 1);
-        ret = CategoryOrGroup(name, desc);
-
-        return ret;
-    };
-
-    auto fromGroupLine = [&](const QString &line) -> Group {
-        Group ret;
-
-        if (line.isEmpty())
-            return ret;
-
-        QString line2 = line;
-        const int type = line.startsWith(dash) ? 1 : 0;
-        if (type == 1)
-            line2 = line.mid(2).trimmed();
-
-        const QString field1 = line2.section(colon, 0, 0);
-        const QString act =
-                field1.startsWith("<") ? field1.mid(1).section(abc, 0, 0).trimmed() : QString();
-        const QString name = act.isEmpty() ? field1 : field1.section(abc, 1);
-        const QString desc = line2.section(colon, 1);
-        ret = CategoryOrGroup(name, desc);
-        ret.type = type;
-        ret.act = act.toUpper();
-
-        return ret;
-    };
-
+QMap<Category, QList<Group>> parseGroupsData(const QString &text)
+{
     QMap<Category, QList<Group>> categoryGroupsMap;
 
     QString text2 = text;
     QTextStream ts(&text2, QIODevice::ReadOnly);
-    Category activeCategory(QStringLiteral("Default Category"));
+    Category activeCategory = defaultCategory();
 
     while (!ts.atEnd()) {
         const QString line = ts.readLine().trimmed();
         if (line.isEmpty())
             continue;
 
-        if (line.startsWith(sqbo))
+        if (line.startsWith(QStringLiteral("[")))
             activeCategory = fromCategoryLine(line);
         else {
             const Group group = fromGroupLine(line);
@@ -4250,6 +4255,101 @@ QMap<Category, QList<Group>> parseGroupsData(const QString &text)
     }
 
     return categoryGroupsMap;
+}
+
+// Descriptions of the categories and groups in the storybeats.lst bundled with the application.
+// Categories are keyed by their name, groups by "CATEGORY NAME/GROUP NAME".
+struct BuiltInGroupsInfo
+{
+    QMap<QString, QString> categoryDescriptions;
+    QMap<QString, QString> groupDescriptions;
+};
+
+const BuiltInGroupsInfo &builtInGroupsInfo()
+{
+    static const BuiltInGroupsInfo info = []() -> BuiltInGroupsInfo {
+        BuiltInGroupsInfo ret;
+
+        QFile f(QStringLiteral(":/misc/storybeats.lst"));
+        if (!f.open(QFile::ReadOnly))
+            return ret;
+
+        const QMap<Category, QList<Group>> map = parseGroupsData(QString::fromUtf8(f.readAll()));
+        for (auto it = map.cbegin(); it != map.cend(); ++it) {
+            const QString catName = it.key().name;
+            ret.categoryDescriptions.insert(catName, it.key().desc);
+            for (const Group &g : it.value())
+                ret.groupDescriptions.insert(catName + QStringLiteral("/") + g.name, g.desc);
+        }
+
+        return ret;
+    }();
+    return info;
+}
+
+// Fills in the description of the categories and groups in the file, from the built-in ones, when
+// the description in the file is either missing or is a shorter form of the built-in one. This way
+// a storybeats.lst saved by an older version of the application gets the newer descriptions, while
+// descriptions customised by the user are left alone. Lines that are not upgraded are left as is.
+void upgradeGroupsDataFile(const QString &fileName)
+{
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly))
+        return;
+
+    const QString text = QString::fromUtf8(file.readAll());
+    file.close();
+
+    const QString crlf = QStringLiteral("\r\n");
+    const QString newl = text.contains(crlf) ? crlf : QStringLiteral("\n");
+
+    auto canUpgrade = [](const QString &desc, const QString &builtInDesc) {
+        return desc != builtInDesc && builtInDesc.startsWith(desc);
+    };
+
+    const BuiltInGroupsInfo &builtIn = builtInGroupsInfo();
+
+    bool changed = false;
+    QString activeCategoryName = defaultCategory().name;
+
+    QStringList lines = text.split(QStringLiteral("\n"));
+    for (QString &line : lines) {
+        if (line.endsWith(QStringLiteral("\r")))
+            line.chop(1);
+
+        const QString trimmedLine = line.trimmed();
+        if (trimmedLine.isEmpty())
+            continue;
+
+        if (trimmedLine.startsWith(QStringLiteral("["))) {
+            Category category = fromCategoryLine(trimmedLine);
+            activeCategoryName = category.name;
+
+            const QString builtInDesc = builtIn.categoryDescriptions.value(category.name);
+            if (canUpgrade(category.desc, builtInDesc)) {
+                category.desc = builtInDesc;
+                line = category.toString();
+                changed = true;
+            }
+        } else {
+            Group group = fromGroupLine(trimmedLine);
+
+            const QString key = activeCategoryName + QStringLiteral("/") + group.name;
+            const QString builtInDesc = builtIn.groupDescriptions.value(key);
+            if (canUpgrade(group.desc, builtInDesc)) {
+                group.desc = builtInDesc;
+                line = group.toString();
+                changed = true;
+            }
+        }
+    }
+
+    if (!changed)
+        return;
+
+    QFile outFile(fileName);
+    if (outFile.open(QFile::WriteOnly))
+        outFile.write(lines.join(newl).toUtf8());
 }
 
 } // namespace
@@ -4272,6 +4372,13 @@ void Structure::loadDefaultGroupsData()
             if (outFile.open(QFile::WriteOnly))
                 outFile.write(inFileData);
         }
+    }
+
+    // Bring descriptions in an older storybeats.lst up to date, once per application run
+    static bool groupsListFileUpgraded = false;
+    if (!groupsListFileUpgraded) {
+        groupsListFileUpgraded = true;
+        upgradeGroupsDataFile(groupsListFileName);
     }
 
     auto reloadGroupsListFile = [=]() {
@@ -4379,9 +4486,12 @@ void Structure::setGroupsData(const QString &val)
     const QList<Category> categories = categoryGroupsMap.keys();
     m_groupCategories.clear();
     m_categoryActNames.clear();
+    m_groupCategoryInfo.clear();
 
     for (const Category &category : categories) {
         m_groupCategories.append(category.name);
+        m_groupCategoryInfo[category.name] = QJsonObject({ { "name", category.label },
+                                                           { "description", category.desc } });
 
         const QList<Group> &groupList = categoryGroupsMap.value(category);
         QStringList acts;
@@ -4418,20 +4528,7 @@ void Structure::setGroupsData(const QString &val)
 
 bool Structure::isBuiltInGroup(const QString &name)
 {
-    static const QSet<QString> builtInNames = []() -> QSet<QString> {
-        QFile f(QStringLiteral(":/misc/storybeats.lst"));
-        if (!f.open(QFile::ReadOnly))
-            return QSet<QString>();
-        const QMap<Category, QList<Group>> map = parseGroupsData(QString::fromUtf8(f.readAll()));
-        QSet<QString> names;
-        for (auto it = map.cbegin(); it != map.cend(); ++it) {
-            const QString catName = it.key().name;
-            for (const Group &g : it.value())
-                names.insert(catName + QStringLiteral("/") + g.name);
-        }
-        return names;
-    }();
-    return builtInNames.contains(name);
+    return builtInGroupsInfo().groupDescriptions.contains(name);
 }
 
 void Structure::setPreferredGroupCategory(const QString &val)
@@ -4453,6 +4550,13 @@ QJsonArray Structure::preferredGroupModel() const
             ret.append(obj);
     }
 
+    return ret;
+}
+
+QJsonObject Structure::preferredGroupInfo() const
+{
+    QJsonObject ret = m_groupCategoryInfo.value(m_preferredGroupCategory.toUpper());
+    ret.insert(QStringLiteral("beats"), this->preferredGroupModel());
     return ret;
 }
 

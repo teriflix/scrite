@@ -1521,6 +1521,15 @@ public:
     // clang-format on
     QJsonArray preferredGroupModel() const;
 
+    // The preferred beat sheet as { "name", "description", "beats" }, where beats is the same
+    // as preferredGroupModel.
+    // clang-format off
+    Q_PROPERTY(QJsonObject preferredGroupInfo
+               READ preferredGroupInfo
+               NOTIFY preferredGroupCategoryChanged)
+    // clang-format on
+    QJsonObject preferredGroupInfo() const;
+
     Q_INVOKABLE QString presentableGroupNames(const QStringList &groups) const;
 
     // Local to the current Scrite document
@@ -1694,6 +1703,7 @@ private:
     QJsonArray m_groupsModel;
     QVariantMap m_categoryActNames;
     QStringList m_groupCategories;
+    QMap<QString, QJsonObject> m_groupCategoryInfo; // by category name, { "name", "description" }
     QString m_preferredGroupCategory;
 
     QJsonArray m_indexCardFields;
