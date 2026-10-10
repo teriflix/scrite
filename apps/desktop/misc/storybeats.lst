@@ -1,47 +1,47 @@
-[Classic Story Beats]: A story beat template based on the universal structural framework used in professional screenwriting.
-<ACT 1>Setup
-<ACT 1>Inciting Incident
-<ACT 1>- Plot Point 1
-<ACT 2A>Rising Action
-<ACT 2A>Midpoint
-<ACT 2B>The Stakes Rise
-<ACT 2B>- Plot Point 2
-<ACT 3>Crisis
-<ACT 3>Climax
-<ACT 3>Resolution
+[Classic Story Beats]: A story beat template based on the universal structural framework used in professional screenwriting. Positions are given as % of total runtime and as pages for a ~110 page feature (1 page is about 1 minute); scale them for other lengths.
+<ACT 1>Setup: 0-10% (pp 1-10). Shows the protagonist's ordinary world, flaws, wants and relationships, and sets tone and genre. Should end by hinting at what is missing. Too long if the story's disruption has not begun by page 12.
+<ACT 1>Inciting Incident: ~10-12% (pp 10-13). One concrete event that disrupts the status quo and raises the central dramatic question. Missing or vague if nothing irreversibly changes for the protagonist here.
+<ACT 1>- Plot Point 1: ~25% (p 25). The protagonist commits to the goal and crosses into Act 2, with no way back. It must be a choice or forced consequence, not coincidence. Ends Act 1.
+<ACT 2A>Rising Action: 25-50% (pp 25-55). The protagonist pursues the goal, meets obstacles and allies, and learns the rules of the new situation. Each sequence should escalate. Flag it as elongated or sagging if scenes repeat the same conflict without raising stakes.
+<ACT 2A>Midpoint: ~50% (p 55). A major reversal or revelation (false victory or false defeat) that raises the stakes and shifts the goal from reacting to acting. Weak if the story before and after it feels the same.
+<ACT 2B>The Stakes Rise: 50-75% (pp 55-80). Opposition tightens, plans fail, costs mount and flaws resurface. The protagonist is pushed toward the lowest point. Flag as a plot hole if setbacks are not caused by earlier choices or by the antagonist.
+<ACT 2B>- Plot Point 2: ~75% (p 80). The lowest point, a loss or revelation that seems to end all hope. Leads to the decision that drives Act 3. Ends Act 2.
+<ACT 3>Crisis: 75-85% (pp 80-90). The protagonist faces the impossible choice and the truth about themselves, then decides to act with new resolve. Missing if Act 3 starts without any change in the protagonist's understanding.
+<ACT 3>Climax: 85-97% (pp 90-105). The final confrontation where the central question is answered. Should pay off setups from Acts 1 and 2 and be won by the protagonist's own choices. Elongated if it runs past about 15 pages.
+<ACT 3>Resolution: 97-100% (pp 105-110). Shows the new status quo and the consequences of the outcome, and closes open threads. Keep it short. Flag any thread from earlier acts left unresolved.
 
-[Hero's Journey (Monomyth)]: A story beat template based on the monomyth structure popularized by Joseph Campbell and Christopher Vogler.
-<ACT 1>The Ordinary World
-<ACT 1>Call to Adventure
-<ACT 1>Refusal of the Call
-<ACT 1>Meeting the Mentor
-<ACT 1>Crossing the First Threshold
-<ACT 2A>Tests, Allies, and Enemies
-<ACT 2A>Approach to the Inmost Cave
-<ACT 2A>The Ordeal
-<ACT 2B>The Reward (Seizing the Sword)
-<ACT 2B>The Road Back
-<ACT 3>The Resurrection
-<ACT 3>Return with the Elixir
+[Hero's Journey (Monomyth)]: A story beat template based on the monomyth structure popularized by Joseph Campbell and Christopher Vogler. Positions are given as % of total runtime and as pages for a ~110 page feature (1 page is about 1 minute); scale them for other lengths.
+<ACT 1>The Ordinary World: 0-8% (pp 1-9). The hero's everyday life, flaws and lack, shown in contrast to the special world to come. Elongated if the call has not arrived by page 10.
+<ACT 1>Call to Adventure: ~10% (pp 10-12). A problem, challenge or invitation that disturbs the ordinary world and sets the goal. Missing if the hero has no clear thing to pursue or fix.
+<ACT 1>Refusal of the Call: 10-15% (pp 12-17). The hero hesitates out of fear, duty or doubt, which establishes the stakes and the hero's inner obstacle. Should be brief and show a real cost of saying no.
+<ACT 1>Meeting the Mentor: 15-20% (pp 17-22). A guide gives wisdom, a gift, training or confidence that prepares the hero. Check that what the mentor gives pays off later.
+<ACT 1>Crossing the First Threshold: ~25% (p 25). The hero commits and enters the special world, leaving the old one behind. Must be an active choice. Ends Act 1.
+<ACT 2A>Tests, Allies, and Enemies: 25-45% (pp 25-50). The hero learns the rules of the new world, makes allies, and meets rivals and the antagonist's forces. Flag as sagging if tests do not escalate or do not reveal character.
+<ACT 2A>Approach to the Inmost Cave: 45-50% (pp 50-55). Preparation and rising tension before the biggest challenge so far. Plans are made and fears surface. Should be short and lead directly into the Ordeal.
+<ACT 2A>The Ordeal: ~50% (p 55). The hero faces death or their greatest fear, a symbolic death and rebirth, usually the story's midpoint. Weak if the stakes are not clearly higher afterwards.
+<ACT 2B>The Reward (Seizing the Sword): 55-65% (pp 60-70). The hero survives and gains something: a treasure, knowledge or reconciliation. Often a moment of celebration, with the cost and consequences of the Ordeal following. Check the reward matters to the final goal.
+<ACT 2B>The Road Back: 65-75% (pp 70-80). The hero commits to returning to the ordinary world, and the antagonist's forces strike back. Raises the stakes for Act 3 and often includes a chase or loss. Ends Act 2.
+<ACT 3>The Resurrection: 80-95% (pp 88-105). The final and most dangerous test, where the hero is changed by a last symbolic death and rebirth and proves what they have learned. Must pay off the flaw set up in the Ordinary World. Elongated if it exceeds about 15 pages.
+<ACT 3>Return with the Elixir: 95-100% (pp 105-110). The hero returns changed, bringing something that benefits the ordinary world, and loose ends are closed. Should mirror the opening and stay short.
 
-[Save the Cat! Style]: A story beat template based on the structural methodology described in 'Save the Cat!' by Blake Snyder.
-<ACT 1>Opening Image
-<ACT 1>Setup
-<ACT 1>- Theme Stated
-<ACT 1>Catalyst
-<ACT 1>Debate
-<ACT 1>Break Into Two
-<ACT 2A>B Story
-<ACT 2A>Fun And Games
-<ACT 2A>Midpoint
-<ACT 2B>Bad Guys Close In
-<ACT 2B>All Is Lost
-<ACT 2B>Dark Night Of The Soul
-<ACT 2B>Break Into Three
-<ACT 3>Finale
-<ACT 3>- Gathering The Team
-<ACT 3>- Executing The Plan
-<ACT 3>- High Tower Surprise
-<ACT 3>- Dig Deep Down
-<ACT 3>- Execution Of The New Plan
-<ACT 3>Final Image
+[Save the Cat! Style]: A story beat template based on the structural methodology described in 'Save the Cat!' by Blake Snyder. Positions are given as % of total runtime and as pages for a ~110 page feature (1 page is about 1 minute); scale them for other lengths.
+<ACT 1>Opening Image: 0-1% (p 1). A visual snapshot that establishes tone, style and the protagonist's starting point. It is the "before" picture that the Final Image will mirror. Keep it to a single scene or a few shots.
+<ACT 1>Setup: 1-10% (pp 1-10). The protagonist's status quo, flaws, desires and what is missing or broken in their world. Introduces the main characters and the stakes. Elongated if the Catalyst does not arrive by page 12.
+<ACT 1>- Theme Stated: ~5% (p 5). A line, usually spoken by a minor character to the protagonist, that states the lesson or truth the protagonist will learn by the end. The protagonist should not yet understand it. Missing if the theme never gets voiced in Act 1.
+<ACT 1>Catalyst: ~10% (p 12). The inciting incident, an event that shatters the status quo and forces the protagonist out of their comfort zone. Must be external and irreversible. Late or weak if the story still feels like the ordinary world.
+<ACT 1>Debate: 10-20% (pp 12-25). The protagonist resists the Catalyst, asks the question "should I go?", and weighs options before committing. Should end with a clear decision. Elongated if it repeats the same hesitation.
+<ACT 1>Break Into Two: ~20% (p 25). The protagonist makes a proactive choice to leave the old world and enter the upside-down world of Act 2. Ends Act 1. Flag as a plot hole if the protagonist is dragged in without choosing.
+<ACT 2A>B Story: ~22% (p 30). Introduces a key subplot, often a romance, friendship or mentorship. This character helps the protagonist learn the theme from Act 1. Missing if the subplot never connects to the theme.
+<ACT 2A>Fun And Games: 20-50% (pp 30-55). The "promise of the premise". The protagonist explores the new world and its genre-specific situations, the main reason the audience came. The longest stretch of Act 2A, so flag it as sagging if scenes lose escalation or drift from the premise.
+<ACT 2A>Midpoint: ~50% (p 55). A major shift, either a false victory or a false defeat, that raises the stakes and makes the clock tick louder. Weak if the story after it feels no different from the story before.
+<ACT 2B>Bad Guys Close In: 55-75% (pp 55-75). External pressure from the antagonists and internal flaws of the protagonist work together to dismantle the hero's progress. Flag as a plot hole if setbacks are not tied to earlier choices.
+<ACT 2B>All Is Lost: ~75% (p 75). The lowest point, the opposite of the Midpoint, marked by a loss, "whiff of death", revealed secret or collapse of the plan. Missing if the protagonist never hits real bottom.
+<ACT 2B>Dark Night Of The Soul: 75-85% (pp 75-85). The protagonist processes the loss, confronts their inner flaw and finally grasps the theme, finding the hidden truth needed to win. Should be short and lead to the epiphany. Elongated if it only wallows without insight.
+<ACT 2B>Break Into Three: ~85% (p 85). Armed with the epiphany and a solution that combines lessons from the A Story and B Story, the protagonist decides on a new plan. Ends Act 2.
+<ACT 3>Finale: 85-100% (pp 85-110). The climax. The protagonist executes the new plan, defeats the antagonistic force, changes their world and proves they have truly changed. Must pay off setups from earlier acts. Flag as elongated beyond about 25 pages.
+<ACT 3>- Gathering The Team: ~85-88% (pp 85-90). The protagonist assembles allies and resources, and the plan is set out. Check that allies from earlier acts are used.
+<ACT 3>- Executing The Plan: ~88-92% (pp 90-95). The plan begins and seems to work, building momentum and showing the protagonist applying what they learned.
+<ACT 3>- High Tower Surprise: ~92-94% (pp 95-98). A twist or complication that breaks the plan and raises the stakes again. Weak if it feels random instead of coming from earlier setups.
+<ACT 3>- Dig Deep Down: ~94-96% (pp 98-101). The protagonist reaches a final inner crisis and must find the courage or change that proves the theme. This is where the character change becomes real.
+<ACT 3>- Execution Of The New Plan: ~96-99% (pp 101-108). The protagonist carries out the new plan and wins, with the theme embodied in the action. Resolves the A Story and B Story.
+<ACT 3>Final Image: ~100% (p 110). A mirror of the Opening Image showing how much the protagonist and their world have changed. Missing if the ending gives no visual proof of change.
