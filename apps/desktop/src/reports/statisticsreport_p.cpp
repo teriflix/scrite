@@ -317,6 +317,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createTimelineItem(const Statistics
 
         QGraphicsSimpleTextItem *text = new QGraphicsSimpleTextItem(tick);
         text->setText(::timeToString(time, inclSecs));
+        text->setBrush(Qt::black);
 
         QRectF textRect = text->boundingRect();
         textRect.moveCenter(QPointF(0, 0));
@@ -414,6 +415,8 @@ QGraphicsRectItem *StatisticsReportTimeline::createDistributionItems(
         label->setHtml(labelHtml);
         if (distItem.color == Qt::transparent || !lightenFillColors)
             label->setDefaultTextColor(Utils::Color::textColorFor(item->brush().color()));
+        else
+            label->setDefaultTextColor(Qt::black);
 
         QRectF labelRect = label->boundingRect();
         if (labelRect.width() > item->rect().width()) {
@@ -676,6 +679,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const Statis
             QGraphicsSimpleTextItem *cellText = new QGraphicsSimpleTextItem(tracksContainer);
             cellText->setFont(Application::font());
             cellText->setText(text);
+            cellText->setBrush(Qt::black);
 
             QRectF cellTextRect = cellText->boundingRect();
             cellTextRect.moveCenter(tableCellRect.center());
@@ -851,6 +855,7 @@ StatisticsReportTimeline::createScenePullouts(const StatisticsReport *report,
         QGraphicsSimpleTextItem *labelItem = new QGraphicsSimpleTextItem(lineItem);
         labelItem->setText(labelText.join(QStringLiteral(", ")));
         labelItem->setFont(font);
+        labelItem->setBrush(Qt::black);
 
         QRectF labelItemRect = labelItem->boundingRect();
         labelItemRect.moveCenter(p2);
@@ -886,6 +891,7 @@ StatisticsReportTimeline::createScenePullouts(const StatisticsReport *report,
         QGraphicsTextItem *textItem = new QGraphicsTextItem(labelsItem);
         textItem->setTextWidth(cellWidth - 10);
         textItem->setFont(font);
+        textItem->setDefaultTextColor(Qt::black);
         textItem->setHtml(QStringLiteral("<center>") + QString::number(i + 1) + QStringLiteral(": ")
                           + sceneInfo.label + QStringLiteral("</center>"));
 
@@ -1205,6 +1211,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createPresenceGraph(
             textItem->setText(evalLabelFunc(presenceItem.first, presenceItem.second));
         else
             textItem->setText(presenceItem.first);
+        textItem->setBrush(Qt::black);
         textItem->setPos(4, (heightPerGraph - textItem->boundingRect().height()) / 3);
 
         QGraphicsRectItem *textItemBg = new QGraphicsRectItem(chartOutline);
@@ -1607,6 +1614,7 @@ void StatisticsReportGraphVLegend::add(const QColor &color, const QString &label
         QGraphicsSimpleTextItem *legendText = new QGraphicsSimpleTextItem(this);
         legendText->setText(label);
         legendText->setFont(m_font);
+        legendText->setBrush(Qt::black);
         legendText->setPos(legendItemPos);
     } else {
         QGraphicsRectItem *legendItem = new QGraphicsRectItem(this);
@@ -1622,6 +1630,7 @@ void StatisticsReportGraphVLegend::add(const QColor &color, const QString &label
         QGraphicsSimpleTextItem *legendText = new QGraphicsSimpleTextItem(legendItem);
         legendText->setText(label);
         legendText->setFont(m_font);
+        legendText->setBrush(Qt::black);
         legendText->setPos(legendRect->rect().width() + 5, 0);
         legendRect->setPos(
                 0, (legendText->boundingRect().height() - legendRect->boundingRect().height()) / 2);

@@ -29,6 +29,15 @@
 PdfExportableGraphicsScene::PdfExportableGraphicsScene(QObject *parent) : QGraphicsScene(parent)
 {
     this->setBackgroundBrush(Qt::white);
+    // this->setForegroundBrush(Qt::black);
+
+    QPalette lightPalette;
+    lightPalette.setColor(QPalette::Window, Qt::white);
+    lightPalette.setColor(QPalette::Base, Qt::white);
+    lightPalette.setColor(QPalette::WindowText, Qt::black);
+    lightPalette.setColor(QPalette::Text, Qt::black);
+    lightPalette.setColor(QPalette::ButtonText, Qt::black);
+    this->setPalette(lightPalette);
 }
 
 PdfExportableGraphicsScene::~PdfExportableGraphicsScene() { }
