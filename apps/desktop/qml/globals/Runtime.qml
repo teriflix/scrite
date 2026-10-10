@@ -220,7 +220,6 @@ Item {
                 } else if(extensionsLoader.status === Component.Error) {
                     Gui.log("ERROR loading extensions: " + extensionsLoader.errorString())
                 }
-
             }
             extensionsLoader.statusChanged.connect(instantiateFn)
             instantiateFn()
