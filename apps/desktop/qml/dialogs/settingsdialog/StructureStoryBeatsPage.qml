@@ -81,6 +81,17 @@ Item {
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
                 onTextEdited: _applyButton.enabled = true
+
+                Component.onCompleted: syntaxHighlighter.addDelegate(_storyBeatsHighlighter)
+
+                StoryBeatsSyntaxHighlighterDelegate {
+                    id: _storyBeatsHighlighter
+
+                    templateColor: Runtime.colors.tx("#c2410c")
+                    actColor: Runtime.colors.tx("#0f766e")
+                    beatColor: Runtime.colors.scheme === Qt.ColorScheme.Dark ? "#4da3ff" : "#1e3a8a"
+                    descriptionColor: Runtime.colors.tx("#A0A0A0")
+                }
             }
         }
 

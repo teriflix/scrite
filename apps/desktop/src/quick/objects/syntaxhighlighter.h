@@ -528,4 +528,72 @@ private:
     QColor m_textColor = QColor(Qt::red);
 };
 
+// Highlights lines in the storybeats.lst format:
+//     [Beat Sheet Template]: description
+//     <ACT NAME>Beat Name: description
+// Colors with zero alpha leave the corresponding text unformatted.
+class StoryBeatsSyntaxHighlighterDelegate : public AbstractSyntaxHighlighterDelegate
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    explicit StoryBeatsSyntaxHighlighterDelegate(QObject *parent = nullptr);
+    ~StoryBeatsSyntaxHighlighterDelegate() override;
+
+    // clang-format off
+    Q_PROPERTY(QColor templateColor
+               READ templateColor
+               WRITE setTemplateColor
+               NOTIFY templateColorChanged)
+    // clang-format on
+    void setTemplateColor(const QColor &val);
+    QColor templateColor() const { return m_templateColor; }
+    Q_SIGNAL void templateColorChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor actColor
+               READ actColor
+               WRITE setActColor
+               NOTIFY actColorChanged)
+    // clang-format on
+    void setActColor(const QColor &val);
+    QColor actColor() const { return m_actColor; }
+    Q_SIGNAL void actColorChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor beatColor
+               READ beatColor
+               WRITE setBeatColor
+               NOTIFY beatColorChanged)
+    // clang-format on
+    void setBeatColor(const QColor &val);
+    QColor beatColor() const { return m_beatColor; }
+    Q_SIGNAL void beatColorChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor descriptionColor
+               READ descriptionColor
+               WRITE setDescriptionColor
+               NOTIFY descriptionColorChanged)
+    // clang-format on
+    void setDescriptionColor(const QColor &val);
+    QColor descriptionColor() const { return m_descriptionColor; }
+    Q_SIGNAL void descriptionColorChanged();
+
+protected:
+    // AbstractSyntaxHighlighterDelegate interface
+    void highlightBlock(const QString &text) override;
+
+private:
+    void applyStyle(int start, int count, const QColor &color, bool bold = false,
+                    int deltaPtSize = 0, const QString &fontFamily = QString());
+
+private:
+    QColor m_templateColor = QColor(Qt::darkMagenta);
+    QColor m_actColor = QColor(Qt::darkGreen);
+    QColor m_beatColor = QColor(Qt::blue);
+    QColor m_descriptionColor = QColor(0, 0, 0, 0);
+};
+
 #endif // SYNTAXHIGHLIGHTER_H

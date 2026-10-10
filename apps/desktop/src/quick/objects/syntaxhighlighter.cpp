@@ -1007,3 +1007,122 @@ void TextLimiterSyntaxHighlighterDelegate::evaluateCursorLimitPosition()
 
     this->setCursorLimitPosition(limitPosition);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+StoryBeatsSyntaxHighlighterDelegate::StoryBeatsSyntaxHighlighterDelegate(QObject *parent)
+    : AbstractSyntaxHighlighterDelegate(parent)
+{
+}
+
+StoryBeatsSyntaxHighlighterDelegate::~StoryBeatsSyntaxHighlighterDelegate() { }
+
+void StoryBeatsSyntaxHighlighterDelegate::setTemplateColor(const QColor &val)
+{
+    if (m_templateColor == val)
+        return;
+
+    m_templateColor = val;
+    emit templateColorChanged();
+
+    this->rehighlight();
+}
+
+void StoryBeatsSyntaxHighlighterDelegate::setActColor(const QColor &val)
+{
+    if (m_actColor == val)
+        return;
+
+    m_actColor = val;
+    emit actColorChanged();
+
+    this->rehighlight();
+}
+
+void StoryBeatsSyntaxHighlighterDelegate::setBeatColor(const QColor &val)
+{
+    if (m_beatColor == val)
+        return;
+
+    m_beatColor = val;
+    emit beatColorChanged();
+
+    this->rehighlight();
+}
+
+void StoryBeatsSyntaxHighlighterDelegate::setDescriptionColor(const QColor &val)
+{
+    if (m_descriptionColor == val)
+        return;
+
+    m_descriptionColor = val;
+    emit descriptionColorChanged();
+
+    this->rehighlight();
+}
+
+void StoryBeatsSyntaxHighlighterDelegate::applyStyle(int start, int count, const QColor &color,
+                                                     bool bold, int deltaPtSize,
+                                                     const QString &fontFamily)
+{
+    if (count <= 0 || color.alpha() == 0)
+        return;
+
+    QTextCharFormat charFormat;
+    charFormat.setForeground(color);
+    if (!fontFamily.isEmpty())
+        charFormat.setFontFamilies({ fontFamily });
+    if (bold)
+        charFormat.setFontWeight(QFont::Bold);
+    if (deltaPtSize != 0) {
+        qreal basePtSize = this->format(start).font().pointSizeF();
+        if (basePtSize <= 0 && this->document() != nullptr)
+            basePtSize = this->document()->defaultFont().pointSizeF();
+        if (basePtSize > 0)
+            charFormat.setFontPointSize(basePtSize + deltaPtSize);
+    }
+    this->mergeFormat(start, count, charFormat);
+}
+
+void StoryBeatsSyntaxHighlighterDelegate::highlightBlock(const QString &text)
+{
+    if (text.isEmpty())
+        return;
+
+    // Only the first ':' after the name separates it from the description, because
+    // descriptions themselves contain colons.
+    int nameEnd = -1;
+    int descriptionStart = -1;
+
+    if (text.at(0) == QChar('[')) {
+        const int close = text.indexOf(QChar(']'));
+        if (close < 0)
+            return;
+
+        this->applyStyle(0, close + 1, m_templateColor, true, 1);
+
+        nameEnd = close + 1;
+        descriptionStart = text.indexOf(QChar(':'), nameEnd);
+        if (descriptionStart >= 0)
+            ++descriptionStart;
+    } else if (text.at(0) == QChar('<')) {
+        const int close = text.indexOf(QChar('>'));
+        if (close < 0)
+            return;
+
+        this->applyStyle(0, close + 1, m_actColor, true);
+
+        const int colon = text.indexOf(QChar(':'), close + 1);
+        nameEnd = colon < 0 ? text.length() : colon;
+        this->applyStyle(close + 1, nameEnd - (close + 1), m_beatColor, true);
+
+        descriptionStart = colon < 0 ? -1 : colon + 1;
+    } else {
+        return;
+    }
+
+    // Descriptions are dense prose, so they are drawn one point smaller than the names.
+    if (descriptionStart >= 0)
+        this->applyStyle(descriptionStart, text.length() - descriptionStart, m_descriptionColor,
+                         false, -2);
+}
