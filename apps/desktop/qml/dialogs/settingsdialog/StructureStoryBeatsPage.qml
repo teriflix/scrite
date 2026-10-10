@@ -76,6 +76,7 @@ Item {
                 clip: true
                 color: Runtime.colors.primary.c50.text
                 text: root.target === root.e_CurrentDocumentTarget ? Scrite.document.structure.groupsData : File.read(Scrite.document.structure.defaultGroupsDataFile)
+                spellCheckEnabled: false
 
                 font.family: "Courier Prime"
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -90,7 +91,7 @@ Item {
                     templateColor: Runtime.colors.tx("#c2410c")
                     actColor: Runtime.colors.tx("#0f766e")
                     beatColor: Runtime.colors.scheme === Qt.ColorScheme.Dark ? "#4da3ff" : "#1e3a8a"
-                    descriptionColor: Runtime.colors.tx("#A0A0A0")
+                    descriptionColor: Runtime.colors.tx(Platform.isMacOSDesktop ? "#999999" : "#A0A0A0")
                 }
             }
         }

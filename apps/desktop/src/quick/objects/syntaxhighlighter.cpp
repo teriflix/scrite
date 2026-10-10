@@ -190,6 +190,7 @@ SyntaxHighlighter::SyntaxHighlighter(QObject *parent) : QSyntaxHighlighter(paren
 {
     connect(this, &SyntaxHighlighter::delegateCountChanged, this,
             &SyntaxHighlighter::sortDelegates);
+    connect(this, &SyntaxHighlighter::delegateCountChanged, this, &SyntaxHighlighter::rehighlight);
 
     if (parent->inherits("QQuickTextEdit")) {
         QVariant textDocVal = parent->property("textDocument");
@@ -1099,7 +1100,8 @@ void StoryBeatsSyntaxHighlighterDelegate::highlightBlock(const QString &text)
         if (close < 0)
             return;
 
-        this->applyStyle(0, close + 1, m_templateColor, true, 1);
+        this->applyStyle(0, close + 1, m_templateColor, true,
+                         Utils::Platform::isMacOSDesktop() ? 2 : 1);
 
         nameEnd = close + 1;
         descriptionStart = text.indexOf(QChar(':'), nameEnd);
@@ -1124,5 +1126,5 @@ void StoryBeatsSyntaxHighlighterDelegate::highlightBlock(const QString &text)
     // Descriptions are dense prose, so they are drawn one point smaller than the names.
     if (descriptionStart >= 0)
         this->applyStyle(descriptionStart, text.length() - descriptionStart, m_descriptionColor,
-                         false, -2);
+                         false, Utils::Platform::isMacOSDesktop() ? -1 : -2);
 }
