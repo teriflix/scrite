@@ -168,6 +168,8 @@ DialogLauncher {
                         spacing: 7
                         clip: true
                         model: ListModel {
+                            ObjectRegister.name: "Scrite.App.AboutBox.CreditsModel"
+
                             ListElement {
                                 credits: "<strong>Phonetic Translator</strong> library for static transliteration of Indian languages."
                                 url: "https://sourceforge.net/projects/phtranslator/"
