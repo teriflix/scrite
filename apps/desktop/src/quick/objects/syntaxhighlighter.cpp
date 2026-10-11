@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+#include <QRegularExpression>
+
 #include "utils.h"
 #include "application.h"
 #include "textlimiter.h"
@@ -376,10 +378,11 @@ SyntaxHighlighter::staticDelegateCount(QQmlListProperty<AbstractSyntaxHighlighte
 void SyntaxHighlighter::sortDelegates()
 {
     m_sortedDelegates = m_delegates;
-    std::sort(m_sortedDelegates.begin(), m_sortedDelegates.end(),
-              [](AbstractSyntaxHighlighterDelegate *a, AbstractSyntaxHighlighterDelegate *b) {
-                  return a->priority() < b->priority();
-              });
+    // Stable, so that delegates of equal priority run in the order they were added.
+    std::stable_sort(m_sortedDelegates.begin(), m_sortedDelegates.end(),
+                     [](AbstractSyntaxHighlighterDelegate *a, AbstractSyntaxHighlighterDelegate *b) {
+                         return a->priority() < b->priority();
+                     });
 }
 
 void SyntaxHighlighter::onDelegateAboutToDelete(AbstractSyntaxHighlighterDelegate *ptr)
@@ -1127,4 +1130,215 @@ void StoryBeatsSyntaxHighlighterDelegate::highlightBlock(const QString &text)
     if (descriptionStart >= 0)
         this->applyStyle(descriptionStart, text.length() - descriptionStart, m_descriptionColor,
                          false, Utils::Platform::isMacOSDesktop() ? -1 : -2);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+QmlSyntaxHighlighterDelegate::QmlSyntaxHighlighterDelegate(QObject *parent)
+    : AbstractSyntaxHighlighterDelegate(parent)
+{
+}
+
+QmlSyntaxHighlighterDelegate::~QmlSyntaxHighlighterDelegate() { }
+
+void QmlSyntaxHighlighterDelegate::setForeground(int start, int count, const QColor &color)
+{
+    if (count <= 0)
+        return;
+
+    QTextCharFormat charFormat;
+    charFormat.setForeground(color);
+    this->mergeFormat(start, count, charFormat);
+}
+
+void QmlSyntaxHighlighterDelegate::setBackground(int start, int count, const QColor &color)
+{
+    if (count <= 0)
+        return;
+
+    QTextCharFormat charFormat;
+    charFormat.setBackground(color);
+    this->mergeFormat(start, count, charFormat);
+}
+
+void QmlSyntaxHighlighterDelegate::setFont(int start, int count, const QFont &font)
+{
+    if (count <= 0)
+        return;
+
+    QTextCharFormat charFormat;
+    charFormat.setFont(font);
+    this->mergeFormat(start, count, charFormat);
+}
+
+QFont QmlSyntaxHighlighterDelegate::font(const QString &family, int pointSize, bool bold,
+                                         bool italic, bool underline) const
+{
+    QFont ret(family, pointSize);
+    ret.setBold(bold);
+    ret.setItalic(italic);
+    ret.setUnderline(underline);
+    return ret;
+}
+
+void QmlSyntaxHighlighterDelegate::highlightBlock(const QString &text)
+{
+    emit highlightRequest(text);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+MarkdownSyntaxHighlighterDelegate::MarkdownSyntaxHighlighterDelegate(QObject *parent)
+    : AbstractSyntaxHighlighterDelegate(parent)
+{
+}
+
+MarkdownSyntaxHighlighterDelegate::~MarkdownSyntaxHighlighterDelegate() { }
+
+void MarkdownSyntaxHighlighterDelegate::setFont(const QFont &val)
+{
+    if (m_font == val)
+        return;
+
+    m_font = val;
+    emit fontChanged();
+
+    this->rehighlight();
+}
+
+void MarkdownSyntaxHighlighterDelegate::setColor(QColor &member, const QColor &val,
+                                                 void (MarkdownSyntaxHighlighterDelegate::*changed)())
+{
+    if (member == val)
+        return;
+
+    member = val;
+    emit(this->*changed)();
+
+    this->rehighlight();
+}
+
+QFont MarkdownSyntaxHighlighterDelegate::variantOfFont(int deltaPtSize, bool bold, bool italic,
+                                                       bool underline) const
+{
+    QFont ret(m_font.family(), m_font.pointSize() + deltaPtSize);
+    ret.setBold(bold);
+    ret.setItalic(italic);
+    ret.setUnderline(underline);
+    return ret;
+}
+
+void MarkdownSyntaxHighlighterDelegate::applyStyle(int start, int count, const QColor &foreground,
+                                                   const QFont *font, const QColor &background)
+{
+    if (count <= 0)
+        return;
+
+    QTextCharFormat charFormat;
+    if (foreground.isValid())
+        charFormat.setForeground(foreground);
+    if (background.isValid())
+        charFormat.setBackground(background);
+    if (font != nullptr)
+        charFormat.setFont(*font);
+    this->mergeFormat(start, count, charFormat);
+}
+
+// Colors, and sizes up, headings. Returns true if text is a heading.
+bool MarkdownSyntaxHighlighterDelegate::highlightHeading(const QString &text)
+{
+    static const QRegularExpression regex(QStringLiteral("^(#{1,6})[ \\t]+\\S.*$"));
+
+    const QRegularExpressionMatch match = regex.match(text);
+    if (!match.hasMatch())
+        return false;
+
+    const int level = match.capturedLength(1);
+    const QFont font = this->variantOfFont(qMax(0, 5 - level), true, false, false);
+    this->applyStyle(0, text.length(), m_headingColors[level - 1], &font);
+    return true;
+}
+
+// Lines that are not highlighted any further. Returns true if text is one of them.
+bool MarkdownSyntaxHighlighterDelegate::highlightCodeFenceOrRule(const QString &text)
+{
+    static const QRegularExpression fence(QStringLiteral("^\\s*(```|~~~)"));
+    static const QRegularExpression rule(QStringLiteral("^\\s*([-*_])(\\s*\\1){2,}\\s*$"));
+
+    if (fence.match(text).hasMatch()) {
+        this->applyStyle(0, text.length(), m_codeColor, nullptr, m_codeBackground);
+        return true;
+    }
+
+    if (rule.match(text).hasMatch()) {
+        this->applyStyle(0, text.length(), m_markerColor);
+        return true;
+    }
+
+    return false;
+}
+
+void MarkdownSyntaxHighlighterDelegate::highlightBlockLevel(const QString &text)
+{
+    static const QRegularExpression quote(QStringLiteral("^\\s*>"));
+    static const QRegularExpression listMarker(QStringLiteral("^\\s*([-*+]|\\d+[.)])[ \\t]"));
+
+    if (quote.match(text).hasMatch())
+        this->applyStyle(0, text.length(), m_quoteColor);
+
+    const QRegularExpressionMatch marker = listMarker.match(text);
+    if (marker.hasMatch())
+        this->applyStyle(marker.capturedStart(1), marker.capturedLength(1), m_markerColor);
+}
+
+void MarkdownSyntaxHighlighterDelegate::highlightInline(const QString &text)
+{
+    static const QRegularExpression strike(QStringLiteral("~~\\S(?:.*?\\S)?~~"));
+    static const QRegularExpression asteriskItalic(
+            QStringLiteral("\\*(?!\\*)\\S(?:[^*]*?\\S)?\\*(?!\\*)"));
+    static const QRegularExpression underscoreItalic(
+            QStringLiteral("(^|\\W)(_\\S(?:[^_]*?\\S)?_)(?!\\w)"));
+    static const QRegularExpression bold(QStringLiteral("(\\*\\*|__)\\S(?:.*?\\S)?\\1"));
+    static const QRegularExpression boldItalic(QStringLiteral("(\\*\\*\\*|___)\\S(?:.*?\\S)?\\1"));
+    static const QRegularExpression link(QStringLiteral("\\[[^\\]\\r\\n]+\\]\\([^)\\r\\n]+\\)"));
+    static const QRegularExpression code(QStringLiteral("`[^`\\r\\n]+`"));
+
+    // Calls func(start, count) for each non-empty match of the given capture group.
+    auto forEachMatch = [&text](const QRegularExpression &regex, int group, auto func) {
+        QRegularExpressionMatchIterator it = regex.globalMatch(text);
+        while (it.hasNext()) {
+            const QRegularExpressionMatch match = it.next();
+            if (match.capturedLength(group) > 0)
+                func(match.capturedStart(group), match.capturedLength(group));
+        }
+    };
+
+    const QFont italicFont = this->variantOfFont(0, false, true, false);
+    const QFont boldFont = this->variantOfFont(0, true, false, false);
+    const QFont boldItalicFont = this->variantOfFont(0, true, true, false);
+    const QFont linkFont = this->variantOfFont(0, false, false, true);
+
+    // Emphasis from the least to the most specific, so that the most specific wins.
+    forEachMatch(strike, 0, [&](int s, int n) { this->applyStyle(s, n, m_markerColor); });
+    forEachMatch(asteriskItalic, 0,
+                 [&](int s, int n) { this->applyStyle(s, n, m_emphasisColor, &italicFont); });
+    forEachMatch(underscoreItalic, 2,
+                 [&](int s, int n) { this->applyStyle(s, n, m_emphasisColor, &italicFont); });
+    forEachMatch(bold, 0, [&](int s, int n) { this->applyStyle(s, n, m_emphasisColor, &boldFont); });
+    forEachMatch(boldItalic, 0,
+                 [&](int s, int n) { this->applyStyle(s, n, m_emphasisColor, &boldItalicFont); });
+    forEachMatch(link, 0, [&](int s, int n) { this->applyStyle(s, n, m_linkColor, &linkFont); });
+    forEachMatch(code, 0,
+                 [&](int s, int n) { this->applyStyle(s, n, m_codeColor, nullptr, m_codeBackground); });
+}
+
+void MarkdownSyntaxHighlighterDelegate::highlightBlock(const QString &text)
+{
+    if (text.isEmpty())
+        return;
+
+    if (!this->highlightHeading(text) && !this->highlightCodeFenceOrRule(text)) {
+        this->highlightBlockLevel(text);
+        this->highlightInline(text);
+    }
 }

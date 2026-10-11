@@ -596,4 +596,201 @@ private:
     QColor m_descriptionColor = QColor(0, 0, 0, 0);
 };
 
+// Lets QML do the highlighting. For every block, highlightRequest(text) is emitted
+// synchronously. Handlers can call setForeground(), setBackground() and setFont() on
+// ranges of that text. Those calls are only meaningful from within the handler.
+class QmlSyntaxHighlighterDelegate : public AbstractSyntaxHighlighterDelegate
+{
+    Q_OBJECT
+    QML_NAMED_ELEMENT(SyntaxHighlighterDelegate)
+
+public:
+    explicit QmlSyntaxHighlighterDelegate(QObject *parent = nullptr);
+    ~QmlSyntaxHighlighterDelegate() override;
+
+    Q_INVOKABLE void setForeground(int start, int count, const QColor &color);
+    Q_INVOKABLE void setBackground(int start, int count, const QColor &color);
+    Q_INVOKABLE void setFont(int start, int count, const QFont &font);
+
+    Q_INVOKABLE QFont font(const QString &family, int pointSize, bool bold = false,
+                           bool italic = false, bool underline = false) const;
+
+    Q_SIGNAL void highlightRequest(const QString &text);
+
+protected:
+    // AbstractSyntaxHighlighterDelegate interface
+    void highlightBlock(const QString &text) override;
+};
+
+// Highlights markdown. Blocks are highlighted one at a time, with no state from one block to the
+// next, so what spans lines is not highlighted: only the lines that open and close a fenced code
+// block are. The font of a range is replaced as a whole, so headings, which have a font of their
+// own, get no emphasis inside them, and emphasis inside emphasis is not nested.
+class MarkdownSyntaxHighlighterDelegate : public AbstractSyntaxHighlighterDelegate
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    explicit MarkdownSyntaxHighlighterDelegate(QObject *parent = nullptr);
+    ~MarkdownSyntaxHighlighterDelegate() override;
+
+    // Only the family and the point size are used. Headings and emphasis are derived from them.
+    // clang-format off
+    Q_PROPERTY(QFont font
+               READ font
+               WRITE setFont
+               NOTIFY fontChanged)
+    // clang-format on
+    void setFont(const QFont &val);
+    QFont font() const { return m_font; }
+    Q_SIGNAL void fontChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor heading1Color
+               READ heading1Color
+               WRITE setHeading1Color
+               NOTIFY heading1ColorChanged)
+    // clang-format on
+    void setHeading1Color(const QColor &val) { this->setColor(m_headingColors[0], val, &MarkdownSyntaxHighlighterDelegate::heading1ColorChanged); }
+    QColor heading1Color() const { return m_headingColors[0]; }
+    Q_SIGNAL void heading1ColorChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor heading2Color
+               READ heading2Color
+               WRITE setHeading2Color
+               NOTIFY heading2ColorChanged)
+    // clang-format on
+    void setHeading2Color(const QColor &val) { this->setColor(m_headingColors[1], val, &MarkdownSyntaxHighlighterDelegate::heading2ColorChanged); }
+    QColor heading2Color() const { return m_headingColors[1]; }
+    Q_SIGNAL void heading2ColorChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor heading3Color
+               READ heading3Color
+               WRITE setHeading3Color
+               NOTIFY heading3ColorChanged)
+    // clang-format on
+    void setHeading3Color(const QColor &val) { this->setColor(m_headingColors[2], val, &MarkdownSyntaxHighlighterDelegate::heading3ColorChanged); }
+    QColor heading3Color() const { return m_headingColors[2]; }
+    Q_SIGNAL void heading3ColorChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor heading4Color
+               READ heading4Color
+               WRITE setHeading4Color
+               NOTIFY heading4ColorChanged)
+    // clang-format on
+    void setHeading4Color(const QColor &val) { this->setColor(m_headingColors[3], val, &MarkdownSyntaxHighlighterDelegate::heading4ColorChanged); }
+    QColor heading4Color() const { return m_headingColors[3]; }
+    Q_SIGNAL void heading4ColorChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor heading5Color
+               READ heading5Color
+               WRITE setHeading5Color
+               NOTIFY heading5ColorChanged)
+    // clang-format on
+    void setHeading5Color(const QColor &val) { this->setColor(m_headingColors[4], val, &MarkdownSyntaxHighlighterDelegate::heading5ColorChanged); }
+    QColor heading5Color() const { return m_headingColors[4]; }
+    Q_SIGNAL void heading5ColorChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor heading6Color
+               READ heading6Color
+               WRITE setHeading6Color
+               NOTIFY heading6ColorChanged)
+    // clang-format on
+    void setHeading6Color(const QColor &val) { this->setColor(m_headingColors[5], val, &MarkdownSyntaxHighlighterDelegate::heading6ColorChanged); }
+    QColor heading6Color() const { return m_headingColors[5]; }
+    Q_SIGNAL void heading6ColorChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor emphasisColor
+               READ emphasisColor
+               WRITE setEmphasisColor
+               NOTIFY emphasisColorChanged)
+    // clang-format on
+    void setEmphasisColor(const QColor &val) { this->setColor(m_emphasisColor, val, &MarkdownSyntaxHighlighterDelegate::emphasisColorChanged); }
+    QColor emphasisColor() const { return m_emphasisColor; }
+    Q_SIGNAL void emphasisColorChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor codeColor
+               READ codeColor
+               WRITE setCodeColor
+               NOTIFY codeColorChanged)
+    // clang-format on
+    void setCodeColor(const QColor &val) { this->setColor(m_codeColor, val, &MarkdownSyntaxHighlighterDelegate::codeColorChanged); }
+    QColor codeColor() const { return m_codeColor; }
+    Q_SIGNAL void codeColorChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor codeBackground
+               READ codeBackground
+               WRITE setCodeBackground
+               NOTIFY codeBackgroundChanged)
+    // clang-format on
+    void setCodeBackground(const QColor &val) { this->setColor(m_codeBackground, val, &MarkdownSyntaxHighlighterDelegate::codeBackgroundChanged); }
+    QColor codeBackground() const { return m_codeBackground; }
+    Q_SIGNAL void codeBackgroundChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor linkColor
+               READ linkColor
+               WRITE setLinkColor
+               NOTIFY linkColorChanged)
+    // clang-format on
+    void setLinkColor(const QColor &val) { this->setColor(m_linkColor, val, &MarkdownSyntaxHighlighterDelegate::linkColorChanged); }
+    QColor linkColor() const { return m_linkColor; }
+    Q_SIGNAL void linkColorChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor markerColor
+               READ markerColor
+               WRITE setMarkerColor
+               NOTIFY markerColorChanged)
+    // clang-format on
+    void setMarkerColor(const QColor &val) { this->setColor(m_markerColor, val, &MarkdownSyntaxHighlighterDelegate::markerColorChanged); }
+    QColor markerColor() const { return m_markerColor; }
+    Q_SIGNAL void markerColorChanged();
+
+    // clang-format off
+    Q_PROPERTY(QColor quoteColor
+               READ quoteColor
+               WRITE setQuoteColor
+               NOTIFY quoteColorChanged)
+    // clang-format on
+    void setQuoteColor(const QColor &val) { this->setColor(m_quoteColor, val, &MarkdownSyntaxHighlighterDelegate::quoteColorChanged); }
+    QColor quoteColor() const { return m_quoteColor; }
+    Q_SIGNAL void quoteColorChanged();
+
+protected:
+    // AbstractSyntaxHighlighterDelegate interface
+    void highlightBlock(const QString &text) override;
+
+private:
+    void setColor(QColor &member, const QColor &val, void (MarkdownSyntaxHighlighterDelegate::*changed)());
+    QFont variantOfFont(int deltaPtSize, bool bold, bool italic, bool underline) const;
+    void applyStyle(int start, int count, const QColor &foreground, const QFont *font = nullptr,
+                    const QColor &background = QColor());
+
+    bool highlightHeading(const QString &text);
+    bool highlightCodeFenceOrRule(const QString &text);
+    void highlightBlockLevel(const QString &text);
+    void highlightInline(const QString &text);
+
+private:
+    QFont m_font;
+    QColor m_headingColors[6] = { QColor("#1d4ed8"), QColor("#7c3aed"), QColor("#be185d"),
+                                  QColor("#c2410c"), QColor("#a16207"), QColor("#4d7c0f") };
+    QColor m_emphasisColor = QColor("#0369a1");
+    QColor m_codeColor = QColor("#9a3412");
+    QColor m_codeBackground = QColor::fromRgbF(0.5, 0.5, 0.5, 0.15);
+    QColor m_linkColor = QColor("#2563eb");
+    QColor m_markerColor = QColor("#6b7280");
+    QColor m_quoteColor = QColor("#6b7280");
+};
+
 #endif // SYNTAXHIGHLIGHTER_H
