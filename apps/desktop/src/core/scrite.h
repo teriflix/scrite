@@ -220,9 +220,17 @@ public:
     static Forms *globalForms();
 
     // clang-format off
+    Q_MOC_INCLUDE("notes.h")
+    Q_PROPERTY(NoteListModel* noteListModel
+               READ noteListModel
+               CONSTANT)
+    // clang-format on
+    NoteListModel *noteListModel() const;
+
+    // clang-format off
     Q_PROPERTY(ScriteDocumentVault *vault
                READ vault
-               CONSTANT )
+               CONSTANT)
     // clang-format on
     static ScriteDocumentVault *vault();
 

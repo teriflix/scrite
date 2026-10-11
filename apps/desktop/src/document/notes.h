@@ -65,6 +65,14 @@ public:
     QString id() const;
     Q_SIGNAL void idChanged();
 
+    // clang-format off
+    Q_PROPERTY(QString path
+               READ path
+               NOTIFY pathChanged)
+    // clang-format on
+    QString path() const;
+    Q_SIGNAL void pathChanged();
+
     enum Type { TextNoteType, FormNoteType, CheckListNoteType };
     Q_ENUM(Type)
     // clang-format off
@@ -310,7 +318,14 @@ public:
     Q_SIGNAL void idChanged();
 
     // Called from BookmarkedNotes
+    // clang-format off
+    Q_PROPERTY(QString title
+               READ title
+               NOTIFY titleChanged)
+    // clang-format on
     QString title() const;
+    Q_SIGNAL void titleChanged();
+
     QString summary() const;
 
     // clang-format off
@@ -384,6 +399,46 @@ private:
     QString m_id;
     QColor m_color = Qt::white;
     OwnerType m_ownerType = OtherOwner;
+};
+
+class NoteListModel : public QAbstractListModel
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Use Scrite.noteListModel instead")
+
+public:
+    static NoteListModel *instance();
+
+    ~NoteListModel() override;
+
+    // clang-format off
+    Q_PROPERTY(int count
+               READ count
+               NOTIFY countChanged)
+    // clang-format on
+    int count() const { return m_notes.size(); }
+    Q_SIGNAL void countChanged();
+
+    Q_INVOKABLE Note *noteAt(int row) const;
+
+    Q_INVOKABLE void sort();
+
+    enum { NoteRole = Qt::UserRole };
+
+    // QAbstractItemModel interface
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
+
+private:
+    explicit NoteListModel(QObject *parent = nullptr);
+    void addNote(Note *note);
+    void removeNote(Note *note);
+
+private:
+    friend class Note;
+    QList<Note *> m_notes;
 };
 
 #endif // NOTES_H

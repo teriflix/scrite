@@ -31,6 +31,9 @@
 #include <QTextTable>
 #include <QUuid>
 
+#include <limits>
+#include <algorithm>
+
 typedef QHash<QString, Note *> IdNoteMapType;
 Q_GLOBAL_STATIC(IdNoteMapType, GlobalIdNoteMap)
 
@@ -47,6 +50,15 @@ Note::Note(QObject *parent) : QObject(parent), m_form(this, "form")
     connect(this, &Note::contentChanged, this, &Note::noteModified);
     connect(this, &Note::formDataChanged, this, &Note::noteModified);
     connect(m_attachments, &Attachments::attachmentsModified, this, &Note::noteModified);
+
+    connect(this, &Note::titleChanged, this, &Note::pathChanged);
+
+    Notes *notes = qobject_cast<Notes *>(this->parent());
+    ;
+    if (notes != nullptr)
+        connect(notes, &Notes::titleChanged, this, &Note::pathChanged);
+
+    NoteListModel::instance()->addNote(this);
 }
 
 Note::~Note()
@@ -59,6 +71,8 @@ Note::~Note()
         ScriteDocument::instance()->releaseForm(m_form.data());
 
     ::GlobalIdNoteMap->remove(m_id);
+    NoteListModel::instance()->removeNote(this);
+
     emit aboutToDelete(this);
 }
 
@@ -76,6 +90,15 @@ QString Note::id() const
     }
 
     return m_id;
+}
+
+QString Note::path() const
+{
+    const Notes *notes = this->notes();
+    if (notes != nullptr)
+        return notes->title() + "/" + this->title();
+
+    return this->title();
 }
 
 void Note::setId(const QString &val)
@@ -575,6 +598,11 @@ Notes::Notes(QObject *parent) : QObjectListModel<Note *>(parent)
         } else if (pmo->inherits(&ScreenplayElement::staticMetaObject)) {
             m_ownerType = BreakOwner;
             m_compatibleFormType = Form::SceneForm;
+
+            ScreenplayElement *element = qobject_cast<ScreenplayElement *>(parent);
+            connect(element, &ScreenplayElement::breakTypeChanged, this, &Notes::titleChanged);
+            connect(element, &ScreenplayElement::breakTitleChanged, this, &Notes::titleChanged);
+            connect(element, &ScreenplayElement::breakSubtitleChanged, this, &Notes::titleChanged);
         } else if (pmo->inherits(&Scene::staticMetaObject)) {
             m_ownerType = SceneOwner;
             m_compatibleFormType = Form::SceneForm;
@@ -582,6 +610,8 @@ Notes::Notes(QObject *parent) : QObjectListModel<Note *>(parent)
             Scene *scene = (qobject_cast<Scene *>(parent));
             m_color = scene->color();
             connect(scene, &Scene::colorChanged, this, [=]() { this->setColor(scene->color()); });
+            connect(scene->heading(), &SceneHeading::enabledChanged, this, &Notes::titleChanged);
+            connect(scene->heading(), &SceneHeading::textChanged, this, &Notes::titleChanged);
         } else if (pmo->inherits(&Character::staticMetaObject)) {
             m_ownerType = CharacterOwner;
             m_compatibleFormType = Form::CharacterForm;
@@ -590,6 +620,7 @@ Notes::Notes(QObject *parent) : QObjectListModel<Note *>(parent)
             m_color = character->color();
             connect(character, &Character::colorChanged, this,
                     [=]() { this->setColor(character->color()); });
+            connect(character, &Character::nameChanged, this, &Notes::titleChanged);
         } else if (pmo->inherits(&Relationship::staticMetaObject)) {
             m_ownerType = RelationshipOwner;
             m_compatibleFormType = Form::RelationshipForm;
@@ -953,4 +984,129 @@ void Notes::renameCharacter(const QString &from, const QString &to)
 {
     for (Note *note : this->constList())
         note->renameCharacter(from, to);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+NoteListModel *NoteListModel::instance()
+{
+    static NoteListModel *theInstance = new NoteListModel(qApp);
+    return theInstance;
+}
+
+NoteListModel::NoteListModel(QObject *parent) : QAbstractListModel(parent) { }
+
+NoteListModel::~NoteListModel() { }
+
+Note *NoteListModel::noteAt(int row) const
+{
+    return row < 0 || row >= m_notes.size() ? nullptr : m_notes.at(row);
+}
+
+int NoteListModel::rowCount(const QModelIndex &parent) const
+{
+    return parent.isValid() ? 0 : m_notes.size();
+}
+
+QVariant NoteListModel::data(const QModelIndex &index, int role) const
+{
+    if (index.isValid() && index.row() >= 0 && index.row() < m_notes.size() && role == NoteRole) {
+        return QVariant::fromValue<QObject *>(m_notes.at(index.row()));
+    }
+
+    return QVariant();
+}
+
+QHash<int, QByteArray> NoteListModel::roleNames() const
+{
+    return { { NoteRole, QByteArrayLiteral("note") } };
+}
+
+static int noteSortRank(const Note *note)
+{
+    const Notes *notes = note->notes();
+    if (notes == nullptr)
+        return 100;
+
+    switch (notes->ownerType()) {
+    case Notes::StructureOwner:
+        return 0;
+    case Notes::CharacterOwner:
+        return 1;
+    case Notes::LocationOwner:
+        return 2;
+    case Notes::PropOwner:
+        return 3;
+    case Notes::RelationshipOwner:
+        return 4;
+    case Notes::OtherOwner:
+        return 5;
+    case Notes::BreakOwner: {
+        const ScreenplayElement *element = notes->breakElement();
+        return (element != nullptr && element->breakType() == Screenplay::Episode) ? 6 : 7;
+    }
+    case Notes::SceneOwner:
+        return 8;
+    }
+
+    return 100;
+}
+
+static int sceneNoteScreenplayIndex(const Note *note)
+{
+    const Scene *scene = note->notes()->scene();
+    const QList<int> idxList = scene->screenplayElementIndexList();
+    return idxList.isEmpty() ? std::numeric_limits<int>::max() : idxList.first();
+}
+
+// Story, Character, Location, Prop, Relationship, Other, Episode, Act, Scene
+// Scene notes are ordered by the position of their scene in the screenplay.
+static bool noteLessThan(const Note *a, const Note *b)
+{
+    const int rankA = noteSortRank(a);
+    const int rankB = noteSortRank(b);
+    if (rankA != rankB)
+        return rankA < rankB;
+
+    if (rankA == 8)
+        return sceneNoteScreenplayIndex(a) < sceneNoteScreenplayIndex(b);
+
+    return false;
+}
+
+void NoteListModel::sort()
+{
+    if (m_notes.size() < 2)
+        return;
+
+    this->beginResetModel();
+    std::stable_sort(m_notes.begin(), m_notes.end(), noteLessThan);
+    this->endResetModel();
+}
+
+void NoteListModel::addNote(Note *note)
+{
+    // m_notes is always sorted, so a binary search gives the insertion row.
+    // upper_bound keeps insertion order among equal notes.
+    const auto it = std::upper_bound(m_notes.begin(), m_notes.end(), note, noteLessThan);
+    const int row = int(std::distance(m_notes.begin(), it));
+
+    this->beginInsertRows(QModelIndex(), row, row);
+    m_notes.insert(row, note);
+    this->endInsertRows();
+
+    emit countChanged();
+}
+
+void NoteListModel::removeNote(Note *note)
+{
+    int row = m_notes.indexOf(note);
+    if (row < 0)
+        return;
+
+    this->beginRemoveRows(QModelIndex(), row, row);
+    m_notes.removeAt(row);
+    this->endRemoveRows();
+
+    emit countChanged();
 }

@@ -1204,6 +1204,10 @@ void DistinctElementValuesMap::include(const DistinctElementValuesMap &other)
 
 Scene::Scene(QObject *parent) : QAbstractListModel(parent)
 {
+    m_heading = new SceneHeading(this);
+    m_attachments = new Attachments(this);
+    m_notes = new Notes(this);
+
     this->setStructureElement(qobject_cast<StructureElement *>(parent));
 
     connect(this, &Scene::synopsisChanged, this, &Scene::summaryChanged);

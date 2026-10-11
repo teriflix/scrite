@@ -1004,6 +1004,11 @@ void ScriteDocument::setBusyMessage(const QString &val)
     this->setBusy(!m_busyMessage.isEmpty());
 }
 
+Note *ScriteDocument::findNote(const QString &id) const
+{
+    return Note::findById(id);
+}
+
 void ScriteDocument::setSpellCheckIgnoreList(const QStringList &val)
 {
     QStringList val2 =

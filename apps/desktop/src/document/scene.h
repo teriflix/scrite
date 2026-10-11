@@ -1015,10 +1015,10 @@ private:
 
     CharacterElementMap m_characterElementMap;
 
-    Attachments *m_attachments = new Attachments(this);
-    Notes *m_notes = new Notes(this);
+    Notes *m_notes = nullptr;
+    Attachments *m_attachments = nullptr;
+    SceneHeading *m_heading = nullptr;
     SceneUndoCommand *m_pushUndoCommand = nullptr;
-    SceneHeading *m_heading = new SceneHeading(this);
     StructureElement *m_structureElement = nullptr;
 
     static void staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr);

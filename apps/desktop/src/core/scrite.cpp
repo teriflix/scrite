@@ -63,6 +63,11 @@ Forms *Scrite::globalForms()
     return Forms::global();
 }
 
+NoteListModel *Scrite::noteListModel() const
+{
+    return NoteListModel::instance();
+}
+
 ScriteDocumentVault *Scrite::vault()
 {
     return ScriteDocumentVault::instance();

@@ -31,6 +31,7 @@
 
 class Forms;
 class FileLocker;
+class NoteListModel;
 class ScriteDocument;
 class AbstractExporter;
 class QFileSystemWatcher;
@@ -646,6 +647,9 @@ public:
     // clang-format on
     Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
+
+    Q_MOC_INCLUDE("notes.h")
+    Q_INVOKABLE Note *findNote(const QString &id) const;
 
     // clang-format off
     Q_MOC_INCLUDE("screenplayformat.h")
