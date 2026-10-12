@@ -20,12 +20,14 @@ import Scrite.App
 import "../globals"
 
 MarkdownSyntaxHighlighterDelegate {
-    heading1Color: Runtime.colors.tx("#1d4ed8")
-    heading2Color: Runtime.colors.tx("#7c3aed")
-    heading3Color: Runtime.colors.tx("#be185d")
-    heading4Color: Runtime.colors.tx("#c2410c")
-    heading5Color: Runtime.colors.tx("#a16207")
-    heading6Color: Runtime.colors.tx("#4d7c0f")
+    readonly property bool isDark: Runtime.colors.scheme === Qt.ColorScheme.Dark
+
+    heading1Color: isDark ? "#60a5fa" : "#1d4ed8"
+    heading2Color: isDark ? "#c4b5fd" : "#7c3aed"
+    heading3Color: isDark ? "#f9a8d4" : "#be185d"
+    heading4Color: isDark ? "#fdba74" : "#c2410c"
+    heading5Color: isDark ? "#fcd34d" : "#a16207"
+    heading6Color: isDark ? "#bef264" : "#4d7c0f"
     emphasisColor: Runtime.colors.tx("#0369a1")
     codeColor: Runtime.colors.tx("#9a3412")
     linkColor: Runtime.colors.tx("#2563eb")
