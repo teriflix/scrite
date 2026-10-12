@@ -1621,7 +1621,8 @@ void Utils::ObjectsDiscovery::discoverTerm(const QString &term)
         if (!m_objects.contains(entry)) {
             m_objects.append(entry);
             emit objectsChanged();
-            emit objectDiscovered(object, term);
+            QMetaObject::invokeMethod(this, "objectDiscovered", Qt::QueuedConnection,
+                                      Q_ARG(QObject *, object), Q_ARG(QString, term));
         }
     }
 }
@@ -1642,7 +1643,7 @@ void Utils::ObjectsDiscovery::forgetTerm(const QString &term)
 
 void Utils::ObjectsDiscovery::objectAddedToRegistry(QObject *ptr, const QString &name)
 {
-    for (const QString &term : m_terms) {
+    for (const QString &term : std::as_const(m_terms)) {
         if (!this->matches(ptr, name, term))
             continue;
 
