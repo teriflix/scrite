@@ -75,7 +75,7 @@ MenuItem {
                 Layout.preferredHeight: _label.height
 
                 visible: root.icon.source !== "" && status === Image.Ready
-                source: root.icon.source
+                source: Runtime.themedIcon(root.icon.source)
                 fillMode: Image.PreserveAspectFit
             }
 
