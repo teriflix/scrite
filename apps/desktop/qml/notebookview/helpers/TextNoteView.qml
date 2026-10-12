@@ -198,18 +198,37 @@ Item {
 
                 spacing: 0
 
-                Switch {
-                    Layout.alignment: Qt.AlignRight
-                    Layout.rightMargin: 4
+                RowLayout {
+                    Layout.fillWidth: true
 
-                    visible: !Scrite.document.readOnly
-                    text: _markdownRoot.editMode ? "Edit" : "View"
-                    checked: _markdownRoot.editMode
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: _markdownToolbar.implicitHeight
 
-                    onToggled: {
-                        _markdownRoot.editMode = checked
-                        if(checked)
-                            _markdownTextArea.textArea.forceActiveFocus()
+                        Row {
+                            id: _markdownToolbar
+
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            FeatureHost.uri: "Scrite.App.Notebook.TextNote.MarkdownToolbar"
+                            FeatureHost.onFeatureAdded: (object) => {
+                                                            const item = object as Item
+                                                            if(item && item.note !== undefined)
+                                                                item.note = Qt.binding( () => { return root.note } )
+                                                       }
+                        }
+                    }
+
+                    Switch {
+                        visible: !Scrite.document.readOnly
+                        text: _markdownRoot.editMode ? "Edit" : "View"
+                        checked: _markdownRoot.editMode
+
+                        onToggled: {
+                            _markdownRoot.editMode = checked
+                            if(checked)
+                                _markdownTextArea.textArea.forceActiveFocus()
+                        }
                     }
                 }
 

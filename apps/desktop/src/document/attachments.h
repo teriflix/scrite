@@ -207,6 +207,7 @@ public:
             return this->includeAttachment(fileUrl.toLocalFile());
         return nullptr;
     }
+    Q_INVOKABLE Attachment *includeTextAttachment(const QString &name, const QString &content);
     Q_INVOKABLE Attachment *includeAttachment(const QString &filePath);
     Q_INVOKABLE void removeAttachment(Attachment *ptr);
     Q_INVOKABLE Attachment *attachmentAt(int index) const;

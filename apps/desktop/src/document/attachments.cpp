@@ -15,6 +15,7 @@
 
 #include "attachments.h"
 
+#include "utils.h"
 #include "application.h"
 #include "timeprofiler.h"
 #include "scritedocument.h"
@@ -27,6 +28,7 @@
 #include <QTemporaryDir>
 #include <QMimeDatabase>
 #include <QDesktopServices>
+#include <QTemporaryFile>
 
 static QStringList supportedExtensions(Attachment::Type type)
 {
@@ -340,6 +342,23 @@ QMimeType Attachments::mimeTypeFor(const QFileInfo &fi)
     static QMimeDatabase mimeDb;
     const QMimeType mimeType = mimeDb.mimeTypeForFile(fi);
     return mimeType;
+}
+
+Attachment *Attachments::includeTextAttachment(const QString &name, const QString &content)
+{
+    if (m_allowedType != DocumentsOfAnyType || name.isEmpty() || content.isEmpty())
+        return nullptr;
+
+    QTemporaryFile tmpFile(QDir::tempPath() + QStringLiteral("/scrite_XXXXXX.txt"));
+    if (!tmpFile.open())
+        return nullptr;
+    tmpFile.write(content.toUtf8());
+    tmpFile.close();
+
+    Attachment *ptr = this->includeAttachment(tmpFile.fileName());
+    if (ptr != nullptr)
+        ptr->setTitle(name);
+    return ptr;
 }
 
 Attachment *Attachments::includeAttachment(const QString &filePath)
