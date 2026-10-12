@@ -83,6 +83,34 @@ public:
     Type type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
+    // UIs use this property to determine the kind of UI to show for this
+    // Note if its type is TextNoteType.
+    // If true, then it must use standard TextInputNote with Markdown Syntax Highlighting.
+    // If false, then it can use QuillJS Editor if available, otherwise a plaintext note is fine.
+    // clang-format off
+    Q_PROPERTY(bool preferPlainTextUi
+               READ isPreferPlainTextUi
+               WRITE setPreferPlainTextUi
+               NOTIFY preferPlainTextUiChanged)
+    // clang-format on
+    void setPreferPlainTextUi(bool val);
+    bool isPreferPlainTextUi() const { return m_preferPlainTextUi; }
+    Q_SIGNAL void preferPlainTextUiChanged();
+
+    // When type=TextNoteType, and preferPlainTextUi=true, this flag provides additioanl context
+    // for the type of viewing experience the UI should offer. If markdownContent=true, then
+    // then the UIs should show a markdown-viewer/editor mode in the rendering.
+    // Otherwise a straight up plain-text editor is fine.
+    // clang-format off
+    Q_PROPERTY(bool hasMarkdownContent
+               READ hasMarkdownContent
+               WRITE setMarkdownContent
+               NOTIFY markdownContentChanged)
+    // clang-format on
+    void setMarkdownContent(bool val);
+    bool hasMarkdownContent() const { return m_markdownContent; }
+    Q_SIGNAL void markdownContentChanged();
+
     // clang-format off
     Q_PROPERTY(QString title
                READ title
@@ -202,6 +230,8 @@ private:
     QJsonObject m_formData;
     QColor m_color = Qt::white;
     Type m_type = TextNoteType;
+    bool m_markdownContent = false;
+    bool m_preferPlainTextUi = false;
     QObjectProperty<Form> m_form;
     Attachments *m_attachments = new Attachments(this);
 };

@@ -101,6 +101,24 @@ QString Note::path() const
     return this->title();
 }
 
+void Note::setPreferPlainTextUi(bool val)
+{
+    if (m_preferPlainTextUi == val)
+        return;
+
+    m_preferPlainTextUi = val;
+    emit preferPlainTextUiChanged();
+}
+
+void Note::setMarkdownContent(bool val)
+{
+    if (m_markdownContent == val)
+        return;
+
+    m_markdownContent = val;
+    emit markdownContentChanged();
+}
+
 void Note::setId(const QString &val)
 {
     if (m_id == val || !m_id.isEmpty())
