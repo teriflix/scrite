@@ -1557,14 +1557,29 @@ QString Utils::File::read(const QString &fileName)
 
 /**
  * \brief Sanitizes a file name by removing invalid characters and ensuring validity across
- * platforms. \param fileName The file name to sanitize. \param removedChars Optional set to store
+ * platforms. \param fileName The file name to sanitize. \param replacedChars Optional set to store
  * removed characters. \return The sanitized file path.
  */
-QString Utils::File::sanitiseName(const QString &fileName, QSet<QChar> *removedChars)
+QString Utils::File::sanitiseName(const QString &fileName, const QChar &replaceWith,
+                                  QSet<QChar> *replacedChars)
 {
     const QFileInfo fi(fileName);
     QString completeBaseName = fi.completeBaseName();
-    bool changed = false;
+    QSet<QChar> charsRemoved;
+
+    completeBaseName = sanitiseBaseName(completeBaseName, replaceWith, &charsRemoved);
+
+    if (!charsRemoved.isEmpty()) {
+        return fi.absoluteDir().absoluteFilePath(completeBaseName + "." + fi.suffix());
+    }
+
+    return fileName;
+}
+
+QString Utils::File::sanitiseBaseName(const QString &baseName, const QChar &replaceWith,
+                                      QSet<QChar> *replacedChars)
+{
+    QString completeBaseName = baseName;
 
     // Disallowed characters: \, /, :, *, ?, ", <, >, |, and ASCII control (0-31)
     static const QSet<QChar> disallowedChars = { '\\', '/', ':', '*', '?', '"', '<', '>', '|' };
@@ -1576,19 +1591,17 @@ QString Utils::File::sanitiseName(const QString &fileName, QSet<QChar> *removedC
             continue;
         }
 
-        if (removedChars) {
-            *removedChars += ch;
+        if (replacedChars) {
+            *replacedChars += ch;
         }
 
-        completeBaseName.remove(i, 1);
-        changed = true;
+        completeBaseName.replace(i, 1, replaceWith);
     }
 
     // Trim trailing spaces and periods
     completeBaseName = completeBaseName.trimmed();
     while (!completeBaseName.isEmpty() && completeBaseName.endsWith('.')) {
         completeBaseName.chop(1);
-        changed = true;
     }
 
     // Check for Windows reserved names (case-insensitive, even with extensions)
@@ -1599,13 +1612,11 @@ QString Utils::File::sanitiseName(const QString &fileName, QSet<QChar> *removedC
     QString baseUpper = completeBaseName.toUpper();
     if (reservedNames.contains(baseUpper)) {
         completeBaseName += "_";
-        changed = true;
     }
 
     // Enforce maximum filename length (255 characters for base name)
     if (completeBaseName.length() > 255) {
         completeBaseName = completeBaseName.left(255);
-        changed = true;
         // Re-trim after truncation
         completeBaseName = completeBaseName.trimmed();
         while (!completeBaseName.isEmpty() && completeBaseName.endsWith('.')) {
@@ -1616,14 +1627,9 @@ QString Utils::File::sanitiseName(const QString &fileName, QSet<QChar> *removedC
     // Ensure base name isn't empty
     if (completeBaseName.isEmpty()) {
         completeBaseName = "untitled";
-        changed = true;
     }
 
-    if (changed) {
-        return fi.absoluteDir().absoluteFilePath(completeBaseName + "." + fi.suffix());
-    }
-
-    return fileName;
+    return completeBaseName;
 }
 
 /**

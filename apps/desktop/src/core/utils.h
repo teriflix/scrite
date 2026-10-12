@@ -844,7 +844,10 @@ public:
 
     Q_INVOKABLE static Utils::FileInfo info(const QString &path);
 
-    static QString sanitiseName(const QString &fileName, QSet<QChar> *removedChars = nullptr);
+    static QString sanitiseName(const QString &fileName, const QChar &replaceWith = '-',
+                                QSet<QChar> *replacedChars = nullptr);
+    static QString sanitiseBaseName(const QString &baseName, const QChar &replaceWith = '-',
+                                    QSet<QChar> *replacedChar = nullptr);
 };
 
 class MouseCursor : public QObject

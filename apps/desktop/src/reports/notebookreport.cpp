@@ -107,12 +107,20 @@ QString NotebookReport::polishFileName(const QString &fileName) const
     const QDir folder = fi.absoluteDir();
     const QString suffix =
             this->format() == PdfFormat ? QLatin1String(".pdf") : QLatin1String(".odt");
-    return folder.absoluteFilePath(m_title + QLatin1String(" - ") + m_subtitle + suffix);
+
+    const QString baseName =
+            Utils::File::sanitiseBaseName(m_title + QLatin1String(" - ") + m_subtitle);
+
+    return folder.absoluteFilePath(baseName + suffix);
 }
 
 QString NotebookReport::personalizedFileName(const QString &fileName) const
 {
-    return fileName;
+    const QString baseName =
+            Utils::File::sanitiseBaseName(m_title + QLatin1String(" - ") + m_subtitle);
+    const QString suffix =
+            this->format() == PdfFormat ? QLatin1String(".pdf") : QLatin1String(".odt");
+    return QDir::homePath() + QDir::separator() + baseName + suffix;
 }
 
 bool NotebookReport::doGenerate(QTextDocument *doc)
@@ -234,9 +242,10 @@ void NotebookReport::evaluateTitleAndSubtitle()
     } else
         m_title = screenplay->title();
 
-    if (m_noteSection)
-        m_subtitle = m_noteSection->title();
-    else if (m_notesSection)
+    if (m_noteSection) {
+        Notes *notes = m_noteSection->notes();
+        m_subtitle = notes->title() + ": " + m_noteSection->title();
+    } else if (m_notesSection)
         m_subtitle = m_notesSection->title();
     else if (m_sceneSection)
         m_subtitle = m_sceneSection->synopsis();
