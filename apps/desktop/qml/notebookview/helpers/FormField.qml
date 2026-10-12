@@ -141,6 +141,11 @@ Column {
                     SpellCheckSyntaxHighlighterDelegate {
                         enabled: root.answer !== ""
                         cursorPosition: _textArea.cursorPosition
+                    },
+
+                    StdMarkdownSyntaxHighlighterDelegate {
+                        font: _textArea.font
+                        enabled: root.answer !== ""
                     }
                 ]
                 SyntaxHighlighter.textDocument: textDocument

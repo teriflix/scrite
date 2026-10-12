@@ -92,33 +92,12 @@ Item {
             width: parent.width >= root.maxTextAreaSize+20 ? root.maxTextAreaSize : parent.width-20
             height: parent.height - _title.height - parent.spacing
 
-            lod: Runtime.notebookSettings.richTextNotesEnabled ? LodLoader.LOD.High : LodLoader.LOD.Low
+            lod: Runtime.notebookSettings.richTextNotesEnabled && !root.note.preferPlainTextUi ? LodLoader.LOD.High : LodLoader.LOD.Low
             resetHeightBeforeLodChange: false
             resetWidthBeforeLodChange: false
             sanctioned: root.note
 
-            lowDetailComponent: FlickableTextArea {
-                DeltaDocument {
-                    id: _noteContent
-                    content: root.note.content
-                }
-
-                text: _noteContent.plainText
-                placeholderText: "Content"
-                tabSequenceIndex: 1
-                tabSequenceManager: _tabManager
-
-                background: Rectangle {
-                    color: Runtime.colors.primary.windowColor
-                    opacity: 0.15
-                }
-
-                onTextEdited: root.note.content = text
-
-                function assumeFocus() {
-                    textArea.forceActiveFocus()
-                }
-            }
+            lowDetailComponent: root.note.hasMarkdownContent ? _markdownTextNoteComponent : _plainTextNoteComponent
 
             highDetailComponent: RichTextEdit {
                 function assumeFocus() {
@@ -162,6 +141,105 @@ Item {
 
         allowMultiple: true
         target: root.note ? root.note.attachments : null
+    }
+
+    Component {
+        id: _plainTextNoteComponent
+
+        Rectangle {
+            color: Runtime.colors.primary.c200.background
+
+            FlickableTextArea {
+                anchors.fill: parent
+                anchors.margins: 4
+
+                DeltaDocument {
+                    id: _noteContent
+                    content: root.note.content
+                }
+
+                text: _noteContent.plainText
+                placeholderText: "Content"
+                tabSequenceIndex: 1
+                tabSequenceManager: _tabManager
+                background.visible: false
+
+                onTextEdited: root.note.content = text
+
+                function assumeFocus() {
+                    textArea.forceActiveFocus()
+                }
+            }
+        }
+    }
+
+    Component {
+        id: _markdownTextNoteComponent
+
+        Rectangle {
+            id: _markdownRoot
+
+            property bool editMode: false
+
+            color: Runtime.colors.primary.c200.background
+
+            Connections {
+                target: root
+
+                function onNoteChanged() {
+                    _markdownRoot.editMode = false
+                }
+            }
+
+            FlickableTextArea {
+                id: _markdownTextArea
+
+                anchors.fill: parent
+                anchors.margins: 4
+
+                DeltaDocument {
+                    id: _noteContent
+                    content: root.note.content
+                }
+
+                text: _noteContent.plainText
+                placeholderText: "Content"
+                tabSequenceIndex: 1
+                tabSequenceManager: _tabManager
+                readOnly: Scrite.document.readOnly || !_markdownRoot.editMode
+                textFormat: _markdownRoot.editMode ? TextEdit.PlainText : TextEdit.MarkdownText
+                markdownSyntaxEnabled: _markdownRoot.editMode
+                spellCheckEnabled: _markdownRoot.editMode
+                background.visible: false
+
+                onTextEdited: if(_markdownRoot.editMode) root.note.content = text
+
+                function assumeFocus() {
+                    _markdownRoot.editMode = true
+                    textArea.forceActiveFocus()
+                }
+            }
+
+            Switch {
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.margins: 8
+
+                visible: !Scrite.document.readOnly
+                text: _markdownRoot.editMode ? "Edit" : "View"
+                checked: _markdownRoot.editMode
+
+                onToggled: {
+                    _markdownRoot.editMode = checked
+                    if(checked)
+                        _markdownTextArea.textArea.forceActiveFocus()
+                }
+            }
+
+            function assumeFocus() {
+                _markdownTextArea.assumeFocus()
+            }
+        }
     }
 
     onNoteChanged: {
