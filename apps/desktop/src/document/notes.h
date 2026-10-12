@@ -66,6 +66,14 @@ public:
     Q_SIGNAL void idChanged();
 
     // clang-format off
+    Q_PROPERTY(QString creator
+               READ creator
+               NOTIFY creatorChanged)
+    // clang-format on
+    QString creator() const { return m_creator; }
+    Q_SIGNAL void creatorChanged();
+
+    // clang-format off
     Q_PROPERTY(QString path
                READ path
                NOTIFY pathChanged)
@@ -225,6 +233,7 @@ private:
     void setType(Type val);
     void setFormId(const QString &val);
     void setForm(Form *val);
+    void setCreator(const QString &creator);
     void resetForm();
     void addAttachment(Attachment *ptr);
     void renameCharacter(const QString &from, const QString &to);
@@ -232,6 +241,7 @@ private:
 private:
     friend class Notes;
     QString m_id;
+    QString m_creator = QString(SCRITE_QML_URI);
     QString m_title;
     QString m_formId;
     QString m_summary;
@@ -379,9 +389,9 @@ public:
     QColor color() const { return m_color; }
     Q_SIGNAL void colorChanged();
 
-    Q_INVOKABLE Note *addTextNote();
-    Q_INVOKABLE Note *addFormNote(const QString &id);
-    Q_INVOKABLE Note *addCheckListNote();
+    Q_INVOKABLE Note *addTextNote(const QString &creator = QString());
+    Q_INVOKABLE Note *addFormNote(const QString &id, const QString &creator = QString());
+    Q_INVOKABLE Note *addCheckListNote(const QString &creator = QString());
     Q_INVOKABLE void removeNote(Note *ptr);
     Q_INVOKABLE Note *noteAt(int index) const;
     Q_INVOKABLE Note *firstNote() const { return this->noteAt(0); }

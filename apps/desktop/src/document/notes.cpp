@@ -185,6 +185,15 @@ void Note::setForm(Form *val)
     emit formChanged();
 }
 
+void Note::setCreator(const QString &creator)
+{
+    // Can be changed only once.
+    if (m_creator == QString(SCRITE_QML_URI) && m_creator != creator) {
+        m_creator = creator;
+        emit creatorChanged();
+    }
+}
+
 void Note::resetForm()
 {
     m_form = nullptr;
@@ -287,6 +296,7 @@ void Note::prepareForSerialization()
 void Note::serializeToJson(QJsonObject &json) const
 {
     json.insert(QStringLiteral("id"), this->id());
+    json.insert(QStringLiteral("creator"), m_creator);
 
     const QMetaObject *mo = &Note::staticMetaObject;
     const QMetaEnum typeEnum = mo->enumerator(mo->indexOfEnumerator("Type"));
@@ -299,6 +309,7 @@ void Note::serializeToJson(QJsonObject &json) const
 void Note::deserializeFromJson(const QJsonObject &json)
 {
     this->setId(json.value(QStringLiteral("id")).toString());
+    this->setCreator(json.value(QStringLiteral("creator")).toString());
 
     /**
      * Previously type should be stored as Text, Form etc.
@@ -789,18 +800,20 @@ void Notes::setColor(const QColor &val)
     }
 }
 
-Note *Notes::addTextNote()
+Note *Notes::addTextNote(const QString &creator)
 {
     Note *ptr = new Note(this);
     ptr->setType(Note::TextNoteType);
+    ptr->setCreator(creator);
     this->addNote(ptr);
     return ptr;
 }
 
-Note *Notes::addFormNote(const QString &id)
+Note *Notes::addFormNote(const QString &id, const QString &creator)
 {
     Note *ptr = new Note(this);
     ptr->setType(Note::FormNoteType);
+    ptr->setCreator(creator);
     ptr->setFormId(id);
     if (ptr->form() == nullptr) {
         delete ptr;
@@ -819,10 +832,11 @@ Note *Notes::addFormNote(const QString &id)
     return ptr;
 }
 
-Note *Notes::addCheckListNote()
+Note *Notes::addCheckListNote(const QString &creator)
 {
     Note *ptr = new Note(this);
     ptr->setType(Note::CheckListNoteType);
+    ptr->setCreator(creator);
     this->addNote(ptr);
     return ptr;
 }
