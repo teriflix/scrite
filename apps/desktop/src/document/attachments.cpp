@@ -29,6 +29,7 @@
 #include <QMimeDatabase>
 #include <QDesktopServices>
 #include <QTemporaryFile>
+#include <QRegularExpression>
 
 static QStringList supportedExtensions(Attachment::Type type)
 {
@@ -349,8 +350,17 @@ Attachment *Attachments::includeTextAttachment(const QString &name, const QStrin
     if (m_allowedType != DocumentsOfAnyType || name.isEmpty() || content.isEmpty())
         return nullptr;
 
-    QTemporaryFile tmpFile(QDir::tempPath() + QStringLiteral("/scrite_XXXXXX.txt"));
-    if (!tmpFile.open())
+    // The original file name of an attachment is taken from the file it is included from, and
+    // can't be changed after that. So the text is written to a file that is named after the
+    // attachment, in a temporary directory of its own.
+    QTemporaryDir tmpDir;
+    if (!tmpDir.isValid())
+        return nullptr;
+
+    const QString fileName = Utils::File::sanitiseBaseName(name);
+
+    QFile tmpFile(tmpDir.filePath(fileName + QStringLiteral(".txt")));
+    if (!tmpFile.open(QFile::WriteOnly))
         return nullptr;
     tmpFile.write(content.toUtf8());
     tmpFile.close();
