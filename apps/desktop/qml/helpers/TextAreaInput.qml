@@ -30,6 +30,7 @@ TextArea {
 
     property bool undoRedoEnabled: false
     property bool spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
+    property bool markdownSyntaxEnabled: false
 
     verticalAlignment: Text.AlignTop
 
@@ -48,6 +49,11 @@ TextArea {
             id: _spellChecker
             enabled: root.spellCheckEnabled
             cursorPosition: root.cursorPosition
+        },
+
+        StdMarkdownSyntaxHighlighterDelegate {
+            font: root.font
+            enabled: root.markdownSyntaxEnabled
         }
     ]
     SyntaxHighlighter.textDocument: textDocument

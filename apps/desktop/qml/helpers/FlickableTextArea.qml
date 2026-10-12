@@ -32,6 +32,7 @@ Flickable {
     property bool scrollBarRequired: contentHeight > height
     property bool tabSequenceEnabled: true
     property bool enforceDefaultFont: true
+    property bool markdownSyntaxEnabled: false
     property bool enforceHeadingFontSize: false
     property bool adjustTextWidthBasedOnScrollBar: true
 
@@ -39,6 +40,7 @@ Flickable {
     property alias font: _textArea.font
     property alias color: _textArea.color
     property alias readOnly: _textArea.readOnly
+    property alias textFormat: _textArea.textFormat
     property alias background: _textArea.background
     property alias textDocument: _textArea.textDocument
     property alias placeholderText: _textArea.placeholderText
@@ -102,6 +104,11 @@ Flickable {
                 id: _spellChecker
                 enabled: root.spellCheckEnabled
                 cursorPosition: _textArea.cursorPosition
+            },
+
+            StdMarkdownSyntaxHighlighterDelegate {
+                font: _textArea.font
+                enabled: root.markdownSyntaxEnabled
             }
         ]
         SyntaxHighlighter.textDocument: textDocument
