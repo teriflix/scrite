@@ -87,7 +87,7 @@ ListView {
 
                 width: parent.width
 
-                color: _delegate.isSelected ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
+                color: Runtime.colors.tx(_delegate.isSelected ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text)
                 elide: Text.ElideMiddle
                 horizontalAlignment: Text.AlignHCenter
                 maximumLineCount: 1
