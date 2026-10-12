@@ -624,8 +624,9 @@ protected:
 
 // Highlights markdown. Blocks are highlighted one at a time, with no state from one block to the
 // next, so what spans lines is not highlighted: only the lines that open and close a fenced code
-// block are. The font of a range is replaced as a whole, so headings, which have a font of their
-// own, get no emphasis inside them, and emphasis inside emphasis is not nested.
+// block are. Headings get no emphasis inside them, and emphasis inside emphasis is not nested.
+// Only the size, weight, italic and underline of the font are set, never the family, so the fonts
+// applied by LanguageFontSyntaxHighlighterDelegate are kept.
 class MarkdownSyntaxHighlighterDelegate : public AbstractSyntaxHighlighterDelegate
 {
     Q_OBJECT
@@ -635,7 +636,7 @@ public:
     explicit MarkdownSyntaxHighlighterDelegate(QObject *parent = nullptr);
     ~MarkdownSyntaxHighlighterDelegate() override;
 
-    // Only the family and the point size are used. Headings and emphasis are derived from them.
+    // Only the point size is used. The size of headings is derived from it.
     // clang-format off
     Q_PROPERTY(QFont font
                READ font
@@ -772,8 +773,9 @@ protected:
 
 private:
     void setColor(QColor &member, const QColor &val, void (MarkdownSyntaxHighlighterDelegate::*changed)());
-    QFont variantOfFont(int deltaPtSize, bool bold, bool italic, bool underline) const;
-    void applyStyle(int start, int count, const QColor &foreground, const QFont *font = nullptr,
+    QTextCharFormat fontFormat(int deltaPtSize, bool bold, bool italic, bool underline) const;
+    void applyStyle(int start, int count, const QColor &foreground,
+                    const QTextCharFormat *fontFormat = nullptr,
                     const QColor &background = QColor());
 
     bool highlightHeading(const QString &text);

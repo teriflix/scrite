@@ -1218,29 +1218,33 @@ void MarkdownSyntaxHighlighterDelegate::setColor(QColor &member, const QColor &v
     this->rehighlight();
 }
 
-QFont MarkdownSyntaxHighlighterDelegate::variantOfFont(int deltaPtSize, bool bold, bool italic,
-                                                       bool underline) const
+// The family is left alone, so that fonts applied by other delegates (language fonts) survive.
+QTextCharFormat MarkdownSyntaxHighlighterDelegate::fontFormat(int deltaPtSize, bool bold,
+                                                              bool italic, bool underline) const
 {
-    QFont ret(m_font.family(), m_font.pointSize() + deltaPtSize);
-    ret.setBold(bold);
-    ret.setItalic(italic);
-    ret.setUnderline(underline);
+    QTextCharFormat ret;
+    if (m_font.pointSizeF() > 0)
+        ret.setFontPointSize(m_font.pointSizeF() + deltaPtSize);
+    ret.setFontWeight(bold ? QFont::Bold : QFont::Normal);
+    ret.setFontItalic(italic);
+    ret.setFontUnderline(underline);
     return ret;
 }
 
 void MarkdownSyntaxHighlighterDelegate::applyStyle(int start, int count, const QColor &foreground,
-                                                   const QFont *font, const QColor &background)
+                                                   const QTextCharFormat *fontFormat,
+                                                   const QColor &background)
 {
     if (count <= 0)
         return;
 
     QTextCharFormat charFormat;
+    if (fontFormat != nullptr)
+        charFormat = *fontFormat;
     if (foreground.isValid())
         charFormat.setForeground(foreground);
     if (background.isValid())
         charFormat.setBackground(background);
-    if (font != nullptr)
-        charFormat.setFont(*font);
     this->mergeFormat(start, count, charFormat);
 }
 
@@ -1254,7 +1258,7 @@ bool MarkdownSyntaxHighlighterDelegate::highlightHeading(const QString &text)
         return false;
 
     const int level = match.capturedLength(1);
-    const QFont font = this->variantOfFont(qMax(0, 5 - level), true, false, false);
+    const QTextCharFormat font = this->fontFormat(qMax(0, 5 - level), true, false, false);
     this->applyStyle(0, text.length(), m_headingColors[level - 1], &font);
     return true;
 }
@@ -1313,10 +1317,10 @@ void MarkdownSyntaxHighlighterDelegate::highlightInline(const QString &text)
         }
     };
 
-    const QFont italicFont = this->variantOfFont(0, false, true, false);
-    const QFont boldFont = this->variantOfFont(0, true, false, false);
-    const QFont boldItalicFont = this->variantOfFont(0, true, true, false);
-    const QFont linkFont = this->variantOfFont(0, false, false, true);
+    const QTextCharFormat italicFont = this->fontFormat(0, false, true, false);
+    const QTextCharFormat boldFont = this->fontFormat(0, true, false, false);
+    const QTextCharFormat boldItalicFont = this->fontFormat(0, true, true, false);
+    const QTextCharFormat linkFont = this->fontFormat(0, false, false, true);
 
     // Emphasis from the least to the most specific, so that the most specific wins.
     forEachMatch(strike, 0, [&](int s, int n) { this->applyStyle(s, n, m_markerColor); });
