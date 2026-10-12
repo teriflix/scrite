@@ -73,25 +73,28 @@ AbstractNotebookPage {
                 onTextEdited: _private.breakElement.breakSubtitle = text
             }
 
-            FlickableTextArea {
-                id: _summaryField
-
+            Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                ScrollBar.vertical: _vscrollBar
+                color: Runtime.colors.primary.c200.background
 
-                adjustTextWidthBasedOnScrollBar: false
-                backTabItem: _headingField
-                placeholderText: _private.breakKind + " Summary ..."
-                text: _private.breakElement.breakSummary
+                FlickableTextArea {
+                    id: _summaryField
 
-                background: Rectangle {
-                    color: Runtime.colors.primary.windowColor
-                    opacity: 0.15
+                    anchors.fill: parent
+                    anchors.margins: 4
+
+                    ScrollBar.vertical: _vscrollBar
+
+                    adjustTextWidthBasedOnScrollBar: false
+                    backTabItem: _headingField
+                    background.visible: false
+                    placeholderText: _private.breakKind + " Summary ..."
+                    text: _private.breakElement.breakSummary
+
+                    onTextEdited: _private.breakElement.breakSummary = text
                 }
-
-                onTextEdited: _private.breakElement.breakSummary = text
             }
         }
 
