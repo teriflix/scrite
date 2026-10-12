@@ -962,6 +962,7 @@ private:
 
     void objectAddedToRegistry(QObject *ptr, const QString &name);
     void objectRemovedFromRegistry(QObject *ptr);
+    void emitObjectDiscovered(QObject *object, const QString &term);
 
 private:
     friend class ObjectDiscovery;

@@ -185,6 +185,16 @@ public:
     Q_INVOKABLE QJsonValue getFormData(const QString &key) const;
 
     // clang-format off
+    Q_PROPERTY(QJsonValue userData
+               READ userData
+               WRITE setUserData
+               NOTIFY userDataChanged)
+    // clang-format on
+    void setUserData(const QJsonValue &val);
+    QJsonValue userData() const { return m_userData; }
+    Q_SIGNAL void userDataChanged();
+
+    // clang-format off
     Q_PROPERTY(Attachments *attachments
                READ attachments
                CONSTANT )
@@ -227,6 +237,7 @@ private:
     QString m_summary;
     bool m_autoSummaryText = false;
     QJsonValue m_content;
+    QJsonValue m_userData;
     QJsonObject m_formData;
     QColor m_color = Qt::white;
     Type m_type = TextNoteType;

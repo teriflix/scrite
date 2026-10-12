@@ -1621,8 +1621,7 @@ void Utils::ObjectsDiscovery::discoverTerm(const QString &term)
         if (!m_objects.contains(entry)) {
             m_objects.append(entry);
             emit objectsChanged();
-            QMetaObject::invokeMethod(this, "objectDiscovered", Qt::QueuedConnection,
-                                      Q_ARG(QObject *, object), Q_ARG(QString, term));
+            emitObjectDiscovered(object, term);
         }
     }
 }
@@ -1651,7 +1650,7 @@ void Utils::ObjectsDiscovery::objectAddedToRegistry(QObject *ptr, const QString 
         if (!m_objects.contains(entry)) {
             m_objects.append(entry);
             emit objectsChanged();
-            emit objectDiscovered(ptr, term);
+            emitObjectDiscovered(ptr, term);
         }
     }
 }
@@ -1667,6 +1666,12 @@ void Utils::ObjectsDiscovery::objectRemovedFromRegistry(QObject *ptr)
         emit objectsChanged();
         emit objectDisappeared(ptr, entry.first);
     }
+}
+
+void Utils::ObjectsDiscovery::emitObjectDiscovered(QObject *object, const QString &term)
+{
+    QMetaObject::invokeMethod(this, "objectDiscovered", Qt::QueuedConnection,
+                              Q_ARG(QObject *, object), Q_ARG(QString, term));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

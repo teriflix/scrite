@@ -269,6 +269,15 @@ QJsonValue Note::getFormData(const QString &key) const
     return m_formData.value(key);
 }
 
+void Note::setUserData(const QJsonValue &val)
+{
+    if (m_userData == val)
+        return;
+
+    m_userData = val;
+    emit userDataChanged();
+}
+
 void Note::prepareForSerialization()
 {
     if (!m_form.isNull())
@@ -319,6 +328,20 @@ void Note::deserializeFromJson(const QJsonObject &json)
 void Note::write(QTextCursor &cursor, const WriteOptions &options) const
 {
     bool insertBlock = !cursor.block().text().isEmpty();
+
+    if (this->type() == TextNoteType && this->isPreferPlainTextUi() && this->hasMarkdownContent()) {
+        if (insertBlock) {
+            QTextBlockFormat blockFormat;
+            blockFormat.setIndent(0);
+            QTextCharFormat charFormat;
+            charFormat.setFontWeight(QFont::Normal);
+            cursor.insertBlock(blockFormat, charFormat);
+        }
+
+        cursor.insertMarkdown(this->content().toString(), QTextDocument::MarkdownDialectGitHub);
+
+        return;
+    }
 
     if (options.includeTitle) {
         QTextBlockFormat headingBlockFormat;

@@ -18,6 +18,7 @@ pragma ComponentBehavior: Bound
 import QtQml
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import QtQuick.Controls.Material
 
 import Scrite.App
@@ -191,48 +192,54 @@ Item {
                 }
             }
 
-            FlickableTextArea {
-                id: _markdownTextArea
-
+            ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 4
 
-                DeltaDocument {
-                    id: _noteContent
-                    content: root.note.content
+                spacing: 0
+
+                Switch {
+                    Layout.alignment: Qt.AlignRight
+                    Layout.rightMargin: 4
+
+                    visible: !Scrite.document.readOnly
+                    text: _markdownRoot.editMode ? "Edit" : "View"
+                    checked: _markdownRoot.editMode
+
+                    onToggled: {
+                        _markdownRoot.editMode = checked
+                        if(checked)
+                            _markdownTextArea.textArea.forceActiveFocus()
+                    }
                 }
 
-                text: _noteContent.plainText
-                placeholderText: "Content"
-                tabSequenceIndex: 1
-                tabSequenceManager: _tabManager
-                readOnly: Scrite.document.readOnly || !_markdownRoot.editMode
-                textFormat: _markdownRoot.editMode ? TextEdit.PlainText : TextEdit.MarkdownText
-                markdownSyntaxEnabled: _markdownRoot.editMode
-                spellCheckEnabled: _markdownRoot.editMode
-                background.visible: false
+                FlickableTextArea {
+                    id: _markdownTextArea
 
-                onTextEdited: if(_markdownRoot.editMode) root.note.content = text
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
 
-                function assumeFocus() {
-                    _markdownRoot.editMode = true
-                    textArea.forceActiveFocus()
-                }
-            }
+                    DeltaDocument {
+                        id: _noteContent
+                        content: root.note.content
+                    }
 
-            Switch {
-                anchors.top: parent.top
-                anchors.right: parent.right
-                anchors.margins: 8
+                    text: _noteContent.plainText
+                    placeholderText: "Content"
+                    tabSequenceIndex: 1
+                    tabSequenceManager: _tabManager
+                    readOnly: Scrite.document.readOnly || !_markdownRoot.editMode
+                    textFormat: _markdownRoot.editMode ? TextEdit.PlainText : TextEdit.MarkdownText
+                    markdownSyntaxEnabled: _markdownRoot.editMode
+                    spellCheckEnabled: _markdownRoot.editMode
+                    background.visible: false
 
-                visible: !Scrite.document.readOnly
-                text: _markdownRoot.editMode ? "Edit" : "View"
-                checked: _markdownRoot.editMode
+                    onTextEdited: if(_markdownRoot.editMode) root.note.content = text
 
-                onToggled: {
-                    _markdownRoot.editMode = checked
-                    if(checked)
-                        _markdownTextArea.textArea.forceActiveFocus()
+                    function assumeFocus() {
+                        _markdownRoot.editMode = true
+                        textArea.forceActiveFocus()
+                    }
                 }
             }
 
