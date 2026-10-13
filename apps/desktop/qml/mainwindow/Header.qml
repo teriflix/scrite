@@ -141,7 +141,7 @@ Rectangle {
 
             ActionToolButton {
                 action: ActionHub.appOptions.find("toggleColorTheme") as Action
-                visible: root.width >= root.idealHeaderWidth && Runtime.applicationSettings.showColorThemeIconOnToolbar
+                visible: root.width >= (root.idealHeaderWidth + _spaceToolBar.implicitWidth) && Runtime.applicationSettings.showColorThemeIconOnToolbar
                 tooltip: "Switch to " + (action.isDarkMode ? "Light" : "Dark") + " Mode (" + Gui.portableShortcut(action.shortcut) + ")"
             }
 
@@ -284,6 +284,29 @@ Rectangle {
             id: _space
 
             Layout.fillWidth: true
+
+            Row {
+                id: _spaceToolBar
+
+                property int count: 0
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                FeatureHost.uri: "Scrite.App.MainWindow.ToolBar"
+                FeatureHost.onFeatureAdded: (object) => { if(object as Item) count = count+1 }
+                FeatureHost.onFeatureRemoved: (object) => { if(object as Item) count = count-1 }
+            }
+
+            Rectangle {
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+
+                width: 1
+                height: _spaceToolBar.height
+
+                color: Runtime.colors.primary.borderColor
+                visible: _spaceToolBar.count > 0
+            }
         }
 
         RowLayout {
@@ -310,7 +333,7 @@ Rectangle {
 
                     action: qmlAction
                     down: qmlAction.down
-                    display: down && root.width >= root.idealHeaderWidth ? Button.TextBesideIcon : Button.IconOnly
+                    display: down && root.width >= root.idealHeaderWidth && _spaceToolBar.count === 0 ? Button.TextBesideIcon : Button.IconOnly
                     flat: true
                     visible: qmlAction.visible !== undefined ? qmlAction.visible === true : true
 
