@@ -70,12 +70,27 @@ set_source_files_properties(${SCRITE_DESKTOP_SINGLETON_QML_FILES}
   PROPERTIES QT_QML_SINGLETON_TYPE TRUE
 )
 
+# Production builds embed extensions.qml (as qrc:/Scrite/App/extensions.qml), so that only the
+# extensions it imports can be loaded. Its imports come from modules built after Scrite, so they
+# cannot be resolved here, and the file is excluded from cache generation and linting.
+set(SCRITE_EXTENSIONS_QML "${CMAKE_SOURCE_DIR}/extra/extensions/extensions.qml")
+set(SCRITE_EMBEDDED_EXTENSIONS_QML_FILES)
+if(SCRITE_PRODUCTION_BUILD AND SCRITE_EXTRA AND EXISTS "${SCRITE_EXTENSIONS_QML}")
+  set_source_files_properties("${SCRITE_EXTENSIONS_QML}" PROPERTIES
+    QT_RESOURCE_ALIAS extensions.qml
+    QT_QML_SKIP_CACHEGEN TRUE
+    QT_QML_SKIP_QMLLINT TRUE
+  )
+  list(APPEND SCRITE_EMBEDDED_EXTENSIONS_QML_FILES "${SCRITE_EXTENSIONS_QML}")
+endif()
+
 qt_add_qml_module(Scrite
   URI Scrite.App
   RESOURCE_PREFIX "/"
   VERSION 1.0
   QML_FILES
     main.qml
+    ${SCRITE_EMBEDDED_EXTENSIONS_QML_FILES}
     ${SCRITE_DESKTOP_QML_FILES}
     ${SCRITE_DESKTOP_SINGLETON_QML_FILES}
   SOURCES
@@ -96,14 +111,7 @@ target_sources(Scrite PRIVATE
 # Make Scrite depend on the generated header
 add_dependencies(Scrite generate_qtchar_header)
 
-# Production-only startup checks: NSIS migration guard, license acceptance, and
-# IEDN Technologies org name. Pass -DSCRITE_PRODUCTION_BUILD=ON from the
-# production build system (which lives outside this repository). Open-source
-# builds leave this OFF and continue to use "Scrite" as the organization name.
-option(SCRITE_PRODUCTION_BUILD
-       "Enable production-only startup checks and IEDN org name"
-       OFF)
-
+# SCRITE_PRODUCTION_BUILD is an option declared in the root CMakeLists.txt.
 target_compile_definitions(Scrite PRIVATE
   SCRITE_VERSION="${PROJECT_VERSION}"
   SCRITE_VERSION_TYPE="${SCRITE_VERSION_TYPE}"

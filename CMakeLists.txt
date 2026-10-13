@@ -49,6 +49,16 @@ if(APPLE)
   enable_language(OBJCXX)
 endif()
 
+# Production-only startup checks: NSIS migration guard, license acceptance, and
+# IEDN Technologies org name. Pass -DSCRITE_PRODUCTION_BUILD=ON from the
+# production build system (which lives outside this repository). Open-source
+# builds leave this OFF and continue to use "Scrite" as the organization name.
+# Production builds also embed extensions.qml, so that only the extensions it
+# imports can be loaded. Declared here because both extra and apps use it.
+option(SCRITE_PRODUCTION_BUILD
+       "Enable production-only startup checks and IEDN org name"
+       OFF)
+
 add_subdirectory(thirdparty)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/extra/CMakeLists.txt")

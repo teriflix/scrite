@@ -209,21 +209,30 @@ Item {
         if(root.extensions !== null)
             return
 
-        const extensionsInfo = File.info(Platform.extensionsQml)
-        if(extensionsInfo.valid && extensionsInfo.exists && extensionsInfo.readable && extensionsInfo.isFile && extensionsInfo.suffix == "qml") {
-            const modulesUrl = Url.fromPath(extensionsInfo.absoluteFilePath)
-            let extensionsLoader = Qt.createComponent(modulesUrl)
-
-            let instantiateFn = () => {
-                if(extensionsLoader.status === Component.Ready) {
-                    root.extensions = extensionsLoader.createObject(root)
-                } else if(extensionsLoader.status === Component.Error) {
-                    Gui.log("ERROR loading extensions: " + extensionsLoader.errorString())
-                }
-            }
-            extensionsLoader.statusChanged.connect(instantiateFn)
-            instantiateFn()
+        // Production builds embed extensions.qml, and give its qrc: URL.
+        let modulesUrl = undefined
+        if(Platform.extensionsQml.startsWith("qrc:")) {
+            modulesUrl = Platform.extensionsQml
+        } else {
+            const extensionsInfo = File.info(Platform.extensionsQml)
+            if(extensionsInfo.valid && extensionsInfo.exists && extensionsInfo.readable && extensionsInfo.isFile && extensionsInfo.suffix == "qml")
+                modulesUrl = Url.fromPath(extensionsInfo.absoluteFilePath)
         }
+
+        if(modulesUrl === undefined)
+            return
+
+        let extensionsLoader = Qt.createComponent(modulesUrl)
+
+        let instantiateFn = () => {
+            if(extensionsLoader.status === Component.Ready) {
+                root.extensions = extensionsLoader.createObject(root)
+            } else if(extensionsLoader.status === Component.Error) {
+                Gui.log("ERROR loading extensions: " + extensionsLoader.errorString())
+            }
+        }
+        extensionsLoader.statusChanged.connect(instantiateFn)
+        instantiateFn()
     }
 
     function closeAllDialogs() {

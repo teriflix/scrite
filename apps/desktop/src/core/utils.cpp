@@ -249,6 +249,10 @@ QString Utils::Platform::extensionsPath()
 
 QString Utils::Platform::extensionsQml()
 {
+#ifdef SCRITE_PRODUCTION_BUILD
+    // Production builds embed extensions.qml, which fixes the extensions that can be loaded.
+    return QStringLiteral("qrc:/Scrite/App/extensions.qml");
+#else
 #ifdef Q_OS_MAC
     return qApp->applicationDirPath() + "/../PlugIns/Extensions/extensions.qml";
 #else
@@ -256,6 +260,7 @@ QString Utils::Platform::extensionsQml()
     return qApp->applicationDirPath() + "/Extensions/extensions.qml";
 #else
     return qApp->applicationDirPath() + "/Extensions/extensions.qml";
+#endif
 #endif
 #endif
 }
