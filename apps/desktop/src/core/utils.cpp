@@ -215,7 +215,7 @@ QString Utils::Platform::hostName()
 QString Utils::Platform::settingsPath()
 {
     const QFileInfo fi(Application::instance()->settingsFilePath());
-    return fi.absoluteFilePath();
+    return fi.absolutePath();
 }
 
 /**
@@ -309,7 +309,7 @@ QString Utils::Platform::architectureString()
 #ifdef Q_OS_MACOS
     if (qtArch == QStringLiteral("arm64")) {
         // Ask the kernel for the CPU brand string, e.g. "Apple M2 Pro"
-        char brand[256] = {};
+        char brand[256] = { };
         size_t size = sizeof(brand);
         if (sysctlbyname("machdep.cpu.brand_string", brand, &size, nullptr, 0) == 0 && size > 0) {
             QString chip = QString::fromUtf8(brand).trimmed();

@@ -63,9 +63,13 @@ add_subdirectory(thirdparty)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/extra/CMakeLists.txt")
     set(SCRITE_EXTRA TRUE)
-    add_subdirectory(extra)
 else()
     set(SCRITE_EXTRA FALSE)
 endif()
 
 add_subdirectory(apps)
+
+# Extra is added after apps, so that it can refer to the Scrite target.
+if(SCRITE_EXTRA)
+    add_subdirectory(extra)
+endif()

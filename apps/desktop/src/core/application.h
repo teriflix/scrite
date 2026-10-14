@@ -154,6 +154,13 @@ public:
     bool isFOSSBuild() const;
 
     // clang-format off
+    Q_PROPERTY(bool productionBuild
+               READ isProductionBuild
+               CONSTANT)
+    // clang-format on
+    bool isProductionBuild() const;
+
+    // clang-format off
     Q_PROPERTY(QStringList availableThemes
                READ availableThemes
                CONSTANT )
