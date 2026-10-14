@@ -205,8 +205,20 @@ Item {
         anchors.fill = parent
     }
 
+    function initExtensions() {
+        Runtime.appFeatures.extensions.enabledChanged.connect(() => {
+              if(Runtime.appFeatures.extensions.enabled) {
+                root.loadExtensions()
+              } else {
+                root.unloadExtensions()
+              }
+          })
+
+        loadExtensions()
+    }
+
     function loadExtensions() {
-        if(root.extensions !== null)
+        if(root.extensions !== null || !Runtime.appFeatures.extensions.enabled)
             return
 
         // Production builds embed extensions.qml, and give its qrc: URL.
@@ -223,7 +235,6 @@ Item {
             return
 
         let extensionsLoader = Qt.createComponent(modulesUrl)
-
         let instantiateFn = () => {
             if(extensionsLoader.status === Component.Ready) {
                 root.extensions = extensionsLoader.createObject(root)
@@ -233,6 +244,12 @@ Item {
         }
         extensionsLoader.statusChanged.connect(instantiateFn)
         instantiateFn()
+    }
+
+    function unloadExtensions() {
+        if(root.extensions) {
+            root.extensions.destroy()
+        }
     }
 
     function closeAllDialogs() {

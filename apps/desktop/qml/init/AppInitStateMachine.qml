@@ -176,7 +176,7 @@ QSM.StateMachine {
             NotificationsLayer.init(root.contentLoader)
             HomeScreen.init()
 
-            Runtime.loadExtensions()
+            Runtime.initExtensions()
 
             Qt.callLater(() => s4AppInit.done())
         }

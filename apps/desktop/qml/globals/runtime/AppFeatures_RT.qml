@@ -58,6 +58,10 @@ QtObject {
         feature: Scrite.TemplateFeature
     }
 
+    readonly property AppFeature extensions: AppFeature {
+        feature: Scrite.ExtensionsFeature
+    }
+
     readonly property AppFeature emailSupport: AppFeature {
         featureName: "support/email"
     }

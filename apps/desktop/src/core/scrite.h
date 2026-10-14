@@ -163,8 +163,9 @@ public:
         WatermarkFeature,
         RecentFilesFeature,
         VaultFilesFeature,
+        ExtensionsFeature,
         MinFeature = ScreenplayFeature,
-        MaxFeature = VaultFilesFeature
+        MaxFeature = ExtensionsFeature
     };
     Q_ENUM(AppFeature)
 

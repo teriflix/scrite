@@ -227,7 +227,8 @@ bool Scrite::isFeatureEnabled(AppFeature feature, const QStringList &features)
         { Scrite::ScritedFeature, "scrited" },
         { Scrite::WatermarkFeature, "watermark" },
         { Scrite::RecentFilesFeature, "recentfiles" },
-        { Scrite::VaultFilesFeature, "vaultfiles" }
+        { Scrite::VaultFilesFeature, "vaultfiles" },
+        { Scrite::ExtensionsFeature, "extensions" }
     };
 
     return Scrite::isFeatureNameEnabled(featureNameMap.value(feature), features);
