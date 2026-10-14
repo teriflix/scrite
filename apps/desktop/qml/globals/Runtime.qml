@@ -66,6 +66,7 @@ Item {
     property Item structureView
     property Item screenplayEditor
     property Item screenplayEditorToolbar
+    property Item activeNotePage // is of type
 
     property ObjectListModel dialogs: ObjectListModel { }
 

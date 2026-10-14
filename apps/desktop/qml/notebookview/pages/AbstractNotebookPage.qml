@@ -34,7 +34,7 @@ FocusScope {
 
     property color backgroundColor: Runtime.colors.primary.c100.background
 
-    clip: true
+    Component.onCompleted: Runtime.activeNotePage = root
 
     function askDeleteConfirmation(message, callback) {
         let popup = _private.deleteConfirmationPopup.createObject(root, {"message": message}) as DeleteConfirmationPopup
@@ -42,6 +42,8 @@ FocusScope {
         popup.deletionConfirmed.connect(callback)
         popup.open()
     }
+
+    clip: true
 
     Rectangle {
         id: _background

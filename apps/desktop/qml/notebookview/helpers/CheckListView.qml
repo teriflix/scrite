@@ -345,6 +345,17 @@ Item {
         }
     }
 
+    // Picks up changes made to the note from outside this view, say by an LLM, but not the ones
+    // saveUpdates() makes, and not while the user is editing an item or has edits waiting to be saved.
+    Connections {
+        target: root.note
+
+        function onContentChanged() {
+            if(!_checkListModel.saving && !_checkListModel.dirty && !FocusInspector.hasFocus(_checkListView))
+                _checkListModel.loadFromNote()
+        }
+    }
+
     ListModel {
         id: _checkListModel
 
@@ -369,7 +380,9 @@ Item {
                         newContent.push(get(i))
                 }
                 newContent = newContent.reverse()
+                saving = true
                 root.note.content = newContent
+                saving = false
                 dirty = false
             }
         }
@@ -386,9 +399,11 @@ Item {
 
             const list = root.note ? root.note.content : []
             list.forEach( (item) => { append(item) } )
+            dirty = false
         }
 
         property bool dirty: false
+        property bool saving: false
     }
 
     onNoteChanged: _checkListModel.loadFromNote()

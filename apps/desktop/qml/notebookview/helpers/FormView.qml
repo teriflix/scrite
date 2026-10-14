@@ -71,6 +71,19 @@ Item {
         onFilterFormsChanged: invalidate()
     }
 
+    Connections {
+        target: root.note
+        enabled: _tabManager.currentItem === null || !root.Window.active
+
+        function onFormDataChanged() {
+            const count = _fieldsRepeater.count
+            for(let i=0; i<count; i++) {
+                let item = _fieldsRepeater.itemAt(i)
+                item.reloadAnswer()
+            }
+        }
+    }
+
     Flickable {
         id: _flickable
 
@@ -238,7 +251,9 @@ Item {
                     property bool visibleToUser: GMath.doRectanglesIntersect( Qt.rect(x,y,width,height),
                                                         Qt.rect(0,_flickable.contentY,width,_flickable.height) )
 
-                    Component.onCompleted: {
+                    Component.onCompleted: reloadAnswer()
+
+                    function reloadAnswer() {
                         if(root.note)
                             answer = root.note.getFormData(formQuestion.id)
                     }
