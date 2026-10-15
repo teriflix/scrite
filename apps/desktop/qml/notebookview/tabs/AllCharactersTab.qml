@@ -29,6 +29,7 @@ import "../../controls"
 import ".."
 import "../menus"
 import "../dialogs"
+import "../helpers"
 
 Item {
     id: root
@@ -48,6 +49,16 @@ Item {
 
         anchors.fill: parent
         anchors.rightMargin: contentHeight > root.height ? 20 : 0
+
+        Keys.onPressed: (event) => {
+                            if(event.matches(StandardKey.SelectAll)) {
+                                _private.selectRange(0, _charactersModel.objectCount-1)
+                                event.accepted = true
+                            } else if(event.key === Qt.Key_Escape) {
+                                _private.clearSelection()
+                                event.accepted = true
+                            }
+                        }
 
         cellHeight: 120
         cellWidth: width/__columnCount
@@ -76,6 +87,11 @@ Item {
 
             property Character character: objectItem as Character
 
+            readonly property bool selected: _private.selection.indexOf(character) >= 0
+
+            // Until the user clicks on something, the current card stands in for the selection.
+            readonly property bool highlighted: selected || (_private.selection.length === 0 && _charactersView.currentIndex === index)
+
             width: _charactersView.cellWidth
             height: _charactersView.cellHeight
 
@@ -83,9 +99,9 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 5
 
-                color: Runtime.colors.tintTx(_delegate.character.color, _charactersView.currentIndex === _delegate.index ? Runtime.colors.currentNoteTint : Runtime.colors.sceneHeadingTint)
-                border.width: 1
-                border.color: Color.isLight(_delegate.character.color) ? (_charactersView.currentIndex === _delegate.index ? "darkgray" : Runtime.colors.primary.borderColor) : _delegate.character.color
+                color: Runtime.colors.tintTx(_delegate.character.color, _delegate.highlighted ? Runtime.colors.currentNoteTint : Runtime.colors.sceneHeadingTint)
+                border.width: _delegate.selected ? 3 : 1
+                border.color: _delegate.selected ? Runtime.colors.primary.highlight.background : (Color.isLight(_delegate.character.color) ? (_delegate.highlighted ? "darkgray" : Runtime.colors.primary.borderColor) : _delegate.character.color)
 
                 Row {
                     anchors.fill: parent
@@ -148,16 +164,68 @@ Item {
                 }
             }
 
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: 5
+
+                color: Color.translucent(Runtime.colors.primary.highlight.background, 0.25)
+                visible: _delegate.selected
+            }
+
+            Rectangle {
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.margins: 10
+
+                width: 22
+                height: 22
+                radius: width/2
+
+                color: Runtime.colors.primary.highlight.background
+                visible: _delegate.selected
+
+                SctLabel {
+                    anchors.centerIn: parent
+
+                    color: Color.textColorFor(parent.color)
+                    text: "✓"
+
+                    font.bold: true
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                }
+            }
+
             MouseArea {
                 anchors.fill: parent
 
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                 onClicked: (mouse) => {
-                               _charactersView.currentIndex = _delegate.index
+                               _charactersView.forceActiveFocus()
+
                                if(mouse.button === Qt.RightButton) {
-                                   _private.popupCharacterMenu(_delegate.character, _delegate)
+                                   if(!_delegate.selected)
+                                       _private.selection = [_delegate.character]
+                                   _charactersView.currentIndex = _delegate.index
+
+                                   if(_private.selection.length > 1)
+                                       _private.popupMultiSelectionMenu(_delegate)
+                                   else
+                                       _private.popupCharacterMenu(_delegate.character, _delegate)
+                                   return
                                }
+
+                               if(mouse.modifiers & Qt.ShiftModifier)
+                                   _private.selectRange(_charactersView.currentIndex, _delegate.index)
+                               else if(mouse.modifiers & Qt.ControlModifier)
+                                   _private.toggleSelection(_delegate.character)
+                               else
+                                   _private.selection = [_delegate.character]
+
+                               // The current index is the anchor for Shift+click ranges, so a range
+                               // keeps extending from the card last clicked without Shift.
+                               if(!(mouse.modifiers & Qt.ShiftModifier))
+                                   _charactersView.currentIndex = _delegate.index
                            }
 
                 onDoubleClicked: (mouse) => {
@@ -261,6 +329,15 @@ Item {
         }
     }
 
+    ActionHandler {
+        action: ActionHub.notebookOperations.find("delete")
+
+        enabled: _private.selection.length > 0 && !Scrite.document.readOnly
+        tooltip: _private.selection.length > 1 ? "Delete selected characters." : "Delete selected character."
+
+        onTriggered: () => { _private.confirmDeleteSelected() }
+    }
+
     SctScrollBar {
         id: _vscrollBar
 
@@ -277,10 +354,88 @@ Item {
 
         sortByProperty: "name"
         sourceModel: Scrite.document.structure.charactersModel
+
+        // Characters can also be removed from elsewhere, so drop any that no longer exist.
+        onObjectCountChanged: _private.selection = _private.selection.filter(c => c)
     }
 
     QtObject {
         id: _private
+
+        property var selection: [] // Characters selected in the grid
+
+        readonly property Component multiSelectionMenu: Menu {
+            MenuItem {
+                enabled: !Scrite.document.readOnly
+                text: "Delete " + _private.selection.length + " Characters"
+                onTriggered: _private.confirmDeleteSelected()
+            }
+        }
+
+        readonly property Component deleteConfirmationPopup: DeleteConfirmationPopup {
+            anchors.centerIn: parent
+        }
+
+        function popupMultiSelectionMenu(source) {
+            let menu = multiSelectionMenu.createObject(source) as Menu
+            menu.aboutToHide.connect(menu.destroy)
+            menu.popup()
+        }
+
+        function toggleSelection(character) {
+            if(selection.indexOf(character) >= 0)
+                selection = selection.filter(c => c !== character)
+            else
+                selection = selection.concat([character])
+        }
+
+        // Selects the characters from fromIndex to toIndex, in the order the grid shows them.
+        function selectRange(fromIndex, toIndex) {
+            const first = Math.max(0, Math.min(fromIndex, toIndex))
+            const last = Math.max(fromIndex, toIndex)
+
+            let range = []
+            for(let i=first; i<=last; i++) {
+                const character = _charactersModel.objectAt(i)
+                if(character)
+                    range.push(character)
+            }
+            selection = range
+        }
+
+        function clearSelection() {
+            selection = []
+        }
+
+        function confirmDeleteSelected() {
+            if(Scrite.document.readOnly || selection.length === 0)
+                return
+
+            const message = selection.length === 1
+                          ? "Are you sure you want to delete this character?"
+                          : "Are you sure you want to delete these " + selection.length + " characters?"
+
+            let popup = deleteConfirmationPopup.createObject(root, {"message": message}) as DeleteConfirmationPopup
+            popup.closed.connect(popup.destroy)
+            popup.deletionConfirmed.connect(deleteSelected)
+            popup.open()
+        }
+
+        function deleteSelected() {
+            const characters = selection.filter(c => c)
+            clearSelection()
+
+            // Removing characters rebuilds the Characters branch in the notebook, which would
+            // otherwise leave a different item current. Ask for this page to be restored after.
+            const notebookModel = ObjectRegistry.find("Scrite.App.Notebook.Model")
+            if(notebookModel)
+                notebookModel.preferredItem = "Characters"
+            else
+                root.switchRequest("Characters")
+
+            for(let i=0; i<characters.length; i++)
+                Scrite.document.structure.removeCharacter(characters[i])
+        }
 
         readonly property Component characterMenu: CharacterMenu {
             onDeleteCharacterRequest: () => { root.deleteCharacterRequest(character) }
