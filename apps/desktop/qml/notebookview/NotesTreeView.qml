@@ -187,20 +187,23 @@ TreeView {
         id: _delegate
 
         required property var notebookItemData
-        required property var notebookModelIndex
+
+        // Derived from the delegate's live row, because the notebookModelIndex role is a
+        // snapshot that goes stale when rows above this one are removed or inserted.
+        readonly property var liveModelIndex: root.index(row, column)
 
         itemData: ({
                        "selected": current,
                        "value": notebookItemData,
                        "isExpanded": expanded,
                        "hasChildren": hasChildren,
-                       "index": notebookModelIndex
+                       "index": liveModelIndex
                    })
-        modelIndex: notebookModelIndex
+        modelIndex: liveModelIndex
         treeViewWidth: root.width
 
         onMakeCurrentRequest: () => {
-            root.setCurrentIndex(notebookModelIndex)
+            root.setCurrentIndex(liveModelIndex)
         }
 
         onModelIndexClicked: (index) => {

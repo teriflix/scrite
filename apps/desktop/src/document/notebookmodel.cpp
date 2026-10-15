@@ -259,17 +259,11 @@ QHash<int, QByteArray> NotebookModel::roleNames() const
 
 QVariant NotebookModel::data(const QModelIndex &index, int role) const
 {
-    if (role == ModelIndexRole)
-        return QVariant::fromValue<QModelIndex>(index);
-
     if (role == ModelDataRole) {
         QHash<int, QByteArray> roles = staticRoleNames();
         roles.remove(ModelDataRole);
 
         QVariantMap ret;
-        ret[QString::fromLatin1(roles.value(ModelIndexRole))] =
-                QVariant::fromValue<QModelIndex>(index);
-
         auto it = roles.begin();
         auto end = roles.end();
         while (it != end) {
@@ -291,8 +285,7 @@ QHash<int, QByteArray> NotebookModel::staticRoleNames()
         { TypeRole, QByteArrayLiteral("notebookItemType") },
         { CategoryRole, QByteArrayLiteral("notebookItemCategory") },
         { ObjectRole, QByteArrayLiteral("notebookItemObject") },
-        { ModelDataRole, QByteArrayLiteral("notebookItemData") },
-        { ModelIndexRole, QByteArrayLiteral("notebookModelIndex") }
+        { ModelDataRole, QByteArrayLiteral("notebookItemData") }
     };
 
     return roles;
