@@ -538,7 +538,8 @@ bool SceneMetadataReport::doGenerate(QTextDocument *document)
             } else if (colKey == COL_KEY_SYNOPSIS) {
                 cellCursor.insertText(scene->synopsis());
             } else if (colKey == COL_KEY_GROUPS) {
-                cellCursor.insertText(scene->groups().join(COMMA_SPACE));
+                cellCursor.insertText(
+                        this->document()->structure()->presentableGroupNames(scene->groups(), true));
             } else if (colKey == COL_KEY_KEYWORDS) {
                 cellCursor.insertText(scene->tags().join(COMMA_SPACE));
             } else if (colKey == COL_KEY_START_PAGE) {
@@ -788,7 +789,8 @@ bool SceneMetadataReport::directExportToOdf(QIODevice *device)
                                                            Qt::TextWordWrap, cellValue)
                                              .height();
                 } else if (colKey == COL_KEY_GROUPS) {
-                    cellValue = scene->groups().join(COMMA_SPACE);
+                    cellValue = this->document()->structure()->presentableGroupNames(
+                            scene->groups(), true);
                 } else if (colKey == COL_KEY_KEYWORDS) {
                     cellValue = scene->tags().join(COMMA_SPACE);
                 } else if (colKey == COL_KEY_START_PAGE) {

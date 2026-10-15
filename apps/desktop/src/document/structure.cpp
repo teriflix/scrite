@@ -4560,7 +4560,7 @@ QJsonObject Structure::preferredGroupInfo() const
     return ret;
 }
 
-QString Structure::presentableGroupNames(const QStringList &groups) const
+QString Structure::presentableGroupNames(const QStringList &groups, bool plainText) const
 {
     const QString slash = QStringLiteral("/");
 
@@ -4575,10 +4575,17 @@ QString Structure::presentableGroupNames(const QStringList &groups) const
     QMap<QString, QStringList>::iterator end = map.end();
     QString ret;
     while (it != end) {
-        if (!ret.isEmpty())
-            ret += QStringLiteral("<br/>");
-        ret += QStringLiteral("<b>") + Utils::SMath::titleCased(it.key()) + QStringLiteral(":</b> ")
-                + it.value().join(QStringLiteral(", "));
+        if (plainText) {
+            if (!ret.isEmpty())
+                ret += QStringLiteral("; ");
+            ret += Utils::SMath::titleCased(it.key()) + QStringLiteral(": ")
+                    + it.value().join(QStringLiteral(", "));
+        } else {
+            if (!ret.isEmpty())
+                ret += QStringLiteral("<br/>");
+            ret += QStringLiteral("<b>") + Utils::SMath::titleCased(it.key())
+                    + QStringLiteral(":</b> ") + it.value().join(QStringLiteral(", "));
+        }
         ++it;
     }
 

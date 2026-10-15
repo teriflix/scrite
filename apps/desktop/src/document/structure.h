@@ -1530,7 +1530,8 @@ public:
     // clang-format on
     QJsonObject preferredGroupInfo() const;
 
-    Q_INVOKABLE QString presentableGroupNames(const QStringList &groups) const;
+    Q_INVOKABLE QString presentableGroupNames(const QStringList &groups,
+                                              bool plainText = false) const;
 
     // Local to the current Scrite document
     // clang-format off
