@@ -297,8 +297,8 @@ Item {
                 readOnly: Scrite.document.readOnly
                 placeholderText: "Scene Synopsis"
                 undoRedoEnabled: true
+                markdownSyntaxEnabled: true
                 adjustTextWidthBasedOnScrollBar: false
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
 
                 onTextEdited: root.scene.setSynopsisDirectly(text)
             }

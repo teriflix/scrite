@@ -90,6 +90,7 @@ AbstractNotebookPage {
                     adjustTextWidthBasedOnScrollBar: false
                     backTabItem: _headingField
                     background.visible: false
+                    markdownSyntaxEnabled: true
                     placeholderText: _private.breakKind + " Summary ..."
                     text: _private.breakElement.breakSummary
 
