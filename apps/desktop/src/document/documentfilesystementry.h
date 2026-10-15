@@ -59,6 +59,8 @@ public:
     Q_INVOKABLE bool exists() const;
     Q_INVOKABLE bool remove();
 
+    Q_INVOKABLE void markModified();
+
 signals:
     // Relayed from ScriteDocument. Close any open handle on the file in response to
     // aboutToSave() and aboutToReset(); it is safe to reopen it after justSaved().

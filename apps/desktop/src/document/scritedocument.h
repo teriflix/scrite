@@ -36,6 +36,7 @@ class ScriteDocument;
 class AbstractExporter;
 class QFileSystemWatcher;
 class ValueIndexLookup;
+class DocumentFileSystemEntry;
 class AbstractReportGenerator;
 class FileModificationTracker;
 
@@ -959,6 +960,8 @@ private:
     void trackedFileModified(const QString &fileName);
 
 private:
+    friend class DocumentFileSystemEntry;
+
     bool m_busy = false;
     bool m_locked = false;
     bool m_loading = false;

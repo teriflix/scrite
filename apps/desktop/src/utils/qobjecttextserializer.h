@@ -33,6 +33,8 @@ public:
 
         virtual QVariantMap defaultSerializeToTextOptions() const { return QVariantMap(); }
         virtual QString serializeToText(const QVariantMap &options = QVariantMap()) const = 0;
+        virtual bool serializeFromText(const QString &text,
+                                       const QVariantMap &options = QVariantMap()) = 0;
     };
 
     ~QObjectTextSerializer() override;
@@ -43,6 +45,8 @@ public:
     Q_INVOKABLE static QVariantMap queryDefaultOptions(const QObject *object);
     Q_INVOKABLE static QString toText(const QObject *object,
                                       const QVariantMap &options = QVariantMap());
+    Q_INVOKABLE static bool fromText(QObject *object, const QString &text,
+                                     const QVariantMap &options = QVariantMap());
 
 private:
     explicit QObjectTextSerializer(QObject *parent = nullptr);

@@ -23,15 +23,6 @@
 #include <QtDebug>
 #include <QFile>
 
-namespace Fountain {
-static bool resolveEmphasis(const QString &input, QString &plainText,
-                            QVector<QTextLayout::FormatRange> &formats);
-static bool encodeEmphasis(const QString &plainText,
-                           const QVector<QTextLayout::FormatRange> &formats, QString &mdText);
-static QStringList sceneHeadingPrefixes();
-
-} // namespace Fountain
-
 QJsonObject Fountain::Element::toJson() const
 {
     QJsonObject ret;
@@ -765,122 +756,301 @@ QString Fountain::Parser::cleanup(const QString &content) const
     return ret;
 }
 
-static bool Fountain::resolveEmphasis(const QString &input, QString &plainText,
-                                      QVector<QTextLayout::FormatRange> &formats)
-{
-    static const QRegularExpression regex("\\*{1,3}|_{1}");
-    if (!regex.match(input).hasMatch())
-        return false;
-
-    // Define regular expression patterns for formatting
-    static const QRegularExpression italicPattern("\\*(.*?)\\*");
-    static const QRegularExpression boldPattern("\\*\\*(.*?)\\*\\*");
-    static const QRegularExpression boldItalicPattern("\\*\\*\\*(.*?)\\*\\*\\*");
-    static const QRegularExpression underlinePattern("\\_(.*?)\\_");
-    static const QRegularExpression strikeoutPattern("~~(.*?)~~");
-
-    // Apply formatting using regular expressions
-    QString formattedText = input;
-    formattedText.replace(boldItalicPattern, "<b><i>\\1</i></b>");
-    formattedText.replace(boldPattern, "<b>\\1</b>");
-    formattedText.replace(italicPattern, "<i>\\1</i>");
-    formattedText.replace(underlinePattern, "<u>\\1</u>");
-    formattedText.replace(strikeoutPattern, "<s>\\1</s>");
-
-    if (formattedText == input)
-        return false;
-
-    QTextDocument doc;
-    doc.setHtml(formattedText);
-
-    const QTextBlock block = doc.firstBlock();
-    plainText = block.text();
-    formats = block.textFormats();
-
-    return true;
+namespace {
+enum EmphasisStyle { BoldStyle = 1, ItalicStyle = 2, UnderlineStyle = 4, StrikeoutStyle = 8 };
 }
 
-static bool Fountain::encodeEmphasis(const QString &plainText,
-                                     const QVector<QTextLayout::FormatRange> &formats,
-                                     QString &mdText)
+bool Fountain::resolveEmphasis(const QString &input, QString &plainText,
+                               QVector<QTextLayout::FormatRange> &formats)
 {
-    if (formats.isEmpty()) {
-        mdText = plainText;
-        return true;
+    /*
+     * *italic*, **bold**, ***bold italic***, _underline_ and ~~strikeout~~.
+     *
+     * A marker counts only if its closing marker is found further along, so that a lone * or _
+     * stays what it is, as in "5 * 3". A backslash in front of *, _, ~ or \ keeps it as it is.
+     *
+     * 'input' and 'plainText' can be the same string: the input is read fully before the result
+     * is written.
+     */
+    static const QString specials = QStringLiteral("*_~\\");
+
+    bool hasSpecials = false;
+    for (const QChar &ch : input) {
+        if (specials.contains(ch)) {
+            hasSpecials = true;
+            break;
+        }
     }
+    if (!hasSpecials)
+        return false;
 
-    QTextDocument document;
+    const QChar star = QLatin1Char('*');
+    const QChar underscore = QLatin1Char('_');
+    const QChar tilde = QLatin1Char('~');
+    const QChar backslash = QLatin1Char('\\');
 
-    QTextCursor cursor(&document);
-    cursor.insertText(plainText);
-    for (const QTextLayout::FormatRange &format : formats) {
-        cursor.setPosition(format.start);
-        cursor.setPosition(format.start + format.length, QTextCursor::KeepAnchor);
-        cursor.mergeCharFormat(format.format);
-        cursor.clearSelection();
-    }
-    cursor.setPosition(0);
+    const int n = input.length();
+    auto isSpace = [&](int i) { return i < 0 || i >= n || input.at(i).isSpace(); };
+    auto isWord = [&](int i) { return i >= 0 && i < n && input.at(i).isLetterOrNumber(); };
+    auto runLength = [&](int i, const QChar &ch) {
+        int length = 0;
+        while (i + length < n && input.at(i + length) == ch)
+            ++length;
+        return length;
+    };
 
-    const QTextBlock block = cursor.block();
-
-    QTextBlock::iterator it = block.begin();
-    while (it != block.end()) {
-        const QTextFragment fragment = it.fragment();
-        if (fragment.isValid()) {
-            QString text = fragment.text();
-            if (text.isEmpty()) {
-                ++it;
+    // Whether a run of 'length' characters of 'ch', that can close what was opened, exists from
+    // index 'from' onwards.
+    auto hasCloser = [&](int from, const QChar &ch, int length) {
+        for (int j = from; j < n;) {
+            if (input.at(j) == backslash) {
+                j += 2;
                 continue;
             }
 
-            QString leftOver;
-            while (text.length() > 0 && text.at(text.length() - 1).isSpace()) {
-                leftOver = text.at(text.length() - 1) + leftOver;
-                text = text.remove(text.length() - 1, 1);
-            }
-
-            if (text.isEmpty()) {
-                mdText += leftOver;
-                ++it;
+            if (input.at(j) != ch) {
+                ++j;
                 continue;
             }
 
-            const QTextCharFormat charFormat = fragment.charFormat();
-            const bool bold = charFormat.fontWeight() == QFont::Bold;
-            const bool italic = charFormat.fontItalic();
-            const bool underline = charFormat.fontUnderline();
-            const bool strikeout = charFormat.fontStrikeOut();
+            const int run = runLength(j, ch);
+            const bool closes = ch == underscore ? (run == 1 && !isWord(j + 1)) : (run == length);
+            if (closes && !isSpace(j - 1))
+                return true;
+            j += run;
+        }
+        return false;
+    };
 
-            if (italic)
-                mdText += "*";
-            if (bold)
-                mdText += "**";
-            if (underline)
-                mdText += "_";
-            if (strikeout)
-                mdText += "~~";
+    QString text;
+    QVector<QTextLayout::FormatRange> ranges;
+    int styles = 0;
+    int rangeStart = 0;
+    bool changed = false;
 
-            mdText += text;
+    // Ends the range that is going on, and starts another one with newStyles.
+    auto changeStyles = [&](int newStyles) {
+        if (styles != 0 && text.length() > rangeStart) {
+            QTextLayout::FormatRange range;
+            range.start = rangeStart;
+            range.length = text.length() - rangeStart;
+            if (styles & BoldStyle)
+                range.format.setFontWeight(QFont::Bold);
+            if (styles & ItalicStyle)
+                range.format.setFontItalic(true);
+            if (styles & UnderlineStyle)
+                range.format.setFontUnderline(true);
+            if (styles & StrikeoutStyle)
+                range.format.setFontStrikeOut(true);
+            ranges.append(range);
+        }
+        if (styles != newStyles)
+            changed = true;
+        styles = newStyles;
+        rangeStart = text.length();
+    };
 
-            if (underline)
-                mdText += "_";
-            if (bold)
-                mdText += "**";
-            if (italic)
-                mdText += "*";
-            if (strikeout)
-                mdText += "~~";
+    int i = 0;
+    while (i < n) {
+        const QChar ch = input.at(i);
 
-            mdText += leftOver;
+        if (ch == backslash && i + 1 < n && specials.contains(input.at(i + 1))) {
+            text += input.at(i + 1);
+            i += 2;
+            changed = true;
+            continue;
         }
 
-        ++it;
+        if (ch == star) {
+            const int run = runLength(i, star);
+            if (run <= 3) {
+                const int style = run == 3 ? (BoldStyle | ItalicStyle)
+                                           : (run == 2 ? BoldStyle : ItalicStyle);
+                if ((styles & style) == style) {
+                    if (!isSpace(i - 1)) {
+                        changeStyles(styles & ~style);
+                        i += run;
+                        continue;
+                    }
+                } else if ((styles & style) == 0 && !isSpace(i + run)
+                           && hasCloser(i + run, star, run)) {
+                    changeStyles(styles | style);
+                    i += run;
+                    continue;
+                }
+            }
+            text += input.mid(i, run);
+            i += run;
+            continue;
+        }
+
+        if (ch == underscore) {
+            if (styles & UnderlineStyle) {
+                if (!isSpace(i - 1) && !isWord(i + 1)) {
+                    changeStyles(styles & ~UnderlineStyle);
+                    ++i;
+                    continue;
+                }
+            } else if (!isWord(i - 1) && !isSpace(i + 1) && hasCloser(i + 1, underscore, 1)) {
+                changeStyles(styles | UnderlineStyle);
+                ++i;
+                continue;
+            }
+            text += ch;
+            ++i;
+            continue;
+        }
+
+        if (ch == tilde) {
+            const int run = runLength(i, tilde);
+            if (run == 2) {
+                if (styles & StrikeoutStyle) {
+                    if (!isSpace(i - 1)) {
+                        changeStyles(styles & ~StrikeoutStyle);
+                        i += run;
+                        continue;
+                    }
+                } else if (!isSpace(i + run) && hasCloser(i + run, tilde, run)) {
+                    changeStyles(styles | StrikeoutStyle);
+                    i += run;
+                    continue;
+                }
+            }
+            text += input.mid(i, run);
+            i += run;
+            continue;
+        }
+
+        text += ch;
+        ++i;
     }
 
+    changeStyles(0);
+
+    if (!changed)
+        return false;
+
+    plainText = text;
+    formats = ranges;
     return true;
 }
 
-static QStringList Fountain::sceneHeadingPrefixes()
+bool Fountain::encodeEmphasis(const QString &plainText,
+                              const QVector<QTextLayout::FormatRange> &formats, QString &mdText)
+{
+    /*
+     * The reverse of resolveEmphasis(). Text that would be read back as emphasis, or as an escape,
+     * is written with backslashes. Text that wouldn't is left as it is, which is all of it when
+     * there are no formats, as before.
+     */
+    const int n = plainText.length();
+
+    QVector<int> styles(n, 0);
+    for (const QTextLayout::FormatRange &range : formats) {
+        const QTextCharFormat &format = range.format;
+
+        int style = 0;
+        if (format.fontWeight() >= QFont::Bold)
+            style |= BoldStyle;
+        if (format.fontItalic())
+            style |= ItalicStyle;
+        if (format.fontUnderline())
+            style |= UnderlineStyle;
+        if (format.fontStrikeOut())
+            style |= StrikeoutStyle;
+        if (style == 0)
+            continue;
+
+        const int end = qMin(n, range.start + range.length);
+        for (int i = qMax(0, range.start); i < end; ++i)
+            styles[i] |= style;
+    }
+
+    // plainText from 'from' till 'to', with backslashes in front of what could be taken for emphasis
+    auto escaped = [&](int from, int to) {
+        QString ret;
+        for (int i = from; i < to; ++i) {
+            const QChar ch = plainText.at(i);
+            const bool special = ch == QLatin1Char('\\') || ch == QLatin1Char('*')
+                    || ch == QLatin1Char('_')
+                    || (ch == QLatin1Char('~')
+                        && ((i > 0 && plainText.at(i - 1) == ch)
+                            || (i + 1 < n && plainText.at(i + 1) == ch)));
+            if (special)
+                ret += QLatin1Char('\\');
+            ret += ch;
+        }
+        return ret;
+    };
+
+    // Same, but only if reading it back would change it.
+    auto escapedIfNeeded = [&](int from, int to) {
+        const QString text = plainText.mid(from, to - from);
+        QString resolved;
+        QVector<QTextLayout::FormatRange> resolvedFormats;
+        return Fountain::resolveEmphasis(text, resolved, resolvedFormats) ? escaped(from, to) : text;
+    };
+
+    auto opening = [](int style) {
+        QString ret;
+        if (style & ItalicStyle)
+            ret += QLatin1String("*");
+        if (style & BoldStyle)
+            ret += QLatin1String("**");
+        if (style & UnderlineStyle)
+            ret += QLatin1String("_");
+        if (style & StrikeoutStyle)
+            ret += QLatin1String("~~");
+        return ret;
+    };
+
+    auto closing = [](int style) {
+        QString ret;
+        if (style & StrikeoutStyle)
+            ret += QLatin1String("~~");
+        if (style & UnderlineStyle)
+            ret += QLatin1String("_");
+        if (style & BoldStyle)
+            ret += QLatin1String("**");
+        if (style & ItalicStyle)
+            ret += QLatin1String("*");
+        return ret;
+    };
+
+    QString ret;
+    int i = 0;
+    while (i < n) {
+        int j = i;
+        while (j < n && styles[j] == styles[i])
+            ++j;
+
+        const int style = styles[i];
+        if (style == 0) {
+            ret += escapedIfNeeded(i, j);
+            i = j;
+            continue;
+        }
+
+        // The markers go around the text, and not around the spaces next to it.
+        int start = i;
+        int end = j;
+        while (start < end && plainText.at(start).isSpace())
+            ++start;
+        while (end > start && plainText.at(end - 1).isSpace())
+            --end;
+
+        ret += plainText.mid(i, start - i);
+        if (start < end)
+            ret += opening(style) + escaped(start, end) + closing(style);
+        ret += plainText.mid(end, j - end);
+        i = j;
+    }
+
+    mdText = ret;
+    return true;
+}
+
+QStringList Fountain::sceneHeadingPrefixes()
 {
     return { "INT", "EXT", "EST", "INT./EXT", "INT/EXT", "I/E" };
 }
@@ -910,6 +1080,11 @@ Fountain::Writer::Writer(const Scene *scene, const ScreenplayElement *element, i
     : m_options(options)
 {
     Fountain::populateBody(scene, m_body, element);
+}
+
+Fountain::Writer::Writer(const SceneElement *element, int options) : m_options(options)
+{
+    Fountain::populateBody(element, m_body);
 }
 
 Fountain::Writer::~Writer() { }
@@ -1316,44 +1491,52 @@ void Fountain::populateBody(const Scene *scene, Body &body, const ScreenplayElem
     }
 
     const int nrParas = scene->elementCount();
-    for (int j = 0; j < nrParas; j++) {
-        const SceneElement *para = scene->elementAt(j);
+    for (int j = 0; j < nrParas; j++)
+        Fountain::populateBody(scene->elementAt(j), body);
+}
 
-        Fountain::Element fPara;
-        fPara.text = para->formattedText();
-        fPara.formats = para->textFormats();
+void Fountain::populateBody(const SceneElement *element, Body &body)
+{
+    if (element == nullptr)
+        return;
 
-        switch (para->type()) {
-        case SceneElement::Shot:
-            fPara.type = Fountain::Element::Shot;
-            break;
-        case SceneElement::Transition:
-            fPara.type = Fountain::Element::Transition;
-            break;
-        case SceneElement::Character:
-            fPara.type = Fountain::Element::Character;
+    Fountain::Element fPara;
+    fPara.text = element->formattedText();
+    fPara.formats = element->textFormats();
+    fPara.isCentered = element->alignment().testFlag(Qt::AlignHCenter);
+
+    switch (element->type()) {
+    case SceneElement::Shot:
+        fPara.type = Fountain::Element::Shot;
+        break;
+    case SceneElement::Transition:
+        fPara.type = Fountain::Element::Transition;
+        break;
+    case SceneElement::Character:
+        fPara.type = Fountain::Element::Character;
+        if (const Scene *scene = element->scene()) {
             if (const SceneDualDialogue *group =
-                        scene->findContainingDualDialogue(const_cast<SceneElement *>(para))) {
-                if (group->rightElements().contains(const_cast<SceneElement *>(para)))
+                        scene->findContainingDualDialogue(const_cast<SceneElement *>(element))) {
+                if (group->rightElements().contains(const_cast<SceneElement *>(element)))
                     fPara.isDualDialogueRightColumn = true;
             }
-            break;
-        case SceneElement::Action:
-            fPara.type = Fountain::Element::Action;
-            break;
-        case SceneElement::Dialogue:
-            fPara.type = Fountain::Element::Dialogue;
-            break;
-        case SceneElement::Parenthetical:
-            fPara.type = Fountain::Element::Parenthetical;
-            break;
-        default:
-            break;
         }
-
-        if (fPara.type != fPara.None)
-            body.append(fPara);
+        break;
+    case SceneElement::Action:
+        fPara.type = Fountain::Element::Action;
+        break;
+    case SceneElement::Dialogue:
+        fPara.type = Fountain::Element::Dialogue;
+        break;
+    case SceneElement::Parenthetical:
+        fPara.type = Fountain::Element::Parenthetical;
+        break;
+    default:
+        break;
     }
+
+    if (fPara.type != fPara.None)
+        body.append(fPara);
 }
 
 void Fountain::populateBody(const Screenplay *screenplay, Body &body,

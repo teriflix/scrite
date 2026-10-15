@@ -76,6 +76,11 @@ bool DocumentFileSystemEntry::remove()
     return ScriteDocument::instance()->fileSystem()->remove(this->dfsPath());
 }
 
+void DocumentFileSystemEntry::markModified()
+{
+    ScriteDocument::instance()->markAsModified();
+}
+
 QString DocumentFileSystemEntry::dfsPath() const
 {
     return extensionsFolder + m_path;

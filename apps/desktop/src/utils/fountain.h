@@ -27,6 +27,7 @@
 class Scene;
 class QIODevice;
 class Screenplay;
+class SceneElement;
 class ScreenplayElement;
 
 namespace Fountain {
@@ -75,12 +76,19 @@ typedef QPair<QString, QString> TitlePageField;
 typedef QList<TitlePageField> TitlePage;
 typedef QList<Element> Body;
 
+bool resolveEmphasis(const QString &input, QString &plainText,
+                     QVector<QTextLayout::FormatRange> &formats);
+bool encodeEmphasis(const QString &plainText, const QVector<QTextLayout::FormatRange> &formats,
+                    QString &mdText);
+QStringList sceneHeadingPrefixes();
+
 void populateTitlePage(const Screenplay *screenplay, TitlePage &titlePage);
 
 void populateBody(const Scene *scene, Body &body, const ScreenplayElement *element = nullptr);
 void populateBody(const Screenplay *screenplay, Body &body,
                   std::function<bool(const ScreenplayElement *)> filterFunc = nullptr);
 void populateBody(const ScreenplayElement *element, Body &body);
+void populateBody(const SceneElement *element, Body &body);
 
 void loadTitlePage(const TitlePage &titlePage, Screenplay *screenplay);
 
@@ -157,6 +165,7 @@ public:
     Writer(const Screenplay *screenplay, int options = DefaultOptions);
     Writer(const ScreenplayElement *element, int options = DefaultOptions);
     Writer(const Scene *scene, const ScreenplayElement *element, int options = DefaultOptions);
+    Writer(const SceneElement *element, int options = DefaultOptions);
     ~Writer();
 
     bool write(const QString &fileName) const;
