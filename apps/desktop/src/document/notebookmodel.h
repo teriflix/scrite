@@ -79,8 +79,7 @@ public:
         TypeRole,
         CategoryRole,
         ObjectRole,
-        ModelDataRole,
-        ModelIndexRole
+        ModelDataRole
     };
 
     Q_INVOKABLE QVariant modelIndexData(const QModelIndex &index) const;
