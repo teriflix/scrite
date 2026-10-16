@@ -27,12 +27,13 @@ import "../../globals"
 import "../../dialogs"
 import "../../helpers"
 import "../../controls"
+import "elementparteditors"
 
 AbstractScreenplayElementDelegate {
     id: root
 
     content: Rectangle {
-        height: _layout.height * 1.2
+        height: _column.height
 
         color: Runtime.colors.primary.c10.background
 
@@ -57,67 +58,97 @@ AbstractScreenplayElementDelegate {
 
           Besides, we won't have too many break delegates anyway.
           */
-        RowLayout {
-            id: _layout
-
-            anchors.verticalCenter: parent.verticalCenter
+        Column {
+            id: _column
 
             width: parent.width
 
-            spacing: 10
-
-            TextField {
-                Layout.preferredWidth: root.pageLeftMargin
-
-                text: {
-                    if(root.screenplayElement.breakType === Screenplay.Episode)
-                        return "Ep " + (root.screenplayElement.episodeIndex+1)
-                    return root.screenplayElement.breakTitle
-                }
-                font: root.font
-                opacity: root.screenplayElement.breakSubtitle.length > 0 ? 1 : 0
-                readOnly: true
-                horizontalAlignment: Text.AlignRight
-                background: Item { }
-            }
-
-            SctTextField {
-                id: _titleField
-
-                Layout.fillWidth: true
-
-                text: root.screenplayElement.breakSubtitle
-                font: root.font
-                label: ""
-                focus: true
-                placeholderText: root.screenplayElement.breakTitle
-                enableTransliteration: true
-
-                onTextEdited: root.screenplayElement.breakSubtitle = text.replace(/[\n\t]/g, ' ')
-                onEditingComplete: root.screenplayElement.breakSubtitle = text.replace(/[\n\t]/g, ' ')
-            }
-
             Item {
-                Layout.preferredWidth: root.pageRightMargin
+                width: parent.width
+                height: _layout.height * 1.2
 
-                FlatToolButton {
+                RowLayout {
+                    id: _layout
+
                     anchors.verticalCenter: parent.verticalCenter
 
-                    width: root.fontMetrics.lineSpacing
-                    height: root.fontMetrics.lineSpacing
-                    toolTipText: {
-                        let ret = "Deletes this "
-                        switch(root.screenplayElement.breakType) {
-                        case Screenplay.Act: ret += "act"; break;
-                        case Screenplay.Episode: ret += "episode"; break;
-                        case Screenplay.Interval: ret += "interval"; break
-                        }
-                        ret += " break."
-                        return ret
-                    }
-                    iconSource: Runtime.themedIcon("qrc:/icons/action/delete.png")
+                    width: parent.width
 
-                    onClicked: Runtime.screenplayAdapter.screenplay.removeElement(root.screenplayElement)
+                    spacing: 10
+
+                    TextField {
+                        Layout.preferredWidth: root.pageLeftMargin
+
+                        text: {
+                            if(root.screenplayElement.breakType === Screenplay.Episode)
+                                return "Ep " + (root.screenplayElement.episodeIndex+1)
+                            return root.screenplayElement.breakTitle
+                        }
+                        font: root.font
+                        opacity: root.screenplayElement.breakSubtitle.length > 0 ? 1 : 0
+                        readOnly: true
+                        horizontalAlignment: Text.AlignRight
+                        background: Item { }
+                    }
+
+                    SctTextField {
+                        id: _titleField
+
+                        Layout.fillWidth: true
+
+                        text: root.screenplayElement.breakSubtitle
+                        font: root.font
+                        label: ""
+                        focus: true
+                        placeholderText: root.screenplayElement.breakTitle
+                        enableTransliteration: true
+
+                        onTextEdited: root.screenplayElement.breakSubtitle = text.replace(/[\n\t]/g, ' ')
+                        onEditingComplete: root.screenplayElement.breakSubtitle = text.replace(/[\n\t]/g, ' ')
+                    }
+
+                    Item {
+                        Layout.preferredWidth: root.pageRightMargin
+
+                        FlatToolButton {
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            width: root.fontMetrics.lineSpacing
+                            height: root.fontMetrics.lineSpacing
+                            toolTipText: {
+                                let ret = "Deletes this "
+                                switch(root.screenplayElement.breakType) {
+                                case Screenplay.Act: ret += "act"; break;
+                                case Screenplay.Episode: ret += "episode"; break;
+                                case Screenplay.Interval: ret += "interval"; break
+                                }
+                                ret += " break."
+                                return ret
+                            }
+                            iconSource: Runtime.themedIcon("qrc:/icons/action/delete.png")
+
+                            onClicked: Runtime.screenplayAdapter.screenplay.removeElement(root.screenplayElement)
+                        }
+                    }
+                }
+            }
+
+            Loader {
+                width: parent.width
+                height: item ? item.implicitHeight : 0
+
+                active: Runtime.screenplayEditorSettings.displaySceneSynopsis
+                visible: active
+
+                sourceComponent: BreakSummaryPartEditor {
+                    screenplayElement: root.screenplayElement
+                    fontMetrics: Runtime.partFontMetrics
+                    pageMargins: root.pageMargins
+                    zoomLevel: root.zoomLevel
+                    isCurrent: root.isCurrent
+                    readOnly: root.readOnly
+
+                    onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
                 }
             }
         }

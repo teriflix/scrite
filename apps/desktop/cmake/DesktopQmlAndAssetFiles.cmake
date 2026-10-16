@@ -201,6 +201,8 @@ set(SCRITE_DESKTOP_QML_FILES
   "qml/screenplayeditor/delegates/AbstractScreenplayElementDelegate.qml"
   "qml/screenplayeditor/delegates/AbstractScreenplayElementSceneDelegate.qml"
   "qml/screenplayeditor/delegates/OmittedScreenplayElementDelegate.qml"
+  "qml/screenplayeditor/delegates/elementparteditors/AbstractElementPartEditor.qml"
+  "qml/screenplayeditor/delegates/elementparteditors/BreakSummaryPartEditor.qml"
   "qml/screenplayeditor/delegates/scenedelegate/HighResolutionSceneContent.qml"
   "qml/screenplayeditor/delegates/scenedelegate/LowResolutionSceneContent.qml"
   "qml/screenplayeditor/delegates/sceneparteditors/AbstractScenePartEditor.qml"
