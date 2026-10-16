@@ -39,6 +39,12 @@ TextArea {
         Qt.callLater(() => { if(root.text !== root.initialText) root.text = root.initialText })
     }
 
+    onInitialTextChanged: {
+        // Picks up changes made from outside, but not while the user is editing.
+        if(!activeFocus && text !== initialText)
+            text = initialText
+    }
+
     SyntaxHighlighter.delegates: [
         LanguageFontSyntaxHighlighterDelegate {
             enabled: Runtime.screenplayEditorSettings.useLanguageFonts
