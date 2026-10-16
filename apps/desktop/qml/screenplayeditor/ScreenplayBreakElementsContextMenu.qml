@@ -37,7 +37,7 @@ SctMenu {
     SctMenuItem {
         text: "Paste After"
 
-        enabled: Scrite.document.screenplay.canPaste && !Scrite.document.screenplay.hasSelectedElements
+        enabled: Scrite.document.screenplay.canPaste || root.element === null
 
         onClicked: {
             const index = Scrite.document.screenplay.indexOfElement(root.element);
@@ -49,7 +49,7 @@ SctMenu {
     SctMenuItem {
         text: "Remove"
 
-        enabled: !Scrite.document.readOnly && !Scrite.document.screenplay.hasSelectedElements
+        enabled: !Scrite.document.readOnly || root.element === null
 
         onClicked: {
             Scrite.document.screenplay.removeElement(root.element)
