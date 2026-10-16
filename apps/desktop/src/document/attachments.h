@@ -101,6 +101,16 @@ public:
     Q_SIGNAL void mimeTypeChanged();
 
     // clang-format off
+    Q_PROPERTY(bool readOnly
+               READ isReadOnly
+               WRITE setReadOnly
+               NOTIFY readOnlyChanged)
+    // clang-format on
+    void setReadOnly(bool val);
+    bool isReadOnly() const;
+    Q_SIGNAL void readOnlyChanged();
+
+    // clang-format off
     Q_PROPERTY(QJsonObject userData
                READ userData
                WRITE setUserData
@@ -110,6 +120,7 @@ public:
     QJsonObject userData() const { return m_userData; }
     Q_SIGNAL void userDataChanged();
 
+    Q_INVOKABLE QString fileContent() const;
     Q_INVOKABLE void openAttachmentAnonymously();
     Q_INVOKABLE void openAttachmentInPlace();
 

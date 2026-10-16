@@ -61,6 +61,7 @@ static QStringList supportedExtensions(Attachment::Type type)
 Attachment::Attachment(QObject *parent) : QObject(parent)
 {
     connect(this, &Attachment::titleChanged, this, &Attachment::attachmentModified);
+    connect(this, &Attachment::filePathChanged, this, &Attachment::readOnlyChanged);
     connect(this, &Attachment::filePathChanged, this, &Attachment::attachmentModified);
     connect(this, &Attachment::mimeTypeChanged, this, &Attachment::attachmentModified);
     connect(this, &Attachment::featuredChanged, this, &Attachment::attachmentModified);
@@ -100,6 +101,39 @@ void Attachment::setTitle(const QString &val)
     emit titleChanged();
 }
 
+void Attachment::setReadOnly(bool val)
+{
+    if (m_filePath.isEmpty() || this->isReadOnly() == val)
+        return;
+
+    ScriteDocument *doc = ScriteDocument::instance()->instance();
+    DocumentFileSystem *dfs = doc->fileSystem();
+    const QString path = dfs->absolutePath(m_filePath);
+
+    auto perms = QFile::permissions(path);
+    perms.setFlag(QFileDevice::WriteOwner, !val);
+    perms.setFlag(QFileDevice::WriteUser, !val);
+    perms.setFlag(QFileDevice::WriteGroup, !val);
+    perms.setFlag(QFileDevice::WriteOther, !val);
+    QFile::setPermissions(path, perms);
+
+    emit readOnlyChanged();
+}
+
+bool Attachment::isReadOnly() const
+{
+    if (m_filePath.isEmpty())
+        return false;
+
+    ScriteDocument *doc = ScriteDocument::instance()->instance();
+    DocumentFileSystem *dfs = doc->fileSystem();
+    const QString path = dfs->absolutePath(m_filePath);
+
+    auto perms = QFile::permissions(path);
+    return !perms.testAnyFlags(QFileDevice::WriteOwner | QFileDevice::WriteUser
+                               | QFileDevice::WriteGroup | QFileDevice::WriteOther);
+}
+
 void Attachment::setUserData(const QJsonObject &val)
 {
     if (m_userData == val)
@@ -107,6 +141,29 @@ void Attachment::setUserData(const QJsonObject &val)
 
     m_userData = val;
     emit userDataChanged();
+}
+
+QString Attachment::fileContent() const
+{
+    if (m_filePath.isEmpty())
+        return QString();
+
+    // Mime databases don't always know .fountain, so the extension is checked as well.
+    static const QStringList textMimeTypes = { "text/plain", "text/markdown", "text/x-markdown" };
+    static const QStringList textExtensions = { "txt", "md", "fountain" };
+    const QString mimeType = this->mimeType();
+    const QString suffix = QFileInfo(m_originalFileName).suffix().toLower();
+    if (textMimeTypes.contains(mimeType) || textExtensions.contains(suffix)) {
+        ScriteDocument *doc = ScriteDocument::instance()->instance();
+        DocumentFileSystem *dfs = doc->fileSystem();
+        const QString path = dfs->absolutePath(m_filePath);
+
+        QFile file(path);
+        if (file.open(QFile::ReadOnly))
+            return QString::fromUtf8(file.readAll());
+    }
+
+    return QString();
 }
 
 void Attachment::openAttachmentAnonymously()

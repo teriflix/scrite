@@ -435,6 +435,17 @@ bool Scrite::doUnzip(const QFileInfo &zipFileInfo, const QTemporaryDir &dstDir)
 
         dstFile.close();
         srcFile.close();
+
+        // Files that went into the archive without write permissions (read-only attachments) come
+        // out without them. The permissions are in the high 16 bits of the external attributes,
+        // as Unix mode bits, and are not there for archives that don't have them.
+        const quint32 unixMode = qfileInfo.externalAttr >> 16;
+        if (unixMode != 0 && (unixMode & 0222) == 0) {
+            const QFileDevice::Permissions writeFlags = QFileDevice::WriteOwner
+                    | QFileDevice::WriteUser | QFileDevice::WriteGroup | QFileDevice::WriteOther;
+            dstFile.setPermissions(dstFile.permissions() & ~writeFlags);
+        }
+
         qzip.goToNextFile();
     }
 
