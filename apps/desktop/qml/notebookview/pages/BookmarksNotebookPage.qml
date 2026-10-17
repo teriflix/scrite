@@ -139,7 +139,7 @@ AbstractNotebookPage {
                             width: parent.width-32-parent.spacing
 
                             font.bold: true
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                            font.pointSize: Runtime.notebookFontPointSize
                         }
                     }
 

@@ -35,6 +35,12 @@ Item {
 
     readonly property Screenplay screenplay: Scrite.document.screenplay
 
+    FontMetrics {
+        id: _fontMetrics
+
+        font.pointSize: Runtime.notebookFontPointSize
+    }
+
     ColumnLayout {
         anchors.centerIn: parent
 
@@ -64,7 +70,7 @@ Item {
             ScrollBar.vertical: SctScrollBar { }
 
             Layout.fillWidth: true
-            Layout.preferredHeight: Math.max(Runtime.idealFontMetrics.lineSpacing*10, contentHeight+10)
+            Layout.preferredHeight: Math.max(_fontMetrics.lineSpacing*10, contentHeight+10)
 
             adjustTextWidthBasedOnScrollBar: true
             placeholderText: "Type your logline here."

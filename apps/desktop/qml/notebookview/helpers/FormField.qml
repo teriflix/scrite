@@ -63,6 +63,12 @@ Column {
         _answerItemLoader.assumeFocus(pos)
     }
 
+    FontMetrics {
+        id: _fontMetrics
+
+        font.pointSize: Runtime.notebookFontPointSize
+    }
+
     Row {
         id: _questionRow
 
@@ -77,7 +83,7 @@ Column {
 
             anchors.top: parent.top
 
-            width: Runtime.idealFontMetrics.averageCharacterWidth * root.nrQuestionDigits
+            width: _fontMetrics.averageCharacterWidth * root.nrQuestionDigits
 
             font.bold: true
             font.pointSize: Runtime.notebookFontPointSize + 2
@@ -100,7 +106,7 @@ Column {
     Rectangle {
         id: _answerArea
 
-        property real minHeight: (Runtime.idealFontMetrics.lineSpacing + Runtime.idealFontMetrics.descent + Runtime.idealFontMetrics.ascent) * (root.answerLength == FormQuestion.ShortParagraph ? 1.1 : 3)
+        property real minHeight: (_fontMetrics.lineSpacing + _fontMetrics.descent + _fontMetrics.ascent) * (root.answerLength == FormQuestion.ShortParagraph ? 1.1 : 3)
 
         anchors.right: parent.right
 

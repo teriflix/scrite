@@ -54,7 +54,7 @@ AbstractNotebookPage {
 
                 text: _private.breakElement.breakTitle
 
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 3
+                font.pointSize: Runtime.notebookFontPointSize + 3
             }
 
             SctTextField {
@@ -68,7 +68,7 @@ AbstractNotebookPage {
                 text: _private.breakElement.breakSubtitle
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 5
+                font.pointSize: Runtime.notebookFontPointSize + 5
 
                 onTextEdited: _private.breakElement.breakSubtitle = text
             }
@@ -93,6 +93,7 @@ AbstractNotebookPage {
                     markdownSyntaxEnabled: true
                     placeholderText: _private.breakKind + " Summary ..."
                     text: _private.breakElement.breakSummary
+                    font.pointSize: Runtime.notebookFontPointSize
 
                     onTextEdited: _private.breakElement.breakSummary = text
                 }
@@ -141,7 +142,7 @@ AbstractNotebookPage {
         wrapMode: Text.WordWrap
 
         font.bold: true
-        font.pointSize: Runtime.idealFontMetrics.font.pointSize + 3
+        font.pointSize: Runtime.notebookFontPointSize + 3
     }
 
     QtObject {

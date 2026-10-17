@@ -350,7 +350,7 @@ Rectangle {
                                     text: "<b>Are you sure you want to delete this relationship?</b><br/><br/>NOTE: This action cannot be undone!!"
                                     wrapMode: Text.WordWrap
 
-                                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                                    font.pointSize: Runtime.notebookFontPointSize
                                 }
 
                                 Row {
@@ -497,7 +497,7 @@ Rectangle {
             text: "Graph will be refreshed when you use it next."
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            font.pointSize: Runtime.notebookFontPointSize
         }
 
         MouseArea {
@@ -703,7 +703,7 @@ Rectangle {
                     horizontalAlignment: Text.AlignHCenter
                     text: _crGraphEdge.modelData.relationship.name
 
-                    font.pointSize: Math.floor(Runtime.idealFontMetrics.font.pointSize*0.75)
+                    font.pointSize: Math.floor(Runtime.notebookFontPointSize*0.75)
                 }
 
                 MouseArea {

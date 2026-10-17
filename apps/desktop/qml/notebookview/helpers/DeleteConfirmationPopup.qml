@@ -57,7 +57,7 @@ Popup {
             wrapMode: Text.WordWrap
 
             font.bold: true
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            font.pointSize: Runtime.notebookFontPointSize
         }
 
         RowLayout {
