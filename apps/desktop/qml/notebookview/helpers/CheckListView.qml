@@ -32,8 +32,8 @@ Item {
 
     property Note note
 
-    property real maxTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 80
-    property real minTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 20
+    required property real maxTextAreaSize
+    required property real minTextAreaSize
 
     ColumnLayout {
         anchors.centerIn: parent

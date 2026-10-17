@@ -35,6 +35,8 @@ AbstractNotePage {
             Layout.fillHeight: true
 
             note: root.note
+            maxTextAreaSize: root.maxTextAreaSize
+            minTextAreaSize: root.minTextAreaSize
         }
 
         AttachmentsView {

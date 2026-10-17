@@ -28,5 +28,7 @@ AbstractNotePage {
         anchors.fill: parent
 
         note: root.note
+        maxTextAreaSize: root.maxTextAreaSize
+        minTextAreaSize: root.minTextAreaSize
     }
 }

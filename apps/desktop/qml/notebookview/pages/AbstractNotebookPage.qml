@@ -29,8 +29,8 @@ FocusScope {
     required property var pageData
     required property NotebookModel notebookModel
 
-    property real maxTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 80
-    property real minTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 20
+    required property real maxTextAreaSize
+    required property real minTextAreaSize
 
     property color backgroundColor: Runtime.colors.primary.c100.background
 

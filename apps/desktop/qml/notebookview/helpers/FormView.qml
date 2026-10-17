@@ -30,8 +30,8 @@ Item {
 
     property int nrQuestionDigits: form ? evalNrQuestionDigits() : 2
 
-    property real maxTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 80
-    property real minTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 20
+    required property real maxTextAreaSize
+    required property real minTextAreaSize
 
     property Form form: note ? note.form : null
     property Note note
