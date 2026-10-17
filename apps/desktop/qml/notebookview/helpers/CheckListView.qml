@@ -59,7 +59,7 @@ Item {
             wrapMode: Text.WordWrap
 
             font.bold: true
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+            font.pointSize: Runtime.notebookFontPointSize + 2
 
             onTextEdited: {
                 if(root.note)
@@ -78,7 +78,7 @@ Item {
             text: root.note ? root.note.summary : ""
             wrapMode: Text.WordWrap
 
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            font.pointSize: Runtime.notebookFontPointSize
 
             onTextEdited: {
                 if(root.note)

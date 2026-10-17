@@ -330,7 +330,7 @@ Item {
     QtObject {
         id: _private
 
-        property real maxTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 120
+        property real maxTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 100
         property real minTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 20
 
         readonly property Component genericPage: GenericNotebookPage {

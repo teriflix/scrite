@@ -80,7 +80,7 @@ Column {
             width: Runtime.idealFontMetrics.averageCharacterWidth * root.nrQuestionDigits
 
             font.bold: true
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+            font.pointSize: Runtime.notebookFontPointSize + 2
             horizontalAlignment: Text.AlignRight
         }
 
@@ -93,7 +93,7 @@ Column {
 
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             font.bold: true
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+            font.pointSize: Runtime.notebookFontPointSize + 2
         }
     }
 
@@ -164,7 +164,7 @@ Column {
                 selectByMouse: false
                 selectByKeyboard: false
 
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.notebookFontPointSize
 
                 background: Item { }
 
@@ -259,7 +259,7 @@ Column {
                 rightPadding: 5
                 bottomPadding: 5
 
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.notebookFontPointSize
 
                 background: Item { }
 

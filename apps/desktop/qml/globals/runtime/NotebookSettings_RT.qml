@@ -25,6 +25,7 @@ Settings {
     property int sceneSynopsisTabIndex: 0
     property int graphLayoutMaxIterations: 50000
     property int graphLayoutMaxTime: 1000
+    property int fontPointSize: 0 // 0 means follow Runtime.idealFontMetrics
 
     property bool richTextNotesEnabled: true
     property bool showAllFormQuestions: true

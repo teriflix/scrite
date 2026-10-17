@@ -70,7 +70,7 @@ Item {
             wrapMode: Text.WordWrap
 
             font.bold: true
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+            font.pointSize: Runtime.notebookFontPointSize + 2
 
             onTextEdited: {
                 if(root.note)
@@ -160,6 +160,7 @@ Item {
                 }
 
                 text: _noteContent.plainText
+                font.pointSize: Runtime.notebookFontPointSize
                 placeholderText: "Content"
                 tabSequenceIndex: 1
                 tabSequenceManager: _tabManager
@@ -244,6 +245,7 @@ Item {
                     }
 
                     text: _noteContent.plainText
+                    font.pointSize: Runtime.notebookFontPointSize
                     placeholderText: "Content"
                     tabSequenceIndex: 1
                     tabSequenceManager: _tabManager

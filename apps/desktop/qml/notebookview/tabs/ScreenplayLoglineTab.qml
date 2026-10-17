@@ -73,7 +73,7 @@ Item {
             undoRedoEnabled: true
 
             font.family: Scrite.document.displayFormat.defaultFont2.family
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+            font.pointSize: Runtime.notebookFontPointSize + 2
 
             background: Rectangle {
                 color: Runtime.colors.primary.windowColor

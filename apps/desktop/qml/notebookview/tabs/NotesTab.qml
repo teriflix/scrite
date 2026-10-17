@@ -105,7 +105,7 @@ Item {
                                 text: _noteItem.note.title
 
                                 font.bold: true
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                                font.pointSize: Runtime.notebookFontPointSize
                             }
 
                             SctLabel {

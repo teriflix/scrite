@@ -216,6 +216,7 @@ Item {
                                 TabSequenceItem.manager: _tabSequence
 
                                 enableTransliteration: true
+                                font.pointSize: Runtime.notebookFontPointSize
                                 label: "Role / Designation:"
                                 labelAlwaysVisible: true
                                 maximumLength: 50
@@ -242,6 +243,7 @@ Item {
                                     TabSequenceItem.manager: _tabSequence
 
                                     enableTransliteration: true
+                                    font.pointSize: Runtime.notebookFontPointSize
                                     label: "Tags:"
                                     labelAlwaysVisible: true
                                     maximumLength: 25
@@ -351,6 +353,7 @@ Item {
                                 TabSequenceItem.manager: _tabSequence
 
                                 enableTransliteration: true
+                                font.pointSize: Runtime.notebookFontPointSize
                                 label: "Aliases:"
                                 labelAlwaysVisible: true
                                 maximumLength: 50
@@ -380,6 +383,7 @@ Item {
                                     TabSequenceItem.manager: _tabSequence
 
                                     enableTransliteration: true
+                                    font.pointSize: Runtime.notebookFontPointSize
                                     label: "Type:"
                                     labelAlwaysVisible: true
                                     maximumLength: 25
@@ -401,6 +405,7 @@ Item {
                                     TabSequenceItem.manager: _tabSequence
 
                                     enableTransliteration: true
+                                    font.pointSize: Runtime.notebookFontPointSize
                                     label: "Gender:"
                                     labelAlwaysVisible: true
                                     maximumLength: 20
@@ -420,6 +425,7 @@ Item {
                                     TabSequenceItem.manager: _tabSequence
 
                                     enableTransliteration: true
+                                    font.pointSize: Runtime.notebookFontPointSize
                                     label: "Age:"
                                     labelAlwaysVisible: true
                                     maximumLength: 20
@@ -439,6 +445,7 @@ Item {
                                     TabSequenceItem.manager: _tabSequence
 
                                     enableTransliteration: true
+                                    font.pointSize: Runtime.notebookFontPointSize
                                     label: "Body Type:"
                                     labelAlwaysVisible: true
                                     maximumLength: 20
@@ -458,6 +465,7 @@ Item {
                                     TabSequenceItem.manager: _tabSequence
 
                                     enableTransliteration: true
+                                    font.pointSize: Runtime.notebookFontPointSize
                                     label: "Height:"
                                     labelAlwaysVisible: true
                                     maximumLength: 20
@@ -477,6 +485,7 @@ Item {
                                     TabSequenceItem.manager: _tabSequence
 
                                     enableTransliteration: true
+                                    font.pointSize: Runtime.notebookFontPointSize
                                     label: "Weight:"
                                     labelAlwaysVisible: true
                                     maximumLength: 20
@@ -563,6 +572,7 @@ Item {
                                     content: root.character.summary
                                 }
 
+                                font.pointSize: Runtime.notebookFontPointSize
                                 placeholderText: "Character Summary"
                                 tabSequenceIndex: 10
                                 tabSequenceManager: _tabSequence

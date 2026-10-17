@@ -102,6 +102,8 @@ Item {
         font.pointSize: Scrite.app.idealFontPointSize
     }
 
+    readonly property real notebookFontPointSize: notebookSettings.fontPointSize > 0 ? notebookSettings.fontPointSize : idealFontMetrics.font.pointSize
+
     readonly property FontMetrics shortcutFontMetrics: FontMetrics {
         readonly property var sizes: GMath.availableFontPointSizes(font.family, font.styleName)
 

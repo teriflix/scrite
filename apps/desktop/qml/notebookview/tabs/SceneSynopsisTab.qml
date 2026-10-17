@@ -80,7 +80,7 @@ Item {
 
             font.capitalization: Font.AllUppercase
             font.family: Scrite.document.formatting.elementFormat(SceneElement.Heading).font.family
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
+            font.pointSize: Runtime.notebookFontPointSize+2
 
             onEditingComplete: root.scene.heading.parseFrom(text)
         }
@@ -99,6 +99,8 @@ Item {
             readOnly: Scrite.document.readOnly
             text: root.scene.structureElement.nativeTitle
             wrapMode: Text.WordWrap
+
+            font.pointSize: Runtime.notebookFontPointSize
 
             onEditingComplete: root.scene.structureElement.title = text
         }
@@ -294,6 +296,7 @@ Item {
                 }
 
                 text: root.scene.synopsis
+                font.pointSize: Runtime.notebookFontPointSize
                 readOnly: Scrite.document.readOnly
                 placeholderText: "Scene Synopsis"
                 undoRedoEnabled: true

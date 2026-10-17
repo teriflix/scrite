@@ -52,6 +52,7 @@ Item {
         height: parent.height - 20
 
         adjustTextWidthBasedOnScrollBar: false
+        font.pointSize: Runtime.notebookFontPointSize
         placeholderText: "Scene Comments"
         readOnly: Scrite.document.readOnly
         text: root.scene.comments

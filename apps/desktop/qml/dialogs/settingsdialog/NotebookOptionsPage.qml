@@ -71,6 +71,42 @@ Item {
             Layout.fillWidth: true
 
             label: SctLabel {
+                text: "Font Size"
+            }
+
+            RowLayout {
+                width: parent.width
+
+                spacing: 10
+
+                SctLabel {
+                    Layout.fillWidth: true
+
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                    text: Runtime.notebookSettings.fontPointSize > 0 ? "Size of text in notebook pages." : "Size of text in notebook pages. Following the application font size."
+                    wrapMode: Text.WordWrap
+                }
+
+                SpinBox {
+                    from: 6
+                    to: 48
+                    editable: true
+                    value: Runtime.notebookFontPointSize
+                    onValueModified: Runtime.notebookSettings.fontPointSize = value
+                }
+
+                Button {
+                    enabled: Runtime.notebookSettings.fontPointSize > 0
+                    text: "Use Default"
+                    onClicked: Runtime.notebookSettings.fontPointSize = 0
+                }
+            }
+        }
+
+        GroupBox {
+            Layout.fillWidth: true
+
+            label: SctLabel {
                 text: "Relationship Graph"
             }
 

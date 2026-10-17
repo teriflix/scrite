@@ -302,7 +302,7 @@ Item {
 
         readonly property FontMetrics fontMetrics: FontMetrics {
             font.family: Runtime.sceneEditorFontMetrics.font.family
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            font.pointSize: Runtime.notebookFontPointSize
         }
     }
 }

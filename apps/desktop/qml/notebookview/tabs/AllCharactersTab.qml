@@ -138,7 +138,7 @@ Item {
                             text: _delegate.character.name
 
                             font.bold: true
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                            font.pointSize: Runtime.notebookFontPointSize
                         }
 
                         SctLabel {
@@ -148,7 +148,7 @@ Item {
                             opacity: 0.75
                             text: "Role: " + _private.polishedStr(_delegate.character.designation, "-")
 
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
+                            font.pointSize: Runtime.notebookFontPointSize - 2
                         }
 
                         SctLabel {
@@ -158,7 +158,7 @@ Item {
                             opacity: 0.75
                             text: ["Age: " + _private.polishedStr(_delegate.character.age, "-"), "Gender: " + _private.polishedStr(_delegate.character.gender, "-")].join(", ")
 
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
+                            font.pointSize: Runtime.notebookFontPointSize - 2
                         }
                     }
                 }
@@ -191,7 +191,7 @@ Item {
                     text: "✓"
 
                     font.bold: true
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                    font.pointSize: Runtime.notebookFontPointSize
                 }
             }
 
@@ -286,6 +286,7 @@ Item {
 
                         Layout.fillWidth: true
 
+                        font.pointSize: Runtime.notebookFontPointSize
                         label: ""
                         placeholderText: Scrite.document.readOnly ? "Enter character name to search." : "Enter character name to search/add."
                         completionStrings: Scrite.document.structure.characterNames
