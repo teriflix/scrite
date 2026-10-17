@@ -300,7 +300,8 @@ Popup {
 
                     text = text.toLowerCase()
 
-                    result.value = (text.indexOf(givenText) >= 0)
+                    const givenWords = givenText.split(/\s+/).filter(word => word !== "")
+                    result.value = givenWords.every(word => text.indexOf(word) >= 0)
                 }
             }
 
