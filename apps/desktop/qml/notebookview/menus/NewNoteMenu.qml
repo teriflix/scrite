@@ -39,6 +39,7 @@ SctMenu {
     ColorMenu {
         title: "Text Note"
 
+        enabled: !Scrite.document.readOnly
         onMenuItemClicked: (color) => {
                                let note = root.notes.addTextNote()
                                if(note) {
@@ -54,6 +55,7 @@ SctMenu {
         title: "Form Note"
         notes: root.notes
 
+        enabled: !Scrite.document.readOnly
         onNoteAdded: (note) => {
                          root.switchRequest(note)
                      }
@@ -62,6 +64,7 @@ SctMenu {
     ColorMenu {
         title: "Checklist Note"
 
+        enabled: !Scrite.document.readOnly
         onMenuItemClicked: (color) => {
                                var note = root.notes.addCheckListNote()
                                if(note) {
