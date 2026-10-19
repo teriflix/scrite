@@ -139,7 +139,7 @@ Column {
                     },
 
                     SpellCheckSyntaxHighlighterDelegate {
-                        enabled: root.answer !== ""
+                        enabled: root.answer !== "" && Runtime.screenplayEditorSettings.enableSpellCheck
                         cursorPosition: _textArea.cursorPosition
                     }
                 ]
