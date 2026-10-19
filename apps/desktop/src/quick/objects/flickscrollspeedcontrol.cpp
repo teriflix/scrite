@@ -23,10 +23,7 @@ FlickScrollSpeedControl::FlickScrollSpeedControl(QObject *parent)
     : QObject(parent), m_flickable(this, "flickable")
 {
     if (parent->inherits("QQuickFlickable")) {
-        m_flickable = qobject_cast<QQuickItem *>(parent);
-        m_flickable->installEventFilter(this);
-        m_flickable->setProperty("boundsBehavior", 0);
-        m_flickable->setProperty("boundsMovement", 0);
+        this->setFlickable(qobject_cast<QQuickItem *>(parent));
         this->computeValues();
     }
 }
@@ -48,8 +45,21 @@ void FlickScrollSpeedControl::setFlickable(QQuickItem *val)
 
     m_flickable = val;
 
-    if (!m_flickable.isNull())
+    if (!m_flickable.isNull()) {
         m_flickable->installEventFilter(this);
+
+        if (m_flickable->inherits("QQuickFlickable")) {
+            m_flickable->setProperty("boundsBehavior", 0);
+            m_flickable->setProperty("boundsMovement", 0);
+        }
+
+        if (m_flickable->inherits("QQuickListView")) {
+            m_flickable->setProperty("highlightMoveDuration", 0);
+            m_flickable->setProperty("highlightResizeDuration", 0);
+        }
+
+        this->computeValues();
+    }
 
     emit flickableChanged();
 
