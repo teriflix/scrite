@@ -2435,6 +2435,13 @@ void Utils::TMath::sleep(int ms)
     eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
 }
 
+QTime Utils::TMath::addTime(const QTime &a, const QTime &b)
+{
+    QTime ret = a;
+    ret = ret.addMSecs(b.msecsSinceStartOfDay());
+    return ret;
+}
+
 /**
  * \brief Converts seconds to a QTime object.
  * \param nrSeconds The number of seconds.

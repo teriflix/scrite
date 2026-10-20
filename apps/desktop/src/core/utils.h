@@ -1109,6 +1109,7 @@ class TMath : public QObject // short for Time Math
 
 public:
     Q_INVOKABLE static void sleep(int ms);
+    Q_INVOKABLE static QTime addTime(const QTime &a, const QTime &b);
     Q_INVOKABLE static QTime secondsToTime(int nrSeconds);
     Q_INVOKABLE static QString relativeTime(const QDateTime &dt);
     Q_INVOKABLE static QString timeLengthString(const QTime &time);
