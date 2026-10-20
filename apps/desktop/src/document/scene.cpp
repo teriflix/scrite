@@ -3652,6 +3652,12 @@ SceneGroup::SceneGroup(QObject *parent)
       m_groups(GenericArrayModel::internalArray()),
       m_structure(this, "structure")
 {
+    m_paginator = new ScreenplayPaginator(this);
+    m_paginator->setFormat(ScriteDocument::instance()->printFormat());
+    connect(m_paginator, &ScreenplayPaginator::paginationUpdated, this,
+            &SceneGroup::lengthsUpdated);
+    connect(m_paginator, &ScreenplayPaginator::syncingChanged, this,
+            &SceneGroup::evaluatingLengthsChanged);
     connect(this, &SceneGroup::sceneCountChanged, this, &SceneGroup::reevalLater);
 
     this->setObjectMembers({ "category", "desc", "label", "name", "type", "checked" });
@@ -4053,15 +4059,7 @@ void SceneGroup::evaluateLengths()
     }
 
     if (m_paginator == nullptr) {
-        if (m_scenes.size() < 2)
-            return;
-
-        m_paginator = new ScreenplayPaginator(this);
-        m_paginator->setFormat(ScriteDocument::instance()->printFormat());
-        connect(m_paginator, &ScreenplayPaginator::paginationUpdated, this,
-                &SceneGroup::lengthsUpdated);
-        connect(m_paginator, &ScreenplayPaginator::syncingChanged, this,
-                &SceneGroup::evaluatingLengthsChanged);
+        return;
     }
 
     Screenplay *screenplay = m_paginator->screenplay();
