@@ -58,17 +58,19 @@ QtObject {
 
             libraryService.importFinished.connect(startSecondHalfTask)
 
-            firstHalfTask.start()
+            if(firstHalfTask)
+                firstHalfTask.start()
         }
 
         function startSecondHalfTask() {
-            secondHalfTask.start()
+            if(secondHalfTask)
+                secondHalfTask.start()
         }
 
         function cleanupLater() { Qt.callLater(cleanup) }
 
         function cleanup() {
-            if(firstHalfTask.waitDialog)
+            if(firstHalfTask && firstHalfTask.waitDialog)
                 firstHalfTask.waitDialog.close()
             Qt.callLater(destroy)
         }
