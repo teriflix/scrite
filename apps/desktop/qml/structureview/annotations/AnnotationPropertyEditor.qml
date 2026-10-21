@@ -530,6 +530,7 @@ Item {
             FileDialog {
                 id: _imageEditorFileDialog
 
+                options: Runtime.fileDialogOptions
                 nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
 
                 onAccepted: {

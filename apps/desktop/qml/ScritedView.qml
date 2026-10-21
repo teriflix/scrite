@@ -1377,6 +1377,7 @@ Item {
     FileDialog {
         id: _fileDialog
 
+        options: Runtime.fileDialogOptions
         currentFolder: Runtime.scritedSettings.lastOpenScritedFolderUrl
         onCurrentFolderChanged: Qt.callLater( function() { Runtime.scritedSettings.lastOpenScritedFolderUrl = _fileDialog.currentFolder } )
 

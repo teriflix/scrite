@@ -185,6 +185,7 @@ Item {
 
         FileDialog {
             title: "Save Scrite Document As"
+            options: Runtime.fileDialogOptions
             fileMode: FileDialog.SaveFile
             nameFilters: ["Scrite Documents (*.scrite)"]
             objectName: "Save File Dialog"

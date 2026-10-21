@@ -193,6 +193,7 @@ Item {
         FileDialog {
             id: _featuredAttachmentFileDialog
 
+            options: Runtime.fileDialogOptions
             nameFilters: root.sceneAttachments ? root.sceneAttachments.nameFilters : []
 
             onAccepted: {

@@ -192,6 +192,7 @@ DialogLauncher {
                     FileDialog {
                         id: _fileDialog
 
+                        options: Runtime.fileDialogOptions
                         currentFolder: Runtime.workspaceSettings.lastOpenPhotosFolderUrl
                         nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
 

@@ -1295,6 +1295,7 @@ Item {
                 FileDialog {
                     id: _importFileDialog
 
+                    options: Runtime.fileDialogOptions
                     title: "Import Screenplay"
                     objectName: "Import Dialog Box"
                     nameFilters: Scrite.document.importFileNameFilters
@@ -1540,6 +1541,7 @@ Item {
     FileDialog {
         id: _openFileDialog
 
+        options: Runtime.fileDialogOptions
         title: "Open Scrite Document"
         nameFilters: ["Scrite Documents (*.scrite)"]
         objectName: "Open File Dialog"
