@@ -445,6 +445,7 @@ Item {
     FileDialog {
         id: _saveFileDialog
 
+        options: Runtime.fileDialogOptions
         fileMode: FileDialog.SaveFile
         nameFilters: ["PDF Files (*.pdf)"]
         currentFolder: {

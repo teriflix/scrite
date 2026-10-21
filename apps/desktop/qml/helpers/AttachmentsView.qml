@@ -151,6 +151,7 @@ ListView {
     FileDialog {
         id: _fileDialog
 
+        options: Runtime.fileDialogOptions
         nameFilters: root.attachments ? root.attachments.nameFilters : ["All Types (*.*)"]
 
          // The default Ctrl+U interfers with underline

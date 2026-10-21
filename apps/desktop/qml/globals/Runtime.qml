@@ -16,6 +16,7 @@
 pragma Singleton
 
 import QtQuick
+import QtQuick.Dialogs
 import QtQuick.Controls.Material
 
 import Scrite.App
@@ -46,6 +47,8 @@ Item {
     readonly property real minWindowWidthForShowingNotebookInStructure: 1600
 
     readonly property url userGuidesUrl: "https://www.scrite.io/docs/userguide/"
+
+    readonly property int fileDialogOptions: Platform.isLinuxDesktop ? FileDialog.DontUseNativeDialog : 0
 
     property int mainWindowTab: Runtime.MainWindowTab.ScreenplayTab
     property int placeholderInterval: bounded(50, Runtime.screenplayEditorSettings.placeholderInterval, 1000)
