@@ -41,13 +41,17 @@ Item {
       This function shows a dialog box with title, message and Ok button. The callback
       will be invoked whenever the user discards the dialog box by clicking on the Ok
       button.
+
+      The dialog box is shown in the main window, unless parentItem is given. It must be an
+      item in the window in which the dialog box is to be shown, for example the contentItem
+      of another window that Scrite shows.
       */
-    function information(title, message, callback) {
+    function information(title, message, callback, parentItem) {
         const params = {
             "title": title,
             "message": message
         }
-        let dlg = _dialogComponent.createObject(root, params)
+        let dlg = _dialogComponent.createObject(parentItem ?? root, params)
         if(dlg) {
             if(callback)
                 dlg.buttonClicked.connect(callback)
@@ -69,14 +73,17 @@ Item {
             else if(buttonText === "Cancel")
                 ...
         })
+
+      As with information(), parentItem is optional. It is an item in the window in which the
+      dialog box is to be shown, if that is not the main window.
       */
-    function question(title, question, answerButtons, callback) {
+    function question(title, question, answerButtons, callback, parentItem) {
         const params = {
             "title": title,
             "message": question,
             "buttons": answerButtons ? answerButtons : ["Yes", "No", "Cancel"]
         }
-        let dlg = _dialogComponent.createObject(root, params)
+        let dlg = _dialogComponent.createObject(parentItem ?? root, params)
         if(dlg) {
             if(callback)
                 dlg.buttonClicked.connect(callback)
@@ -98,7 +105,7 @@ Item {
 
             signal buttonClicked(string buttonText)
 
-            width: Math.min(Scrite.window.width * 0.9, Math.max(500, _buttonRow.implicitWidth + 40))
+            width: Math.min((_dialog.parent ? _dialog.parent.width : Scrite.window.width) * 0.9, Math.max(500, _buttonRow.implicitWidth + 40))
             height: _layout.implicitHeight + 40 + header.height
 
             focus: true

@@ -33,7 +33,9 @@ Popup {
 
     property LanguageTransliterator transliterator
 
-    property rect textRect: transliterator ? Scrite.window.contentItem.mapFromItem(transliterator.editor, transliterator.textRect) : Qt.rgba(0,0,0,0)
+    // In the coordinates of the editor, which is the parent of the popup. It is not the main window,
+    // because the editor can be in another window, for example the one of AI Chat.
+    property rect textRect: transliterator ? transliterator.textRect : Qt.rect(0, 0, 0, 0)
 
     Material.elevation: 6
     Material.containerStyle: Material.Filled
@@ -44,7 +46,7 @@ Popup {
     width: _content.implicitWidth + leftPadding + rightPadding
     height: _content.implicitHeight + topPadding + bottomPadding
 
-    parent: Scrite.window.contentItem
+    parent: transliterator && transliterator.editor ? transliterator.editor : Scrite.window.contentItem
     visible: transliterator ? transliterator.suggestions.length > 0 : false
     closePolicy: Popup.NoAutoClose
 
