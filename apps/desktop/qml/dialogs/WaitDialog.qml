@@ -31,7 +31,15 @@ Item {
 
     parent: Scrite.window.contentItem
 
-    function launch(message, progressReport) {
+    /**
+      Shows a dialog box that asks the user to wait, with the message and, if there is a
+      progressReport, its progress. Returns the dialog, which the caller closes.
+
+      The dialog box is shown in the main window, unless parentItem is given. It must be an
+      item in the window in which the dialog box is to be shown, for example the contentItem
+      of another window that Scrite shows.
+      */
+    function launch(message, progressReport, parentItem) {
         var initialProps = {
             "message": "Please wait ..."
         }
@@ -40,7 +48,7 @@ Item {
         if(progressReport && Object.isOfType(progressReport, "ProgressReport"))
             initialProps.progressReport = progressReport
 
-        var dlg = _dialogComponent.createObject(root, initialProps)
+        var dlg = _dialogComponent.createObject(parentItem ?? root, initialProps)
         if(dlg) {
             dlg.closed.connect(dlg.destroy)
             dlg.open()
@@ -60,7 +68,10 @@ Item {
             property string message
             property ProgressReport progressReport
 
-            width: Math.min(500, Scrite.window.width*0.5)
+            // The window that the dialog is shown in, which is not always the main window.
+            readonly property var hostWindow: (parent ? parent.Window.window : null) ?? Scrite.window
+
+            width: Math.min(500, _dialog.hostWindow.width*0.5)
             height: 200 // placeholder; actual height is set in onOpened
 
             clip: true
@@ -118,7 +129,7 @@ Item {
             // Height is set here rather than as a declarative binding because Popup.open() writes to height
             // internally, which would break any QML binding set before open() is called. By the time
             // onOpened fires, the layout has settled and contentItem.implicitHeight is stable.
-            onOpened: height = Math.min(Math.max(200, _dialog.contentItem.implicitHeight + _dialog.header.height + _dialog.footer.height), Scrite.window.height * 0.3)
+            onOpened: height = Math.min(Math.max(200, _dialog.contentItem.implicitHeight + _dialog.header.height + _dialog.footer.height), _dialog.hostWindow.height * 0.3)
         }
     }
 }

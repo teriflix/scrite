@@ -257,6 +257,22 @@ Item {
 
                     onTextEdited: if(_markdownRoot.editMode) root.note.content = text
 
+                    // Links are clickable only when the note is being viewed, and are opened only
+                    // after the user says so.
+                    onLinkActivated: (link) => {
+                                         if(_markdownRoot.editMode || !/^https?:\/\//i.test(link))
+                                             return
+
+                                         const maxWidth = Math.min(500, Scrite.window.width * 0.5) - 40
+                                         const elidedLink = Runtime.idealFontMetrics.elidedText(link, Text.ElideMiddle, maxWidth)
+                                         MessageBox.question("Link clicked",
+                                                             "The following link was activated. Do you want to open it?\n\n" +
+                                                             elidedLink, ["Yes", "No"], (answer) => {
+                                                                 if(answer === "Yes")
+                                                                     Qt.openUrlExternally(link)
+                                                             })
+                                     }
+
                     function assumeFocus() {
                         _markdownRoot.editMode = true
                         textArea.forceActiveFocus()

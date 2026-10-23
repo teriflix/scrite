@@ -79,6 +79,9 @@ AbstractScenePartEditor {
         property bool hasSelection: selectionStart >= 0 && selectionEnd >= 0 && selectionEnd > selectionStart
         property bool controlModifierPressed: false
 
+        // Links are opened only with a click while Control is pressed, see onLinkActivated.
+        readonly property bool hoveringActivatableLink: activeFocus && controlModifierPressed && hoveredLink !== ""
+
         signal highlightCursor()
 
         Keys.onTabPressed: (event) => { _private.handleSceneTextEditorTabPressed(event) }
@@ -193,12 +196,17 @@ AbstractScenePartEditor {
             }
         }
 
+        // The MouseArea below sets the cursor when the text can be edited. This is for when it can't.
+        HoverHandler {
+            cursorShape: _sceneTextEditor.hoveringActivatableLink ? Qt.PointingHandCursor : Qt.IBeamCursor
+        }
+
         // For handling context menu popup and hyperlinks
         MouseArea {
             anchors.fill: parent
 
             enabled: !_sceneTextEditor.readOnly && !_spellingSuggestionsMenu.active && !_contextMenu.active && _sceneTextEditor.activeFocus
-            cursorShape: Qt.IBeamCursor
+            cursorShape: _sceneTextEditor.hoveringActivatableLink ? Qt.PointingHandCursor : Qt.IBeamCursor
             acceptedButtons: Qt.RightButton
 
             onClicked: (mouse) => {

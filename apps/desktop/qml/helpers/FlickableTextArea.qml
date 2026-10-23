@@ -54,6 +54,7 @@ Flickable {
 
     signal textEdited()
     signal editingFinished()
+    signal linkActivated(string link)
 
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
@@ -121,6 +122,13 @@ Flickable {
         LanguageTransliterator.enabled: !readOnly
 
         persistentSelection: _contextMenu.visible || _spellCheckMenu.active
+
+        onLinkActivated: (link) => root.linkActivated(link)
+
+        // Links can be clicked only when the text is read-only.
+        HoverHandler {
+            cursorShape: _textArea.readOnly && _textArea.hoveredLink !== "" ? Qt.PointingHandCursor : Qt.IBeamCursor
+        }
 
         ContextMenuEvent.onPopup: (mouse) => {
             if(!_textArea.activeFocus)
