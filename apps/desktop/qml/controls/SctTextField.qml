@@ -83,6 +83,7 @@ TextField {
     }
 
     Keys.onPressed: (event) => {
+        event.accepted = false
         if(event.text !== "")
             userTypedSomeText = true
     }
@@ -97,8 +98,8 @@ TextField {
         returnPressed()
     }
 
-    Keys.onTabPressed: {
-        autoCompleteOrFocusNext(true)
+    Keys.onTabPressed: (event) => {
+        event.accepted = autoCompleteOrFocusNext(true)
     }
 
     KeyNavigation.tab: tabItem
@@ -333,11 +334,17 @@ TextField {
         if(_completionModel.hasSuggestion && _completionModel.suggestion !== text) {
             text = includeSuggestion(_completionModel.suggestion)
             editingFinished()
-        } else if(tabItem && (doTabItem === undefined || doTabItem === true)) {
+            return true
+        }
+
+        if(tabItem && (doTabItem === undefined || doTabItem === true)) {
             editingFinished()
             tabItem.forceActiveFocus()
-        } else
-            editingFinished()
+            return true
+        }
+
+        editingFinished()
+        return false
     }
 
     onTextEdited: {
