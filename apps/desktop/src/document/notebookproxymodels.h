@@ -220,6 +220,28 @@ public:
     // clang-format on
     int checkedCount() const { return int(m_checkedKeys.size()); }
 
+    // The most items that can be ticked, or 0 if there is no limit. An item can't be ticked when
+    // as many are, which untick one first. Keys that are set with checkedKeys are all kept, even if
+    // there are more of them than this allows, which only means that no more can be added.
+    // clang-format off
+    Q_PROPERTY(int maxChecked
+               READ maxChecked
+               WRITE setMaxChecked
+               NOTIFY maxCheckedChanged)
+    // clang-format on
+    void setMaxChecked(int val);
+    int maxChecked() const { return m_maxChecked; }
+    Q_SIGNAL void maxCheckedChanged();
+
+    // True if no more items can be ticked, because maxChecked of them are.
+    // clang-format off
+    Q_PROPERTY(bool full
+               READ isFull
+               NOTIFY fullChanged)
+    // clang-format on
+    bool isFull() const { return m_maxChecked > 0 && m_checkedKeys.size() >= m_maxChecked; }
+    Q_SIGNAL void fullChanged();
+
     // The items that are ticked and are in the document, in the order of the Notebook, each as
     // { key, kind, label, owner }. It is for showing what is ticked. Changes when the ticks do,
     // and a moment after the NotebookModel does, because the label of an item may.
@@ -263,6 +285,7 @@ private:
     void setChecked(const QString &key, bool checked);
 
 private:
+    int m_maxChecked = 0;
     QTimer m_itemsTimer;
     QString m_searchText;
     QStringList m_searchWords;

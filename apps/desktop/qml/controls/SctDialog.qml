@@ -47,6 +47,25 @@ import "../helpers"
 Dialog {
     id: root
 
+    // True if the dialog box is in the main window, which is so unless it is hosted in another
+    // window, such as the one of an extension.
+    readonly property bool inMainWindow: {
+        const window = parent ? parent.Window.window : null
+        return window === null || window === Scrite.window
+    }
+
+    // True if the dialog box is one of the app, which means that it is listed in Runtime.dialogs,
+    // which keeps the rest of the main window from being used while it is open, and that it hides the
+    // close button of the main window, if appCloseButtonVisible is false. A dialog box in the main
+    // window always is. One in another window is not, because it blocks only that window, unless
+    // blocksMainWindow is true.
+    readonly property bool isAppDialog: inMainWindow || blocksMainWindow
+
+    // Only for a dialog box that is in another window than the main one, which it makes one of the
+    // app anyway, because the main window must not be used or closed while it is open, for example
+    // when it runs tasks. It has no effect on a dialog box in the main window.
+    property bool blocksMainWindow: false
+
     // If this property is set to false, then the main-window's close button on
     // the title bar is disabled whenever the dialog box is active.
     property bool appCloseButtonVisible: true
@@ -279,26 +298,46 @@ Dialog {
     }
 
     onAboutToShow: {
-        Scrite.window.closeButtonVisible = appCloseButtonVisible
+        if(isAppDialog)
+            Scrite.window.closeButtonVisible = appCloseButtonVisible
         if(appOverrideCursor >= 0) {
             MouseCursor.setShape(appOverrideCursor);
             _private.overrideCursorMustBeRestored = true
         }
         focus = true
-        Runtime.dialogs.include(root)
+        if(isAppDialog)
+            Runtime.dialogs.include(root)
     }
 
     onAboutToHide: {
-        Scrite.window.closeButtonVisible = true
+        if(isAppDialog)
+            Scrite.window.closeButtonVisible = true
         if(_private.overrideCursorMustBeRestored) {
             MouseCursor.unsetShape()
             _private.overrideCursorMustBeRestored = false
         }
-        Runtime.dialogs.exclude(root)
+        if(isAppDialog)
+            Runtime.dialogs.exclude(root)
     }
 
     onAppCloseButtonVisibleChanged: {
-        Scrite.window.closeButtonVisible = visible && appCloseButtonVisible
+        if(isAppDialog)
+            Scrite.window.closeButtonVisible = visible && appCloseButtonVisible
+    }
+
+    // A dialog box that stops, or starts, being one of the app while it is open, for example because
+    // it is moved from one window to another, is listed, or not, as it is now.
+    onIsAppDialogChanged: {
+        if(!visible)
+            return
+
+        if(isAppDialog) {
+            Scrite.window.closeButtonVisible = appCloseButtonVisible
+            Runtime.dialogs.include(root)
+        } else {
+            Scrite.window.closeButtonVisible = true
+            Runtime.dialogs.exclude(root)
+        }
     }
 
     onClosed: {

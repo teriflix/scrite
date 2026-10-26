@@ -411,11 +411,31 @@ void NotebookTreeLens::setCheckedKeys(const QStringList &val)
     if (m_checkedKeys == val)
         return;
 
+    const bool wasFull = this->isFull();
+
     m_checkedKeys = val;
     this->announceCheckedChanged();
 
     emit checkedKeysChanged();
     emit checkedItemsChanged();
+
+    if (wasFull != this->isFull())
+        emit fullChanged();
+}
+
+void NotebookTreeLens::setMaxChecked(int val)
+{
+    val = qMax(0, val);
+    if (m_maxChecked == val)
+        return;
+
+    const bool wasFull = this->isFull();
+
+    m_maxChecked = val;
+    emit maxCheckedChanged();
+
+    if (wasFull != this->isFull())
+        emit fullChanged();
 }
 
 QVariantList NotebookTreeLens::checkedItems() const
@@ -564,6 +584,10 @@ void NotebookTreeLens::announceCheckedChanged(const QModelIndex &parent)
 void NotebookTreeLens::setChecked(const QString &key, bool checked)
 {
     if (checked == m_checkedKeys.contains(key))
+        return;
+
+    // One more is not ticked when there is no room for it, but one can always be unticked.
+    if (checked && this->isFull())
         return;
 
     QStringList keys = m_checkedKeys;
