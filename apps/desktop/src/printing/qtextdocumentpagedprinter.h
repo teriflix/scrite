@@ -21,6 +21,7 @@
 #include <QObject>
 #include <QTextDocument>
 #include <QPagedPaintDevice>
+#include <QtGui/qpdfwriter.h>
 
 #include "errorreport.h"
 #include "progressreport.h"
@@ -345,6 +346,23 @@ private:
     QTextDocumentPageSideBarInterface *m_sideBar = nullptr;
     QRectF m_headerRect;
     QRectF m_footerRect;
+};
+
+class QTextDocumentPdfPrinter : public QTextDocumentPagedPrinter
+{
+    Q_OBJECT
+    QML_NAMED_ELEMENT(TextDocumentPdfPrinter)
+
+public:
+    explicit QTextDocumentPdfPrinter(QObject *parent = nullptr) : QTextDocumentPagedPrinter(parent)
+    {
+    }
+    ~QTextDocumentPdfPrinter() override { }
+
+    Q_INVOKABLE bool printToPdf(QTextDocument *document, QPdfWriter *pdfWriter)
+    {
+        return this->print(document, pdfWriter);
+    }
 };
 
 #endif // QTEXTDOCUMENTPAGEDPRINTER_H
