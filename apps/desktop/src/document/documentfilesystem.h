@@ -24,6 +24,7 @@
 #include <QFileInfo>
 
 class DocumentFile;
+class DocumentFileSystemEntry;
 
 struct DocumentFileSystemData;
 class DocumentFileSystem : public QObject
@@ -84,8 +85,14 @@ private:
     bool unpack(QDataStream &ds);
     void saveTaskFinished();
 
+    void registerEntry(const QString &path);
+    void saveEntries();
+    void loadEntries();
+
 private:
     friend class DocumentFile;
+    friend class DocumentFileSystemEntry;
+
     DocumentFileSystemData *d;
 };
 

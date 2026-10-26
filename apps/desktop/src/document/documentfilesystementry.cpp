@@ -30,6 +30,8 @@ DocumentFileSystemEntry::DocumentFileSystemEntry(QObject *parent) : QObject(pare
             &DocumentFileSystemEntry::absoluteFilePathChanged);
     connect(doc, &ScriteDocument::justLoaded, this,
             &DocumentFileSystemEntry::absoluteFilePathChanged);
+    connect(doc, &ScriteDocument::justReset, this, &DocumentFileSystemEntry::registerPath);
+    connect(doc, &ScriteDocument::justLoaded, this, &DocumentFileSystemEntry::registerPath);
     connect(doc, &ScriteDocument::aboutToSave, this, &DocumentFileSystemEntry::aboutToSave);
     connect(doc, &ScriteDocument::justSaved, this, &DocumentFileSystemEntry::justSaved);
     connect(doc, &ScriteDocument::aboutToReset, this, &DocumentFileSystemEntry::aboutToReset);
@@ -48,6 +50,7 @@ void DocumentFileSystemEntry::setPath(const QString &val)
         return;
 
     m_path = val2;
+    this->registerPath();
     emit pathChanged();
     emit absoluteFilePathChanged();
 }
@@ -84,6 +87,14 @@ void DocumentFileSystemEntry::markModified()
 QString DocumentFileSystemEntry::dfsPath() const
 {
     return extensionsFolder + m_path;
+}
+
+// The document file system forgets its entries when the document is reset or loaded, so
+// an entry registers its path again then.
+void DocumentFileSystemEntry::registerPath()
+{
+    if (!m_path.isEmpty())
+        ScriteDocument::instance()->fileSystem()->registerEntry(this->dfsPath());
 }
 
 void DocumentFileSystemEntry::onDfsAuction(const QString &filePath, int *claims)

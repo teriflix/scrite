@@ -24,7 +24,10 @@
  * cleanup that happens before every save, and is packed into the .scrite file.
  *
  * The file always lives under the "extensions/" folder of the document file system.
- * When no live entry claims a file there, it is removed before the next save.
+ * When no live entry claims a file there, it is removed before the next save, unless an entry
+ * was ever registered on its path, in which case the document remembers the path (entries.json)
+ * and keeps the file, so that the work of an extension that is not enabled is not lost.
+ * Call remove() to delete such a file.
  */
 class DocumentFileSystemEntry : public QObject
 {
@@ -70,6 +73,7 @@ signals:
 
 private:
     QString dfsPath() const;
+    void registerPath();
     void onDfsAuction(const QString &filePath, int *claims);
 
 private:

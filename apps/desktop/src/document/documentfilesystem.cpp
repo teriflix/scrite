@@ -17,6 +17,8 @@
 
 #include <QDir>
 #include <QtDebug>
+#include <QJsonArray>
+#include <QJsonDocument>
 #include <QDateTime>
 #include <QDataStream>
 #include <QTemporaryDir>
@@ -34,12 +36,14 @@ struct DocumentFileSystemData
 {
     QByteArray header;
     QList<DocumentFile *> files;
+    QStringList entries; // paths on which there was a DocumentFileSystemEntry at some point
     QMutex folderMutex;
     QScopedPointer<QTemporaryDir> folder;
     qint64 fileNameCounter = 0;
 
     static const QString normalHeaderFile;
     static const QString encryptedHeaderFile;
+    static const QString entriesFile;
 
     void pack(QDataStream &ds, const QString &path);
 
@@ -57,6 +61,7 @@ private:
 const QString DocumentFileSystemData::normalHeaderFile = QStringLiteral("_header.json");
 const QString DocumentFileSystemData::encryptedHeaderFile =
         QStringLiteral("_header.json_encrypted");
+const QString DocumentFileSystemData::entriesFile = QStringLiteral("_entries.json");
 
 void DocumentFileSystemData::pack(QDataStream &ds, const QString &path)
 {
@@ -139,6 +144,7 @@ void DocumentFileSystem::hardReset()
 void DocumentFileSystem::reset()
 {
     d->header.clear();
+    d->entries.clear();
     d->fileNameCounter = QDateTime::currentMSecsSinceEpoch();
 
     while (!d->files.isEmpty()) {
@@ -209,6 +215,8 @@ bool DocumentFileSystem::load(const QString &fileName, Format *format)
         } else
             d->header = headerData;
 
+        this->loadEntries();
+
         if (format)
             *format = ZipFormat;
     }
@@ -263,6 +271,9 @@ bool DocumentFileSystem::save(const QString &fileName, bool encrypt, SaveMode mo
 
     // Ensure that unwanted files are no longer in the DFS folder
     this->cleanup();
+
+    // Remember which paths have had entries, so that a later session can retain their files
+    this->saveEntries();
 
 #if 0
     QFile file(fileName);
@@ -449,6 +460,8 @@ bool DocumentFileSystem::remove(const QString &path)
     if (path.isEmpty())
         return false;
 
+    d->entries.removeAll(path);
+
     const QString completePath = this->absolutePath(path);
     return QFile::remove(completePath);
 }
@@ -607,6 +620,11 @@ void DocumentFileSystem::cleanup()
 {
     const QStringList filePaths = d->filePaths();
     for (const QString &filePath : filePaths) {
+        // Files on which a DocumentFileSystemEntry has existed are retained, even when nobody
+        // claims them now, because the extension that owns them may not be enabled.
+        if (d->entries.contains(filePath))
+            continue;
+
         int claims = 0;
         emit auction(filePath, &claims);
         if (claims == 0)
@@ -679,6 +697,40 @@ void DocumentFileSystem::saveTaskFinished()
             emit saveFinished(watcher->result());
             watcher->deleteLater();
         }
+    }
+}
+
+void DocumentFileSystem::registerEntry(const QString &path)
+{
+    // Path may not exist, but it needs to be captured in here
+    // provided its a path that is within the folder.
+    if (path.isEmpty() || QDir::isAbsolutePath(path) || d->entries.contains(path))
+        return;
+
+    d->entries << path;
+}
+
+void DocumentFileSystem::saveEntries()
+{
+    if (d->entries.isEmpty())
+        return;
+
+    this->write(
+            DocumentFileSystemData::entriesFile,
+            QJsonDocument(QJsonArray::fromStringList(d->entries)).toJson(QJsonDocument::Compact));
+}
+
+void DocumentFileSystem::loadEntries()
+{
+    // Entries that were registered when the document was last saved, including those of
+    // extensions that may not be enabled now. Their files must not be pruned.
+    const QJsonArray entries =
+            QJsonDocument::fromJson(this->read(DocumentFileSystemData::entriesFile)).array();
+    for (const QJsonValue &entry : entries) {
+        const QString path = QDir::cleanPath(entry.toString());
+        if (path != QStringLiteral(".") && path != QStringLiteral("..")
+            && !path.startsWith(QStringLiteral("../")))
+            this->registerEntry(path);
     }
 }
 
