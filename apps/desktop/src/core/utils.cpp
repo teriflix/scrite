@@ -845,14 +845,19 @@ Utils::ObjectConfig Utils::Object::configuration(const QObject *object, const QM
 
     for (int i = from->propertyOffset(); i < mo->propertyCount(); i++) {
         const QMetaProperty prop = mo->property(i);
-        if (!prop.isWritable() || !prop.isStored() || !prop.isDesignable())
+        if (!prop.isWritable() || !prop.isDesignable())
+            continue;
+
+        // A property that is not stored has a field only if it names the editor for it.
+        const QString editor = queryPropertyInfo(prop, "FieldEditor");
+        if (!prop.isStored() && editor.isEmpty())
             continue;
 
         ObjectConfigField field;
         field.name = QString::fromLatin1(prop.name());
         field.label = queryPropertyInfo(prop, "FieldLabel");
         field.note = queryPropertyInfo(prop, "FieldNote");
-        field.editor = queryPropertyInfo(prop, "FieldEditor");
+        field.editor = editor;
         field.min = queryPropertyInfo(prop, "FieldMinValue");
         field.max = queryPropertyInfo(prop, "FieldMaxValue");
         field.ideal = queryPropertyInfo(prop, "FieldDefaultValue");

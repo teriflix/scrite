@@ -381,6 +381,173 @@ void NotebookFlatLens::collect(const QModelIndex &parent)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+NotebookCheckedItems::NotebookCheckedItems(QObject *parent) : QObjectListModel<QObject *>(parent)
+{
+    m_notebook = new NotebookModel(this);
+    m_notebook->setDocument(ScriteDocument::instance());
+
+    m_refreshTimer.setSingleShot(true);
+    m_refreshTimer.setInterval(refreshIntervalInMs);
+    connect(&m_refreshTimer, &QTimer::timeout, this, &NotebookCheckedItems::refresh);
+
+    auto restart = QOverload<>::of(&QTimer::start);
+    connect(m_notebook, &QAbstractItemModel::rowsInserted, &m_refreshTimer, restart);
+    connect(m_notebook, &QAbstractItemModel::rowsRemoved, &m_refreshTimer, restart);
+    connect(m_notebook, &QAbstractItemModel::modelReset, &m_refreshTimer, restart);
+    connect(m_notebook, &QAbstractItemModel::layoutChanged, &m_refreshTimer, restart);
+    connect(m_notebook, &QAbstractItemModel::dataChanged, &m_refreshTimer, restart);
+}
+
+NotebookCheckedItems::~NotebookCheckedItems() { }
+
+bool NotebookCheckedItems::addKey(const QString &key)
+{
+    if (this->indexOfKey(key) >= 0)
+        return false;
+
+    const NotebookItemInfo info = this->findInfo(key);
+    if (!info.isValid())
+        return false;
+
+    this->add(info);
+    return true;
+}
+
+int NotebookCheckedItems::indexOfKey(const QString &key) const
+{
+    for (int row = 0; row < m_list.size(); row++) {
+        if (m_infos.value(m_list.at(row)).key == key)
+            return row;
+    }
+
+    return -1;
+}
+
+// Adds the object of the item to the end of the list, if the item is not in it. If it is, then the
+// item keeps its row, and only what it is called changes. If its object is a new one, as it is when
+// the NotebookModel makes the object again, then it takes the row of the old one.
+void NotebookCheckedItems::add(const NotebookItemInfo &info)
+{
+    QObject *object = info.object.data();
+    if (object == nullptr)
+        return;
+
+    const int row = this->indexOfKey(info.key);
+    if (row < 0) {
+        m_infos.insert(object, info);
+        this->append(object);
+        return;
+    }
+
+    if (m_list.at(row) != object) {
+        this->removeAt(row);
+        m_infos.insert(object, info);
+        this->insert(row, object);
+        return;
+    }
+
+    const NotebookItemInfo old = m_infos.value(object);
+    m_infos.insert(object, info);
+    if (old.label != info.label || old.owner != info.owner) {
+        const QModelIndex index = this->index(row, 0, QModelIndex());
+        emit dataChanged(index, index);
+    }
+}
+
+QHash<int, QByteArray> NotebookCheckedItems::roleNames() const
+{
+    QHash<int, QByteArray> roles = QObjectListModel<QObject *>::roleNames();
+    roles.insert(ItemKeyRole, QByteArrayLiteral("itemKey"));
+    roles.insert(ItemKindRole, QByteArrayLiteral("itemKind"));
+    roles.insert(ItemLabelRole, QByteArrayLiteral("itemLabel"));
+    roles.insert(ItemOwnerRole, QByteArrayLiteral("itemOwner"));
+    return roles;
+}
+
+QVariant NotebookCheckedItems::data(const QModelIndex &index, int role) const
+{
+    switch (role) {
+    case ItemKeyRole:
+    case ItemKindRole:
+    case ItemLabelRole:
+    case ItemOwnerRole: {
+        QObject *object = this->at(index.row());
+        if (object == nullptr)
+            return QVariant();
+
+        const NotebookItemInfo info = m_infos.value(object);
+        switch (role) {
+        case ItemKeyRole:
+            return info.key;
+        case ItemKindRole:
+            return info.kind;
+        case ItemLabelRole:
+            return info.label;
+        default:
+            return info.owner;
+        }
+    }
+    default:
+        break;
+    }
+
+    return QObjectListModel<QObject *>::data(index, role);
+}
+
+// Looks at the items again: those that are not in the Notebook any more are removed, and the rest
+// are told what they are called now, and what their object is, which the NotebookModel makes again.
+void NotebookCheckedItems::refresh()
+{
+    if (m_list.isEmpty())
+        return;
+
+    QHash<QString, NotebookItemInfo> infos;
+    this->collectInfos(QModelIndex(), infos);
+
+    for (int row = m_list.size() - 1; row >= 0; row--) {
+        const QString key = this->keyAt(row);
+        if (infos.contains(key))
+            this->add(infos.value(key));
+        else
+            this->removeAt(row);
+    }
+}
+
+NotebookItemInfo NotebookCheckedItems::findInfo(const QString &key, const QModelIndex &parent) const
+{
+    const int nrRows = m_notebook->rowCount(parent);
+    for (int row = 0; row < nrRows; row++) {
+        const QModelIndex index = m_notebook->index(row, 0, parent);
+
+        const NotebookItemInfo info = infoOf(index);
+        if (info.isValid() && info.key == key)
+            return info;
+
+        const NotebookItemInfo found = this->findInfo(key, index);
+        if (found.isValid())
+            return found;
+    }
+
+    return NotebookItemInfo();
+}
+
+void NotebookCheckedItems::collectInfos(const QModelIndex &parent,
+                                        QHash<QString, NotebookItemInfo> &infos) const
+{
+    const int nrRows = m_notebook->rowCount(parent);
+    for (int row = 0; row < nrRows; row++) {
+        const QModelIndex index = m_notebook->index(row, 0, parent);
+
+        const NotebookItemInfo info = infoOf(index);
+        if (info.isValid())
+            infos.insert(info.key, info);
+
+        this->collectInfos(index, infos);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 NotebookTreeLens::NotebookTreeLens(QObject *parent) : QSortFilterProxyModel(parent)
 {
     // A row that holds an item that the search finds is kept, and so are the rows above it.
@@ -404,6 +571,15 @@ void NotebookTreeLens::setSearchText(const QString &val)
     this->endFilterChange();
 
     emit searchTextChanged();
+}
+
+void NotebookTreeLens::setKinds(const QStringList &val)
+{
+    if (m_kinds == val)
+        return;
+
+    m_kinds = val;
+    emit kindsChanged();
 }
 
 void NotebookTreeLens::setCheckedKeys(const QStringList &val)
@@ -488,7 +664,7 @@ QVariant NotebookTreeLens::data(const QModelIndex &index, int role) const
         case ItemOwnerRole:
             return info.owner;
         case ItemCheckableRole:
-            return info.isValid();
+            return this->isCheckable(info);
         default:
             return info.isValid() && m_checkedKeys.contains(info.key);
         }
@@ -506,11 +682,17 @@ bool NotebookTreeLens::setData(const QModelIndex &index, const QVariant &value, 
         return QSortFilterProxyModel::setData(index, value, role);
 
     const NotebookItemInfo info = infoOf(this->mapToSource(index));
-    if (!info.isValid())
+    if (!this->isCheckable(info))
         return false;
 
     this->setChecked(info.key, value.toBool());
     return true;
+}
+
+// Whether an item can be ticked: it is one, and is of one of the kinds, if there are any.
+bool NotebookTreeLens::isCheckable(const NotebookItemInfo &info) const
+{
+    return info.isValid() && (m_kinds.isEmpty() || m_kinds.contains(info.kind));
 }
 
 void NotebookTreeLens::setSourceModel(QAbstractItemModel *model)

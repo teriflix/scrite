@@ -170,6 +170,81 @@ private:
 };
 
 /**
+ * Some items of the Notebook of the document, picked one by one by the user, in a list that can be
+ * reordered, for whoever uses them in the order that the user wants. It keeps a NotebookModel of
+ * its own, which is also what the lens that the user picks from can look at.
+ *
+ * Each row is the object of an item: the Note, the Notes of a scene or a character, or the
+ * ScreenplayElement of an episode or an act, and has the itemKey, itemKind, itemLabel and itemOwner
+ * of the item. An item is added with its key, as in NotebookFlatLens.keyOf(). An object that is
+ * deleted is removed from the list, and so is an item that is not in the Notebook any more, a
+ * moment after the NotebookModel changes, which is also when the label of an item is looked at again.
+ */
+class NotebookCheckedItems : public QObjectListModel<QObject *>
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    explicit NotebookCheckedItems(QObject *parent = nullptr);
+    ~NotebookCheckedItems() override;
+
+    // clang-format off
+    Q_PROPERTY(NotebookModel *notebook
+               READ notebook
+               CONSTANT)
+    // clang-format on
+    NotebookModel *notebook() const { return m_notebook; }
+
+    // Adds the object of the item that has this key to the end of the list. It returns false if
+    // there is no such item, or it is already in the list.
+    Q_INVOKABLE bool addKey(const QString &key);
+
+    // Removes the object in the row, and moves the object in row from to row to, which is what
+    // removeAt() and move() do, for QML.
+    Q_INVOKABLE void removeObject(int row) { this->removeAt(row); }
+    Q_INVOKABLE void moveObject(int from, int to) { this->move(from, to); }
+
+    // The key of the item whose object is in the row, or an empty string if there is no such row.
+    QString keyAt(int row) const { return m_infos.value(this->at(row)).key; }
+
+    int indexOfKey(const QString &key) const;
+
+    // QAbstractItemModel interface
+    enum Roles {
+        ItemKeyRole = ObjectKindRole + 1,
+        ItemKindRole,
+        ItemLabelRole,
+        ItemOwnerRole
+    };
+    QHash<int, QByteArray> roleNames() const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+
+protected:
+    // QObjectListModel interface
+    void itemInsertEvent(QObject *ptr) override
+    {
+        connect(ptr, &QObject::destroyed, this, &NotebookCheckedItems::objectDestroyed);
+    }
+    void itemRemoveEvent(QObject *ptr) override
+    {
+        disconnect(ptr, &QObject::destroyed, this, &NotebookCheckedItems::objectDestroyed);
+        m_infos.remove(ptr);
+    }
+
+private:
+    void add(const NotebookItemInfo &info);
+    void refresh();
+    NotebookItemInfo findInfo(const QString &key, const QModelIndex &parent = QModelIndex()) const;
+    void collectInfos(const QModelIndex &parent, QHash<QString, NotebookItemInfo> &infos) const;
+
+private:
+    QTimer m_refreshTimer;
+    NotebookModel *m_notebook = nullptr;
+    QHash<QObject *, NotebookItemInfo> m_infos;
+};
+
+/**
  * The tree of a NotebookModel, as the Notebook shows it, for a user who ticks the items to attach:
  * the same branches, without Bookmarks, which has nothing under it. The tree lens keeps the
  * ticks, and not the NotebookModel or the view, so that they stay as the NotebookModel rebuilds
@@ -201,6 +276,19 @@ public:
     void setSearchText(const QString &val);
     QString searchText() const { return m_searchText; }
     Q_SIGNAL void searchTextChanged();
+
+    // Limits what can be ticked to items of some kinds, such as ["note", "scene"], and all of them
+    // can be if it is empty. The rows of the other items are still in the tree, but are not
+    // itemCheckable. It is to be set before a view looks at the lens.
+    // clang-format off
+    Q_PROPERTY(QStringList kinds
+               READ kinds
+               WRITE setKinds
+               NOTIFY kindsChanged)
+    // clang-format on
+    void setKinds(const QStringList &val);
+    QStringList kinds() const { return m_kinds; }
+    Q_SIGNAL void kindsChanged();
 
     // The keys of the items that are ticked, in the order in which they were.
     // clang-format off
@@ -280,6 +368,7 @@ protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 
 private:
+    bool isCheckable(const NotebookItemInfo &info) const;
     void collectChecked(const QModelIndex &parent, QVariantList &items) const;
     void announceCheckedChanged(const QModelIndex &parent = QModelIndex());
     void setChecked(const QString &key, bool checked);
@@ -288,6 +377,7 @@ private:
     int m_maxChecked = 0;
     QTimer m_itemsTimer;
     QString m_searchText;
+    QStringList m_kinds;
     QStringList m_searchWords;
     QStringList m_checkedKeys;
 };

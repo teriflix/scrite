@@ -17,6 +17,7 @@
 
 #include "notes.h"
 #include "scene.h"
+#include "qobjectlistmodel.h"
 #include "structure.h"
 #include "screenplay.h"
 #include "scritedocument.h"
@@ -31,7 +32,11 @@ NotebookReport::NotebookReport(QObject *parent) : AbstractReportGenerator(parent
                               Qt::QueuedConnection);
 }
 
-NotebookReport::~NotebookReport() { }
+NotebookReport::~NotebookReport()
+{
+    if (m_noteListSection != nullptr)
+        disconnect(m_noteListSection, nullptr, this, nullptr);
+}
 
 void NotebookReport::setActsOnNewPage(bool val)
 {
@@ -51,15 +56,27 @@ void NotebookReport::setEpisodesOnNewPage(bool val)
     emit episodesOnNewPageChanged();
 }
 
+void NotebookReport::setNotesOnNewPage(bool val)
+{
+    if (m_notesOnNewPage == val)
+        return;
+
+    m_notesOnNewPage = val;
+    emit notesOnNewPageChanged();
+}
+
 void NotebookReport::setSection(QObject *val)
 {
     if (m_section == val)
         return;
 
     auto sectionFound = [=]() {
-        return m_noteSection || m_notesSection || m_sceneSection || m_storySection
-                || m_screenplaySection;
+        return m_noteSection || m_notesSection || m_sceneSection || m_characterSection
+                || m_storySection || m_screenplaySection || m_noteListSection;
     };
+
+    if (m_noteListSection != nullptr)
+        disconnect(m_noteListSection, nullptr, this, nullptr);
 
     m_noteSection = nullptr;
     m_notesSection = nullptr;
@@ -67,6 +84,7 @@ void NotebookReport::setSection(QObject *val)
     m_characterSection = nullptr;
     m_storySection = nullptr;
     m_screenplaySection = nullptr;
+    m_noteListSection = nullptr;
 
     m_noteSection = qobject_cast<Note *>(val);
     m_notesSection = !sectionFound() ? qobject_cast<Notes *>(val) : nullptr;
@@ -74,6 +92,17 @@ void NotebookReport::setSection(QObject *val)
     m_characterSection = !sectionFound() ? qobject_cast<Character *>(val) : nullptr;
     m_storySection = !sectionFound() ? qobject_cast<Structure *>(val) : nullptr;
     m_screenplaySection = !sectionFound() ? qobject_cast<Screenplay *>(val) : nullptr;
+    m_noteListSection = !sectionFound() ? qobject_cast<AbstractQObjectListModel *>(val) : nullptr;
+
+    // The subtitle depends on whether the model has any objects in it.
+    if (m_noteListSection != nullptr) {
+        connect(m_noteListSection, &QAbstractItemModel::rowsInserted, this,
+                &NotebookReport::evaluateTitleAndSubtitle);
+        connect(m_noteListSection, &QAbstractItemModel::rowsRemoved, this,
+                &NotebookReport::evaluateTitleAndSubtitle);
+        connect(m_noteListSection, &QAbstractItemModel::modelReset, this,
+                &NotebookReport::evaluateTitleAndSubtitle);
+    }
 
     QObject *val2 = sectionFound() ? val : nullptr;
     if (m_section == val2)
@@ -191,6 +220,16 @@ bool NotebookReport::doGenerate(QTextDocument *doc)
         Structure::WriteOptions options;
         options.charactersOnly = charactersIntent;
         m_storySection->write(cursor, options);
+    } else if (m_noteListSection != nullptr && m_noteListSection->objectCount() > 0) {
+        QTextBlockFormat pageBreakBlockFormat = normalBlockFormat;
+        pageBreakBlockFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysBefore);
+
+        const QList<Note *> notes = this->selectedNotes();
+        for (Note *note : notes) {
+            if (m_notesOnNewPage && note != notes.first())
+                cursor.insertBlock(pageBreakBlockFormat, normalCharFormat);
+            note->write(cursor);
+        }
     } else {
         auto addSection = [&cursor](const QString &title, int headingLevel = 2) {
             QTextBlockFormat sectionBlockFormat;
@@ -231,8 +270,12 @@ bool NotebookReport::doGenerate(QTextDocument *doc)
 
 void NotebookReport::evaluateTitleAndSubtitle()
 {
+    // This is also called when the model of the section changes, which can be after the document is
+    // gone.
     ScriteDocument *scriteDocument = this->document();
-    Screenplay *screenplay = scriteDocument->screenplay();
+    Screenplay *screenplay = scriteDocument ? scriteDocument->screenplay() : nullptr;
+    if (screenplay == nullptr)
+        return;
 
     if (screenplay->title().isEmpty()) {
         if (scriteDocument->fileName().isEmpty())
@@ -241,6 +284,9 @@ void NotebookReport::evaluateTitleAndSubtitle()
             m_title = QFileInfo(scriteDocument->fileName()).completeBaseName();
     } else
         m_title = screenplay->title();
+
+    // The subtitle is made again each time, because this is called more than once.
+    m_subtitle.clear();
 
     if (m_noteSection) {
         Notes *notes = m_noteSection->notes();
@@ -258,8 +304,38 @@ void NotebookReport::evaluateTitleAndSubtitle()
             m_subtitle = QLatin1String("All Character");
     } else if (m_screenplaySection)
         m_subtitle = QLatin1String("Scene");
+    else if (m_noteListSection != nullptr && m_noteListSection->objectCount() > 0)
+        m_subtitle = QLatin1String("Selected");
 
     m_subtitle += QLatin1String(" Notes");
+}
+
+// The notes of the objects in the model passed as section, in the order of the model, each once.
+QList<Note *> NotebookReport::selectedNotes() const
+{
+    QList<Note *> ret;
+
+    auto addNote = [&ret](Note *note) {
+        if (note != nullptr && !ret.contains(note))
+            ret.append(note);
+    };
+
+    auto addNotes = [&addNote](Notes *notes) {
+        for (int i = 0; notes != nullptr && i < notes->noteCount(); i++)
+            addNote(notes->noteAt(i));
+    };
+
+    for (int i = 0; m_noteListSection != nullptr && i < m_noteListSection->objectCount(); i++) {
+        QObject *object = m_noteListSection->objectAt(i);
+        if (Note *note = qobject_cast<Note *>(object))
+            addNote(note);
+        else if (Notes *notes = qobject_cast<Notes *>(object))
+            addNotes(notes);
+        else if (ScreenplayElement *element = qobject_cast<ScreenplayElement *>(object))
+            addNotes(element->notes());
+    }
+
+    return ret;
 }
 
 void NotebookReport::polishFormInfo(Utils::ObjectConfig &formInfo) const

@@ -366,6 +366,7 @@ SctDialog {
             "MultipleLocationSelector",
             "MultipleSceneSelector",
             "MultipleTagGroupSelector",
+            "NotebookSectionSelector",
             "TextBox",
             "TwoColumnLayoutSelector",
             "TwoColumnWidthDistributionEditor"

@@ -26,6 +26,7 @@ class Scene;
 class Structure;
 class Character;
 class Screenplay;
+class AbstractQObjectListModel;
 
 class NotebookReport : public AbstractReportGenerator
 {
@@ -66,9 +67,27 @@ public:
     bool isEpisodesOnNewPage() const { return m_episodesOnNewPage; }
     Q_SIGNAL void episodesOnNewPageChanged();
 
-    // Can be Scene, Structure, Screenplay, Character, Notes or Note
+    // clang-format off
+    Q_CLASSINFO("notesOnNewPage_FieldGroup", "Basic")
+    Q_CLASSINFO("notesOnNewPage_FieldLabel", "When printing selected notes, start each on a new page.")
+    Q_CLASSINFO("notesOnNewPage_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool notesOnNewPage
+               READ isNotesOnNewPage
+               WRITE setNotesOnNewPage
+               NOTIFY notesOnNewPageChanged)
+    // clang-format on
+    void setNotesOnNewPage(bool val);
+    bool isNotesOnNewPage() const { return m_notesOnNewPage; }
+    Q_SIGNAL void notesOnNewPageChanged();
+
+    // Can be Scene, Structure, Screenplay, Character, Notes, Note or a QObjectListModel of Note,
+    // Notes or ScreenplayElement (of an episode or act) objects, as in
+    // NotebookTreeLens::checkedModel. Only the notes of those objects are printed, in model order.
     // Otherwise it generates a dump of all notes in the Notebook
     // clang-format off
+    Q_CLASSINFO("section_FieldGroup", "Selection")
+    Q_CLASSINFO("section_FieldLabel", "Select the parts of the Notebook to print. Leave all unchecked to print the entire Notebook.")
+    Q_CLASSINFO("section_FieldEditor", "NotebookSectionSelector")
     Q_PROPERTY(QObject *section
                READ section
                WRITE setSection
@@ -106,6 +125,7 @@ protected:
 
 private:
     void evaluateTitleAndSubtitle();
+    QList<Note *> selectedNotes() const;
 
 private:
     Note *m_noteSection = nullptr;
@@ -114,6 +134,7 @@ private:
     Structure *m_storySection = nullptr;
     Character *m_characterSection = nullptr;
     Screenplay *m_screenplaySection = nullptr;
+    AbstractQObjectListModel *m_noteListSection = nullptr;
 
     QObject *m_section = nullptr;
     QJsonValue m_options;
@@ -121,6 +142,7 @@ private:
     QString m_title;
     QString m_subtitle;
     bool m_actsOnNewPage = false;
+    bool m_notesOnNewPage = false;
     bool m_episodesOnNewPage = false;
 };
 
