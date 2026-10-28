@@ -1341,6 +1341,16 @@ void MarkdownSyntaxHighlighterDelegate::highlightBlock(const QString &text)
     if (text.isEmpty())
         return;
 
+    // A text area that is switched from rendered markdown to plain text can carry the formatting
+    // at the end of the rendered text over to all of the plain text, which makes all of it bold
+    // when the last line is. Weight and slant are therefore never left to what is underneath, and
+    // everything below that wants either sets it on top of this. Underline is left alone, because
+    // the spell checker sets it.
+    QTextCharFormat plain;
+    plain.setFontWeight(QFont::Normal);
+    plain.setFontItalic(false);
+    this->mergeFormat(0, text.length(), plain);
+
     if (!this->highlightHeading(text) && !this->highlightCodeFenceOrRule(text)) {
         this->highlightBlockLevel(text);
         this->highlightInline(text);
