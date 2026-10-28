@@ -36,6 +36,14 @@ AbstractNotebookPage {
 
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
 
+    // Asks the user to confirm, and then deletes the note. What the toolbar does, and what the delete
+    // button of a note does.
+    function askDeleteNote() {
+        askDeleteConfirmation("Are you sure you want to delete this note?", () => {
+                                  Qt.callLater(() => { _private.note.notes.removeNote(_private.note) })
+                              })
+    }
+
     backgroundColor: Runtime.colors.tintTx(_private.note.color, Runtime.colors.sceneHeadingTint)
 
     ActionHandler {
@@ -55,20 +63,9 @@ AbstractNotebookPage {
         action: ActionHub.notebookOperations.find("delete")
 
         enabled: true
-        tooltip: "Delete current text note."
+        tooltip: "Delete current note."
 
-        onTriggered: () => {
-                         root.askDeleteConfirmation("Are you sure you want to delete this text note?", confirmDeleteLater)
-                     }
-
-        function confirmDeleteLater() {
-            Qt.callLater(confirmDelete)
-        }
-
-        function confirmDelete() {
-            let notes = _private.note.notes
-            notes.removeNote(_private.note)
-        }
+        onTriggered: () => { root.askDeleteNote() }
     }
 
     ActionHandler {

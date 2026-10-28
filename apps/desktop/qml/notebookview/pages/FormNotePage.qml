@@ -13,11 +13,15 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 
 import Scrite.App
 
+import "../../globals"
+import "../../helpers"
 import ".."
 import "../helpers"
 
@@ -30,5 +34,15 @@ AbstractNotePage {
         note: root.note
         maxTextAreaSize: root.maxTextAreaSize
         minTextAreaSize: root.minTextAreaSize
+
+        viewAccessory: FlatToolButton {
+            suggestedWidth: 28
+
+            iconSource: Runtime.themedIcon("qrc:/icons/action/delete.png")
+            toolTipText: "Delete this note"
+            visible: !Scrite.document.readOnly
+
+            onClicked: root.askDeleteNote()
+        }
     }
 }

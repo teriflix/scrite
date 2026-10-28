@@ -35,6 +35,8 @@ Item {
     required property real maxTextAreaSize
     required property real minTextAreaSize
 
+    signal deleteRequest()
+
     ColumnLayout {
         anchors.centerIn: parent
 
@@ -48,22 +50,40 @@ Item {
             Layout.preferredHeight: 1
         }
 
-        SctTextField {
-            id: _title
-
+        RowLayout {
             Layout.fillWidth: true
 
-            placeholderText: "Title"
-            tabItem: _description
-            text: root.note ? root.note.title : ""
-            wrapMode: Text.WordWrap
+            spacing: 8
 
-            font.bold: true
-            font.pointSize: Runtime.notebookFontPointSize + 2
+            SctTextField {
+                id: _title
 
-            onTextEdited: {
-                if(root.note)
-                    root.note.title = text
+                Layout.fillWidth: true
+
+                placeholderText: "Title"
+                tabItem: _description
+                text: root.note ? root.note.title : ""
+                wrapMode: Text.WordWrap
+
+                font.bold: true
+                font.pointSize: Runtime.notebookFontPointSize + 2
+
+                onTextEdited: {
+                    if(root.note)
+                        root.note.title = text
+                }
+            }
+
+            FlatToolButton {
+                Layout.alignment: Qt.AlignTop
+
+                suggestedWidth: 28
+
+                iconSource: Runtime.themedIcon("qrc:/icons/action/delete.png")
+                toolTipText: "Delete this note"
+                visible: !Scrite.document.readOnly
+
+                onClicked: root.deleteRequest()
             }
         }
 

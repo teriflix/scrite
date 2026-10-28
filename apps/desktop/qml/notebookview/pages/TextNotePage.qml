@@ -30,5 +30,7 @@ AbstractNotePage {
         note: root.note
         maxTextAreaSize: root.maxTextAreaSize
         minTextAreaSize: root.minTextAreaSize
+
+        onDeleteRequest: root.askDeleteNote()
     }
 }
