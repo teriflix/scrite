@@ -247,6 +247,7 @@ bool GenericArrayModel::setData(const QModelIndex &index, const QVariant &value,
 
     const QString member = m_objectMembers.at(memberIndex);
     item.insert(member, value.toJsonValue());
+    m_array.replace(index.row(), item);
     emit dataChanged(index, index, { role });
 
     return true;
