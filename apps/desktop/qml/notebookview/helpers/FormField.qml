@@ -222,6 +222,11 @@ Column {
                         id: _spellChecker
                         enabled: Runtime.screenplayEditorSettings.enableSpellCheck
                         cursorPosition: _answerText.cursorPosition
+                    },
+
+                    StdMarkdownSyntaxHighlighterDelegate {
+                        font: _answerText.font
+                        enabled: _answerText.text !== ""
                     }
                 ]
                 SyntaxHighlighter.textDocument: textDocument

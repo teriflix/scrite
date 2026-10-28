@@ -39,6 +39,16 @@ AbstractNotebookPage {
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
     signal deleteNoteRequest(Note note)
 
+    // Selects the tab of the singleton note. Returns false if this page does not have one for it.
+    function showNote(note) {
+        const index = _private.singletonNotes.indexOf(note)
+        if(index < 0)
+            return false
+
+        _tabBar.currentTab = _tabBar.tabs.length - _private.singletonNotes.length + index
+        return true
+    }
+
     backgroundColor: Runtime.colors.tintTx(_private.character.color, Runtime.colors.sceneHeadingTint)
 
     ColumnLayout {
@@ -53,7 +63,7 @@ AbstractNotebookPage {
             Layout.fillWidth: true
 
             name: _private.character.name
-            tabs: ["Information", "Relationships", "Notes"]
+            tabs: ["Information", "Relationships", "Notes", "Attributes"].concat(_private.singletonNotes.map(note => note.title))
             currentTab: Runtime.notebookSettings.characterPageTab
             switchTabHandlerEnabled: true
 
@@ -65,7 +75,7 @@ AbstractNotebookPage {
             Layout.fillHeight: true
 
             clip: true
-            currentIndex: _tabBar.currentTab
+            currentIndex: Math.min(_tabBar.currentTab, _tabBar.tabs.length - 1)
 
             Loader {
                 Layout.fillWidth: true
@@ -104,6 +114,42 @@ AbstractNotebookPage {
 
                     onSwitchRequest: (item) => { root.switchRequest(item) }
                     onDeleteNoteRequest: (note) => { root.deleteNoteRequest(note) }
+                }
+            }
+
+            Loader {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                active: visible
+
+                sourceComponent: AttributesTab {
+                    notes: _private.notes
+                    maxTextAreaSize: root.maxTextAreaSize
+                    minTextAreaSize: root.minTextAreaSize
+                }
+            }
+
+            Repeater {
+                model: _private.singletonNotes
+
+                delegate: Loader {
+                    id: _singletonLoader
+
+                    required property var modelData
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    active: visible
+
+                    sourceComponent: SingletonNoteTab {
+                        note: _singletonLoader.modelData
+                        maxTextAreaSize: root.maxTextAreaSize
+                        minTextAreaSize: root.minTextAreaSize
+
+                        onDeleteRequest: (note) => { _private.deleteSingletonNote(note) }
+                    }
                 }
             }
         }
@@ -178,6 +224,13 @@ AbstractNotebookPage {
 
         property Notes notes: character ? character.notes : null
         property Character character: root.pageData ? root.pageData.notebookItemObject.character : null
+        property var singletonNotes: notes ? notes.singletonNotes : []
+
+        function deleteSingletonNote(note) {
+            root.askDeleteConfirmation("Are you sure you want to delete this note?", () => {
+                                           Qt.callLater(() => { _private.notes.removeNote(note) })
+                                       })
+        }
 
         readonly property Component newNoteMenu: NewNoteMenu {
             notes: _private.notes

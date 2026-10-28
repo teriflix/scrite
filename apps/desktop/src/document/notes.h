@@ -22,6 +22,7 @@
 #include <QAbstractListModel>
 
 #include "attachments.h"
+#include "noteskvstore.h"
 #include "qobjectproperty.h"
 
 class Form;
@@ -178,6 +179,16 @@ public:
     // clang-format on
     Form *form() const { return m_form; }
     Q_SIGNAL void formChanged();
+
+    // True if this is a form note, and its form allows just one note of it in a Notes.
+    // UIs show such notes in a tab of their own, and not in the list of notes.
+    // clang-format off
+    Q_PROPERTY(bool singleton
+               READ isSingleton
+               NOTIFY formChanged
+               STORED false)
+    // clang-format on
+    bool isSingleton() const;
 
     // clang-format off
     Q_PROPERTY(QJsonObject formData
@@ -415,6 +426,24 @@ public:
     // clang-format on
     int compatibleFormType() const { return m_compatibleFormType; }
 
+    // clang-format off
+    Q_PROPERTY(NotesKVStore *kvStore
+               READ kvStore
+               STORED false
+               CONSTANT )
+    // clang-format on
+    NotesKVStore *kvStore() const { return m_kvStore; }
+
+    // The notes that are singletons (see Note::singleton), which UIs show in tabs of their own.
+    // clang-format off
+    Q_PROPERTY(QList<Note *> singletonNotes
+               READ singletonNotes
+               NOTIFY singletonNotesChanged
+               STORED false)
+    // clang-format on
+    QList<Note *> singletonNotes() const { return m_singletonNotes; }
+    Q_SIGNAL void singletonNotesChanged();
+
     Q_SIGNAL void notesModified();
 
     // QObjectSerializer::Interface interface
@@ -443,6 +472,7 @@ private:
     void setNotes(const QList<Note *> &list);
     void moveNotes(Notes *target);
     void renameCharacter(const QString &from, const QString &to);
+    void updateSingletonNotes();
 
 private:
     friend class RemoveNoteUndoCommand;
@@ -450,6 +480,8 @@ private:
     QString m_id;
     QColor m_color = Qt::white;
     OwnerType m_ownerType = OtherOwner;
+    NotesKVStore *m_kvStore = new NotesKVStore(this);
+    QList<Note *> m_singletonNotes;
 };
 
 class NoteListModel : public QAbstractListModel

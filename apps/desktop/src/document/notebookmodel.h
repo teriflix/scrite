@@ -53,6 +53,18 @@ public:
     ScriteDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
 
+    // If false, notes that are singletons (see Note::singleton) are left out of the model, because
+    // the UI shows them in a tab of their own.
+    // clang-format off
+    Q_PROPERTY(bool includeSingletonNotes
+               READ isIncludeSingletonNotes
+               WRITE setIncludeSingletonNotes
+               NOTIFY includeSingletonNotesChanged)
+    // clang-format on
+    void setIncludeSingletonNotes(bool val);
+    bool isIncludeSingletonNotes() const { return m_includeSingletonNotes; }
+    Q_SIGNAL void includeSingletonNotesChanged();
+
     enum ItemType {
         CategoryType, // Just heading text, no "live" object
         EpisodeBreakType,
@@ -127,6 +139,7 @@ private:
     void onDataChanged(const QModelIndex &start, const QModelIndex &end, const QVector<int> &roles);
 
 private:
+    bool m_includeSingletonNotes = true;
     QTimer m_syncScenesTimer;
     QTimer m_syncCharactersTimer;
     QObjectProperty<ScriteDocument> m_document;

@@ -17,6 +17,7 @@ pragma ComponentBehavior: Bound
 
 import QtQml
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
@@ -35,6 +36,12 @@ Item {
 
     property Form form: note ? note.form : null
     property Note note
+
+    // If false, the title and the description of the note are not shown, and so can't be edited.
+    property bool showHeading: true
+
+    // Shown after the choice of questions to view, for whatever a page wants next to it.
+    property Component viewAccessory
 
     function evalNrQuestionDigits() {
         var nrQs = form.questionCount
@@ -141,8 +148,10 @@ Item {
 
                     width: parent.width
 
+                    enabled: root.showHeading
                     placeholderText: "Title"
                     text: root.note ? root.note.title : ""
+                    visible: root.showHeading
                     wrapMode: Text.WordWrap
 
                     font.bold: true
@@ -167,8 +176,10 @@ Item {
 
                     width: parent.width
 
+                    enabled: root.showHeading
                     placeholderText: "Description"
                     text: root.note ? root.note.summary : ""
+                    visible: root.showHeading
                     wrapMode: Text.WordWrap
 
                     font.pointSize: Runtime.notebookFontPointSize
@@ -197,13 +208,15 @@ Item {
                 }
             }
 
-            Row {
+            RowLayout {
+                width: parent.width
+
                 spacing: 10
 
                 SctLabel {
-                    text: "View"
+                    Layout.alignment: Qt.AlignVCenter
 
-                    anchors.verticalCenter: parent.verticalCenter
+                    text: "View"
                 }
 
                 SctRadioButton {
@@ -218,6 +231,16 @@ Item {
                     checked: !Runtime.notebookSettings.showAllFormQuestions
 
                     onToggled: Runtime.notebookSettings.showAllFormQuestions = false
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                Loader {
+                    Layout.alignment: Qt.AlignVCenter
+
+                    sourceComponent: root.viewAccessory
                 }
             }
 
@@ -347,11 +370,13 @@ Item {
 
     onNoteChanged: {
         if(note) {
-            if(note.objectName === "_newNote")
-                _description.forceActiveFocus()
-            else if(note.objectName === "_focusNote") {
-                _description.forceActiveFocus()
-                _tabManager.focusNext()
+            if(root.showHeading) {
+                if(note.objectName === "_newNote")
+                    _description.forceActiveFocus()
+                else if(note.objectName === "_focusNote") {
+                    _description.forceActiveFocus()
+                    _tabManager.focusNext()
+                }
             }
             note.objectName = ""
         }

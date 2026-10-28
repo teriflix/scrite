@@ -23,12 +23,16 @@ Settings {
     property int screenplayPageTab: 0
     property int sceneNotesPageTab: 0
     property int sceneSynopsisTabIndex: 0
+    property int attributesCategoriesWidth: 200 // Width of the list of categories in the Attributes tab
     property int graphLayoutMaxIterations: 50000
     property int graphLayoutMaxTime: 1000
     property int fontPointSize: 0 // 0 means follow Runtime.idealFontMetrics
 
     property bool richTextNotesEnabled: true
     property bool showAllFormQuestions: true
+
+    // The category that the Attributes tab selects, for the notes that have it
+    property string attributesCategory: ""
 
     location: Platform.settingsLocation
     category: "Notebook"

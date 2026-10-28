@@ -87,13 +87,17 @@ private:
 class NotesItem : public ObjectItem
 {
 public:
-    explicit NotesItem(Notes *notes);
+    explicit NotesItem(Notes *notes, bool includeSingletonNotes);
     ~NotesItem() override;
 
     void sync();
     void updateText();
 
 private:
+    QList<Note *> visibleNotes() const;
+
+private:
+    bool m_includeSingletonNotes = true;
     Notes *m_notes = nullptr;
     QTimer m_syncTimer;
 };
@@ -187,6 +191,17 @@ void NotebookModel::setDocument(ScriteDocument *val)
         connect(m_document, &ScriteDocument::justReset, this, &NotebookModel::reload);
         connect(m_document, &ScriteDocument::justLoaded, this, &NotebookModel::reload);
     }
+
+    this->reload();
+}
+
+void NotebookModel::setIncludeSingletonNotes(bool val)
+{
+    if (m_includeSingletonNotes == val)
+        return;
+
+    m_includeSingletonNotes = val;
+    emit includeSingletonNotesChanged();
 
     this->reload();
 }
@@ -325,12 +340,12 @@ void NotebookModel::loadStory()
     Structure *structure = m_document->structure();
     Notes *storyNotes = structure->notes();
 
-    NotesItem *storyNotesItem = new NotesItem(storyNotes);
+    NotesItem *storyNotesItem = new NotesItem(storyNotes, m_includeSingletonNotes);
     storyNotesItem->setData(1, NotebookModel::IdRole);
     this->appendRow(storyNotesItem);
 }
 
-QStandardItem *createItemForNode(StoryNode *node)
+QStandardItem *createItemForNode(StoryNode *node, bool includeSingletonNotes)
 {
     QStandardItem *nodeItem = nullptr;
     if (node->scene == nullptr && node->unusedScene == nullptr) {
@@ -345,9 +360,9 @@ QStandardItem *createItemForNode(StoryNode *node)
         else
             nodeItem = new StandardItemWithId;
     } else if (node->scene != nullptr)
-        nodeItem = new NotesItem(node->scene->scene()->notes());
+        nodeItem = new NotesItem(node->scene->scene()->notes(), includeSingletonNotes);
     else if (node->unusedScene != nullptr)
-        nodeItem = new NotesItem(node->unusedScene->scene()->notes());
+        nodeItem = new NotesItem(node->unusedScene->scene()->notes(), includeSingletonNotes);
 
     Notes *nodeNotes = nullptr;
 
@@ -373,12 +388,12 @@ QStandardItem *createItemForNode(StoryNode *node)
         nodeItem->setText(QStringLiteral("Story Notes"));
 
     if (nodeNotes != nullptr) {
-        NotesItem *nodeNotesItem = new NotesItem(nodeNotes);
+        NotesItem *nodeNotesItem = new NotesItem(nodeNotes, includeSingletonNotes);
         nodeItem->appendRow(nodeNotesItem);
     }
 
     for (StoryNode *childNode : std::as_const(node->childNodes)) {
-        QStandardItem *childNodeItem = createItemForNode(childNode);
+        QStandardItem *childNodeItem = createItemForNode(childNode, includeSingletonNotes);
         nodeItem->appendRow(childNodeItem);
     }
 
@@ -481,11 +496,11 @@ void NotebookModel::syncScenes()
 
     removeTopLevelItems(this, unusedScenesItem);
     if (structureNode != nullptr)
-        this->insertRow(2, createItemForNode(structureNode));
+        this->insertRow(2, createItemForNode(structureNode, m_includeSingletonNotes));
 
     removeTopLevelItems(this, screenplayScenesItem);
     if (screenplayNode != nullptr)
-        this->insertRow(2, createItemForNode(screenplayNode));
+        this->insertRow(2, createItemForNode(screenplayNode, m_includeSingletonNotes));
 
     if (hasScenes)
         emit justReloadedScenes();
@@ -520,7 +535,7 @@ void NotebookModel::syncCharacters()
     for (Character *character : std::as_const(characters)) {
         Notes *characterNotes = character->notes();
 
-        NotesItem *notesItem = new NotesItem(characterNotes);
+        NotesItem *notesItem = new NotesItem(characterNotes, m_includeSingletonNotes);
         charactersItem->appendRow(notesItem);
     }
 
@@ -611,7 +626,8 @@ void NoteItem::updateText()
     this->setText(title.isEmpty() ? QStringLiteral("New Note") : title);
 }
 
-NotesItem::NotesItem(Notes *notes) : ObjectItem(notes), m_notes(notes)
+NotesItem::NotesItem(Notes *notes, bool includeSingletonNotes)
+    : ObjectItem(notes), m_includeSingletonNotes(includeSingletonNotes), m_notes(notes)
 {
     this->updateText();
     switch (m_notes->ownerType()) {
@@ -642,13 +658,12 @@ NotesItem::NotesItem(Notes *notes) : ObjectItem(notes), m_notes(notes)
 
     this->setData(NotebookModel::NotesType, NotebookModel::TypeRole);
 
-    const int nrNotes = m_notes->noteCount();
+    const QList<Note *> visibleNotes = this->visibleNotes();
 
     QList<QStandardItem *> noteItems;
-    noteItems.reserve(nrNotes);
+    noteItems.reserve(visibleNotes.size());
 
-    for (int i = 0; i < nrNotes; i++) {
-        Note *note = m_notes->noteAt(i);
+    for (Note *note : visibleNotes) {
         NoteItem *noteItem = new NoteItem(note);
         noteItems.append(noteItem);
     }
@@ -670,16 +685,27 @@ NotesItem::~NotesItem()
     m_syncTimer.stop();
 }
 
+QList<Note *> NotesItem::visibleNotes() const
+{
+    QList<Note *> ret;
+    for (int i = 0; i < m_notes->noteCount(); i++) {
+        Note *note = m_notes->noteAt(i);
+        if (m_includeSingletonNotes || !note->isSingleton())
+            ret.append(note);
+    }
+    return ret;
+}
+
 void NotesItem::sync()
 {
-    if (this->rowCount() > m_notes->noteCount()) {
+    const QList<Note *> notes = this->visibleNotes();
+    if (this->rowCount() > notes.size()) {
         m_syncTimer.start();
         return;
     }
 
-    const int noteCount = m_notes->noteCount();
-    for (int i = 0; i < noteCount; i++) {
-        Note *actualNote = m_notes->at(i);
+    for (int i = 0; i < notes.size(); i++) {
+        Note *actualNote = notes.at(i);
         QStandardItem *noteItem = this->child(i);
         Note *assignedNote = noteItem
                 ? qobject_cast<Note *>(noteItem->data(NotebookModel::ObjectRole).value<QObject *>())

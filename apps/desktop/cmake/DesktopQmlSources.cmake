@@ -35,6 +35,8 @@ set(SCRITE_DESKTOP_QML_SOURCES
   "src/document/notebookproxymodels.h"
   "src/document/notes.cpp"
   "src/document/notes.h"
+  "src/document/noteskvstore.cpp"
+  "src/document/noteskvstore.h"
   "src/document/scene.cpp"
   "src/document/scene.h"
   "src/document/scenedocumentbinder_p.h"

@@ -101,6 +101,11 @@ QString Note::path() const
     return this->title();
 }
 
+bool Note::isSingleton() const
+{
+    return m_form != nullptr && m_form->isSingleton();
+}
+
 void Note::setPreferPlainTextUi(bool val)
 {
     if (m_preferPlainTextUi == val)
@@ -639,6 +644,8 @@ Notes::Notes(QObject *parent) : QObjectListModel<Note *>(parent)
 {
     connect(this, &Notes::objectCountChanged, this, &Notes::noteCountChanged);
     connect(this, &Notes::noteCountChanged, this, &Notes::notesModified);
+    connect(this, &Notes::noteCountChanged, this, &Notes::updateSingletonNotes);
+    connect(m_kvStore, &NotesKVStore::storeModified, this, &Notes::notesModified);
 
     m_compatibleFormType = Form::GeneralForm;
 
@@ -820,7 +827,7 @@ Note *Notes::addFormNote(const QString &id, const QString &creator)
         return nullptr;
     }
 
-    if (ptr->form()->isSingleton()) {
+    if (ptr->isSingleton()) {
         Note *other = this->findFirstFormNote(id);
         if (other != nullptr) {
             delete ptr;
@@ -880,7 +887,13 @@ void Notes::setNotes(const QList<Note *> &list)
 
 void Notes::moveNotes(Notes *target)
 {
-    if (this->isEmpty() || target == nullptr)
+    if (target == nullptr)
+        return;
+
+    target->m_kvStore->merge(m_kvStore);
+    m_kvStore->clear();
+
+    if (this->isEmpty())
         return;
 
     QList<Note *> &list = this->list();
@@ -911,6 +924,21 @@ void Notes::removeNote(Note *ptr)
 Note *Notes::noteAt(int index) const
 {
     return this->at(index);
+}
+
+void Notes::updateSingletonNotes()
+{
+    QList<Note *> notes;
+    for (Note *note : this->constList()) {
+        if (note->isSingleton())
+            notes.append(note);
+    }
+
+    if (m_singletonNotes == notes)
+        return;
+
+    m_singletonNotes = notes;
+    emit singletonNotesChanged();
 }
 
 Note *Notes::findFirstFormNote(const QString &id) const
@@ -951,6 +979,9 @@ void Notes::serializeToJson(QJsonObject &json) const
 {
     json.insert(QStringLiteral("id"), this->id());
 
+    if (!m_kvStore->isEmpty())
+        json.insert(QStringLiteral("kvStore"), m_kvStore->toJson());
+
     if (this->isEmpty())
         return;
 
@@ -968,6 +999,10 @@ void Notes::serializeToJson(QJsonObject &json) const
 void Notes::deserializeFromJson(const QJsonObject &json)
 {
     this->setId(json.value(QStringLiteral("id")).toString());
+
+    const QJsonArray jsKVStore = json.value(QStringLiteral("kvStore")).toArray();
+    if (!jsKVStore.isEmpty())
+        m_kvStore->fromJson(jsKVStore);
 
     const QJsonArray jsNotes = json.value(QStringLiteral("#data")).toArray();
     if (jsNotes.isEmpty())
@@ -1039,6 +1074,8 @@ void Notes::renameCharacter(const QString &from, const QString &to)
 {
     for (Note *note : this->constList())
         note->renameCharacter(from, to);
+
+    m_kvStore->renameCharacter(from, to);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -36,36 +36,39 @@ Item {
 
     EventFilter.events: [EventFilter.Wheel]
     EventFilter.onFilter: (object,event,result) => {
-        EventFilter.forwardEventTo(_textArea)
-        result.filter = true
-        result.accepted = true
-    }
+                              EventFilter.forwardEventTo(_textArea)
+                              result.filter = true
+                              result.accepted = true
+                          }
 
-    FlickableTextArea {
-        id: _textArea
-
-        ScrollBar.vertical: _scrollBar
-
+    Rectangle {
         anchors.centerIn: parent
 
         width: parent.width >= root.maxTextAreaSize+20 ? root.maxTextAreaSize : parent.width-20
         height: parent.height - 20
 
-        adjustTextWidthBasedOnScrollBar: false
-        font.pointSize: Runtime.notebookFontPointSize
-        placeholderText: "Scene Comments"
-        readOnly: Scrite.document.readOnly
-        text: root.scene.comments
-        undoRedoEnabled: true
+        color: Runtime.colors.tintTx(root.scene.color, Runtime.colors.sceneHeadingTint)
+        border.width: 1
+        border.color: Runtime.colors.primary.borderColor
 
-        background: Rectangle {
-            color: Runtime.colors.primary.windowColor
-            opacity: 0.25
-            border.width: 1
-            border.color: Runtime.colors.primary.borderColor
+        FlickableTextArea {
+            id: _textArea
+
+            ScrollBar.vertical: _scrollBar
+
+            anchors.fill: parent
+            anchors.margins: 5
+
+            adjustTextWidthBasedOnScrollBar: false
+            font.pointSize: Runtime.notebookFontPointSize
+            placeholderText: "Scene Comments"
+            readOnly: Scrite.document.readOnly
+            text: root.scene.comments
+            undoRedoEnabled: true
+            background: null
+
+            onTextEdited: root.scene.comments = text
         }
-
-        onTextEdited: root.scene.comments = text
     }
 
     SctScrollBar {

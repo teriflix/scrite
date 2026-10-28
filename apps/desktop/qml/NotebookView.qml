@@ -165,6 +165,8 @@ Item {
                 }
             }
 
+            onLoaded: _private.showPendingSingletonNote()
+
             onStatusChanged: {
                 if(status === Loader.Loading) {
                     if(_private.deleteTriggerTimer) {
@@ -289,6 +291,7 @@ Item {
             preferredItem = null
         }
 
+        includeSingletonNotes: false
         document: Scrite.document.loading ? null : Scrite.document
 
         onAboutToRefresh: noteCurrentItem()
@@ -372,6 +375,7 @@ Item {
             notebookModel: _notebookModel
             maxTextAreaSize: _private.maxTextAreaSize
             minTextAreaSize: _private.minTextAreaSize
+            showTabs: true
 
             onSwitchRequest: (item) => {
                                  _private.scheduleSwitchTo(item)
@@ -494,8 +498,21 @@ Item {
                 switchTo(character.notes)
         }
 
+        // A singleton note is not in the notebook tree. It is in a tab of the page of its Notes.
+        property Note pendingSingletonNote
+
+        function showPendingSingletonNote() {
+            const page = _contentLoader.item
+            if(pendingSingletonNote && page && page.showNote && page.showNote(pendingSingletonNote))
+                pendingSingletonNote = null
+        }
+
         function switchTo(item) {
-            if(typeof item === "string") {
+            if(item && item.singleton === true) {
+                pendingSingletonNote = item
+                _notebookTree.setCurrentIndex( _notebookTree.model.findModelIndexFor(item.notes) )
+                showPendingSingletonNote()
+            } else if(typeof item === "string") {
                 let midx
                 if(item === "Bookmarks")
                     midx = _notebookTree.model.findModelIndexForCategory(NotebookModel.BookmarksCategory)

@@ -72,6 +72,9 @@ Item {
                     width: _private.noteSize
                     height: _private.noteSize
 
+                    // Singleton notes have a tab of their own.
+                    visible: !note.singleton
+
                     BoxShadow {
                         anchors.fill: _noteVisual
 
