@@ -134,6 +134,47 @@ static QString ownerOf(Notes *notes, const QModelIndex &index)
     return QString();
 }
 
+// Which of the types of notes the note is. A text note is rich text unless it prefers a plain text
+// UI, and then it is markdown text if it has markdown content.
+static NotebookItemFilter::NoteTypes noteTypeOf(Note *note)
+{
+    switch (note->type()) {
+    case Note::FormNoteType:
+        return NotebookItemFilter::FormNote;
+    case Note::CheckListNoteType:
+        return NotebookItemFilter::ChecklistNote;
+    default:
+        break;
+    }
+
+    if (!note->isPreferPlainTextUi())
+        return NotebookItemFilter::RichTextNote;
+
+    return note->hasMarkdownContent() ? NotebookItemFilter::MarkdownTextNote
+                                      : NotebookItemFilter::PlainTextNote;
+}
+
+static NotebookItemFilter::Kind kindOf(const NotebookItemInfo &info)
+{
+    if (info.kind == QStringLiteral("note"))
+        return NotebookItemFilter::NoteKind;
+    if (info.kind == QStringLiteral("scene"))
+        return NotebookItemFilter::SceneKind;
+    if (info.kind == QStringLiteral("character"))
+        return NotebookItemFilter::CharacterKind;
+    return NotebookItemFilter::BreakKind;
+}
+
+// Whether an item is of one of the kinds, and, if it is a note, is of one of the types of notes.
+static bool isAccepted(const NotebookItemInfo &info, NotebookItemFilter::Kinds kinds,
+                       NotebookItemFilter::NoteTypes noteTypes)
+{
+    if (!info.isValid() || !(kinds & kindOf(info)))
+        return false;
+
+    return info.kind != QStringLiteral("note") || (info.noteType & noteTypes);
+}
+
 // What the row at index, in the NotebookModel, is as an item. Invalid if it isn't one.
 static NotebookItemInfo infoOf(const QModelIndex &index)
 {
@@ -150,6 +191,7 @@ static NotebookItemInfo infoOf(const QModelIndex &index)
             return info;
 
         info.kind = QStringLiteral("note");
+        info.noteType = noteTypeOf(note);
         info.key = keyOf(info.kind, note->id());
         // Notes are called by their owner and title, as in "ACT 1 / AI Act Summary", because the
         // titles of notes are the same in many places.
@@ -250,7 +292,7 @@ void NotebookFlatLens::setSourceModel(NotebookModel *val)
     emit sourceModelChanged();
 }
 
-void NotebookFlatLens::setKinds(const QStringList &val)
+void NotebookFlatLens::setKinds(NotebookItemFilter::Kinds val)
 {
     if (m_kinds == val)
         return;
@@ -258,6 +300,16 @@ void NotebookFlatLens::setKinds(const QStringList &val)
     m_kinds = val;
     this->rebuild();
     emit kindsChanged();
+}
+
+void NotebookFlatLens::setNoteTypes(NotebookItemFilter::NoteTypes val)
+{
+    if (m_noteTypes == val)
+        return;
+
+    m_noteTypes = val;
+    this->rebuild();
+    emit noteTypesChanged();
 }
 
 void NotebookFlatLens::setSearchText(const QString &val)
@@ -372,7 +424,7 @@ void NotebookFlatLens::collect(const QModelIndex &parent)
         const QModelIndex index = m_sourceModel->index(row, 0, parent);
 
         const NotebookItemInfo info = infoOf(index);
-        if (info.isValid() && (m_kinds.isEmpty() || m_kinds.contains(info.kind)))
+        if (isAccepted(info, m_kinds, m_noteTypes))
             m_items.append(info);
 
         this->collect(index);
@@ -573,13 +625,25 @@ void NotebookTreeLens::setSearchText(const QString &val)
     emit searchTextChanged();
 }
 
-void NotebookTreeLens::setKinds(const QStringList &val)
+void NotebookTreeLens::setKinds(NotebookItemFilter::Kinds val)
 {
     if (m_kinds == val)
         return;
 
     m_kinds = val;
     emit kindsChanged();
+}
+
+void NotebookTreeLens::setNoteTypes(NotebookItemFilter::NoteTypes val)
+{
+    if (m_noteTypes == val)
+        return;
+
+    this->beginFilterChange();
+    m_noteTypes = val;
+    this->endFilterChange();
+
+    emit noteTypesChanged();
 }
 
 void NotebookTreeLens::setCheckedKeys(const QStringList &val)
@@ -689,10 +753,11 @@ bool NotebookTreeLens::setData(const QModelIndex &index, const QVariant &value, 
     return true;
 }
 
-// Whether an item can be ticked: it is one, and is of one of the kinds, if there are any.
+// Whether an item can be ticked: it is one, and is of one of the kinds, and, if it
+// is a note, of one of the types of notes, which is so for all the notes that are in the tree.
 bool NotebookTreeLens::isCheckable(const NotebookItemInfo &info) const
 {
-    return info.isValid() && (m_kinds.isEmpty() || m_kinds.contains(info.kind));
+    return isAccepted(info, m_kinds, m_noteTypes);
 }
 
 void NotebookTreeLens::setSourceModel(QAbstractItemModel *model)
@@ -720,6 +785,13 @@ bool NotebookTreeLens::filterAcceptsRow(int sourceRow, const QModelIndex &source
     if (index.data(NotebookModel::TypeRole).toInt() == NotebookModel::CategoryType
         && index.data(NotebookModel::CategoryRole).toInt() == NotebookModel::BookmarksCategory)
         return false;
+
+    // A note that is not of one of the types of notes is not in the tree at all.
+    if (m_noteTypes != NotebookItemFilter::AnyNote) {
+        const NotebookItemInfo note = infoOf(index);
+        if (note.kind == QStringLiteral("note") && !(note.noteType & m_noteTypes))
+            return false;
+    }
 
     if (m_searchWords.isEmpty())
         return true;

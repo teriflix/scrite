@@ -257,7 +257,7 @@ DialogLauncher {
                 id: _lens
 
                 sourceModel: _dialog.notebook
-                kinds: ["note", "scene", "character"]
+                kinds: NotebookItemFilter.NoteKind | NotebookItemFilter.SceneKind | NotebookItemFilter.CharacterKind
             }
 
             // The Notebook makes its branches again as the document changes, and the tree is narrowed

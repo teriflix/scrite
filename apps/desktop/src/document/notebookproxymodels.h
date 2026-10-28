@@ -54,8 +54,49 @@
  * Searching is by words: an item is found if each word of the search is in its kind, label or
  * owner, ignoring case. So "char ra" finds characters with "ra" in their names.
  */
+
+/**
+ * What the lenses can be limited to, as flags. Kinds are the kinds of items: NoteKind, SceneKind,
+ * CharacterKind and BreakKind. NoteTypes are the types of the notes: PlainTextNote,
+ * MarkdownTextNote and RichTextNote are three distinct types of text notes, and TextNote is all
+ * three of them.
+ */
+class NotebookItemFilter
+{
+    Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Only its enums are to be used.")
+
+public:
+    enum Kind {
+        NoteKind = 1,
+        SceneKind = 2,
+        CharacterKind = 4,
+        BreakKind = 8,
+        AnyKind = NoteKind | SceneKind | CharacterKind | BreakKind
+    };
+    Q_DECLARE_FLAGS(Kinds, Kind)
+    Q_FLAG(Kinds)
+
+    enum NoteType {
+        PlainTextNote = 1,
+        MarkdownTextNote = 2,
+        RichTextNote = 4,
+        ChecklistNote = 8,
+        FormNote = 16,
+        TextNote = PlainTextNote | MarkdownTextNote | RichTextNote,
+        AnyNote = TextNote | ChecklistNote | FormNote
+    };
+    Q_DECLARE_FLAGS(NoteTypes, NoteType)
+    Q_FLAG(NoteTypes)
+};
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(NotebookItemFilter::Kinds)
+Q_DECLARE_OPERATORS_FOR_FLAGS(NotebookItemFilter::NoteTypes)
+
 struct NotebookItemInfo
 {
+    NotebookItemFilter::NoteTypes noteType; // of a note, which is the only kind that has one
     QString kind;
     QString key;
     QString label;
@@ -71,8 +112,10 @@ struct NotebookItemInfo
  * and no containers. It is for lists where the user picks one item, such as a popup that
  * completes what is typed after an @.
  *
- * kinds limits the list to some kinds, such as ["note"]. All of them are in it if it is empty.
- * searchText narrows the list to the items that it finds. The list is made again, a moment after
+ * kinds limits the list to some kinds, such as NoteKind | SceneKind. All of them are in it by
+ * default.
+ * noteTypes limits the notes in it to some types of notes, such as TextNote or ChecklistNote |
+ * FormNote, and does nothing to items that are not notes. searchText narrows the list to the items that it finds. The list is made again, a moment after
  * the NotebookModel changes, and is reset when it is, so a view of it starts at its top.
  */
 class NotebookFlatLens : public QAbstractListModel
@@ -95,14 +138,24 @@ public:
     Q_SIGNAL void sourceModelChanged();
 
     // clang-format off
-    Q_PROPERTY(QStringList kinds
+    Q_PROPERTY(NotebookItemFilter::Kinds kinds
                READ kinds
                WRITE setKinds
                NOTIFY kindsChanged)
     // clang-format on
-    void setKinds(const QStringList &val);
-    QStringList kinds() const { return m_kinds; }
+    void setKinds(NotebookItemFilter::Kinds val);
+    NotebookItemFilter::Kinds kinds() const { return m_kinds; }
     Q_SIGNAL void kindsChanged();
+
+    // clang-format off
+    Q_PROPERTY(NotebookItemFilter::NoteTypes noteTypes
+               READ noteTypes
+               WRITE setNoteTypes
+               NOTIFY noteTypesChanged)
+    // clang-format on
+    void setNoteTypes(NotebookItemFilter::NoteTypes val);
+    NotebookItemFilter::NoteTypes noteTypes() const { return m_noteTypes; }
+    Q_SIGNAL void noteTypesChanged();
 
     // clang-format off
     Q_PROPERTY(QString searchText
@@ -161,8 +214,9 @@ private:
 
 private:
     QTimer m_rebuildTimer;
+    NotebookItemFilter::NoteTypes m_noteTypes = NotebookItemFilter::AnyNote;
+    NotebookItemFilter::Kinds m_kinds = NotebookItemFilter::AnyKind;
     QString m_searchText;
-    QStringList m_kinds;
     QStringList m_labels; // of the rows, see labels()
     QList<int> m_rows; // of m_items, for the items that the search finds
     QList<NotebookItemInfo> m_items;
@@ -277,18 +331,31 @@ public:
     QString searchText() const { return m_searchText; }
     Q_SIGNAL void searchTextChanged();
 
-    // Limits what can be ticked to items of some kinds, such as ["note", "scene"], and all of them
-    // can be if it is empty. The rows of the other items are still in the tree, but are not
+    // Limits what can be ticked to items of some kinds, such as NoteKind | SceneKind, and all of
+    // them can be by default. The rows of the other items are still in the tree, but are not
     // itemCheckable. It is to be set before a view looks at the lens.
     // clang-format off
-    Q_PROPERTY(QStringList kinds
+    Q_PROPERTY(NotebookItemFilter::Kinds kinds
                READ kinds
                WRITE setKinds
                NOTIFY kindsChanged)
     // clang-format on
-    void setKinds(const QStringList &val);
-    QStringList kinds() const { return m_kinds; }
+    void setKinds(NotebookItemFilter::Kinds val);
+    NotebookItemFilter::Kinds kinds() const { return m_kinds; }
     Q_SIGNAL void kindsChanged();
+
+    // Limits the notes in the tree to some types of notes, such as TextNote. The other notes are
+    // not in the tree at all, unlike the items that kinds leaves out. It does nothing to items
+    // that are not notes.
+    // clang-format off
+    Q_PROPERTY(NotebookItemFilter::NoteTypes noteTypes
+               READ noteTypes
+               WRITE setNoteTypes
+               NOTIFY noteTypesChanged)
+    // clang-format on
+    void setNoteTypes(NotebookItemFilter::NoteTypes val);
+    NotebookItemFilter::NoteTypes noteTypes() const { return m_noteTypes; }
+    Q_SIGNAL void noteTypesChanged();
 
     // The keys of the items that are ticked, in the order in which they were.
     // clang-format off
@@ -376,8 +443,9 @@ private:
 private:
     int m_maxChecked = 0;
     QTimer m_itemsTimer;
+    NotebookItemFilter::NoteTypes m_noteTypes = NotebookItemFilter::AnyNote;
+    NotebookItemFilter::Kinds m_kinds = NotebookItemFilter::AnyKind;
     QString m_searchText;
-    QStringList m_kinds;
     QStringList m_searchWords;
     QStringList m_checkedKeys;
 };

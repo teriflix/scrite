@@ -52,16 +52,16 @@ TreeViewDelegate {
             let baseColor = undefined
 
             if(root.itemData.value.notebookItemType === NotebookModel.NotesType) {
-                switch(root.itemData.value.notebookItemObject.ownerType) {
+                switch(root.itemData.value.notebookItemObject?.ownerType) {
                 case Notes.SceneOwner:
                 case Notes.CharacterOwner:
-                    baseColor = root.itemData.value.notebookItemObject.color
+                    baseColor = root.itemData.value.notebookItemObject?.color
                     break
                 default:
                     break
                 }
             } else if(root.itemData.value.notebookItemType === NotebookModel.NoteType)
-                baseColor = root.itemData.value.notebookItemObject.color
+                baseColor = root.itemData.value.notebookItemObject?.color
 
             if(baseColor)
                 return Runtime.colors.tintTx(baseColor, Runtime.colors.sceneHeadingTint)
@@ -106,7 +106,7 @@ TreeViewDelegate {
                 case NotebookModel.ActBreakType:
                     return Runtime.themedIcon("qrc:/icons/content/act.png")
                 case NotebookModel.NotesType:
-                    switch(root.itemData.value.notebookItemObject.ownerType) {
+                    switch(root.itemData.value.notebookItemObject?.ownerType) {
                     case Notes.SceneOwner:
                         return Runtime.themedIcon("qrc:/icons/content/scene.png")
                     case Notes.CharacterOwner:
@@ -118,7 +118,7 @@ TreeViewDelegate {
                     }
                     break;
                 case NotebookModel.NoteType:
-                    switch(root.itemData.value.notebookItemObject.type) {
+                    switch(root.itemData.value.notebookItemObject?.type) {
                     case Note.TextNoteType:
                         return Runtime.themedIcon("qrc:/icons/content/note.png")
                     case Note.FormNoteType:
@@ -152,7 +152,7 @@ TreeViewDelegate {
             font.capitalization: Runtime.idealFontMetrics.font.capitalization
             font.bold: root.itemData.value.notebookItemType === NotebookModel.CategoryType ||
                        (root.itemData.value.notebookItemType === NotebookModel.NotesType &&
-                        root.itemData.value.notebookItemObject.ownerType === Notes.StructureOwner)
+                        root.itemData.value.notebookItemObject?.ownerType === Notes.StructureOwner)
         }
     }
 
