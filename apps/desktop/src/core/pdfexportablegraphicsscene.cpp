@@ -309,6 +309,7 @@ GraphicsHeaderItem::GraphicsHeaderItem(const QString &title, const QString &subt
     titleText->setTextWidth(qMin(actualTitleWidth, maxTitleWidth));
     titleText->setFont(titleFont);
     titleText->setPlainText(title);
+    titleText->setDefaultTextColor(Qt::black);
     titleText->document()->setDocumentMargin(0);
 
     QFont subtitleFont = Application::font();
@@ -324,6 +325,7 @@ GraphicsHeaderItem::GraphicsHeaderItem(const QString &title, const QString &subt
     subtitleText->setFont(subtitleFont);
     subtitleText->setPlainText(subtitle);
     subtitleText->setOpacity(0.75);
+    subtitleText->setDefaultTextColor(Qt::black);
     subtitleText->document()->setDocumentMargin(0);
 
     QRectF subtitleTextRect = subtitleText->boundingRect();
