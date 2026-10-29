@@ -590,6 +590,7 @@ Item {
             readonly property bool hideInCommandCenter: true
             readonly property bool nativeVisible: false
             readonly property string defaultShortcut: "F1"
+            readonly property int triggerMethod: ActionHandler.TriggerFirst
 
             enabled: ActionHandler.canHandle
             objectName: "helpCenter"
