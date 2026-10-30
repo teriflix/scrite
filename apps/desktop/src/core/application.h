@@ -209,6 +209,8 @@ public:
     // clang-format on
     Forms *forms() const;
 
+    Q_INVOKABLE static QWindow *currentWindow() { return QApplication::focusWindow(); }
+
     // TODO: Move this to Platform.fontInfo() ...
     Q_INVOKABLE static QJsonObject systemFontInfo();
 
