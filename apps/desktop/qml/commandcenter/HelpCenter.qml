@@ -31,6 +31,9 @@ import "../controls"
 Popup {
     id: root
 
+    readonly property alias index: _private.searchIndex
+    readonly property alias userGuide: _private.searchIndex.userGuide
+
     function init(_parent) {
         if( !(_parent && Object.isOfType(_parent, "QQuickItem")) )
             _parent = Scrite.window.contentItem

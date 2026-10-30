@@ -192,6 +192,18 @@ public:
     // clang-format on
     QString fileName() const { return info.fileName(); }
 
+    // clang-format off
+    Q_PROPERTY(QDateTime creationTime
+               READ creationTime)
+    // clang-format on
+    QDateTime creationTime() const { return info.fileTime(QFileDevice::FileBirthTime); }
+
+    // clang-format off
+    Q_PROPERTY(QDateTime modifiedTime
+               READ modifiedTime)
+    // clang-format on
+    QDateTime modifiedTime() const { return info.fileTime(QFileDevice::FileModificationTime); }
+
     FileInfo() { }
     FileInfo(const FileInfo &other) { *this = other; }
     FileInfo(const QFileInfo &_fileInfo) : info(_fileInfo) { }

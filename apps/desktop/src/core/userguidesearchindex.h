@@ -17,6 +17,7 @@
 #define USERGUIDESEARCHINDEX_H
 
 #include <QQmlEngine>
+#include <QJsonArray>
 #include <QSortFilterProxyModel>
 
 class UserGuideSearchIndex : public QAbstractListModel
@@ -34,6 +35,13 @@ public:
 
     Q_INVOKABLE QUrl find(const QString &searchTerm) const;
 
+    // Extensions own the download and upkeep of their guides. They hand over the records (in the
+    // same format as the "docs" array of a MkDocs search index) using addGuide(). A uri that is
+    // empty or already added is rejected. To refresh a guide, remove it and add it again.
+    Q_INVOKABLE bool addGuide(const QString &uri, const QString &title, const QUrl &baseUrl,
+                              const QJsonArray &docs);
+    Q_INVOKABLE void removeGuide(const QString &uri);
+
     enum { LocationRole = Qt::UserRole, TitleRole, FullTitleRole, RichTextRole, PlainTextRole };
 
     // QAbstractItemModel interface
@@ -41,8 +49,14 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
 
+signals:
+    void modified();
+
 private:
     void loadSearchIndex();
+    void appendRecords(const QString &guide, const QString &guideTitle, const QString &baseUrl,
+                       const QJsonArray &docs, const QStringList &sortOrder);
+    void sortItems();
 
     void checkSearchIndexForUpdates();
     void onSearchIndexChecked();
@@ -53,6 +67,7 @@ private:
 private:
     struct Item
     {
+        QString guide; // uri of the guide this item belongs to, empty for the primary guide
         QUrl location;
         QString title;
         QString fullTitle;
@@ -63,6 +78,7 @@ private:
         int sortOrder = -1;
     };
     QList<Item> m_items;
+    QStringList m_guides; // uris of added guides, in the order they were added
 
     bool m_busy = false;
     QString m_filter;
@@ -76,6 +92,13 @@ class UserGuideSearchIndexFilter : public QSortFilterProxyModel
 public:
     explicit UserGuideSearchIndexFilter(QObject *parent = nullptr);
     ~UserGuideSearchIndexFilter() override;
+
+    // clang-format off
+    Q_PROPERTY(UserGuideSearchIndex* userGuide
+               READ userGuide
+               CONSTANT)
+    // clang-format on
+    UserGuideSearchIndex *userGuide() const;
 
     // clang-format off
     Q_PROPERTY(QString filter

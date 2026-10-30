@@ -31,9 +31,16 @@ static const char *userGuideSearchIndex = "userGuideSearchIndex";
 UserGuideSearchIndex::UserGuideSearchIndex(QObject *parent) : QAbstractListModel(parent)
 {
     QTimer::singleShot(0, this, &UserGuideSearchIndex::checkSearchIndexForUpdates);
+
+    connect(this, &UserGuideSearchIndex::modelReset, this, &UserGuideSearchIndex::modified);
+    connect(this, &UserGuideSearchIndex::rowsRemoved, this, &UserGuideSearchIndex::modified);
+    connect(this, &UserGuideSearchIndex::rowsInserted, this, &UserGuideSearchIndex::modified);
 }
 
-UserGuideSearchIndex::~UserGuideSearchIndex() { }
+UserGuideSearchIndex::~UserGuideSearchIndex()
+{
+    Utils::ObjectRegistry::remove(this);
+}
 
 QUrl UserGuideSearchIndex::find(const QString &searchTerm) const
 {
@@ -100,30 +107,70 @@ QHash<int, QByteArray> UserGuideSearchIndex::roleNames() const
              { PlainTextRole, QByteArrayLiteral("plainText") } };
 }
 
+bool UserGuideSearchIndex::addGuide(const QString &uri, const QString &title, const QUrl &baseUrl,
+                                    const QJsonArray &docs)
+{
+    if (uri.isEmpty() || m_guides.contains(uri))
+        return false;
+
+    this->beginResetModel();
+
+    m_guides.append(uri);
+    this->appendRecords(uri, title, baseUrl.toString(), docs, QStringList());
+    this->sortItems();
+
+    this->endResetModel();
+
+    return true;
+}
+
+void UserGuideSearchIndex::removeGuide(const QString &uri)
+{
+    if (uri.isEmpty() || !m_guides.contains(uri))
+        return;
+
+    this->beginResetModel();
+
+    m_guides.removeAll(uri);
+    m_items.removeIf([uri](const Item &item) { return item.guide == uri; });
+
+    this->endResetModel();
+}
+
 void UserGuideSearchIndex::loadSearchIndex()
 {
     this->beginResetModel();
 
-    m_items.clear();
+    m_items.removeIf([](const Item &item) { return item.guide.isEmpty(); });
 
     const QString baseUrl = LocalStorage::load(userGuideBaseUrl).toString();
     const QVariant searchIndexVariant = LocalStorage::load(userGuideSearchIndex);
     const QJsonArray searchIndex = searchIndexVariant.value<QJsonArray>();
+    const QStringList sortOrder = LocalStorage::load(userGuideSortOrder).toStringList();
 
+    this->appendRecords(QString(), QStringLiteral("User Guide"), baseUrl, searchIndex, sortOrder);
+    this->sortItems();
+
+    this->endResetModel();
+}
+
+void UserGuideSearchIndex::appendRecords(const QString &guide, const QString &guideTitle,
+                                         const QString &baseUrl, const QJsonArray &docs,
+                                         const QStringList &sortOrder)
+{
     QString chapterName;
 
-    const QString userGuide = QStringLiteral("User Guide");
     const QString fullTitleSeparator = " » ";
-    const QStringList sortOrder = LocalStorage::load(userGuideSortOrder).toStringList();
 
     int index = 0;
 
-    for (const QJsonValue &searchItem : searchIndex) {
+    for (const QJsonValue &searchItem : docs) {
         const QJsonObject record = searchItem.toObject();
 
         const QString recordLocation = record.value("location").toString();
 
         Item item;
+        item.guide = guide;
         item.location = QUrl(baseUrl + recordLocation);
         item.title = record.value("title").toString();
         item.richText = record.value("text").toString();
@@ -132,7 +179,7 @@ void UserGuideSearchIndex::loadSearchIndex()
             chapterName = item.title;
 
         if (item.title == chapterName)
-            item.fullTitle = userGuide + fullTitleSeparator + item.title;
+            item.fullTitle = guideTitle + fullTitleSeparator + item.title;
         else
             item.fullTitle = chapterName + fullTitleSeparator + item.title;
 
@@ -155,18 +202,23 @@ void UserGuideSearchIndex::loadSearchIndex()
 
         m_items.append(item);
     }
+}
 
-    std::sort(m_items.begin(), m_items.end(), [](const Item &a, const Item &b) {
+void UserGuideSearchIndex::sortItems()
+{
+    std::sort(m_items.begin(), m_items.end(), [this](const Item &a, const Item &b) {
+        if (a.guide != b.guide)
+            return m_guides.indexOf(a.guide) < m_guides.indexOf(b.guide);
         if (a.sortOrder != b.sortOrder)
             return a.sortOrder < b.sortOrder;
         return a.index < b.index;
     });
-
-    this->endResetModel();
 }
 
 void UserGuideSearchIndex::checkSearchIndexForUpdates()
 {
+    Utils::ObjectRegistry::add(this, QStringLiteral("Scrite.App.UserGuideSearchIndex"));
+
     AppUserGuideSearchIndexRestApiCall *call =
             this->findChild<AppUserGuideSearchIndexRestApiCall *>(QString(),
                                                                   Qt::FindDirectChildrenOnly);
@@ -217,19 +269,19 @@ void UserGuideSearchIndex::onSearchIndexDownloaded()
         return;
 
     const QByteArray data = reply->readAll();
+    reply->deleteLater();
 
     QJsonParseError error;
     const QJsonDocument doc = QJsonDocument::fromJson(data, &error);
     if (error.error != QJsonParseError::NoError) {
+        m_busy = false;
+        emit busyChanged();
         return;
     }
 
     const QJsonObject json = doc.object();
-    const QJsonArray array = json.value("docs").toArray();
 
     LocalStorage::store(userGuideSearchIndex, json.value("docs").toArray());
-
-    reply->deleteLater();
 
     this->loadSearchIndex();
 
@@ -249,6 +301,11 @@ UserGuideSearchIndexFilter::UserGuideSearchIndexFilter(QObject *parent)
 }
 
 UserGuideSearchIndexFilter::~UserGuideSearchIndexFilter() { }
+
+UserGuideSearchIndex *UserGuideSearchIndexFilter::userGuide() const
+{
+    return qobject_cast<UserGuideSearchIndex *>(this->sourceModel());
+}
 
 void UserGuideSearchIndexFilter::setFilter(const QString &val)
 {
