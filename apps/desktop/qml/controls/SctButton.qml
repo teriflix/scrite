@@ -37,7 +37,16 @@ Button {
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-    implicitWidth: Math.max(GMath.horizontalAdvance(text, font) + leftPadding + rightPadding + 20, 120)
+    implicitWidth: {
+        const iconShown = root.display !== AbstractButton.TextOnly && (root.icon.source.toString() !== "" || root.icon.name !== "")
+        const textShown = root.display !== AbstractButton.IconOnly && root.text !== ""
+
+        const textWidth = textShown ? GMath.horizontalAdvance(root.text, root.font) : 0
+        const iconWidth = iconShown ? root.icon.width : 0
+        const contentWidth = root.display === AbstractButton.TextUnderIcon ? Math.max(textWidth, iconWidth)
+                                                                           : textWidth + iconWidth + (textShown && iconShown ? root.spacing : 0)
+        return Math.max(contentWidth + root.leftPadding + root.rightPadding + 20, 120)
+    }
 
     ToolTipPopup {
         container: root
