@@ -11,6 +11,8 @@ set(SCRITE_DESKTOP_QML_SOURCES
   "src/core/languageengine.h"
   "src/core/localstorage.cpp"
   "src/core/localstorage.h"
+  "src/core/objects/secrets.cpp"
+  "src/core/objects/secrets.h"
   "src/core/qobjectlistmodel.cpp"
   "src/core/qobjectlistmodel.h"
   "src/core/scrite.cpp"

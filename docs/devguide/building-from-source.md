@@ -43,7 +43,8 @@ In the installer, select the open-source option and choose the latest Qt 6 relea
        libxcb-render-util0 libxcb-image0 libxcb-shape0 libxcb-sync1 libxcb-xfixes0 \
        libfontconfig1 libglib2.0-dev \
        libminizip-dev zlib1g-dev \
-       hunspell libhunspell-dev
+       hunspell libhunspell-dev \
+       libsecret-1-dev
      ```
    - **Packages by category:**
      - **Build Essentials:** `build-essential`, `git`
@@ -59,6 +60,8 @@ In the installer, select the open-source option and choose the latest Qt 6 relea
      - **System Libraries:** `libfontconfig1`, `libglib2.0-dev`
      - **Compression & Archives:** `libminizip-dev`, `zlib1g-dev`
      - **Spell Checking:** `hunspell`, `libhunspell-dev`
+     - **Secure Credential Storage:** `libsecret-1-dev` (used by QtKeyChain to
+       keep API keys in the system keyring)
 
    > NOTE: Dependencies vary by distribution. Search for distribution-specific instructions if needed.
 
@@ -67,7 +70,8 @@ In the installer, select the open-source option and choose the latest Qt 6 relea
    chmod +x qt-online-installer-*.run
    ./qt-online-installer-*.run
    ```
-3. In the installer, select **Qt 6.x > Desktop (gcc 64-bit)** (latest 6.11+ recommended)
+3. In the installer, select **Qt 6.x > Desktop (gcc 64-bit)** (latest 6.11+ recommended).
+   Qt D-Bus is part of this and is needed by QtKeyChain
 4. Note: Qt 6 requires glibc 2.34 or newer (Ubuntu 22.04+, Debian 12, RHEL 9+ are supported)
 5. Reference: https://doc.qt.io/qt-6/linux.html
 
@@ -122,6 +126,22 @@ Using Qt's `MaintenanceTool`, we recommend installing:
 - All components in the **Additional Libraries** section
 - The **Desktop** component of **Qt PDF**
 - The **Desktop** component of **Qt WebEngine**
+
+## API Keys and the System Keychain
+
+Scrite keeps API keys (for example the one for your AI provider) in the keychain
+of your operating system, using [QtKeyChain](https://github.com/frankosterfeld/qtkeychain),
+which is fetched as a git submodule along with the other third-party libraries.
+Make sure you ran `git submodule update --init --recursive` before building.
+
+- **macOS:** the Keychain is used. Builds that are not code-signed, which is
+  what you get when building from source, may ask for permission each time Scrite
+  starts.
+- **Windows:** the Credential Manager is used. Nothing else is needed.
+- **Linux:** a Secret Service provider, such as GNOME Keyring or KWallet, must
+  be running. Building needs `libsecret-1-dev`, listed above. If no provider is
+  running, Scrite still works: it keeps keys in an obfuscated form in its
+  settings, and the settings pages tell you so.
 
 ## Building the Project
 

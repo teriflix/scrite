@@ -13,3 +13,6 @@
 [submodule "thirdparty/source/sanscript.js/sanscript.js"]
 	path = thirdparty/source/sanscript.js/sanscript.js
 	url = https://github.com/indic-transliteration/sanscript.js
+[submodule "thirdparty/static/qtkeychain/qtkeychain"]
+	path = thirdparty/static/qtkeychain/qtkeychain
+	url = https://github.com/frankosterfeld/qtkeychain

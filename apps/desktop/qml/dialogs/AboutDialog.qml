@@ -201,6 +201,11 @@ DialogLauncher {
                             }
 
                             ListElement {
+                                credits: "<strong>QtKeyChain</strong> for keeping API keys in the keychain of your system."
+                                url: "https://github.com/frankosterfeld/qtkeychain"
+                            }
+
+                            ListElement {
                                 credits: "<strong>OpenXLSX</strong> for exporting reports to Excel format."
                                 url: "https://github.com/troldal/OpenXLSX"
                             }

@@ -116,6 +116,7 @@ target_compile_definitions(Scrite PRIVATE
   SCRITE_VERSION="${PROJECT_VERSION}"
   SCRITE_VERSION_TYPE="${SCRITE_VERSION_TYPE}"
   SCRITE_QML_URI="Scrite.App"
+  QT6KEYCHAIN_STATIC_DEFINE
   $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
   $<$<BOOL:${SCRITE_PRODUCTION_BUILD}>:SCRITE_PRODUCTION_BUILD>
 )
@@ -132,6 +133,7 @@ target_include_directories(Scrite PRIVATE
   "${CMAKE_SOURCE_DIR}/../apikeys"
   "${CMAKE_CURRENT_SOURCE_DIR}/src"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/core"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/core/objects"
   "${CMAKE_CURRENT_BINARY_DIR}"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/network"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/importers"
@@ -196,6 +198,7 @@ target_link_libraries(Scrite PRIVATE
   OpenXLSX
   poly2tri
   simplecrypt
+  qt6keychain
   phtranslator
   KF6::SonnetCore
 )

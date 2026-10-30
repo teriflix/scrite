@@ -869,7 +869,7 @@ license terms to ensure compliance.
 COMPONENT SOURCES:
 
   • Git Submodules: Source code fetched from external repositories as git submodules
-    (KDE Sonnet, OpenXLSX, QuaZip, Extra CMake Modules, Sanscript)
+    (KDE Sonnet, OpenXLSX, QuaZip, QtKeyChain, Extra CMake Modules, Sanscript)
 
   • Included in Repository: Source code included in thirdparty/ directory
     (poly2tri, SimpleCrypt, phtranslator, OpenSSL, Quill, Curved-Arrows)
@@ -908,6 +908,12 @@ DYNAMICALLY LINKED LIBRARIES:
             built; pre-built DLLs bundled in official binaries
     https://www.openssl.org/
 
+  • libsecret (Secret Service client, used by QtKeyChain on Linux only)
+    License: LGPL 2.1+
+    Linking: Dynamic
+    Source: Pre-installed on build system (not in repository)
+    https://wiki.gnome.org/Projects/Libsecret
+
 STATICALLY LINKED LIBRARIES:
 (License terms permit or explicitly allow static linking)
 
@@ -928,6 +934,12 @@ STATICALLY LINKED LIBRARIES:
     Linking: Static
     Source: Included in repository (thirdparty/static/simplecrypt)
     https://wiki.qt.io/Simple_encryption_with_SimpleCrypt
+
+  • QtKeyChain (Secure Credential Storage)
+    License: BSD 3-Clause
+    Linking: Static
+    Source: Git submodule (https://github.com/frankosterfeld/qtkeychain)
+    https://github.com/frankosterfeld/qtkeychain
 
   • OpenXLSX (Spreadsheet Support)
     License: MIT
