@@ -744,6 +744,12 @@ QString Notes::id() const
 
 QString Notes::title() const
 {
+    auto elidedText = [](const QString &text, int length = 25) {
+        if (text.length() < length)
+            return text;
+        return text.left(length - 4) + QString(" ...");
+    };
+
     switch (m_ownerType) {
     case SceneOwner: {
         const Scene *scene = this->scene();
@@ -751,15 +757,15 @@ QString Notes::title() const
         return (idxList.isEmpty() ? QStringLiteral("[-1]: ")
                                   : QStringLiteral("[") + QString::number(idxList.first())
                                 + QStringLiteral("]: "))
-                + scene->heading()->text();
+                + elidedText(scene->heading()->displayText());
     } break;
     case StructureOwner:
         return QStringLiteral("Story");
     case BreakOwner:
         return this->breakElement()->breakTitle() + QStringLiteral(": ")
-                + this->breakElement()->breakSubtitle();
+                + elidedText(this->breakElement()->breakSubtitle());
     case CharacterOwner:
-        return this->character()->name();
+        return elidedText(this->character()->name(), 40);
     default:
         break;
     }
