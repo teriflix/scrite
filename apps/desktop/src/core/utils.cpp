@@ -353,9 +353,15 @@ QString Utils::Gui::themedIcon(const QString &source, Qt::ColorScheme colorSchem
     if (actualSource.startsWith(prefix))
         actualSource = actualSource.mid(prefix.size());
 
-    const QString theme = (colorScheme == Qt::ColorScheme::Dark ? "dark/" : "light/");
-    if (actualSource.startsWith(theme))
-        actualSource = actualSource.mid(theme.size());
+    // The source may have been themed already, and for either color scheme.
+    const QString dark = QStringLiteral("dark/");
+    const QString light = QStringLiteral("light/");
+    if (actualSource.startsWith(dark))
+        actualSource = actualSource.mid(dark.size());
+    else if (actualSource.startsWith(light))
+        actualSource = actualSource.mid(light.size());
+
+    const QString theme = (colorScheme == Qt::ColorScheme::Dark ? dark : light);
 
     if (!actualSource.startsWith("qrc:/"))
         return actualSource;
