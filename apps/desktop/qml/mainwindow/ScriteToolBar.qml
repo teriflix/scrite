@@ -62,7 +62,7 @@ Rectangle {
 
             // Tabs show their text when there is room to spare, and that is not counted in the width
             // that is available, so that showing it doesn't make the room go away.
-            availableWidth: root.width - _tabIconWidth.implicitWidth * _tabsRepeater.count - _userAccount.implicitWidth - _userAccount.Layout.leftMargin
+            availableWidth: root.width - _tabIconWidth.implicitWidth * _tabsRepeater.count - _mainTabs.spacing * Math.max(_tabsRepeater.count - 1, 0) - _userAccount.implicitWidth - _userAccount.Layout.leftMargin
             roomyWidth: 150
         }
 
@@ -133,8 +133,9 @@ Rectangle {
         uri: "Scrite.ToolBar.File"
         hostUri: root.uri
         order: 10
-        priority: 90
+        priority: 50
         collapsible: true
+        title: "File"
         visible: !root.inScrited
         actionManager: ActionHub.fileOperations
     }
@@ -143,10 +144,11 @@ Rectangle {
         uri: "Scrite.ToolBar.Export"
         hostUri: root.uri
         order: 20
-        priority: 50
+        priority: 45
         collapsible: true
         title: "Export & Reports"
         visible: !root.inScrited
+        iconSource: "qrc:/icons/action/exportAndReports.png"
         entries: [ActionHub.exportOptions, ActionHub.reportOptions]
     }
 

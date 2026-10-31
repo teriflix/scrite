@@ -13,6 +13,7 @@ set(SCRITE_DESKTOP_ICON_FILES
   "icons/action/dialog_close_button.png"
   "icons/action/done_all.png"
   "icons/action/edit.png"
+  "icons/action/exportAndReports.png"
   "icons/action/edit_title_page.png"
   "icons/action/filter.png"
   "icons/action/find_replace.png"
