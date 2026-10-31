@@ -36,7 +36,9 @@ Item {
     property string nativeShortcut: Gui.nativeShortcut(portableShortcut)
 
     property bool readOnly: false
-    property font font: fontMetrics.font
+    // Runtime.shortcutFontMetrics is null while the application closes, as Runtime goes before the
+    // items that use it, so everything that reads the metrics is guarded.
+    property font font: fontMetrics ? fontMetrics.font : Qt.application.font
     property FontMetrics fontMetrics: Runtime.shortcutFontMetrics
 
     property scriteKeyCombinations keyCombinations: Gui.keyCombinations(portableShortcut)
@@ -60,7 +62,7 @@ Item {
 
         anchors.verticalCenter: parent.verticalCenter
 
-        spacing: root.fontMetrics.averageCharacterWidth * 0.4
+        spacing: root.fontMetrics ? root.fontMetrics.averageCharacterWidth * 0.4 : 0
 
         opacity: enabled ? 1 : 0.5
 
@@ -119,8 +121,8 @@ Item {
         onClicked: root.editShortcut()
     }
 
-    property real __minimumKeyWidth: fontMetrics.boundingRect("Ctrl").width + 6
-    property real __minimumKeyHeight: fontMetrics.lineSpacing + 4
+    property real __minimumKeyWidth: fontMetrics ? fontMetrics.boundingRect("Ctrl").width + 6 : 0
+    property real __minimumKeyHeight: fontMetrics ? fontMetrics.lineSpacing + 4 : 0
 
     component KeyboardKey : Rectangle {
         property string text
