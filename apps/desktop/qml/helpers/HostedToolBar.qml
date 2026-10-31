@@ -105,12 +105,40 @@ Item {
                 visible: _group.level !== ToolBarHost.Hidden
 
                 // The backdrop of groups that have one, which includes what is merged into them.
-                Loader {
+                Item {
+                    id: _backdropHost
+
+                    // Made, and not loaded, so that the backdrop can have expanded as a required
+                    // property, which it is given along with a binding that keeps it up to date.
+                    property Item backdropItem: null
+
+                    function makeBackdrop() {
+                        if(backdropItem) {
+                            backdropItem.destroy()
+                            backdropItem = null
+                        }
+
+                        const component = _group.group.backdrop
+                        if(component) {
+                            backdropItem = component.createObject(_backdropHost, {"expanded": Qt.binding( () => { return _group.level === ToolBarHost.Expanded } )}) as Item
+                            if(backdropItem)
+                                backdropItem.anchors.fill = _backdropHost
+                        }
+                    }
+
                     anchors.fill: parent
                     anchors.topMargin: 3
                     anchors.bottomMargin: 3
 
-                    sourceComponent: _group.group.backdrop
+                    Component.onCompleted: makeBackdrop()
+
+                    Connections {
+                        target: _group.group
+
+                        function onBackdropChanged() {
+                            _backdropHost.makeBackdrop()
+                        }
+                    }
                 }
 
                 RowLayout {

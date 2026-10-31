@@ -351,7 +351,9 @@ public:
 
     // Something to pull the attention of the user to the group, and to what is merged into it: an
     // Item that the toolbar sizes to the group, and puts behind its buttons. It is made once for
-    // each toolbar that shows the group. Groups without one have no backdrop.
+    // each toolbar that shows the group. Groups without one have no backdrop. Its root must have
+    // a required bool property named expanded, which the toolbar keeps at whether the group is
+    // expanded, as opposed to folded into one button, so that the backdrop can look different.
     // clang-format off
     Q_PROPERTY(QQmlComponent* backdrop
                READ backdrop
