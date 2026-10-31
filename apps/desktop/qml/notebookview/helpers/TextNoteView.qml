@@ -229,17 +229,15 @@ Item {
                         Layout.fillWidth: true
                         Layout.preferredHeight: _markdownToolbar.implicitHeight
 
-                        Row {
+                        HostedToolBar {
                             id: _markdownToolbar
 
                             anchors.verticalCenter: parent.verticalCenter
 
-                            FeatureHost.uri: "Scrite.App.Notebook.TextNote.MarkdownToolbar"
-                            FeatureHost.onFeatureAdded: (object) => {
-                                                            const item = object as Item
-                                                            if(item && item.note !== undefined)
-                                                                item.note = Qt.binding( () => { return root.note } )
-                                                       }
+                            uri: "Scrite.App.Notebook.TextNote.MarkdownToolbar"
+                            context: NoteContext {
+                                note: root.note
+                            }
                         }
                     }
 

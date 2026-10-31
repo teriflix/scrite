@@ -28,6 +28,10 @@ ToolButton {
 
     property alias tooltip: _tooltip.text
 
+    // The context of the host that this button is shown in. Actions read it from the source that
+    // is passed to their onTriggered handler. Null for buttons that no host made.
+    property AbstractActionContext context: null
+
     Material.background: "transparent"
 
     flat: true

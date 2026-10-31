@@ -23,7 +23,6 @@ import "./qml"
 import "./qml/globals"
 import "./qml/init"
 import "./qml/notifications"
-import "./qml/native"
 
 ApplicationWindow {
     id: root
@@ -32,6 +31,8 @@ ApplicationWindow {
 
     AppWindow.closeButtonVisible: closeButtonVisible
     AppWindow.onInitialize: _initSM.start()
+
+    menuBar: _menuBar as Item
 
     width: AppWindow.minimumWindowWidth
     height: AppWindow.minimumWindowHeight
@@ -81,9 +82,12 @@ ApplicationWindow {
         contentLoader: _contentLoader
     }
 
-    Component.onCompleted: {
-        if(Platform.isMacOSDesktop)
-            Qt.createQmlObject("import \"./qml/native\"; NativeMenuBar { }", root)
+    // The menus of the menu bar, which extensions can add to and merge into.
+    ScriteMenuBarMenus { }
+
+    // Native on macOS and Windows, in the window on Linux. It is an Item only on Linux.
+    ScriteMenuBar {
+        id: _menuBar
     }
 }
 

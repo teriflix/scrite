@@ -120,6 +120,7 @@ Item {
 
         Action {
             readonly property var keywords: ["file", "open"]
+            readonly property string menuText: "Open"
             readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Open)
 
             enabled: Runtime.allowAppUsage
@@ -134,6 +135,7 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property string menuText: "New"
             readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.New)
 
             enabled: Runtime.allowAppUsage
@@ -147,6 +149,7 @@ Item {
         Action {
             readonly property bool visible: false
             readonly property bool allowShortcut: true
+            readonly property string menuText: "Close"
             readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Close)
 
             enabled: Runtime.allowAppUsage
@@ -275,6 +278,7 @@ Item {
         }
 
         Action {
+            readonly property string menuText: "Save"
             readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Save)
 
             enabled: Runtime.allowAppUsage && (Scrite.document.modified || Scrite.document.fileName === "") && !Scrite.document.readOnly
@@ -293,6 +297,7 @@ Item {
         }
 
         Action {
+            readonly property string menuText: "Save As"
             readonly property string defaultShortcut: "Ctrl+Shift+S"
             property bool visible: Scrite.document.fileName !== "" || Scrite.document.readOnly
 

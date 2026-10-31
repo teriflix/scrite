@@ -110,9 +110,11 @@ set(SCRITE_DESKTOP_QML_FILES
   "qml/helpers/ColorToolButton.qml"
   "qml/helpers/DialogLauncher.qml"
   "qml/helpers/DisabledFeatureNotice.qml"
+  "qml/helpers/EntriesMenu.qml"
   "qml/helpers/FileSelector.qml"
   "qml/helpers/FlatToolButton.qml"
   "qml/helpers/FlickableTextArea.qml"
+  "qml/helpers/HostedToolBar.qml"
   "qml/helpers/LanguageTransliteratorPopup.qml"
   "qml/helpers/Link.qml"
   "qml/helpers/LodLoader.qml"
@@ -147,17 +149,17 @@ set(SCRITE_DESKTOP_QML_FILES
   "qml/helpers/UserAccountToolButton.qml"
   "qml/helpers/ZoomSlider.qml"
   "qml/init/AppInitStateMachine.qml"
-  "qml/mainwindow/Header.qml"
   "qml/mainwindow/NotebookTab.qml"
   "qml/mainwindow/ReloadPromptDialog.qml"
   "qml/mainwindow/ScreenplayTab.qml"
   "qml/mainwindow/ScritedTab.qml"
+  "qml/mainwindow/ScriteToolBar.qml"
   "qml/mainwindow/StructureTab.qml"
   "qml/mainwindow/VerticalToolBar.qml"
   "qml/mainwindow/Workspace.qml"
+  "qml/menubar/ScriteMenuBarMenus.qml"
   "qml/native/ActionManagerNativeMenu.qml"
   "qml/native/NativeActionMenuItem.qml"
-  "qml/native/NativeMenuBar.qml"
   "qml/NotebookView.qml"
   "qml/notebookview/helpers/CharacterRelationshipsGraphView.qml"
   "qml/notebookview/helpers/CheckListView.qml"
@@ -287,6 +289,18 @@ set(SCRITE_DESKTOP_QML_FILES
   "qml/timelineview/TimelineViewFooter.qml"
   "qml/timelineview/TimelineViewHighlightedItemAnimation.qml"
 )
+
+# One ScriteMenuBar per platform: native on macOS and Windows, in the window on Linux.
+if(APPLE OR WIN32)
+  list(APPEND SCRITE_DESKTOP_QML_FILES
+    "qml/menubar/native/NativeMenuGroupMenu.qml"
+    "qml/menubar/native/ScriteMenuBar.qml"
+  )
+else()
+  list(APPEND SCRITE_DESKTOP_QML_FILES
+    "qml/menubar/linux/ScriteMenuBar.qml"
+  )
+endif()
 
 set(SCRITE_DESKTOP_SINGLETON_QML_FILES
   "qml/commandcenter/CommandCenter.qml"

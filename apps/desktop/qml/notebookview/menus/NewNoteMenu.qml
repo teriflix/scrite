@@ -30,11 +30,12 @@ SctMenu {
 
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
 
-    ObjectRegister.name: "Scrite.App.Notebook.NewNoteMenu"
+    uri: "Scrite.App.Notebook.NewNoteMenu"
+    context: NotesContext {
+        notes: root.notes
+    }
 
     enabled: notes
-    insertIndex: -1
-    minInsertIndex: -1
 
     ColorMenu {
         title: "Text Note"

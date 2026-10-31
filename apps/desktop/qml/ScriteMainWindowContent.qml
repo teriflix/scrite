@@ -100,7 +100,7 @@ Item {
             }
         }
 
-        Header {
+        ScriteToolBar {
             id: _header
 
             Layout.fillWidth: true

@@ -25,6 +25,10 @@ import "../helpers"
 MenuItem {
     id: root
 
+    // The context of the host that this item is shown in. Actions read it from the source that
+    // is passed to their onTriggered handler. Null for items that no host made.
+    property AbstractActionContext context: null
+
     focusPolicy: Qt.NoFocus
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
@@ -35,9 +39,10 @@ MenuItem {
         property real indicatorPadding: root.checkable && root.indicator ? root.indicator.width + root.spacing : 0
         property var fields: {
             if(root.action) {
+                const actionText = root.action.menuText !== undefined ? root.action.menuText : root.action.text
                 if(root.action.shortcut && root.action.shortcut !== "")
-                    return [root.action.text,root.action.shortcut]
-                return [root.action.text]
+                    return [actionText,root.action.shortcut]
+                return [actionText]
             }
 
             let label = "", shortcut = ""

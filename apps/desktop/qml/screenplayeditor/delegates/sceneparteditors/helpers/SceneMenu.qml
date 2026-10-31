@@ -42,7 +42,10 @@ MenuLoader {
     menu: SctMenu {
         id: _sceneMenu
 
-        ObjectRegister.name: "Scrite.App.ScreenplayEditor.SceneMenu"
+        uri: "Scrite.App.ScreenplayEditor.SceneMenu"
+        context: SceneContext {
+            scene: root.scene
+        }
 
         SctMenuItem {
             enabled: !root.screenplayElement.omitted
