@@ -151,24 +151,16 @@ Rectangle {
     }
 
     ToolBarGroup {
-        uri: "Scrite.ToolBar.AppOptions"
-        hostUri: root.uri
-        order: 30
-        priority: 80
-        visible: !root.inScrited
-        entries: [ActionHub.appOptions]
-    }
-
-    ToolBarGroup {
         uri: "Scrite.ToolBar.Theme"
         hostUri: root.uri
-        order: 31
+        order: 30
         priority: 10
         visible: !root.inScrited && Runtime.applicationSettings.showColorThemeIconOnToolbar
 
         delegate: ActionToolButton {
             action: ActionHub.appOptions.find("toggleColorTheme") as Action
             tooltip: "Switch to " + (action.isDarkMode ? "Light" : "Dark") + " Mode (" + Gui.portableShortcut(action.shortcut) + ")"
+            visible: true
         }
     }
 
@@ -335,5 +327,14 @@ Rectangle {
         collapsible: true
         visible: root.inScrited
         actionManager: ActionHub.scritedOptions
+    }
+
+    ToolBarGroup {
+        uri: "Scrite.ToolBar.AppOptions"
+        hostUri: root.uri
+        order: 90
+        priority: 80
+        visible: !root.inScrited
+        entries: [ActionHub.appOptions]
     }
 }

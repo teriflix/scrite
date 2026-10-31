@@ -352,8 +352,14 @@ Menu {
             put(entriesMenuComponent.createObject(root, {"group": group, "context": root.context}))
         }
 
-        // A group is either a submenu, or if it is inline, its items follow a separator.
+        // A group is either a submenu, or if it is inline, its items follow a separator. The groups
+        // of toolbars are the buttons of one row, and are flat in a menu, one after the other.
         function renderGroup(group, touchedGroups) {
+            if((group as ToolBarGroup) !== null) {
+                renderContent(group, touchedGroups)
+                return
+            }
+
             observe(group, ["inlineChanged"])
 
             if(group.inline !== true) {

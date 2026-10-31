@@ -514,6 +514,28 @@ void ToolBarGroup::setSeparator(bool val)
     emit separatorChanged();
 }
 
+void ToolBarGroup::setBackdrop(QQmlComponent *val)
+{
+    if (m_backdrop == val)
+        return;
+
+    if (m_backdrop != nullptr)
+        disconnect(m_backdrop, &QObject::destroyed, this, &ToolBarGroup::onBackdropDestroyed);
+
+    m_backdrop = val;
+
+    if (m_backdrop != nullptr)
+        connect(m_backdrop, &QObject::destroyed, this, &ToolBarGroup::onBackdropDestroyed);
+
+    emit backdropChanged();
+}
+
+void ToolBarGroup::onBackdropDestroyed()
+{
+    m_backdrop = nullptr;
+    emit backdropChanged();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 AbstractActionHost::AbstractActionHost(AbstractActionGroup::Kind kind, QObject *parent)

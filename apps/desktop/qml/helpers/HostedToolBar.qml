@@ -71,7 +71,7 @@ Item {
         Repeater {
             model: _host
 
-            delegate: RowLayout {
+            delegate: Item {
                 id: _group
 
                 required property int index
@@ -86,7 +86,11 @@ Item {
                     return list
                 }
 
-                readonly property real separatorWidth: _group.group.separator ? 1 : 0
+                // A backdrop sets its group apart, so the group before it needs no separator.
+                readonly property ToolBarGroup nextGroup: _host.groupAt(_group.index + 1) as ToolBarGroup
+                readonly property bool showSeparator: _group.group.separator && !(_group.nextGroup && _group.nextGroup.backdrop)
+
+                readonly property real separatorWidth: _group.showSeparator ? 1 : 0
 
                 function reportWidths() {
                     _host.setGroupWidths(_group.index,
@@ -96,114 +100,139 @@ Item {
 
                 Layout.fillHeight: true
 
-                spacing: 0
+                implicitWidth: _content.implicitWidth
+                implicitHeight: _content.implicitHeight
                 visible: _group.level !== ToolBarHost.Hidden
 
-                // The expanded form is always there, only hidden when it isn't shown, so that
-                // its width is known.
-                RowLayout {
-                    id: _expandedRow
+                // The backdrop of groups that have one, which includes what is merged into them.
+                Loader {
+                    anchors.fill: parent
+                    anchors.topMargin: 3
+                    anchors.bottomMargin: 3
 
-                    Layout.fillHeight: true
+                    sourceComponent: _group.group.backdrop
+                }
+
+                RowLayout {
+                    id: _content
+
+                    anchors.fill: parent
 
                     spacing: 0
-                    visible: _group.level === ToolBarHost.Expanded
 
-                    Repeater {
-                        model: _group.entries
+                    // The expanded form is always there, only hidden when it isn't shown, so that
+                    // its width is known.
+                    RowLayout {
+                        id: _expandedRow
 
-                        delegate: Loader {
-                            id: _entryLoader
+                        Layout.fillHeight: true
 
-                            required property var modelData
+                        spacing: 0
+                        visible: _group.level === ToolBarHost.Expanded
 
-                            Layout.fillHeight: true
+                        Repeater {
+                            model: _group.entries
 
-                            sourceComponent: {
-                                if(_entryLoader.modelData === null || _entryLoader.modelData === undefined)
+                            delegate: Loader {
+                                id: _entryLoader
+
+                                required property var modelData
+
+                                // An action that isn't visible takes no room either, which the button
+                                // that it makes cannot tell the layout, because a loader is as wide as
+                                // what it loads even when that is hidden.
+                                readonly property Action entryAction: modelData as Action
+
+                                Layout.fillHeight: true
+
+                                visible: entryAction && entryAction.visible !== undefined ? entryAction.visible : true
+
+                                sourceComponent: {
+                                    if(_entryLoader.modelData === null || _entryLoader.modelData === undefined)
+                                        return null
+                                    if(_entryLoader.modelData.delegateGroup !== undefined)
+                                        return _delegateItemComponent
+                                    if(_entryLoader.modelData as MenuGroup)
+                                        return _groupMenuButtonComponent
+                                    if(_entryLoader.modelData as ActionManager)
+                                        return _managerMenuButtonComponent
+                                    if(_entryLoader.modelData as Action)
+                                        return _actionButtonComponent
                                     return null
-                                if(_entryLoader.modelData.delegateGroup !== undefined)
-                                    return _delegateItemComponent
-                                if(_entryLoader.modelData as MenuGroup)
-                                    return _groupMenuButtonComponent
-                                if(_entryLoader.modelData as ActionManager)
-                                    return _managerMenuButtonComponent
-                                if(_entryLoader.modelData as Action)
-                                    return _actionButtonComponent
-                                return null
-                            }
-
-                            Component {
-                                id: _actionButtonComponent
-
-                                ActionToolButton {
-                                    action: _entryLoader.modelData as Action
-                                    context: root.context
                                 }
-                            }
 
-                            Component {
-                                id: _managerMenuButtonComponent
+                                Component {
+                                    id: _actionButtonComponent
 
-                                ActionManagerToolButton {
-                                    actionManager: _entryLoader.modelData as ActionManager
+                                    ActionToolButton {
+                                        action: _entryLoader.modelData as Action
+                                        context: root.context
+                                    }
                                 }
-                            }
 
-                            Component {
-                                id: _groupMenuButtonComponent
+                                Component {
+                                    id: _managerMenuButtonComponent
 
-                                GroupMenuButton {
-                                    group: _entryLoader.modelData as MenuGroup
-                                    context: root.context
+                                    ActionManagerToolButton {
+                                        actionManager: _entryLoader.modelData as ActionManager
+                                    }
                                 }
-                            }
 
-                            Component {
-                                id: _delegateItemComponent
+                                Component {
+                                    id: _groupMenuButtonComponent
 
-                                Item {
-                                    id: _delegateItem
+                                    GroupMenuButton {
+                                        group: _entryLoader.modelData as MenuGroup
+                                        context: root.context
+                                    }
+                                }
 
-                                    property Item delegateItem: null
+                                Component {
+                                    id: _delegateItemComponent
 
-                                    implicitWidth: delegateItem ? delegateItem.implicitWidth : 0
-                                    implicitHeight: delegateItem ? delegateItem.implicitHeight : 0
+                                    Item {
+                                        id: _delegateItem
 
-                                    Component.onCompleted: {
-                                        const component = _entryLoader.modelData.delegateGroup.delegate
-                                        if(component) {
-                                            delegateItem = component.createObject(_delegateItem, {"context": Qt.binding( () => { return root.context } )}) as Item
-                                            if(delegateItem)
-                                                delegateItem.anchors.verticalCenter = _delegateItem.verticalCenter
+                                        property Item delegateItem: null
+
+                                        implicitWidth: delegateItem ? delegateItem.implicitWidth : 0
+                                        implicitHeight: delegateItem ? delegateItem.implicitHeight : 0
+
+                                        Component.onCompleted: {
+                                            const component = _entryLoader.modelData.delegateGroup.delegate
+                                            if(component) {
+                                                delegateItem = component.createObject(_delegateItem, {"context": Qt.binding( () => { return root.context } )}) as Item
+                                                if(delegateItem)
+                                                    delegateItem.anchors.verticalCenter = _delegateItem.verticalCenter
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+
+                        onImplicitWidthChanged: _group.reportWidths()
                     }
 
-                    onImplicitWidthChanged: _group.reportWidths()
-                }
+                    GroupMenuButton {
+                        id: _menuButton
 
-                GroupMenuButton {
-                    id: _menuButton
+                        Layout.fillHeight: true
 
-                    Layout.fillHeight: true
+                        group: _group.group
+                        context: root.context
+                        visible: _group.level === ToolBarHost.Menu
 
-                    group: _group.group
-                    context: root.context
-                    visible: _group.level === ToolBarHost.Menu
+                        onImplicitWidthChanged: _group.reportWidths()
+                    }
 
-                    onImplicitWidthChanged: _group.reportWidths()
-                }
+                    Rectangle {
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: 1
 
-                Rectangle {
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: 1
-
-                    color: Runtime.colors.primary.borderColor
-                    visible: _group.group.separator
+                        color: Runtime.colors.primary.borderColor
+                        visible: _group.showSeparator
+                    }
                 }
 
                 onIndexChanged: reportWidths()

@@ -349,10 +349,26 @@ public:
     bool hasSeparator() const { return m_separator; }
     Q_SIGNAL void separatorChanged();
 
+    // Something to pull the attention of the user to the group, and to what is merged into it: an
+    // Item that the toolbar sizes to the group, and puts behind its buttons. It is made once for
+    // each toolbar that shows the group. Groups without one have no backdrop.
+    // clang-format off
+    Q_PROPERTY(QQmlComponent* backdrop
+               READ backdrop
+               WRITE setBackdrop
+               NOTIFY backdropChanged)
+    // clang-format on
+    void setBackdrop(QQmlComponent *val);
+    QQmlComponent *backdrop() const { return m_backdrop; }
+    Q_SIGNAL void backdropChanged();
+
 private:
+    void onBackdropDestroyed();
+
     int m_priority = 0;
     bool m_collapsible = false;
     bool m_separator = true;
+    QQmlComponent *m_backdrop = nullptr;
 };
 
 /**
