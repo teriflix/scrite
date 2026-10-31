@@ -304,10 +304,11 @@ Rectangle {
         uri: "Scrite.ToolBar.Screenplay"
         hostUri: root.uri
         order: 70
-        priority: 65
+        priority: 40
         collapsible: true
         visible: !root.inScrited
         actionManager: ActionHub.screenplayOperations
+        iconSource: "qrc:/icons/content/add_box.png"
     }
 
     ToolBarGroup {
@@ -335,6 +336,7 @@ Rectangle {
         order: 90
         priority: 80
         visible: !root.inScrited
+        separator: false
         entries: [ActionHub.appOptions]
     }
 }
