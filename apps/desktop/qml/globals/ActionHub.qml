@@ -2333,6 +2333,7 @@ Item {
         Action {
             readonly property bool allowShortcut: true
             readonly property string tooltip: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
+            readonly property int sortOrder: 10
 
             checkable: true
             checked: ActionHandler.active ? ActionHandler.active.checked : false
@@ -2349,6 +2350,7 @@ Item {
             readonly property bool allowShortcut: true
             readonly property string tooltip: "Reloads the notebook tree."
             readonly property int triggerMethod: ActionHandler.TriggerFirst
+            readonly property int sortOrder: 20
 
             enabled: ActionHandler.canHandle
             objectName: "reload"
@@ -2364,6 +2366,7 @@ Item {
             readonly property bool allowShortcut: true
             readonly property var keywords: ["pdf"]
             readonly property int triggerMethod: ActionHandler.TriggerFirst
+            readonly property int sortOrder: 30
 
             property string tooltip: ActionHandler.active ? ActionHandler.active.tooltip : text
 
@@ -2379,6 +2382,7 @@ Item {
             property bool down: ActionHandler.active ? ActionHandler.active.down : false
             property string tooltip: ActionHandler.active && ActionHandler.active.tooltip !== "" ? ActionHandler.active.tooltip : "New text or form note."
             readonly property string defaultShortcut: "Ctrl+T"
+            readonly property int sortOrder: 40
 
             enabled: ActionHandler.canHandle
             objectName: "addNote"
@@ -2392,6 +2396,7 @@ Item {
             readonly property bool nativeVisible: false
             readonly property bool allowShortcut: true
             property bool down: ActionHandler.active ? ActionHandler.active.down : false
+            readonly property int sortOrder: 50
 
             enabled: ActionHandler.canHandle
             objectName: "noteColor"
@@ -2404,6 +2409,7 @@ Item {
         Action {
             readonly property string defaultShortcut: "Ctrl+D"
             property string tooltip: ActionHandler.active ? ActionHandler.active.tooltip : "Toggle bookmark of a Note, Scene, Episode/Act Notes or Character"
+            readonly property int sortOrder: 60
 
             enabled: ActionHandler.canHandle
             objectName: "toggleBookmark"
@@ -2416,6 +2422,7 @@ Item {
         Action {
             readonly property bool allowShortcut: true
             property string tooltip: ActionHandler.active ? ActionHandler.active.tooltip : "Delete the current note or character"
+            readonly property int sortOrder: 70
 
             enabled: ActionHandler.canHandle
             objectName: "delete"
@@ -2428,6 +2435,7 @@ Item {
             readonly property bool visible: false
             readonly property string defaultShortcut: "Ctrl+Shift+K"
             property int triggerCount: 0
+            readonly property int sortOrder: 80
 
             enabled: Runtime.allowAppUsage && Runtime.appFeatures.notebook.enabled
             objectName: "bookmarkedNotes"
@@ -2444,6 +2452,7 @@ Item {
             readonly property bool visible: false
             readonly property string defaultShortcut: "Ctrl+Shift+Y"
             property int triggerCount: 0
+            readonly property int sortOrder: 90
 
             enabled: Runtime.allowAppUsage && Runtime.appFeatures.notebook.enabled
             objectName: "storyNotes"
@@ -2459,6 +2468,7 @@ Item {
         Action {
             readonly property bool visible: false
             readonly property string defaultShortcut: "Ctrl+Shift+R"
+            readonly property int sortOrder: 100
 
             property int triggerCount: 0
             property string characterName
