@@ -32,7 +32,9 @@ DialogLauncher {
     id: root
 
     function init() { }
-    function launch(mode) { return doLaunch({"mode": mode}) }
+    function launch(mode) {
+        return doLaunch(mode ? {"mode": mode} : undefined)
+    }
     function firstLaunch() {
         if(_private.launchCounter === 0)
             launch()

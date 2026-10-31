@@ -38,10 +38,19 @@ Item {
     Component.onCompleted: {
         _private.switchMode()
         root.modeChanged.connect(_private.switchMode)
+        Qt.callLater( () => { _layoutLoader.active = true } )
     }
 
     Loader {
+        id: _layoutLoader
+
         anchors.fill: parent
+
+        // The layout depends on the size, which is zero until the dialog sizes its content. Loading
+        // before that makes the layout, and then replaces it while its pages are still being made.
+        // So, we create this loader a bit after the root item is created. See Component.onCompleted's
+        // loadLater() call.
+        active: false
 
         sourceComponent: {
             if(_private.layoutType === 1)
