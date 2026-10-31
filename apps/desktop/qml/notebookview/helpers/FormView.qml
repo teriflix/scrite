@@ -199,6 +199,17 @@ Item {
                     width: parent.width
 
                     elide: Text.ElideRight
+                    maximumLineCount: 5
+                    text: root.note ? root.note.summary : ""
+                    visible: text !== "" && !root.showHeading
+                    wrapMode: Text.WordWrap
+                    font.pointSize: Runtime.notebookFontPointSize
+                }
+
+                SctLabel {
+                    width: parent.width
+
+                    elide: Text.ElideRight
                     maximumLineCount: 2
                     text: root.form.moreInfoUrl == "" ? "" : "To learn more about this form, visit <a href=\"" + root.form.moreInfoUrl + "\">" + root.form.moreInfoUrl + "</a>"
                     visible: text !== ""
