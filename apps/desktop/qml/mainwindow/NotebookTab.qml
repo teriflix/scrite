@@ -45,7 +45,6 @@ Item {
             NotebookView {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-
             }
         }
     }

@@ -51,7 +51,8 @@ AbstractNotebookPage {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: root.showTabs ? 11 : 0
+        anchors.topMargin: root.showTabs ? 11 : 0
+        anchors.leftMargin: root.showTabs ? 11 : 0
 
         TextTabBar {
             id: _tabBar
