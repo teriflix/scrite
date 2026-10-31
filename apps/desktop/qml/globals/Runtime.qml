@@ -539,6 +539,7 @@ Item {
                                           Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
                                       })
             Runtime.notebookSettings.characterPageTab = 0
+            Runtime.notebookSettings.breakPageTab = 0
             Runtime.notebookSettings.charactersPageTab = 0
             Runtime.notebookSettings.screenplayPageTab = 0
             Runtime.notebookSettings.sceneNotesPageTab = 0

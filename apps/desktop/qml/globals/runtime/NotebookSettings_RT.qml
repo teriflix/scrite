@@ -19,6 +19,7 @@ import Scrite.App
 
 Settings {
     property int characterPageTab: 0
+    property int breakPageTab: 0
     property int charactersPageTab: 0
     property int screenplayPageTab: 0
     property int sceneNotesPageTab: 0

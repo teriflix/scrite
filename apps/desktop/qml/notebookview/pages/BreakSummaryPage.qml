@@ -13,6 +13,8 @@
 **
 ****************************************************************************/
 
+pragma ComponentBehavior: Bound
+
 import QtQml
 import QtQuick
 import QtQuick.Controls
@@ -23,111 +25,118 @@ import Scrite.App
 import "../../globals"
 import "../../helpers"
 import "../../controls"
-import "../../dialogs"
 import ".."
+import "../tabs"
 
 AbstractNotebookPage {
     id: root
 
-    EventFilter.events: [EventFilter.Wheel]
-    EventFilter.onFilter: (object, event, result) => {
-                              EventFilter.forwardEventTo(_summaryField)
-                              result.filter = true
-                              result.accepted = true
-                          }
+    property alias currentTab: _tabBar.currentTab
 
-    Item {
+    signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
+    signal deleteNoteRequest(Note note)
+
+    // Selects the tab of the singleton note. Returns false if this page does not have one for it.
+    function showNote(note) {
+        const index = _private.singletonNotes.indexOf(note)
+        if(index < 0)
+            return false
+
+        _tabBar.currentTab = _tabBar.tabs.length - _private.singletonNotes.length + index
+        return true
+    }
+
+    ColumnLayout {
         anchors.fill: parent
 
         visible: _private.breakElement !== null
 
-        ColumnLayout {
-            anchors.top: parent.top
-            anchors.bottom: _attachmentsView.top
-            anchors.margins: 11
-            anchors.horizontalCenter: parent.horizontalCenter
+        TextTabBar {
+            id: _tabBar
 
-            width: parent.width >= root.maxTextAreaSize+20 ? root.maxTextAreaSize : parent.width-30
+            Layout.topMargin: 11
+            Layout.leftMargin: 11
+            Layout.rightMargin: 11
+            Layout.fillWidth: true
 
-            SctLabel {
-                Layout.fillWidth: true
+            name: _private.breakElement ? _private.breakElement.breakTitle : ""
+            tabs: ["Information", "Notes", "Attributes"].concat(_private.singletonNotes.map(note => note.title))
+            currentTab: Runtime.notebookSettings.breakPageTab
+            switchTabHandlerEnabled: true
 
-                text: _private.breakElement.breakTitle
+            onCurrentTabChanged: Runtime.notebookSettings.breakPageTab = currentTab
+        }
 
-                font.pointSize: Runtime.notebookFontPointSize + 3
-            }
+        StackLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-            SctTextField {
-                id: _headingField
+            clip: true
+            currentIndex: Math.min(_tabBar.currentTab, _tabBar.tabs.length - 1)
 
-                Layout.fillWidth: true
-
-                label: ""
-                placeholderText: _private.breakKind + " Name"
-                tabItem: _summaryField
-                text: _private.breakElement.breakSubtitle
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-
-                font.pointSize: Runtime.notebookFontPointSize + 5
-
-                onTextEdited: _private.breakElement.breakSubtitle = text
-            }
-
-            Rectangle {
+            Loader {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                color: Runtime.colors.primary.c200.background
+                active: visible && _private.breakElement !== null
 
-                FlickableTextArea {
-                    id: _summaryField
-
-                    anchors.fill: parent
-                    anchors.margins: 4
-
-                    ScrollBar.vertical: _vscrollBar
-
-                    adjustTextWidthBasedOnScrollBar: false
-                    backTabItem: _headingField
-                    background.visible: false
-                    markdownSyntaxEnabled: true
-                    placeholderText: _private.breakKind + " Summary ..."
-                    text: _private.breakElement.breakSummary
-                    font.pointSize: Runtime.notebookFontPointSize
-
-                    onTextEdited: _private.breakElement.breakSummary = text
+                sourceComponent: BreakInformationTab {
+                    breakElement: _private.breakElement
+                    breakKind: _private.breakKind
+                    maxTextAreaSize: root.maxTextAreaSize
+                    minTextAreaSize: root.minTextAreaSize
                 }
             }
-        }
 
-        SctScrollBar {
-            id: _vscrollBar
+            Loader {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.bottom: _attachmentsView.top
+                active: visible && _private.notes !== null
 
-            flickable: _summaryField
-            orientation: Qt.Vertical
-        }
+                sourceComponent: NotesTab {
+                    notes: _private.notes
 
-        AttachmentsView {
-            id: _attachmentsView
+                    onSwitchRequest: (item) => { root.switchRequest(item) }
+                    onDeleteNoteRequest: (note) => { root.deleteNoteRequest(note) }
+                }
+            }
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
+            Loader {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-            attachments: _private.breakElement ? _private.breakElement.attachments : null
-        }
+                active: visible && _private.notes !== null
 
-        AttachmentsDropArea {
-            id: _dropArea
+                sourceComponent: AttributesTab {
+                    notes: _private.notes
+                    maxTextAreaSize: root.maxTextAreaSize
+                    minTextAreaSize: root.minTextAreaSize
+                }
+            }
 
-            anchors.fill: parent
+            Repeater {
+                model: _private.singletonNotes
 
-            allowMultiple: true
-            target: _private.breakElement ? _private.breakElement.attachments : null
+                delegate: Loader {
+                    id: _singletonLoader
+
+                    required property var modelData
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    active: visible
+
+                    sourceComponent: SingletonNoteTab {
+                        note: _singletonLoader.modelData
+                        maxTextAreaSize: root.maxTextAreaSize
+                        minTextAreaSize: root.minTextAreaSize
+
+                        onDeleteRequest: (note) => { _private.deleteSingletonNote(note) }
+                    }
+                }
+            }
         }
     }
 
@@ -148,7 +157,15 @@ AbstractNotebookPage {
     QtObject {
         id: _private
 
-        property ScreenplayElement breakElement: root.pageData.notebookItemObject
-        property string breakKind: root.pageData.notebookItemType === NotebookModel.EpisodeBreakType ? "Episode" : "Act"
+        property ScreenplayElement breakElement: root.pageData
+        property Notes notes: breakElement ? breakElement.notes : null
+        property string breakKind: breakElement ? (breakElement.notebookItemType === NotebookModel.EpisodeBreakType ? "Episode" : "Act") : "a"
+        property var singletonNotes: notes ? notes.singletonNotes : []
+
+        function deleteSingletonNote(note) {
+            root.askDeleteConfirmation("Are you sure you want to delete this note?", () => {
+                                           Qt.callLater(() => { _private.notes.removeNote(note) })
+                                       })
+        }
     }
 }

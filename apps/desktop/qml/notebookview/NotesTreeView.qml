@@ -50,6 +50,11 @@ TreeView {
         if(currentData.notebookItemType === NotebookModel.CategoryType &&
                 currentData.notebookItemCategory === NotebookModel.ScreenplayCategory)
             return Scrite.document.structure.notes
+        if(currentData.notebookItemType === NotebookModel.EpisodeBreakType ||
+                currentData.notebookItemType === NotebookModel.ActBreakType) {
+            if(currentData.notebookItemObject)
+                return currentData.notebookItemObject.notes
+        }
         return null
     }
 

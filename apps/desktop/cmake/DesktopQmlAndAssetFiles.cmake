@@ -190,6 +190,7 @@ set(SCRITE_DESKTOP_QML_FILES
   "qml/notebookview/tabs/AllCharactersRelationshipsTab.qml"
   "qml/notebookview/tabs/AllCharactersTab.qml"
   "qml/notebookview/tabs/AttributesTab.qml"
+  "qml/notebookview/tabs/BreakInformationTab.qml"
   "qml/notebookview/tabs/CharacterInformationTab.qml"
   "qml/notebookview/tabs/CharacterRelationshipsTab.qml"
   "qml/notebookview/tabs/NotesTab.qml"

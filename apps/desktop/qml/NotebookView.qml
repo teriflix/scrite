@@ -120,6 +120,8 @@ Item {
                         return _private.characterPage
                     case Notes.SceneOwner:
                         return _private.sceneNotesPage
+                    case Notes.BreakOwner:
+                        return _private.breakSummaryPage
                     default:
                         return _private.notesPage
                     }
@@ -421,10 +423,19 @@ Item {
         }
 
         readonly property Component breakSummaryPage: BreakSummaryPage {
-            pageData: _notebookTree.currentData
+            pageData: _notebookTree.currentBreak
             notebookModel: _notebookModel
             maxTextAreaSize: _private.maxTextAreaSize
             minTextAreaSize: _private.minTextAreaSize
+
+            onSwitchRequest: (item) => {
+                                 _private.scheduleSwitchTo(item)
+                             }
+
+            onDeleteNoteRequest: (note) => {
+                                     _private.switchTo(note)
+                                     _private.scheduleDeleteRequest() // Must be called after switchTo
+                                 }
         }
 
         readonly property Component screenplayPage: ScreenplayPage {
