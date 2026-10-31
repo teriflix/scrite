@@ -310,8 +310,10 @@ Dialog {
     }
 
     onAboutToHide: {
-        if(isAppDialog)
-            Scrite.window.closeButtonVisible = true
+        if(isAppDialog) {
+            if(Scrite && Scrite.window)
+                Scrite.window.closeButtonVisible = true
+        }
         if(_private.overrideCursorMustBeRestored) {
             MouseCursor.unsetShape()
             _private.overrideCursorMustBeRestored = false
