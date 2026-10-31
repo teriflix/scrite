@@ -747,24 +747,34 @@ void ToolBarHost::fit()
 
     qreal total = totalWidth();
 
+    // The row of the group with the lowest priority, among those that are at the given level. Of
+    // equals, the rightmost.
+    auto lowestAt = [&](Level level) -> int {
+        int victim = -1;
+        for (int row = 0; row < groups.size(); row++) {
+            if (levels.at(row) != level)
+                continue;
+
+            if (victim < 0) {
+                victim = row;
+                continue;
+            }
+
+            const ToolBarGroup *a = qobject_cast<ToolBarGroup *>(groups.at(row));
+            const ToolBarGroup *b = qobject_cast<ToolBarGroup *>(groups.at(victim));
+            if ((a ? a->priority() : 0) <= (b ? b->priority() : 0))
+                victim = row;
+        }
+        return victim;
+    };
+
     if (m_availableWidth > 0) {
         while (total > m_availableWidth) {
-            // The group with the lowest priority steps down. Of equals, the rightmost does.
-            int victim = -1;
-            for (int row = 0; row < groups.size(); row++) {
-                if (levels.at(row) == Hidden)
-                    continue;
-
-                if (victim < 0) {
-                    victim = row;
-                    continue;
-                }
-
-                const ToolBarGroup *a = qobject_cast<ToolBarGroup *>(groups.at(row));
-                const ToolBarGroup *b = qobject_cast<ToolBarGroup *>(groups.at(victim));
-                if ((a ? a->priority() : 0) <= (b ? b->priority() : 0))
-                    victim = row;
-            }
+            // The group with the lowest priority steps down, but one that has folded into a menu is
+            // hidden only when every group is folded or hidden, so that menus outlast buttons.
+            int victim = lowestAt(Expanded);
+            if (victim < 0)
+                victim = lowestAt(Menu);
 
             if (victim < 0)
                 break;
