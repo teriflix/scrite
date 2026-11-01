@@ -85,7 +85,7 @@ ApplicationWindow {
     // The menus of the menu bar, which extensions can add to and merge into.
     ScriteMenuBarMenus { }
 
-    // Native on macOS and Windows, in the window on Linux. It is an Item only on Linux.
+    // Native on macOS, in the window on Windows and Linux. It is an Item only on Windows and Linux.
     ScriteMenuBar {
         id: _menuBar
     }

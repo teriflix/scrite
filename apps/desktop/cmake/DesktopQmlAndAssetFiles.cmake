@@ -291,15 +291,23 @@ set(SCRITE_DESKTOP_QML_FILES
   "qml/timelineview/TimelineViewHighlightedItemAnimation.qml"
 )
 
-# One ScriteMenuBar per platform: native on macOS and Windows, in the window on Linux.
-if(APPLE OR WIN32)
+# One ScriteMenuBar per platform: native on macOS, in the window on Windows and Linux. The one in
+# the window is for the mouse only, unless SCRITE_MENUBAR_KEY_NAVIGATION is ON, which builds the one
+# that also lets the keyboard navigate the menus (Alt, arrow keys, Down, Esc).
+option(SCRITE_MENUBAR_KEY_NAVIGATION "Windows and Linux: let the keyboard navigate the menu bar (Experimental)" OFF)
+
+if(APPLE)
   list(APPEND SCRITE_DESKTOP_QML_FILES
     "qml/menubar/native/NativeMenuGroupMenu.qml"
     "qml/menubar/native/ScriteMenuBar.qml"
   )
+elseif(SCRITE_MENUBAR_KEY_NAVIGATION)
+  list(APPEND SCRITE_DESKTOP_QML_FILES
+    "qml/menubar/qtquick-keynavigation/ScriteMenuBar.qml"
+  )
 else()
   list(APPEND SCRITE_DESKTOP_QML_FILES
-    "qml/menubar/linux/ScriteMenuBar.qml"
+    "qml/menubar/qtquick-std/ScriteMenuBar.qml"
   )
 endif()
 

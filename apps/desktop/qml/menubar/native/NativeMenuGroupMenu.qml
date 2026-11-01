@@ -53,7 +53,7 @@ Native.Menu {
         //
         // TODO: This is for macOS only for now. If shortcuts of actions that are not in the menu bar
         // turn out not to be delivered on Windows (native menu bar, same as here) or on Linux (the
-        // in-window menu bar of menubar/linux, which has no such menu), the same is needed there:
+        // in-window menu bar of menubar/qtquick-std, which has no such menu), the same is needed there:
         // drop the Platform check here, and for Linux add a hidden menu to EntriesMenu of Tools.
         readonly property bool isToolsMenu: Platform.isMacOSDesktop && root.group !== null &&
                                             root.group.uri === "Scrite.MenuBar.Tools"

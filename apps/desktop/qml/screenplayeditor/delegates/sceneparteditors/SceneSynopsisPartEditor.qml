@@ -63,7 +63,6 @@ AbstractScenePartEditor {
                 rightPadding: 0
                 verticalAlignment: Text.AlignTop
                 background: Item { }
-
             }
 
             MouseArea {

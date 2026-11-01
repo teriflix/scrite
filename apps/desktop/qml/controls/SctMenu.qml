@@ -27,6 +27,11 @@ Menu {
 
     property bool autoWidth: true
 
+    // By default the items of the menu do not take keyboard focus, so that a context menu doesn't
+    // take focus away from the item that opened it. A menu of the menu bar sets this to true, so that
+    // arrow keys can move between all of its items. Submenus made by this menu follow it.
+    property bool keyboardNavigable: false
+
     property int minInsertIndex: 0
     property int insertIndex: minInsertIndex
 
@@ -171,7 +176,7 @@ Menu {
                 required property var qmlAction
 
                 action: qmlAction
-                focusPolicy: Qt.NoFocus
+                focusPolicy: root.keyboardNavigable ? Qt.TabFocus : Qt.NoFocus
                 opacity: enabled ? 1 : 0.5
 
                 icon.source: qmlAction.icon.source !== undefined ? Runtime.themedIcon(qmlAction.icon.source) : ""
@@ -349,7 +354,7 @@ Menu {
         function putSubMenu(group) {
             if(entriesMenuComponent === null)
                 entriesMenuComponent = Qt.createComponent(Qt.resolvedUrl("../helpers/EntriesMenu.qml"))
-            put(entriesMenuComponent.createObject(root, {"group": group, "context": root.context}))
+            put(entriesMenuComponent.createObject(root, {"group": group, "context": root.context, "keyboardNavigable": root.keyboardNavigable}))
         }
 
         // A group is either a submenu, or if it is inline, its items follow a separator. The groups
