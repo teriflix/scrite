@@ -138,7 +138,6 @@ Rectangle {
         hostUri: root.uri
         order: 10
         priority: 50
-        collapsible: true
         title: "File"
         visible: !root.inScrited
         actionManager: ActionHub.fileOperations
