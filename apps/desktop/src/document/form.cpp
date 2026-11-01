@@ -412,6 +412,8 @@ Forms::Forms(QObject *parent) : QObjectListModel<Form *>(parent)
 Forms::Forms(bool, QObject *parent) : QObjectListModel<Form *>(parent)
 {
     this->downloadForms();
+
+    connect(RestApi::instance(), &RestApi::sessionTokenAvailable, this, &Forms::downloadForms);
 }
 
 Forms::~Forms() { }
@@ -583,6 +585,9 @@ void Forms::downloadForms()
     if (this->findChild<RestApiCall *>() != nullptr)
         return;
 
+    if (!RestApi::instance()->isSessionTokenAvailable())
+        return;
+
     ScriptalayFormsRestApiCall *call = new ScriptalayFormsRestApiCall(this);
     connect(call, &RestApiCall::finished, this, [=]() {
         if (call->hasError()) {
@@ -609,15 +614,23 @@ void Forms::downloadForms()
             const QJsonObject formJson = record.toObject();
 
             Form *form = new Form(this);
-            if (QObjectSerializer::fromJson(formJson, form))
-                forms.append(form);
-            else {
+            if (!QObjectSerializer::fromJson(formJson, form)) {
                 errors << tempErrorReport.errorMessage();
                 delete form;
+                continue;
             }
+
+            // Forms that are already here, say added by AI, are upgraded if this one is newer.
+            Form *existing = this->findForm(form->id());
+            if (existing) {
+                existing->upgradeFrom(form);
+                delete form;
+            } else
+                forms.append(form);
         }
 
-        this->assign(forms);
+        for (Form *form : std::as_const(forms))
+            this->append(form);
 
         m_errorReport = actualErrorReport;
 
