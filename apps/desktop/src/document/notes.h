@@ -34,6 +34,7 @@ class Character;
 class Structure;
 class Attachments;
 class Relationship;
+class DeltaDocument;
 class ScreenplayElement;
 
 class Note : public QObject, public QObjectSerializer::Interface
@@ -140,6 +141,20 @@ public:
     void setSummary(const QString &val);
     QString summary() const { return m_summary; }
     Q_SIGNAL void summaryChanged();
+
+    // Short text that UIs can show as a preview of this note. It is composed only when asked for,
+    // and cached until the note changes. For text notes with markdown content, it is markdown
+    // text, so UIs can render it as such. For text notes with rich text content, it is empty
+    // until the content is resolved to plain text, after which previewChanged() is emitted.
+    // For all other notes, it is the summary.
+    // clang-format off
+    Q_PROPERTY(QString preview
+               READ preview
+               NOTIFY previewChanged
+               STORED false)
+    // clang-format on
+    QString preview() const;
+    Q_SIGNAL void previewChanged();
 
     // clang-format off
     Q_PROPERTY(QJsonValue content
@@ -248,6 +263,9 @@ private:
     void resetForm();
     void addAttachment(Attachment *ptr);
     void renameCharacter(const QString &from, const QString &to);
+    void invalidatePreview();
+    QString composePreview() const;
+    static QString truncatePreview(const QString &text);
 
 private:
     friend class Notes;
@@ -256,7 +274,10 @@ private:
     QString m_title;
     QString m_formId;
     QString m_summary;
+    mutable QString m_preview;
     bool m_autoSummaryText = false;
+    mutable bool m_previewDirty = true;
+    mutable DeltaDocument *m_deltaDocument = nullptr;
     QJsonValue m_content;
     QJsonValue m_userData;
     QJsonObject m_formData;

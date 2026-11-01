@@ -49,6 +49,12 @@ Note::Note(QObject *parent) : QObject(parent), m_form(this, "form")
     connect(this, &Note::summaryChanged, this, &Note::noteModified);
     connect(this, &Note::contentChanged, this, &Note::noteModified);
     connect(this, &Note::formDataChanged, this, &Note::noteModified);
+
+    connect(this, &Note::typeChanged, this, &Note::invalidatePreview);
+    connect(this, &Note::summaryChanged, this, &Note::invalidatePreview);
+    connect(this, &Note::contentChanged, this, &Note::invalidatePreview);
+    connect(this, &Note::markdownContentChanged, this, &Note::invalidatePreview);
+
     connect(m_attachments, &Attachments::attachmentsModified, this, &Note::noteModified);
 
     connect(this, &Note::titleChanged, this, &Note::pathChanged);
@@ -222,6 +228,61 @@ void Note::setSummary(const QString &val)
     m_summary = val;
     m_autoSummaryText = false;
     emit summaryChanged();
+}
+
+QString Note::preview() const
+{
+    if (m_previewDirty) {
+        m_preview = this->composePreview();
+        m_previewDirty = false;
+    }
+
+    return m_preview;
+}
+
+void Note::invalidatePreview()
+{
+    if (m_deltaDocument != nullptr)
+        m_deltaDocument->setContent(m_content);
+
+    m_previewDirty = true;
+    emit previewChanged();
+}
+
+QString Note::composePreview() const
+{
+    if (m_type != TextNoteType)
+        return m_summary;
+
+    if (m_content.isString())
+        return Note::truncatePreview(m_content.toString());
+
+    if (!m_content.isObject())
+        return QString();
+
+    if (m_deltaDocument == nullptr) {
+        Note *that = const_cast<Note *>(this);
+        m_deltaDocument = new DeltaDocument(that);
+        connect(m_deltaDocument, &DeltaDocument::plainTextChanged, that, &Note::invalidatePreview);
+        m_deltaDocument->setContent(m_content);
+    }
+
+    return Note::truncatePreview(m_deltaDocument->plainText());
+}
+
+QString Note::truncatePreview(const QString &text)
+{
+    const int maxLength = 256;
+    if (text.length() <= maxLength)
+        return text;
+
+    // Cut at a line boundary, so that markdown syntax is not split in the middle of a line.
+    QString ret = text.left(maxLength);
+    const int lineEnd = ret.lastIndexOf(QLatin1Char('\n'));
+    if (lineEnd > 0)
+        ret = ret.left(lineEnd);
+
+    return ret;
 }
 
 void Note::setContent(const QJsonValue &val)

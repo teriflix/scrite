@@ -96,6 +96,7 @@ Item {
                             anchors.margins: 16
 
                             spacing: 8
+                            clip: true
 
                             SctLabel {
                                 id: _noteHeading
@@ -118,16 +119,11 @@ Item {
                                 color: _noteHeading.color
                                 elide: Text.ElideRight
                                 opacity: 0.75
-                                text: _noteItem.note.type === Note.TextNoteType ? _deltaDoc.plainText : _noteItem.note.summary
+                                text: _noteItem.note.preview
+                                textFormat: _noteItem.note.hasMarkdownContent ? Text.MarkdownText : Text.PlainText
                                 wrapMode: Text.WordWrap
 
                                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-
-                                DeltaDocument {
-                                    id: _deltaDoc
-
-                                    content: _noteItem.note.type === Note.TextNoteType ? _noteItem.note.content : {}
-                                }
                             }
                         }
                     }
