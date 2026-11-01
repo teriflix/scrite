@@ -710,7 +710,7 @@ AbstractScenePartEditor {
         readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition") as Action
         readonly property Action translateToActiveLanguage: ActionHub.editOptions.find("translateToActiveLanguage") as Action
 
-        property bool readOnly: root.readOnly /*|| _sceneDocumentBinder.currentDualDialogue !== null*/
+        property bool readOnly: root.readOnly || Runtime.dialogs.objectCount > 0 /*|| _sceneDocumentBinder.currentDualDialogue !== null*/
 
         property bool canSplitScene: _sceneTextEditor.activeFocus &&
                                      !_private.readOnly &&
