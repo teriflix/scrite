@@ -42,6 +42,9 @@ Rectangle {
     readonly property string uri: "Scrite.App.MainWindow.ToolBar"
     readonly property bool inScrited: Runtime.mainWindowTab === Runtime.MainWindowTab.ScritedTab
 
+    // The least room between the end of the groups and the tabs. Groups fold into menus to keep it.
+    readonly property real minimumTabsGap: Runtime.iconImageSize * 1.5
+
     color: Runtime.colors.primary.c50.background
 
     implicitHeight: _layout.height
@@ -62,12 +65,13 @@ Rectangle {
 
             // Tabs show their text when there is room to spare, and that is not counted in the width
             // that is available, so that showing it doesn't make the room go away.
-            availableWidth: root.width - _tabIconWidth.implicitWidth * _tabsRepeater.count - _mainTabs.spacing * Math.max(_tabsRepeater.count - 1, 0) - _userAccount.implicitWidth - _userAccount.Layout.leftMargin
+            availableWidth: root.width - _tabIconWidth.implicitWidth * _tabsRepeater.count - _mainTabs.spacing * Math.max(_tabsRepeater.count - 1, 0) - _userAccount.implicitWidth - _userAccount.Layout.leftMargin - root.minimumTabsGap
             roomyWidth: 150
         }
 
         Item {
             Layout.fillWidth: true
+            Layout.minimumWidth: root.minimumTabsGap
         }
 
         RowLayout {
