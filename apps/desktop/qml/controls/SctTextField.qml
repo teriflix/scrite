@@ -202,7 +202,8 @@ TextField {
         anchors.verticalCenterOffset: parent.topPadding/4
 
         text: root.placeholderText
-        visible: root.labelAlwaysVisible ? true : root.text !== "" && root.activeFocus
+        visible: root.labelAlwaysVisible ? true : root.text !== "" && root.activeFocus && _label.text !== root.text
+        opacity: 0.75
 
         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
     }
