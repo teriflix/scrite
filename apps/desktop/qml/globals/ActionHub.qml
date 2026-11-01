@@ -648,6 +648,8 @@ Item {
 
             text: "FAQs"
 
+            icon.source: "qrc:/icons/action/faqs.png"
+
             onTriggered: Qt.openUrlExternally("https://www.scrite.io/faqs/")
         }
 
@@ -655,6 +657,8 @@ Item {
             readonly property var keywords: ["support", "community", "question", "bug", "feedback", "feature request"]
 
             text: "Discord"
+
+            icon.source: "qrc:/icons/action/community_forum.png"
 
             onTriggered: Qt.openUrlExternally("https://www.scrite.io/forum/")
         }
@@ -664,6 +668,8 @@ Item {
 
             text: "Policies"
 
+            icon.source: "qrc:/icons/action/policies.png"
+
             onTriggered: Qt.openUrlExternally("https://www.scrite.io/policies/")
         }
 
@@ -671,6 +677,8 @@ Item {
             readonly property var keywords: ["contact", "phone"]
 
             text: "Email Support"
+
+            icon.source: "qrc:/icons/action/email_support.png"
 
             onTriggered: {
                 if(Runtime.appFeatures.emailSupport.enabled)
@@ -684,6 +692,8 @@ Item {
             readonly property var keywords: ["github"]
 
             text: "Source Code"
+
+            icon.source: "qrc:/icons/action/source_code.png"
 
             onTriggered: {
                 Qt.openUrlExternally("https://www.scrite.io/source-code")
@@ -2999,7 +3009,6 @@ Item {
 
         Action {
             readonly property bool nativeVisible: true
-            readonly property bool visible: false
             readonly property var keywords: ["plan", "paid", "pay", "purchase", "buy", "license", "pricing", "price", "discount"]
             readonly property string defaultShortcut: "F10"
 
@@ -3011,7 +3020,6 @@ Item {
 
         Action {
             readonly property bool nativeVisible: true
-            readonly property bool visible: false
             readonly property var keywords: ["device"]
             readonly property string defaultShortcut: "F11"
 
@@ -3023,7 +3031,6 @@ Item {
 
         Action {
             readonly property bool nativeVisible: true
-            readonly property bool visible: false
             readonly property string defaultShortcut: "F9"
             readonly property var keywords: ["notifications"]
 

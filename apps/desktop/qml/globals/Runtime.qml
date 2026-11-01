@@ -367,9 +367,15 @@ Item {
     }
 
     function themedIcon(source) {
-        return Gui.themedIcon(source.toString(),
-                              colors.theme === Material.Dark ? Qt.ColorScheme.Dark
-                                                             : Qt.ColorScheme.Light)
+        if(source) {
+            const sourceString = (typeof source === "string") ? source : source.toString()
+            if(sourceString !== "") {
+                return Gui.themedIcon(source.toString(),
+                                      colors.theme === Material.Dark ? Qt.ColorScheme.Dark
+                                                                     : Qt.ColorScheme.Light)
+            }
+        }
+        return ""
     }
 
     function bounded(min, val, max) {

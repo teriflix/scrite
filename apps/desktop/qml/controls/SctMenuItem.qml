@@ -79,8 +79,11 @@ MenuItem {
                 Layout.preferredWidth: _label.height
                 Layout.preferredHeight: _label.height
 
-                visible: root.icon.source !== "" && status === Image.Ready
-                source: Runtime.themedIcon(root.icon.source)
+                readonly property bool hasIcon: iconSource !== ""
+                readonly property string iconSource: root.icon.source.toString()
+
+                visible: hasIcon && status === Image.Ready
+                source: hasIcon ? Runtime.themedIcon(iconSource) : ""
                 fillMode: Image.PreserveAspectFit
             }
 
