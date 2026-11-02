@@ -545,6 +545,27 @@ public:
     ~Character() override;
     Q_SIGNAL void aboutToDelete(Character *ptr);
 
+    /*
+     * Scene, Note, ScreenplayElement and Attachment have an 'id' property that never changes.
+     * Character cannot have one: its 'id' property already exists, and returns its name (see
+     * below). That value changes when the character is renamed, and it is used as a character's
+     * identity by BookmarkedNotes (which saves it in the document), by the keys of the notebook
+     * proxy models, and by the tools of LLMHub. So the identity that never changes is called
+     * 'uuid' here.
+     *
+     * Like the 'id' of the other classes, 'uuid' can be set only once. If it is not set an ID is
+     * automatically generated whenever the property value is queried for the first time.
+     */
+    // clang-format off
+    Q_PROPERTY(QString uuid
+               READ uuid
+               WRITE setUuid
+               NOTIFY uuidChanged)
+    // clang-format on
+    void setUuid(const QString &val);
+    QString uuid() const;
+    Q_SIGNAL void uuidChanged();
+
     // clang-format off
     Q_PROPERTY(Structure *structure
                READ structure
@@ -875,6 +896,7 @@ private:
     static qsizetype staticRelationshipCount(QQmlListProperty<Relationship> *list);
 
 private:
+    mutable QString m_uuid;
     QString m_age;
     QString m_name;
     QColor m_color = Qt::transparent;

@@ -38,6 +38,21 @@ public:
     ~Attachment() override;
     Q_SIGNAL void aboutToDelete(Attachment *ptr);
 
+    /*
+     * The 'id' is a special property. It can be set only once. If it is not
+     * set an ID is automatically generated whenever the property value is
+     * queried for the first time.
+     */
+    // clang-format off
+    Q_PROPERTY(QString id
+               READ id
+               WRITE setId
+               NOTIFY idChanged)
+    // clang-format on
+    void setId(const QString &val);
+    QString id() const;
+    Q_SIGNAL void idChanged();
+
     enum Type { Photo, Video, Audio, Document };
     Q_ENUM(Type)
     // clang-format off
@@ -148,6 +163,7 @@ private:
     void setRemoveFileOnDelete(bool val) { m_removeFileOnDelete = val; }
 
 private:
+    mutable QString m_id;
     QString m_name;
     QString m_title;
     QUrl m_fileSource;

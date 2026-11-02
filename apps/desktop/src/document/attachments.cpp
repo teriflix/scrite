@@ -21,6 +21,7 @@
 #include "scritedocument.h"
 #include "documentfilesystem.h"
 
+#include <QUuid>
 #include <QFileInfo>
 #include <QMimeType>
 #include <QMimeData>
@@ -81,6 +82,23 @@ Attachment::~Attachment()
         this->removeAttachedFile();
 
     emit aboutToDelete(this);
+}
+
+void Attachment::setId(const QString &val)
+{
+    if (m_id == val || !m_id.isEmpty())
+        return;
+
+    m_id = val;
+    emit idChanged();
+}
+
+QString Attachment::id() const
+{
+    if (m_id.isEmpty())
+        m_id = QUuid::createUuid().toString();
+
+    return m_id;
 }
 
 void Attachment::setFeatured(bool val)

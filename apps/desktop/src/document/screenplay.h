@@ -42,6 +42,21 @@ public:
     ~ScreenplayElement() override;
     Q_SIGNAL void aboutToDelete(ScreenplayElement *element);
 
+    /*
+     * The 'id' is a special property. It can be set only once. If it is not
+     * set an ID is automatically generated whenever the property value is
+     * queried for the first time.
+     */
+    // clang-format off
+    Q_PROPERTY(QString id
+               READ id
+               WRITE setId
+               NOTIFY idChanged)
+    // clang-format on
+    void setId(const QString &val);
+    QString id() const;
+    Q_SIGNAL void idChanged();
+
     // clang-format off
     Q_PROPERTY(int serialNumber
                READ serialNumber
@@ -395,6 +410,7 @@ private:
     int m_elementIndex = -1;
     int m_episodeIndex = -1;
     int m_sceneNumber = -1;
+    mutable QString m_id;
     QString m_sceneID;
     Notes *m_notes = nullptr;
     Attachments *m_attachments = nullptr;

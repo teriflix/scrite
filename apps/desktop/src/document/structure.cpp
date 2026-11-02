@@ -30,6 +30,7 @@
 
 #include <QDir>
 #include <QSet>
+#include <QUuid>
 #include <QtMath>
 #include <QStack>
 #include <QBuffer>
@@ -1194,6 +1195,23 @@ Character::~Character()
 {
     for (Relationship *relationship : m_relationships.constList())
         disconnect(relationship, nullptr, this, nullptr);
+}
+
+void Character::setUuid(const QString &val)
+{
+    if (m_uuid == val || !m_uuid.isEmpty())
+        return;
+
+    m_uuid = val;
+    emit uuidChanged();
+}
+
+QString Character::uuid() const
+{
+    if (m_uuid.isEmpty())
+        m_uuid = QUuid::createUuid().toString();
+
+    return m_uuid;
 }
 
 void Character::setName(const QString &val)

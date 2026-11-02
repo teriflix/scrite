@@ -23,6 +23,7 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
+#include <QUuid>
 #include <QMimeData>
 #include <QSettings>
 #include <QClipboard>
@@ -69,6 +70,23 @@ ScreenplayElement::~ScreenplayElement()
 {
     GarbageCollector::instance()->avoidChildrenOf(this);
     emit aboutToDelete(this);
+}
+
+void ScreenplayElement::setId(const QString &val)
+{
+    if (m_id == val || !m_id.isEmpty())
+        return;
+
+    m_id = val;
+    emit idChanged();
+}
+
+QString ScreenplayElement::id() const
+{
+    if (m_id.isEmpty())
+        m_id = QUuid::createUuid().toString();
+
+    return m_id;
 }
 
 void ScreenplayElement::setElementType(ScreenplayElement::ElementType val)
