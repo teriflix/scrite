@@ -1295,15 +1295,20 @@ QVariant ActionsModel::data(const QModelIndex &index, int role) const
     if (index.row() < 0 || index.row() >= m_items.size())
         return QVariant();
 
+    // Rows of destroyed action managers linger until the pending reload happens.
+    const Item &item = m_items[index.row()];
+
     switch (role) {
     case GroupNameRole:
-        return qobject_cast<ActionManager *>(m_items[index.row()].actionManager)->title();
+        return item.actionManager.isNull()
+                ? QString()
+                : qobject_cast<ActionManager *>(item.actionManager)->title();
     case ActionManagerRole:
-        return QVariant::fromValue<QObject *>(m_items[index.row()].actionManager);
+        return QVariant::fromValue<QObject *>(item.actionManager);
     case ActionRole:
-        return QVariant::fromValue<QObject *>(m_items[index.row()].action);
+        return QVariant::fromValue<QObject *>(item.action);
     case ShortcutIsEditableRole:
-        return this->isActionShortcutEditable(m_items[index.row()].action);
+        return item.action.isNull() ? false : this->isActionShortcutEditable(item.action);
     default:
         break;
     }
@@ -1359,6 +1364,8 @@ void ActionsModel::reload()
         connect(actionManager, &ActionManager::dataChanged, this,
                 &ActionsModel::onActionManagerDataChanged, Qt::UniqueConnection);
 
+        connect(actionManager, &QObject::destroyed, this, &ActionsModel::reloadLater,
+                Qt::UniqueConnection);
         connect(actionManager, &ActionManager::modelReset, this, &ActionsModel::reloadLater,
                 Qt::UniqueConnection);
         connect(actionManager, &ActionManager::rowsAboutToBeRemoved, this,
@@ -1411,38 +1418,38 @@ void ActionsModel::onActionManagerDataChanged(const QModelIndex &start, const QM
     if (actionManager == nullptr)
         return;
 
-    // Ensure that all the changed actions actually exist
+    // Find the row of each changed action in this model. If any of them is not here, then rows
+    // have been inserted, removed or moved in the action manager, and a reload is the only way
+    // to get the rows right.
+    QList<int> changedRows;
     for (int i = start.row(); i <= end.row(); i++) {
-        QObject *changedAction = start.data(ActionManager::ActionRole).value<QObject *>();
-        if (changedAction) {
-            auto it = std::find_if(m_items.begin(), m_items.end(),
-                                   [actionManager, changedAction](const Item &item) {
-                                       return item.actionManager == actionManager
-                                               && item.action == changedAction;
-                                   });
-            if (it == m_items.end()) {
-                this->reloadLater();
-                return;
-            }
+        const QModelIndex changedIndex = start.sibling(i, start.column());
+        QObject *changedAction = changedIndex.data(ActionManager::ActionRole).value<QObject *>();
+        if (changedAction == nullptr)
+            continue;
+
+        auto it = std::find_if(m_items.begin(), m_items.end(),
+                               [actionManager, changedAction](const Item &item) {
+                                   return item.actionManager == actionManager
+                                           && item.action == changedAction;
+                               });
+        if (it == m_items.end()) {
+            this->reloadLater();
+            return;
         }
+
+        changedRows.append(std::distance(m_items.begin(), it));
     }
 
-    auto it = std::find_if(m_items.begin(), m_items.end(), [actionManager](const Item &item) {
-        return item.actionManager == actionManager;
-    });
+    // Consecutive rows are announced together.
+    for (int i = 0; i < changedRows.size();) {
+        const int first = changedRows.at(i);
+        int last = first;
+        for (i++; i < changedRows.size() && changedRows.at(i) == last + 1; i++)
+            last = changedRows.at(i);
 
-    if (it == m_items.end()) {
-        /** we could have inserted actions from this action-manager at the end, but then
-         *  we would have a hard time figuring out the insert indexes based on the sort
-         *  order. Its better off to simply reload the whole thing in such a case */
-        this->reloadLater();
-        return;
+        emit dataChanged(this->index(first), this->index(last));
     }
-
-    const int offset = std::distance(m_items.begin(), it);
-    const QModelIndex start2 = this->index(start.row() + offset);
-    const QModelIndex end2 = this->index(end.row() + offset);
-    emit dataChanged(start2, end2);
 }
 
 QPair<int, int> ActionsModel::findRowRange(QObject *actionManager) const
