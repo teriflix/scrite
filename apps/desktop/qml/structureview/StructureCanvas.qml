@@ -314,6 +314,8 @@ GridBackground {
 
         readonly property TabSequenceManager tabSequence: TabSequenceManager {
             wrapAround: true
+
+            onFocusWasReleased: root.forceActiveFocus()
         }
 
         readonly property BoundingBoxEvaluator itemsBoundingBox : BoundingBoxEvaluator {

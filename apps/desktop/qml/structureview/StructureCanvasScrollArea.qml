@@ -167,7 +167,7 @@ ScrollArea {
             enabled: _canvas.editElementItem !== null
 
             onTriggered: () => {
-                             _canvas.editElementItem.focus = false
+                             _canvas.tabSequence.releaseFocus()
                          }
         }
 
