@@ -2849,6 +2849,18 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+Shift+."
+
+            enabled: ActionHandler.canHandle
+            checkable: true
+            checked: ActionHandler.active ? ActionHandler.active.checked : true
+            text: "Toggle MenuBar Visibility"
+            shortcut: defaultShortcut
+            objectName: "toggleMenubarVisibility"
+        }
+
+        Action {
+            readonly property bool visible: false
             readonly property string defaultShortcut: "Ctrl+M"
 
             text: "New Scrite Window"

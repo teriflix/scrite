@@ -68,4 +68,17 @@ MenuBar {
         onObjectAdded: (index, object) => root.insertMenu(index, object)
         onObjectRemoved: (index, object) => root.removeMenu(object)
     }
+
+    ActionHandler {
+        action: ActionHub.applicationOptions.find("toggleMenubarVisibility")
+
+        checked: root.visible
+        onToggled: () => {
+                       Qt.callLater(toggleVisibility)
+                   }
+
+        function toggleVisibility() {
+            root.visible = !root.visible
+        }
+    }
 }
