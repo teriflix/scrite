@@ -280,6 +280,11 @@ bool Attachment::removeAttachedFile()
     DocumentFileSystem *dfs = doc->fileSystem();
     const QString path = dfs->absolutePath(m_filePath);
 
+    if (this->isReadOnly()) {
+        QSignalBlocker block(this);
+        this->setReadOnly(false);
+    }
+
     if (QFile::remove(path)) {
         this->setFilePath(QString());
         return true;
