@@ -70,6 +70,19 @@ Item {
             minTextAreaSize: root.minTextAreaSize
             showHeading: false
             viewAccessory: _deleteButton
+
+            ActionHandler {
+                action: ActionHub.notebookOperations.find("report")
+
+                enabled: true
+                tooltip: "Export current form note as a PDF or ODT."
+
+                onTriggered: () => {
+                                 let generator = Scrite.document.createReportGenerator("Notebook Report")
+                                 generator.section = root.note
+                                 ReportConfigurationDialog.launch(generator)
+                             }
+            }
         }
     }
 
