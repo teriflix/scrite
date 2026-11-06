@@ -73,7 +73,7 @@ Item {
 
         Component.onCompleted: {
             root.font.family = "Verdana"
-            root.font.pointSize = Qt.binding( () => { return Runtime.idealFontMetrics.font.pointSize } )
+            root.font.pointSize = Qt.binding( () => { return Runtime.notebookFontPointSize } )
 
             if(!Runtime.richTextEditorSettings.languageNoteShown) {
                 Runtime.richTextEditorSettings.languageNoteShown = true
