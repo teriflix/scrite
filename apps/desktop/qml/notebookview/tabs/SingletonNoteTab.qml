@@ -16,6 +16,7 @@ pragma ComponentBehavior: Bound
 
 import QtQml
 import QtQuick
+import QtQuick.Layouts
 
 import Scrite.App
 
@@ -35,10 +36,29 @@ Item {
     signal deleteRequest(Note note)
 
     // The tab says which note this is, so the views have no title.
-    Loader {
+    ColumnLayout {
+        anchors.fill: parent
+        spacing: 0
+
+        Loader {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            sourceComponent: _private.viewFor(root.note)
+        }
+
+        AttachmentsView {
+            Layout.fillWidth: true
+
+            attachments: root.note ? root.note.attachments : null
+        }
+    }
+
+    AttachmentsDropArea {
         anchors.fill: parent
 
-        sourceComponent: _private.viewFor(root.note)
+        allowMultiple: true
+        target: root.note ? root.note.attachments : null
     }
 
     Component {

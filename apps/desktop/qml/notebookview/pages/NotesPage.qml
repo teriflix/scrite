@@ -52,12 +52,12 @@ AbstractNotebookPage {
     ColumnLayout {
         anchors.fill: parent
         anchors.topMargin: root.showTabs ? 11 : 0
-        anchors.leftMargin: root.showTabs ? 11 : 0
 
         TextTabBar {
             id: _tabBar
 
             Layout.fillWidth: true
+            Layout.leftMargin: root.showTabs ? 11 : 0
 
             currentTab: 0
             name: _private.notes ? _private.notes.title : "Notes"

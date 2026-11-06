@@ -51,12 +51,12 @@ AbstractNotebookPage {
     ColumnLayout {
         anchors.fill: parent
         anchors.topMargin: 11
-        anchors.leftMargin: 11
 
         TextTabBar {
             id: _tabBar
 
             Layout.fillWidth: true
+            Layout.leftMargin: 11
 
             name: "Screenplay"
             tabs: ["Title Page", "Logline", "Notes", "Stats", "Attributes"].concat(_private.singletonNotes.map(note => note.title))
