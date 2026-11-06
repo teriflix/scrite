@@ -38,6 +38,8 @@ Loader {
     sourceComponent: _private.defaultDetailComponent
 
     onLodChanged: _private.loadLodComponent()
+    onLowDetailComponentChanged: if(lod === LodLoader.LOD.Low) _private.loadLodComponent()
+    onHighDetailComponentChanged: if(lod === LodLoader.LOD.High) _private.loadLodComponent()
 
     Component {
         id: _defaultDetailComponent
