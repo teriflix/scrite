@@ -68,7 +68,7 @@ Flickable {
     TextArea {
         id: _textArea
 
-        width: root.width - (root.scrollBarRequired && root.adjustTextWidthBasedOnScrollBar ? 20 : 0)
+        width: root.width - (DelayedProperty.get && root.adjustTextWidthBasedOnScrollBar ? 20 : 0)
         height: Math.max(root.height-topPadding-bottomPadding, contentHeight+20)
 
         topPadding: 5
@@ -82,6 +82,9 @@ Flickable {
         selectByKeyboard: true
 
         font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+        DelayedProperty.set: root.scrollBarRequired
+        DelayedProperty.initial: false
 
         PlaceholderVisibility.visible: !activeFocus && text === ""
 
