@@ -28,115 +28,51 @@ import "../../controls"
 import ".."
 import "../tabs"
 
-AbstractNotebookPage {
+AbstractNotebookTabPage {
     id: root
 
-    property alias currentTab: _tabBar.currentTab
+    hostUri: "Scrite.App.Notebook.BreakSummaryPage.Tabs"
 
-    signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
-    signal deleteNoteRequest(Note note)
+    notes: _private.notes
+    tabBarName: _private.breakElement ? _private.breakElement.breakTitle : ""
+    tabsVisible: _private.breakElement !== null
+    currentTabUri: Runtime.notebookSettings.breakPageTabUri
 
-    // Selects the tab of the singleton note. Returns false if this page does not have one for it.
-    function showNote(note) {
-        const index = _private.singletonNotes.indexOf(note)
-        if(index < 0)
-            return false
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Break.Information"
+        title: "Information"
+        order: 100
 
-        _tabBar.currentTab = _tabBar.tabs.length - _private.singletonNotes.length + index
-        return true
+        BreakInformationTab {
+            breakElement: _private.breakElement
+            breakKind: _private.breakKind
+            maxTextAreaSize: root.maxTextAreaSize
+            minTextAreaSize: root.minTextAreaSize
+        }
     }
 
-    ColumnLayout {
-        anchors.fill: parent
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Break.Notes"
+        title: "Notes"
+        order: 200
 
-        visible: _private.breakElement !== null
+        NotesTab {
+            notes: _private.notes
 
-        TextTabBar {
-            id: _tabBar
-
-            Layout.topMargin: 11
-            Layout.leftMargin: 11
-            Layout.rightMargin: 11
-            Layout.fillWidth: true
-
-            name: _private.breakElement ? _private.breakElement.breakTitle : ""
-            tabs: ["Information", "Notes", "Attributes"].concat(_private.singletonNotes.map(note => note.title))
-            currentTab: Runtime.notebookSettings.breakPageTab
-            switchTabHandlerEnabled: true
-
-            onCurrentTabChanged: Runtime.notebookSettings.breakPageTab = currentTab
+            onSwitchRequest: (item) => { root.switchRequest(item) }
+            onDeleteNoteRequest: (note) => { root.deleteNoteRequest(note) }
         }
+    }
 
-        StackLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Break.Attributes"
+        title: "Attributes"
+        order: 300
 
-            clip: true
-            currentIndex: Math.min(_tabBar.currentTab, _tabBar.tabs.length - 1)
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible && _private.breakElement !== null
-
-                sourceComponent: BreakInformationTab {
-                    breakElement: _private.breakElement
-                    breakKind: _private.breakKind
-                    maxTextAreaSize: root.maxTextAreaSize
-                    minTextAreaSize: root.minTextAreaSize
-                }
-            }
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible && _private.notes !== null
-
-                sourceComponent: NotesTab {
-                    notes: _private.notes
-
-                    onSwitchRequest: (item) => { root.switchRequest(item) }
-                    onDeleteNoteRequest: (note) => { root.deleteNoteRequest(note) }
-                }
-            }
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible && _private.notes !== null
-
-                sourceComponent: AttributesTab {
-                    notes: _private.notes
-                    maxTextAreaSize: root.maxTextAreaSize
-                    minTextAreaSize: root.minTextAreaSize
-                }
-            }
-
-            Repeater {
-                model: _private.singletonNotes
-
-                delegate: Loader {
-                    id: _singletonLoader
-
-                    required property var modelData
-
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    active: visible
-
-                    sourceComponent: SingletonNoteTab {
-                        note: _singletonLoader.modelData
-                        maxTextAreaSize: root.maxTextAreaSize
-                        minTextAreaSize: root.minTextAreaSize
-
-                        onDeleteRequest: (note) => { _private.deleteSingletonNote(note) }
-                    }
-                }
-            }
+        AttributesTab {
+            notes: _private.notes
+            maxTextAreaSize: root.maxTextAreaSize
+            minTextAreaSize: root.minTextAreaSize
         }
     }
 
@@ -154,18 +90,15 @@ AbstractNotebookPage {
         font.pointSize: Runtime.notebookFontPointSize + 3
     }
 
+    onCurrentTabUriChanged: Runtime.notebookSettings.breakPageTabUri = currentTabUri
+
     QtObject {
         id: _private
 
         property ScreenplayElement breakElement: root.pageData
-        property Notes notes: breakElement ? breakElement.notes : null
-        property string breakKind: breakElement ? (breakElement.notebookItemType === NotebookModel.EpisodeBreakType ? "Episode" : "Act") : "a"
-        property var singletonNotes: notes ? notes.singletonNotes : []
 
-        function deleteSingletonNote(note) {
-            root.askDeleteConfirmation("Are you sure you want to delete this note?", () => {
-                                           Qt.callLater(() => { _private.notes.removeNote(note) })
-                                       })
-        }
+        property Notes notes: breakElement ? breakElement.notes : null
+
+        property string breakKind: breakElement ? (breakElement.notebookItemType === NotebookModel.EpisodeBreakType ? "Episode" : "Act") : "a"
     }
 }

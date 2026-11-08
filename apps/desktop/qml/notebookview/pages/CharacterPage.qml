@@ -31,127 +31,63 @@ import ".."
 import "../tabs"
 import "../menus"
 
-AbstractNotebookPage {
+AbstractNotebookTabPage {
     id: root
 
-    property alias currentTab: _tabBar.currentTab
+    hostUri: "Scrite.App.Notebook.CharacterPage.Tabs"
 
-    signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
-    signal deleteNoteRequest(Note note)
-
-    // Selects the tab of the singleton note. Returns false if this page does not have one for it.
-    function showNote(note) {
-        const index = _private.singletonNotes.indexOf(note)
-        if(index < 0)
-            return false
-
-        _tabBar.currentTab = _tabBar.tabs.length - _private.singletonNotes.length + index
-        return true
-    }
+    notes: _private.notes
+    tabBarName: _private.character.name
+    currentTabUri: Runtime.notebookSettings.characterPageTabUri
 
     backgroundColor: Runtime.colors.tintTx(_private.character.color, Runtime.colors.sceneHeadingTint)
 
-    ColumnLayout {
-        anchors.fill: parent
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Character.Information"
+        title: "Information"
+        order: 100
 
-        TextTabBar {
-            id: _tabBar
-
-            Layout.topMargin: 11
-            Layout.leftMargin: 11
-            Layout.rightMargin: 11
-            Layout.fillWidth: true
-
-            name: _private.character.name
-            tabs: ["Information", "Relationships", "Notes", "Attributes"].concat(_private.singletonNotes.map(note => note.title))
-            currentTab: Runtime.notebookSettings.characterPageTab
-            switchTabHandlerEnabled: true
-
-            onCurrentTabChanged: Runtime.notebookSettings.characterPageTab = currentTab
+        CharacterInformationTab {
+            character: _private.character
+            maxTextAreaSize: root.maxTextAreaSize
+            minTextAreaSize: root.minTextAreaSize
         }
+    }
 
-        StackLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Character.Relationships"
+        title: "Relationships"
+        order: 200
 
-            clip: true
-            currentIndex: Math.min(_tabBar.currentTab, _tabBar.tabs.length - 1)
+        CharacterRelationshipsTab {
+            character: _private.character
 
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+            onSwitchRequest: (item) => { root.switchRequest(item) }
+        }
+    }
 
-                active: visible
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Character.Notes"
+        title: "Notes"
+        order: 300
 
-                sourceComponent: CharacterInformationTab {
-                    character: _private.character
-                    maxTextAreaSize: root.maxTextAreaSize
-                    minTextAreaSize: root.minTextAreaSize
-                }
-            }
+        NotesTab {
+            notes: _private.notes
 
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+            onSwitchRequest: (item) => { root.switchRequest(item) }
+            onDeleteNoteRequest: (note) => { root.deleteNoteRequest(note) }
+        }
+    }
 
-                active: visible
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Character.Attributes"
+        title: "Attributes"
+        order: 400
 
-                sourceComponent: CharacterRelationshipsTab {
-                    character: _private.character
-
-                    onSwitchRequest: (item) => { root.switchRequest(item) }
-                }
-            }
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible
-
-                sourceComponent: NotesTab {
-                    notes: _private.notes
-
-                    onSwitchRequest: (item) => { root.switchRequest(item) }
-                    onDeleteNoteRequest: (note) => { root.deleteNoteRequest(note) }
-                }
-            }
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible
-
-                sourceComponent: AttributesTab {
-                    notes: _private.notes
-                    maxTextAreaSize: root.maxTextAreaSize
-                    minTextAreaSize: root.minTextAreaSize
-                }
-            }
-
-            Repeater {
-                model: _private.singletonNotes
-
-                delegate: Loader {
-                    id: _singletonLoader
-
-                    required property var modelData
-
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    active: visible
-
-                    sourceComponent: SingletonNoteTab {
-                        note: _singletonLoader.modelData
-                        maxTextAreaSize: root.maxTextAreaSize
-                        minTextAreaSize: root.minTextAreaSize
-
-                        onDeleteRequest: (note) => { _private.deleteSingletonNote(note) }
-                    }
-                }
-            }
+        AttributesTab {
+            notes: _private.notes
+            maxTextAreaSize: root.maxTextAreaSize
+            minTextAreaSize: root.minTextAreaSize
         }
     }
 
@@ -219,18 +155,14 @@ AbstractNotebookPage {
                      }
     }
 
+    onCurrentTabUriChanged: Runtime.notebookSettings.characterPageTabUri = currentTabUri
+
     QtObject {
         id: _private
 
         property Notes notes: character ? character.notes : null
-        property Character character: root.pageData ? root.pageData.notebookItemObject.character : null
-        property var singletonNotes: notes ? notes.singletonNotes : []
 
-        function deleteSingletonNote(note) {
-            root.askDeleteConfirmation("Are you sure you want to delete this note?", () => {
-                                           Qt.callLater(() => { _private.notes.removeNote(note) })
-                                       })
-        }
+        property Character character: root.pageData ? root.pageData.notebookItemObject.character : null
 
         readonly property Component newNoteMenu: NewNoteMenu {
             notes: _private.notes

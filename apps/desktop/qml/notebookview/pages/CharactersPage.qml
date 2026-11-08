@@ -29,60 +29,36 @@ import "../../controls"
 import ".."
 import "../tabs"
 
-AbstractNotebookPage {
+AbstractNotebookTabPage {
     id: root
 
-    property alias currentTab: _tabBar.currentTab
-
-    signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
     signal deleteCharacterRequest(Character character)
 
-    ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: 11
+    hostUri: "Scrite.App.Notebook.CharactersPage.Tabs"
+    tabBarName: "Characters"
+    contentMargin: 11
+    currentTabUri: Runtime.notebookSettings.charactersPageTabUri
 
-        TextTabBar {
-            id: _tabBar
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Characters.List"
+        title: "List"
+        order: 100
 
-            Layout.fillWidth: true
-
-            name: "Characters"
-            tabs: ["List", "Relationships"]
-            currentTab: Runtime.notebookSettings.charactersPageTab
-            switchTabHandlerEnabled: true
-
-            onCurrentTabChanged: Runtime.notebookSettings.charactersPageTab = currentTab
-        }
-
-        StackLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            clip: true
-            currentIndex: _tabBar.currentTab
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible
-
-                sourceComponent: AllCharactersTab {
-                    onSwitchRequest: (item) => { root.switchRequest(item) }
-                    onDeleteCharacterRequest: (character) => { root.deleteCharacterRequest(character) }
-                }
-            }
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible
-
-                sourceComponent: AllCharactersRelationshipsTab {
-                    onSwitchRequest: (item) => { root.switchRequest(item) }
-                }
-            }
+        AllCharactersTab {
+            onSwitchRequest: (item) => { root.switchRequest(item) }
+            onDeleteCharacterRequest: (character) => { root.deleteCharacterRequest(character) }
         }
     }
+
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Characters.Relationships"
+        title: "Relationships"
+        order: 200
+
+        AllCharactersRelationshipsTab {
+            onSwitchRequest: (item) => { root.switchRequest(item) }
+        }
+    }
+
+    onCurrentTabUriChanged: Runtime.notebookSettings.charactersPageTabUri = currentTabUri
 }

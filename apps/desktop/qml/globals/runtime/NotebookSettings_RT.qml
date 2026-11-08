@@ -18,6 +18,7 @@ import QtCore
 import Scrite.App
 
 Settings {
+    // The five *PageTab settings are not used anymore, but older versions of Scrite look for them
     property int characterPageTab: 0
     property int breakPageTab: 0
     property int charactersPageTab: 0
@@ -34,6 +35,13 @@ Settings {
 
     // The category that the Attributes tab selects, for the notes that have it
     property string attributesCategory: ""
+
+    // The uri of the current tab of the pages, which is empty for the first tab
+    property string characterPageTabUri: ""
+    property string breakPageTabUri: ""
+    property string charactersPageTabUri: ""
+    property string screenplayPageTabUri: ""
+    property string sceneNotesPageTabUri: ""
 
     location: Platform.settingsLocation
     category: "Notebook"

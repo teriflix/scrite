@@ -544,11 +544,19 @@ Item {
             Runtime.resetMainWindowUi( () => {
                                           Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
                                       })
-            Runtime.notebookSettings.characterPageTab = 0
+
             Runtime.notebookSettings.breakPageTab = 0
+            Runtime.notebookSettings.characterPageTab = 0
             Runtime.notebookSettings.charactersPageTab = 0
             Runtime.notebookSettings.screenplayPageTab = 0
             Runtime.notebookSettings.sceneNotesPageTab = 0
+
+            Runtime.notebookSettings.breakPageTabUri = ""
+            Runtime.notebookSettings.characterPageTabUri = ""
+            Runtime.notebookSettings.charactersPageTabUri = ""
+            Runtime.notebookSettings.screenplayPageTabUri = ""
+            Runtime.notebookSettings.sceneNotesPageTabUri = ""
+
             Runtime.notebookSettings.sceneSynopsisTabIndex = 0
             Runtime.screenplayEditorSettings.sceneSidePanelOpen = false
             Scrite.document.displayFormat.activeLanguageCode = Runtime.language.activeCode

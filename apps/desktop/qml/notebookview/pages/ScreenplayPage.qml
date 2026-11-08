@@ -30,131 +30,67 @@ import "../../controls"
 import ".."
 import "../tabs"
 
-AbstractNotebookPage {
+AbstractNotebookTabPage {
     id: root
 
-    property alias currentTab: _tabBar.currentTab
+    hostUri: "Scrite.App.Notebook.ScreenplayPage.Tabs"
 
-    signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
-    signal deleteNoteRequest(Note note)
+    notes: _private.structure.notes
+    tabBarName: "Screenplay"
+    currentTabUri: Runtime.notebookSettings.screenplayPageTabUri
 
-    // Selects the tab of the singleton note. Returns false if this page does not have one for it.
-    function showNote(note) {
-        const index = _private.singletonNotes.indexOf(note)
-        if(index < 0)
-            return false
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Screenplay.TitlePage"
+        title: "Title Page"
+        order: 100
 
-        _tabBar.currentTab = _tabBar.tabs.length - _private.singletonNotes.length + index
-        return true
+        ScreenplayTitlePageTab {
+            maxTextAreaSize: root.maxTextAreaSize
+            minTextAreaSize: root.minTextAreaSize
+        }
     }
 
-    ColumnLayout {
-        anchors.fill: parent
-        anchors.topMargin: 11
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Screenplay.Logline"
+        title: "Logline"
+        order: 200
 
-        TextTabBar {
-            id: _tabBar
-
-            Layout.fillWidth: true
-            Layout.leftMargin: 11
-
-            name: "Screenplay"
-            tabs: ["Title Page", "Logline", "Notes", "Stats", "Attributes"].concat(_private.singletonNotes.map(note => note.title))
-            currentTab: Runtime.notebookSettings.screenplayPageTab
-            switchTabHandlerEnabled: true
-
-            onCurrentTabChanged: Runtime.notebookSettings.screenplayPageTab = currentTab
+        ScreenplayLoglineTab {
+            maxTextAreaSize: root.maxTextAreaSize
+            minTextAreaSize: root.minTextAreaSize
         }
+    }
 
-        StackLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Screenplay.Notes"
+        title: "Notes"
+        order: 300
 
-            clip: true
-            currentIndex: Math.min(_tabBar.currentTab, _tabBar.tabs.length - 1)
+        NotesTab {
+            notes: _private.structure.notes
 
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+            onSwitchRequest: (item) => { root.switchRequest(item) }
+            onDeleteNoteRequest: (note) => { root.deleteNoteRequest(note) }
+        }
+    }
 
-                active: visible
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Screenplay.Stats"
+        title: "Stats"
+        order: 400
 
-                sourceComponent: ScreenplayTitlePageTab {
-                    maxTextAreaSize: root.maxTextAreaSize
-                    minTextAreaSize: root.minTextAreaSize
-                }
-            }
+        ScreenplayStatsTab { }
+    }
 
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Screenplay.Attributes"
+        title: "Attributes"
+        order: 500
 
-                active: visible
-
-                sourceComponent: ScreenplayLoglineTab {
-                    maxTextAreaSize: root.maxTextAreaSize
-                    minTextAreaSize: root.minTextAreaSize
-                }
-            }
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible
-
-                sourceComponent: NotesTab {
-                    notes: _private.structure.notes
-
-                    onSwitchRequest: (item) => { root.switchRequest(item) }
-                    onDeleteNoteRequest: (note) => { root.deleteNoteRequest(note) }
-                }
-            }
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible
-
-                sourceComponent: ScreenplayStatsTab { }
-            }
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible
-
-                sourceComponent: AttributesTab {
-                    notes: _private.structure.notes
-                    maxTextAreaSize: root.maxTextAreaSize
-                    minTextAreaSize: root.minTextAreaSize
-                }
-            }
-
-            Repeater {
-                model: _private.singletonNotes
-
-                delegate: Loader {
-                    id: _singletonLoader
-
-                    required property var modelData
-
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    active: visible
-
-                    sourceComponent: SingletonNoteTab {
-                        note: _singletonLoader.modelData
-                        maxTextAreaSize: root.maxTextAreaSize
-                        minTextAreaSize: root.minTextAreaSize
-
-                        onDeleteRequest: (note) => { _private.deleteSingletonNote(note) }
-                    }
-                }
-            }
+        AttributesTab {
+            notes: _private.structure.notes
+            maxTextAreaSize: root.maxTextAreaSize
+            minTextAreaSize: root.minTextAreaSize
         }
     }
 
@@ -171,17 +107,13 @@ AbstractNotebookPage {
                      }
     }
 
+    onCurrentTabUriChanged: Runtime.notebookSettings.screenplayPageTabUri = currentTabUri
+
     QtObject {
         id: _private
 
         property Structure structure: Scrite.document.structure
-        property Screenplay screenplay: Scrite.document.screenplay
-        property var singletonNotes: structure.notes.singletonNotes
 
-        function deleteSingletonNote(note) {
-            root.askDeleteConfirmation("Are you sure you want to delete this note?", () => {
-                                           Qt.callLater(() => { _private.structure.notes.removeNote(note) })
-                                       })
-        }
+        property Screenplay screenplay: Scrite.document.screenplay
     }
 }

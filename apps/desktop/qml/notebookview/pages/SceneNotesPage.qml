@@ -31,141 +31,75 @@ import ".."
 import "../tabs"
 import "../menus"
 
-AbstractNotebookPage {
+AbstractNotebookTabPage {
     id: root
 
-    property alias currentTab: _tabBar.currentTab
+    hostUri: "Scrite.App.Notebook.SceneNotesPage.Tabs"
 
-    signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
-    signal deleteNoteRequest(Note note)
-
-    // Selects the tab of the singleton note. Returns false if this page does not have one for it.
-    function showNote(note) {
-        const index = _private.singletonNotes.indexOf(note)
-        if(index < 0)
-            return false
-
-        _tabBar.currentTab = _tabBar.tabs.length - _private.singletonNotes.length + index
-        return true
-    }
+    notes: _private.notes
+    tabBarName: root.pageData ? root.pageData.notebookItemTitle.substr(0, root.pageData.notebookItemTitle.indexOf(']')+1) : "Scene"
+    currentTabUri: Runtime.notebookSettings.sceneNotesPageTabUri
 
     backgroundColor: Runtime.colors.tintTx(_private.scene.color, Runtime.colors.currentNoteTint)
 
-    ColumnLayout {
-        anchors.fill: parent
-        anchors.topMargin: 11
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Scene.Synopsis"
+        title: "Synopsis"
+        order: 100
 
-        TextTabBar {
-            id: _tabBar
-
-            Layout.fillWidth: true
-            Layout.leftMargin: 11
-
-            name: root.pageData ? root.pageData.notebookItemTitle.substr(0, root.pageData.notebookItemTitle.indexOf(']')+1) : "Scene"
-            tabs: ["Synopsis", "Relationships", "Notes", "Comments", "Attributes"].concat(_private.singletonNotes.map(note => note.title))
-            currentTab: Runtime.notebookSettings.sceneNotesPageTab
-            switchTabHandlerEnabled: true
-
-            onCurrentTabChanged: Runtime.notebookSettings.sceneNotesPageTab = currentTab
+        SceneSynopsisTab {
+            scene: _private.scene
+            maxTextAreaSize: root.maxTextAreaSize
+            minTextAreaSize: root.minTextAreaSize
         }
+    }
 
-        StackLayout {
-            id: _contentArea
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Scene.Relationships"
+        title: "Relationships"
+        order: 200
 
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+        SceneCharacterRelationshipsTab {
+            scene: _private.scene
 
-            clip: true
-            currentIndex: Math.min(_tabBar.currentTab, _tabBar.tabs.length - 1)
+            onSwitchRequest: (item) => { root.switchRequest(item) }
+        }
+    }
 
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Scene.Notes"
+        title: "Notes"
+        order: 300
 
-                active: visible
+        NotesTab {
+            notes: _private.notes
 
-                sourceComponent: SceneSynopsisTab {
-                    scene: _private.scene
-                    maxTextAreaSize: root.maxTextAreaSize
-                    minTextAreaSize: root.minTextAreaSize
-                }
-            }
+            onSwitchRequest: (item) => { root.switchRequest(item) }
+            onDeleteNoteRequest: (note) => { root.deleteNoteRequest(note) }
+        }
+    }
 
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Scene.Comments"
+        title: "Comments"
+        order: 400
 
-                active: visible
+        SceneCommentsTab {
+            scene: _private.scene
+            maxTextAreaSize: root.maxTextAreaSize
+            minTextAreaSize: root.minTextAreaSize
+        }
+    }
 
-                sourceComponent: SceneCharacterRelationshipsTab {
-                    scene: _private.scene
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.Scene.Attributes"
+        title: "Attributes"
+        order: 500
 
-                    onSwitchRequest: (item) => { root.switchRequest(item) }
-                }
-            }
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible
-
-                sourceComponent: NotesTab {
-                    notes: _private.notes
-
-                    onSwitchRequest: (item) => { root.switchRequest(item) }
-                    onDeleteNoteRequest: (note) => { root.deleteNoteRequest(note) }
-                }
-            }
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible
-
-                sourceComponent: SceneCommentsTab {
-                    scene: _private.scene
-                    maxTextAreaSize: root.maxTextAreaSize
-                    minTextAreaSize: root.minTextAreaSize
-                }
-            }
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible
-
-                sourceComponent: AttributesTab {
-                    notes: _private.notes
-                    maxTextAreaSize: root.maxTextAreaSize
-                    minTextAreaSize: root.minTextAreaSize
-                }
-            }
-
-            Repeater {
-                model: _private.singletonNotes
-
-                delegate: Loader {
-                    id: _singletonLoader
-
-                    required property var modelData
-
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    active: visible
-
-                    sourceComponent: SingletonNoteTab {
-                        note: _singletonLoader.modelData
-                        maxTextAreaSize: root.maxTextAreaSize
-                        minTextAreaSize: root.minTextAreaSize
-
-                        onDeleteRequest: (note) => { _private.deleteSingletonNote(note) }
-                    }
-                }
-            }
+        AttributesTab {
+            notes: _private.notes
+            maxTextAreaSize: root.maxTextAreaSize
+            minTextAreaSize: root.minTextAreaSize
         }
     }
 
@@ -213,18 +147,14 @@ AbstractNotebookPage {
                      }
     }
 
+    onCurrentTabUriChanged: Runtime.notebookSettings.sceneNotesPageTabUri = currentTabUri
+
     QtObject {
         id: _private
 
         property Notes notes: root.pageData ? root.pageData.notebookItemObject : null
-        property Scene scene: notes ? notes.scene : null
-        property var singletonNotes: notes ? notes.singletonNotes : []
 
-        function deleteSingletonNote(note) {
-            root.askDeleteConfirmation("Are you sure you want to delete this note?", () => {
-                                           Qt.callLater(() => { _private.notes.removeNote(note) })
-                                       })
-        }
+        property Scene scene: notes ? notes.scene : null
 
         readonly property Component newNoteMenu: NewNoteMenu {
             notes: _private.notes
