@@ -29,7 +29,7 @@ import "../tabs"
   Extensions add theirs with a FeatureProvider whose hostUri is the hostUri of the page. All tabs,
   including the singleton notes of the notes of the page, are sorted by their order.
 
-  The hostUri of a page is "Scrite.App.Notebook.<Page>.Tabs", and is unique to it.
+  The hostUri of a page is "Scrite.App.Notebook.<Page>", and is unique to it.
   */
 AbstractNotebookPage {
     id: root
@@ -54,6 +54,9 @@ AbstractNotebookPage {
 
     // The notes whose singleton notes get a tab each.
     property Notes notes
+
+    // The object that owns the notes, like a Character, Scene, Structure or the break of a screenplay.
+    readonly property QtObject owner: notes ? notes.owner : null
 
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
     signal deleteNoteRequest(Note note)

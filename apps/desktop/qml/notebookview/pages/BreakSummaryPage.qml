@@ -31,15 +31,17 @@ import "../tabs"
 AbstractNotebookTabPage {
     id: root
 
-    hostUri: "Scrite.App.Notebook.BreakSummaryPage.Tabs"
+    hostUri: "Scrite.App.Notebook.BreakSummaryPage"
 
     notes: _private.notes
+
+    readonly property ScreenplayElement breakElement: owner as ScreenplayElement
     tabBarName: _private.breakElement ? _private.breakElement.breakTitle : ""
     tabsVisible: _private.breakElement !== null
     currentTabUri: Runtime.notebookSettings.breakPageTabUri
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Break.Information"
+        uri: "Scrite.NotebookTab.BreakSummaryPage.InformationTab"
         title: "Information"
         order: 100
 
@@ -52,7 +54,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Break.Notes"
+        uri: "Scrite.NotebookTab.BreakSummaryPage.NotesTab"
         title: "Notes"
         order: 200
 
@@ -65,7 +67,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Break.Attributes"
+        uri: "Scrite.NotebookTab.BreakSummaryPage.AttributesTab"
         title: "Attributes"
         order: 300
 

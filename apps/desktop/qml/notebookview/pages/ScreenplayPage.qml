@@ -33,14 +33,16 @@ import "../tabs"
 AbstractNotebookTabPage {
     id: root
 
-    hostUri: "Scrite.App.Notebook.ScreenplayPage.Tabs"
+    hostUri: "Scrite.App.Notebook.ScreenplayPage"
 
     notes: _private.structure.notes
+
+    readonly property Structure structure: owner as Structure
     tabBarName: "Screenplay"
     currentTabUri: Runtime.notebookSettings.screenplayPageTabUri
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Screenplay.TitlePage"
+        uri: "Scrite.NotebookTab.ScreenplayPage.TitlePageTab"
         title: "Title Page"
         order: 100
 
@@ -51,7 +53,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Screenplay.Logline"
+        uri: "Scrite.NotebookTab.ScreenplayPage.LoglineTab"
         title: "Logline"
         order: 200
 
@@ -62,7 +64,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Screenplay.Notes"
+        uri: "Scrite.NotebookTab.ScreenplayPage.NotesTab"
         title: "Notes"
         order: 300
 
@@ -75,7 +77,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Screenplay.Stats"
+        uri: "Scrite.NotebookTab.ScreenplayPage.StatsTab"
         title: "Stats"
         order: 400
 
@@ -83,7 +85,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Screenplay.Attributes"
+        uri: "Scrite.NotebookTab.ScreenplayPage.AttributesTab"
         title: "Attributes"
         order: 500
 

@@ -23,7 +23,7 @@ import QtQml
   The content of the tab is the one item declared inside it, which is made when the tab is shown for
   the first time, and not before.
   */
-QtObject {
+QtObject { 
     // Tabs are sorted by order, left to right. Scrite spaces its own tabs 100 apart, so that tabs
     // offered by extensions can go in between.
     property int order: 0
@@ -31,7 +31,7 @@ QtObject {
     property bool visible: true
 
     // The name of this tab among the tabs of its page. Stable, because it is what the page remembers
-    // as its current tab. Use the form "<Scrite|Extension>.NotebookTab.<Page>.<Name>".
+    // as its current tab. Use the form "<Scrite|Extension>.NotebookTab.<Page>.<Name>Tab".
     property string uri
     property string title
 

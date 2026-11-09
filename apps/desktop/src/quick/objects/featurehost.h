@@ -50,6 +50,16 @@ public:
     // clang-format on
     QQuickItem *item() const { return m_item; }
 
+    // clang-format off
+    Q_PROPERTY(QObject* context
+               READ context
+               WRITE setContext
+               NOTIFY contextChanged)
+    // clang-format on
+    void setContext(QObject *val);
+    QObject *context() const;
+    Q_SIGNAL void contextChanged();
+
     // QQmlParserStatus interface
     void classBegin() override;
     void componentComplete() override;
@@ -64,10 +74,12 @@ public:
 
 private:
     static int resolveProviderHosts(FeatureHost *host);
+    void onContextDestroyed(QObject *object);
 
 private:
     friend class FeatureProvider;
     QString m_uri;
+    QObject *m_context = nullptr;
     QQuickItem *m_item = nullptr;
     bool m_componentComplete = true;
 };

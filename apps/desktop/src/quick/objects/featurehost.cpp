@@ -15,6 +15,7 @@
 
 #include "featurehost.h"
 #include <QQmlEngine>
+#include <QQmlContext>
 
 Q_GLOBAL_STATIC(QList<FeatureHost *>, FeatureHosts)
 Q_GLOBAL_STATIC(QList<FeatureProvider *>, FeatureProviders)
@@ -55,9 +56,35 @@ void FeatureHost::setUri(const QString &val)
     resolveProviderHosts(this);
 }
 
+// Unless explicitly set, the context is the item that the host is attached to or declared in.
+QObject *FeatureHost::context() const
+{
+    return m_context ? m_context : m_item;
+}
+
+void FeatureHost::setContext(QObject *val)
+{
+    if(m_context == val)
+        return;
+
+    if(m_context)
+        disconnect(m_context, &QObject::destroyed, this, &FeatureHost::onContextDestroyed);
+
+    m_context = val;
+
+    if(m_context)
+        connect(m_context, &QObject::destroyed, this, &FeatureHost::onContextDestroyed);
+
+    emit contextChanged();
+}
+
 void FeatureHost::classBegin()
 {
     m_componentComplete = false;
+
+    // When declared as an element, the parent is set by QML after construction.
+    if (m_item == nullptr)
+        m_item = qobject_cast<QQuickItem *>(parent());
 }
 
 void FeatureHost::componentComplete()
@@ -94,6 +121,14 @@ int FeatureHost::resolveProviderHosts(FeatureHost *host)
     }
 
     return count;
+}
+
+void FeatureHost::onContextDestroyed(QObject *object)
+{
+    if(m_context == object) {
+        m_context = nullptr;
+        emit contextChanged();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -200,7 +235,17 @@ void FeatureProvider::provideFeature()
         if (context == nullptr)
             context = QQmlEngine::contextForObject(this);
 
-        m_feature = m_delegate->create(context);
+        // The host is offered to the delegate as an initial property named "host", so
+        // delegates can declare "required property FeatureHost host". Delegates that
+        // don't declare it are created as usual, but cannot refer to the host.
+        m_feature = m_delegate->beginCreate(context);
+        if (m_feature != nullptr) {
+            if (m_feature->metaObject()->indexOfProperty("host") >= 0)
+                m_delegate->setInitialProperties(
+                        m_feature, { { QStringLiteral("host"), QVariant::fromValue(m_host) } });
+            m_delegate->completeCreate();
+        }
+
         if (m_feature != nullptr) {
             QQuickItem *qmlItem = qobject_cast<QQuickItem *>(m_feature);
             if (qmlItem) {

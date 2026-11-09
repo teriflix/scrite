@@ -39,7 +39,7 @@ Item {
         id: _switchTabActionHandler
 
         property int nextIndex: (root.currentTab+1)%_tabsRepeater.count
-        property string text: "Switch to <b>" + _tabsRepeater.itemAt(nextIndex).text + "</b> tab in <i>" + root.name + "</i>"
+        property string text: "Switch to <b>" + (_tabsRepeater.itemAt(nextIndex)?.text ?? "") + "</b> tab in <i>" + root.name + "</i>"
 
         enabled: false
         action: ActionHub.applicationOptions.find("tabRight")
@@ -48,7 +48,7 @@ Item {
 
     ActionHandler {
         property int previousIndex: (root.currentTab-1) < 0 ? _tabsRepeater.count-1 : root.currentTab-1
-        property string text: "Switch to <b>" + _tabsRepeater.itemAt(previousIndex).text + "</b> tab in <i>" + root.name + "</i>"
+        property string text: "Switch to <b>" + (_tabsRepeater.itemAt(previousIndex)?.text ?? "") + "</b> tab in <i>" + root.name + "</i>"
 
         enabled: _switchTabActionHandler.enabled
         action: ActionHub.applicationOptions.find("tabLeft")

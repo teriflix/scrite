@@ -34,16 +34,18 @@ import "../menus"
 AbstractNotebookTabPage {
     id: root
 
-    hostUri: "Scrite.App.Notebook.SceneNotesPage.Tabs"
+    hostUri: "Scrite.App.Notebook.SceneNotesPage"
 
     notes: _private.notes
+
+    readonly property Scene scene: owner as Scene
     tabBarName: root.pageData ? root.pageData.notebookItemTitle.substr(0, root.pageData.notebookItemTitle.indexOf(']')+1) : "Scene"
     currentTabUri: Runtime.notebookSettings.sceneNotesPageTabUri
 
     backgroundColor: Runtime.colors.tintTx(_private.scene.color, Runtime.colors.currentNoteTint)
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Scene.Synopsis"
+        uri: "Scrite.NotebookTab.SceneNotesPage.SynopsisTab"
         title: "Synopsis"
         order: 100
 
@@ -55,7 +57,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Scene.Relationships"
+        uri: "Scrite.NotebookTab.SceneNotesPage.RelationshipsTab"
         title: "Relationships"
         order: 200
 
@@ -67,7 +69,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Scene.Notes"
+        uri: "Scrite.NotebookTab.SceneNotesPage.NotesTab"
         title: "Notes"
         order: 300
 
@@ -80,7 +82,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Scene.Comments"
+        uri: "Scrite.NotebookTab.SceneNotesPage.CommentsTab"
         title: "Comments"
         order: 400
 
@@ -92,7 +94,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Scene.Attributes"
+        uri: "Scrite.NotebookTab.SceneNotesPage.AttributesTab"
         title: "Attributes"
         order: 500
 

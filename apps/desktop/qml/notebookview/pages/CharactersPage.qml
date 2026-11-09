@@ -34,13 +34,13 @@ AbstractNotebookTabPage {
 
     signal deleteCharacterRequest(Character character)
 
-    hostUri: "Scrite.App.Notebook.CharactersPage.Tabs"
+    hostUri: "Scrite.App.Notebook.CharactersPage"
     tabBarName: "Characters"
     contentMargin: 11
     currentTabUri: Runtime.notebookSettings.charactersPageTabUri
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Characters.List"
+        uri: "Scrite.NotebookTab.CharactersPage.ListTab"
         title: "List"
         order: 100
 
@@ -51,7 +51,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Characters.Relationships"
+        uri: "Scrite.NotebookTab.CharactersPage.RelationshipsTab"
         title: "Relationships"
         order: 200
 

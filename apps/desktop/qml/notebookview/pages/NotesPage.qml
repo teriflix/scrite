@@ -32,14 +32,14 @@ import "../tabs"
 AbstractNotebookTabPage {
     id: root
 
-    hostUri: "Scrite.App.Notebook.NotesPage.Tabs"
+    hostUri: "Scrite.App.Notebook.NotesPage"
     showTabs: false
 
     notes: root.pageData ? root.pageData.notebookItemObject : null
     tabBarName: notes ? notes.title : "Notes"
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Notes.Notes"
+        uri: "Scrite.NotebookTab.NotesPage.NotesTab"
         title: "Notes"
         order: 100
 
@@ -52,7 +52,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Notes.Attributes"
+        uri: "Scrite.NotebookTab.NotesPage.AttributesTab"
         title: "Attributes"
         order: 200
 

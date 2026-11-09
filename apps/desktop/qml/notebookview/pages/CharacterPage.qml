@@ -34,16 +34,18 @@ import "../menus"
 AbstractNotebookTabPage {
     id: root
 
-    hostUri: "Scrite.App.Notebook.CharacterPage.Tabs"
+    hostUri: "Scrite.App.Notebook.CharacterPage"
 
     notes: _private.notes
+
+    readonly property Character character: owner as Character
     tabBarName: _private.character.name
     currentTabUri: Runtime.notebookSettings.characterPageTabUri
 
     backgroundColor: Runtime.colors.tintTx(_private.character.color, Runtime.colors.sceneHeadingTint)
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Character.Information"
+        uri: "Scrite.NotebookTab.CharacterPage.InformationTab"
         title: "Information"
         order: 100
 
@@ -55,7 +57,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Character.Relationships"
+        uri: "Scrite.NotebookTab.CharacterPage.RelationshipsTab"
         title: "Relationships"
         order: 200
 
@@ -67,7 +69,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Character.Notes"
+        uri: "Scrite.NotebookTab.CharacterPage.NotesTab"
         title: "Notes"
         order: 300
 
@@ -80,7 +82,7 @@ AbstractNotebookTabPage {
     }
 
     NotebookPageTab {
-        uri: "Scrite.NotebookTab.Character.Attributes"
+        uri: "Scrite.NotebookTab.CharacterPage.AttributesTab"
         title: "Attributes"
         order: 400
 
