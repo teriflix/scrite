@@ -48,7 +48,7 @@ Item {
 
     readonly property url userGuidesUrl: "https://www.scrite.io/docs/userguide/"
 
-    readonly property int fileDialogOptions: Platform.isLinuxDesktop ? FileDialog.DontUseNativeDialog : 0
+    readonly property int fileDialogOptions: workspaceSettings.useNativeFileDialog ? 0 : FileDialog.DontUseNativeDialog
 
     property int mainWindowTab: Runtime.MainWindowTab.ScreenplayTab
     property int placeholderInterval: bounded(50, Runtime.screenplayEditorSettings.placeholderInterval, 1000)

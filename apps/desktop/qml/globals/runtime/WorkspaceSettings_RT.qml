@@ -33,6 +33,7 @@ Settings {
     property bool showNotebookInStructure: true
     property bool showScritedTab: false
     property bool syncCurrentSceneOnNotebook: true
+    property bool useNativeFileDialog: true
 
     property real flickScrollSpeedFactor: 1.0
     property real screenplayEditorWidth: -1
