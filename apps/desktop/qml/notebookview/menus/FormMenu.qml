@@ -62,9 +62,19 @@ SctMenu {
     SortFilterObjectListModel {
         id: _model
 
+        function formFilterFunction(form) {
+            if(form.singleton)
+                return false
+            const types = filterValues
+            return types.length === 0 || types.indexOf(form.type) >= 0
+        }
+
         filterByProperty: "type"
         filterValues: root.notes ? [root.notes.compatibleFormType] : []
+        filterFunction: formFilterFunction
         sortByProperty: "title"
         sourceModel: Scrite.globalForms
+
+        onFilterValuesChanged: invalidate()
     }
 }
