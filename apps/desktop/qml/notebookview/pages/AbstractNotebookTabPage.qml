@@ -155,7 +155,7 @@ AbstractNotebookPage {
         }
 
         onObjectAdded: _private.collectSingletonTabs()
-        onObjectRemoved: _private.collectSingletonTabs()
+        onObjectRemoved: (index, object) => { _private.collectSingletonTabs(object) }
     }
 
     Component.onCompleted: {
@@ -214,10 +214,14 @@ AbstractNotebookPage {
             builtinTabs = list
         }
 
-        function collectSingletonTabs() {
+        // The Instantiator still lists an object while it announces that it is being removed.
+        function collectSingletonTabs(removed) {
             const list = []
-            for(let i = 0; i < _singletonTabs.count; i++)
-                list.push(_singletonTabs.objectAt(i))
+            for(let i = 0; i < _singletonTabs.count; i++) {
+                const tab = _singletonTabs.objectAt(i)
+                if(tab && tab !== removed)
+                    list.push(tab)
+            }
             singletonTabs = list
         }
 
