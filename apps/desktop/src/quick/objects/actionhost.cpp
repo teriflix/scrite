@@ -44,7 +44,32 @@ public:
             return;
 
         ::ActionGroups->removeOne(group);
-        resolve(group->kind(), group->hostUri());
+
+        // The group is being destroyed, possibly along with the QML items that show it. So we must
+        // neither reset any host model (which makes views create delegates that touch half-destroyed
+        // objects) nor resolve synchronously. We only drop dangling pointers here, using row removals
+        // (views only delete delegates for those), and leave the rest to a deferred resolve.
+        for (AbstractActionGroup *other : std::as_const(*::ActionGroups)) {
+            if (other->m_mergeParent == group)
+                other->m_mergeParent = nullptr;
+            other->m_merged.removeAll(group);
+        }
+
+        if (!::ActionHosts.isDestroyed()) {
+            const QList<AbstractActionHost *> hosts = hostsOf(group->kind(), group->hostUri());
+            for (AbstractActionHost *host : hosts) {
+                const int row = host->m_groups.indexOf(group);
+                if (row < 0)
+                    continue;
+
+                host->beginRemoveRows(QModelIndex(), row, row);
+                host->m_groups.removeAt(row);
+                host->endRemoveRows();
+                emit host->countChanged();
+            }
+        }
+
+        scheduleResolve(group->kind(), group->hostUri());
     }
 
     static void add(AbstractActionHost *host) { ::ActionHosts->append(host); }
