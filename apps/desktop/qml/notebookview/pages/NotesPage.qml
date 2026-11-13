@@ -37,6 +37,7 @@ AbstractNotebookTabPage {
 
     notes: root.pageData ? root.pageData.notebookItemObject : null
     tabBarName: notes ? notes.title : "Notes"
+    currentTabUri: Runtime.notebookSettings.notesPageTabUris[_private.ownerName] ?? ""
 
     NotebookPageTab {
         uri: "Scrite.NotebookTab.NotesPage.NotesTab"
@@ -61,5 +62,18 @@ AbstractNotebookTabPage {
             maxTextAreaSize: root.maxTextAreaSize
             minTextAreaSize: root.minTextAreaSize
         }
+    }
+
+    onCurrentTabUriChanged: {
+        const tabUris = Object.assign({}, Runtime.notebookSettings.notesPageTabUris)
+        tabUris[_private.ownerName] = currentTabUri
+        Runtime.notebookSettings.notesPageTabUris = tabUris
+    }
+
+    QtObject {
+        id: _private
+
+        // The kind of owner of the notes, which keys the tab that the settings remember for it.
+        readonly property string ownerName: Object.enumKey(root.notes, "OwnerType", root.notes ? root.notes.ownerType : Notes.OtherOwner)
     }
 }

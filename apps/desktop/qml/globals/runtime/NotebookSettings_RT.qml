@@ -43,6 +43,9 @@ Settings {
     property string screenplayPageTabUri: ""
     property string sceneNotesPageTabUri: ""
 
+    // The uri of the current tab of the notes page, for each kind of owner of the notes
+    property var notesPageTabUris: ({})
+
     location: Platform.settingsLocation
     category: "Notebook"
 }

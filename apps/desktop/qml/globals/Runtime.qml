@@ -556,6 +556,7 @@ Item {
             Runtime.notebookSettings.charactersPageTabUri = ""
             Runtime.notebookSettings.screenplayPageTabUri = ""
             Runtime.notebookSettings.sceneNotesPageTabUri = ""
+            Runtime.notebookSettings.notesPageTabUris = ({})
 
             Runtime.notebookSettings.sceneSynopsisTabIndex = 0
             Runtime.screenplayEditorSettings.sceneSidePanelOpen = false

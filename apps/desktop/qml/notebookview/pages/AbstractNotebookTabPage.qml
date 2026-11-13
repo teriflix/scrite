@@ -235,7 +235,7 @@ AbstractNotebookPage {
         }
 
         function singletonTabUri(note) {
-            return "Scrite.NotebookTab.SingletonNote." + note.id
+            return "Scrite.NotebookTab.SingletonNote." + note.formId
         }
 
         function deleteSingletonNote(note) {
