@@ -1972,6 +1972,8 @@ void Character::write(QTextCursor &cursor, const WriteOptions &options) const
             Notes::WriteOptions notesOptions;
             notesOptions.includeFormNotes = options.includeFormNotes;
             notesOptions.includeTextNotes = options.includeTextNotes;
+            notesOptions.includePath = options.includePath;
+            notesOptions.notesOnNewPage = options.notesOnNewPage;
             m_notes->write(cursor, notesOptions);
         }
     }
@@ -5268,9 +5270,11 @@ void Structure::write(QTextCursor &cursor, const WriteOptions &options) const
                 for (int i = 0; i < characters.size(); i++) {
                     Character *character = characters.at(i);
 
-                    Character::WriteOptions options;
-                    options.headingLevel = 2;
-                    character->write(cursor, options);
+                    Character::WriteOptions characterOptions;
+                    characterOptions.headingLevel = 2;
+                    characterOptions.includePath = options.includePath;
+                    characterOptions.notesOnNewPage = options.notesOnNewPage;
+                    character->write(cursor, characterOptions);
 
                     if (i != characters.size() - 1) {
                         QTextBlockFormat pageBreakFormat;
@@ -5284,6 +5288,8 @@ void Structure::write(QTextCursor &cursor, const WriteOptions &options) const
             Notes::WriteOptions notesOptions;
             notesOptions.includeFormNotes = options.includeFormNotes;
             notesOptions.includeTextNotes = options.includeTextNotes;
+            notesOptions.includePath = options.includePath;
+            notesOptions.notesOnNewPage = options.notesOnNewPage;
             m_notes->write(cursor, notesOptions);
         }
     }

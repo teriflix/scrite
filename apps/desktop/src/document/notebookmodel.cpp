@@ -1053,7 +1053,7 @@ QVariant BookmarkedNotes::data(QObject *ptr, int role) const
     case TitleRole: {
         if (ptr->metaObject()->inherits(&Notes::staticMetaObject)) {
             Notes *notes = qobject_cast<Notes *>(ptr);
-            return notes->title();
+            return notes->elidedTitle();
         } else if (ptr->metaObject()->inherits(&Note::staticMetaObject)) {
             Note *note = qobject_cast<Note *>(ptr);
             return note->title();

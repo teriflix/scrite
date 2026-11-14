@@ -25,6 +25,7 @@
 
 #include <QDir>
 #include <QJsonDocument>
+#include <QTextTable>
 
 NotebookReport::NotebookReport(QObject *parent) : AbstractReportGenerator(parent)
 {
@@ -149,7 +150,7 @@ QString NotebookReport::personalizedFileName(const QString &fileName) const
             Utils::File::sanitiseBaseName(m_title + QLatin1String(" - ") + m_subtitle);
     const QString suffix =
             this->format() == PdfFormat ? QLatin1String(".pdf") : QLatin1String(".odt");
-    return QDir::homePath() + QDir::separator() + baseName + suffix;
+    return QFileInfo(fileName).absoluteDir().absoluteFilePath(baseName + suffix);
 }
 
 bool NotebookReport::doGenerate(QTextDocument *doc)
@@ -203,32 +204,45 @@ bool NotebookReport::doGenerate(QTextDocument *doc)
 
     cursor.insertBlock(normalBlockFormat, normalCharFormat);
 
-    if (m_noteSection)
-        m_noteSection->write(cursor);
-    else if (m_notesSection)
-        m_notesSection->write(cursor);
-    else if (m_sceneSection)
-        m_sceneSection->write(cursor);
-    else if (m_characterSection)
-        m_characterSection->write(cursor);
-    else if (m_screenplaySection) {
+    if (m_noteSection) {
+        Note::WriteOptions options;
+        options.includePath = true;
+        m_noteSection->write(cursor, options);
+    } else if (m_notesSection) {
+        Notes::WriteOptions options;
+        options.includePath = true;
+        options.notesOnNewPage = m_notesOnNewPage;
+        m_notesSection->write(cursor, options);
+    } else if (m_sceneSection) {
+        Scene::WriteOptions options;
+        options.includePath = true;
+        options.notesOnNewPage = m_notesOnNewPage;
+        m_sceneSection->write(cursor, options);
+    } else if (m_characterSection) {
+        Character::WriteOptions options;
+        options.includePath = true;
+        options.notesOnNewPage = m_notesOnNewPage;
+        m_characterSection->write(cursor, options);
+    } else if (m_screenplaySection) {
         Screenplay::WriteOptions options;
         options.actsOnNewPage = m_actsOnNewPage;
         options.episodesOnNewPage = m_episodesOnNewPage;
+        options.includePath = true;
+        options.notesOnNewPage = m_notesOnNewPage;
         m_screenplaySection->write(cursor, options);
     } else if (m_storySection) {
         Structure::WriteOptions options;
         options.charactersOnly = charactersIntent;
+        options.includePath = true;
+        options.notesOnNewPage = m_notesOnNewPage;
         m_storySection->write(cursor, options);
     } else if (m_noteListSection != nullptr && m_noteListSection->objectCount() > 0) {
-        QTextBlockFormat pageBreakBlockFormat = normalBlockFormat;
-        pageBreakBlockFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysBefore);
-
         const QList<Note *> notes = this->selectedNotes();
         for (Note *note : notes) {
-            if (m_notesOnNewPage && note != notes.first())
-                cursor.insertBlock(pageBreakBlockFormat, normalCharFormat);
-            note->write(cursor);
+            Note::WriteOptions options;
+            options.includePath = true;
+            options.startOnNewPage = m_notesOnNewPage && note != notes.first();
+            note->write(cursor, options);
         }
     } else {
         auto addSection = [&cursor](const QString &title, int headingLevel = 2) {
@@ -248,21 +262,31 @@ bool NotebookReport::doGenerate(QTextDocument *doc)
         };
 
         addSection(QLatin1String("Story Notes"));
-        structure->write(cursor);
+        {
+            Structure::WriteOptions options;
+            options.includePath = true;
+            options.notesOnNewPage = m_notesOnNewPage;
+            structure->write(cursor, options);
+        }
 
         addSection(QLatin1String("Scene Notes"));
         {
             Screenplay::WriteOptions options;
             options.actsOnNewPage = m_actsOnNewPage;
             options.episodesOnNewPage = m_episodesOnNewPage;
+            options.includePath = true;
+            options.notesOnNewPage = m_notesOnNewPage;
             screenplay->write(cursor, options);
         }
 
         addSection(QLatin1String("Character Notes"));
+        Character::WriteOptions characterOptions;
+        characterOptions.includePath = true;
+        characterOptions.notesOnNewPage = m_notesOnNewPage;
         const QList<Character *> characters =
                 structure->charactersModel()->sortedList(&Character::LessThan);
         for (Character *character : characters)
-            character->write(cursor);
+            character->write(cursor, characterOptions);
     }
 
     return true;
@@ -290,9 +314,9 @@ void NotebookReport::evaluateTitleAndSubtitle()
 
     if (m_noteSection) {
         Notes *notes = m_noteSection->notes();
-        m_subtitle = notes->title() + ": " + m_noteSection->title();
+        m_subtitle = notes->elidedTitle() + ": " + m_noteSection->title();
     } else if (m_notesSection)
-        m_subtitle = m_notesSection->title();
+        m_subtitle = m_notesSection->elidedTitle();
     else if (m_sceneSection)
         m_subtitle = m_sceneSection->synopsis();
     else if (m_characterSection)

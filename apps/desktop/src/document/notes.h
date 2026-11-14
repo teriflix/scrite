@@ -77,10 +77,11 @@ public:
 
     // clang-format off
     Q_PROPERTY(QString path
-               READ path
+               READ elidedPath
                NOTIFY pathChanged)
     // clang-format on
     QString path() const;
+    QString elidedPath() const;
     Q_SIGNAL void pathChanged();
 
     enum Type { TextNoteType, FormNoteType, CheckListNoteType };
@@ -251,6 +252,8 @@ public:
         bool includeSummary = true;
         bool includeFormAnswerHints = true;
         bool includeAnsweredFormQuestionsOnly = true;
+        bool includePath = false;
+        bool startOnNewPage = false;
     };
     void write(QTextCursor &cursor, const WriteOptions &options = WriteOptions()) const;
 
@@ -403,10 +406,11 @@ public:
     // Called from BookmarkedNotes
     // clang-format off
     Q_PROPERTY(QString title
-               READ title
+               READ elidedTitle
                NOTIFY titleChanged)
     // clang-format on
     QString title() const;
+    QString elidedTitle() const;
     Q_SIGNAL void titleChanged();
 
     QString summary() const;
@@ -481,6 +485,8 @@ public:
         bool includeTextNotes = true;
         bool includeFormNotes = true;
         bool includeCheckListNotes = true;
+        bool includePath = false;
+        bool notesOnNewPage = false;
     };
     void write(QTextCursor &cursor, const WriteOptions &options = WriteOptions()) const;
 
@@ -494,6 +500,7 @@ private:
     void moveNotes(Notes *target);
     void renameCharacter(const QString &from, const QString &to);
     void updateSingletonNotes();
+    QString composeTitle(bool elide) const;
 
 private:
     friend class RemoveNoteUndoCommand;

@@ -193,11 +193,11 @@ static NotebookItemInfo infoOf(const QModelIndex &index)
         info.kind = QStringLiteral("note");
         info.noteType = noteTypeOf(note);
         info.key = keyOf(info.kind, note->id());
-        // Notes are called by their owner and title, as in "ACT 1 / AI Act Summary", because the
+        // Notes are called by their owner and title, as in "ACT 1 » AI Act Summary", because the
         // titles of notes are the same in many places.
         const QString title = note->title().isEmpty() ? QStringLiteral("New Note") : note->title();
         info.owner = ownerOf(note->notes(), index);
-        info.label = info.owner.isEmpty() ? title : info.owner + QStringLiteral(" / ") + title;
+        info.label = info.owner.isEmpty() ? title : info.owner + QStringLiteral(" » ") + title;
     } break;
     case NotebookModel::NotesType: {
         Notes *notes = qobject_cast<Notes *>(object);

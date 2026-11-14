@@ -951,6 +951,8 @@ public:
         bool includeTextNotes = true;
         bool includeFormNotes = true;
         bool includeHeading = true;
+        bool includePath = false;
+        bool notesOnNewPage = false;
     };
     void write(QTextCursor &cursor, const WriteOptions &options = WriteOptions()) const;
 

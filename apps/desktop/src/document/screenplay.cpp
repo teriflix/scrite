@@ -3352,10 +3352,12 @@ void Screenplay::write(QTextCursor &cursor, const WriteOptions &options) const
                     heading = element->resolvedSceneNumber() + QLatin1String(". ") + heading;
                 addSection(heading);
 
-                Scene::WriteOptions options;
-                options.headingLevel = 4;
-                options.includeHeading = false;
-                scene->write(cursor, options);
+                Scene::WriteOptions sceneOptions;
+                sceneOptions.headingLevel = 4;
+                sceneOptions.includeHeading = false;
+                sceneOptions.includePath = options.includePath;
+                sceneOptions.notesOnNewPage = options.notesOnNewPage;
+                scene->write(cursor, sceneOptions);
             } break;
             case ScreenplayElement::BreakElementType: {
                 addSection(element->breakTitle() + QLatin1String(" - ") + element->breakSubtitle());
@@ -3378,8 +3380,10 @@ void Screenplay::write(QTextCursor &cursor, const WriteOptions &options) const
                 Notes *notes = element->notes();
                 if (notes) {
                     const int cp1 = cursor.position();
-                    Notes::WriteOptions options;
-                    notes->write(cursor, options);
+                    Notes::WriteOptions notesOptions;
+                    notesOptions.includePath = options.includePath;
+                    notesOptions.notesOnNewPage = options.notesOnNewPage;
+                    notes->write(cursor, notesOptions);
                     const int cp2 = cursor.position();
 
                     cursor.setPosition(cp1);

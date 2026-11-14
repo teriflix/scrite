@@ -102,7 +102,16 @@ QString Note::path() const
 {
     const Notes *notes = this->notes();
     if (notes != nullptr)
-        return notes->title() + "/" + this->title();
+        return notes->title() + QStringLiteral(" » ") + this->title();
+
+    return this->title();
+}
+
+QString Note::elidedPath() const
+{
+    const Notes *notes = this->notes();
+    if (notes != nullptr)
+        return notes->elidedTitle() + QStringLiteral(" » ") + this->title();
 
     return this->title();
 }
@@ -404,6 +413,28 @@ void Note::deserializeFromJson(const QJsonObject &json)
 
 void Note::write(QTextCursor &cursor, const WriteOptions &options) const
 {
+    if (options.includePath) {
+        // Bordered banner with the path of this note. The page break is set on the banner, because
+        // the first block of the note that follows resets its own format.
+        QTextFrame *frame = cursor.currentFrame();
+
+        QTextTableFormat bannerFormat;
+        bannerFormat.setBorder(1);
+        bannerFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+        bannerFormat.setBorderBrush(Qt::black);
+        bannerFormat.setCellPadding(4);
+        if (options.startOnNewPage)
+            bannerFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysBefore);
+
+        QTextCharFormat bannerCharFormat;
+        bannerCharFormat.setFontPointSize(cursor.document()->defaultFont().pointSizeF() * 0.7);
+
+        QTextTable *banner = cursor.insertTable(1, 1, bannerFormat);
+        cursor = banner->cellAt(0, 0).firstCursorPosition();
+        cursor.insertText(this->path(), bannerCharFormat);
+        cursor = frame->lastCursorPosition();
+    }
+
     bool insertBlock = !cursor.block().text().isEmpty();
 
     if (this->type() == TextNoteType && this->isPreferPlainTextUi() && this->hasMarkdownContent()) {
@@ -805,8 +836,18 @@ QString Notes::id() const
 
 QString Notes::title() const
 {
-    auto elidedText = [](const QString &text, int length = 25) {
-        if (text.length() < length)
+    return this->composeTitle(false);
+}
+
+QString Notes::elidedTitle() const
+{
+    return this->composeTitle(true);
+}
+
+QString Notes::composeTitle(bool elide) const
+{
+    auto elidedText = [elide](const QString &text, int length = 25) {
+        if (!elide || text.length() < length)
             return text;
         return text.left(length - 4) + QString(" ...");
     };
@@ -1129,11 +1170,17 @@ void Notes::loadOldNotes(const QJsonArray &jsNotes)
 
 void Notes::write(QTextCursor &cursor, const WriteOptions &options) const
 {
+    bool firstNote = true;
     for (Note *note : this->constList()) {
         if ((options.includeTextNotes && note->type() == Note::TextNoteType)
             || (options.includeFormNotes && note->type() == Note::FormNoteType)
-            || (options.includeCheckListNotes && note->type() == Note::CheckListNoteType))
-            note->write(cursor);
+            || (options.includeCheckListNotes && note->type() == Note::CheckListNoteType)) {
+            Note::WriteOptions noteOptions;
+            noteOptions.includePath = options.includePath;
+            noteOptions.startOnNewPage = options.notesOnNewPage && !firstNote;
+            note->write(cursor, noteOptions);
+            firstNote = false;
+        }
     }
 }
 

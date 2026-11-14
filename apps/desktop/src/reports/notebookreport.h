@@ -69,7 +69,7 @@ public:
 
     // clang-format off
     Q_CLASSINFO("notesOnNewPage_FieldGroup", "Basic")
-    Q_CLASSINFO("notesOnNewPage_FieldLabel", "When printing selected notes, start each on a new page.")
+    Q_CLASSINFO("notesOnNewPage_FieldLabel", "Start each note on a new page.")
     Q_CLASSINFO("notesOnNewPage_FieldEditor", "CheckBox")
     Q_PROPERTY(bool notesOnNewPage
                READ isNotesOnNewPage

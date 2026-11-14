@@ -2920,6 +2920,8 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             Notes::WriteOptions notesOptions;
             notesOptions.includeFormNotes = options.includeFormNotes;
             notesOptions.includeTextNotes = options.includeTextNotes;
+            notesOptions.includePath = options.includePath;
+            notesOptions.notesOnNewPage = options.notesOnNewPage;
             m_notes->write(cursor, notesOptions);
         }
     }

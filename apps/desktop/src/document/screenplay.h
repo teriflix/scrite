@@ -945,6 +945,8 @@ public:
         bool includeFormNotes = true;
         bool actsOnNewPage = false;
         bool episodesOnNewPage = false;
+        bool includePath = false;
+        bool notesOnNewPage = false;
     };
     void write(QTextCursor &cursor, const WriteOptions &options = WriteOptions()) const;
 

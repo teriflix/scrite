@@ -876,6 +876,8 @@ public:
         bool includeSummary = true;
         bool includeTextNotes = true;
         bool includeFormNotes = true;
+        bool includePath = false;
+        bool notesOnNewPage = false;
     };
     void write(QTextCursor &cursor, const WriteOptions &options = WriteOptions()) const;
 
@@ -1632,6 +1634,8 @@ public:
         bool includeTextNotes = true;
         bool includeFormNotes = true;
         bool charactersOnly = false;
+        bool includePath = false;
+        bool notesOnNewPage = false;
     };
     void write(QTextCursor &cursor, const WriteOptions &options = WriteOptions()) const;
 
