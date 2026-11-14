@@ -991,6 +991,7 @@ public:
     Q_INVOKABLE bool hasPlatformLanguages() const;
 
     QStringList bundledFontFilesForScript(QChar::Script script) const;
+    QStringList bundledFontFilesForFamily(const QString &fontFamily) const;
 
     QList<int> platformLanguages() const;
     QList<TransliterationOption> queryTransliterationOptions(int language) const;
@@ -1038,6 +1039,7 @@ private:
     QMap<QChar::Script, QString> m_defaultScriptFontFamily, m_scriptFontFamily;
     QList<AbstractTransliterationEngine *> m_transliterators;
     QMap<QChar::Script, QStringList> m_bundledFontFiles;
+    QMap<QString, QStringList> m_bundledFontFilesByFamily;
 };
 
 class PlatformLanguageObserver : public QQuickItem

@@ -23,6 +23,7 @@
 #include "screenplay.h"
 #include "application.h"
 #include "timeprofiler.h"
+#include "odtexporter.h"
 #include "deltadocument.h"
 #include "scritedocument.h"
 #include "screenplaytextdocument.h"
@@ -438,7 +439,7 @@ void Note::write(QTextCursor &cursor, const WriteOptions &options) const
 
         // ODT writer ignores page breaks on tables. The marker is turned into a page break when the
         // ODT content is polished by the report generator.
-        const QString pageBreakMarker = cursor.document()->property("#pageBreakMarker").toString();
+        const QString pageBreakMarker = OdtUtils::pageBreakMarker(cursor.document());
         if (options.startOnNewPage && !pageBreakMarker.isEmpty())
             cursor.insertText(pageBreakMarker, bannerCharFormat);
         cursor = frame->lastCursorPosition();

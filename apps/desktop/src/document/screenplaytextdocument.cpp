@@ -45,6 +45,7 @@
 #include <QAbstractTextDocumentLayout>
 
 #include "hourglass.h"
+#include "odtexporter.h"
 #include "application.h"
 #include "timeprofiler.h"
 #include "printerobject.h"
@@ -1317,6 +1318,9 @@ void ScreenplayTextDocument::loadScreenplay()
                     QVector<QTextLayout::FormatRange>(), !m_useSingleFont);
     };
 
+    const QString pageBreakMarker = OdtUtils::pageBreakMarker(m_textDocument);
+    bool pageBreakAfterLastScene = false;
+
     const int fsi = m_screenplay->firstSceneElementIndex();
     for (int i = 0; i < m_screenplay->elementCount(); i++) {
         const ScreenplayElement *element = m_screenplay->elementAt(i);
@@ -1390,8 +1394,14 @@ void ScreenplayTextDocument::loadScreenplay()
             frameFormat.setTopMargin(blockFormat.topMargin());
         }
 
-        if ((i > 0 && m_printEachSceneOnANewPage)
-            || (m_purpose == ForPrinting && element->isPageBreakBefore()))
+        // When the text document has a page break marker, then it is being written to ODT. The ODT
+        // writer ignores page breaks on frames, so we mark the scene instead.
+        const bool honorPageBreaks = m_purpose == ForPrinting || !pageBreakMarker.isEmpty();
+        const bool pageBreakBefore = (i > 0 && m_printEachSceneOnANewPage)
+                || (honorPageBreaks && element->isPageBreakBefore()) || pageBreakAfterLastScene;
+        pageBreakAfterLastScene = !pageBreakMarker.isEmpty() && element->isPageBreakAfter();
+
+        if (pageBreakBefore)
             frameFormat.setPageBreakPolicy(QTextFrameFormat::PageBreak_AlwaysBefore);
         if (m_purpose == ForPrinting && element->isPageBreakAfter())
             frameFormat.setPageBreakPolicy(QTextFrameFormat::PageBreak_AlwaysAfter);
@@ -1401,6 +1411,11 @@ void ScreenplayTextDocument::loadScreenplay()
         QTextFrame *frame = cursor.insertFrame(frameFormat);
         this->registerTextFrame(element, frame);
         this->loadScreenplayElement(element, cursor);
+
+        if (pageBreakBefore && i > fsi && !pageBreakMarker.isEmpty()) {
+            QTextCursor markerCursor = frame->firstCursorPosition();
+            markerCursor.insertText(pageBreakMarker);
+        }
 
         // We have to move the cursor out of the frame we created for the scene
         // https://doc.qt.io/qt-5/richtext-cursor.html#frames

@@ -26,7 +26,6 @@
 class QPrinter;
 class QPdfWriter;
 class QTextCursor;
-class QDomDocument;
 class QTextDocumentWriter;
 class QTextDocumentPagedPrinter;
 
@@ -177,15 +176,9 @@ protected:
     // Inserts an invisible marker at the cursor, but only when generating ODT. While polishing the
     // ODT content, the marker is removed and the top-level paragraph or table that contained it is
     // made to start on a new page. Code that writes into the document without access to this class
-    // can insert the marker found in the document's "#pageBreakMarker" property, if it is set.
+    // can insert the marker returned by OdtUtils::pageBreakMarker(QTextDocument *), if it is not
+    // empty.
     void insertPageBreakMarker(QTextCursor &cursor);
-
-    // Reimplement and return true if we need to unpack the generated ODT file and further work on
-    // the content.xml
-    virtual bool requiresOdtContentPolish() const { return false; }
-
-    // Reimplement to alter content.xml
-    virtual bool polishOdtContent(QDomDocument &) { return false; }
 
 private:
     bool m_hasPageBreakMarkers = false;

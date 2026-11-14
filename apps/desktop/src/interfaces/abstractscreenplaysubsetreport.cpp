@@ -322,8 +322,7 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
     stDoc.setSceneIcons(this->format() == PdfFormat ? m_includeSceneIcons : false);
     stDoc.setSceneColors(m_useSceneColors);
     stDoc.setListSceneCharacters(m_listSceneCharacters);
-    stDoc.setPrintEachSceneOnANewPage(this->format() == PdfFormat ? m_printEachSceneOnANewPage
-                                                                  : false);
+    stDoc.setPrintEachSceneOnANewPage(m_printEachSceneOnANewPage);
     stDoc.setSyncEnabled(false);
     if (this->format() == PdfFormat)
         stDoc.setPurpose(ScreenplayTextDocument::ForPrinting);

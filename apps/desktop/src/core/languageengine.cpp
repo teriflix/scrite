@@ -2481,6 +2481,14 @@ LanguageEngine::LanguageEngine(QObject *parent) : QObject(parent)
             const int id = QFontDatabase::addApplicationFont(fontFile);
             if (fontId < 0)
                 fontId = id;
+
+            const QStringList families = QFontDatabase::applicationFontFamilies(id);
+            if (families.isEmpty())
+                continue;
+
+            QStringList &familyFontFiles = m_bundledFontFilesByFamily[families.first()];
+            if (!familyFontFiles.contains(fontFile))
+                familyFontFiles.append(fontFile);
         }
 
         m_bundledFontFiles[script] = fontFiles;
@@ -2601,6 +2609,11 @@ bool LanguageEngine::hasPlatformLanguages() const
 QStringList LanguageEngine::bundledFontFilesForScript(QChar::Script script) const
 {
     return m_bundledFontFiles.value(script, QStringList());
+}
+
+QStringList LanguageEngine::bundledFontFilesForFamily(const QString &fontFamily) const
+{
+    return m_bundledFontFilesByFamily.value(fontFamily, QStringList());
 }
 
 QList<int> LanguageEngine::platformLanguages() const
