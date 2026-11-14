@@ -413,6 +413,9 @@ void Note::deserializeFromJson(const QJsonObject &json)
 
 void Note::write(QTextCursor &cursor, const WriteOptions &options) const
 {
+    QTextDocument *document = cursor.document();
+    document->setProperty("#notesWritten", document->property("#notesWritten").toInt() + 1);
+
     if (options.includePath) {
         // Bordered banner with the path of this note. The page break is set on the banner, because
         // the first block of the note that follows resets its own format.
@@ -432,6 +435,12 @@ void Note::write(QTextCursor &cursor, const WriteOptions &options) const
         QTextTable *banner = cursor.insertTable(1, 1, bannerFormat);
         cursor = banner->cellAt(0, 0).firstCursorPosition();
         cursor.insertText(this->path(), bannerCharFormat);
+
+        // ODT writer ignores page breaks on tables. The marker is turned into a page break when the
+        // ODT content is polished by the report generator.
+        const QString pageBreakMarker = cursor.document()->property("#pageBreakMarker").toString();
+        if (options.startOnNewPage && !pageBreakMarker.isEmpty())
+            cursor.insertText(pageBreakMarker, bannerCharFormat);
         cursor = frame->lastCursorPosition();
     }
 
@@ -1170,16 +1179,17 @@ void Notes::loadOldNotes(const QJsonArray &jsNotes)
 
 void Notes::write(QTextCursor &cursor, const WriteOptions &options) const
 {
-    bool firstNote = true;
+    // Every note starts on a new page, except the first note written into the document. This is
+    // tracked per document, because notes of different owners are written by different Notes.
     for (Note *note : this->constList()) {
         if ((options.includeTextNotes && note->type() == Note::TextNoteType)
             || (options.includeFormNotes && note->type() == Note::FormNoteType)
             || (options.includeCheckListNotes && note->type() == Note::CheckListNoteType)) {
             Note::WriteOptions noteOptions;
             noteOptions.includePath = options.includePath;
-            noteOptions.startOnNewPage = options.notesOnNewPage && !firstNote;
+            noteOptions.startOnNewPage = options.notesOnNewPage
+                    && cursor.document()->property("#notesWritten").toInt() > 0;
             note->write(cursor, noteOptions);
-            firstNote = false;
         }
     }
 }

@@ -31,7 +31,86 @@
 #include <QMetaObject>
 #include <QDomDocument>
 #include <QMetaClassInfo>
+#include <QTextCursor>
 #include <QTextDocumentWriter>
+
+static const QString pageBreakMarker(3, QChar(0x2063));
+
+static void removePageBreakMarker(QDomNode node)
+{
+    if (node.isText()) {
+        QDomText textNode = node.toText();
+        QString data = textNode.data();
+        if (data.contains(pageBreakMarker))
+            textNode.setData(data.remove(pageBreakMarker));
+        return;
+    }
+
+    for (QDomNode child = node.firstChild(); !child.isNull(); child = child.nextSibling())
+        removePageBreakMarker(child);
+}
+
+// Removes page break markers from content.xml, and makes the top-level paragraph or table that
+// contained a marker start on a new page. Returns true if content.xml was modified.
+static bool applyPageBreakMarkers(QDomDocument &xmlDoc)
+{
+    QDomElement rootE = xmlDoc.documentElement();
+    QDomElement stylesE = rootE.firstChildElement("office:automatic-styles");
+    QDomElement textE = rootE.firstChildElement("office:body").firstChildElement("office:text");
+    if (stylesE.isNull() || textE.isNull())
+        return false;
+
+    QMap<QString, QString> breakStyleNames; // original style name -> style name with page break
+    bool success = false;
+
+    QDomElement childE = textE.firstChildElement();
+    while (!childE.isNull()) {
+        if (childE.text().contains(pageBreakMarker)) {
+            const bool isTable = childE.tagName() == QStringLiteral("table:table");
+            const QString styleAttr =
+                    isTable ? QStringLiteral("table:style-name") : QStringLiteral("text:style-name");
+            const QString propsTag = isTable ? QStringLiteral("style:table-properties")
+                                             : QStringLiteral("style:paragraph-properties");
+            const QString styleName = childE.attribute(styleAttr);
+
+            if (!breakStyleNames.contains(styleName)) {
+                const QString breakStyleName = styleName.isEmpty()
+                        ? QStringLiteral("ScritePageBreak")
+                        : styleName + QStringLiteral("_PageBreak");
+
+                QDomElement styleE = stylesE.firstChildElement("style:style");
+                while (!styleE.isNull() && styleE.attribute("style:name") != styleName)
+                    styleE = styleE.nextSiblingElement("style:style");
+
+                QDomElement breakStyleE;
+                if (styleE.isNull()) {
+                    breakStyleE = xmlDoc.createElement("style:style");
+                    breakStyleE.setAttribute("style:family", isTable ? "table" : "paragraph");
+                } else
+                    breakStyleE = styleE.cloneNode(true).toElement();
+                breakStyleE.setAttribute("style:name", breakStyleName);
+
+                QDomElement propsE = breakStyleE.firstChildElement(propsTag);
+                if (propsE.isNull()) {
+                    propsE = xmlDoc.createElement(propsTag);
+                    breakStyleE.appendChild(propsE);
+                }
+                propsE.setAttribute("fo:break-before", "page");
+
+                stylesE.appendChild(breakStyleE);
+                breakStyleNames[styleName] = breakStyleName;
+            }
+
+            childE.setAttribute(styleAttr, breakStyleNames.value(styleName));
+            removePageBreakMarker(childE);
+            success = true;
+        }
+
+        childE = childE.nextSiblingElement();
+    }
+
+    return success;
+}
 
 static QString toTitleCase(const QString &str)
 {
@@ -258,7 +337,11 @@ bool AbstractReportGenerator::generate()
     this->progress()->setProgressText(QString("Generating \"%1\"").arg(classInfo.value()));
 
     this->progress()->start();
+    if (m_format == OpenDocumentFormat)
+        textDocument.setProperty("#pageBreakMarker", pageBreakMarker);
     const bool ret = this->doGenerate(&textDocument);
+    m_hasPageBreakMarkers =
+            m_format == OpenDocumentFormat && textDocument.toPlainText().contains(pageBreakMarker);
 
     if (!ret) {
         this->progress()->finish();
@@ -447,9 +530,18 @@ bool AbstractReportGenerator::usePdfWriter() const
 #endif
 }
 
+void AbstractReportGenerator::insertPageBreakMarker(QTextCursor &cursor)
+{
+    if (m_format != OpenDocumentFormat)
+        return;
+
+    cursor.insertText(pageBreakMarker);
+}
+
 void AbstractReportGenerator::polishOdtContent(const QString &fileName)
 {
-    if (m_format == OpenDocumentFormat && this->requiresOdtContentPolish()) {
+    if (m_format == OpenDocumentFormat
+        && (m_hasPageBreakMarkers || this->requiresOdtContentPolish())) {
         // Unzip contents
         const QFileInfo fi(fileName);
 
@@ -477,7 +569,10 @@ void AbstractReportGenerator::polishOdtContent(const QString &fileName)
         contentXmlFile.close();
 
         // Polish & Save
-        if (!this->polishOdtContent(contentXmlDom))
+        bool polished = m_hasPageBreakMarkers && applyPageBreakMarkers(contentXmlDom);
+        if (this->requiresOdtContentPolish())
+            polished |= this->polishOdtContent(contentXmlDom);
+        if (!polished)
             return;
 
         if (!contentXmlFile.open(QFile::WriteOnly))

@@ -259,8 +259,6 @@ public:
 
 protected:
     bool doGenerate(QTextDocument *document) override;
-    bool requiresOdtContentPolish() const override;
-    bool polishOdtContent(QDomDocument &) override;
 
     // These functions must return true if element should be included in the
     // final report.

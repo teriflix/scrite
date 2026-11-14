@@ -26,8 +26,6 @@
 #include <QTextTable>
 #include <QTextBlock>
 #include <QTextCursor>
-#include <QDomElement>
-#include <QDomDocument>
 #include <QTextDocument>
 #include <QAbstractTextDocumentLayout>
 
@@ -294,6 +292,7 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
     QTextTable *sceneTable = nullptr;
     int sceneCount = -1;
     int currentRow = 0;
+    bool pageBreakAfterPreviousScene = false;
     // int nrElements = screenplay->elementCount();
 
     auto includeElementInReport = [=](const ScreenplayElement *element) -> bool {
@@ -397,6 +396,16 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
             sceneTable = cursor.insertTable(1, 2, sceneTableFormat);
 
             currentRow = 0;
+
+            // ODT writer ignores page breaks on tables, so we mark the table and have the marker
+            // converted into a page break when the ODT content is polished. The marker goes into
+            // the right cell, because the left cell's emptiness is checked while filling it.
+            if (sceneCount > 0
+                && (m_printEachSceneOnANewPage || pageBreakAfterPreviousScene
+                    || (!m_ignorePageBreaks && element->isPageBreakBefore()))) {
+                QTextCursor markerCursor = sceneTable->cellAt(0, 1).firstCursorPosition();
+                this->insertPageBreakMarker(markerCursor);
+            }
         }
 
         if (scene->heading()->isEnabled()) {
@@ -571,52 +580,10 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
         QTextFrame *rootFrame = document->rootFrame();
         cursor = rootFrame->lastCursorPosition();
         sceneTable = nullptr;
+        pageBreakAfterPreviousScene = !m_ignorePageBreaks && element->isPageBreakAfter();
     }
 
     return true;
-}
-
-bool TwoColumnReport::requiresOdtContentPolish() const
-{
-    return m_printEachSceneOnANewPage;
-}
-
-bool TwoColumnReport::polishOdtContent(QDomDocument &xmlDoc)
-{
-    QDomElement rootE = xmlDoc.documentElement();
-    QDomElement bodyE = rootE.firstChildElement("office:body");
-
-    const QDomNodeList tableElements = bodyE.elementsByTagName("table:table");
-    QStringList tableStyles;
-    for (int i = 0; i < tableElements.size(); i++) {
-        const QDomElement tableE = tableElements.at(i).toElement();
-        const QString styleName = tableE.attribute("table:style-name");
-        if (tableStyles.isEmpty() || tableStyles.last() != styleName)
-            tableStyles.append(styleName);
-    }
-
-    if (!tableStyles.isEmpty())
-        tableStyles.takeFirst();
-
-    if (tableStyles.isEmpty())
-        return false;
-
-    bool success = false;
-    QDomElement stylesE = rootE.firstChildElement("office:automatic-styles");
-    QDomElement styleE = stylesE.firstChildElement("style:style");
-    while (!styleE.isNull()) {
-        const QString styleName = styleE.attribute("style:name");
-        const QString styleFamily = styleE.attribute("style:family");
-        if (styleFamily == "table" && tableStyles.contains(styleName)) {
-            QDomElement stylePropsE = styleE.firstChildElement("style:table-properties");
-            stylePropsE.setAttribute("fo:break-before", "page");
-            success |= true;
-        }
-
-        styleE = styleE.nextSiblingElement(styleE.tagName());
-    }
-
-    return success;
 }
 
 bool TwoColumnReport::includeElementByTag(const ScreenplayElement *element) const
