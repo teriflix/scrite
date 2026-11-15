@@ -242,7 +242,13 @@ AbstractScenePartEditor {
         }
 
         onActiveFocusChanged: () => {
-                                  if(activeFocus) root.scene.undoRedoEnabled = !_private.readOnly
+                                  if(activeFocus) {
+                                      root.scene.undoRedoEnabled = !_private.readOnly
+                                      if(Scrite.window.active)
+                                          _private.cursorPositionBeforeFocusLoss = -1
+                                  } else {
+                                      _private.cursorPositionBeforeFocusLoss = cursorPosition
+                                  }
                                   Qt.callLater(_private.handleSceneTextEditorFocusChange)
                               }
 
@@ -676,27 +682,14 @@ AbstractScenePartEditor {
                                      }
 
     Connections {
-        target: Scrite.app
+        // When the window loses focus, the text editor loses active focus along with it.
+        // When the window becomes active again, we restore the cursor position that was
+        // captured at the moment the text editor lost focus.
+        target: Scrite.window
 
-        function onApplicationStateChanged(state) {
-            if(state === Qt.ApplicationActive) {
-                if(_private.cursorPositionBeforeAppSwitch >= 0) {
-                    _private.placeCursorAt(_private.cursorPositionBeforeAppSwitch)
-                }
-                _private.cursorPositionBeforeAppSwitch = -1
-            }
-        }
-    }
-
-    DelayedProperty {
-        id: _lastCursorPosition
-
-        set: _sceneDocumentBinder.cursorPosition
-        delay: 50
-
-        onGetChanged: {
-            if(Scrite.app.appState === Qt.ApplicationActive) {
-                _private.cursorPositionBeforeAppSwitch = _lastCursorPosition.get
+        function onActiveChanged() {
+            if(Scrite.window.active && _private.cursorPositionBeforeFocusLoss >= 0) {
+                Qt.callLater(_private.restoreCursorPositionAfterFocusLoss)
             }
         }
     }
@@ -723,7 +716,7 @@ AbstractScenePartEditor {
                                               && root.index > 0
 
         property int numberOfWordsAddedToDict: 0
-        property int cursorPositionBeforeAppSwitch: -1
+        property int cursorPositionBeforeFocusLoss: -1
         property int cursorPositionBeforeSceneReset: -1
 
         property bool scrollingBetweenScenes: false
@@ -879,6 +872,13 @@ AbstractScenePartEditor {
 
         function reload() {
             _sceneDocumentBinder.preserveScrollAndReload()
+        }
+
+        function restoreCursorPositionAfterFocusLoss() {
+            const position = cursorPositionBeforeFocusLoss
+            cursorPositionBeforeFocusLoss = -1
+            if(position >= 0)
+                placeCursorAt(position)
         }
 
         function placeCursorAt(position) {
