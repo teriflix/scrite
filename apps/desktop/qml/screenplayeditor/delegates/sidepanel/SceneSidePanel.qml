@@ -60,7 +60,10 @@ AbstractScenePartEditor {
             tabContentBorderVisible: false
         }
 
-        onExpandedEdited: Runtime.screenplayEditorSettings.sceneSidePanelOpen = expanded
+        onExpandedEdited: () => {
+                            Runtime.screenplayEditorSettings.sceneSidePanelOpen = expanded
+                            expanded = Qt.binding(() => Runtime.screenplayEditorSettings.sceneSidePanelOpen)
+                        }
     }
 
     ActionHandler {
