@@ -555,8 +555,6 @@ void Application::setBaseWindowTitle(const QString &val)
 
 QJsonObject Application::systemFontInfo()
 {
-    HourGlass hourGlass;
-
     static QJsonObject ret;
 
     static QMutex retLock;
