@@ -53,8 +53,11 @@ public:
         } else
             keys.append(QByteArray(mo->className()));
         m_metaObjects.insert(mo, keys);
-        for (const QByteArray &key : std::as_const(keys))
+        for (const QByteArray &key : std::as_const(keys)) {
+            if (!m_keyMap.contains(key))
+                m_keys.append(key);
             m_keyMap[key].append(mo);
+        }
     }
     void remove(const QMetaObject *mo)
     {
@@ -62,8 +65,10 @@ public:
         for (const QByteArray &key : keys) {
             QList<const QMetaObject *> mos = m_keyMap.take(key);
             mos.removeOne(mo);
-            if (mos.isEmpty())
+            if (mos.isEmpty()) {
+                m_keys.removeOne(key);
                 continue;
+            }
             m_keyMap[key] = mos;
         }
     }
@@ -80,7 +85,7 @@ public:
         this->remove(&Class::staticMetaObject);
     }
 
-    QList<QByteArray> keys() const { return m_keyMap.keys(); }
+    QList<QByteArray> keys() const { return m_keys; }
 
     const QMetaObject *find(const QByteArray &val) const
     {
@@ -118,6 +123,7 @@ private:
     }
 
 private:
+    QList<QByteArray> m_keys; // in the order in which they were first registered
     QMap<const QMetaObject *, QList<QByteArray>> m_metaObjects;
     QMap<QByteArray, QList<const QMetaObject *>> m_keyMap;
     QByteArray m_classInfoKey;

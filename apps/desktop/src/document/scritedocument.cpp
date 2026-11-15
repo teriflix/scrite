@@ -30,6 +30,7 @@
 #include "odtexporter.h"
 #include "localstorage.h"
 #include "htmlexporter.h"
+#include "epubexporter.h"
 #include "textexporter.h"
 #include "notification.h"
 #include "htmlimporter.h"
@@ -703,23 +704,24 @@ DeviceIOFactories::DeviceIOFactories()
     ImporterFactory.addClass<FinalDraftImporter>();
     ImporterFactory.addClass<OsfImporter>();
 
-    ExporterFactory.addClass<OdtExporter>();
-    ExporterFactory.addClass<PdfExporter>();
-    ExporterFactory.addClass<HtmlExporter>();
-    ExporterFactory.addClass<TextExporter>();
-    ExporterFactory.addClass<FountainExporter>();
     ExporterFactory.addClass<FinalDraftExporter>();
+    ExporterFactory.addClass<FountainExporter>();
+    ExporterFactory.addClass<HtmlExporter>();
+    ExporterFactory.addClass<EpubExporter>();
+    ExporterFactory.addClass<OdtExporter>();
     ExporterFactory.addClass<OsfExporter>();
+    ExporterFactory.addClass<PdfExporter>();
+    ExporterFactory.addClass<TextExporter>();
 
-    ReportsFactory.addClass<ScreenplaySubsetReport>();
-    ReportsFactory.addClass<LocationReport>();
-    // ReportsFactory.addClass<LocationScreenplayReport>();
     ReportsFactory.addClass<CharacterReport>();
     ReportsFactory.addClass<CharacterScreenplayReport>();
-    ReportsFactory.addClass<SceneMetadataReport>();
-    ReportsFactory.addClass<SceneCharacterMatrixReport>();
-    ReportsFactory.addClass<StatisticsReport>();
+    ReportsFactory.addClass<LocationReport>();
+    // ReportsFactory.addClass<LocationScreenplayReport>();
     ReportsFactory.addClass<NotebookReport>();
+    ReportsFactory.addClass<SceneCharacterMatrixReport>();
+    ReportsFactory.addClass<SceneMetadataReport>();
+    ReportsFactory.addClass<ScreenplaySubsetReport>();
+    ReportsFactory.addClass<StatisticsReport>();
     ReportsFactory.addClass<TwoColumnReport>();
 }
 
@@ -1727,10 +1729,9 @@ QJsonArray ScriteDocument::supportedExportFormats() const
     static QJsonArray exporters;
 
     if (exporters.isEmpty()) {
-        QList<QByteArray> keys = deviceIOFactories->ExporterFactory.keys();
-        std::sort(keys.begin(), keys.end());
+        const QList<QByteArray> keys = deviceIOFactories->ExporterFactory.keys();
 
-        for (const QByteArray &key : std::as_const(keys)) {
+        for (const QByteArray &key : keys) {
             const QString skey = QString::fromLatin1(key);
             const QStringList fields = skey.split("/");
             const QMetaObject *mo = deviceIOFactories->ExporterFactory.find(key);

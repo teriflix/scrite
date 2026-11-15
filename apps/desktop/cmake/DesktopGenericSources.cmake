@@ -25,6 +25,8 @@ set(SCRITE_DESKTOP_GENERIC_SOURCES
   "src/exporters/characterrelationshipsgraphexporter.h"
   "src/exporters/characterrelationshipsgraphexporter_p.cpp"
   "src/exporters/characterrelationshipsgraphexporter_p.h"
+  "src/exporters/epubexporter.cpp"
+  "src/exporters/epubexporter.h"
   "src/exporters/finaldraftexporter.cpp"
   "src/exporters/finaldraftexporter.h"
   "src/exporters/osfexporter.cpp"

@@ -57,6 +57,19 @@ public:
     Q_SIGNAL void exportWithSceneColorsChanged();
 
     // clang-format off
+    Q_CLASSINFO("includeTitlePage_FieldLabel", "Include title page.")
+    Q_CLASSINFO("includeTitlePage_FieldNote", "The cover photo, if any, is exported into a resources folder next to the HTML file.")
+    Q_CLASSINFO("includeTitlePage_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeTitlePage
+               READ isIncludeTitlePage
+               WRITE setIncludeTitlePage
+               NOTIFY includeTitlePageChanged)
+    // clang-format on
+    void setIncludeTitlePage(bool val);
+    bool isIncludeTitlePage() const { return m_includeTitlePage; }
+    Q_SIGNAL void includeTitlePageChanged();
+
+    // clang-format off
     Q_CLASSINFO("bundleFonts_FieldLabel", "Export font files and reference them.")
     Q_CLASSINFO("bundleFonts_FieldNote", "Only built in fonts are exported when checked. And when unchecked, fonts will be looked up in the system.")
     Q_CLASSINFO("bundleFonts_FieldEditor", "CheckBox")
@@ -69,6 +82,32 @@ public:
     bool isBundleFonts() const { return m_bundleFonts; }
     Q_SIGNAL void bundleFontsChanged();
 
+    // clang-format off
+    Q_CLASSINFO("embedResources_FieldLabel", "Embed fonts and images in the HTML file.")
+    Q_CLASSINFO("embedResources_FieldNote", "A single HTML file is generated, without a resources folder. The file gets larger.")
+    Q_CLASSINFO("embedResources_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool embedResources
+               READ isEmbedResources
+               WRITE setEmbedResources
+               NOTIFY embedResourcesChanged)
+    // clang-format on
+    void setEmbedResources(bool val);
+    bool isEmbedResources() const { return m_embedResources; }
+    Q_SIGNAL void embedResourcesChanged();
+
+    // clang-format off
+    Q_CLASSINFO("mobileFriendly_FieldLabel", "Make the HTML mobile friendly.")
+    Q_CLASSINFO("mobileFriendly_FieldNote", "The text reflows to fit the width of the screen, instead of being laid out on a fixed size page.")
+    Q_CLASSINFO("mobileFriendly_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool mobileFriendly
+               READ isMobileFriendly
+               WRITE setMobileFriendly
+               NOTIFY mobileFriendlyChanged)
+    // clang-format on
+    void setMobileFriendly(bool val);
+    bool isMobileFriendly() const { return m_mobileFriendly; }
+    Q_SIGNAL void mobileFriendlyChanged();
+
     bool canBundleFonts() const { return true; }
     bool requiresConfiguration() const override { return true; }
 
@@ -80,6 +119,9 @@ private:
     bool m_includeSceneNumbers = false;
     bool m_exportWithSceneColors = false;
     bool m_bundleFonts = true;
+    bool m_includeTitlePage = true;
+    bool m_embedResources = true;
+    bool m_mobileFriendly = true;
 };
 
 #endif // HTMLEXPORTER_H

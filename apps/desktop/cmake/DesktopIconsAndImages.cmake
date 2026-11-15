@@ -118,6 +118,7 @@ set(SCRITE_DESKTOP_ICON_FILES
   "icons/editor/format_strikethrough.png"
   "icons/editor/format_underline.png"
   "icons/exporter/character_relationship_graph.png"
+  "icons/exporter/epub.png"
   "icons/exporter/exporters_menu_item.png"
   "icons/exporter/final_draft.png"
   "icons/exporter/osf.png"
