@@ -777,7 +777,8 @@ void AttachmentsDropArea::dropEvent(QDropEvent *de)
             }
         }
 
-        m_attachment->deleteLater();
+        if (m_attachment != nullptr)
+            m_attachment->deleteLater();
         this->setAttachment(nullptr);
     }
 }
@@ -785,10 +786,20 @@ void AttachmentsDropArea::dropEvent(QDropEvent *de)
 void AttachmentsDropArea::setAttachment(Attachment *attachment, const QList<QUrl> &dropUrls)
 {
     if (m_attachment != attachment) {
-        if (m_attachment != nullptr && m_attachment->parent() == this)
-            m_attachment->deleteLater();
+        if (m_attachment != nullptr) {
+            disconnect(m_attachment, &Attachment::aboutToDelete, this,
+                       &AttachmentsDropArea::onAttachmentDestroyed);
+
+            if (m_attachment->parent() == this)
+                m_attachment->deleteLater();
+        }
 
         m_attachment = attachment;
+
+        if (m_attachment != nullptr)
+            connect(m_attachment, &Attachment::aboutToDelete, this,
+                    &AttachmentsDropArea::onAttachmentDestroyed);
+
         emit attachmentChanged();
     }
 
@@ -796,6 +807,15 @@ void AttachmentsDropArea::setAttachment(Attachment *attachment, const QList<QUrl
         m_dropUrls = dropUrls;
         emit dropUrlsChanged();
     }
+}
+
+void AttachmentsDropArea::onAttachmentDestroyed(Attachment *ptr)
+{
+    if (m_attachment != ptr)
+        return;
+
+    m_attachment = nullptr;
+    emit attachmentChanged();
 }
 
 void AttachmentsDropArea::setMouse(const QPointF &val)

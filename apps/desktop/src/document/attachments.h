@@ -372,6 +372,7 @@ protected:
 private:
     void resetAttachments();
     void setAttachment(Attachment *attachment, const QList<QUrl> &dropUrls = QList<QUrl>());
+    void onAttachmentDestroyed(Attachment *ptr);
     void setMouse(const QPointF &val);
     bool prepareAttachmentFromMimeData(const QMimeData *mimeData);
 

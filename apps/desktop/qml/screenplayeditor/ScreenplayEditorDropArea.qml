@@ -100,8 +100,9 @@ BasicAttachmentsDropArea {
     }
 
     onDropped: {
+        const filePath = attachment.filePath
         if(Scrite.document.empty)
-            Scrite.document.openOrImport(attachment.filePath)
+            Qt.callLater(() => { Scrite.document.openOrImport(filePath) })
         else {
             droppedFilePath = attachment.filePath
             droppedFileName = attachment.originalFileName
