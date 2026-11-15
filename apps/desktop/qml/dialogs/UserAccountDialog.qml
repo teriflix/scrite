@@ -115,11 +115,25 @@ Item {
         property string startScreen: "WelcomeScreen" // Runtime.userAccountDialogSettings.welcomeScreenShown ? "AccountEmailScreen" : "WelcomeScreen"
 
         property SessionNewRestApiCall newSessionTokenCall: SessionNewRestApiCall {
+            id: _newSessionCall
+
             property SctDialog waitDialog
+            property Timer waitDialogTimer
 
             onAboutToCall: MessageBox.discardMessageBoxes()
-            onJustIssuedCall: waitDialog = WaitDialog.launch("Fetching new access tokens ...")
-            onFinished: waitDialog.close()
+            onJustIssuedCall: {
+                waitDialogTimer = Runtime.execLater(_newSessionCall,  1500, () => {
+                                      waitDialog = WaitDialog.launch("Fetching new access tokens ...")
+                                  })
+            }
+            onFinished: {
+                if(waitDialogTimer) {
+                    waitDialogTimer.stop()
+                    waitDialogTimer.destroy()
+                }
+                if(waitDialog)
+                    waitDialog.close()
+            }
         }
 
         readonly property Connections trackRestApi: Connections {

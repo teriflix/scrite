@@ -336,7 +336,24 @@ public:
 
     Q_INVOKABLE bool enqueue(RestApiCall *call);
     Q_INVOKABLE bool remove(RestApiCall *call);
-    Q_INVOKABLE bool contains(RestApiCall *call) const { return m_queue.contains(call); }
+    Q_INVOKABLE bool contains(RestApiCall *call) const
+    {
+        return m_current == call || m_queue.contains(call);
+    }
+
+    template<class T>
+    bool contains() const
+    {
+        if (qobject_cast<T *>(m_current) != nullptr)
+            return true;
+
+        for (RestApiCall *call : m_queue) {
+            if (qobject_cast<T *>(call) != nullptr)
+                return true;
+        }
+
+        return false;
+    }
 
 signals:
     void called(RestApiCall *call, bool success);

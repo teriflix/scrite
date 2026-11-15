@@ -597,11 +597,11 @@ static QString msixPhysicalPath(const QString &virtualPath)
     static const MsixPaths s = []() -> MsixPaths {
         UINT32 len = 0;
         if (GetPackageFamilyName(GetCurrentProcess(), &len, nullptr) != ERROR_INSUFFICIENT_BUFFER)
-            return { }; // not running as an MSIX package
+            return {}; // not running as an MSIX package
 
         QVector<wchar_t> familyName(len);
         if (GetPackageFamilyName(GetCurrentProcess(), &len, familyName.data()) != ERROR_SUCCESS)
-            return { };
+            return {};
 
         PWSTR pRoaming = nullptr;
         PWSTR pLocal = nullptr;
@@ -615,7 +615,7 @@ static QString msixPhysicalPath(const QString &virtualPath)
                 CoTaskMemFree(pRoaming);
             if (pLocal)
                 CoTaskMemFree(pLocal);
-            return { };
+            return {};
         }
 
         MsixPaths result;

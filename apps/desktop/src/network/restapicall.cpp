@@ -124,12 +124,20 @@ void RestApi::reportInvalidApiKey()
 void RestApi::requestNewSessionTokenNow()
 {
 #ifndef SCRITE_FOSS_BUILD
+    // A new session token is already being fetched, or is waiting in the queue to be fetched.
+    if (m_sessionApiQueue->contains<SessionNewRestApiCall>())
+        return;
+
+    // A fresh session token has been fetched since this request was made, so
+    // wiping it out and fetching yet another one would only cause a loop.
+    if (this->isSessionTokenAvailable())
+        return;
+
     const QDateTime now = QDateTime::currentDateTime();
-    if (m_lastSessionTokenRequestTimestamp.isValid()) {
-        if (m_lastSessionTokenRequestTimestamp.msecsTo(now) < 1000)
-            return;
-    } else
-        m_lastSessionTokenRequestTimestamp = now;
+    if (m_lastSessionTokenRequestTimestamp.isValid()
+        && m_lastSessionTokenRequestTimestamp.msecsTo(now) < 1000)
+        return;
+    m_lastSessionTokenRequestTimestamp = now;
 
     LocalStorage::store(LocalStorage::sessionToken, QVariant());
     emit newSessionTokenRequired();
@@ -260,8 +268,8 @@ QJsonValue sanitizeJsonValue(const QJsonValue &value)
     if (value.isString()) {
         QString str = value.toString();
         // Trim + remove NUL and basic control chars only
-        return str.trimmed()
-                .replace(QRegularExpression(QStringLiteral("[\\x{00}-\\x{1F}\\x{7F}]")), "");
+        return str.trimmed().replace(QRegularExpression(QStringLiteral("[\\x{00}-\\x{1F}\\x{7F}]")),
+                                     "");
     }
 
     if (value.isObject()) {
@@ -591,7 +599,7 @@ bool RestApiCallQueue::enqueue(RestApiCall *call)
     };
 
     if (call && !callQueuedEslewhere(call, this)) {
-        if (m_queue.contains(call))
+        if (m_current == call || m_queue.contains(call))
             return true;
 
         connect(call, &RestApiCall::aboutToDelete, this, &RestApiCallQueue::onCallDestroyed);

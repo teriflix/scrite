@@ -336,10 +336,12 @@ Item {
         timer.interval = delay === undefined ? 100 : delay
         timer.repeat = false
         timer.triggered.connect(() => {
-            if (args)
+            if (args) {
                 callback(args)
-                else callback()
-                timer.destroy()
+            } else {
+                callback()
+            }
+            timer.destroy()
         })
         timer.start()
 
