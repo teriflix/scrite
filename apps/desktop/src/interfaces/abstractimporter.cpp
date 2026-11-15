@@ -111,13 +111,6 @@ bool AbstractImporter::read()
     this->progress()->start();
     UndoHub::blocked = true;
     const bool ret = this->doImport(&file);
-    if (ret) {
-        for (int i = 0; i < structure->elementCount(); i++) {
-            StructureElement *element = structure->elementAt(i);
-            if (element != nullptr && element->scene() != nullptr)
-                element->scene()->inferSynopsisFromContent();
-        }
-    }
     screenplay->setCurrentElementIndex(0);
     UndoHub::blocked = false;
     UndoHub::clearAllStacks();
@@ -176,11 +169,6 @@ Scene *AbstractImporter::createScene(const QString &heading)
     else {
         scene->heading()->setEnabled(true);
         scene->heading()->parseFrom(heading);
-
-        const QString location = scene->heading()->location();
-        const QString titleBit = location.length() > 50 ? location.left(47) + "..." : location;
-        scene->setSynopsis(
-                QString("Scene number #%1 at %2").arg(sceneIndex + 1).arg(titleBit.toLower()));
     }
 
     return scene;
