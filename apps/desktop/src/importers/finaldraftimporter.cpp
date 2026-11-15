@@ -224,22 +224,27 @@ bool FinalDraftImporter::doImport(QIODevice *device)
             if (!number.isEmpty())
                 element->setUserSceneNumber(number);
 
-            const QDomElement sceneProperiesE = paragraphE.firstChildElement(FDX_SceneNumberAttr);
+            const QDomElement sceneProperiesE =
+                    paragraphE.firstChildElement(FDX_ScenePropertiesTag);
             if (!sceneProperiesE.isNull()) {
                 const QString title = sceneProperiesE.attribute(FDX_TitleProperty);
-                const QColor color = fromFdxColorCode(sceneProperiesE.attribute(FDX_ColorProperty));
-                scene->setColor(color);
+                if (sceneProperiesE.hasAttribute(FDX_ColorProperty))
+                    scene->setColor(
+                            fromFdxColorCode(sceneProperiesE.attribute(FDX_ColorProperty)));
                 scene->structureElement()->setTitle(title);
 
+                // A summary can have more than one paragraph. Ignore formatting, just retain
+                // the text.
+                QStringList summaryParagraphTexts;
                 const QDomElement summaryE = sceneProperiesE.firstChildElement(FDX_SummaryProperty);
-                const QDomElement summaryParagraphE = summaryE.isNull()
-                        ? QDomElement()
-                        : summaryE.firstChildElement(FDX_ParagraphTag);
-                const QPair<QString, QVector<QTextLayout::FormatRange>> summaryParagraphText =
-                        parseParagraphTexts(summaryParagraphE);
-
-                // Ignore formatting, just retain the text.
-                scene->setSynopsis(summaryParagraphText.first);
+                QDomElement summaryParagraphE = summaryE.firstChildElement(FDX_ParagraphTag);
+                while (!summaryParagraphE.isNull()) {
+                    const QString summaryParagraphText = parseParagraphTexts(summaryParagraphE).first;
+                    if (!summaryParagraphText.isEmpty())
+                        summaryParagraphTexts.append(summaryParagraphText);
+                    summaryParagraphE = summaryParagraphE.nextSiblingElement(FDX_ParagraphTag);
+                }
+                scene->setSynopsis(summaryParagraphTexts.join(QStringLiteral("\n\n")));
             }
         } break;
         case 1:
@@ -424,9 +429,17 @@ void fixOmittedScenes(QDomElement &contentE)
         QDomElement omittedSceneE = paragraphE.firstChildElement(FDX_OmittedSceneTag);
         if (!omittedSceneE.isNull()) {
             paragraphE.setAttribute(FDX_FlagsAttr, FDX_IgnoreFlag);
-            const QDomNodeList childParagraphs = omittedSceneE.elementsByTagName(FDX_ParagraphTag);
+            // Only the paragraphs that are direct children of the omitted scene are moved. The
+            // paragraphs deeper down, such as those in a scene summary, stay where they are.
+            QList<QDomElement> childParagraphs;
+            QDomElement childE = omittedSceneE.firstChildElement(FDX_ParagraphTag);
+            while (!childE.isNull()) {
+                childParagraphs.append(childE);
+                childE = childE.nextSiblingElement(FDX_ParagraphTag);
+            }
+
             for (int i = childParagraphs.size() - 1; i >= 0; i--) {
-                QDomElement childParagraphE = childParagraphs.at(i).toElement();
+                QDomElement childParagraphE = childParagraphs.at(i);
                 childParagraphE.setAttribute(FDX_FlagsAttr, FDX_OmittedFlag);
                 contentE.insertAfter(childParagraphE, paragraphE);
             }
