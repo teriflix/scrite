@@ -690,6 +690,20 @@ void Screenplay::setLoglineComments(const QString &val)
     emit loglineCommentsChanged();
 }
 
+void Screenplay::setComments(const QString &val)
+{
+    if (m_comments == val)
+        return;
+
+    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "comments");
+    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+    if (!info->isLocked())
+        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
+
+    m_comments = val;
+    emit commentsChanged();
+}
+
 void Screenplay::setBasedOn(const QString &val)
 {
     if (m_basedOn == val)

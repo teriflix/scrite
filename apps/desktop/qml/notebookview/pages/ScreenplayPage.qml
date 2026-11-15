@@ -35,9 +35,6 @@ AbstractNotebookTabPage {
 
     hostUri: "Scrite.App.Notebook.ScreenplayPage"
 
-    notes: _private.structure.notes
-
-    readonly property Structure structure: owner as Structure
     tabBarName: "Screenplay"
     currentTabUri: Runtime.notebookSettings.screenplayPageTabUri
 
@@ -58,6 +55,17 @@ AbstractNotebookTabPage {
         order: 200
 
         ScreenplayLoglineTab {
+            maxTextAreaSize: root.maxTextAreaSize
+            minTextAreaSize: root.minTextAreaSize
+        }
+    }
+
+    NotebookPageTab {
+        uri: "Scrite.NotebookTab.ScreenplayPage.CommentsTab"
+        title: "Comments"
+        order: 250
+
+        ScreenplayCommentsTab {
             maxTextAreaSize: root.maxTextAreaSize
             minTextAreaSize: root.minTextAreaSize
         }

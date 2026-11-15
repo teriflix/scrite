@@ -117,58 +117,185 @@ Item {
     Component {
         id: _sceneListPanel
 
-        RowLayout {
-            spacing: 0
+        SplitView {
+            id: _sceneListPanelSplitView
 
-            ScreenplayTracksView {
-                id: _screenplayTracksView
+            orientation: Qt.Vertical
 
-                Layout.fillHeight: true
+            RowLayout {
+                SplitView.fillHeight: true
+                SplitView.minimumHeight: 100
 
-                DelayedProperty.initial: 0
-                DelayedProperty.delay: 10
-                DelayedProperty.set: _sceneListView.delegateCount
+                spacing: 0
 
-                enabled: Math.abs(DelayedProperty.get - root.screenplayAdapter.elementCount) < 2
-                visible: Runtime.sceneListPanelSettings.displayTracks && Runtime.screenplayTracksSettings.displayTracks && root.screenplayAdapter.isSourceScreenplay
-                listView: _sceneListView
-                screenplay: root.screenplayAdapter.screenplay
+                ScreenplayTracksView {
+                    id: _screenplayTracksView
 
-                property var __watch: [Runtime.sceneListPanelSettings.sceneTextMode, Runtime.screenplayEditorSettings.slpSynopsisLineCount]
-                on__WatchChanged: Qt.callLater(_sceneListView.updateCacheBuffer)
+                    Layout.fillHeight: true
+
+                    DelayedProperty.initial: 0
+                    DelayedProperty.delay: 10
+                    DelayedProperty.set: _sceneListView.delegateCount
+
+                    enabled: Math.abs(DelayedProperty.get - root.screenplayAdapter.elementCount) < 2
+                    visible: Runtime.sceneListPanelSettings.displayTracks && Runtime.screenplayTracksSettings.displayTracks && root.screenplayAdapter.isSourceScreenplay
+                    listView: _sceneListView
+                    screenplay: root.screenplayAdapter.screenplay
+
+                    property var __watch: [Runtime.sceneListPanelSettings.sceneTextMode, Runtime.screenplayEditorSettings.slpSynopsisLineCount]
+                    on__WatchChanged: Qt.callLater(_sceneListView.updateCacheBuffer)
+                }
+
+                SceneListPanel {
+                    id: _sceneListView
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    readOnly: root.readOnly
+                    screenplayAdapter: root.screenplayAdapter
+                    tracksVisible: _screenplayTracksView.visible
+
+                    onCollapseSidePanelRequest: () => { _sidePanel.expanded = false }
+
+                    ToolTipPopup {
+                        background: Rectangle {
+                            color: Runtime.colors.accent.c500.background
+                            opacity: 0.9
+                        }
+
+                        delay: 0
+                        text: {
+                            const sceneGroup = _sceneListView.sceneGroup
+                            const fields = [
+                                             sceneGroup.sceneCount + " scene(s)",
+                                             "<b>Duration</b> " + (sceneGroup.evaluatingLengths ? "...." : TMath.timeLengthString(sceneGroup.timeLength)),
+                                             "<b>Page Count</b> " + (sceneGroup.evaluatingLengths ? "...." : sceneGroup.pageCount + " or " + sceneGroup.pageLength1_8 + " page(s)")
+                                         ]
+                            return "<p>Scene Selection:</p>" + SMath.formatAsBulletPoints(fields)
+                        }
+                        textColor: Runtime.colors.accent.c500.text
+                        visible: Runtime.sceneListPanelSettings.showTooltip && _sceneListView.sceneGroup.evaluateLengths && _sceneListView.sceneGroup.sceneCount >= 2
+                        parseShortcutInText: false
+                    }
+                }
             }
 
-            SceneListPanel {
-                id: _sceneListView
+            Rectangle {
+                SplitView.minimumHeight: 100
+                SplitView.preferredHeight: _sceneListPanelSplitView.height * Runtime.sceneListPanelSettings.commentsHeightRatio
 
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                color: Runtime.colors.primary.editor.background
+                border.color: Runtime.colors.accent.borderColor
+                border.width: 0.5
+                visible: Runtime.sceneListPanelSettings.displayComments
 
-                readOnly: root.readOnly
-                screenplayAdapter: root.screenplayAdapter
-                tracksVisible: _screenplayTracksView.visible
+                // Remembered, so that the comments area is the same size in the next session.
+                onHeightChanged: {
+                    if(SplitView.view.resizing)
+                        Runtime.sceneListPanelSettings.commentsHeightRatio = height / _sceneListPanelSplitView.height
+                }
 
-                onCollapseSidePanelRequest: () => { _sidePanel.expanded = false }
+                ColumnLayout {
+                    anchors.fill: parent
 
-                ToolTipPopup {
-                    background: Rectangle {
-                        color: Runtime.colors.accent.c500.background
-                        opacity: 0.9
+                    spacing: 0
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: _commentsTitle.height
+
+                        color: Runtime.colors.accent.c100.background
+
+                        SctText {
+                            id: _commentsTitle
+
+                            width: parent.width
+
+                            elide: Text.ElideRight
+                            color: Color.textColorFor(parent.color)
+                            text: "Comments"
+                            padding: 10
+
+                            font.bold: true
+                            font.family: Runtime.sceneEditorFontMetrics.font.family
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                        }
+
+                        FlatToolButton {
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            suggestedWidth: _commentsTitle.height
+                            suggestedHeight: _commentsTitle.height
+
+                            iconSource: Runtime.themedIcon("qrc:/icons/navigation/close.png")
+                            toolTipText: "Hide Comments"
+
+                            onClicked: Runtime.sceneListPanelSettings.displayComments = false
+                        }
                     }
 
-                    delay: 0
-                    text: {
-                        const sceneGroup = _sceneListView.sceneGroup
-                        const fields = [
-                                         sceneGroup.sceneCount + " scene(s)",
-                                         "<b>Duration</b> " + (sceneGroup.evaluatingLengths ? "...." : TMath.timeLengthString(sceneGroup.timeLength)),
-                                         "<b>Page Count</b> " + (sceneGroup.evaluatingLengths ? "...." : sceneGroup.pageCount + " or " + sceneGroup.pageLength1_8 + " page(s)")
-                                     ]
-                        return "<p>Scene Selection:</p>" + SMath.formatAsBulletPoints(fields)
+                    FlickableTextArea {
+                        id: _commentsTextArea
+
+                        Component.onCompleted: textArea.cursorPosition = textArea.length
+
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        Keys.onEscapePressed: (event) => {
+                                                  let action = ActionHub.editOptions.find("editSceneContent")
+                                                  if(action && action.enabled) {
+                                                      action.trigger(_commentsTextArea.textArea)
+                                                      event.accepted = true
+                                                  } else {
+                                                      event.accepted = false
+                                                  }
+                                              }
+
+                        text: root.screenplayAdapter.isSourceScreenplay ? root.screenplayAdapter.screenplay.comments : ""
+                        enabled: root.screenplayAdapter.isSourceScreenplay
+                        font.pointSize: Runtime.notebookFontPointSize
+                        readOnly: root.readOnly || Scrite.document.readOnly
+                        undoRedoEnabled: true
+                        markdownSyntaxEnabled: true
+                        adjustTextWidthBasedOnScrollBar: false
+
+                        onTextEdited: root.screenplayAdapter.screenplay.comments = text
+
+                        ActionHandler {
+                            action: ActionHub.sceneListPanelOptions.find("editScreenplayComments")
+                            enabled: Runtime.sceneListPanelSettings.displayComments
+                            onTriggered: _commentsTextArea.textArea.forceActiveFocus()
+                        }
                     }
-                    textColor: Runtime.colors.accent.c500.text
-                    visible: Runtime.sceneListPanelSettings.showTooltip && _sceneListView.sceneGroup.evaluateLengths && _sceneListView.sceneGroup.sceneCount >= 2
-                    parseShortcutInText: false
+                }
+
+                // Stands in for the placeholder text of the text area, which cannot show markdown.
+                TextArea {
+                    anchors.fill: parent
+                    anchors.topMargin: _commentsTitle.height
+
+                    topPadding: 5
+                    leftPadding: 5
+                    rightPadding: 5
+                    bottomPadding: 5
+
+                    background: null
+                    focusPolicy: Qt.NoFocus
+                    font.pointSize: Runtime.notebookFontPointSize
+                    opacity: 0.6
+                    readOnly: true
+                    text: "## Notes\n\nCapture comments about your screenplay on the go. It's not per scene, it's for the entire screenplay."
+                    textFormat: TextEdit.MarkdownText
+                    verticalAlignment: Text.AlignTop
+                    visible: _commentsTextArea.text === "" && !_commentsTextArea.textArea.activeFocus
+                    wrapMode: Text.WordWrap
+
+                    TapHandler {
+                        onTapped: _commentsTextArea.textArea.forceActiveFocus()
+                    }
                 }
             }
         }

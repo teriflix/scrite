@@ -134,6 +134,15 @@ Rectangle {
                                Runtime.screenplayTracksSettings.displayTracks = !Runtime.screenplayTracksSettings.displayTracks
                            }
             }
+
+            ActionHandler {
+                action: ActionHub.sceneListPanelOptions.find("displayScreenplayComments")
+                checked: Runtime.sceneListPanelSettings.displayComments
+
+                onToggled: () => {
+                               Runtime.sceneListPanelSettings.displayComments = !Runtime.sceneListPanelSettings.displayComments
+                           }
+            }
         }
     }
 

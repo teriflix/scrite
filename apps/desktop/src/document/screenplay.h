@@ -533,6 +533,16 @@ public:
     Q_SIGNAL void loglineCommentsChanged();
 
     // clang-format off
+    Q_PROPERTY(QString comments
+               READ comments
+               WRITE setComments
+               NOTIFY commentsChanged)
+    // clang-format on
+    void setComments(const QString &val);
+    QString comments() const { return m_comments; }
+    Q_SIGNAL void commentsChanged();
+
+    // clang-format off
     Q_PROPERTY(QString basedOn
                READ basedOn
                WRITE setBasedOn
@@ -996,6 +1006,7 @@ private:
     QString m_version;
     QString m_website;
     QString m_address;
+    QString m_comments;
     QString m_subtitle;
     QString m_phoneNumber;
     QString m_coverPagePhoto;

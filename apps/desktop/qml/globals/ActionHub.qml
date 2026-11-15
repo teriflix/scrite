@@ -1528,6 +1528,29 @@ Item {
         }
 
         Action {
+            readonly property bool allowShortcut: true
+            readonly property bool visible: false
+            readonly property bool nativeVisible: true
+
+            objectName: "displayScreenplayComments"
+            checkable: true
+            checked: ActionHandler.active ? ActionHandler.active.checked : false
+            enabled: ActionHandler.canHandle
+            text: "Display Screenplay Comments"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property bool nativeVisible: true
+            readonly property string defaultShortcut: "Ctrl+'"
+
+            enabled: ActionHandler.canHandle
+            objectName: "editScreenplayComments"
+            shortcut: defaultShortcut
+            text: "Edit Screenplay Comments"
+        }
+
+        Action {
             readonly property string defaultShortcut: "Ctrl+Shift+C"
 
             enabled: ActionHandler.canHandle

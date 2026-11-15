@@ -199,6 +199,7 @@ set(SCRITE_DESKTOP_QML_FILES
   "qml/notebookview/tabs/SceneCharacterRelationshipsTab.qml"
   "qml/notebookview/tabs/SceneCommentsTab.qml"
   "qml/notebookview/tabs/SceneSynopsisTab.qml"
+  "qml/notebookview/tabs/ScreenplayCommentsTab.qml"
   "qml/notebookview/tabs/ScreenplayLoglineTab.qml"
   "qml/notebookview/tabs/ScreenplayStatsTab.qml"
   "qml/notebookview/tabs/ScreenplayTitlePageTab.qml"

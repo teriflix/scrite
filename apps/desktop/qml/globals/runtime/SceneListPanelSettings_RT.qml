@@ -21,6 +21,8 @@ Settings {
     property bool showTooltip: true
 
     property bool displayTracks: true
+    property bool displayComments: true
+    property real commentsHeightRatio: 0.35 // Height of the comments area, as a ratio of the height of the panel
     property string displaySceneLength: "TIME" // can be NO, PAGE, TIME, PAGE_1_8
     property string sceneTextMode: "HEADING" // can be SUMMARY also
 

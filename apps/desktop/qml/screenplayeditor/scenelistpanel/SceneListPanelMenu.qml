@@ -132,4 +132,12 @@ SctMenu {
             onClicked: ScreenplayTracksDialog.launch()
         }
     }
+
+    SctMenuItem {
+        text: "Show Comments"
+
+        icon.source: Runtime.sceneListPanelSettings.displayComments ? Runtime.themedIcon("qrc:/icons/navigation/check.png") : Runtime.themedIcon("qrc:/icons/content/blank.png")
+
+        onClicked: Runtime.sceneListPanelSettings.displayComments = !Runtime.sceneListPanelSettings.displayComments
+    }
 }
