@@ -91,6 +91,10 @@ Dialog {
     property alias contentImplicitHeight: _contentItemLoader.implicitHeight
     property alias contentInstance: _contentItemLoader.item
 
+    // Height that the dialog box needs to show its content in full, along with its header and footer.
+    // Dialog boxes that must not be taller than they need to be can limit their height to this.
+    readonly property real requiredHeight: header.height + contentImplicitHeight + footer.height
+
     readonly property Action acceptAction: Action {
         enabled: ActionHandler.canHandle
         shortcut: Gui.shortcut(Qt.Key_Return)
