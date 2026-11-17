@@ -190,7 +190,7 @@ Item {
                 border.width: 0.5
                 visible: Runtime.sceneListPanelSettings.displayComments
 
-                // Remembered, so that the comments area is the same size in the next session.
+                // Remembered, so that the notepad area is the same size in the next session.
                 onHeightChanged: {
                     if(SplitView.view.resizing)
                         Runtime.sceneListPanelSettings.commentsHeightRatio = height / _sceneListPanelSplitView.height
@@ -203,18 +203,18 @@ Item {
 
                     Rectangle {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: _commentsTitle.height
+                        Layout.preferredHeight: _notepadTitle.height
 
                         color: Runtime.colors.accent.c100.background
 
                         SctText {
-                            id: _commentsTitle
+                            id: _notepadTitle
 
                             width: parent.width
 
                             elide: Text.ElideRight
                             color: Color.textColorFor(parent.color)
-                            text: "Comments"
+                            text: "Notepad"
                             padding: 10
 
                             font.bold: true
@@ -226,18 +226,18 @@ Item {
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
 
-                            suggestedWidth: _commentsTitle.height
-                            suggestedHeight: _commentsTitle.height
+                            suggestedWidth: _notepadTitle.height
+                            suggestedHeight: _notepadTitle.height
 
                             iconSource: Runtime.themedIcon("qrc:/icons/navigation/close.png")
-                            toolTipText: "Hide Comments"
+                            toolTipText: "Hide Notepad"
 
                             onClicked: Runtime.sceneListPanelSettings.displayComments = false
                         }
                     }
 
                     FlickableTextArea {
-                        id: _commentsTextArea
+                        id: _notepadTextArea
 
                         Component.onCompleted: textArea.cursorPosition = textArea.length
 
@@ -247,13 +247,14 @@ Item {
                         Keys.onEscapePressed: (event) => {
                                                   let action = ActionHub.editOptions.find("editSceneContent")
                                                   if(action && action.enabled) {
-                                                      action.trigger(_commentsTextArea.textArea)
+                                                      action.trigger(_notepadTextArea.textArea)
                                                       event.accepted = true
                                                   } else {
                                                       event.accepted = false
                                                   }
                                               }
 
+                        // Screenplay comments are shown in Notepad
                         text: root.screenplayAdapter.isSourceScreenplay ? root.screenplayAdapter.screenplay.comments : ""
                         enabled: root.screenplayAdapter.isSourceScreenplay
                         font.pointSize: Runtime.notebookFontPointSize
@@ -267,7 +268,7 @@ Item {
                         ActionHandler {
                             action: ActionHub.sceneListPanelOptions.find("editScreenplayComments")
                             enabled: Runtime.sceneListPanelSettings.displayComments
-                            onTriggered: _commentsTextArea.textArea.forceActiveFocus()
+                            onTriggered: _notepadTextArea.textArea.forceActiveFocus()
                         }
                     }
                 }
@@ -275,7 +276,7 @@ Item {
                 // Stands in for the placeholder text of the text area, which cannot show markdown.
                 TextArea {
                     anchors.fill: parent
-                    anchors.topMargin: _commentsTitle.height
+                    anchors.topMargin: _notepadTitle.height
 
                     topPadding: 5
                     leftPadding: 5
@@ -287,14 +288,14 @@ Item {
                     font.pointSize: Runtime.notebookFontPointSize
                     opacity: 0.6
                     readOnly: true
-                    text: "## Notes\n\nCapture comments about your screenplay on the go. It's not per scene, it's for the entire screenplay."
+                    text: "## Thoughts, Ideas, Snippets\n\nJot down thoughts about your screenplay on the go. It's not per scene, it's for the entire screenplay."
                     textFormat: TextEdit.MarkdownText
                     verticalAlignment: Text.AlignTop
-                    visible: _commentsTextArea.text === "" && !_commentsTextArea.textArea.activeFocus
+                    visible: _notepadTextArea.text === "" && !_notepadTextArea.textArea.activeFocus
                     wrapMode: Text.WordWrap
 
                     TapHandler {
-                        onTapped: _commentsTextArea.textArea.forceActiveFocus()
+                        onTapped: _notepadTextArea.textArea.forceActiveFocus()
                     }
                 }
             }

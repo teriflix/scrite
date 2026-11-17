@@ -62,7 +62,7 @@ AbstractNotebookTabPage {
 
     NotebookPageTab {
         uri: "Scrite.NotebookTab.ScreenplayPage.CommentsTab"
-        title: "Comments"
+        title: "Notepad"
         order: 250
 
         ScreenplayCommentsTab {

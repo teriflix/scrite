@@ -62,13 +62,38 @@ Item {
             adjustTextWidthBasedOnScrollBar: false
             font.pointSize: Runtime.notebookFontPointSize
             markdownSyntaxEnabled: true
-            placeholderText: "Screenplay Comments"
+            placeholderText: ""
             readOnly: Scrite.document.readOnly
-            text: root.screenplay.comments
+            text: root.screenplay.comments // Screenplay comments are shown in Notepad
             undoRedoEnabled: true
             background: null
 
             onTextEdited: root.screenplay.comments = text
+        }
+
+        // Stands in for the placeholder text of the text area, which cannot show markdown.
+        TextArea {
+            anchors.fill: _textArea
+
+            topPadding: _textArea.textArea.topPadding
+            leftPadding: _textArea.textArea.leftPadding
+            rightPadding: _textArea.textArea.leftPadding
+            bottomPadding: _textArea.textArea.bottomPadding
+
+            background: null
+            focusPolicy: Qt.NoFocus
+            font.pointSize: Runtime.notebookFontPointSize
+            opacity: 0.6
+            readOnly: true
+            text: "## Thoughts, Ideas, Snippets\n\nJot down thoughts about your screenplay on the go. It's not per scene, it's for the entire screenplay."
+            textFormat: TextEdit.MarkdownText
+            verticalAlignment: Text.AlignTop
+            visible: _textArea.text === "" && !_textArea.textArea.activeFocus
+            wrapMode: Text.WordWrap
+
+            TapHandler {
+                onTapped: _textArea.textArea.forceActiveFocus()
+            }
         }
     }
 
