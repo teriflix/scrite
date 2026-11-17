@@ -54,7 +54,25 @@ Item {
         FlickableTextArea {
             id: _textArea
 
+            Component.onCompleted: {
+                textArea.cursorPosition = textArea.length
+                if(_editScreenplayCommentsActionHandler.action?.focusRequest ?? false) {
+                    Qt.callLater(textArea.forceActiveFocus)
+                    _editScreenplayCommentsActionHandler.action.focusRequest = false
+                }
+            }
+
             ScrollBar.vertical: _scrollBar
+
+            Keys.onEscapePressed: (event) => {
+                                      let action = ActionHub.editOptions.find("editSceneContent")
+                                      if(action && action.enabled) {
+                                          action.trigger(_textArea.textArea)
+                                          event.accepted = true
+                                      } else {
+                                          event.accepted = false
+                                      }
+                                  }
 
             anchors.fill: parent
             anchors.margins: 5
@@ -77,7 +95,7 @@ Item {
 
             topPadding: _textArea.textArea.topPadding
             leftPadding: _textArea.textArea.leftPadding
-            rightPadding: _textArea.textArea.leftPadding
+            rightPadding: _textArea.textArea.rightPadding
             bottomPadding: _textArea.textArea.bottomPadding
 
             background: null
@@ -106,5 +124,15 @@ Item {
 
         orientation: Qt.Vertical
         flickable: _textArea
+    }
+
+    ActionHandler {
+        id: _editScreenplayCommentsActionHandler
+
+        action: ActionHub.sceneListPanelOptions.find("editScreenplayComments")
+
+        onTriggered: () => {
+                         _textArea.textArea.forceActiveFocus()
+                     }
     }
 }

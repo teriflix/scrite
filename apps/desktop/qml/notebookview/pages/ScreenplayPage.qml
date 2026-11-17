@@ -117,6 +117,16 @@ AbstractNotebookTabPage {
                      }
     }
 
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("editScreenplayComments")
+        enabled: root.currentTabUri !== "Scrite.NotebookTab.ScreenplayPage.CommentsTab"
+
+        onTriggered: () => {
+                         action.focusRequest = true
+                         root.showTab("Scrite.NotebookTab.ScreenplayPage.CommentsTab")
+                     }
+    }
+
     onCurrentTabUriChanged: Runtime.notebookSettings.screenplayPageTabUri = currentTabUri
 
     QtObject {

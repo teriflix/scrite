@@ -1544,10 +1544,12 @@ Item {
             readonly property bool nativeVisible: true
             readonly property string defaultShortcut: "Ctrl+'"
 
+            property bool focusRequest: false
+
             enabled: ActionHandler.canHandle
             objectName: "editScreenplayComments"
             shortcut: defaultShortcut
-            text: "Edit Screenplay Comments"
+            text: "Goto Screenplay Notepad"
         }
 
         Action {

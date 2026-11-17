@@ -61,17 +61,18 @@ AbstractNotebookPage {
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
     signal deleteNoteRequest(Note note)
 
-    // Selects the tab of the singleton note. Returns false if this page does not have one for it.
-    function showNote(note) {
-        if(!root.showTabs || !note)
-            return false
-
-        const uri = _private.singletonTabUri(note)
-        if(!_private.tabs.some( (tab) => tab.uri === uri ))
+    // Selects the tab with the uri. Returns false if this page does not have one.
+    function showTab(uri) {
+        if(!root.showTabs || !_private.tabs.some( (tab) => tab.uri === uri ))
             return false
 
         root.currentTabUri = uri
         return true
+    }
+
+    // Selects the tab of the singleton note. Returns false if this page does not have one for it.
+    function showNote(note) {
+        return note ? root.showTab(_private.singletonTabUri(note)) : false
     }
 
     ColumnLayout {

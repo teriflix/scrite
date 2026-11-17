@@ -95,7 +95,7 @@ Item {
 
             property int currentNotebookItemId: _notebookTree.currentData !== undefined && _notebookTree.currentData.notebookItemId !== undefined ? _notebookTree.currentData.notebookItemId : -1
 
-            active: opacity > 0
+            active: _contentActiveProperty.value
             opacity: _contentActiveProperty.value ? 1 : 0
             sourceComponent: {
                 if(!_notebookTree.currentData)
@@ -270,6 +270,18 @@ Item {
                                        }
                                    }
                                }
+    }
+
+    ActionHandler {
+        action: ActionHub.sceneListPanelOptions.find("editScreenplayComments")
+        enabled: _notebookTree.currentData?.notebookItemCategory !== NotebookModel.ScreenplayCategory
+
+        onTriggered: () => {
+                         action.focusRequest = true
+
+                         Runtime.notebookSettings.screenplayPageTabUri = "Scrite.NotebookTab.ScreenplayPage.CommentsTab"
+                         _private.scheduleSwitchTo("Story")
+                     }
     }
 
     NotebookModel {
