@@ -29,6 +29,8 @@ ApplicationWindow {
 
     property bool closeButtonVisible: true
 
+    readonly property bool usingSoftwareRenderer: AppWindow.usingSoftwareRenderer
+
     AppWindow.closeButtonVisible: closeButtonVisible
     AppWindow.onInitialize: _initSM.start()
 

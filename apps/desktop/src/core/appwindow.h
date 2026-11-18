@@ -57,6 +57,16 @@ public:
     bool isCloseButtonVisible() const { return m_closeButtonVisible; }
     Q_SIGNAL void closeButtonVisibleChanged();
 
+    // clang-format off
+    Q_PROPERTY(bool usingSoftwareRenderer
+               READ isUsingSoftwareRenderer
+               CONSTANT)
+    // clang-format on
+    bool isUsingSoftwareRenderer() const
+    {
+        return QQuickWindow::graphicsApi() == QSGRendererInterface::Software;
+    }
+
 signals:
     void initialize();
 

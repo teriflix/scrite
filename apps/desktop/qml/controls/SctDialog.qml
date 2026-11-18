@@ -38,6 +38,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
+import QtQuick.Effects
 
 import Scrite.App
 
@@ -256,7 +257,46 @@ Dialog {
         }
     }
 
-    background: Rectangle { color: Runtime.colors.primary.c100.background }
+    background: Item {
+        Loader {
+            anchors.fill: parent
+
+            active: Scrite.window.usingSoftwareRenderer === false
+
+            sourceComponent: Item {
+                RectangularShadow {
+                    anchors.fill: parent
+
+                    offset: Qt.vector2d(0, 0)
+                    blur: 24
+                    spread: 0
+
+                    color: Runtime.colors.scheme === Qt.ColorScheme.Dark ? Qt.rgba(0,0,0,0.6) : Qt.rgba(0,0,0,0.35)
+                }
+
+                RectangularShadow {
+                    anchors.fill: parent
+
+                    visible: Runtime.colors.scheme === Qt.ColorScheme.Dark
+
+                    offset: Qt.vector2d(0, 0)
+                    blur: 16
+                    spread: 0
+
+                    color: Qt.rgba(1,1,1,0.3)
+                }
+            }
+        }
+
+        Rectangle {
+            anchors.fill: parent
+
+            color: Runtime.colors.primary.c100.background
+
+            border.width: Runtime.colors.scheme === Qt.ColorScheme.Dark ? 1 : 0
+            border.color: Qt.rgba(1,1,1,0.4)
+        }
+    }
 
     // Private section
     Announcement.onIncoming: (type,data) => {

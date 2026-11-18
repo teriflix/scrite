@@ -25,6 +25,7 @@ ToolTip {
     id: root
 
     readonly property real maximumContentWidth: 350
+
     property bool parseShortcutInText: true
     property color textColor: Runtime.colors.primary.c100.text
 
@@ -96,6 +97,9 @@ ToolTip {
 
     exit: null
     enter: null
+
+    readonly property int dialogCount: Runtime.dialogs.objectCount
+    onDialogCountChanged: close()
 
     onAboutToShow: Runtime.visibleTooltipCount = Runtime.visibleTooltipCount + 1
     onAboutToHide: Runtime.visibleTooltipCount = Runtime.visibleTooltipCount - 1
