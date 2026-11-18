@@ -71,7 +71,7 @@ DialogLauncher {
                           */
                     color: _dialog.background && _dialog.background.item ? _dialog.background.item.color : Runtime.colors.primary.c10.background
                     border.width: Scrite.document.screenplay.coverPagePhoto === "" ? 1 : 0
-                    border.color: "black"
+                    border.color: Runtime.colors.primary.borderColor
                     Layout.preferredWidth: 400
                     Layout.preferredHeight: 255
                     Layout.alignment: Qt.AlignHCenter
