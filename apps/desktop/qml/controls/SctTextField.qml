@@ -137,9 +137,10 @@ TextField {
             anchors.bottom: parent.bottom
 
             width: parent.width
-            height: root.activeFocus ? 2 : 0.5
+            height: root.activeFocus ? 2 : 1
 
             color: root.activeFocus ? Runtime.colors.accent.c900.background : Runtime.colors.primary.c900.background
+            opacity: root.activeFocus ? 1 : 0.5
         }
     }
 
