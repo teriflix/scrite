@@ -15,8 +15,14 @@
 #include "secrets.h"
 #include "simplecrypt.h"
 
+#include <QDir>
+#include <QFile>
 #include <QTimer>
+#include <QFileInfo>
+#include <QSaveFile>
 #include <QSettings>
+#include <QJsonObject>
+#include <QJsonDocument>
 #include <QCoreApplication>
 
 #include <qtkeychain/keychain.h>
@@ -66,6 +72,17 @@ void Secrets::store(const QString &key, const QString &value)
 
 void Secrets::probe()
 {
+#ifndef SCRITE_PRODUCTION_BUILD
+    // Builds that are not production builds never ask the keychain, which asks for a password every
+    // time the application is run from a build folder. Secrets are kept, obfuscated, in a file.
+    QTimer::singleShot(0, this, [this]() {
+        this->setStoreType(LocalEncrypted);
+        this->setReady(true);
+        this->runPendingCalls();
+    });
+    return;
+#endif
+
     // Jobs have no parent, and delete themselves when done. That way a job that was started by an
     // instance which goes away right after, as a settings page does, still runs to the end.
     QKeychain::ReadPasswordJob *job =
@@ -194,8 +211,36 @@ void Secrets::storeInKeychain(const QString &key, const QString &value)
     job->start();
 }
 
+// Where secrets are kept in builds that are not production builds: ai/apikeys.json, in the folder of
+// the settings of the application. Each value is obfuscated, as it is in the settings.
+QString Secrets::fileStorePath() const
+{
+#ifndef SCRITE_PRODUCTION_BUILD
+    QSettings *settings = this->settings();
+    if (settings != nullptr)
+        return QFileInfo(settings->fileName()).absolutePath() + QStringLiteral("/ai/apikeys.json");
+#endif
+
+    return QString();
+}
+
 void Secrets::loadFromSettings(const QString &key)
 {
+    const QString filePath = this->fileStorePath();
+    if (!filePath.isEmpty()) {
+        QFile file(filePath);
+        const QJsonObject object = file.open(QFile::ReadOnly)
+                ? QJsonDocument::fromJson(file.readAll()).object()
+                : QJsonObject();
+        const QString cipherText = object.value(this->service() + QLatin1Char('/') + key).toString();
+
+        QTimer::singleShot(0, this, [this, key, cipherText]() {
+            this->setErrorMessage(QString());
+            emit loaded(key, this->decrypt(cipherText));
+        });
+        return;
+    }
+
     QSettings *settings = this->settings();
     const QString cipherText = settings
             ? settings->value(this->service() + QLatin1Char('/') + key).toString()
@@ -209,6 +254,34 @@ void Secrets::loadFromSettings(const QString &key)
 
 void Secrets::storeInSettings(const QString &key, const QString &value)
 {
+    const QString filePath = this->fileStorePath();
+    if (!filePath.isEmpty()) {
+        QJsonObject object;
+        {
+            QFile file(filePath);
+            if (file.open(QFile::ReadOnly))
+                object = QJsonDocument::fromJson(file.readAll()).object();
+        }
+
+        const QString path = this->service() + QLatin1Char('/') + key;
+        if (value.isEmpty())
+            object.remove(path);
+        else
+            object.insert(path, this->encrypt(value));
+
+        QDir().mkpath(QFileInfo(filePath).absolutePath());
+        QSaveFile file(filePath);
+        const bool ok = file.open(QSaveFile::WriteOnly)
+                && file.write(QJsonDocument(object).toJson(QJsonDocument::Indented)) >= 0
+                && file.commit();
+
+        QTimer::singleShot(0, this, [this, key, ok]() {
+            this->setErrorMessage(ok ? QString() : QStringLiteral("Couldn't write ai/apikeys.json."));
+            emit stored(key, ok);
+        });
+        return;
+    }
+
     QSettings *settings = this->settings();
     if (settings != nullptr) {
         const QString path = this->service() + QLatin1Char('/') + key;

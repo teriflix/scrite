@@ -111,6 +111,7 @@ private:
     void run(const PendingCall &call);
     void loadFromKeychain(const QString &key);
     void storeInKeychain(const QString &key, const QString &value);
+    QString fileStorePath() const;
     void loadFromSettings(const QString &key);
     void storeInSettings(const QString &key, const QString &value);
 
