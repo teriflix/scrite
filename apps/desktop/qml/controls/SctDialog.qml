@@ -248,6 +248,12 @@ Dialog {
 
         height: _footerLoader.item ? _footerLoader.height : 0
 
+        Rectangle {
+            x: 0; y: 0; width: parent.width; height: 1
+
+            color: Runtime.colors.primary.borderColor
+        }
+
         Loader {
             id: _footerLoader
 
@@ -290,6 +296,7 @@ Dialog {
 
         Rectangle {
             anchors.fill: parent
+            anchors.margins: Runtime.colors.scheme === Qt.ColorScheme.Dark ? -1 : 0
 
             color: Runtime.colors.primary.c100.background
 
