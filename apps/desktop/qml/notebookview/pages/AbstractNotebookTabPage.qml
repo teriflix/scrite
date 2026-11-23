@@ -75,6 +75,8 @@ AbstractNotebookPage {
         return note ? root.showTab(_private.singletonTabUri(note)) : false
     }
 
+    ObjectRegister.name: "Scrite.App.Notebook.NotebookTabPage"
+
     ColumnLayout {
         anchors.fill: parent
         anchors.topMargin: root.showTabs ? 11 : 0
@@ -89,7 +91,7 @@ AbstractNotebookPage {
             Layout.fillWidth: true
 
             name: root.tabBarName
-            tabs: _private.tabs.map( (tab) => tab.title )
+            tabs: _private.tabs.map( (tab) => ({ "text": tab.title, "iconSource": tab.iconSource }) )
             switchTabHandlerEnabled: root.showTabs && root.tabsVisible
             visible: root.showTabs
 

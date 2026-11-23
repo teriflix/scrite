@@ -15,6 +15,8 @@
 
 import QtQml
 
+import Scrite.App
+
 /**
   Declares one tab of a page that derives from AbstractNotebookTabPage. Scrite declares its own tabs
   as children of the page. Extensions offer theirs through a FeatureProvider, whose hostUri is the
@@ -35,5 +37,10 @@ QtObject {
     property string uri
     property string title
 
+    // Optional icon shown before the title in the tab bar. Leave empty for a tab without an icon.
+    property url iconSource
+
     default property Component component
+
+    ObjectRegister.name: "Scrite.App.Notebook.NotebookPageTab"
 }

@@ -80,15 +80,45 @@ Item {
 
             model: root.tabs
 
-            delegate: SctLabel {
+            // Each tab is either a string, or an object with text and an optional iconSource.
+            delegate: Item {
                 id: _tabDelegate
 
                 required property int index
                 required property var modelData
 
-                color: root.currentTab === index ? Runtime.colors.accent.c900.background : Runtime.colors.primary.c700.background
-                font: Runtime.idealFontMetrics.font
-                text: modelData
+                readonly property string text: typeof modelData === "string" ? modelData : (modelData.text ?? "")
+                readonly property string iconSource: typeof modelData === "string" ? "" : (modelData.iconSource ?? "").toString()
+
+                width: _tabContent.width
+                height: _tabContent.height
+
+                Row {
+                    id: _tabContent
+
+                    spacing: 4
+
+                    Image {
+                        id: _tabIcon
+
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        width: _tabLabel.height
+                        height: _tabLabel.height
+
+                        visible: status === Image.Ready
+                        source: _tabDelegate.iconSource !== "" ? Runtime.themedIcon(_tabDelegate.iconSource) : ""
+                        fillMode: Image.PreserveAspectFit
+                    }
+
+                    SctLabel {
+                        id: _tabLabel
+
+                        color: root.currentTab === _tabDelegate.index ? Runtime.colors.accent.c900.background : Runtime.colors.primary.c700.background
+                        font: Runtime.idealFontMetrics.font
+                        text: _tabDelegate.text
+                    }
+                }
 
                 MouseArea {
                     anchors.fill: parent
