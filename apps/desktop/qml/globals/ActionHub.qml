@@ -1536,7 +1536,7 @@ Item {
             checkable: true
             checked: ActionHandler.active ? ActionHandler.active.checked : false
             enabled: ActionHandler.canHandle
-            text: "Display Screenplay Comments"
+            text: "Display Screenplay Notepad"
         }
 
         Action {
