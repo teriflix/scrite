@@ -43,6 +43,7 @@
 #include <QStandardPaths>
 #include <QProcessEnvironment>
 #include <QOperatingSystemVersion>
+#include <QStringDecoder>
 
 #ifdef Q_OS_MACOS
 #include <sys/sysctl.h>
@@ -1988,6 +1989,46 @@ QString Utils::File::read(const QString &fileName)
         return QString();
 
     return QString::fromLatin1(file.readAll());
+}
+
+/**
+ * \brief Reads the content of a file as UTF-8.
+ * \param fileName The file path.
+ * \return The file content decoded as UTF-8, or empty if the file can't be read or isn't valid UTF-8.
+ */
+QString Utils::File::readUtf8(const QString &fileName)
+{
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly))
+        return QString();
+
+    QByteArray bytes = file.readAll();
+    if (bytes.startsWith(QByteArray("\xEF\xBB\xBF")))
+        bytes.remove(0, 3);
+
+    QStringDecoder decoder(QStringDecoder::Utf8);
+    const QString text = decoder(bytes);
+    if (decoder.hasError())
+        return QString();
+
+    return text;
+}
+
+/**
+ * \brief Writes content to a file as UTF-8.
+ * \param fileName The file path.
+ * \param content The content to write.
+ * \return True if written successfully, false otherwise.
+ */
+bool Utils::File::writeUtf8(const QString &fileName, const QString &content)
+{
+    QFile file(fileName);
+    if (file.open(QFile::WriteOnly)) {
+        const QByteArray bytes = content.toUtf8();
+        return file.write(bytes) == bytes.size();
+    }
+
+    return false;
 }
 
 /**

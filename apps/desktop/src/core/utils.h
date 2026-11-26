@@ -1053,6 +1053,9 @@ public:
                                                     const QString &nfileName);
     Q_INVOKABLE static QString path(const QString &name);
     Q_INVOKABLE static QString read(const QString &fileName);
+    Q_INVOKABLE static QString readUtf8(const QString &fileName);
+
+    Q_INVOKABLE static bool writeUtf8(const QString &fileName, const QString &content);
 
     Q_INVOKABLE static Utils::FileInfo info(const QString &path);
 
