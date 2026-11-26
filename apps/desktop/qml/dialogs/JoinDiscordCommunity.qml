@@ -92,7 +92,7 @@ DialogLauncher {
 
                     SctText {
                         id: _discordInviteLink
-                        font.family: "Courier New"
+                        font.family: "Courier Prime"
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                         text: root.inviteUrl
                     }

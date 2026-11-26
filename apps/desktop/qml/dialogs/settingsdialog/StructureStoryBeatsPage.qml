@@ -78,8 +78,8 @@ Item {
                 text: root.target === root.e_CurrentDocumentTarget ? Scrite.document.structure.groupsData : File.read(Scrite.document.structure.defaultGroupsDataFile)
                 spellCheckEnabled: false
 
-                font.family: "Courier Prime"
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                font.family: Runtime.sceneEditorFontMetrics.font.family
+                font.pointSize: Runtime.notebookFontPointSize
 
                 onTextEdited: _applyButton.enabled = true
 
