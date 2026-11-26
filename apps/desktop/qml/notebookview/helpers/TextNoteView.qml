@@ -260,6 +260,13 @@ Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
+                    // Preformatted markdown blocks, such as fenced source or code, don't word
+                    // wrap; the view reveals them with a horizontal scroll instead of clipping
+                    // them at the right edge. Normally contentWidth stays at the viewport width,
+                    // so the scroll bar only shows up when a wide block needs it.
+                    contentWidth: Math.max(width, _markdownTextArea.textArea.contentWidth)
+                    ScrollBar.horizontal: SctScrollBar { }
+
                     DeltaDocument {
                         id: _noteContent
                         content: root.note.content
