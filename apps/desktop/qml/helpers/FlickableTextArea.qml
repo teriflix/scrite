@@ -40,6 +40,7 @@ Flickable {
     property alias font: _textArea.font
     property alias color: _textArea.color
     property alias readOnly: _textArea.readOnly
+    property alias wrapMode: _textArea.wrapMode
     property alias textFormat: _textArea.textFormat
     property alias background: _textArea.background
     property alias textDocument: _textArea.textDocument
