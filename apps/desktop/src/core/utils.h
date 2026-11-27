@@ -25,6 +25,7 @@
 #include <QQuickItem>
 #include <QVersionNumber>
 #include <QAbstractItemModel>
+#include <QMimeType>
 
 namespace Utils {
 
@@ -204,6 +205,18 @@ public:
     // clang-format on
     QDateTime modifiedTime() const { return info.fileTime(QFileDevice::FileModificationTime); }
 
+    // clang-format off
+    Q_PROPERTY(QString mimeType
+               READ mimeType)
+    // clang-format on
+    QString mimeType() const;
+
+    // clang-format off
+    Q_PROPERTY(bool isPlainTextFile
+               READ isPlainTextFile)
+    // clang-format on
+    bool isPlainTextFile() const;
+
     FileInfo() { }
     FileInfo(const FileInfo &other) { *this = other; }
     FileInfo(const QFileInfo &_fileInfo) : info(_fileInfo) { }
@@ -214,6 +227,8 @@ public:
     }
     bool operator==(const FileInfo &other) const { return info == other.info; }
     bool operator!=(const FileInfo &other) const { return info != other.info; }
+
+    QMimeType qmimeType() const;
 };
 
 class ObjectConfigFieldChoice

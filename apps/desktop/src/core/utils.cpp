@@ -44,6 +44,7 @@
 #include <QProcessEnvironment>
 #include <QOperatingSystemVersion>
 #include <QStringDecoder>
+#include <QMimeDatabase>
 
 #ifdef Q_OS_MACOS
 #include <sys/sysctl.h>
@@ -102,6 +103,25 @@ QKeySequence Utils::KeyCombinations::toKeySequence() const
         k4 = this->keyCodes[3];
 
     return QKeySequence(k1, k2, k3, k4);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+QString Utils::FileInfo::mimeType() const
+{
+    return this->qmimeType().name();
+}
+
+bool Utils::FileInfo::isPlainTextFile() const
+{
+    const QMimeType type = this->qmimeType();
+    return type.inherits("text/plain");
+}
+
+QMimeType Utils::FileInfo::qmimeType() const
+{
+    static QMimeDatabase mimeDb;
+    return mimeDb.mimeTypeForFile(this->info);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1994,7 +2014,8 @@ QString Utils::File::read(const QString &fileName)
 /**
  * \brief Reads the content of a file as UTF-8.
  * \param fileName The file path.
- * \return The file content decoded as UTF-8, or empty if the file can't be read or isn't valid UTF-8.
+ * \return The file content decoded as UTF-8, or empty if the file can't be read or isn't valid
+ * UTF-8.
  */
 QString Utils::File::readUtf8(const QString &fileName)
 {
