@@ -1070,10 +1070,29 @@ When createNewScene() is called as a because of Ctrl+Shift+N shortcut key then
 a new scene must be created after all act-breaks. (fuzzyScreenplayInsert = true)
 
 Otherwise it must add a new scene after the current scene in screenplay.
+
+Here the placement policy is merely translated into an after-index; the actual
+scene creation and insertion are done by createNewSceneAfter().
 */
 Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
 {
+    const int currentIndex = m_screenplay->currentElementIndex();
+    const bool asLastScene = currentIndex < 0
+            || (fuzzyScreenplayInsert && currentIndex == m_screenplay->lastSceneElementIndex());
+
+    // Appending is expressed as an after-index of the last element; insertElementAt()
+    // clamps an out-of-range index, including a negative one, to the end.
+    const int insertAfterScreenplayElementIndex =
+            asLastScene ? m_screenplay->elementCount() - 1 : currentIndex;
+    return this->createNewSceneAfter(insertAfterScreenplayElementIndex);
+}
+
+Scene *ScriteDocument::createNewSceneAfter(int screenplayElementIndex)
+{
     QScopedValueRollback<bool> createNewSceneRollback(m_inCreateNewScene, true);
+
+    if (screenplayElementIndex < 0 || screenplayElementIndex >= m_screenplay->elementCount())
+        screenplayElementIndex = m_screenplay->elementCount() - 1;
 
     StructureElement *structureElement = nullptr;
     int structureElementIndex = m_structure->elementCount() - 1;
@@ -1111,24 +1130,13 @@ Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
     newStructureElement->setScene(scene);
     m_structure->addElement(newStructureElement);
 
-    const bool asLastScene = m_screenplay->currentElementIndex() < 0
-            || (fuzzyScreenplayInsert
-                && m_screenplay->currentElementIndex() == m_screenplay->lastSceneElementIndex());
-
     ScreenplayElement *newScreenplayElement = new ScreenplayElement(m_screenplay);
     newScreenplayElement->setScene(scene);
-    int newScreenplayElementIndex = -1;
-    if (asLastScene) {
-        newScreenplayElementIndex = m_screenplay->elementCount();
-        m_screenplay->addElement(newScreenplayElement);
-    } else {
-        newScreenplayElementIndex = m_screenplay->currentElementIndex() + 1;
-        m_screenplay->insertElementAt(newScreenplayElement,
-                                      m_screenplay->currentElementIndex() + 1);
-    }
+    m_screenplay->insertElementAt(newScreenplayElement, screenplayElementIndex + 1);
 
-    if (m_screenplay->elementAt(newScreenplayElementIndex) != newScreenplayElement)
-        newScreenplayElementIndex = m_screenplay->indexOfElement(newScreenplayElement);
+    if (m_screenplay->indexOfElement(newScreenplayElement) < 0)
+        m_screenplay->addElement(newScreenplayElement);
+    const int newScreenplayElementIndex = m_screenplay->indexOfElement(newScreenplayElement);
 
     m_structure->placeElement(newStructureElement, m_screenplay);
     m_structure->setCurrentElementIndex(m_structure->elementCount() - 1);
